@@ -23,5 +23,7 @@ namespace form_builder.Models
         public string Value { get; set; } = string.Empty;
 
         public string Hint { get; set; } = string.Empty;
+
+        public string CustomValidationMessage { get; set; } = string.Empty;
     }
 }
