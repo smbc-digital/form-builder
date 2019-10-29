@@ -86,6 +86,13 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.True(BrowserSession.FindField(inputName).Exists());
         }
 
+        [Then(@"I should see the ""(.*)"" ""(.*)"" radio button")]
+        public void ThenIShouldSeetheRadioButton(string fieldset, string value)
+        {
+            Assert.True(BrowserSession.FindFieldset(fieldset).FindField(value).Exists());
+        }
+
+
         [Then(@"I should see a validation message for ""(.*)"" input")]
         public void ThenIShouldSeeValidationMessageForInput(string inputName)
         {

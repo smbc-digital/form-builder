@@ -17,7 +17,7 @@ namespace form_builder_tests_ui.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [Xunit.TraitAttribute("Category", "my-details")]
+    [Xunit.TraitAttribute("Category", "yourdetails")]
     public partial class YourDetailsFeature : Xunit.IClassFixture<YourDetailsFeature.FixtureData>, System.IDisposable
     {
         
@@ -38,7 +38,7 @@ namespace form_builder_tests_ui.Features
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "YourDetails", "\tIn order to fill in my details I have to navigate to Your Details", ProgrammingLanguage.CSharp, new string[] {
-                        "my-details"});
+                        "yourdetails"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -118,6 +118,20 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("I navigate to \"/ReportAnIssue/Your-Details\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 18
  testRunner.Then("I fill in your details", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 19
+ testRunner.Then("I press the next step button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 20
+ testRunner.Then("I should see the \"issueDetails\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 21
+ testRunner.And("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 22
+ testRunner.Then("I fill in issue details", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 23
+ testRunner.Then("I press the next step button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 24
+ testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 25
+ testRunner.And("I should see the \"Do you have more details?\" \"moreDetails-0\" radio button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }
