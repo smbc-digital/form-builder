@@ -11,3 +11,8 @@ Scenario: User navigates to ReportAnIssue/Your-Details
 	And I should see the "middleName" input
 	And I should see the "address" input
 	And I should see the "nextStep" button
+
+
+Scenario: User fills in data and clicks next
+	Given I navigate to "/ReportAnIssue/Your-Details"
+	Then I fill in your details

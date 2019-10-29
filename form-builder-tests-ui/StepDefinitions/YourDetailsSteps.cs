@@ -7,10 +7,13 @@ namespace form_builder_tests_ui.StepDefinitions
     [Binding, Scope(Tag = "yourdetails")]
     public class YourDetails : UiTestBase
     {
-        [Then(@"I should see a Your Details Content")]
-        public void ThenIShouldSeeALinkToAnArticle()
+        [Then(@"I fill in your details")]
+        public void ThenIFillInYourDetails()
         {
-            Assert.True(BrowserSession.HasContent("Your Details"));
+            BrowserSession.FillIn("firstName").With("test");
+            BrowserSession.FillIn("LastName").With("test");
+            BrowserSession.FillIn("middleName").With("test");
+            BrowserSession.FillIn("address").With("test");           
         }
 
     }
