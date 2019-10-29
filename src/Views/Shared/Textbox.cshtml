@@ -18,6 +18,8 @@
 
     @if (!Model.IsValid)
     {
-        <span class="input-error-content" id="@errorId">@Model.ValidationMessage</span>
+        var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+
+        <span class="input-error-content" id="@errorId">@validationMessage</span>
     }
 </div>
