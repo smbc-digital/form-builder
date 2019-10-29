@@ -1,0 +1,25 @@
+﻿@model List<form_builder.Models.FormAnswers>;
+@{
+    ViewData["Title"] = "Submit";
+}
+    <div id="root" class="text-center">
+        <h1>Submit</h1>
+        <table>
+            <caption>Data</caption>
+            <tbody>
+                @foreach (var page in Model)
+                {
+
+                    @foreach (var question in page.Answers)
+                    {
+                        <tr>
+                            <th>@question.QuestionId</th>
+                            <td>@question.Response</td>
+
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+</div>

@@ -1,0 +1,34 @@
+﻿@{
+    var showAtoZ = ViewData["showAtoZ"] == null ? false : (bool)ViewData["showAtoZ"];
+    var isForm = (bool?)ViewData["Form"] ?? false;
+}
+<footer>
+    @if (showAtoZ)
+    {
+        <partial name='AToZStockportGov' />
+    }
+
+    <div class="center-wrapper">
+        <div id="footer-logo">
+            <a href="https://www.stockport.gov.uk">Stockport Metropolitan Borough Council Homepage</a>
+        </div>
+        <ul class="footer-links">
+            <li><a href="https://www.stockport.gov.uk/topic/about-our-website">About our website</a></li>
+            <li><a href="https://www.stockport.gov.uk/accessibility-statement">Accessibility statement</a></li>
+            <li><a href="https://www.stockport.gov.uk/contact">Contact us</a></li>
+            <li><a href="https://www.stockport.gov.uk/how-to-find-us">How to find us</a></li>
+            <li><a href="https://www.stockport.gov.uk/topic/data-protection">Data protection</a></li>
+            <li><a href="https://www.stockport.gov.uk/terms-and-conditions">Terms and conditions</a></li>
+            <li><a href="https://www.stockport.gov.uk/freedom-of-information">Freedom of information</a></li>
+            <li><a href="https://www.stockport.gov.uk/website-feedback">Feedback</a></li>
+        </ul>
+
+    </div>
+    <div class="footer-copyright">
+        <div class="center-wrapper">
+            <p id="ami-trigger">
+                <span class="fa fa-copyright" aria-hidden="true"></span>&nbsp;@DateTime.Now.Year Stockport Metropolitan Borough Council
+            </p>
+        </div>
+    </div>
+</footer>

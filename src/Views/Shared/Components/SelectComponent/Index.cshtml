@@ -1,0 +1,13 @@
+﻿@using form_builder.ViewComponents;
+@model SelectInputModel
+<div>
+    <label for="sort">
+        @Model.Label
+    </label>
+    <select id="sort" name="sort">
+        @foreach (var item in Model.Options)
+        {
+            <option value="@item.Value">@item.Label</option>
+        }
+    </select>
+</div>

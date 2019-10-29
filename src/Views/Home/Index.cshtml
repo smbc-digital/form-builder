@@ -1,0 +1,15 @@
+﻿@model form_builder.ViewModels.FormBuilderViewModel
+@{
+    ViewData["Title"] = "Home Page";
+    ViewData["BannerTypeformUrl"] = Model.FeedbackForm;
+}
+
+<div id="root" class="text-center">
+    @using (Html.BeginForm("Index", "Home", FormMethod.Post))
+    {
+        @Html.Raw(Model.RawHTML)
+
+        @Html.HiddenFor(_ => _.Guid)
+        @Html.HiddenFor(_ => _.Path)
+    }
+</div>

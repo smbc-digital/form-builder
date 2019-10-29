@@ -1,0 +1,21 @@
+﻿@model form_builder.Models.Element
+@{
+    var hintId = $"{Model.Properties.QuestionId}-hint";
+    var errorId = $"{Model.Properties.QuestionId}-error";
+}
+
+<div>
+    <label for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+
+    @if (!string.IsNullOrEmpty(Model.Properties.Hint))
+    {
+        <span id=@hintId>@Model.Properties.Hint</span>
+    }
+
+    @Html.TextArea(Model.Properties.QuestionId, Model.Properties.Value, @Model.GenerateElementProperties())
+
+    @if (!Model.IsValid)
+    {
+        <span class="input-error-content" id="@errorId">@Model.ValidationMessage</span>
+    }
+</div>

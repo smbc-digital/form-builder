@@ -1,0 +1,18 @@
+﻿@model form_builder.Models.Element
+
+@for (var i = 0; i < Model.Properties.Options.Count; i++)
+{
+    var item = Model.Properties.Options[i];
+    var itemHint = $"{Model.Properties.QuestionId}-{i}-hint";
+    var itemId = $"{Model.Properties.QuestionId}-{i}";
+
+    <div class="input-radio-container">
+        @Html.RadioButton(Model.Properties.QuestionId, Model.Properties.Options[i].Value, @Model.GenerateElementProperties(i))
+        <label for="@itemId">@item.Text</label>
+
+        @if (!string.IsNullOrEmpty(item.Hint))
+        {
+            <span id=@itemHint>@item.Hint</span>
+        }
+    </div>
+}
