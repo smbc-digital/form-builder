@@ -56,29 +56,36 @@ namespace form_builder.Controllers
         [Route("{form}/{path}")]
         public async Task<IActionResult> Index(string form, string path, [FromQuery] Guid guid)
         {
-            var baseForm = await _schemaProvider.Get<FormSchema>(form);
-
-            if (Guid.Empty == guid)
+            try
             {
-                guid = Guid.NewGuid();
-            }
+                var baseForm = await _schemaProvider.Get<FormSchema>(form);
 
-            if (string.IsNullOrEmpty(path))
-            {
-                path = baseForm.StartPage;
-            }
+                if (Guid.Empty == guid)
+                {
+                    guid = Guid.NewGuid();
+                }
 
-            var page = baseForm.GetPage(path);
-            if (page == null)
+                if (string.IsNullOrEmpty(path))
+                {
+                    path = baseForm.StartPage;
+                }
+
+                var page = baseForm.GetPage(path);
+                if (page == null)
+                {
+                    return RedirectToAction("Error");
+                }
+
+                var viewModel = await GenerateHtml(page, new Dictionary<string, string>(), baseForm);
+
+                viewModel.Path = path;
+                viewModel.Guid = guid;
+                return View(viewModel);
+            }
+            catch (Exception ex)
             {
                 return RedirectToAction("Error");
             }
-
-            var viewModel = await GenerateHtml(page, new Dictionary<string, string>(), baseForm);
-
-            viewModel.Path = path;
-            viewModel.Guid = guid;
-            return View(viewModel);
         }
 
         [HttpPost]
