@@ -215,6 +215,15 @@ namespace form_builder.Controllers
                     case EElementType.H3:
                         formModel.RawHTML += await _viewRender.RenderAsync("H3", element);
                         break;
+                    case EElementType.H4:
+                        formModel.RawHTML += await _viewRender.RenderAsync("H4", element);
+                        break;
+                    case EElementType.H5:
+                        formModel.RawHTML += await _viewRender.RenderAsync("H5", element);
+                        break;
+                    case EElementType.H6:
+                        formModel.RawHTML += await _viewRender.RenderAsync("H6", element);
+                        break;
                     case EElementType.P:
                         formModel.RawHTML += await _viewRender.RenderAsync("P", element);
                         break;
