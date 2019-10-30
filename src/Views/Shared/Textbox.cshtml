@@ -5,21 +5,19 @@
 }
 
 <div>
-    <label for="@Model.Properties.QuestionId">
-        @Model.Properties.Label
-    </label>
+    <label for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
 
-    @if (!string.IsNullOrEmpty(Model.Properties.Hint))
+    @if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
     {
-        <span class="description" id=@hintId>@Model.Properties.Hint</span>
+        <p><span class="description" id=@hintId>@Model.Properties.Hint</span></p>
     }
 
-    @Html.TextBox(Model.Properties.QuestionId,Model.Properties.Value, Model.GenerateElementProperties())
+    @Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())
 
     @if (!Model.IsValid)
     {
         var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
 
-        <span class="input-error-content" id="@errorId">@validationMessage</span>
+        <p class="input-error-content" id="@errorId">@validationMessage</p>
     }
 </div>

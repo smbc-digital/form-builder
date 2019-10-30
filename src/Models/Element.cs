@@ -58,6 +58,8 @@ namespace form_builder.Models
         public Dictionary<string, object> GenerateElementProperties()
         {
             var properties = new Dictionary<string, object>();
+            //maxLength is being decided by UX. 500 is used as a temp number
+            var maxLength = string.IsNullOrEmpty(Properties.MaxLength) ? "500" : Properties.MaxLength;
 
             switch (Type)
             {
@@ -67,7 +69,7 @@ namespace form_builder.Models
                     {
                         {"name", Properties.QuestionId },
                         { "id", Properties.QuestionId },
-                        { "maxlength", Properties.MaxLength },
+                        { "maxlength", maxLength },
                         { "value", Properties.Value}
                     };
 
