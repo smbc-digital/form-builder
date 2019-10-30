@@ -8,5 +8,5 @@ help:
 # ---------------------------------------------------------------------------------------
 .PHONY: ui-test
 ui-test:
-	cd ./form-builder-test-ui && dotnet build
+	cd ./form-builder-tests-ui && dotnet build
 	cd ./packages/SpecRun.Runner.*/tools/ && ./SpecRun.exe run Default.srprofile "/baseFolder:$(CUR_DIR)\form-builder-tests-ui\bin\Debug" /log:specrun.log /toolIntegration:TeamCity
