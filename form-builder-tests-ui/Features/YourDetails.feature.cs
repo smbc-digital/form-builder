@@ -17,24 +17,18 @@ namespace form_builder_tests_ui.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [Xunit.TraitAttribute("Category", "yourdetails")]
-    public partial class YourDetailsFeature : Xunit.IClassFixture<YourDetailsFeature.FixtureData>, System.IDisposable
+    [TechTalk.SpecRun.FeatureAttribute("YourDetails", new string[] {
+            "yourdetails"}, Description="\tIn order to fill in my details I have to navigate to Your Details", SourceFile="Features\\YourDetails.feature", SourceLine=1)]
+    public partial class YourDetailsFeature
     {
         
-        private static TechTalk.SpecFlow.ITestRunner testRunner;
-        
-        private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
+        private TechTalk.SpecFlow.ITestRunner testRunner;
         
 #line 1 "YourDetails.feature"
 #line hidden
         
-        public YourDetailsFeature(YourDetailsFeature.FixtureData fixtureData, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
-        {
-            this._testOutputHelper = testOutputHelper;
-            this.TestInitialize();
-        }
-        
-        public static void FeatureSetup()
+        [TechTalk.SpecRun.FeatureInitialize()]
+        public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "YourDetails", "\tIn order to fill in my details I have to navigate to Your Details", ProgrammingLanguage.CSharp, new string[] {
@@ -42,7 +36,8 @@ namespace form_builder_tests_ui.Features
             testRunner.OnFeatureStart(featureInfo);
         }
         
-        public static void FeatureTearDown()
+        [TechTalk.SpecRun.FeatureCleanup()]
+        public virtual void FeatureTearDown()
         {
             testRunner.OnFeatureEnd();
             testRunner = null;
@@ -52,6 +47,7 @@ namespace form_builder_tests_ui.Features
         {
         }
         
+        [TechTalk.SpecRun.ScenarioCleanup()]
         public virtual void ScenarioTearDown()
         {
             testRunner.OnScenarioEnd();
@@ -60,7 +56,6 @@ namespace form_builder_tests_ui.Features
         public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
-            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Xunit.Abstractions.ITestOutputHelper>(_testOutputHelper);
         }
         
         public virtual void ScenarioStart()
@@ -73,14 +68,7 @@ namespace form_builder_tests_ui.Features
             testRunner.CollectScenarioErrors();
         }
         
-        void System.IDisposable.Dispose()
-        {
-            this.ScenarioTearDown();
-        }
-        
-        [Xunit.FactAttribute(DisplayName="User navigates to ReportAnIssue/Your-Details")]
-        [Xunit.TraitAttribute("FeatureTitle", "YourDetails")]
-        [Xunit.TraitAttribute("Description", "User navigates to ReportAnIssue/Your-Details")]
+        [TechTalk.SpecRun.ScenarioAttribute("User navigates to ReportAnIssue/Your-Details", SourceLine=5)]
         public virtual void UserNavigatesToReportAnIssueYour_Details()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User navigates to ReportAnIssue/Your-Details", null, ((string[])(null)));
@@ -105,9 +93,7 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.FactAttribute(DisplayName="User fills in data and clicks next")]
-        [Xunit.TraitAttribute("FeatureTitle", "YourDetails")]
-        [Xunit.TraitAttribute("Description", "User fills in data and clicks next")]
+        [TechTalk.SpecRun.ScenarioAttribute("User fills in data and clicks next", SourceLine=15)]
         public virtual void UserFillsInDataAndClicksNext()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User fills in data and clicks next", null, ((string[])(null)));
@@ -136,20 +122,10 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
-        [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-        public class FixtureData : System.IDisposable
+        [TechTalk.SpecRun.TestRunCleanup()]
+        public virtual void TestRunCleanup()
         {
-            
-            public FixtureData()
-            {
-                YourDetailsFeature.FeatureSetup();
-            }
-            
-            void System.IDisposable.Dispose()
-            {
-                YourDetailsFeature.FeatureTearDown();
-            }
+            TechTalk.SpecFlow.TestRunnerManager.GetTestRunner().OnTestRunEnd();
         }
     }
 }
