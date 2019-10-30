@@ -2,6 +2,7 @@
 
 @{
     var text = string.IsNullOrEmpty(Model.Properties.Text) ? "Next step" : Model.Properties.Text;
+    var className = string.IsNullOrEmpty(Model.Properties.ClassName) ? "button-primary" : Model.Properties.ClassName;
 }
 
-<button class="button-primary" type="submit" id="@Model.Properties.ButtonId">@text</button>
+<button class=@className type="submit" id="@Model.Properties.ButtonId">@text</button>
