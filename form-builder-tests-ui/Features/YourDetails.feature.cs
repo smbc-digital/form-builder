@@ -131,7 +131,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 24
  testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 25
- testRunner.And("I should see the \"Do you have more details?\" \"moreDetails-0\" radio button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see the \"Do you have more details?\" fieldset", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }
