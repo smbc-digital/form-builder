@@ -22,5 +22,5 @@ Scenario: User fills in data and clicks next
 	Then I fill in issue details
 	Then I press the next step button
 	Then I should see the header
-	And I should see the "Do you have more details?" "moreDetails-0" radio button
+	And I should see the "Do you have more details?" fieldset
 	

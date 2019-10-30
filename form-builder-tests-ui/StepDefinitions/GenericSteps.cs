@@ -92,6 +92,11 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.True(BrowserSession.FindFieldset(fieldset).FindField(value).Exists());
         }
 
+        [Then(@"I should see the ""(.*)"" fieldset")]
+        public void ThenIShouldSeeTheFieldset(string fieldset)
+        {
+            Assert.True(BrowserSession.FindFieldset(fieldset).Exists());
+        }
 
         [Then(@"I should see a validation message for ""(.*)"" input")]
         public void ThenIShouldSeeValidationMessageForInput(string inputName)
