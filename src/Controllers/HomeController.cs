@@ -220,6 +220,7 @@ namespace form_builder.Controllers
                         break;
                     case EElementType.Textbox:
                         element.Properties.Value = CurrentValue(element, viewModel);
+                        CheckForLabel(element, viewModel);
                         formModel.RawHTML += await _viewRender.RenderAsync("Textbox", element);
                         break;
                     case EElementType.Textarea:
@@ -247,5 +248,15 @@ namespace form_builder.Controllers
             return currentValue ? viewModel[element.Properties.QuestionId] : string.Empty;
         }
 
+        private bool CheckForLabel(Element element, Dictionary<string, string> viewModel)
+        {
+            //var currentLabel = viewModel.ContainsKey(element.Properties.Label);
+            if(string.IsNullOrEmpty(element.Properties.Label))
+            {
+                throw new Exception("no label");
+            }
+
+            return true;
+        }
     }
 }

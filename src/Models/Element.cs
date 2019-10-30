@@ -129,5 +129,23 @@ namespace form_builder.Models
 
             return describedByValue;
         }
+
+        public string WriteOptional()
+        {
+            if (DisplayOptional)
+            {
+                return "class = optional";
+            }
+
+            return null;
+        }
+
+        private bool DisplayOptional
+        {
+            get
+            {
+                return Properties?.Optional ?? true;
+            }
+        }
     }
 }
