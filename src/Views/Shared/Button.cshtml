@@ -1,3 +1,7 @@
 ﻿@model form_builder.Models.Element
 
-<button class="button-primary" type="submit" id="@Model.Properties.ButtonId">@Model.Properties.Text</button>
+@{
+    var text = string.IsNullOrEmpty(Model.Properties.Text) ? "Next step" : Model.Properties.Text;
+}
+
+<button class="button-primary" type="submit" id="@Model.Properties.ButtonId">@text</button>
