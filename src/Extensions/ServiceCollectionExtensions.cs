@@ -44,13 +44,6 @@ namespace form_builder.Extensions
             services.AddHttpContextAccessor();
             if (isLocalEnv)
             {
-                services.AddSession(options =>
-                {
-                    options.IdleTimeout = TimeSpan.FromMinutes(30);
-                    options.Cookie.HttpOnly = true;
-                    options.Cookie.IsEssential = true;
-                });
-
                 var redisUrl = "localhost:6379";
                 var redis = ConnectionMultiplexer.Connect(redisUrl);
                 services.AddDataProtection()
@@ -59,6 +52,13 @@ namespace form_builder.Extensions
             } 
             else
             {
+                services.AddSession(options =>
+                {
+                    options.IdleTimeout = TimeSpan.FromMinutes(30);
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.IsEssential = true;
+                });
+
                 services.AddSingleton<ICacheProvider, LocalSessionCacheProvider>();
             }
 
@@ -78,7 +78,7 @@ namespace form_builder.Extensions
 
         public static IServiceCollection AddSchemaProvider(this IServiceCollection services, IHostingEnvironment HostingEnvironment)
         {
-            if (HostingEnvironment.IsEnvironment("local"))
+            if (HostingEnvironment.IsEnvironment("local") || HostingEnvironment.IsEnvironment("uitest"))
             {
                 services.AddSingleton<ISchemaProvider, LocalFileSchemaProvider>();
             }

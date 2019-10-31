@@ -20,7 +20,7 @@ Scenario: User fills in data and clicks next
 	Then I should see the "issueDetails" input
 	And I should see the header
 	Then I fill in issue details
-	Then I press the next step button
+	Then I press the this is a test button
 	Then I should see the header
 	And I should see the "Do you have more details?" fieldset
 	

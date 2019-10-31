@@ -62,7 +62,7 @@ Example JSON:
     }
 
 * **Type** (*string*) (HTML element)
-    * [H1/H2/H3](#headingprops) (Heading levels)
+    * [H1-H6](#headingprops) (Heading levels)
     * [P](#ptextprops) (Paragraph text)
     * [Textbox](#textboxprops)
     * [Textarea](#textareaprops) (Large text box)
@@ -75,7 +75,7 @@ Example JSON:
 
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)
-    * <a name="headingprops">**H1/H2/H3** (Heading levels)</a>
+    * <a name="headingprops">**H1-H6** (Heading levels)</a>
         * Text (*string*) __*__
 
     * <a name="ptextprops">**P** (Paragraph text)</a>

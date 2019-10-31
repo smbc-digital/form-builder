@@ -41,7 +41,7 @@ namespace form_builder
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsEnvironment("local"))
+            if (env.IsEnvironment("local") || env.IsEnvironment("uitest"))
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -50,6 +50,11 @@ namespace form_builder
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+            }
+
+            if (!env.IsEnvironment("local"))
+            {
+                app.UseSession();
             }
 
             app.UseHttpsRedirection();

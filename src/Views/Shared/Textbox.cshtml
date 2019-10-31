@@ -5,11 +5,16 @@
 }
 
 <div>
-    <label for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+    <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+
+    @if (Model.Properties?.Optional ?? true)
+    {
+        <p class="optional">(optional)</p>
+    }
 
     @if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
     {
-        <p><span class="description" id=@hintId>@Model.Properties.Hint</span></p>
+        <p class="description" id=@hintId>@Model.Properties.Hint</p>
     }
 
     @Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())
@@ -17,7 +22,6 @@
     @if (!Model.IsValid)
     {
         var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
-
         <p class="input-error-content" id="@errorId">@validationMessage</p>
     }
 </div>
