@@ -5,6 +5,14 @@
   <a href="https://www.stockport.gov.uk">Stockport Council</a>
 </div>
 
+## Table of Contents
+- [Base JSON Structure](##BaseJSONStructure)
+- [UI Tests](#UI_Tests)
+
+## Requirments
+- dotnet core 2.2
+- gpg key added to accepted contributors
+
 ## Base JSON Structure
 
     {
@@ -189,3 +197,28 @@ Example where if a user selects yes they will continue on with the form, otherwi
 * 2 = GoToExternalPage
 
 **PageSlug** (*string*) __*__ - The PageSlug the form will redirect to
+
+## UI_Tests
+
+The form builder app has UI tests to ensure that the UI is expected. Our UI Tests are written using SpecFlow
+
+### Requirments
+- chromdrivers.exe
+- make (not required)
+
+### How to run UI tests locally
+
+```console
+$ make ui-test
+```
+
+without make you can also run the UI Test locally by running the two commands listed below
+
+```console
+$ cd ./src && dotnet run
+```
+```console
+$ dotnet test ./form-builder-tests-ui/form-builder-tests-ui.csproj
+```
+
+It is possible to change the default browser the UI Tests are run from, to do this you need to modify the BrowserConfiguration to run with firefox or another browser of your choice.
