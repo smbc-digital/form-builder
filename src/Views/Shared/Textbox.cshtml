@@ -14,7 +14,7 @@
 
     @if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
     {
-        <p><span class="description" id=@hintId>@Model.Properties.Hint</span></p>
+        <p class="description" id=@hintId>@Model.Properties.Hint</p>
     }
 
     @Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())

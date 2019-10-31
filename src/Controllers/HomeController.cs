@@ -84,7 +84,7 @@ namespace form_builder.Controllers
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Error");
+                return RedirectToAction("Error", "Home", new { ex = ex.Message });
             }
         }
 
@@ -143,7 +143,6 @@ namespace form_builder.Controllers
 
             try
             {
-                //_gateway.ChangeAuthenticationHeader("TestToken");
                 await _gateway.PostAsync(null, convertedAnswers);
             }
             catch (Exception e)
@@ -156,8 +155,9 @@ namespace form_builder.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult Error(string ex)
         {
+            ViewData["Error"] = ex;
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
@@ -167,7 +167,8 @@ namespace form_builder.Controllers
             var formData = _cacheProvider.GetString(guid);
             var convertedAnswers = new List<FormAnswers>();
 
-            if (!string.IsNullOrEmpty(formData)) {
+            if (!string.IsNullOrEmpty(formData))
+            {
                 convertedAnswers = JsonConvert.DeserializeObject<List<FormAnswers>>(formData);
             }
 
@@ -201,9 +202,12 @@ namespace form_builder.Controllers
             FormBuilderViewModel formModel = new FormBuilderViewModel();
             formModel.RawHTML += await _viewRender.RenderAsync("H1", baseForm.Name);
             formModel.FeedbackForm = baseForm.FeedbackForm;
+
+            CheckForDuplicateQuestionIDs(page);
+
             foreach (var element in page.Elements)
             {
-                
+
                 switch (element.Type)
                 {
                     case EElementType.H1:
@@ -251,6 +255,19 @@ namespace form_builder.Controllers
             return formModel;
         }
 
+        private void CheckForDuplicateQuestionIDs(Page page)
+        {
+            var numberOfDuplicates = page.Elements.GroupBy(x => x.Properties.QuestionId + x.Properties.Text + x.Type)
+                .Where(g => g.Count() > 1)
+                .Select(y => y.Key)
+                .ToList();
+
+            if (numberOfDuplicates.Count > 0)
+            {
+                throw new Exception("Question id, text or type is not unique.");
+            }
+        }
+
         private string CurrentValue(Element element, Dictionary<string, string> viewModel)
         {
             var currentValue = viewModel.ContainsKey(element.Properties.QuestionId);
@@ -259,8 +276,7 @@ namespace form_builder.Controllers
 
         private bool CheckForLabel(Element element, Dictionary<string, string> viewModel)
         {
-            //var currentLabel = viewModel.ContainsKey(element.Properties.Label);
-            if(string.IsNullOrEmpty(element.Properties.Label))
+            if (string.IsNullOrEmpty(element.Properties.Label))
             {
                 throw new Exception("no label");
             }
