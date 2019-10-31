@@ -14,12 +14,5 @@ namespace form_builder_tests_ui.StepDefinitions
             var webDriver = BrowserSession.Native as IWebDriver;
             Assert.True(webDriver.FindElement(By.XPath("//p/strong[text() = 'This is a paragraph']")).Displayed);
         }
-
-        [Then(@"I should see a list within a p tag")]
-        public void ThenIShouldSeeAList()
-        {
-            var webDriver = BrowserSession.Native as IWebDriver;
-            Assert.True(webDriver.FindElement(By.XPath("//p//child:ul//child:li[text() = 'list item 1']")).Displayed);
-        }
     }
 }
