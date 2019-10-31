@@ -116,5 +116,12 @@ namespace form_builder_tests_ui.StepDefinitions
         {
             BrowserSession.Select(value).From(fieldName);
         }
+
+        [Then(@"I should see a ""(.*)"" element with ""(.*)"" text")]
+        public void ThenIShouldSeeAElement(string elementType, string elementText)
+        {
+            var webDriver = BrowserSession.Native as IWebDriver;
+            Assert.True(webDriver.FindElement(By.XPath($"//{elementType}[text() = '{elementText}']")).Displayed);
+        }
     }
 }

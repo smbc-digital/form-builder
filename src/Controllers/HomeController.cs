@@ -227,6 +227,9 @@ namespace form_builder.Controllers
                     case EElementType.P:
                         formModel.RawHTML += await _viewRender.RenderAsync("P", element);
                         break;
+                    case EElementType.Span:
+                        formModel.RawHTML += await _viewRender.RenderAsync("Span", element);
+                        break;
                     case EElementType.Textbox:
                         element.Properties.Value = CurrentValue(element, viewModel);
                         formModel.RawHTML += await _viewRender.RenderAsync("Textbox", element);

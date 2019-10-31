@@ -10,6 +10,7 @@
         H5,
         H6,
         P,
+        Span,
         Textbox,
         Textarea,
         Radio,

@@ -40,9 +40,5 @@ namespace form_builder_tests.UnitTests.Controllers
         {
             Assert.IsType<ViewResult>(_homeController.Index());
         }
-
-        
-
-
     }
 }
