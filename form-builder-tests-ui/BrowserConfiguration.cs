@@ -18,7 +18,7 @@ namespace form_builder_tests_ui
         {
             var sessionConfiguration = new SessionConfiguration
             {
-                AppHost = "https://localhost",
+                AppHost = "http://localhost",
                 Browser = Browser.Chrome,
                 Port = 5000,
                 Timeout = TimeSpan.FromSeconds(4),
