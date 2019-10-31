@@ -20,7 +20,7 @@ namespace form_builder_tests_ui
             {
                 AppHost = "http://localhost",
                 Browser = Browser.Chrome,
-                Port = 5000,
+                Port = 5001,
                 Timeout = TimeSpan.FromSeconds(4),
                 RetryInterval = TimeSpan.FromSeconds(0.5)
             };
