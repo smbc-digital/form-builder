@@ -78,7 +78,7 @@ namespace form_builder.Extensions
 
         public static IServiceCollection AddSchemaProvider(this IServiceCollection services, IHostingEnvironment HostingEnvironment)
         {
-            if (HostingEnvironment.IsEnvironment("local"))
+            if (HostingEnvironment.IsEnvironment("local") || HostingEnvironment.IsEnvironment("uitest"))
             {
                 services.AddSingleton<ISchemaProvider, LocalFileSchemaProvider>();
             }
