@@ -19,7 +19,7 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenIShouldSeeAList()
         {
             var webDriver = BrowserSession.Native as IWebDriver;
-            Assert.True(webDriver.FindElement(By.XPath("//p/child:ul/child:li[text() = 'list item 1']")).Displayed);
+            Assert.True(webDriver.FindElement(By.XPath("//p//child:ul//child:li[text() = 'list item 1']")).Displayed);
         }
     }
 }
