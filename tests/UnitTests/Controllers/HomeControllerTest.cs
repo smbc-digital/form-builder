@@ -29,10 +29,8 @@ namespace form_builder_tests.UnitTests.Controllers
         
         public HomeControllerTest()
         {
-            
-       
-            _homeController = new HomeController(_cacheProvider.Object, _validators.Object, _schemaProvider,_viewRender.Object, _disallowedKeys.Object, _gateWay.Object);
 
+            _homeController = new HomeController(_cacheProvider.Object, _validators.Object, _schemaProvider,_viewRender.Object, _disallowedKeys.Object, _gateWay.Object);
         }
 
         [Fact]
