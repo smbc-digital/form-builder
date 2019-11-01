@@ -1,7 +1,7 @@
 ﻿using form_builder.Models;
 using System.Collections.Generic;
 
-namespace form_builder_tests.Helpers.Builders
+namespace form_builder_tests.Builders
 {
     public class PageBuilder
     {

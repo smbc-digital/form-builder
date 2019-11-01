@@ -1,7 +1,7 @@
 ﻿using form_builder.Enum;
 using form_builder.Models;
 
-namespace form_builder_tests.Helpers.Builders
+namespace form_builder_tests.Builders
 {
     public class ElementBuilder
     {
@@ -26,6 +26,25 @@ namespace form_builder_tests.Helpers.Builders
         public ElementBuilder WithPropertyText(string propertyText)
         {
             _property.Text = propertyText;
+            return this;
+        }
+
+        public ElementBuilder WithQuestionId(string questionId)
+        {
+            _property.QuestionId = questionId;
+            return this;
+        }
+
+
+        public ElementBuilder WithLabel(string label)
+        {
+            _property.Label = label;
+            return this;
+        }
+
+        public ElementBuilder WithValue(string value)
+        {
+            _property.Label = value;
             return this;
         }
     }

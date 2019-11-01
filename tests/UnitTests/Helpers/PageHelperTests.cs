@@ -5,7 +5,7 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers;
-using form_builder_tests.Helpers.Builders;
+using form_builder_tests.Builders;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Helpers.PageHelpers
+namespace form_builder_tests.UnitTests.Helpers
 {
     public class PageHelperTests
     {

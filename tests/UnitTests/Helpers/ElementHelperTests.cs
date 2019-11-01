@@ -1,7 +1,6 @@
 ﻿using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
-using form_builder.Models;
-using Moq;
+using form_builder_tests.Builders;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -12,32 +11,21 @@ namespace form_builder_tests.UnitTests.Helpers
     {
         private ElementHelper _elementHelper = new ElementHelper();
 
-        //public ElementHelperTests(ElementHelper elementHelper)
-        //{
-        //    _elementHelper = elementHelper;
-        //}
-
         [Fact]
         public void CurrentValue_ReturnsCurrentValueOfElement()
         {
             // Arrange
-            var elements = new List<Element>
-            {
-                new Element
-                   {
-                        Type = EElementType.Textbox,
-                        Properties = new Property
-                        {
-                             QuestionId = "test-id",
-                             Label = "test-text",
-                             Value = "this is the value"
-                        }
-                    }
-            };
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("test-id")
+                .WithLabel("test-text")
+                .WithValue("this is the value")
+                .Build();
+
             var viewModel = new Dictionary<string, string>();
             viewModel.Add("test-id", "this is the value");
             // Act
-            var result = _elementHelper.CurrentValue(elements[0], viewModel);
+            var result = _elementHelper.CurrentValue(element, viewModel);
 
             // Assert
             Assert.Equal("this is the value", result);
@@ -47,23 +35,17 @@ namespace form_builder_tests.UnitTests.Helpers
         public void CurrentValue_ReturnsNoValueOfElement()
         {
             // Arrange
-            var elements = new List<Element>
-            {
-                new Element
-                   {
-                        Type = EElementType.Textbox,
-                        Properties = new Property
-                        {
-                             QuestionId = "test-id",
-                             Label = "test-text",
-                             Value = "this is the value"
-                        }
-                    }
-            };
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("test-id")
+                .WithLabel("test-text")
+                .WithValue("this is the value")
+                .Build();
+
             var viewModel = new Dictionary<string, string>();
             viewModel.Add("test-id2", "this is the value");
             // Act
-            var result = _elementHelper.CurrentValue(elements[0], viewModel);
+            var result = _elementHelper.CurrentValue(element, viewModel);
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -73,22 +55,16 @@ namespace form_builder_tests.UnitTests.Helpers
         public void CheckForLabel_ReturnsTrue_IfLabelExists()
         {
             // Arrange
-            var elements = new List<Element>
-            {
-                new Element
-                   {
-                        Type = EElementType.Textbox,
-                        Properties = new Property
-                        {
-                             QuestionId = "test-id",
-                             Label = "test-text"
-                        }
-                    }
-            };
+            var element = new ElementBuilder()
+               .WithType(EElementType.Textbox)
+               .WithQuestionId("test-id")
+               .WithLabel("test-text")
+               .Build();
+           
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var result = _elementHelper.CheckForLabel(elements[0], viewModel);
+            var result = _elementHelper.CheckForLabel(element, viewModel);
 
             // Assert
             Assert.True(result);
@@ -98,45 +74,31 @@ namespace form_builder_tests.UnitTests.Helpers
         public void CheckForLabel_ThrowsException_IfLabelDoesNotExists()
         {
             // Arrange
-            var elements = new List<Element>
-            {
-                new Element
-                   {
-                        Type = EElementType.Textbox,
-                        Properties = new Property
-                        {
-                             QuestionId = "test-id"
-                        }
-                    }
-            };
+            var element = new ElementBuilder()
+              .WithType(EElementType.Textbox)
+              .WithQuestionId("test-id")
+              .Build();
 
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(elements[0], viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
         }
 
         [Fact]
         public void CheckForLabel_ThrowsException_IfLabelIsEmpty()
         {
             // Arrange
-            var elements = new List<Element>
-            {
-                new Element
-                   {
-                        Type = EElementType.Textbox,
-                        Properties = new Property
-                        {
-                             QuestionId = "test-id",
-                             Label = string.Empty
-                        }
-                    }
-            };
+            var element = new ElementBuilder()
+              .WithType(EElementType.Textbox)
+              .WithQuestionId("test-id")
+              .WithLabel(string.Empty)
+              .Build();
 
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(elements[0], viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
         }
     }
 }
