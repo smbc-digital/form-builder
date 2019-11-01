@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System;
 using StockportGovUK.AspNetCore.Gateways;
 using form_builder.Helpers.PageHelpers;
+using System.Linq;
 
 namespace form_builder.Controllers
 {
@@ -97,7 +98,7 @@ namespace form_builder.Controllers
 
             var behaviour = currentPage.GetNextPage(viewModel);
             _pageHelper.SaveAnswers(viewModel);
-
+            
             switch (behaviour.BehaviourType)
             {
                 case EBehaviourType.GoToExternalPage:

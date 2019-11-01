@@ -4,6 +4,7 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
 using form_builder.Providers;
 using form_builder.ViewModels;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -26,10 +27,12 @@ namespace form_builder.Helpers.PageHelpers
         private readonly ICacheProvider _cacheProvider;
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
 
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper)
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, ICacheProvider cacheProvider, IOptions<DisallowedAnswerKeysConfiguration> disallowedAnswerKeysConfiguration)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
+            _cacheProvider = cacheProvider;
+            _disallowedKeys = disallowedAnswerKeysConfiguration.Value;
         }
 
         public void CheckForDuplicateQuestionIDs(Page page)
