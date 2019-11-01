@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
-using form_builder.Configuration;
 using form_builder.Controllers;
 using form_builder.Providers;
 using form_builder.Validators;
-using form_builder.Helpers;
-using Microsoft.Extensions.Options;
 using Xunit;
 using Moq;
 using StockportGovUK.AspNetCore.Gateways;
@@ -15,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using form_builder.ViewModels;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.ElementHelpers;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -25,15 +21,16 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<ICacheProvider> _cacheProvider = new Mock<ICacheProvider>();
         private readonly Mock<IEnumerable<IElementValidator>> _validators = new Mock<IEnumerable<IElementValidator>>();
         private readonly Mock<ISchemaProvider> _schemaProvider = new Mock<ISchemaProvider>();
-        private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _disallowedKeys = new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
-        private readonly Mock<IViewRender> _viewRender = new Mock<IViewRender>();
         private readonly Mock<IGateway> _gateWay = new Mock<IGateway>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IElementHelper> _elementHelper = new Mock<IElementHelper>();
         
         public HomeControllerTest()
         {
-            _homeController = new HomeController(_cacheProvider.Object, _validators.Object, _schemaProvider.Object , _disallowedKeys.Object, _gateWay.Object, _pageHelper.Object, _elementHelper.Object);
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>()))
+             .ReturnsAsync(new FormBuilderViewModel());
+
+
+            _homeController = new HomeController(_cacheProvider.Object, _validators.Object, _schemaProvider.Object, _gateWay.Object, _pageHelper.Object);
         }
 
         [Fact]
@@ -43,7 +40,6 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _schemaProvider.Verify(_ => _.Get<FormSchema>(It.Is<string>(x => x == "form")));
         }
-
 
         [Fact]
         public async Task Index_ShouldGenerateGuidWhenGuidIsEmpty()
@@ -79,7 +75,6 @@ namespace form_builder_tests.UnitTests.Controllers
 
             Assert.NotEqual(Guid.Empty, model.Guid);
         }
-
 
         [Fact]
         public async Task Index_ShouldRedirectToError_WhenPageIsNotWithin_FormSchema()

@@ -9,11 +9,8 @@ using form_builder.Providers;
 using form_builder.Validators;
 using System.Threading.Tasks;
 using System;
-using Microsoft.Extensions.Options;
-using form_builder.Configuration;
 using StockportGovUK.AspNetCore.Gateways;
 using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.ElementHelpers;
 
 namespace form_builder.Controllers
 {
@@ -25,23 +22,17 @@ namespace form_builder.Controllers
 
         private readonly ISchemaProvider _schemaProvider;
 
-        private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
-
         private readonly IGateway _gateway;
 
         private readonly IPageHelper _pageHelper;
 
-        private readonly IElementHelper _elementHelper;
-
-        public HomeController(ICacheProvider cacheProvider, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IGateway gateway, IPageHelper pageHelper, IElementHelper elementHelper)
+        public HomeController(ICacheProvider cacheProvider, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper)
         {
             _cacheProvider = cacheProvider;
             _validators = validators;
             _schemaProvider = schemaProvider;
-            _disallowedKeys = disallowedKeys.Value;
             _gateway = gateway;
             _pageHelper = pageHelper;
-            _elementHelper = elementHelper;
         }
 
         [HttpGet]
