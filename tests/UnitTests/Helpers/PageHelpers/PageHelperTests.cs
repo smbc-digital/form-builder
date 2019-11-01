@@ -36,7 +36,6 @@ namespace form_builder_tests.UnitTests.Helpers.PageHelpers
             _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockCacheProvider.Object, _mockDisallowedKeysOptions.Object);
         }
 
-
         [Fact]
         public async Task GenerateHtml_ShouldRenderH1Element_WithBaseformName()
         {
@@ -64,7 +63,7 @@ namespace form_builder_tests.UnitTests.Helpers.PageHelpers
         [InlineData(EElementType.Textarea)]
         [InlineData(EElementType.Radio)]
         [InlineData(EElementType.Button)]
-        public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartialandPropertiesData(EElementType type)
+        public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial(EElementType type)
         {
             var element = new ElementBuilder()
                 .WithType(type)
@@ -85,7 +84,6 @@ namespace form_builder_tests.UnitTests.Helpers.PageHelpers
 
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>()), Times.Once);
         }
-
 
         [Fact]
         public void SaveAnswers_ShouldCallCacheProvider()
