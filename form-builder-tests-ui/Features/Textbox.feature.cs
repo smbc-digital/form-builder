@@ -82,28 +82,59 @@ this.ScenarioInitialize(scenarioInfo);
 #line 9
  testRunner.And("I should see the \"firstName\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 10
- testRunner.And("I should see the \"lastName\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see the \"middleName\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 11
+ testRunner.And("I should see a \"p\" element with \"(optional)\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 12
+ testRunner.And("I should see the \"lastName\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 13
  testRunner.And("I should see the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("User fills in data and clicks next", SourceLine=13)]
+        [TechTalk.SpecRun.ScenarioAttribute("User fills in data and clicks next", SourceLine=15)]
         public virtual void UserFillsInDataAndClicksNext()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User fills in data and clicks next", null, ((string[])(null)));
-#line 14
+#line 16
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
-#line 15
- testRunner.Given("I navigate to \"/Textbox/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 16
- testRunner.Then("I fill in page1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 17
- testRunner.Then("I press the next step button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Given("I navigate to \"/Textbox/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 18
- testRunner.Then("I should see the \"otherNames\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I fill in page1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 19
+ testRunner.Then("I press the next step button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 20
+ testRunner.And("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 21
+ testRunner.Then("I should see the \"emailAddress\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 22
+ testRunner.And("I should see a \"p\" element with \"ie: someone@example.com\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 23
+ testRunner.And("I should see the \"phoneNumber\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 24
+ testRunner.And("I should see a \"p\" element with \"ie: 01615347890\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [TechTalk.SpecRun.ScenarioAttribute("User enters nothing on page1", SourceLine=25)]
+        public virtual void UserEntersNothingOnPage1()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters nothing on page1", null, ((string[])(null)));
+#line 26
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 27
+ testRunner.Given("I navigate to \"/Textbox/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 28
+ testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 29
+ testRunner.Then("I should see a validation message for \"firstName\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 30
+ testRunner.Then("I should see a validation message for \"lastName\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
