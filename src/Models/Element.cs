@@ -57,14 +57,13 @@ namespace form_builder.Models
 
         public Dictionary<string, object> GenerateElementProperties()
         {
-            var properties = new Dictionary<string, object>();
             var maxLength = string.IsNullOrEmpty(Properties.MaxLength) ? "200" : Properties.MaxLength;
 
             switch (Type)
             {
                 case EElementType.Textbox:
                 case EElementType.Textarea:
-                    properties = new Dictionary<string, object>()
+                    var properties = new Dictionary<string, object>()
                     {
                         {"name", Properties.QuestionId },
                         { "id", Properties.QuestionId },
@@ -81,18 +80,14 @@ namespace form_builder.Models
                 default:
                     return null;
             }
-
-            return properties;
         }
 
         public Dictionary<string, object> GenerateElementProperties(int index)
         {
-            var properties = new Dictionary<string, object>();
-
             switch (Type)
             {
                 case EElementType.Radio:
-                    properties = new Dictionary<string, object>()
+                    var properties = new Dictionary<string, object>()
                     {
                         {"name", Properties.QuestionId },
                         { "id", $"{Properties.QuestionId}-{index}" },
@@ -108,8 +103,6 @@ namespace form_builder.Models
                 default:
                     return null;
             }
-
-            return properties;
         }
 
         public string DescribedByValue()
