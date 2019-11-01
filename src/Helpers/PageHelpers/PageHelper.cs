@@ -27,12 +27,12 @@ namespace form_builder.Helpers.PageHelpers
         private readonly ICacheProvider _cacheProvider;
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
 
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, ICacheProvider cacheProvider, IOptions<DisallowedAnswerKeysConfiguration> disallowedAnswerKeysConfiguration)
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, ICacheProvider cacheProvider, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
             _cacheProvider = cacheProvider;
-            _disallowedKeys = disallowedAnswerKeysConfiguration.Value;
+            _disallowedKeys = disallowedKeys.Value;
         }
 
         public void CheckForDuplicateQuestionIDs(Page page)
@@ -51,7 +51,7 @@ namespace form_builder.Helpers.PageHelpers
         public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
-            formModel.RawHTML += await _viewRender.RenderAsync("H1", baseForm.Name);
+            formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new Property { Text = baseForm.Name } });
             formModel.FeedbackForm = baseForm.FeedbackForm;
 
             CheckForDuplicateQuestionIDs(page);
@@ -62,7 +62,7 @@ namespace form_builder.Helpers.PageHelpers
                 switch (element.Type)
                 {
                     case EElementType.H1:
-                        formModel.RawHTML += await _viewRender.RenderAsync("H1", element.Properties.Text);
+                        formModel.RawHTML += await _viewRender.RenderAsync("H1", element);
                         break;
                     case EElementType.H2:
                         formModel.RawHTML += await _viewRender.RenderAsync("H2", element);
