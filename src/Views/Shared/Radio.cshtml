@@ -8,7 +8,8 @@
 <div>
 
     @await Html.BeginFieldSet(Model)
-    <legend>@Model.Properties.Label</legend>
+    <legend class="sr-only">@Model.Properties.Label</legend>
+    <label>@Model.Properties.Label</label>
 
     @if (!string.IsNullOrEmpty(Model.Properties.Hint))
     {

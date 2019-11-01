@@ -8,12 +8,12 @@ using form_builder.Enum;
 using form_builder.Providers;
 using form_builder.Validators;
 using System.Threading.Tasks;
-using form_builder.Helpers;
 using System;
 using Microsoft.Extensions.Options;
 using form_builder.Configuration;
-using System.Linq;
 using StockportGovUK.AspNetCore.Gateways;
+using form_builder.Helpers.PageHelpers;
+using form_builder.Helpers.ElementHelpers;
 
 namespace form_builder.Controllers
 {
@@ -23,24 +23,25 @@ namespace form_builder.Controllers
 
         private readonly IEnumerable<IElementValidator> _validators;
 
-        private readonly IViewRender _viewRender;
-
         private readonly ISchemaProvider _schemaProvider;
 
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
 
         private readonly IGateway _gateway;
 
-        //private readonly IHttpClient _client;
+        private readonly IPageHelper _pageHelper;
 
-        public HomeController(ICacheProvider cacheProvider, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IViewRender viewRender, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IGateway gateway)
+        private readonly IElementHelper _elementHelper;
+
+        public HomeController(ICacheProvider cacheProvider, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IGateway gateway, IPageHelper pageHelper, IElementHelper elementHelper)
         {
             _cacheProvider = cacheProvider;
             _validators = validators;
             _schemaProvider = schemaProvider;
-            _viewRender = viewRender;
             _disallowedKeys = disallowedKeys.Value;
             _gateway = gateway;
+            _pageHelper = pageHelper;
+            _elementHelper = elementHelper;
         }
 
         [HttpGet]
@@ -68,7 +69,7 @@ namespace form_builder.Controllers
                     return RedirectToAction("Error");
                 }
 
-                var viewModel = await GenerateHtml(page, new Dictionary<string, string>(), baseForm);
+                var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
 
                 viewModel.Path = path;
                 viewModel.Guid = guid;
@@ -97,14 +98,14 @@ namespace form_builder.Controllers
             currentPage.Validate(viewModel, _validators);
             if (!currentPage.IsValid)
             {
-                var formModel = await GenerateHtml(currentPage, viewModel, baseForm);
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm);
                 formModel.Path = currentPage.PageURL;
                 formModel.Guid = guid;
                 return View(formModel);
             }
 
             var behaviour = currentPage.GetNextPage(viewModel);
-            SaveAnswers(viewModel);
+            _pageHelper.SaveAnswers(viewModel);
 
             switch (behaviour.BehaviourType)
             {
@@ -151,132 +152,6 @@ namespace form_builder.Controllers
         {
             ViewData["Error"] = ex;
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
-        private void SaveAnswers(Dictionary<string, string> viewModel)
-        {
-            var guid = viewModel["Guid"];
-            var formData = _cacheProvider.GetString(guid);
-            var convertedAnswers = new List<FormAnswers>();
-
-            if (!string.IsNullOrEmpty(formData))
-            {
-                convertedAnswers = JsonConvert.DeserializeObject<List<FormAnswers>>(formData);
-            }
-
-            if (convertedAnswers.Any(_ => _.PageUrl == viewModel["Path"].ToLower()))
-            {
-                convertedAnswers = convertedAnswers.Where(_ => _.PageUrl != viewModel["Path"].ToLower())
-                                                    .ToList();
-            }
-
-            var answers = new List<Answers>();
-
-            foreach (var item in viewModel)
-            {
-                if (!_disallowedKeys.DisallowedAnswerKeys.Contains(item.Key))
-                {
-                    answers.Add(new Answers { QuestionId = item.Key, Response = item.Value });
-                }
-            }
-
-            convertedAnswers.Add(new FormAnswers
-            {
-                PageUrl = viewModel["Path"].ToLower(),
-                Answers = answers
-            });
-            _cacheProvider.SetString(guid, JsonConvert.SerializeObject(convertedAnswers), 30);
-        }
-
-        private async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm)
-        {
-            //To refactor out the switch with a renderasync.element (see SL)
-            FormBuilderViewModel formModel = new FormBuilderViewModel();
-            formModel.RawHTML += await _viewRender.RenderAsync("H1", baseForm.Name);
-            formModel.FeedbackForm = baseForm.FeedbackForm;
-
-            CheckForDuplicateQuestionIDs(page);
-
-            foreach (var element in page.Elements)
-            {
-
-                switch (element.Type)
-                {
-                    case EElementType.H1:
-                        formModel.RawHTML += await _viewRender.RenderAsync("H1", element.Properties.Text);
-                        break;
-                    case EElementType.H2:
-                        formModel.RawHTML += await _viewRender.RenderAsync("H2", element);
-                        break;
-                    case EElementType.H3:
-                        formModel.RawHTML += await _viewRender.RenderAsync("H3", element);
-                        break;
-                    case EElementType.H4:
-                        formModel.RawHTML += await _viewRender.RenderAsync("H4", element);
-                        break;
-                    case EElementType.H5:
-                        formModel.RawHTML += await _viewRender.RenderAsync("H5", element);
-                        break;
-                    case EElementType.H6:
-                        formModel.RawHTML += await _viewRender.RenderAsync("H6", element);
-                        break;
-                    case EElementType.P:
-                        formModel.RawHTML += await _viewRender.RenderAsync("P", element);
-                        break;
-                    case EElementType.Span:
-                        formModel.RawHTML += await _viewRender.RenderAsync("Span", element);
-                        break;
-                    case EElementType.Textbox:
-                        element.Properties.Value = CurrentValue(element, viewModel);
-                        CheckForLabel(element, viewModel);
-                        formModel.RawHTML += await _viewRender.RenderAsync("Textbox", element);
-                        break;
-                    case EElementType.Textarea:
-                        element.Properties.Value = CurrentValue(element, viewModel);
-                        formModel.RawHTML += await _viewRender.RenderAsync("Textarea", element);
-                        break;
-                    case EElementType.Radio:
-                        element.Properties.Value = CurrentValue(element, viewModel);
-                        formModel.RawHTML += await _viewRender.RenderAsync("Radio", element);
-                        break;
-                    case EElementType.Button:
-                        formModel.RawHTML += await _viewRender.RenderAsync("Button", element);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            return formModel;
-        }
-
-        private void CheckForDuplicateQuestionIDs(Page page)
-        {
-            var numberOfDuplicates = page.Elements.GroupBy(x => x.Properties.QuestionId + x.Properties.Text + x.Type)
-                .Where(g => g.Count() > 1)
-                .Select(y => y.Key)
-                .ToList();
-            
-            if (numberOfDuplicates.Count > 0)
-            {
-                throw new Exception("Question id, text or type is not unique.");
-            }
-        }
-
-        private string CurrentValue(Element element, Dictionary<string, string> viewModel)
-        {
-            var currentValue = viewModel.ContainsKey(element.Properties.QuestionId);
-            return currentValue ? viewModel[element.Properties.QuestionId] : string.Empty;
-        }
-
-        private bool CheckForLabel(Element element, Dictionary<string, string> viewModel)
-        {
-            if (string.IsNullOrEmpty(element.Properties.Label))
-            {
-                throw new Exception("no label");
-            }
-
-            return true;
         }
     }
 }

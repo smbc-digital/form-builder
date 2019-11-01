@@ -2,6 +2,8 @@
 using Amazon.S3;
 using form_builder.Configuration;
 using form_builder.Gateway;
+using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.PageHelpers;
 using form_builder.Providers;
 using form_builder.Validators;
 using Microsoft.AspNetCore.Builder;
@@ -35,6 +37,15 @@ namespace form_builder.Extensions
         public static IServiceCollection AddAmazonS3Client(this IServiceCollection services, string accessKey, string secretKey)
         {
             services.AddSingleton<IAmazonS3, AmazonS3Client>(provider => new AmazonS3Client(accessKey, secretKey, RegionEndpoint.EUWest1));
+
+            return services;
+        }
+
+        public static IServiceCollection AddHelpers(this IServiceCollection services)
+        {
+            services.AddSingleton<IPageHelper, PageHelper>();
+            services.AddSingleton<IElementHelper, ElementHelper>();
+
 
             return services;
         }

@@ -14,6 +14,8 @@ using form_builder.Models;
 using Microsoft.AspNetCore.Mvc;
 using form_builder.ViewModels;
 using form_builder.Enum;
+using form_builder.Helpers.PageHelpers;
+using form_builder.Helpers.ElementHelpers;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -26,10 +28,12 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _disallowedKeys = new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
         private readonly Mock<IViewRender> _viewRender = new Mock<IViewRender>();
         private readonly Mock<IGateway> _gateWay = new Mock<IGateway>();
+        private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
+        private readonly Mock<IElementHelper> _elementHelper = new Mock<IElementHelper>();
         
         public HomeControllerTest()
         {
-            _homeController = new HomeController(_cacheProvider.Object, _validators.Object, _schemaProvider.Object , _viewRender.Object, _disallowedKeys.Object, _gateWay.Object);
+            _homeController = new HomeController(_cacheProvider.Object, _validators.Object, _schemaProvider.Object , _disallowedKeys.Object, _gateWay.Object, _pageHelper.Object, _elementHelper.Object);
         }
 
         [Fact]
