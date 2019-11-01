@@ -5,12 +5,15 @@ using form_builder.Providers;
 using form_builder.Validators;
 using form_builder.Helpers;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Razor;
 using Xunit;
 using Moq;
-using Microsoft.Extensions.Logging;
 using StockportGovUK.AspNetCore.Gateways;
+using System.Threading.Tasks;
+using System;
+using form_builder.Models;
+using Microsoft.AspNetCore.Mvc;
+using form_builder.ViewModels;
+using form_builder.Enum;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -19,26 +22,94 @@ namespace form_builder_tests.UnitTests.Controllers
         private HomeController _homeController;
         private readonly Mock<ICacheProvider> _cacheProvider = new Mock<ICacheProvider>();
         private readonly Mock<IEnumerable<IElementValidator>> _validators = new Mock<IEnumerable<IElementValidator>>();
-        private ISchemaProvider _schemaProvider = new LocalFileSchemaProvider();       
-        private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _disallowedKeys = new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();       
-        private readonly Mock<IOptions<RazorViewEngineOptions>> _options = new Mock<IOptions<RazorViewEngineOptions>>();
-        private readonly Mock<ILoggerFactory> _logger = new Mock<ILoggerFactory>();
-        private readonly Mock<System.Diagnostics.DiagnosticSource> _diagnosticSource = new Mock<System.Diagnostics.DiagnosticSource>();
+        private readonly Mock<ISchemaProvider> _schemaProvider = new Mock<ISchemaProvider>();
+        private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _disallowedKeys = new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
         private readonly Mock<IViewRender> _viewRender = new Mock<IViewRender>();
         private readonly Mock<IGateway> _gateWay = new Mock<IGateway>();
         
         public HomeControllerTest()
         {
-            
-       
-            _homeController = new HomeController(_cacheProvider.Object, _validators.Object, _schemaProvider,_viewRender.Object, _disallowedKeys.Object, _gateWay.Object);
+            _homeController = new HomeController(_cacheProvider.Object, _validators.Object, _schemaProvider.Object , _viewRender.Object, _disallowedKeys.Object, _gateWay.Object);
 
         }
 
         [Fact]
-        public void Index_Should_Return_Index()
+        public async Task Index_ShouldCallSchemaProvider_ToGetFormSchema()
         {
-            Assert.IsType<ViewResult>(_homeController.Index());
+
+            var result = await _homeController.Index("form", "page-one", Guid.NewGuid());
+
+            _schemaProvider.Verify(_ => _.Get<FormSchema>(It.Is<string>(x => x == "form")));
+        }
+
+
+        [Fact]
+        public async Task Index_ShouldGenerateGuidWhenGuidIsEmpty()
+        {
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(new FormSchema
+                {
+                    Pages = new List<Page>
+                    {
+                        new Page
+                        {
+                            PageURL = "page-one",
+                            Elements = new List<Element>
+                            {
+                                 new Element
+                                 {
+                                     Type = EElementType.H1,
+                                     Properties = new Property
+                                     {
+                                         QuestionId = "test-id",
+                                          Text = "test-text"
+                                     }
+                                 }
+                            }
+                        }
+                    }
+                });
+
+            var result = await _homeController.Index("form", "page-one", Guid.Empty);
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = (FormBuilderViewModel)viewResult.Model;
+
+            Assert.NotEqual(Guid.Empty, model.Guid);
+        }
+
+
+        [Fact]
+        public async Task Index_ShouldRedirectToError_WhenPageIsNotWithin_FormSchema()
+        {
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(new FormSchema
+                {
+                    Pages = new List<Page>
+                    {
+                        new Page
+                        {
+                            PageURL = "page-one",
+                            Elements = new List<Element>
+                            {
+                                 new Element
+                                 {
+                                     Type = EElementType.H1,
+                                     Properties = new Property
+                                     {
+                                         QuestionId = "test-id",
+                                          Text = "test-text"
+                                     }
+                                 }
+                            }
+                        }
+                    }
+                });
+
+            var result = await _homeController.Index("form", "non-existance-page", Guid.Empty);
+
+            var viewResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Error", viewResult.ActionName);
         }
     }
 }

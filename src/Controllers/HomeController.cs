@@ -10,8 +10,6 @@ using form_builder.Validators;
 using System.Threading.Tasks;
 using form_builder.Helpers;
 using System;
-using System.Net.Http;
-using System.Text;
 using Microsoft.Extensions.Options;
 using form_builder.Configuration;
 using System.Linq;
@@ -43,12 +41,6 @@ namespace form_builder.Controllers
             _viewRender = viewRender;
             _disallowedKeys = disallowedKeys.Value;
             _gateway = gateway;
-        }
-
-        [HttpGet]
-        public IActionResult Index()
-        {
-            return View();
         }
 
         [HttpGet]
@@ -264,7 +256,7 @@ namespace form_builder.Controllers
                 .Where(g => g.Count() > 1)
                 .Select(y => y.Key)
                 .ToList();
-
+            
             if (numberOfDuplicates.Count > 0)
             {
                 throw new Exception("Question id, text or type is not unique.");
