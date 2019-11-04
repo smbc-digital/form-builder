@@ -50,13 +50,28 @@ namespace form_builder.Extensions
             return services;
         }
 
-        public static IServiceCollection AddCacheProvider(this IServiceCollection services, string redisUrl)
+        public static IServiceCollection AddCacheProvider(this IServiceCollection services, bool isLocalEnv)
         {
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             services.AddHttpContextAccessor();
+            if (isLocalEnv)
+            {
+                var redisUrl = "localhost:6379";
                 var redis = ConnectionMultiplexer.Connect(redisUrl);
                 services.AddDataProtection()
                     .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys");
                 services.AddSingleton<ICacheProvider, RedisCacheProvider>(provider => new RedisCacheProvider(redis, true));
+            } 
+            else
+            {
+                services.AddSingleton<ICacheProvider, LocalSessionCacheProvider>();
+            }
 
             return services;
         }
