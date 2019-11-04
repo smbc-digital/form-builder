@@ -82,6 +82,7 @@ Example JSON:
     * [Button](#buttonprops)
     * [Ul (Unordered List)](#Ulprops)
     * [Ol (Ordered List)](#Olprops)
+    * [Img](#Imgprops)
     
 
 
@@ -90,7 +91,7 @@ Example JSON:
         * Text (*string*) __*__
 
     * <a name="ptextprops">**P** (Paragraph text)</a>
-        * Text (*string*) __*__
+        * Text (*string*) (Can embed HTML code e.g. \<strong\>) __*__
 
     * <a name="textboxprops">**Textbox**</a>
         * Label (*string*) __*__
@@ -174,6 +175,11 @@ Example JSON:
       
     * <a name="olprops">**Ol**</a>
       * ListItems[*string*] __*__
+      * ClassName (*string*)
+      
+    * <a name="imgprops">**Img**</a>
+      * AltText (*string*) __*__
+      * Source (*string*) __*__
       * ClassName (*string*)
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>

@@ -29,6 +29,12 @@ namespace form_builder_tests.Builders
             return this;
         }
 
+        public FormSchemaBuilder WithPage(Page page)
+        {
+            _pages.Add(page);
+            return this;
+        }
+
         public FormSchemaBuilder WithName(string name)
         {
             _name = name;
