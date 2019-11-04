@@ -4,7 +4,7 @@
     var className = Model.Properties.ClassName ?? "";
 }
 
-<ol class=@className>
+<ol class="@className">
     @foreach (var li in Model.Properties.ListItems)
     {
         <li>@Html.Raw(li)</li>

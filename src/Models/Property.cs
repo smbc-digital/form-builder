@@ -29,5 +29,9 @@ namespace form_builder.Models
         public string ClassName { get; set; }
 
         public List<string> ListItems = new List<string>();
+
+        public string Source { get; set; }
+
+        public string AltText { get; set; }
     }
 }

@@ -79,6 +79,9 @@ namespace form_builder.Helpers.PageHelpers
                     case EElementType.H6:
                         formModel.RawHTML += await _viewRender.RenderAsync("H6", element);
                         break;
+                    case EElementType.Img:
+                        formModel.RawHTML += await _viewRender.RenderAsync("Img", element);
+                        break;
                     case EElementType.P:
                         formModel.RawHTML += await _viewRender.RenderAsync("P", element);
                         break;
