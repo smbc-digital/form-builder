@@ -24,7 +24,7 @@
             {
                 var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
 
-                <span class="input-error-content" id="@errorId">@validationMessage</span>
+                <p class="input-error-content" id="@errorId">@validationMessage</p>
             }
         }
     </div>
