@@ -5,5 +5,5 @@
     var className = string.IsNullOrEmpty(Model.Properties.ClassName) ? "button-primary" : Model.Properties.ClassName;
 }
 
-<button class=@className type="submit" id="@Model.Properties.ButtonId">@text</button>
+<button class="@className" type="submit" id="@Model.Properties.ButtonId">@text</button>
 <a class="back-button" href="javascript:history.back()">Previous</a>
