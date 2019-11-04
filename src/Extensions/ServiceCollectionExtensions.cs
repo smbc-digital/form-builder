@@ -52,6 +52,13 @@ namespace form_builder.Extensions
 
         public static IServiceCollection AddCacheProvider(this IServiceCollection services, bool isLocalEnv)
         {
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             services.AddHttpContextAccessor();
             if (isLocalEnv)
             {
@@ -63,13 +70,6 @@ namespace form_builder.Extensions
             } 
             else
             {
-                services.AddSession(options =>
-                {
-                    options.IdleTimeout = TimeSpan.FromMinutes(30);
-                    options.Cookie.HttpOnly = true;
-                    options.Cookie.IsEssential = true;
-                });
-
                 services.AddSingleton<ICacheProvider, LocalSessionCacheProvider>();
             }
 
