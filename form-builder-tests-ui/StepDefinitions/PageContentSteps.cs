@@ -59,5 +59,20 @@ namespace form_builder_tests_ui.StepDefinitions
 
             Assert.Equal("https://www.stockport.gov.uk/", linkHref);
         }
+
+        [Then(@"I should see an img element")]
+        public void ThenIShouldSeeAnImgElement()
+        {
+            var webDriver = BrowserSession.Native as IWebDriver;
+
+            var src = webDriver.FindElements(By.TagName("img"))[1].GetAttribute("src");
+            var alt = webDriver.FindElements(By.TagName("img"))[1].GetAttribute("alt");
+            var cssClass = webDriver.FindElements(By.TagName("img"))[1].GetAttribute("class");
+
+            Assert.Equal("http://images.contentful.com/6cfgzlmcakf7/2FNKi2ZYcomigKGAqWiSyC/aec4f120903972fd6c842e84603c6a50/Flu_Jab.jpg", src);
+            Assert.Equal("Flu Jab", alt);
+            Assert.Equal("image foo", cssClass);
+
+        }
     }
 }

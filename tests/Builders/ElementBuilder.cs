@@ -54,5 +54,17 @@ namespace form_builder_tests.Builders
             _property.ListItems = listItems;
             return this;
         }
+
+        public ElementBuilder WithSource(string source)
+        {
+            _property.Source = source;
+            return this;
+        }
+
+        public ElementBuilder WithAltText(string alt)
+        {
+            _property.AltText = alt;
+            return this;
+        }
     }
 }

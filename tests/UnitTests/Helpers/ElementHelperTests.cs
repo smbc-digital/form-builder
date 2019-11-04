@@ -136,6 +136,20 @@ namespace form_builder_tests.UnitTests.Helpers
                                 
         }
 
+        [Fact]
+        public void CreateImage()
+        {
+            var element = new ElementBuilder()
+                .WithType(EElementType.Img)
+                .WithAltText("alt text")
+                .WithSource("source")
+                .Build();
+
+            Assert.Equal("alt text", element.Properties.AltText);
+            Assert.Equal("source", element.Properties.Source);
+
+
+        }
        
     }
 }

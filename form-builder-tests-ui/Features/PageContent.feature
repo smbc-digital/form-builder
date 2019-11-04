@@ -12,6 +12,7 @@ Scenario: Render information on the page correctly
 	And I should see a "p" element with "This is paragraph text" text
 	And I should see an unordered list with list items
 	And I should see an ordered list with list items
+	And I should see an img element
 
 @pagecontent
 Scenario: Render HTML within P tag elements
