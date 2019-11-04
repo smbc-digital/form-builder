@@ -22,10 +22,16 @@ namespace form_builder_tests.Builders
             };
         }
 
-
-        public PageBuilder WithPageTitle(string pageTitle)
+        public PageBuilder WithPageTitle(string title)
         {
-            _pageURL = pageTitle;
+            _title = title;
+
+            return this;
+        }
+
+        public PageBuilder WithPageUrl(string url)
+        {
+            _pageURL = url;
 
             return this;
         }
@@ -33,6 +39,13 @@ namespace form_builder_tests.Builders
         public PageBuilder WithElement(Element element)
         {
             _elements.Add(element);
+
+            return this;
+        }
+
+        public PageBuilder WithBehaviour(Behaviour behaviour)
+        {
+            _behaviours.Add(behaviour);
 
             return this;
         }

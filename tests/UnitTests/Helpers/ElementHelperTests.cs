@@ -24,6 +24,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var viewModel = new Dictionary<string, string>();
             viewModel.Add("test-id", "this is the value");
+
             // Act
             var result = _elementHelper.CurrentValue(element, viewModel);
 
@@ -44,6 +45,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var viewModel = new Dictionary<string, string>();
             viewModel.Add("test-id2", "this is the value");
+
             // Act
             var result = _elementHelper.CurrentValue(element, viewModel);
 

@@ -42,6 +42,12 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.True(BrowserSession.FindCss(".breadcrumb-container").Exists());
         }
 
+        [Then(@"I should find an element with class ""(.*)""")]
+        public void ThenIShouldSeeBreadcrumbs(string className)
+        {
+            Assert.True(BrowserSession.FindCss(className).Exists());
+        }
+
         [Then("I should see the footer")]
         public void ThenIShouldSeeTheFooterSection()
         {

@@ -2,6 +2,7 @@
 {
     public enum EBehaviourType
     {
+        Unknown,
         GoToPage,
         SubmitForm,
         GoToExternalPage

@@ -123,6 +123,11 @@ namespace form_builder.Controllers
         [Route("submit")]
         public async Task<IActionResult> Submit([FromQuery] Guid guid)
         {
+            if (guid == Guid.Empty)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+
             var formData = _cacheProvider.GetString(guid.ToString());
             var convertedAnswers = JsonConvert.DeserializeObject<List<FormAnswers>>(formData);
 
