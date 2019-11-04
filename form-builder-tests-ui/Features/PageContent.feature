@@ -8,9 +8,11 @@ Scenario: Render information on the page correctly
 	And I should see a "h4" element with "This is a H4" text
 	And I should see a "h5" element with "This is a H5" text
 	And I should see a "h6" element with "This is a H6" text
-	And I should see a "p" element with "This is some text" text
+	And I should see a "p" element with "This is paragraph text" text
 
-#@pagecontent
-#Scenario: Render HTML within P tag elements
-#	Given I navigate to "/pagecontent/page1"
-#	Then I should see a strong element within a p tag
+@pagecontent
+Scenario: Render HTML within P tag elements
+	Given I navigate to "/pagecontent/page1"
+	Then I should see a strong element within a p tag
+	And I should see an image element within a p tag
+	And I should see a link element within a p tag
