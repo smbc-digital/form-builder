@@ -1,5 +1,6 @@
 ﻿using form_builder.Enum;
 using form_builder.Models;
+using System.Collections.Generic;
 
 namespace form_builder_tests.Builders
 {
@@ -45,6 +46,12 @@ namespace form_builder_tests.Builders
         public ElementBuilder WithValue(string value)
         {
             _property.Label = value;
+            return this;
+        }
+
+        public ElementBuilder WithListItems(List<string> listItems)
+        {
+            _property.ListItems = listItems;
             return this;
         }
     }

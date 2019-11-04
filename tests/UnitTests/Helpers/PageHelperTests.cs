@@ -85,6 +85,33 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>()), Times.Once);
         }
 
+        [Theory]
+        [InlineData(EElementType.OL)]
+        [InlineData(EElementType.UL)]
+        public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartialForList(EElementType type)
+        {
+            List<string> listItems = new List<string> { "item 1", "item 2", "item 3" };
+
+            var element = new ElementBuilder()
+                .WithType(type)
+                .WithListItems(listItems)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>()), Times.Once);
+        }
+
         [Fact]
         public void SaveAnswers_ShouldCallCacheProvider()
         {

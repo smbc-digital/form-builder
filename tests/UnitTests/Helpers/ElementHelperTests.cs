@@ -100,5 +100,42 @@ namespace form_builder_tests.UnitTests.Helpers
             // Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
         }
+
+        [Theory]
+        [InlineData(EElementType.P, "paragraph")]
+        [InlineData(EElementType.H1,"Header 1")]
+        [InlineData(EElementType.H2, "Header 2")]
+        [InlineData(EElementType.H3, "Header 3")]
+        [InlineData(EElementType.H4, "Header 4")]
+        [InlineData(EElementType.H5, "Header 5")]
+        [InlineData(EElementType.H6, "Header 6")]
+        public void CreateGenericHtmlElement(EElementType eElementType, string text)
+        {
+            var element = new ElementBuilder()
+                .WithType(eElementType)
+                .WithPropertyText(text)
+                .Build();
+           
+            Assert.Equal(text, element.Properties.Text);
+        }
+
+        [Theory]
+        [InlineData(EElementType.OL)]
+        [InlineData(EElementType.UL)]
+        public void CreateLists(EElementType eElementType)
+        {
+            List<string> listItems = new List<string>{ "item 1", "item 2", "item 3" };
+
+            var element = new ElementBuilder()
+                .WithType(eElementType)
+                .WithListItems(listItems)
+                .Build();
+
+            Assert.Equal(3, element.Properties.ListItems.Count);
+            Assert.Equal("item 1", element.Properties.ListItems[0]);
+                                
+        }
+
+       
     }
 }
