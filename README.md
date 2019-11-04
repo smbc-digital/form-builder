@@ -169,7 +169,7 @@ Example JSON:
         * ID (*string*)
    
     * <a name="ulprops">**Ul**</a>
-      * ListItems*[string]* __*__
+      * ListItems[*string*] __*__
       * ClassName (*string*)
       
     * <a name="olprops">**Ol**</a>
