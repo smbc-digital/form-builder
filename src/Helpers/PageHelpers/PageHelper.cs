@@ -82,6 +82,12 @@ namespace form_builder.Helpers.PageHelpers
                     case EElementType.P:
                         formModel.RawHTML += await _viewRender.RenderAsync("P", element);
                         break;
+                    case EElementType.OL:
+                        formModel.RawHTML += await _viewRender.RenderAsync("OL", element);
+                        break;
+                    case EElementType.UL:
+                        formModel.RawHTML += await _viewRender.RenderAsync("UL", element);
+                            break;
                     case EElementType.Span:
                         formModel.RawHTML += await _viewRender.RenderAsync("Span", element);
                         break;

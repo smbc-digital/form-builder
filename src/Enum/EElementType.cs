@@ -10,6 +10,8 @@
         H5,
         H6,
         P,
+        OL,
+        UL,        
         Span,
         Textbox,
         Textarea,

@@ -27,5 +27,7 @@ namespace form_builder.Models
         public string CustomValidationMessage { get; set; } = string.Empty;
 
         public string ClassName { get; set; }
+
+        public List<string> ListItems = new List<string>();
     }
 }

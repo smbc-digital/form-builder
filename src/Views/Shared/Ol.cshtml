@@ -1,0 +1,12 @@
+﻿@model form_builder.Models.Element
+
+@{
+    var className = Model.Properties.ClassName ?? "";
+}
+
+<ol class=@className>
+    @foreach (var li in Model.Properties.ListItems)
+    {
+        <li>@Html.Raw(li)</li>
+    }
+</ol>
