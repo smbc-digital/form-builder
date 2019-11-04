@@ -80,6 +80,9 @@ Example JSON:
     * [Link](#linkprops) (Anchor styled as button)
     * [Alert](#alertprops)
     * [Button](#buttonprops)
+    * [Ul (Unordered List)](#Ulprops)
+    * [Ol (Ordered List)](#Olprops)
+    
 
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)
@@ -164,6 +167,14 @@ Example JSON:
         * Type (*string*) __*__
         * ClassName (*string*)
         * ID (*string*)
+   
+    * <a name="ulprops">**Ul**</a>
+      * ListItems (*[string]*) __*__
+      * ClassName (*string*)
+      
+    * <a name="olprops">**Ol**</a>
+      * ListItems (*[string]*) __*__
+      * ClassName (*string*)
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>
 Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer:
