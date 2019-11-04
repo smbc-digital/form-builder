@@ -53,10 +53,7 @@ namespace form_builder
                 app.UseHsts();
             }
 
-            if (!env.IsEnvironment("local"))
-            {
-                app.UseSession();
-            }
+            app.UseSession();
 
             app.UseHttpsRedirection();
             app.UseMvc(routes =>
