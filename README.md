@@ -80,9 +80,9 @@ Example JSON:
     * [Link](#linkprops) (Anchor styled as button)
     * [Alert](#alertprops)
     * [Button](#buttonprops)
-    * [Ul (Unordered List)](#Ulprops)
-    * [Ol (Ordered List)](#Olprops)
-    * [Img (Image)](#Imgprops)
+    * [Ul](#Ulprops) (Unordered List)
+    * [Ol](#Olprops) (Ordered List)
+    * [Img](#Imgprops) (Image)
     
 
 
