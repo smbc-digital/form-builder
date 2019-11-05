@@ -4,20 +4,25 @@
     var errorId = $"{Model.Properties.QuestionId}-error";
 }
 
-<div>
-    <label for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+    <div>
+        <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
 
-    @if (!string.IsNullOrEmpty(Model.Properties.Hint))
-    {
-        <span id=@hintId>@Model.Properties.Hint</span>
-    }
+        @if (Model.Properties?.Optional ?? true)
+        {
+            <p class="optional">(optional)</p>
+        }
 
-    @Html.TextArea(Model.Properties.QuestionId, Model.Properties.Value, @Model.GenerateElementProperties())
+        @if (!string.IsNullOrEmpty(Model.Properties.Hint))
+        {
+            <div id=@hintId>@Html.Raw(Model.Properties.Hint)</div>
+        }
 
-    @if (!Model.IsValid)
-    {
-        var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+        <p>Your description can be up to @Model.Properties.MaxLength characters</p>
+        @Html.TextArea(Model.Properties.QuestionId, Model.Properties.Value, @Model.GenerateElementProperties())
 
-        <span class="input-error-content" id="@errorId">@validationMessage</span>
-    }
-</div>
+        @if (!Model.IsValid)
+        {
+            var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+            <p class="input-error-content text-area-validation" id="@errorId">@validationMessage</p>
+        }
+    </div>

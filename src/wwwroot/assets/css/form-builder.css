@@ -1,0 +1,13 @@
+﻿ul {
+    margin: 0 0 20px 15px;
+}
+
+ul li {
+    margin: 0;
+}
+
+/*.input-error .input-content > p:before {
+}*/
+.text-area-validation {
+    top: -10px;
+}

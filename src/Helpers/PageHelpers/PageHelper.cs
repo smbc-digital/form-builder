@@ -101,6 +101,7 @@ namespace form_builder.Helpers.PageHelpers
                         break;
                     case EElementType.Textarea:
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        _elementHelper.CheckForLabel(element, viewModel);
                         formModel.RawHTML += await _viewRender.RenderAsync("Textarea", element);
                         break;
                     case EElementType.Radio:
