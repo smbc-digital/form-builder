@@ -82,7 +82,7 @@ Example JSON:
     * [Button](#buttonprops)
     * [Ul (Unordered List)](#Ulprops)
     * [Ol (Ordered List)](#Olprops)
-    * [Img](#Imgprops)
+    * [Img (Image)](#Imgprops)
     
 
 
