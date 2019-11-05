@@ -14,7 +14,7 @@
 - gpg key added to accepted contributors
 
 ## Base JSON Structure
-
+```json
     {
         "FormName": "",
         "BaseURL": "",
@@ -28,6 +28,7 @@
           }
         ],
     }
+```
 **FormName** (*string*) - Name of the form - Will display in browser tab name
 
 **BaseURL** (*string*) - "test-form" would create stockport.gov.uk/test-form/
