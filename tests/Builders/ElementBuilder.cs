@@ -68,9 +68,16 @@ namespace form_builder_tests.Builders
             return this;
         }
 
+
         public ElementBuilder WithMaxLength(int maxLength)
         {
             _property.MaxLength = maxLength.ToString();
+            return this;
+        }
+
+        public ElementBuilder WithOptions(List<Option> options)
+        {
+            _property.Options = options;
             return this;
         }
     }

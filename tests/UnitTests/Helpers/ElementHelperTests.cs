@@ -1,5 +1,6 @@
 ﻿using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Models;
 using form_builder_tests.Builders;
 using System;
 using System.Collections.Generic;
@@ -228,6 +229,31 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal("source", element.Properties.Source);
 
 
+        }
+
+        [Fact]
+        public void CreateRadioButton()
+        {
+            var element = new ElementBuilder()
+                .WithType(EElementType.Radio)
+                .WithQuestionId("questionId")
+                .WithLabel("Label")
+                .WithOptions(new List<Option>
+                { new Option { Value = "option1", Text = "Option 1", Hint = "Option 1 Hint" }, 
+                  new Option { Value = "option2", Text = "Option 2", Hint = "Option 2 Hint" } })
+                .Build();
+
+            Assert.Equal("questionId", element.Properties.QuestionId);
+            Assert.Equal("Label", element.Properties.Label);
+
+            Assert.Equal("option1", element.Properties.Options[0].Value);
+            Assert.Equal("Option 1", element.Properties.Options[0].Text);
+            Assert.Equal("Option 1 Hint", element.Properties.Options[0].Hint);
+
+
+            Assert.Equal("option2", element.Properties.Options[1].Value);
+            Assert.Equal("Option 2", element.Properties.Options[1].Text);
+            Assert.Equal("Option 2 Hint", element.Properties.Options[1].Hint);
         }
        
     }
