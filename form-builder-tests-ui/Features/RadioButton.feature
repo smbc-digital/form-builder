@@ -7,6 +7,7 @@ Scenario: User enters nothing on page1
 	Given I navigate to "/RadioButton/page1"
 	When I click the "submit" button
 	Then I should see a validation message for "radButton-error" input
+	And I should not see a validation message for "radButtonOpt-error" input
 
 Scenario: User enters yes on page1
 	Given I navigate to "/RadioButton/page1"

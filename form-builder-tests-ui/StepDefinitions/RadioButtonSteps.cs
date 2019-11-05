@@ -20,6 +20,14 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.True(BrowserSession.FindId(inputName).Exists());
         }
 
+        [Then(@"I should not see a validation message for ""(.*)"" input")]
+        public void ThenIShouldNotSeeValidationMessageForInput(string inputName)
+        {
+            Assert.False(BrowserSession.FindId(inputName).Exists());
+        }
+
+
+
 
         [Then(@"I click the ""(.*)"" radiobutton")]
         [When(@"I click the ""(.*)"" radiobutton")]
