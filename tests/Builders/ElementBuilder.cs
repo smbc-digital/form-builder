@@ -1,5 +1,6 @@
 ﻿using form_builder.Enum;
 using form_builder.Models;
+using System;
 using System.Collections.Generic;
 
 namespace form_builder_tests.Builders
@@ -64,6 +65,12 @@ namespace form_builder_tests.Builders
         public ElementBuilder WithAltText(string alt)
         {
             _property.AltText = alt;
+            return this;
+        }
+
+        public ElementBuilder WithMaxLength(int maxLength)
+        {
+            _property.MaxLength = maxLength.ToString();
             return this;
         }
     }

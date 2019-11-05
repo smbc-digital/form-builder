@@ -11,12 +11,14 @@ namespace form_builder_tests.UnitTests.Helpers
     {
         private ElementHelper _elementHelper = new ElementHelper();
 
-        [Fact]
-        public void CurrentValue_ReturnsCurrentValueOfElement()
+        [Theory]
+        [InlineData(EElementType.Textbox)]
+        [InlineData(EElementType.Textarea)]
+        public void CurrentValue_ReturnsCurrentValueOfElement(EElementType elementType)
         {
             // Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.Textbox)
+                .WithType(elementType)
                 .WithQuestionId("test-id")
                 .WithLabel("test-text")
                 .WithValue("this is the value")
@@ -53,12 +55,14 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal(string.Empty, result);
         }
 
-        [Fact]
-        public void CheckForLabel_ReturnsTrue_IfLabelExists()
+        [Theory]
+        [InlineData(EElementType.Textbox)]
+        [InlineData(EElementType.Textarea)]
+        public void CheckForLabel_ReturnsTrue_IfLabelExists(EElementType elementType)
         {
             // Arrange
             var element = new ElementBuilder()
-               .WithType(EElementType.Textbox)
+               .WithType(elementType)
                .WithQuestionId("test-id")
                .WithLabel("test-text")
                .Build();
@@ -72,12 +76,14 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.True(result);
         }
 
-        [Fact]
-        public void CheckForLabel_ThrowsException_IfLabelDoesNotExists()
+        [Theory]
+        [InlineData(EElementType.Textbox)]
+        [InlineData(EElementType.Textarea)]
+        public void CheckForLabel_ThrowsException_IfLabelDoesNotExists(EElementType elementType)
         {
             // Arrange
             var element = new ElementBuilder()
-              .WithType(EElementType.Textbox)
+              .WithType(elementType)
               .WithQuestionId("test-id")
               .Build();
 
@@ -87,12 +93,14 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
         }
 
-        [Fact]
-        public void CheckForLabel_ThrowsException_IfLabelIsEmpty()
+        [Theory]
+        [InlineData(EElementType.Textbox)]
+        [InlineData(EElementType.Textarea)]
+        public void CheckForLabel_ThrowsException_IfLabelIsEmpty(EElementType elementType)
         {
             // Arrange
             var element = new ElementBuilder()
-              .WithType(EElementType.Textbox)
+              .WithType(elementType)
               .WithQuestionId("test-id")
               .WithLabel(string.Empty)
               .Build();
@@ -101,6 +109,75 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
+        }
+
+        [Fact]
+        public void CheckForMaxLength_ReturnsTrue_IfMaxLengthExists()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+               .WithType(EElementType.Textarea)
+               .WithQuestionId("issueOne")
+               .WithMaxLength(2000)
+               .Build();
+
+            var viewModel = new Dictionary<string, string>();
+
+            // Act
+            var result = _elementHelper.CheckForMaxLength(element, viewModel);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void CheckForMaxLength_ThrowsException_IfMaxLengthDoesNotExist()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+               .WithType(EElementType.Textarea)
+               .WithQuestionId("issueOne")
+               .Build();
+
+            var viewModel = new Dictionary<string, string>();
+
+            // Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element, viewModel));
+        }
+
+        [Fact]
+        public void CheckForMaxLength_ReturnsTrue_IfMaxLengthExistsAndAboveZero()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+               .WithType(EElementType.Textarea)
+               .WithQuestionId("issueOne")
+               .WithMaxLength(1)
+               .Build();
+
+            var viewModel = new Dictionary<string, string>();
+
+            // Act
+            var result = _elementHelper.CheckForMaxLength(element, viewModel);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void CheckForMaxLength_ThrowsException_IfMaxLengthExistsAndIsZero()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+               .WithType(EElementType.Textarea)
+               .WithQuestionId("issueOne")
+               .WithMaxLength(0)
+               .Build();
+
+            var viewModel = new Dictionary<string, string>();
+
+            // Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element, viewModel));
         }
 
         [Theory]
