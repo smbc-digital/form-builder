@@ -180,6 +180,39 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element, viewModel));
         }
 
+        [Fact]
+        public void CheckIfLabelAndText_ReturnsTrue_IfLabelAndTextAreFilledIn()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+               .WithType(EElementType.InlineAlert)
+               .WithLabel("test-text")
+               .WithPropertyText("Test")
+               .Build();
+
+            var viewModel = new Dictionary<string, string>();
+
+            // Act
+            var result = _elementHelper.CheckIfLabelAndTextEmpty(element, viewModel);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void CheckIfLabelAndTextEmpty_ThrowsException_IfLabelAndTextAreEmpty()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+               .WithType(EElementType.InlineAlert)
+               .Build();
+
+            var viewModel = new Dictionary<string, string>();
+
+            // Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckIfLabelAndTextEmpty(element, viewModel));
+        }
+
         [Theory]
         [InlineData(EElementType.P, "paragraph")]
         [InlineData(EElementType.H1,"Header 1")]

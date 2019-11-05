@@ -14,6 +14,7 @@
         OL,
         UL,        
         Span,
+        InlineAlert,
         Textbox,
         Textarea,
         Radio,

@@ -94,6 +94,10 @@ namespace form_builder.Helpers.PageHelpers
                     case EElementType.Span:
                         formModel.RawHTML += await _viewRender.RenderAsync("Span", element);
                         break;
+                    case EElementType.InlineAlert:
+                        formModel.RawHTML += await _viewRender.RenderAsync("InlineAlert", element);
+                        _elementHelper.CheckIfLabelAndTextEmpty(element, viewModel);
+                        break;
                     case EElementType.Textbox:
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                         _elementHelper.CheckForLabel(element, viewModel);

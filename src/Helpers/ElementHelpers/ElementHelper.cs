@@ -11,6 +11,8 @@ namespace form_builder.Helpers.ElementHelpers
         bool CheckForLabel(Element element, Dictionary<string, string> viewModel);
 
         bool CheckForMaxLength(Element element, Dictionary<string, string> viewModel);
+
+        bool CheckIfLabelAndTextEmpty(Element element, Dictionary<string, string> viewModel);
     }
 
     public class ElementHelper : IElementHelper
@@ -42,6 +44,16 @@ namespace form_builder.Helpers.ElementHelpers
             if (Int32.Parse(element.Properties.MaxLength) < 1)
             {
                 throw new Exception("Max Length must be greater than zero. Cannot render form.");
+            }
+
+            return true;
+        }
+
+        public bool CheckIfLabelAndTextEmpty(Element element, Dictionary<string, string> viewModel)
+        {
+            if(string.IsNullOrEmpty(element.Properties.Label) && string.IsNullOrEmpty(element.Properties.Text))
+            {
+                throw new Exception("An inline alert requires either a label or text or both to be present. Both can not be empty");
             }
 
             return true;
