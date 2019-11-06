@@ -98,14 +98,9 @@ Example JSON:
 Paragraph text JSON example:
 ```json
 {
-  "Type": "ul",
+  "Type": "p",
   "Properties": {
-    "ClassName":  "indented-list",
-    "ListItems": [
-      "List Item 1",
-      "List Item 2",
-      "List Item 3"
-    ]
+    "Text": "<strong>This is strong text</strong>"
   }
 }
 ```
