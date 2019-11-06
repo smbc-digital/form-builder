@@ -1,13 +1,13 @@
 ﻿@model form_builder.Models.Element
 
-    <section class="alert-inline">
-        @if (!string.IsNullOrEmpty(Model.Properties.Label))
-        {
-            <h2>@Model.Properties.Label</h2>
-        }
+<section class="alert-inline">
+    @if (!string.IsNullOrEmpty(Model.Properties.Label))
+    {
+        <h2>@Model.Properties.Label</h2>
+    }
 
-        @if (!string.IsNullOrEmpty(Model.Properties.Text))
-        {
-            <p>@Model.Properties.Text</p>
-        }
-    </section>
+    @if (!string.IsNullOrEmpty(Model.Properties.Text))
+    {
+        <p>@Html.Raw(@Model.Properties.Text)</p>
+    }
+</section>
