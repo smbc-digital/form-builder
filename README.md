@@ -256,6 +256,18 @@ Button JSON example:
       * Source (*string*) __*__
       * ClassName (*string*)
       
+Image JSON example:
+```json
+  {
+    "Type": "img",
+    "Properties": {
+     "Source": "http://url.com/image",
+            "AltText": "alt image text",
+            "ClassName": "image-class"
+    }
+  }
+```
+
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>
 Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer:
