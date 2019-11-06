@@ -128,8 +128,6 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("I press the next step button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 24
  testRunner.Then("I press the submit button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 25
- testRunner.Then("I should see a validation message for \"issueTwo\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }

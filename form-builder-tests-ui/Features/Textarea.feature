@@ -22,4 +22,3 @@ Scenario: User enters nothing on page2
 	Then I fill in page1
 	Then I press the next step button
 	Then I press the submit button
-	Then I should see a validation message for "issueTwo" input
