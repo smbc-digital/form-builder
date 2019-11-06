@@ -88,14 +88,14 @@ Example JSON:
 
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)
-    #
-    * <a name="headingprops">**H1-H6** (Heading levels)</a>
+#
+   * <a name="headingprops">**H1-H6** (Heading levels)</a>
         * Text (*string*) __*__
-    #
-    * <a name="ptextprops">**P** (Paragraph text)</a>
+#
+   * <a name="ptextprops">**P** (Paragraph text)</a>
         * Text (*string*) (Can embed HTML code e.g. \<strong\>) __*__
-    #
-    * <a name="textboxprops">**Textbox**</a>
+#
+   * <a name="textboxprops">**Textbox**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
         * CustomValidationMessage (*string*)
