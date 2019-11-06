@@ -101,8 +101,22 @@ Example JSON:
         * Hint (*string*)
         * MaxLength (*int*) (defaulted to 200)
         * Optional (*boolean*) (defaults to false)
+Textbox JSON example:
+```json
+  {
+    "Type": "Textbox",
+    "Properties": {
+      "QuestionId": "emailAddress",
+      "Label": "Email address",
+      "Hint": "ie: someone@example.com",
+      "CustomValidationMessage": "Check the email address and try again",
+      "Optional": false,
+      "MaxLength": 60
+    }
+  }
+```
 
-    * <a name="textareaprops">**Textarea**</a>
+   * <a name="textareaprops">**Textarea**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
         * CustomValidationMessage (*string*)
@@ -110,7 +124,7 @@ Example JSON:
         * MaxLength (*int*) __*__
         * Optional (*boolean*) (defaults to false)
 
-    * <a name="radioprops">**Radio**</a>
+   * <a name="radioprops">**Radio**</a>
         * Label (*string*) __*__
         * Name (*string*) __*__
         * QuestionId (*string*) __*__
@@ -122,7 +136,7 @@ Example JSON:
         * Hint (*string*)
         * Optional (*boolean*)
 
-    * <a name="selectprops">**Select**</a>
+   * <a name="selectprops">**Select**</a>
         * Label (*string*) __*__
         * Name (*string*) __*__
         * QuestionId (*string*) __*__
@@ -134,7 +148,7 @@ Example JSON:
         * Optional (*boolean*)
         * Placeholder (*string*)
 
-    * <a name="checkboxprops">**Checkbox**</a>
+   * <a name="checkboxprops">**Checkbox**</a>
         * Label (*string*) __*__
         * Name (*string*) __*__
         * QuestionId (*string*) __*__
@@ -146,14 +160,14 @@ Example JSON:
         * Hint (*string*)
         * Optional (*boolean*)
 
-    * <a name="linkprops">**Link**</a>
+   * <a name="linkprops">**Link**</a>
         * Text (*string*) __*__
         * Name (*string*) __*__
         * URL (*string*) __*__
         * ClassName (*string*)
         * QuestionId (*string*)
 
-    * <a name="buttonprops">**Button**</a>
+   * <a name="buttonprops">**Button**</a>
         * Text (*string*) (defaulted to "Next step")
         * ClassName (*string*) (defaulted to "button-primary")
         * ButtonId (*string*)
