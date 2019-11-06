@@ -135,6 +135,7 @@ Textbox JSON example:
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * Optional (*boolean*)
+ 
  Radio JSON example:
  ```json
  {
@@ -143,7 +144,7 @@ Textbox JSON example:
       "QuestionId": "radButton",
       "Label": "Do you like things?",
       "Hint": "<strong>Things</strong> like this and that",
-      "Optional": false,
+      "Optional": true,
       "Options": [
         {
           "Text": "Yes",
