@@ -169,20 +169,20 @@ Button JSON example:
     }
   }
 ```
-    * <a name="ulprops">**UL** (Unordered List)</a>
+   * <a name="ulprops">**UL** (Unordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
       
-    * <a name="olprops">**OL** (Ordered List)</a>
+   * <a name="olprops">**OL** (Ordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
       
-    * <a name="imgprops">**Img** (Image)</a>
+   * <a name="imgprops">**Img** (Image)</a>
       * AltText (*string*) __*__
       * Source (*string*) __*__
       * ClassName (*string*)
       
-    * <a name="inlinealertprops">**InlineAlert**</a>
+   * <a name="inlinealertprops">**InlineAlert**</a>
       * Text (*string*) 
       * Label (*string*) (at least one Text or Label must be entered for it to render) 
 
