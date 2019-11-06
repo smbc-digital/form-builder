@@ -121,6 +121,27 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [TechTalk.SpecRun.ScenarioAttribute("User selects more than one radio input", SourceLine=21)]
+        public virtual void UserSelectsMoreThanOneRadioInput()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User selects more than one radio input", null, ((string[])(null)));
+#line 22
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 23
+ testRunner.Given("I navigate to \"/RadioButton/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 24
+ testRunner.When("I click the \"radButton-0\" radiobutton", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 25
+ testRunner.Then("I click the \"radButton-1\" radiobutton", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 26
+ testRunner.Then("The \"radButton-1\" radiobutton should be checked", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 27
+ testRunner.Then("The \"radButton-0\" radiobutton should be unchecked", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
         [TechTalk.SpecRun.TestRunCleanup()]
         public virtual void TestRunCleanup()
         {

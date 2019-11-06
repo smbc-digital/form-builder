@@ -34,5 +34,12 @@ namespace form_builder_tests_ui.StepDefinitions
             var webDriver = BrowserSession.Native as IWebDriver;
             Assert.True(webDriver.FindElement(By.Id(inputId)).Selected);
         }
+
+        [Then(@"The ""(.*)"" radiobutton should be unchecked")]
+        public void TheradioButtonShouldNotBeChecked(string inputId)
+        {
+            var webDriver = BrowserSession.Native as IWebDriver;
+            Assert.False(webDriver.FindElement(By.Id(inputId)).Selected);
+        }
     }
 }

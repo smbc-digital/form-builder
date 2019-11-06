@@ -18,3 +18,10 @@ Scenario: User enters no on page1
 	Given I navigate to "/RadioButton/page1"
 	When I click the "radButton-1" radiobutton
 	Then The "radButton-1" radiobutton should be checked
+
+Scenario: User selects more than one radio input
+	Given I navigate to "/RadioButton/page1"
+	When I click the "radButton-0" radiobutton
+	Then I click the "radButton-1" radiobutton
+	Then The "radButton-1" radiobutton should be checked
+	Then The "radButton-0" radiobutton should be unchecked

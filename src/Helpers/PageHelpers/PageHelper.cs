@@ -111,6 +111,8 @@ namespace form_builder.Helpers.PageHelpers
                         break;
                     case EElementType.Radio:
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForRadioOptions(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Radio", element);
                         break;
                     case EElementType.Button:
