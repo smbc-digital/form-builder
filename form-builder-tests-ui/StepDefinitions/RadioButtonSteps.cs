@@ -26,9 +26,6 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.False(BrowserSession.FindId(inputName).Exists());
         }
 
-
-
-
         [Then(@"I click the ""(.*)"" radiobutton")]
         [When(@"I click the ""(.*)"" radiobutton")]
         public void ThenIClickTheRadioButton(string inputId)
@@ -45,6 +42,11 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.True(webDriver.FindElement(By.Id(inputId)).Selected);
         }
 
-
+        [Then(@"The ""(.*)"" radiobutton should be unchecked")]
+        public void TheradioButtonShouldNotBeChecked(string inputId)
+        {
+            var webDriver = BrowserSession.Native as IWebDriver;
+            Assert.False(webDriver.FindElement(By.Id(inputId)).Selected);
+        }
     }
 }

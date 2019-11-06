@@ -214,6 +214,37 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Throws<Exception>(() => _elementHelper.CheckIfLabelAndTextEmpty(element, viewModel));
         }
 
+
+        [Fact]
+        public void CheckForRadioOptions_ShouldThrowException_IfNoOptionsAreGiven()
+        {
+
+            var element = new ElementBuilder()
+               .WithType(EElementType.Radio)
+               .WithQuestionId("questionId")
+               .WithLabel("Label").Build();
+
+
+            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
+        }
+
+        [Fact]
+        public void CheckForRadioOptions_ShouldThrowException_IfOptionsAreEmpty()
+        {
+
+            var element = new ElementBuilder()
+               .WithType(EElementType.Radio)
+               .WithQuestionId("questionId")
+               .WithLabel("Label")
+               .WithOptions(new List<Option>())
+               .Build();
+
+            var viewModel = new Dictionary<string, string>();
+
+
+            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
+        }
+
         [Theory]
         [InlineData(EElementType.P, "paragraph")]
         [InlineData(EElementType.H1,"Header 1")]
@@ -222,7 +253,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData(EElementType.H4, "Header 4")]
         [InlineData(EElementType.H5, "Header 5")]
         [InlineData(EElementType.H6, "Header 6")]
-        public void CreateGenericHtmlElement(EElementType eElementType, string text)
+        public void ElementBuilder_ShouldCreateGenericHtmlElementsWithText(EElementType eElementType, string text)
         {
             var element = new ElementBuilder()
                 .WithType(eElementType)
@@ -235,7 +266,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Theory]
         [InlineData(EElementType.OL)]
         [InlineData(EElementType.UL)]
-        public void CreateLists(EElementType eElementType)
+        public void ElemenetBuilder_ShouldCreateListsWithListItems(EElementType eElementType)
         {
             List<string> listItems = new List<string>{ "item 1", "item 2", "item 3" };
 
@@ -250,7 +281,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CreateImage()
+        public void ElementBuilder_ShouldCreateImageElement_WithProperties()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.Img)
@@ -265,7 +296,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CreateRadioButton()
+        public void ElementBuilder_ShouldCreateRadioSet_WithOptionsAndHintText()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.Radio)
@@ -276,18 +307,18 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2", Hint = "Option 2 Hint" } })
                 .Build();
 
+            Assert.True(_elementHelper.CheckForRadioOptions(element));
+            
             Assert.Equal("questionId", element.Properties.QuestionId);
             Assert.Equal("Label", element.Properties.Label);
 
             Assert.Equal("option1", element.Properties.Options[0].Value);
             Assert.Equal("Option 1", element.Properties.Options[0].Text);
             Assert.Equal("Option 1 Hint", element.Properties.Options[0].Hint);
-
-
+            
             Assert.Equal("option2", element.Properties.Options[1].Value);
             Assert.Equal("Option 2", element.Properties.Options[1].Text);
             Assert.Equal("Option 2 Hint", element.Properties.Options[1].Hint);
         }
-       
     }
 }

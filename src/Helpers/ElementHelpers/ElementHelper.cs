@@ -13,6 +13,8 @@ namespace form_builder.Helpers.ElementHelpers
         bool CheckForMaxLength(Element element, Dictionary<string, string> viewModel);
 
         bool CheckIfLabelAndTextEmpty(Element element, Dictionary<string, string> viewModel);
+
+        bool CheckForRadioOptions(Element element);
     }
 
     public class ElementHelper : IElementHelper
@@ -56,6 +58,15 @@ namespace form_builder.Helpers.ElementHelpers
                 throw new Exception("An inline alert requires either a label or text or both to be present. Both can not be empty");
             }
 
+            return true;
+        }
+
+        public bool CheckForRadioOptions(Element element)
+        {
+            if(element.Properties.Options == null || element.Properties.Options.Count <= 1)
+            {
+                throw new Exception("A radio element requires two or more options to be present.");
+            }
             return true;
         }
     }

@@ -12,7 +12,7 @@
 
         @if (!string.IsNullOrEmpty(item.Hint))
         {
-            <span class="radio-sub-label" id=@itemHint>@item.Hint</span>
+            <span class="radio-sub-label" id=@itemHint>@Html.Raw(item.Hint)</span>
         }
     </div>
 }

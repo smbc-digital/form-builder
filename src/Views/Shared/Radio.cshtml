@@ -17,7 +17,7 @@
 
         @if (!string.IsNullOrEmpty(Model.Properties.Hint))
         {
-            <span id=@hintId>@Model.Properties.Hint</span>
+            <span id=@hintId>@Html.Raw(Model.Properties.Hint)</span>
         }
 
         <div>
