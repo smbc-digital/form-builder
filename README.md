@@ -79,7 +79,7 @@ Example JSON:
     * [Select](#selectprops)
     * [Checkbox](#checkboxprops)
     * [Link](#linkprops) (Anchor styled as button)
-    * [Alert](#alertprops)
+    * [InlineAlert](#alertprops)
     * [Button](#buttonprops)
     * [UL](#Ulprops) (Unordered List)
     * [OL](#Olprops) (Ordered List)
@@ -98,7 +98,6 @@ Example JSON:
         * Label (*string*) __*__
         * Name (*string*) __*__
         * ID (*string*) __*__
-        * AriaLabel (*string*)
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * MaxLength (*int*)
@@ -108,7 +107,6 @@ Example JSON:
         * Label (*string*) __*__
         * Name (*string*) __*__
         * ID (*string*) __*__
-        * AriaLabel (*string*)
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * MaxLength (*int*)
@@ -157,12 +155,9 @@ Example JSON:
         * ClassName (*string*)
         * ID (*string*)
 
-    * <a name="alertprops">**Alert**</a>
+    * <a name="alertprops">**InlineAlert**</a>
+        * Label (*string*) __*__
         * Text (*string*) __*__
-        * Type (*string*) __*__
-            * Info
-            * Warning
-        * ClassName (*string*)
 
     * <a name="buttonprops">**Button**</a>
         * Text (*string*) __*__
