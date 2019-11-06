@@ -16,12 +16,6 @@ namespace form_builder_tests_ui.StepDefinitions
             BrowserSession.FillIn("address").With("test");           
         }
 
-        [Then(@"I press the next step button")]
-        public void ThenIPressTheNextStepButton()
-        {
-            BrowserSession.ClickButton("nextStep");
-        }
-
         [Then(@"I fill in issue details")]
         public void ThenIFillinIssueDetails()
         {

@@ -105,7 +105,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 18
  testRunner.Then("I fill in your details", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 19
- testRunner.Then("I press the next step button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 20
  testRunner.Then("I should see the \"issueDetails\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 21
@@ -113,7 +113,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 22
  testRunner.Then("I fill in issue details", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 23
- testRunner.Then("I press the this is a test button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I click the \"this is a test\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 24
  testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 25

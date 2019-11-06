@@ -104,7 +104,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 15
  testRunner.Then("I fill in page1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 16
- testRunner.Then("I press the next step button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 17
  testRunner.Then("I fill in page2", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 18
@@ -125,9 +125,9 @@ this.ScenarioInitialize(scenarioInfo);
 #line 22
  testRunner.Then("I fill in page1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 23
- testRunner.Then("I press the next step button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 24
- testRunner.Then("I press the submit button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.When("I click the \"submit\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 25
  testRunner.Then("I should see a validation message for \"issueTwo\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

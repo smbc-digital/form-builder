@@ -18,18 +18,6 @@ namespace form_builder_tests_ui.StepDefinitions
             BrowserSession.FillIn("issueTwo").With("test data test data. test data test data. test data test data. test data test data. test data test data. test data test data. test data test data. test data test data.");
         }
 
-        [Then(@"I press the next step button")]
-        public void ThenIPressTheNextStepButton()
-        {
-            BrowserSession.ClickButton("nextStep");
-        }
-
-        [Then(@"I press the submit button")]
-        public void ThenIPressTheSubmitButton()
-        {
-            BrowserSession.ClickButton("submit");
-        }
-
         [Then(@"I should see a validation message for ""(.*)"" input")]
         public void ThenIShouldSeeValidationMessageForInput(string inputName)
         {
