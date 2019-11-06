@@ -157,7 +157,7 @@ Example JSON:
         * Text (*string*) (defaulted to "Next step")
         * ClassName (*string*) (defaulted to "button-primary")
         * ButtonId (*string*)
-## 
+        
 Button JSON example:
 ```json
   {
