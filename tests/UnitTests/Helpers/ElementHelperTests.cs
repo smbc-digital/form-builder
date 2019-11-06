@@ -218,20 +218,20 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public void CheckForRadioOptions_ShouldThrowException_IfNoOptionsAreGiven()
         {
-
+            //Arrange
             var element = new ElementBuilder()
                .WithType(EElementType.Radio)
                .WithQuestionId("questionId")
                .WithLabel("Label").Build();
 
-
+            //Assert
             var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
         }
 
         [Fact]
         public void CheckForRadioOptions_ShouldThrowException_IfOptionsAreEmpty()
         {
-
+            //Arrange
             var element = new ElementBuilder()
                .WithType(EElementType.Radio)
                .WithQuestionId("questionId")
@@ -241,7 +241,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var viewModel = new Dictionary<string, string>();
 
-
+            //Assert
             var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
         }
 
@@ -311,6 +311,7 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2", Hint = "Option 2 Hint" } })
                 .Build();
 
+            //Assert
             Assert.True(_elementHelper.CheckForRadioOptions(element));
 
             Assert.Equal("questionId", element.Properties.QuestionId);

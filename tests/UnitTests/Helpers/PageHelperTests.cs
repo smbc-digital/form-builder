@@ -65,6 +65,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData(EElementType.Button)]
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial(EElementType type)
         {
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(type)
                 .WithPropertyText("text")
@@ -79,9 +80,10 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithName("form-name")
                 .Build();
 
-
+            //Act
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
 
+            //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>()), Times.Once);
         }
 
@@ -90,6 +92,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData(EElementType.UL)]
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartialForList(EElementType type)
         {
+            //Arrange
             List<string> listItems = new List<string> { "item 1", "item 2", "item 3" };
 
             var element = new ElementBuilder()
@@ -106,9 +109,10 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithName("form-name")
                 .Build();
 
-
+            //Act
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
 
+            //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>()), Times.Once);
         }
 
@@ -116,6 +120,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartialForImg()
         {
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Img)
                 .WithAltText("alt text")
@@ -131,9 +136,10 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithName("form-name")
                 .Build();
 
-
+            //Act
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
 
+            //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == EElementType.Img.ToString()), It.IsAny<Element>()), Times.Once);
         }
 
