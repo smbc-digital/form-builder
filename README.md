@@ -94,6 +94,21 @@ Example JSON:
 #
    * <a name="ptextprops">**P** (Paragraph text)</a>
         * Text (*string*) (Can embed HTML code e.g. \<strong\>) __*__
+
+Paragraph text JSON example:
+```json
+{
+  "Type": "ul",
+  "Properties": {
+    "ClassName":  "indented-list",
+    "ListItems": [
+      "List Item 1",
+      "List Item 2",
+      "List Item 3"
+    ]
+  }
+}
+```
 #
    * <a name="textboxprops">**Textbox**</a>
         * Label (*string*) __*__
@@ -227,7 +242,6 @@ Textarea JSON example:
         * Text (*string*) (defaulted to "Next step")
         * ClassName (*string*) (defaulted to "button-primary")
         * ButtonId (*string*)
-
 
 Button JSON example:
 ```json
