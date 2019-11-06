@@ -225,7 +225,7 @@ Textarea JSON example:
       "Text": "This is the description of the alert"
     }
   }
-      
+ ```     
    * <a name="buttonprops">**Button**</a>
         * Text (*string*) (defaulted to "Next step")
         * ClassName (*string*) (defaulted to "button-primary")
