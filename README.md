@@ -244,12 +244,27 @@ Button JSON example:
    * <a name="ulprops">**UL** (Unordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
+      
+Unordered List JSON example:
+```json
+{
+  "Type": "ul",
+  "Properties": {
+    "ClassName":  "indented-list",
+    "ListItems": [
+      "List Item 1",
+      "List Item 2",
+      "List Item 3"
+    ]
+  }
+}
+```
 #      
    * <a name="olprops">**OL** (Ordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
  
-Ordered List JSON example 
+Ordered List JSON example: 
 ```json
 {
   "Type": "ol",
