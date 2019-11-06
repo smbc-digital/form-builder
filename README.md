@@ -88,12 +88,13 @@ Example JSON:
 
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)
+    #
     * <a name="headingprops">**H1-H6** (Heading levels)</a>
         * Text (*string*) __*__
-
+    #
     * <a name="ptextprops">**P** (Paragraph text)</a>
         * Text (*string*) (Can embed HTML code e.g. \<strong\>) __*__
-
+    #
     * <a name="textboxprops">**Textbox**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
@@ -116,7 +117,7 @@ Textbox JSON example:
     }
   }
 ```
-
+#
    * <a name="textareaprops">**Textarea**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
@@ -139,9 +140,7 @@ Textarea JSON example:
     }
   }
 ```
-
-<br />
-
+#
    * <a name="radioprops">**Radio**</a>
         * Label (*string*) __*__
         * Name (*string*) __*__
@@ -178,9 +177,7 @@ Textarea JSON example:
       ]
  }
  ```
- 
-<br />
-
+#
    * <a name="selectprops">**Select**</a>
         * Label (*string*) __*__
         * Name (*string*) __*__
@@ -192,7 +189,7 @@ Textarea JSON example:
         * Hint (*string*)
         * Optional (*boolean*)
         * Placeholder (*string*)
-
+#
    * <a name="checkboxprops">**Checkbox**</a>
         * Label (*string*) __*__
         * Name (*string*) __*__
@@ -204,14 +201,14 @@ Textarea JSON example:
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * Optional (*boolean*)
-
+#
    * <a name="linkprops">**Link**</a>
         * Text (*string*) __*__
         * Name (*string*) __*__
         * URL (*string*) __*__
         * ClassName (*string*)
         * QuestionId (*string*)
-        
+ #       
    * <a name="inlinealertprops">**InlineAlert**</a>
       * Text (*string*) 
       * Label (*string*) (at least one Text or Label must be entered for it to render) 
@@ -225,7 +222,8 @@ Textarea JSON example:
       "Text": "This is the description of the alert"
     }
   }
- ```     
+ ```    
+ #
    * <a name="buttonprops">**Button**</a>
         * Text (*string*) (defaulted to "Next step")
         * ClassName (*string*) (defaulted to "button-primary")
@@ -243,14 +241,15 @@ Button JSON example:
     }
   }
 ```
+#
    * <a name="ulprops">**UL** (Unordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
-      
+#
    * <a name="olprops">**OL** (Ordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
-      
+#     
    * <a name="imgprops">**Img** (Image)</a>
       * AltText (*string*) __*__
       * Source (*string*) __*__
