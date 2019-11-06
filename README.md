@@ -79,7 +79,7 @@ Example JSON:
     * [Select](#selectprops)
     * [Checkbox](#checkboxprops)
     * [Link](#linkprops) (Anchor styled as button)
-    * [InlineAlert](#alertprops)
+    * [InlineAlert](#inlinealertprops)
     * [Button](#buttonprops)
     * [UL](#Ulprops) (Unordered List)
     * [OL](#Olprops) (Ordered List)
@@ -171,7 +171,7 @@ Example JSON:
       * Source (*string*) __*__
       * ClassName (*string*)
       
-      * <a name="inlineAlert">**InlineAlert**</a>
+    * <a name="inlinealertprops">**InlineAlert**</a>
       * Text (*string*) 
       * Label (*string*) (at least one Text or Label must be entered for it to render) 
 
