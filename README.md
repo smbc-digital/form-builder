@@ -141,7 +141,6 @@ Textarea JSON example:
 
    * <a name="radioprops">**Radio**</a>
         * Label (*string*) __*__
-        * Name (*string*) __*__
         * QuestionId (*string*) __*__
         * Options[*object*] __*__
             * Text (*string*) __*__
