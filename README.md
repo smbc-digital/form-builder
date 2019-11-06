@@ -81,8 +81,8 @@ Example JSON:
     * [Link](#linkprops) (Anchor styled as button)
     * [Alert](#alertprops)
     * [Button](#buttonprops)
-    * [Ul](#Ulprops) (Unordered List)
-    * [Ol](#Olprops) (Ordered List)
+    * [UL](#Ulprops) (Unordered List)
+    * [OL](#Olprops) (Ordered List)
     * [Img](#Imgprops) (Image)
     
 
@@ -170,15 +170,15 @@ Example JSON:
         * ClassName (*string*)
         * ID (*string*)
    
-    * <a name="ulprops">**Ul**</a>
+    * <a name="ulprops">**UL** (Unordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
       
-    * <a name="olprops">**Ol**</a>
+    * <a name="olprops">**OL** (Ordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
       
-    * <a name="imgprops">**Img**</a>
+    * <a name="imgprops">**Img** (Image)</a>
       * AltText (*string*) __*__
       * Source (*string*) __*__
       * ClassName (*string*)
