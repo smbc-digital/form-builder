@@ -48,7 +48,7 @@
 **PageElements[*object*]**:
 
 Example JSON:
-
+```json
     {
         "PageElements": [
             {
@@ -64,12 +64,12 @@ Example JSON:
                 {
                     "Label": "Enter your first name",
                     "Name": "firstName",
-                    "ID": "first-name"
+                    "QuestionId": "first-name"
                 }
             }
         ]
     }
-
+```
 * **Type** (*string*) (HTML element)
     * [H1-H6](#headingprops) (Heading levels)
     * [P](#ptextprops) (Paragraph text)
@@ -154,10 +154,21 @@ Example JSON:
         * QuestionId (*string*)
 
     * <a name="buttonprops">**Button**</a>
-        * Text (*string*)
-        * ClassName (*string*)
-        * QuestionId (*string*)
-   
+        * Text (*string*) (defaulted to "Next step")
+        * ClassName (*string*) (defaulted to "button-primary")
+        * ButtonId (*string*)
+## 
+Button JSON example:
+```json
+  {
+    "Type": "Button",
+    "Properties": {
+      "ButtonId": "nextStep",
+      "Text": "Custom text",
+      "className": "button-secondary"
+    }
+  }
+```
     * <a name="ulprops">**UL** (Unordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
@@ -177,7 +188,7 @@ Example JSON:
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>
 Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer:
-
+```json
     {
         "PageBehaviours": [
             {
@@ -197,6 +208,7 @@ Example where if a user selects yes they will continue on with the form, otherwi
             }
         ]
     }
+```
 **Conditions**[*object*]
 * QuestionID (*string*) - The name of the Radio/Checkbox list to evaluate
 * EqualTo (*string*) - The value it must equal to for the behaviour to happen
