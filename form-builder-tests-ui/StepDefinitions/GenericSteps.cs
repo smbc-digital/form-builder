@@ -69,6 +69,7 @@ namespace form_builder_tests_ui.StepDefinitions
         }
 
         [When(@"I click the ""(.*)"" button")]
+        [Then(@"I click the ""(.*)"" button")]
         public void WhenIClickTheButton(string name)
         {
             BrowserSession.ClickButton(name);

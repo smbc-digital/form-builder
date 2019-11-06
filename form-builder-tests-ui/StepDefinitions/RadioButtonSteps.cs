@@ -7,13 +7,6 @@ namespace form_builder_tests_ui.StepDefinitions
     [Binding, Scope(Tag = "radiobutton")]
     class RadioButtonSteps : UiTestBase
     {
-        [Then(@"I press the submit button")]
-        public void ThenIPressTheSubmitButton()
-        {
-            BrowserSession.ClickButton("submit");
-        }
-
-
         [Then(@"I should see a validation message for ""(.*)"" input")]
         public void ThenIShouldSeeValidationMessageForInput(string inputName)
         {

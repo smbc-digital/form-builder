@@ -79,10 +79,10 @@ Example JSON:
     * [Select](#selectprops)
     * [Checkbox](#checkboxprops)
     * [Link](#linkprops) (Anchor styled as button)
-    * [Alert](#alertprops)
+    * [InlineAlert](#alertprops)
     * [Button](#buttonprops)
-    * [Ul](#Ulprops) (Unordered List)
-    * [Ol](#Olprops) (Ordered List)
+    * [UL](#Ulprops) (Unordered List)
+    * [OL](#Olprops) (Ordered List)
     * [Img](#Imgprops) (Image)
     
 
@@ -96,28 +96,24 @@ Example JSON:
 
     * <a name="textboxprops">**Textbox**</a>
         * Label (*string*) __*__
-        * Name (*string*) __*__
-        * ID (*string*) __*__
-        * AriaLabel (*string*)
+        * QuestionId (*string*) __*__
         * CustomValidationMessage (*string*)
         * Hint (*string*)
-        * MaxLength (*int*)
-        * Optional (*boolean*)
+        * MaxLength (*int*) (defaulted to 200)
+        * Optional (*boolean*) (defaults to false)
 
     * <a name="textareaprops">**Textarea**</a>
         * Label (*string*) __*__
-        * Name (*string*) __*__
-        * ID (*string*) __*__
-        * AriaLabel (*string*)
+        * QuestionId (*string*) __*__
         * CustomValidationMessage (*string*)
         * Hint (*string*)
-        * MaxLength (*int*)
-        * Optional (*boolean*)
+        * MaxLength (*int*) __*__
+        * Optional (*boolean*) (defaults to false)
 
     * <a name="radioprops">**Radio**</a>
         * Label (*string*) __*__
         * Name (*string*) __*__
-        * ID (*string*) __*__
+        * QuestionId (*string*) __*__
         * Options[*object*] __*__
             * Text (*string*) __*__
             * Value (*string*) __*__
@@ -129,7 +125,7 @@ Example JSON:
     * <a name="selectprops">**Select**</a>
         * Label (*string*) __*__
         * Name (*string*) __*__
-        * ID (*string*) __*__
+        * QuestionId (*string*) __*__
         * Options[*object*] __*__
             * Text (*string*) __*__
             * Value (*string*) __*__
@@ -141,7 +137,7 @@ Example JSON:
     * <a name="checkboxprops">**Checkbox**</a>
         * Label (*string*) __*__
         * Name (*string*) __*__
-        * ID (*string*) __*__
+        * QuestionId (*string*) __*__
         * Options[*object*] __*__
             * Text (*string*) __*__
             * Value (*string*) __*__
@@ -155,33 +151,29 @@ Example JSON:
         * Name (*string*) __*__
         * URL (*string*) __*__
         * ClassName (*string*)
-        * ID (*string*)
-
-    * <a name="alertprops">**Alert**</a>
-        * Text (*string*) __*__
-        * Type (*string*) __*__
-            * Info
-            * Warning
-        * ClassName (*string*)
+        * QuestionId (*string*)
 
     * <a name="buttonprops">**Button**</a>
-        * Text (*string*) __*__
-        * Type (*string*) __*__
+        * Text (*string*)
         * ClassName (*string*)
-        * ID (*string*)
+        * QuestionId (*string*)
    
-    * <a name="ulprops">**Ul**</a>
+    * <a name="ulprops">**UL** (Unordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
       
-    * <a name="olprops">**Ol**</a>
+    * <a name="olprops">**OL** (Ordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
       
-    * <a name="imgprops">**Img**</a>
+    * <a name="imgprops">**Img** (Image)</a>
       * AltText (*string*) __*__
       * Source (*string*) __*__
       * ClassName (*string*)
+      
+      * <a name="inlineAlert">**InlineAlert**</a>
+      * Text (*string*) 
+      * Label (*string*) (at least one Text or Label must be entered for it to render) 
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>
 Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer:

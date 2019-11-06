@@ -13,13 +13,12 @@ Scenario: Renders HTML tags on the page
 Scenario: User fills in data and clicks next
 	Given I navigate to "/Textarea/page1"
 	Then I fill in page1
-	Then I press the next step button
+	Then I click the "nextStep" button
 	Then I fill in page2
 	And I should see the "submit" button
 
 Scenario: User enters nothing on page2
 	Given I navigate to "/Textarea/page1"
 	Then I fill in page1
-	Then I press the next step button
-	Then I press the submit button
-	Then I should see a validation message for "issueTwo" input
+	Then I click the "nextStep" button
+	When I click the "submit" button

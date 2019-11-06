@@ -13,12 +13,6 @@ namespace form_builder_tests_ui.StepDefinitions
             BrowserSession.FillIn("lastName").With("test");          
         }
 
-        [Then(@"I press the next step button")]
-        public void ThenIPressTheNextStepButton()
-        {
-            BrowserSession.ClickButton("nextStep");
-        }
-
         [Then(@"I should see a validation message for ""(.*)"" input")]
         public void ThenIShouldSeeValidationMessageForInput(string inputName)
         {
