@@ -88,19 +88,20 @@ Example JSON:
 
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)
-    * <a name="headingprops">**H1-H6** (Heading levels)</a>
-        * Text (*string*) __*__
 
-    * <a name="ptextprops">**P** (Paragraph text)</a>
-        * Text (*string*) (Can embed HTML code e.g. \<strong\>) __*__
+* <a name="headingprops">**H1-H6** (Heading levels)</a>
+    * Text (*string*) __*__
 
-    * <a name="textboxprops">**Textbox**</a>
-        * Label (*string*) __*__
-        * QuestionId (*string*) __*__
-        * CustomValidationMessage (*string*)
-        * Hint (*string*)
-        * MaxLength (*int*) (defaulted to 200)
-        * Optional (*boolean*) (defaults to false)
+* <a name="ptextprops">**P** (Paragraph text)</a>
+    * Text (*string*) (Can embed HTML code e.g. \<strong\>) __*__
+
+* <a name="textboxprops">**Textbox**</a>
+    * Label (*string*) __*__
+    * QuestionId (*string*) __*__
+    * CustomValidationMessage (*string*)
+    * Hint (*string*)
+    * MaxLength (*int*) (defaulted to 200)
+    * Optional (*boolean*) (defaults to false)
         
 Textbox JSON example:
 ```json
