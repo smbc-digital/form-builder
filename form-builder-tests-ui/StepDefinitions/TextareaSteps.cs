@@ -22,8 +22,8 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then(@"I should see a validation message for ""(.*)"" input")]
         public void ThenIShouldSeeValidationMessageForInput(string inputName)
         {
-            Thread.Sleep(4200);
-            Assert.True(BrowserSession.FindId("issueTwo-error").Exists());
+            Thread.Sleep(1200);
+            Assert.True(BrowserSession.FindId("issueOne-error").Exists());
         }
     }
 }

@@ -17,10 +17,10 @@ Scenario: User fills in data and clicks next
 	Given I navigate to "/ReportAnIssue/Your-Details"
 	Then I fill in your details
 	Then I click the "nextStep" button
-	Then I should see the "issueDetails" input
 	And I should see the header
+	Then I should see the "issueDetails" input
 	Then I fill in issue details
-	Then I click the "this is a test" button
+	Then I click the "nextStep" button
 	Then I should see the header
 	And I should see the "Do you have more details?" fieldset
 	

@@ -48,7 +48,7 @@
 **PageElements[*object*]**:
 
 Example JSON:
-
+```json
     {
         "PageElements": [
             {
@@ -64,12 +64,12 @@ Example JSON:
                 {
                     "Label": "Enter your first name",
                     "Name": "firstName",
-                    "ID": "first-name"
+                    "QuestionId": "first-name"
                 }
             }
         ]
     }
-
+```
 * **Type** (*string*) (HTML element)
     * [H1-H6](#headingprops) (Heading levels)
     * [P](#ptextprops) (Paragraph text)
@@ -79,38 +79,79 @@ Example JSON:
     * [Select](#selectprops)
     * [Checkbox](#checkboxprops)
     * [Link](#linkprops) (Anchor styled as button)
-    * [InlineAlert](#alertprops)
+    * [InlineAlert](#inlinealertprops)
     * [Button](#buttonprops)
     * [UL](#Ulprops) (Unordered List)
-    * [OL](#Olprops) (Ordered List)
+    * [OL](#olprops) (Ordered List)
     * [Img](#Imgprops) (Image)
     
 
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)
-    * <a name="headingprops">**H1-H6** (Heading levels)</a>
+#
+   * <a name="headingprops">**H1-H6** (Heading levels)</a>
         * Text (*string*) __*__
-
-    * <a name="ptextprops">**P** (Paragraph text)</a>
+#
+   * <a name="ptextprops">**P** (Paragraph text)</a>
         * Text (*string*) (Can embed HTML code e.g. \<strong\>) __*__
 
-    * <a name="textboxprops">**Textbox**</a>
+Paragraph text JSON example:
+```json
+{
+  "Type": "p",
+  "Properties": {
+    "Text": "<strong>This is strong text</strong>"
+  }
+}
+```
+#
+   * <a name="textboxprops">**Textbox**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * MaxLength (*int*) (defaulted to 200)
         * Optional (*boolean*) (defaults to false)
-
-    * <a name="textareaprops">**Textarea**</a>
+        
+Textbox JSON example:
+```json
+  {
+    "Type": "Textbox",
+    "Properties": {
+      "QuestionId": "emailAddress",
+      "Label": "Email address",
+      "Hint": "ie: someone@example.com",
+      "CustomValidationMessage": "Check the email address and try again",
+      "Optional": false,
+      "MaxLength": 60
+    }
+  }
+```
+#
+   * <a name="textareaprops">**Textarea**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
         * CustomValidationMessage (*string*)
         * Hint (*string*)
-        * MaxLength (*int*) __*__
+        * MaxLength (*int*) (defaults to 200)
         * Optional (*boolean*) (defaults to false)
 
-    * <a name="radioprops">**Radio**</a>
+Textarea JSON example:
+```json
+  {
+    "Type": "Textarea",
+    "Properties": {
+      "Label": "Enter your issue",
+      "QuestionId": "issueOne",
+      "CustomValidationMessage": "Custom validation message",
+      "Hint": "Hint text",
+      "MaxLength": "2000",
+      "Optional": false
+    }
+  }
+```
+#
+   * <a name="radioprops">**Radio**</a>
         * Label (*string*) __*__
         * Name (*string*) __*__
         * QuestionId (*string*) __*__
@@ -121,8 +162,32 @@ Example JSON:
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * Optional (*boolean*)
-
-    * <a name="selectprops">**Select**</a>
+ 
+ Radio JSON example:
+ ```json
+ {
+    "Type": "Radio",
+    "Properties": {
+      "QuestionId": "radButton",
+      "Label": "Do you like things?",
+      "Hint": "<strong>Things</strong> like this and that",
+      "Optional": true,
+      "Options": [
+        {
+          "Text": "Yes",
+          "Value": "yes",
+          "Hint": "<strong>This</strong> is an affirmative response."
+        },
+        {
+          "Text": "No",
+          "Value": "no",
+          "Hint": "This is a negative response."
+        }
+      ]
+ }
+ ```
+#
+   * <a name="selectprops">**Select**</a>
         * Label (*string*) __*__
         * Name (*string*) __*__
         * QuestionId (*string*) __*__
@@ -133,8 +198,8 @@ Example JSON:
         * Hint (*string*)
         * Optional (*boolean*)
         * Placeholder (*string*)
-
-    * <a name="checkboxprops">**Checkbox**</a>
+#
+   * <a name="checkboxprops">**Checkbox**</a>
         * Label (*string*) __*__
         * Name (*string*) __*__
         * QuestionId (*string*) __*__
@@ -145,39 +210,103 @@ Example JSON:
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * Optional (*boolean*)
-
-    * <a name="linkprops">**Link**</a>
+#
+   * <a name="linkprops">**Link**</a>
         * Text (*string*) __*__
         * Name (*string*) __*__
         * URL (*string*) __*__
         * ClassName (*string*)
         * QuestionId (*string*)
+#        
+   * <a name="inlinealertprops">**InlineAlert**</a>
+      * Text (*string*) 
+      * Label (*string*) (at least one Text or Label must be entered for it to render) 
+      
+  InlineAlert JSON example:
+  ```json
+  {
+    "Type": "InlineAlert",
+    "Properties": {
+      "Label": "This is the heading of the alert",
+      "Text": "This is the description of the alert"
+    }
+  }
+ ```     
+ #
+   * <a name="buttonprops">**Button**</a>
+        * Text (*string*) (defaulted to "Next step")
+        * ClassName (*string*) (defaulted to "button-primary")
+        * ButtonId (*string*)
 
-    * <a name="buttonprops">**Button**</a>
-        * Text (*string*)
-        * ClassName (*string*)
-        * QuestionId (*string*)
-   
-    * <a name="ulprops">**UL** (Unordered List)</a>
+Button JSON example:
+```json
+  {
+    "Type": "Button",
+    "Properties": {
+      "ButtonId": "nextStep",
+      "Text": "Custom text",
+      "className": "button-secondary"
+    }
+  }
+```
+#
+   * <a name="ulprops">**UL** (Unordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
       
-    * <a name="olprops">**OL** (Ordered List)</a>
+Unordered List JSON example:
+```json
+{
+  "Type": "ul",
+  "Properties": {
+    "ClassName":  "indented-list",
+    "ListItems": [
+      "List Item 1",
+      "List Item 2",
+      "List Item 3"
+    ]
+  }
+}
+```
+#      
+   * <a name="olprops">**OL** (Ordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
-      
-    * <a name="imgprops">**Img** (Image)</a>
+ 
+Ordered List JSON example: 
+```json
+{
+  "Type": "ol",
+  "Properties": {
+    "ListItems": [
+      "Ordered List Item 1",
+      "Ordered List Item 2",
+      "Ordered List Item 3"
+    ]
+  }
+}
+```
+#
+   * <a name="imgprops">**Img** (Image)</a>
       * AltText (*string*) __*__
       * Source (*string*) __*__
       * ClassName (*string*)
       
-      * <a name="inlineAlert">**InlineAlert**</a>
-      * Text (*string*) 
-      * Label (*string*) (at least one Text or Label must be entered for it to render) 
+Image JSON example:
+```json
+  {
+    "Type": "img",
+    "Properties": {
+     "Source": "http://url.com/image",
+            "AltText": "alt image text",
+            "ClassName": "image-class"
+    }
+  }
+```
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>
 Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer:
-
+```json
     {
         "PageBehaviours": [
             {
@@ -197,6 +326,7 @@ Example where if a user selects yes they will continue on with the form, otherwi
             }
         ]
     }
+```
 **Conditions**[*object*]
 * QuestionID (*string*) - The name of the Radio/Checkbox list to evaluate
 * EqualTo (*string*) - The value it must equal to for the behaviour to happen
