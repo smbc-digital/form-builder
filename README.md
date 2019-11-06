@@ -121,8 +121,23 @@ Textbox JSON example:
         * QuestionId (*string*) __*__
         * CustomValidationMessage (*string*)
         * Hint (*string*)
-        * MaxLength (*int*) __*__
+        * MaxLength (*int*) (defaults to 200)
         * Optional (*boolean*) (defaults to false)
+
+Textarea JSON example:
+```json
+  {
+    "Type": "Textarea",
+    "Properties": {
+      "Label": "Enter your issue",
+      "QuestionId": "issueOne",
+      "CustomValidationMessage": "Custom validation message",
+      "Hint": "Hint text",
+      "MaxLength": "2000",
+      "Optional": false
+    }
+  }
+```
 
    * <a name="radioprops">**Radio**</a>
         * Label (*string*) __*__
