@@ -16,7 +16,7 @@ Scenario: Renders HTML tags on the page
 Scenario: User fills in data and clicks next
 	Given I navigate to "/Textbox/page1"
 	Then I fill in page1
-	Then I press the next step button
+	Then I click the "nextStep" button
 	And I should see the header
 	Then I should see the "emailAddress" input
 	And I should see a "p" element with "ie: someone@example.com" text

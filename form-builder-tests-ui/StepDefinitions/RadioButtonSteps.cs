@@ -7,13 +7,6 @@ namespace form_builder_tests_ui.StepDefinitions
     [Binding, Scope(Tag = "radiobutton")]
     class RadioButtonSteps : UiTestBase
     {
-        [Then(@"I press the submit button")]
-        public void ThenIPressTheSubmitButton()
-        {
-            BrowserSession.ClickButton("submit");
-        }
-
-
         [Then(@"I should see a validation message for ""(.*)"" input")]
         public void ThenIShouldSeeValidationMessageForInput(string inputName)
         {
@@ -25,9 +18,6 @@ namespace form_builder_tests_ui.StepDefinitions
         {
             Assert.False(BrowserSession.FindId(inputName).Exists());
         }
-
-
-
 
         [Then(@"I click the ""(.*)"" radiobutton")]
         [When(@"I click the ""(.*)"" radiobutton")]
@@ -44,7 +34,5 @@ namespace form_builder_tests_ui.StepDefinitions
             var webDriver = BrowserSession.Native as IWebDriver;
             Assert.True(webDriver.FindElement(By.Id(inputId)).Selected);
         }
-
-
     }
 }
