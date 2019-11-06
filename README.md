@@ -121,23 +121,8 @@ Textbox JSON example:
         * QuestionId (*string*) __*__
         * CustomValidationMessage (*string*)
         * Hint (*string*)
-        * MaxLength (*int*) (defaults to 200)
+        * MaxLength (*int*) __*__
         * Optional (*boolean*) (defaults to false)
-
-Textarea JSON example:
-```json
-  {
-    "Type": "Textarea",
-    "Properties": {
-      "Label": "Enter your issue",
-      "QuestionId": "issueOne",
-      "CustomValidationMessage": "Custom validation message",
-      "Hint": "Hint text",
-      "MaxLength": "2000",
-      "Optional": false
-    }
-  }
-```
 
    * <a name="radioprops">**Radio**</a>
         * Label (*string*) __*__
@@ -206,12 +191,27 @@ Textarea JSON example:
         * URL (*string*) __*__
         * ClassName (*string*)
         * QuestionId (*string*)
+       
+   * <a name="inlinealertprops">**InlineAlert**</a>
+      * Text (*string*) 
+      * Label (*string*) (at least one Text or Label must be entered for it to render) 
+      
+InlineAlert JSON example:
+```json
+  {
+    "Type": "InlineAlert",
+    "Properties": {
+      "Label": "This is the heading of the alert",
+      "Text": "This is the description of the alert"
+    }
+  }
+``` 
+ 
 
    * <a name="buttonprops">**Button**</a>
         * Text (*string*) (defaulted to "Next step")
         * ClassName (*string*) (defaulted to "button-primary")
         * ButtonId (*string*)
-
 
 Button JSON example:
 ```json
@@ -237,10 +237,6 @@ Button JSON example:
       * Source (*string*) __*__
       * ClassName (*string*)
       
-   * <a name="inlinealertprops">**InlineAlert**</a>
-      * Text (*string*) 
-      * Label (*string*) (at least one Text or Label must be entered for it to render) 
-
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>
 Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer:
 ```json
