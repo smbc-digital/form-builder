@@ -101,6 +101,7 @@ Example JSON:
         * Hint (*string*)
         * MaxLength (*int*) (defaulted to 200)
         * Optional (*boolean*) (defaults to false)
+        
 Textbox JSON example:
 ```json
   {
@@ -139,8 +140,11 @@ Textarea JSON example:
   }
 ```
 
+<br />
+
    * <a name="radioprops">**Radio**</a>
         * Label (*string*) __*__
+        * Name (*string*) __*__
         * QuestionId (*string*) __*__
         * Options[*object*] __*__
             * Text (*string*) __*__
@@ -175,6 +179,8 @@ Textarea JSON example:
  }
  ```
  
+<br />
+
    * <a name="selectprops">**Select**</a>
         * Label (*string*) __*__
         * Name (*string*) __*__
@@ -205,7 +211,21 @@ Textarea JSON example:
         * URL (*string*) __*__
         * ClassName (*string*)
         * QuestionId (*string*)
-
+        
+   * <a name="inlinealertprops">**InlineAlert**</a>
+      * Text (*string*) 
+      * Label (*string*) (at least one Text or Label must be entered for it to render) 
+      
+  InlineAlert JSON example:
+  ```json
+  {
+    "Type": "InlineAlert",
+    "Properties": {
+      "Label": "This is the heading of the alert",
+      "Text": "This is the description of the alert"
+    }
+  }
+      
    * <a name="buttonprops">**Button**</a>
         * Text (*string*) (defaulted to "Next step")
         * ClassName (*string*) (defaulted to "button-primary")
@@ -236,9 +256,6 @@ Button JSON example:
       * Source (*string*) __*__
       * ClassName (*string*)
       
-   * <a name="inlinealertprops">**InlineAlert**</a>
-      * Text (*string*) 
-      * Label (*string*) (at least one Text or Label must be entered for it to render) 
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>
 Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer:
