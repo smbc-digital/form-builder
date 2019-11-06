@@ -101,7 +101,6 @@ Example JSON:
         * Hint (*string*)
         * MaxLength (*int*) (defaulted to 200)
         * Optional (*boolean*) (defaults to false)
-        
 Textbox JSON example:
 ```json
   {
@@ -136,6 +135,30 @@ Textbox JSON example:
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * Optional (*boolean*)
+ Radio JSON example:
+ ```json
+ {
+    "Type": "Radio",
+    "Properties": {
+      "QuestionId": "radButton",
+      "Label": "Do you like things?",
+      "Hint": "<strong>Things</strong> like this and that",
+      "Optional": false,
+      "Options": [
+        {
+          "Text": "Yes",
+          "Value": "yes",
+          "Hint": "<strong>This</strong> is an affirmative response."
+
+        },
+        {
+          "Text": "No",
+          "Value": "no",
+          "Hint": "This is a negative response."
+        }
+      ]
+ }
+ ```
 
    * <a name="selectprops">**Select**</a>
         * Label (*string*) __*__
@@ -172,7 +195,8 @@ Textbox JSON example:
         * Text (*string*) (defaulted to "Next step")
         * ClassName (*string*) (defaulted to "button-primary")
         * ButtonId (*string*)
-        
+
+
 Button JSON example:
 ```json
   {
