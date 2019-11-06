@@ -224,11 +224,13 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData(EElementType.H6, "Header 6")]
         public void CreateGenericHtmlElement(EElementType eElementType, string text)
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(eElementType)
                 .WithPropertyText(text)
                 .Build();
-           
+
+            // Assert
             Assert.Equal(text, element.Properties.Text);
         }
 
@@ -237,6 +239,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData(EElementType.UL)]
         public void CreateLists(EElementType eElementType)
         {
+            // Arrange
             List<string> listItems = new List<string>{ "item 1", "item 2", "item 3" };
 
             var element = new ElementBuilder()
@@ -244,29 +247,30 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithListItems(listItems)
                 .Build();
 
+            // Assert
             Assert.Equal(3, element.Properties.ListItems.Count);
             Assert.Equal("item 1", element.Properties.ListItems[0]);
-                                
         }
 
         [Fact]
         public void CreateImage()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Img)
                 .WithAltText("alt text")
                 .WithSource("source")
                 .Build();
 
+            // Assert
             Assert.Equal("alt text", element.Properties.AltText);
             Assert.Equal("source", element.Properties.Source);
-
-
         }
 
         [Fact]
         public void CreateRadioButton()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Radio)
                 .WithQuestionId("questionId")
@@ -276,13 +280,13 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2", Hint = "Option 2 Hint" } })
                 .Build();
 
+            // Assert
             Assert.Equal("questionId", element.Properties.QuestionId);
             Assert.Equal("Label", element.Properties.Label);
 
             Assert.Equal("option1", element.Properties.Options[0].Value);
             Assert.Equal("Option 1", element.Properties.Options[0].Text);
             Assert.Equal("Option 1 Hint", element.Properties.Options[0].Hint);
-
 
             Assert.Equal("option2", element.Properties.Options[1].Value);
             Assert.Equal("Option 2", element.Properties.Options[1].Text);
