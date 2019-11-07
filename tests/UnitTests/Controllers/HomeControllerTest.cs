@@ -27,8 +27,8 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<ISchemaProvider> _schemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IGateway> _gateWay = new Mock<IGateway>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
-        private readonly ILogger<HomeController> _logger;
-        
+        private readonly Mock<ILogger<HomeController>> _logger = new Mock<ILogger<HomeController>>();
+
         public HomeControllerTest()
         {
             _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Controllers
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>()))
              .ReturnsAsync(new FormBuilderViewModel());
 
-            _homeController = new HomeController(_logger, _mockDistributedCache.Object, _validators.Object, _schemaProvider.Object, _gateWay.Object, _pageHelper.Object);
+            _homeController = new HomeController(_logger.Object, _mockDistributedCache.Object, _validators.Object, _schemaProvider.Object, _gateWay.Object, _pageHelper.Object);
         }
 
         [Fact]
@@ -333,7 +333,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
             _gateWay.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
-                .ThrowsAsync(new Exception());
+                .ThrowsAsync(new Exception("error"));
 
             // Act & Assert
             await Assert.ThrowsAsync<Exception>(async () => await _homeController.Submit(guid));
