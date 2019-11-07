@@ -3,7 +3,9 @@ using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
 using form_builder.Providers;
+using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
@@ -26,14 +28,14 @@ namespace form_builder.Helpers.PageHelpers
     {
         private readonly IViewRender _viewRender;
         private readonly IElementHelper _elementHelper;
-        private readonly ICacheProvider _cacheProvider;
+        private readonly IDistributedCacheWrapper _distributedCache;
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
 
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, ICacheProvider cacheProvider, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys)
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
-            _cacheProvider = cacheProvider;
+            _distributedCache = distributedCache;
             _disallowedKeys = disallowedKeys.Value;
         }
 
@@ -130,7 +132,7 @@ namespace form_builder.Helpers.PageHelpers
         public void SaveAnswers(Dictionary<string, string> viewModel)
         {
             var guid = viewModel["Guid"];
-            var formData = _cacheProvider.GetString(guid);
+            var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new List<FormAnswers>();
 
             if (!string.IsNullOrEmpty(formData))
@@ -160,7 +162,7 @@ namespace form_builder.Helpers.PageHelpers
                 Answers = answers
             });
 
-            _cacheProvider.SetString(guid, JsonConvert.SerializeObject(convertedAnswers), 30);
+            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
     }
 }

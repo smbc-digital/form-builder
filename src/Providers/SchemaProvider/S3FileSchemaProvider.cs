@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using form_builder.Extensions;
 
-namespace form_builder.Providers
+namespace form_builder.Providers.SchemaProvider
 {
     public class S3FileSchemaProvider : ISchemaProvider
     {

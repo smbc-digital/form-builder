@@ -27,13 +27,14 @@ namespace form_builder
         {
             services
                 .ConfigureCookiePolicy()
-                .AddCacheProvider(HostingEnvironment.IsEnvironment("local"))
                 .AddValidators()
+                .AddStorageProvider(Configuration)
                 .AddSchemaProvider(HostingEnvironment)
                 .AddAmazonS3Client(Configuration.GetSection("AmazonS3Configuration")["AccessKey"], Configuration.GetSection("AmazonS3Configuration")["SecretKey"])
                 .AddGateways()
                 .AddIOptionsConfiguration(Configuration)
                 .AddHelpers();
+
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddScoped<IViewRender, ViewRender>();
@@ -49,11 +50,8 @@ namespace form_builder
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
-            app.UseSession();
 
             app.UseHttpsRedirection();
             app.UseMvc(routes =>

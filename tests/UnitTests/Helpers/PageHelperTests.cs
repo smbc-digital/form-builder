@@ -4,13 +4,15 @@ using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
-using form_builder.Providers;
+using form_builder.Providers.StorageProvider;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -21,7 +23,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly PageHelper _pageHelper;
         private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
-        private readonly Mock<ICacheProvider> _mockCacheProvider = new Mock<ICacheProvider>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _mockDisallowedKeysOptions = new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
         public PageHelperTests()
         {
@@ -33,7 +35,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 }
             });
 
-            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockCacheProvider.Object, _mockDisallowedKeysOptions.Object);
+            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object);
         }
 
         [Fact]
@@ -153,8 +155,8 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _pageHelper.SaveAnswers(viewModel);
 
-            _mockCacheProvider.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())));
-            _mockCacheProvider.Verify(_ => _.SetString(It.Is<string>(x => x == guid.ToString()), It.IsAny<string>(), It.IsAny<int>()));
+            _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())));
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == guid.ToString()), It.IsAny<string>(), It.IsAny<CancellationToken>()));
         }
 
         [Fact]
@@ -165,12 +167,12 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var callbackCacheProvider = string.Empty;
             var mockData = JsonConvert.SerializeObject(new List<FormAnswers> { new FormAnswers { PageUrl = "path", Answers = new List<Answers> { new Answers { QuestionId = "Item1", Response = "old-answer" }, new Answers { QuestionId = "Item2", Response = "old-answer" } } } });
-            _mockCacheProvider.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
 
 
-            _mockCacheProvider.Setup(_ => _.SetString(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()))
-                .Callback<string, string, int>((x, y, z) => callbackCacheProvider = y);
+            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
             var guid = Guid.NewGuid();
             var viewModel = new Dictionary<string, string>();
@@ -195,8 +197,8 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             var callbackCacheProvider = string.Empty;
 
-            _mockCacheProvider.Setup(_ => _.SetString(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()))
-                .Callback<string, string, int>((x, y, z) => callbackCacheProvider = y);
+            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
             var guid = Guid.NewGuid();
             var viewModel = new Dictionary<string, string>();
@@ -217,8 +219,8 @@ namespace form_builder_tests.UnitTests.Helpers
             var item1Data = "item1-data";
             var item2Data = "item2-data";
 
-            _mockCacheProvider.Setup(_ => _.SetString(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()))
-                .Callback<string, string, int>((x, y, z) => callbackCacheProvider = y);
+            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
             var guid = Guid.NewGuid();
             var viewModel = new Dictionary<string, string>();

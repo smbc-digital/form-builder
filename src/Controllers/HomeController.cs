@@ -5,19 +5,19 @@ using form_builder.Models;
 using form_builder.ViewModels;
 using Newtonsoft.Json;
 using form_builder.Enum;
-using form_builder.Providers;
 using form_builder.Validators;
 using System.Threading.Tasks;
 using System;
 using StockportGovUK.AspNetCore.Gateways;
 using form_builder.Helpers.PageHelpers;
-using System.Linq;
+using form_builder.Providers.SchemaProvider;
+using form_builder.Providers.StorageProvider;
 
 namespace form_builder.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ICacheProvider _cacheProvider;
+        private readonly IDistributedCacheWrapper _distributedCache;
 
         private readonly IEnumerable<IElementValidator> _validators;
 
@@ -27,9 +27,9 @@ namespace form_builder.Controllers
 
         private readonly IPageHelper _pageHelper;
 
-        public HomeController(ICacheProvider cacheProvider, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper)
+        public HomeController(IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper)
         {
-            _cacheProvider = cacheProvider;
+            _distributedCache = distributedCache;
             _validators = validators;
             _schemaProvider = schemaProvider;
             _gateway = gateway;
@@ -128,19 +128,19 @@ namespace form_builder.Controllers
                 return RedirectToAction("Error", "Home");
             }
 
-            var formData = _cacheProvider.GetString(guid.ToString());
+            var formData = _distributedCache.GetString(guid.ToString());
             var convertedAnswers = JsonConvert.DeserializeObject<List<FormAnswers>>(formData);
 
             try
             {
-                await _gateway.PostAsync(null, convertedAnswers);
+                await _gateway.PostAsync("http://localhost:5001/api/v1/home", convertedAnswers);
             }
             catch (Exception e)
             {
-                throw;
+                throw;  
             }
 
-            _cacheProvider.RemoveKey(guid.ToString());
+            _distributedCache.Remove(guid.ToString());
             return View("Submit", convertedAnswers);
         }
 

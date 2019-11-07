@@ -1,7 +1,7 @@
 using form_builder.Models;
 using System.Threading.Tasks;
 
-namespace form_builder.Providers
+namespace form_builder.Providers.SchemaProvider
 {
     public interface ISchemaProvider
     {

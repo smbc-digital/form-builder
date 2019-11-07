@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using form_builder.Controllers;
-using form_builder.Providers;
 using form_builder.Validators;
 using Xunit;
 using Moq;
@@ -14,13 +13,15 @@ using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using Newtonsoft.Json;
 using form_builder_tests.Builders;
+using form_builder.Providers.SchemaProvider;
+using form_builder.Providers.StorageProvider;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
     public class HomeControllerTest
     {
         private HomeController _homeController;
-        private readonly Mock<ICacheProvider> _cacheProvider = new Mock<ICacheProvider>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IEnumerable<IElementValidator>> _validators = new Mock<IEnumerable<IElementValidator>>();
         private readonly Mock<ISchemaProvider> _schemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IGateway> _gateWay = new Mock<IGateway>();
@@ -28,11 +29,12 @@ namespace form_builder_tests.UnitTests.Controllers
         
         public HomeControllerTest()
         {
+            _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
+
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>()))
              .ReturnsAsync(new FormBuilderViewModel());
 
-
-            _homeController = new HomeController(_cacheProvider.Object, _validators.Object, _schemaProvider.Object, _gateWay.Object, _pageHelper.Object);
+            _homeController = new HomeController(_mockDistributedCache.Object, _validators.Object, _schemaProvider.Object, _gateWay.Object, _pageHelper.Object);
         }
 
         [Fact]
@@ -100,7 +102,7 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task Index_ShouldRunBehaviourForRedirect_GoToExternalPage ()
+        public async Task Index_ShouldRunBehaviourForRedirect_GoToExternalPage()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -270,13 +272,14 @@ namespace form_builder_tests.UnitTests.Controllers
             // Arrange
             var guid = Guid.NewGuid();
             var cacheData = new List<FormAnswers>();
-            _cacheProvider.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(cacheData));
 
             // Act
             await _homeController.Submit(guid);
 
             // Assert
-            _cacheProvider.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())), Times.Once);
+            _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())), Times.Once);
         }
 
         [Fact]
@@ -303,7 +306,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 }
             };
 
-            _cacheProvider.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
             _gateWay.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .Callback<string, object>((x, y) => callbackValue = (List<FormAnswers>)y);
 
@@ -311,7 +314,7 @@ namespace form_builder_tests.UnitTests.Controllers
             await _homeController.Submit(guid);
 
             // Assert
-            _cacheProvider.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())), Times.Once);
+            _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())), Times.Once);
             _gateWay.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
 
             Assert.NotNull(callbackValue);
@@ -326,7 +329,7 @@ namespace form_builder_tests.UnitTests.Controllers
             var guid = Guid.NewGuid();
             var cacheData = new List<FormAnswers>();
 
-            _cacheProvider.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
             _gateWay.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ThrowsAsync(new Exception());
 
@@ -341,14 +344,14 @@ namespace form_builder_tests.UnitTests.Controllers
             var guid = Guid.NewGuid();
             var cacheData = new List<FormAnswers>();
 
-            _cacheProvider.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
             // Act
             var result = await _homeController.Submit(guid);
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
-            _cacheProvider.Verify(_ => _.RemoveKey(It.Is<string>(x => x == guid.ToString())), Times.Once);
+            _mockDistributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == guid.ToString())), Times.Once);
             Assert.Equal("Submit", viewResult.ViewName);
         }
 
