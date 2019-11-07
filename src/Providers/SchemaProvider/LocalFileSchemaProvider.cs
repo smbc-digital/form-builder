@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using form_builder.Models;
 using Newtonsoft.Json;
 
-namespace form_builder.Providers
+namespace form_builder.Providers.SchemaProvider
 {
     public class LocalFileSchemaProvider : ISchemaProvider
     {

@@ -65,7 +65,7 @@ namespace form_builder.Models
                 case EElementType.Textarea:
                     var properties = new Dictionary<string, object>()
                     {
-                        {"name", Properties.QuestionId },
+                        { "name", Properties.QuestionId },
                         { "id", Properties.QuestionId },
                         { "maxlength", maxLength },
                         { "value", Properties.Value}

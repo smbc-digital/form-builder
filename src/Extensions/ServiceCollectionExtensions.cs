@@ -4,16 +4,14 @@ using form_builder.Configuration;
 using form_builder.Gateway;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
-using form_builder.Providers;
+using form_builder.Providers.SchemaProvider;
+using form_builder.Providers.StorageProvider;
 using form_builder.Validators;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using StackExchange.Redis;
-using System;
 
 namespace form_builder.Extensions
 {
@@ -50,32 +48,6 @@ namespace form_builder.Extensions
             return services;
         }
 
-        public static IServiceCollection AddCacheProvider(this IServiceCollection services, bool isLocalEnv)
-        {
-            services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromMinutes(30);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-            });
-
-            services.AddHttpContextAccessor();
-            if (isLocalEnv)
-            {
-                var redisUrl = "localhost:6379";
-                var redis = ConnectionMultiplexer.Connect(redisUrl);
-                services.AddDataProtection()
-                    .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys");
-                services.AddSingleton<ICacheProvider, RedisCacheProvider>(provider => new RedisCacheProvider(redis, true));
-            }
-            else
-            {
-                services.AddSingleton<ICacheProvider, LocalSessionCacheProvider>();
-            }
-
-            return services;
-        }
-
         public static IServiceCollection ConfigureCookiePolicy(this IServiceCollection services)
         {
             services.Configure<CookiePolicyOptions>(options =>
@@ -104,6 +76,31 @@ namespace form_builder.Extensions
         public static IServiceCollection AddIOptionsConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<DisallowedAnswerKeysConfiguration>(configuration.GetSection("FormConfig"));
+            return services;
+        }
+
+        public static IServiceCollection AddStorageProvider(this IServiceCollection services, IConfiguration configuration)
+        {
+              var storageProviderConfiguration = configuration.GetSection("StorageProvider");
+
+            switch (storageProviderConfiguration["Type"])
+            {
+                case "Redis":
+                    services.AddStackExchangeRedisCache(options => 
+                    {
+                        options.Configuration = storageProviderConfiguration["Address"];
+                        options.InstanceName = storageProviderConfiguration["InstanceName"];
+                    });
+                    break;
+                case "Application":
+                    services.AddDistributedMemoryCache();
+                    break;
+                default:
+                    services.AddDistributedMemoryCache();
+                    break;
+            }
+
+            services.AddSingleton<IDistributedCacheWrapper, DistributedCacheWrapper>();
             return services;
         }
     }
