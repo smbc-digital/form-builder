@@ -71,7 +71,7 @@ namespace form_builder_tests_ui.StepDefinitions
 
             Assert.Equal("http://images.contentful.com/6cfgzlmcakf7/2FNKi2ZYcomigKGAqWiSyC/aec4f120903972fd6c842e84603c6a50/Flu_Jab.jpg", src);
             Assert.Equal("Flu Jab", alt);
-            Assert.Equal("image foo", cssClass);
+            Assert.Equal("form-builder-img", cssClass);
 
         }
     }
