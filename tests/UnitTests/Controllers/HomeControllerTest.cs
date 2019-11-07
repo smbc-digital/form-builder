@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using form_builder_tests.Builders;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
+using Microsoft.Extensions.Logging;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -26,6 +27,7 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<ISchemaProvider> _schemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IGateway> _gateWay = new Mock<IGateway>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
+        private readonly ILogger<HomeController> _logger;
         
         public HomeControllerTest()
         {
@@ -34,7 +36,7 @@ namespace form_builder_tests.UnitTests.Controllers
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>()))
              .ReturnsAsync(new FormBuilderViewModel());
 
-            _homeController = new HomeController(_mockDistributedCache.Object, _validators.Object, _schemaProvider.Object, _gateWay.Object, _pageHelper.Object);
+            _homeController = new HomeController(_logger, _mockDistributedCache.Object, _validators.Object, _schemaProvider.Object, _gateWay.Object, _pageHelper.Object);
         }
 
         [Fact]

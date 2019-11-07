@@ -22,6 +22,8 @@ namespace form_builder.Helpers.PageHelpers
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm);
 
         void SaveAnswers(Dictionary<string, string> viewModel);
+
+        bool CheckForStartPage(FormSchema form, Page page);
     }
     
     public class PageHelper : IPageHelper
@@ -119,7 +121,8 @@ namespace form_builder.Helpers.PageHelpers
                         formModel.RawHTML += await _viewRender.RenderAsync("Radio", element);
                         break;
                     case EElementType.Button:
-                        formModel.RawHTML += await _viewRender.RenderAsync("Button", element);
+                        var viewData = new Dictionary<string, object> { { "displayAnchor", !CheckForStartPage(baseForm, page) } };
+                        formModel.RawHTML += await _viewRender.RenderAsync("Button", element, viewData);
                         break;
                     default:
                         break;
@@ -163,6 +166,11 @@ namespace form_builder.Helpers.PageHelpers
             });
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+        }
+
+        public bool CheckForStartPage(FormSchema form, Page page)
+        {
+            return form.StartPage == page.PageURL;
         }
     }
 }

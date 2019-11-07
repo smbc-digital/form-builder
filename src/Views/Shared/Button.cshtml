@@ -1,9 +1,16 @@
 ﻿@model form_builder.Models.Element
 
 @{
+    var displayAnchor = (bool)ViewData["displayAnchor"];
     var text = string.IsNullOrEmpty(Model.Properties.Text) ? "Next step" : Model.Properties.Text;
     var className = string.IsNullOrEmpty(Model.Properties.ClassName) ? "button-primary" : Model.Properties.ClassName;
 }
 
 <button class="@className" type="submit" id="@Model.Properties.ButtonId">@text</button>
-<a class="back-button" href="javascript:history.back()">Previous</a>
+
+<P></P>
+
+@if (@displayAnchor)
+{
+    <a class="back-button" href="javascript:history.back()">Previous</a>
+}

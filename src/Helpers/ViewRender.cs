@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace form_builder.Helpers
 {
@@ -27,7 +29,7 @@ namespace form_builder.Helpers
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<string> RenderAsync<TModel>(string viewName, TModel model)
+        public async Task<string> RenderAsync<TModel>(string viewName, TModel model, Dictionary<string, object> viewData = null)
         {
             var httpContext = new DefaultHttpContext { RequestServices = _serviceProvider };
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
@@ -38,7 +40,6 @@ namespace form_builder.Helpers
             {
                 throw new InvalidOperationException($"Couldn't find view {viewName}");
             }
-
             var view = viewEngineResult.View;
 
             using (var output = new StringWriter())
@@ -57,6 +58,14 @@ namespace form_builder.Helpers
                         _tempDataProvider),
                     output,
                     new HtmlHelperOptions());
+
+                if (viewData != null)
+                {
+                    foreach (var item in viewData)
+                    {
+                        viewContext.ViewData.Add(item.Key, item.Value);
+                    }
+                }
 
                 await view.RenderAsync(viewContext);
 
