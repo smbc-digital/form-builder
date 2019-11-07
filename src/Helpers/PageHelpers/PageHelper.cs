@@ -16,7 +16,9 @@ namespace form_builder.Helpers.PageHelpers
     public interface IPageHelper
     {
         void CheckForDuplicateQuestionIDs(Page page);
+
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm);
+
         void SaveAnswers(Dictionary<string, string> viewModel);
     }
     
@@ -58,7 +60,6 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var element in page.Elements)
             {
-
                 switch (element.Type)
                 {
                     case EElementType.H1:
