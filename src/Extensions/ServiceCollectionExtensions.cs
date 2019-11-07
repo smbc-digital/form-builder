@@ -67,7 +67,7 @@ namespace form_builder.Extensions
                 services.AddDataProtection()
                     .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys");
                 services.AddSingleton<ICacheProvider, RedisCacheProvider>(provider => new RedisCacheProvider(redis, true));
-            } 
+            }
             else
             {
                 services.AddSingleton<ICacheProvider, LocalSessionCacheProvider>();

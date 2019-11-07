@@ -68,15 +68,15 @@ namespace form_builder_tests_ui.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("User navigates to ReportAnIssue/Your-Details", SourceLine=5)]
-        public virtual void UserNavigatesToReportAnIssueYour_Details()
+        [TechTalk.SpecRun.ScenarioAttribute("User navigates to reportanissue/Your-Details", SourceLine=5)]
+        public virtual void UserNavigatesToReportanissueYour_Details()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User navigates to ReportAnIssue/Your-Details", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User navigates to reportanissue/Your-Details", null, ((string[])(null)));
 #line 6
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 7
- testRunner.Given("I navigate to \"/ReportAnIssue/Your-Details\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("I navigate to \"/reportanissue/Your-Details\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 8
  testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 9
@@ -101,7 +101,7 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 17
- testRunner.Given("I navigate to \"/ReportAnIssue/Your-Details\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("I navigate to \"/reportanissue/Your-Details\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 18
  testRunner.Then("I fill in your details", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 19

@@ -12,12 +12,12 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "Textarea"
+      "launchUrl": "textarea"
     },
     "form_builder": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "Textarea",
+      "launchUrl": "textarea",
       "applicationUrl": "https://localhost:5000;http://localhost:5001"
     }
   }
