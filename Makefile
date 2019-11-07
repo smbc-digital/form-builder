@@ -8,5 +8,4 @@ help:
 # ---------------------------------------------------------------------------------------
 .PHONY: ui-test
 ui-test:
-	cd ./src && dotnet run &
-	dotnet test ./form-builder-tests-ui/form-builder-tests-ui.csproj
+	dotnet test ./form-builder-tests-ui/form-builder-tests-ui.csproj & cd ./src && dotnet run
