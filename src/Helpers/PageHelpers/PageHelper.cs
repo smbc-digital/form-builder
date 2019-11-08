@@ -121,6 +121,12 @@ namespace form_builder.Helpers.PageHelpers
                     case EElementType.Button:
                         formModel.RawHTML += await _viewRender.RenderAsync("Button", element);
                         break;
+                    case EElementType.Select:
+                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        //_elementHelper.CheckForLabel(element, viewModel);
+                        //_elementHelper.CheckForRadioOptions(element);
+                        formModel.RawHTML += await _viewRender.RenderAsync("Select", element);
+                        break;
                     default:
                         break;
                 }

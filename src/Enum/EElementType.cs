@@ -18,6 +18,7 @@
         Textbox,
         Textarea,
         Radio,
-        Button
+        Button,
+        Select
     }
 }

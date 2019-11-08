@@ -43,7 +43,8 @@ namespace form_builder.Models
             get
             {
                 return Elements.Where(element => element.Type == EElementType.Radio   || 
-                                                    element.Type == EElementType.Textarea || 
+                                                    element.Type == EElementType.Textarea ||
+                                                    element.Type == EElementType.Select ||
                                                     element.Type == EElementType.Textbox);
             }
         }
