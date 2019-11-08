@@ -1,4 +1,4 @@
-﻿@model List<form_builder.Models.FormAnswers>;
+﻿@model FormAnswers;
 @{
     ViewData["Title"] = "Submit";
 }
@@ -7,9 +7,8 @@
         <table>
             <caption>Data</caption>
             <tbody>
-                @foreach (var page in Model)
+                @foreach (var page in Model.Pages)
                 {
-
                     @foreach (var question in page.Answers)
                     {
                         <tr>

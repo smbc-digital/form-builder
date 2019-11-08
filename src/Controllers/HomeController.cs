@@ -13,6 +13,8 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Logging;
+using System.Linq;
+using System.Net;
 
 namespace form_builder.Controllers
 {
@@ -102,7 +104,7 @@ namespace form_builder.Controllers
 
             var behaviour = currentPage.GetNextPage(viewModel);
             _pageHelper.SaveAnswers(viewModel);
-            
+
             switch (behaviour.BehaviourType)
             {
                 case EBehaviourType.GoToExternalPage:
@@ -116,6 +118,7 @@ namespace form_builder.Controllers
                 case EBehaviourType.SubmitForm:
                     return RedirectToAction("Submit", "Home", new
                     {
+                        form = baseForm.BaseURL,
                         guid
                     });
                 default:
@@ -124,25 +127,42 @@ namespace form_builder.Controllers
         }
 
         [HttpGet]
-        [Route("submit")]
-        public async Task<IActionResult> Submit([FromQuery] Guid guid)
+        [Route("{form}/submit")]
+        public async Task<IActionResult> Submit(string form, [FromQuery] Guid guid)
         {
             if (guid == Guid.Empty)
             {
                 return RedirectToAction("Error", "Home");
             }
 
+            var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var formData = _distributedCache.GetString(guid.ToString());
-            var convertedAnswers = JsonConvert.DeserializeObject<List<FormAnswers>>(formData);
+            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+            var currentPage = baseForm.GetPage(convertedAnswers.Path);
+            var postUrl = currentPage.Behaviours
+                .Where(_ => _.BehaviourType == EBehaviourType.SubmitForm)
+                .FirstOrDefault().pageURL;
+
+            if (string.IsNullOrEmpty(postUrl))
+            {
+                _logger.LogError("HomeController, Submit: No postUrl supplied for submit form");
+                return RedirectToAction("Error");
+            }
 
             try
             {
-                var res = await _gateway.PostAsync(null, convertedAnswers);
+                var response = await _gateway.PostAsync(postUrl, convertedAnswers);
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    _logger.LogError($"HomeController, Submit: Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                    return RedirectToAction("Error");
+                }
             }
             catch (Exception e)
             {
-                _logger.LogError(e.Message);
-                throw;  
+                _logger.LogError($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Exception Message: {e.Message}");
+                return RedirectToAction("Error");
             }
 
             _distributedCache.Remove(guid.ToString());
