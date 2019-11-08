@@ -137,8 +137,7 @@ namespace form_builder.Controllers
 
             try
             {
-                _gateway.ChangeAuthenticationHeader("TestToken");
-                var res = await _gateway.PostAsync("https://localhost:44359/api/v1/home", convertedAnswers);
+                var res = await _gateway.PostAsync(null, convertedAnswers);
             }
             catch (Exception e)
             {
