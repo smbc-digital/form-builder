@@ -137,7 +137,7 @@ namespace form_builder.Controllers
 
             try
             {
-                await _gateway.PostAsync("https://localhost:44359/api/v1/home", convertedAnswers);
+                await _gateway.PostAsync(null, convertedAnswers);
             }
             catch (Exception e)
             {
