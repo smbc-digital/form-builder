@@ -12,6 +12,7 @@ using StockportGovUK.AspNetCore.Gateways;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
+using Microsoft.Extensions.Logging;
 
 namespace form_builder.Controllers
 {
@@ -27,13 +28,16 @@ namespace form_builder.Controllers
 
         private readonly IPageHelper _pageHelper;
 
-        public HomeController(IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper)
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper)
         {
             _distributedCache = distributedCache;
             _validators = validators;
             _schemaProvider = schemaProvider;
             _gateway = gateway;
             _pageHelper = pageHelper;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -138,6 +142,7 @@ namespace form_builder.Controllers
             }
             catch (Exception e)
             {
+                _logger.LogError(e.Message);
                 throw;  
             }
 

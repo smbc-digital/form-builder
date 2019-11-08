@@ -50,7 +50,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
 
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "H1"), It.Is<Element>(x => x.Properties.Text == "form-name")));
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "H1"), It.Is<Element>(x => x.Properties.Text == "form-name"), It.IsAny<Dictionary<string, object>>()));
         }
 
         [Theory]
@@ -86,7 +86,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Theory]
@@ -115,7 +115,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
 
@@ -142,7 +142,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == EElementType.Img.ToString()), It.IsAny<Element>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == EElementType.Img.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]

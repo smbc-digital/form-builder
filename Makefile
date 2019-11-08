@@ -8,4 +8,4 @@ help:
 # ---------------------------------------------------------------------------------------
 .PHONY: ui-test
 ui-test:
-	dotnet test ./form-builder-tests-ui/form-builder-tests-ui.csproj & cd ./src && dotnet run
+	 cd ./src && dotnet run & dotnet test ./form-builder-tests-ui/form-builder-tests-ui.csproj && trap "kill 0" EXIT
