@@ -17,8 +17,7 @@ namespace form_builder_tests_ui.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [TechTalk.SpecRun.FeatureAttribute("Button", Description="\tIn order to avoid silly mistakes\r\n\tAs a math idiot\r\n\tI want to be told the sum o" +
-        "f two numbers", SourceFile="Features\\Button.feature", SourceLine=0)]
+    [TechTalk.SpecRun.FeatureAttribute("Button", Description="\tIn order to verify buttons are renderd correctly", SourceFile="Features\\Button.feature", SourceLine=0)]
     public partial class ButtonFeature
     {
         
@@ -31,8 +30,7 @@ namespace form_builder_tests_ui.Features
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Button", "\tIn order to avoid silly mistakes\r\n\tAs a math idiot\r\n\tI want to be told the sum o" +
-                    "f two numbers", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Button", "\tIn order to verify buttons are renderd correctly", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -68,23 +66,42 @@ namespace form_builder_tests_ui.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Render information on the page correctly", SourceLine=5)]
-        public virtual void RenderInformationOnThePageCorrectly()
+        [TechTalk.SpecRun.ScenarioAttribute("Render buttons on the page correctly", SourceLine=3)]
+        public virtual void RenderButtonsOnThePageCorrectly()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Render information on the page correctly", null, ((string[])(null)));
-#line 6
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Render buttons on the page correctly", null, ((string[])(null)));
+#line 4
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
-#line 7
+#line 5
  testRunner.Given("I navigate to \"/button/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 8
+#line 6
  testRunner.Then("I should see a \"button\" element with \"Next step\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 9
+#line 7
  testRunner.Then("I should see a \"button\" element with \"Custom Text\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 10
+#line 8
  testRunner.Then("I should find an element with class \".button-primary\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 11
+#line 9
  testRunner.Then("I should find an element with class \".button-inverted\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [TechTalk.SpecRun.ScenarioAttribute("Button not on firstpage should display back anchor", SourceLine=10)]
+        public virtual void ButtonNotOnFirstpageShouldDisplayBackAnchor()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Button not on firstpage should display back anchor", null, ((string[])(null)));
+#line 11
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 12
+ testRunner.Given("I navigate to \"/button/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 13
+    testRunner.Then("I should not see any \"back-button\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 14
+ testRunner.When("I click the \"nextStep1\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 15
+ testRunner.Then("I should see a \"a\" element with \"Previous\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }

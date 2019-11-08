@@ -28,32 +28,5 @@
     <Folder Include="Screenshots\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Features\InlineAlert.feature.cs">
-      <DependentUpon>InlineAlert.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\Textarea.feature.cs">
-      <DependentUpon>Textarea.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\Textbox.feature.cs">
-      <DependentUpon>Textbox.feature</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <SpecFlowFeatureFiles Update="Features\InlineAlert.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\Textarea.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\Textbox.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-  </ItemGroup>
-
 
 </Project>

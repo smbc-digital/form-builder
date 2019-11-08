@@ -117,6 +117,12 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.True(BrowserSession.FindCss(string.Format(".form-field-validation-error[data-valmsg-for='{0}']", inputName)).Exists());
         }
 
+        [Then(@"I should not see any ""(.*)"" html element")]
+        public void ThenIShouldNotSeeAnyHtmlElementWithClassName(string className)
+        {
+            Assert.False(BrowserSession.FindCss(className).Exists());
+        }
+
         [When(@"I enter ""(.*)"" in ""(.*)""")]
         public void WhenIEnter(string value, string fieldName)
         {
