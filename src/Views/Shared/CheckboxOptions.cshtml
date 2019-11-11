@@ -7,12 +7,12 @@
     var itemId = $"{Model.Properties.QuestionId}-{i}";
 
     <div class="input-checkbox-container">
-        @Html.RadioButton(Model.Properties.QuestionId, Model.Properties.Options[i].Value, @Model.GenerateElementProperties(i))
+        @Html.CheckBox(Model.Properties.QuestionId, false , @Model.GenerateElementProperties(i))
         <label for="@itemId">@item.Text</label>
 
         @if (!string.IsNullOrEmpty(item.Hint))
         {
-            <p><span class="radio-sub-label" id=@itemHint>@Html.Raw(item.Hint)</span></p>
+            <p><span class="checkbox-sub-label" id=@itemHint>@Html.Raw(item.Hint)</span></p>
         }
     </div>
 }
