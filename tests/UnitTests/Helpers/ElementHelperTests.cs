@@ -67,7 +67,7 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithQuestionId("test-id")
                .WithLabel("test-text")
                .Build();
-           
+
             var viewModel = new Dictionary<string, string>();
 
             // Act
@@ -247,7 +247,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
         [Theory]
         [InlineData(EElementType.P, "paragraph")]
-        [InlineData(EElementType.H1,"Header 1")]
+        [InlineData(EElementType.H1, "Header 1")]
         [InlineData(EElementType.H2, "Header 2")]
         [InlineData(EElementType.H3, "Header 3")]
         [InlineData(EElementType.H4, "Header 4")]
@@ -271,7 +271,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void ElemenetBuilder_ShouldCreateListsWithListItems(EElementType eElementType)
         {
             // Arrange
-            List<string> listItems = new List<string>{ "item 1", "item 2", "item 3" };
+            List<string> listItems = new List<string> { "item 1", "item 2", "item 3" };
 
             var element = new ElementBuilder()
                 .WithType(eElementType)
@@ -307,7 +307,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithQuestionId("questionId")
                 .WithLabel("Label")
                 .WithOptions(new List<Option>
-                { new Option { Value = "option1", Text = "Option 1", Hint = "Option 1 Hint" }, 
+                { new Option { Value = "option1", Text = "Option 1", Hint = "Option 1 Hint" },
                   new Option { Value = "option2", Text = "Option 2", Hint = "Option 2 Hint" } })
                 .Build();
 
@@ -324,6 +324,50 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal("option2", element.Properties.Options[1].Value);
             Assert.Equal("Option 2", element.Properties.Options[1].Text);
             Assert.Equal("Option 2 Hint", element.Properties.Options[1].Hint);
+        }
+
+        [Fact]
+        public void ElementBuilder_ShouldCreateSelect_WithTwoOptions()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Select)
+                .WithQuestionId("questionId")
+                .WithLabel("Label")
+                .WithOptions(new List<Option>
+                { new Option { Value = "option1", Text = "Option 1"},
+                  new Option { Value = "option2", Text = "Option 2"} })
+                .Build();
+
+            //Assert
+            Assert.True(_elementHelper.CheckForSelectOptions(element));
+
+            Assert.Equal("questionId", element.Properties.QuestionId);
+            Assert.Equal("Label", element.Properties.Label);
+
+            Assert.Equal("option1", element.Properties.Options[0].Value);
+            Assert.Equal("Option 1", element.Properties.Options[0].Text);
+
+            Assert.Equal("option2", element.Properties.Options[1].Value);
+            Assert.Equal("Option 2", element.Properties.Options[1].Text);
+        }
+
+        [Fact]
+        public void ElementBuilder_ShouldThrowException_WithNoLabel()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Select)
+                .WithQuestionId("questionId")
+                 .WithOptions(new List<Option>
+                { new Option { Value = "option1", Text = "Option 1"},
+                  new Option { Value = "option2", Text = "Option 2"} })
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+
+            // Assert
+            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
         }
     }
 }

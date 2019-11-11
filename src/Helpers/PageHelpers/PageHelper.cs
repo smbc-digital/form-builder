@@ -126,8 +126,8 @@ namespace form_builder.Helpers.PageHelpers
                         break;
                     case EElementType.Select:
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
-                        //_elementHelper.CheckForLabel(element, viewModel);
-                        //_elementHelper.CheckForRadioOptions(element);
+                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForSelectOptions(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Select", element);
                         break;
                     default:

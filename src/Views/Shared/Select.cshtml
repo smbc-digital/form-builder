@@ -7,7 +7,7 @@
     <div>
         @*@await Html.BeginFieldSet(Model)*@
         <legend class="sr-only">@Model.Properties.Label</legend>
-        <label @Model.WriteOptional()>@Model.Properties.Label</label>
+        <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
         @if (Model.Properties?.Optional ?? true)
         {
         <p class="optional">(optional)</p>

@@ -15,6 +15,8 @@ namespace form_builder.Helpers.ElementHelpers
         bool CheckIfLabelAndTextEmpty(Element element, Dictionary<string, string> viewModel);
 
         bool CheckForRadioOptions(Element element);
+
+        bool CheckForSelectOptions(Element element);
     }
 
     public class ElementHelper : IElementHelper
@@ -66,6 +68,15 @@ namespace form_builder.Helpers.ElementHelpers
             if(element.Properties.Options == null || element.Properties.Options.Count <= 1)
             {
                 throw new Exception("A radio element requires two or more options to be present.");
+            }
+            return true;
+        }
+
+        public bool CheckForSelectOptions(Element element)
+        {
+            if (element.Properties.Options == null || element.Properties.Options.Count <= 1)
+            {
+                throw new Exception("A select element requires two or more options to be present.");
             }
             return true;
         }
