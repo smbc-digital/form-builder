@@ -353,6 +353,22 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
+        public void ElementBuilder_ShouldThrowException_WithOneSelectOption()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Select)
+                .WithQuestionId("questionId")
+                .WithLabel("Label")
+                .WithOptions(new List<Option>
+                { new Option { Value = "option1", Text = "Option 1"}})
+                .Build();
+
+            //Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckForSelectOptions(element));
+        }
+
+        [Fact]
         public void ElementBuilder_ShouldThrowException_WithNoLabel()
         {
             // Arrange

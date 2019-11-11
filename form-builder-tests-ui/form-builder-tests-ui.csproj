@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\PageContent - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\RadioButton - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Textbox - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\YourDetails - Copy.feature.cs" />
   </ItemGroup>
@@ -16,6 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Coypu" Version="3.1.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="Selenium.Support" Version="3.141.0" />
     <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.0.225" />
     <PackageReference Include="SpecRun.SpecFlow" Version="3.0.391" />
     <PackageReference Include="WireMock.Net" Version="1.0.36" />
@@ -26,6 +28,19 @@
 
   <ItemGroup>
     <Folder Include="Screenshots\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Features\Select.feature.cs">
+      <DependentUpon>Select.feature</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\Select.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
   </ItemGroup>
 
 

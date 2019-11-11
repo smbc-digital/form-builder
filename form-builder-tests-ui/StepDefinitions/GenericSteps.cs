@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using TechTalk.SpecFlow;
 using Xunit;
 
@@ -134,6 +135,15 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenISelect(string value, string fieldName)
         {
             BrowserSession.Select(value).From(fieldName);
+        }
+
+        [When(@"I select ""(.*)"" in ""(.*)"" dropdown")]
+        [Then(@"I select ""(.*)"" in ""(.*)"" dropdown")]
+        public void ThenISelectDropdown(string value, string fieldName)
+        {
+            //BrowserSession.Select(value).From(fieldName);
+            BrowserSession.FindId(fieldName).SelectOption(value);
+            
         }
 
         [Then(@"I should see a ""(.*)"" element with ""(.*)"" text")]
