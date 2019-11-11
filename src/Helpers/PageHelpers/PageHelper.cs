@@ -142,17 +142,16 @@ namespace form_builder.Helpers.PageHelpers
         {
             var guid = viewModel["Guid"];
             var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new List<FormAnswers>();
+            var convertedAnswers = new FormAnswers {Pages = new List<PageAnswers>() };
 
             if (!string.IsNullOrEmpty(formData))
             {
-                convertedAnswers = JsonConvert.DeserializeObject<List<FormAnswers>>(formData);
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
             }
 
-            if (convertedAnswers.Any(_ => _.PageUrl == viewModel["Path"].ToLower()))
+            if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageUrl == viewModel["Path"].ToLower()))
             {
-                convertedAnswers = convertedAnswers.Where(_ => _.PageUrl != viewModel["Path"].ToLower())
-                                                    .ToList();
+                convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageUrl != viewModel["Path"].ToLower()).ToList();
             }
 
             var answers = new List<Answers>();
@@ -165,11 +164,12 @@ namespace form_builder.Helpers.PageHelpers
                 }
             }
 
-            convertedAnswers.Add(new FormAnswers
+            convertedAnswers.Pages.Add(new PageAnswers
             {
                 PageUrl = viewModel["Path"].ToLower(),
                 Answers = answers
             });
+            convertedAnswers.Path = viewModel["Path"];
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }

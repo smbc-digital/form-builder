@@ -153,6 +153,11 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add("Guid", guid.ToString());
             viewModel.Add("Path", "path");
 
+            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(mockData);
+
             _pageHelper.SaveAnswers(viewModel);
 
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())));
@@ -166,10 +171,27 @@ namespace form_builder_tests.UnitTests.Helpers
             var item2Data = "item2-data";
 
             var callbackCacheProvider = string.Empty;
-            var mockData = JsonConvert.SerializeObject(new List<FormAnswers> { new FormAnswers { PageUrl = "path", Answers = new List<Answers> { new Answers { QuestionId = "Item1", Response = "old-answer" }, new Answers { QuestionId = "Item2", Response = "old-answer" } } } });
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers
+                    {
+                        PageUrl = "path",
+                        Answers = new List<Answers>
+                        {
+                             new Answers { QuestionId = "Item1", Response = "old-answer" },
+                             new Answers { QuestionId = "Item2", Response = "old-answer" }
+                        }
+                    }
+                }
+            };
+
+            var mockData = JsonConvert.SerializeObject(formAnswers);
+
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
-
 
             _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
@@ -183,13 +205,13 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _pageHelper.SaveAnswers(viewModel);
 
-            var callbackModel = JsonConvert.DeserializeObject<List<FormAnswers>>(callbackCacheProvider);
+            var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
-            Assert.Equal("Item1", callbackModel[0].Answers[0].QuestionId);
-            Assert.Equal(item1Data, callbackModel[0].Answers[0].Response);
+            Assert.Equal("Item1", callbackModel.Pages[0].Answers[0].QuestionId);
+            Assert.Equal(item1Data, callbackModel.Pages[0].Answers[0].Response);
 
-            Assert.Equal("Item2", callbackModel[0].Answers[1].QuestionId);
-            Assert.Equal(item2Data, callbackModel[0].Answers[1].Response);
+            Assert.Equal("Item2", callbackModel.Pages[0].Answers[1].QuestionId);
+            Assert.Equal(item2Data, callbackModel.Pages[0].Answers[1].Response);
         }
 
         [Fact]
@@ -200,6 +222,11 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
+            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(mockData);
+
             var guid = Guid.NewGuid();
             var viewModel = new Dictionary<string, string>();
             viewModel.Add("Guid", guid.ToString());
@@ -207,9 +234,9 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _pageHelper.SaveAnswers(viewModel);
 
-            var callbackModel = JsonConvert.DeserializeObject<List<FormAnswers>>(callbackCacheProvider);
+            var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
-            Assert.Empty(callbackModel[0].Answers);
+            Assert.Empty(callbackModel.Pages[0].Answers);
         }
 
         [Fact]
@@ -218,6 +245,10 @@ namespace form_builder_tests.UnitTests.Helpers
             var callbackCacheProvider = string.Empty;
             var item1Data = "item1-data";
             var item2Data = "item2-data";
+            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(mockData);
 
             _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
@@ -231,13 +262,13 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _pageHelper.SaveAnswers(viewModel);
 
-            var callbackModel = JsonConvert.DeserializeObject<List<FormAnswers>>(callbackCacheProvider);
+            var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
-            Assert.Equal("Item1", callbackModel[0].Answers[0].QuestionId);
-            Assert.Equal(item1Data, callbackModel[0].Answers[0].Response);
+            Assert.Equal("Item1", callbackModel.Pages[0].Answers[0].QuestionId);
+            Assert.Equal(item1Data, callbackModel.Pages[0].Answers[0].Response);
 
-            Assert.Equal("Item2", callbackModel[0].Answers[1].QuestionId);
-            Assert.Equal(item2Data, callbackModel[0].Answers[1].Response);
+            Assert.Equal("Item2", callbackModel.Pages[0].Answers[1].QuestionId);
+            Assert.Equal(item2Data, callbackModel.Pages[0].Answers[1].Response);
         }
     }
 }

@@ -16,6 +16,7 @@ using form_builder_tests.Builders;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -36,20 +37,30 @@ namespace form_builder_tests.UnitTests.Controllers
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>()))
              .ReturnsAsync(new FormBuilderViewModel());
 
+            var cacheData = new FormAnswers
+            {
+                Path = "page-one"
+            };
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+
             _homeController = new HomeController(_logger.Object, _mockDistributedCache.Object, _validators.Object, _schemaProvider.Object, _gateWay.Object, _pageHelper.Object);
         }
 
         [Fact]
         public async Task Index_ShouldCallSchemaProvider_ToGetFormSchema()
         {
+            // Act
             var result = await _homeController.Index("form", "page-one", Guid.NewGuid());
 
+            // Assert
             _schemaProvider.Verify(_ => _.Get<FormSchema>(It.Is<string>(x => x == "form")));
         }
 
         [Fact]
         public async Task Index_ShouldGenerateGuidWhenGuidIsEmpty()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.H1)
                 .WithQuestionId("test-id")
@@ -68,8 +79,12 @@ namespace form_builder_tests.UnitTests.Controllers
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
+
+            // Act
             var result = await _homeController.Index("form", "page-one", Guid.Empty);
 
+
+            // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = (FormBuilderViewModel)viewResult.Model;
 
@@ -79,6 +94,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Index_ShouldRedirectToError_WhenPageIsNotWithin_FormSchema()
         {
+            // Arrange
             var element = new ElementBuilder()
               .WithType(EElementType.H1)
               .WithQuestionId("test-id")
@@ -97,8 +113,10 @@ namespace form_builder_tests.UnitTests.Controllers
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
+            // Act
             var result = await _homeController.Index("form", "non-existance-page", Guid.Empty);
 
+            // Assert
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("Error", viewResult.ActionName);
         }
@@ -273,12 +291,31 @@ namespace form_builder_tests.UnitTests.Controllers
         {
             // Arrange
             var guid = Guid.NewGuid();
-            var cacheData = new List<FormAnswers>();
-            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns(JsonConvert.SerializeObject(cacheData));
+
+            _gateWay.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>())).ReturnsAsync(new System.Net.Http.HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK
+            });
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageUrl("testUrl")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageUrl("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
 
             // Act
-            await _homeController.Submit(guid);
+            await _homeController.Submit("form", guid);
 
             // Assert
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())), Times.Once);
@@ -290,53 +327,95 @@ namespace form_builder_tests.UnitTests.Controllers
             // Arrange
             var questionId = "test-question";
             var questionResponse = "test-response";
-            var callbackValue = new List<FormAnswers>();
+            var callbackValue = new FormAnswers();
             var guid = Guid.NewGuid();
-            var cacheData = new List<FormAnswers>
+            var cacheData = new FormAnswers
             {
-                new FormAnswers
+                Pages = new List<PageAnswers>
                 {
-                    PageUrl = "page-one",
-                    Answers = new List<Answers>
+                    new PageAnswers
                     {
-                        new Answers
+                        PageUrl = "page-one",
+                        Answers = new List<Answers>
                         {
-                             QuestionId = questionId,
-                             Response = questionResponse
+                            new Answers
+                            {
+                                    QuestionId = questionId,
+                                    Response = questionResponse
+                            }
                         }
                     }
-                }
+                },
+                Path = "page-one"
             };
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageUrl("testUrl")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageUrl("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
             _gateWay.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
-                .Callback<string, object>((x, y) => callbackValue = (List<FormAnswers>)y);
-
+                .ReturnsAsync(new System.Net.Http.HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK
+                })
+                .Callback<string, object>((x, y) => callbackValue = (FormAnswers)y);
             // Act
-            await _homeController.Submit(guid);
+            await _homeController.Submit("form", guid);
 
             // Assert
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())), Times.Once);
             _gateWay.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
 
             Assert.NotNull(callbackValue);
-            Assert.Equal(questionId, callbackValue[0].Answers[0].QuestionId);
-            Assert.Equal(questionResponse, callbackValue[0].Answers[0].Response);
+            Assert.Equal(questionId, callbackValue.Pages[0].Answers[0].QuestionId);
+            Assert.Equal(questionResponse, callbackValue.Pages[0].Answers[0].Response);
         }
 
         [Fact]
-        public async Task Submit_ShouldThrowException_WhenGatewayCallFails()
+        public async Task Submit_ShouldReturnErrorView_WhenGatewayCallFails()
         {
             // Arrange
             var guid = Guid.NewGuid();
-            var cacheData = new List<FormAnswers>();
 
-            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageUrl("testUrl")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageUrl("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
             _gateWay.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ThrowsAsync(new Exception("error"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<Exception>(async () => await _homeController.Submit(guid));
+            var result = await _homeController.Submit("form", guid);
+
+            var viewResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Error", viewResult.ActionName);
         }
 
         [Fact]
@@ -344,12 +423,32 @@ namespace form_builder_tests.UnitTests.Controllers
         {
             // Arrange
             var guid = Guid.NewGuid();
-            var cacheData = new List<FormAnswers>();
 
-            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageUrl("testUrl")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageUrl("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+            _gateWay.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+               .ReturnsAsync(new System.Net.Http.HttpResponseMessage
+               {
+                   StatusCode = HttpStatusCode.OK
+               });
+
 
             // Act
-            var result = await _homeController.Submit(guid);
+            var result = await _homeController.Submit("form", guid);
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -361,13 +460,99 @@ namespace form_builder_tests.UnitTests.Controllers
         public async Task Submit_ShouldReturnErrorView_WhenGuid_IsEmpty()
         {
             // Act
-            var result = await _homeController.Submit(Guid.Empty);
+            var result = await _homeController.Submit("", Guid.Empty);
 
             // Assert
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("Error", viewResult.ActionName);
             Assert.Equal("Home", viewResult.ControllerName);
 
+        }
+
+        [Fact]
+        public async Task Submit_ShouldRedirectToError_WhenNoSubmitUrlSpecified()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                 .WithType(EElementType.H1)
+                 .WithQuestionId("test-id")
+                 .WithPropertyText("test-text")
+                 .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageUrl(null)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithBehaviour(behaviour)
+                .WithPageUrl("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            // Act
+            var result = await _homeController.Submit("form", Guid.NewGuid());
+
+            // Assert
+            var viewResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Error", viewResult.ActionName);
+            _gateWay.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Submit_ShouldRedirectToError_WhenGatewayResponse_IsNotOk()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                 .WithType(EElementType.H1)
+                 .WithQuestionId("test-id")
+                 .WithPropertyText("test-text")
+                 .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageUrl("test-url")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithBehaviour(behaviour)
+                .WithPageUrl("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var cacheData = new FormAnswers
+            {
+                Path = "page-one"
+            };
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+
+            _gateWay.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>())).ReturnsAsync(new System.Net.Http.HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError
+            });
+
+            // Act
+            var result = await _homeController.Submit("form", Guid.NewGuid());
+
+            // Assert
+            var viewResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Error", viewResult.ActionName);
+            _gateWay.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
     }
 }
