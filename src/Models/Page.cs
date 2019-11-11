@@ -51,7 +51,9 @@ namespace form_builder.Models
         
         public void Validate(Dictionary<string, string> viewModel, IEnumerable<IElementValidator> form_builder)
         {   
-            ValidatableElements.ToList().ForEach(element => element.Validate(viewModel, form_builder));
+            ValidatableElements.ToList()
+                .ForEach(element => element.Validate(viewModel, form_builder));
+
             IsValidated = true;
         }
 
@@ -62,7 +64,24 @@ namespace form_builder.Models
                 return Behaviours.FirstOrDefault();
             }
 
-            return Behaviours.Where(_ => _.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId])).FirstOrDefault();
+            return Behaviours.OrderByDescending(_ => _.Conditions.Count)
+                            .Where(_ => _.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]))
+                            .FirstOrDefault();
+        }
+
+        public string GetSubmitFormEndpoint(FormAnswers formAnswers)
+        {
+            if (Behaviours.Count > 1)
+            {
+                var previousPage = formAnswers.Pages.Where(_ => _.PageUrl == formAnswers.Path)
+                    .FirstOrDefault();
+
+                var viewModel = new Dictionary<string, string>();
+                previousPage.Answers.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
+                return GetNextPage(viewModel).pageURL;
+            }
+
+            return Behaviours.FirstOrDefault().pageURL;
         }
     }
 }

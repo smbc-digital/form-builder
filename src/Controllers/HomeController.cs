@@ -138,10 +138,9 @@ namespace form_builder.Controllers
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var formData = _distributedCache.GetString(guid.ToString());
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
             var currentPage = baseForm.GetPage(convertedAnswers.Path);
-            var postUrl = currentPage.Behaviours
-                .Where(_ => _.BehaviourType == EBehaviourType.SubmitForm)
-                .FirstOrDefault().pageURL;
+            var postUrl = currentPage.GetSubmitFormEndpoint(convertedAnswers);
 
             if (string.IsNullOrEmpty(postUrl))
             {
