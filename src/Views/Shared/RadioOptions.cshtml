@@ -6,7 +6,7 @@
     var itemHint = $"{Model.Properties.QuestionId}-{i}-hint";
     var itemId = $"{Model.Properties.QuestionId}-{i}";
 
-    <div class="input-checkbox-container">
+    <div class="input-radio-container">
         @Html.RadioButton(Model.Properties.QuestionId, Model.Properties.Options[i].Value, @Model.GenerateElementProperties(i))
         <label for="@itemId">@item.Text</label>
 

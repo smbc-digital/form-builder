@@ -19,8 +19,7 @@
         Textarea,
         Radio,
         Button,
-        Select,
-        CheckBoxList,
-        CheckBox
+        Select,        
+        CheckBoxList
     }
 }

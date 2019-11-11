@@ -353,6 +353,31 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
+        public void ElementBuilder_ShouldCreateCheckBoxList()
+        {
+            var element = new ElementBuilder()
+                .WithType(EElementType.CheckBoxList)
+                .WithQuestionId("questionId")
+                .WithLabel("Label").WithOptions(new List<Option>
+                { new Option { Value = "option1", Text = "Option 1"},
+                  new Option { Value = "option2", Text = "Option 2"} })
+                .Build();
+
+            Assert.Equal("questionId", element.Properties.QuestionId);
+            Assert.Equal("Label", element.Properties.Label);
+            Assert.Equal("option1", element.Properties.Options[0].Value);
+            Assert.Equal("Option 1", element.Properties.Options[0].Text);
+
+            Assert.Equal("option2", element.Properties.Options[1].Value);
+            Assert.Equal("Option 2", element.Properties.Options[1].Text);
+
+
+
+
+
+        }
+
+        [Fact]
         public void ElementBuilder_ShouldThrowException_WithOneSelectOption()
         {
             // Arrange

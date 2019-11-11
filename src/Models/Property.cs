@@ -33,5 +33,7 @@ namespace form_builder.Models
         public string Source { get; set; }
 
         public string AltText { get; set; }
+
+        public bool Checked { get; set; }
     }
 }

@@ -80,5 +80,11 @@ namespace form_builder_tests.Builders
             _property.Options = options;
             return this;
         }
+
+        public ElementBuilder WithChecked(bool isChecked)
+        {
+            _property.Checked = isChecked;
+            return this;
+        }
     }
 }
