@@ -71,6 +71,8 @@ namespace form_builder.Models
 
         public string GetSubmitFormEndpoint(FormAnswers formAnswers)
         {
+            var pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitForm);
+
             if (Behaviours.Count > 1)
             {
                 var previousPage = formAnswers.Pages.Where(_ => _.PageUrl == formAnswers.Path)
@@ -81,7 +83,14 @@ namespace form_builder.Models
                 return GetNextPage(viewModel).pageURL;
             }
 
-            return Behaviours.FirstOrDefault().pageURL;
+            return pageSubmitBehaviours.Count == 0 
+                ? null 
+                : pageSubmitBehaviours.FirstOrDefault().pageURL;
+        }
+
+        private List<Behaviour> GetBehavioursByType(EBehaviourType type)
+        {
+            return Behaviours.Where(_ => _.BehaviourType == type).ToList();
         }
     }
 }

@@ -31,5 +31,11 @@ namespace form_builder_tests.Builders
             _pageURL = pageUrl;
             return this;
         }
+
+        public BehaviourBuilder WithCondition(Condition condition)
+        {
+            _conditions.Add(condition);
+            return this;
+        }
     }
 }
