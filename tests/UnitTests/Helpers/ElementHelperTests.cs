@@ -370,11 +370,6 @@ namespace form_builder_tests.UnitTests.Helpers
 
             Assert.Equal("option2", element.Properties.Options[1].Value);
             Assert.Equal("Option 2", element.Properties.Options[1].Text);
-
-
-
-
-
         }
 
         [Fact]
