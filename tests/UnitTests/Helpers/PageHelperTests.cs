@@ -64,7 +64,8 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData(EElementType.Textbox)]
         [InlineData(EElementType.Textarea)]
         [InlineData(EElementType.Radio)]
-        [InlineData(EElementType.CheckBoxList)]
+        [InlineData(EElementType.Checkbox)]
+        [InlineData(EElementType.Select)]
         [InlineData(EElementType.Button)]
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial(EElementType type)
         {

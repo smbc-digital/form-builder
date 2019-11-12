@@ -460,12 +460,11 @@ namespace form_builder_tests.UnitTests.Controllers
         public async Task Submit_ShouldReturnErrorView_WhenGuid_IsEmpty()
         {
             // Act
-            var result = await _homeController.Submit("", Guid.Empty);
+            var result = await _homeController.Submit("form", Guid.Empty);
 
             // Assert
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("Error", viewResult.ActionName);
-            Assert.Equal("Home", viewResult.ControllerName);
 
         }
 

@@ -153,7 +153,6 @@ Textarea JSON example:
 #
    * <a name="radioprops">**Radio**</a>
         * Label (*string*) __*__
-        * Name (*string*) __*__
         * QuestionId (*string*) __*__
         * Options[*object*] __*__
             * Text (*string*) __*__
@@ -189,7 +188,6 @@ Textarea JSON example:
 #
    * <a name="selectprops">**Select**</a>
         * Label (*string*) __*__
-        * Name (*string*) __*__
         * QuestionId (*string*) __*__
         * Options[*object*] __*__
             * Text (*string*) __*__
@@ -197,11 +195,51 @@ Textarea JSON example:
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * Optional (*boolean*)
-        * Placeholder (*string*)
+```json
+{
+          "Type": "Select",
+          "Properties": {
+            "QuestionId": "select",
+            "Label": "Favourite day of the week",
+            "Hint": "This is the <strong> hint </strong>",
+            "CustomValidationMessage": "Awooga",
+            "Optional": false,
+            "Options": [
+              {
+                "Text": "Sunday",
+                "Value": "sunday"
+              },
+              {
+                "Text": "Monday",
+                "Value": "monday"
+              },
+              {
+                "Text": "Tuesday",
+                "Value": "tuesday"
+              },
+              {
+                "Text": "Wednesday",
+                "Value": "wednesday"
+              },
+              {
+                "Text": "Thursday",
+                "Value": "thursday"
+              },
+              {
+                "Text": "Friday",
+                "Value": "friday"
+              },
+              {
+                "Text": "Saturday",
+                "Value": "saturday"
+              }
+            ]
+          }
+        }
+```        
 #
    * <a name="checkboxprops">**Checkbox**</a>
         * Label (*string*) __*__
-        * Name (*string*) __*__
         * QuestionId (*string*) __*__
         * Options[*object*] __*__
             * Text (*string*) __*__
