@@ -2,7 +2,7 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 
-namespace form_builder.Gateway
+namespace form_builder.Gateways
 {
     public class S3Gateway : IS3Gateway
     {
