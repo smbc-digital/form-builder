@@ -84,6 +84,7 @@ Example JSON:
     * [UL](#Ulprops) (Unordered List)
     * [OL](#olprops) (Ordered List)
     * [Img](#Imgprops) (Image)
+    * [DateInput](#DateInputprops)
     
 
 
@@ -341,6 +342,12 @@ Image JSON example:
     }
   }
 ```
+#
+  * <a name="DateInputprops">**DateInput**</a>
+    * Label (*string*) __*__
+    * QuestionId (*string*) __*__
+    * Hint (*string*)
+    
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>
 Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer:
