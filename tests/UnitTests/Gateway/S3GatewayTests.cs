@@ -1,6 +1,6 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
-using form_builder.Gateway;
+using form_builder.Gateways;
 using Moq;
 using System.Threading;
 using System.Threading.Tasks;

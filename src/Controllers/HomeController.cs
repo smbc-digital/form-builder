@@ -133,7 +133,7 @@ namespace form_builder.Controllers
         {
             if (guid == Guid.Empty)
             {
-                return RedirectToAction("Error", "Home");
+                return RedirectToAction("Error", new { form });
             }
 
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
@@ -146,7 +146,7 @@ namespace form_builder.Controllers
             if (string.IsNullOrEmpty(postUrl))
             {
                 _logger.LogError("HomeController, Submit: No postUrl supplied for submit form");
-                return RedirectToAction("Error");
+                return RedirectToAction("Error", new { form });
             }
 
             try
@@ -156,19 +156,21 @@ namespace form_builder.Controllers
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
                     _logger.LogError($"HomeController, Submit: Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
-                    return RedirectToAction("Error");
+                    return RedirectToAction("Error", new { form });
                 }
             }
             catch (Exception e)
             {
                 _logger.LogError($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Exception Message: {e.Message}");
-                return RedirectToAction("Error");
+                return RedirectToAction("Error", new { form });
             }
 
             _distributedCache.Remove(guid.ToString());
             return View("Submit", convertedAnswers);
         }
 
+        [HttpGet]
+        [Route("{form}/error")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error(string ex)
         {

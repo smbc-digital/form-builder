@@ -193,7 +193,6 @@ Textarea JSON example:
         * Options[*object*] __*__
             * Text (*string*) __*__
             * Value (*string*) __*__
-            * Hint (*string*) (ignored)
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * Optional (*boolean*)
