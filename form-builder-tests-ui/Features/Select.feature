@@ -10,6 +10,7 @@ Scenario: Renders HTML tags on the page
 
 Scenario: User selects Tuesday on page1
 	Given I navigate to "/select/page1"
+	This I should see "" is selected in dropdown
 	When I select "tuesday" in "select" dropdown
 	Then I should see "Tuesday" is selected in dropdown
 
