@@ -5,8 +5,8 @@
     var errorId = $"{Model.Properties.QuestionId}-error";
 }
 
-<fieldset>
-    @await Html.BeginFieldSet(Model)
+
+@await Html.BeginFieldSet(Model)
     <legend class="sr-only">@Model.Properties.Label</legend>
     <label @Model.WriteOptional()>@Model.Properties.Label</label>
     @if (Model.Properties?.Optional ?? true)
@@ -32,5 +32,4 @@
         }
     </div>
 
-    @await Html.EndFieldSet()
-</fieldset>
+@await Html.EndFieldSet()

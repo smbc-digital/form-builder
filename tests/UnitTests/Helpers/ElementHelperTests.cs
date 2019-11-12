@@ -356,7 +356,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void ElementBuilder_ShouldCreateCheckBoxList()
         {
             var element = new ElementBuilder()
-                .WithType(EElementType.CheckBoxList)
+                .WithType(EElementType.Checkbox)
                 .WithQuestionId("questionId")
                 .WithLabel("Label").WithOptions(new List<Option>
                 { new Option { Value = "option1", Text = "Option 1"},
@@ -370,11 +370,6 @@ namespace form_builder_tests.UnitTests.Helpers
 
             Assert.Equal("option2", element.Properties.Options[1].Value);
             Assert.Equal("Option 2", element.Properties.Options[1].Text);
-
-
-
-
-
         }
 
         [Fact]

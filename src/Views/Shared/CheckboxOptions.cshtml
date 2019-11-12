@@ -19,10 +19,9 @@
             <input type="checkbox" value="@item.Value" name="@itemName" id="@itemId" />
         }
         <label @Model.WriteOptional() for="@itemId">@item.Text</label>
+        @if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
+        {
+            <span class="radio-sub-label">@item.Hint</span>
+        }
     </div>
-    @if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
-    {
-        <p class="description">@item.Hint</p>
-    }
-
 }

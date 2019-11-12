@@ -20,6 +20,6 @@
         Radio,
         Button,
         Select,        
-        CheckBoxList
+        Checkbox
     }
 }
