@@ -7,6 +7,7 @@
     <div>
         <legend class="sr-only">@Model.Properties.Label</legend>
         <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+
         @if (Model.Properties?.Optional ?? true)
     {
         <p class="optional">(optional)</p>
