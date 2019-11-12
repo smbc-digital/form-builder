@@ -38,7 +38,7 @@ namespace form_builder
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddScoped<IViewRender, ViewRender>();
-            services.AddResilientHttpClients<IGateway, StockportGovUK.AspNetCore.Gateways.Gateway>(Configuration);
+            services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

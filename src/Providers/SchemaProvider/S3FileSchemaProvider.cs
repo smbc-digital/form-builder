@@ -1,5 +1,4 @@
-﻿using form_builder.Gateway;
-using form_builder.Models;
+﻿using form_builder.Models;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -8,6 +7,7 @@ using Amazon.S3;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using form_builder.Extensions;
+using form_builder.Gateways;
 
 namespace form_builder.Providers.SchemaProvider
 {
