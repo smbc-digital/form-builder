@@ -127,6 +127,12 @@ namespace form_builder.Helpers.PageHelpers
                         _elementHelper.CheckForLabel(element, viewModel);
                         _elementHelper.CheckForSelectOptions(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Select", element);
+                        break;                   
+                    case EElementType.CheckBoxList:
+                        //element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForCheckBoxListValues(element);
+                        formModel.RawHTML += await _viewRender.RenderAsync("CheckBoxList", element);
                         break;
                     default:
                         break;

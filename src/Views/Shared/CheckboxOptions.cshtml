@@ -1,0 +1,28 @@
+﻿@model form_builder.Models.Element
+
+@for (var i = 0; i < Model.Properties.Options.Count; i++)
+{
+    var item = Model.Properties.Options[i];
+    var itemHint = $"{Model.Properties.QuestionId}-{i}-hint";
+    var itemId = $"{Model.Properties.QuestionId}-{i}";
+    var itemName = $"{Model.Properties.QuestionId}";
+
+
+
+    <div class="input-checkbox-container">
+        @if (Model.Properties.Checked)
+        {
+            <input type="checkbox" value="@item.Value" name="@itemName" id="@itemId" checked />
+        }
+        else
+        {
+            <input type="checkbox" value="@item.Value" name="@itemName" id="@itemId" />
+        }
+        <label @Model.WriteOptional() for="@itemId">@item.Text</label>
+    </div>
+    @if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
+    {
+        <p class="description">@item.Hint</p>
+    }
+
+}
