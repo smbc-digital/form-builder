@@ -13,3 +13,18 @@ ul li {
 .form-builder-img {
     width: 100%;
 }
+
+.input-memorable-date div input[type=number] {
+    display: inline-block;
+    width: 55px;
+    margin-right: 20px;
+}
+
+.input-memorable-date div {
+    display: inline-block;
+    position: relative;
+}
+
+.input-memorable-date div:last-of-type input[type=number] {
+    width: 110px;
+}

@@ -134,6 +134,11 @@ namespace form_builder.Helpers.PageHelpers
                         _elementHelper.CheckForCheckBoxListValues(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("CheckBoxList", element);
                         break;
+                    case EElementType.DateInput:
+                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        _elementHelper.CheckForLabel(element, viewModel);
+                        formModel.RawHTML += await _viewRender.RenderAsync("DateInput", element);
+                        break;
                     default:
                         break;
                 }

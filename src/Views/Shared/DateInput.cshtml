@@ -1,0 +1,31 @@
+﻿@model form_builder.Models.Element
+@{
+    var hintId = $"{Model.Properties.QuestionId}-hint";
+    var dayId = $"{Model.Properties.QuestionId}-day";
+    var monthId = $"{Model.Properties.QuestionId}-month";
+    var yearId = $"{Model.Properties.QuestionId}-year";
+}
+
+<fieldset class="input-memorable-date" aria-describedby="@hintId">
+    <legend><h2>@Model.Properties.Label</h2></legend>
+    <p id="@hintId">@Model.Properties.Hint</p>
+    
+        <div>
+            <label for="@dayId">
+                Day
+            </label>
+            <input id="@dayId" name="@dayId" type="number" maxlength=2 />
+        </div>
+        <div>
+            <label for="@monthId">
+                Month
+            </label>
+            <input id="@monthId" name="@monthId" type="number" maxlength=2 />
+        </div>
+        <div>
+            <label for="@yearId">
+                Year
+            </label>
+            <input id="@yearId" name="@yearId" type="number" maxlength=4 />
+        </div>
+</fieldset>

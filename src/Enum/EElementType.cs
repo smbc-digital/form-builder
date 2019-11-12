@@ -20,6 +20,7 @@
         Radio,
         Button,
         Select,        
-        CheckBoxList
+        CheckBoxList,
+        DateInput
     }
 }
