@@ -14,10 +14,15 @@
         {
             <input type="checkbox" value="@item.Value" name="@itemName" id="@itemId" checked />
         }
-        else
+        else if(Model.Properties.Value.Contains(item.Value))
+
         {
-            <input type="checkbox" value="@item.Value" name="@itemName" id="@itemId" />
+            <input type="checkbox" value="@item.Value" name="@itemName" id="@itemId" checked />
         }
+    else
+    {
+        <input type="checkbox" value="@item.Value" name="@itemName" id="@itemId" />
+    }
         <label @Model.WriteOptional() for="@itemId">@item.Text</label>
         @if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
         {

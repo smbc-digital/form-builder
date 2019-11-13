@@ -129,7 +129,7 @@ namespace form_builder.Helpers.PageHelpers
                         formModel.RawHTML += await _viewRender.RenderAsync("Select", element);
                         break;                   
                     case EElementType.Checkbox:
-                        //element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                         _elementHelper.CheckForLabel(element, viewModel);
                         _elementHelper.CheckForCheckBoxListValues(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Checkbox", element);
