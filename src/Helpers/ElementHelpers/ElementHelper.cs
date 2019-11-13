@@ -17,7 +17,8 @@ namespace form_builder.Helpers.ElementHelpers
         bool CheckForRadioOptions(Element element);
         bool CheckForSelectOptions(Element element);
         bool CheckForCheckBoxListValues(Element element);
-
+        void ReSelectPreviousSelectedOptions(Element element);
+        void ReCheckPreviousRadioOptions(Element element);
     }
 
     public class ElementHelper : IElementHelper
@@ -90,6 +91,36 @@ namespace form_builder.Helpers.ElementHelpers
                 throw new Exception("A checkbox list requires one or more options to be present.");
             }
             return true;
+        }
+
+        public void ReSelectPreviousSelectedOptions(Element element)
+        {
+            foreach (var option in element.Properties.Options)
+            {
+                if (option.Value == element.Properties.Value)
+                {
+                    option.Selected = true;
+                }
+                else
+                {
+                    option.Selected = false;
+                }
+            }
+        }
+
+        public void ReCheckPreviousRadioOptions(Element element)
+        {
+            foreach (var option in element.Properties.Options)
+            {
+                if (option.Value == element.Properties.Value)
+                {
+                    option.Checked = true;
+                }
+                else
+                {
+                    option.Checked = false;
+                }
+            }
         }
     }
 }
