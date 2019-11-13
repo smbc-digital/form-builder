@@ -9,7 +9,7 @@
 - [Base JSON Structure](##BaseJSONStructure)
 - [UI Tests](#UI_Tests)
 
-## Requirments
+## Requirements
 - dotnet core 2.2
 - gpg key added to accepted contributors
 
@@ -432,7 +432,7 @@ Example where if a user selects yes they will continue on with the form, otherwi
 
 The form builder app has UI tests to ensure that the UI is expected. Our UI Tests are written using SpecFlow
 
-### Requirments
+### Requirements
 - chromdrivers.exe
 - make (not required)
 

@@ -6,5 +6,6 @@ namespace form_builder.Models
         public string Value { get; set; }
         public string Hint { get; set; }
         public bool Checked { get; set; }
+        public bool Selected { get; set; }
     }
 }
