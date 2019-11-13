@@ -85,10 +85,10 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("User enters yes on page1", SourceLine=10)]
-        public virtual void UserEntersYesOnPage1()
+        [TechTalk.SpecRun.ScenarioAttribute("User enters Apples on page1", SourceLine=10)]
+        public virtual void UserEntersApplesOnPage1()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters yes on page1", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters Apples on page1", null, ((string[])(null)));
 #line 11
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
@@ -102,10 +102,10 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("User enters no on page1", SourceLine=15)]
-        public virtual void UserEntersNoOnPage1()
+        [TechTalk.SpecRun.ScenarioAttribute("User enters Oranges on page1", SourceLine=15)]
+        public virtual void UserEntersOrangesOnPage1()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters no on page1", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters Oranges on page1", null, ((string[])(null)));
 #line 16
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
@@ -119,10 +119,10 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("User selects more than one radio input", SourceLine=20)]
-        public virtual void UserSelectsMoreThanOneRadioInput()
+        [TechTalk.SpecRun.ScenarioAttribute("User selects more than one checkbox input", SourceLine=20)]
+        public virtual void UserSelectsMoreThanOneCheckboxInput()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User selects more than one radio input", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User selects more than one checkbox input", null, ((string[])(null)));
 #line 21
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
@@ -136,6 +136,25 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("The \"CheckBoxList-1\" checkbox should be checked", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 26
  testRunner.Then("The \"CheckBoxList-0\" checkbox should be checked", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [TechTalk.SpecRun.ScenarioAttribute("User selects declaration but does not select mandatory fruit", SourceLine=27)]
+        public virtual void UserSelectsDeclarationButDoesNotSelectMandatoryFruit()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User selects declaration but does not select mandatory fruit", null, ((string[])(null)));
+#line 28
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 29
+ testRunner.Given("I navigate to \"/checkbox/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 30
+ testRunner.When("I click the \"Declaration-0\" checkbox", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 31
+ testRunner.Then("I click the \"submit\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 32
+ testRunner.Then("I should see a validation message for \"CheckBoxList-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
