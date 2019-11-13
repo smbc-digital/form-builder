@@ -5,32 +5,32 @@
     var errorId = $"{Model.Properties.QuestionId}-error";
 }
 
-    <div>
-        @await Html.BeginFieldSet(Model)
-        <legend class="sr-only">@Model.Properties.Label</legend>
-        <label @Model.WriteOptional()>@Model.Properties.Label</label>
-        @if (Model.Properties?.Optional ?? true)
+@await Html.BeginFieldSet(Model)
+<legend>
+    <label @Model.WriteOptional()>@Model.Properties.Label</label>
+
+    @if (Model.Properties?.Optional ?? true)
+    {
+        <p class="optional">(optional)</p>
+    }
+</legend>
+
+@if (!string.IsNullOrEmpty(Model.Properties.Hint))
+{
+    <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
+}
+
+<div>
+    <partial name="RadioOptions" />
+
+    @if (!Model.IsValid)
+    {
         {
-            <p class="optional">(optional)</p>
+            var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+
+            <p class="input-error-content" id="@errorId">@validationMessage</p>
         }
+    }
+</div>
 
-        @if (!string.IsNullOrEmpty(Model.Properties.Hint))
-        {
-            <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
-        }
-
-        <div>
-            <partial name="RadioOptions" />
-
-            @if (!Model.IsValid)
-            {
-                {
-                    var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
-
-                    <p class="input-error-content" id="@errorId">@validationMessage</p>
-                }
-            }
-        </div>
-
-        @await Html.EndFieldSet()
-    </div>
+@await Html.EndFieldSet()
