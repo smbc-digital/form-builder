@@ -249,6 +249,51 @@ Textarea JSON example:
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * Optional (*boolean*)
+
+  Checkbox JSON example:
+  ```json
+  {
+    "Type": "Checkbox",
+    "Properties": {
+      "Hint": "You can select <strong>more than one option</strong>",
+      "Label": "Select your favorite fruits",
+      "CustomValidationMessage": "Please select at least one option",
+      "QuestionId": "CheckBoxList",
+      "Options": [
+        {
+          "Text": "Apples",
+          "Value": "Apples",
+          "Hint": "Usually green or red"
+        },
+        {
+          "Text": "Oranges",
+          "Value": "Oranges",
+          "Hint": "Nothing rhymes with orange"
+        },
+        {
+          "Text": "Bananas",
+          "Value": "Bananas",
+          "Hint": "High in potassium"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "Checkbox",
+    "Properties": {
+      "Label": "Declaration",
+      "Hint": "Macaroon candy canes bear claw pie cupcake sweet roll macaroon. Jelly-o cheesecake danish cheesecake marzipan fruitcake pastry chocolate cake. Gingerbread jelly pudding cheesecake donut sugar plum. Cake chocolate cake jelly-o cheesecake gummies.",
+      "CustomValidationMessage": "You must check this box before proceeding",
+      "QuestionId": "Declaration",
+      "Options": [
+        {
+          "Text": "I agree to the terms and conditions regarding fruit selection",
+          "Value": true
+        }
+      ]
+    }
+  }
+ ```  
 #
    * <a name="linkprops">**Link**</a>
         * Text (*string*) __*__
