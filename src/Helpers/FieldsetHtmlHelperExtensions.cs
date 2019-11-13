@@ -13,7 +13,7 @@ namespace form_builder.Helpers
 
             if (element.DisplayAriaDescribedby)
             {
-                fieldsetBuilder.Attributes.Add("aria-describedby", element.DescribedByValue());
+                fieldsetBuilder.Attributes.Add("aria-describedby", element.DescribedByValue().Trim());
             }
             fieldsetBuilder.AddCssClass("form-section question-section");
 
