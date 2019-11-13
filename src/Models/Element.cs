@@ -109,14 +109,14 @@ namespace form_builder.Models
         {
             var describedByValue = string.Empty;
 
-            if (!IsValid)
-            {
-                describedByValue += $"{Properties.QuestionId}-error ";
-            }
-
             if (!string.IsNullOrEmpty(Properties.Hint))
             {
-                describedByValue += $"{Properties.QuestionId}-hint"; ;
+                describedByValue += $"{Properties.QuestionId}-hint ";
+            }
+
+            if (!IsValid)
+            {
+                describedByValue += $"{Properties.QuestionId}-error";
             }
 
             return describedByValue;
