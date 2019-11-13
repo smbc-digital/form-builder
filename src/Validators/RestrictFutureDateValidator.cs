@@ -1,23 +1,14 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using form_builder.Models;
 
 namespace form_builder.Validators
 {
-    public class DateInputElementValidator : IElementValidator
+    public class RestrictFutureDateValidator : IElementValidator
     {
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
-            if (element.Type != EElementType.DateInput)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
-
-            if ((element.Properties.Optional.HasValue && element.Properties.Optional.Value))
+            if (!element.Properties.RestrictFutureDate)
             {
                 return new ValidationResult
                 {
@@ -37,9 +28,9 @@ namespace form_builder.Validators
                 ? viewModel[$"{element.Properties.QuestionId}-year"]
                 : null;
 
-            var isValid = !string.IsNullOrEmpty(valueDay) || !string.IsNullOrEmpty(valueMonth) || !string.IsNullOrEmpty(valueYear);
+            var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out _);
 
-            if (!isValid)
+            if (!isValidDate)
             {
                 return new ValidationResult
                 {
@@ -48,12 +39,27 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out _);
+            var date = DateTime.Today;
+            if (!element.Properties.RestrictCurrentDate)
+            {
+                date.AddDays(1);
+            }
+
+            var dateOutput = DateTime.Parse($"{valueDay}/{valueMonth}/{valueYear}");
+
+            if (dateOutput > date)
+            {
+                return new ValidationResult
+                {
+                    IsValid = false,
+                    Message = "Invalid date in future"
+                };
+            }
 
             return new ValidationResult
             {
-                IsValid = isValidDate,
-                Message = isValidDate ? string.Empty : $"Invalid date input"
+                IsValid = true,
+                Message = string.Empty
             };
         }
     }
