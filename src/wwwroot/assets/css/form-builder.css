@@ -14,7 +14,7 @@ ul li {
     width: 100%;
 }
 
-.input-memorable-date div input[type=number] {
+.input-memorable-date div input[type=text] {
     display: inline-block;
     width: 55px;
     margin-right: 20px;
@@ -25,6 +25,6 @@ ul li {
     position: relative;
 }
 
-.input-memorable-date div:last-of-type input[type=number] {
+.input-memorable-date div:last-of-type input[type=text] {
     width: 110px;
 }

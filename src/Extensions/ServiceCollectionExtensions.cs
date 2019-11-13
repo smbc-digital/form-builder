@@ -21,6 +21,7 @@ namespace form_builder.Extensions
         {
             services.AddTransient<IElementValidator, RequiredElementValidator>();
             services.AddTransient<IElementValidator, NumericValueElementValidator>();
+            services.AddTransient<IElementValidator, DateInputElementValidator>();
 
             return services;
         }

@@ -1,31 +1,40 @@
 ﻿@model form_builder.Models.Element
 @{
     var hintId = $"{Model.Properties.QuestionId}-hint";
+
     var dayId = $"{Model.Properties.QuestionId}-day";
     var monthId = $"{Model.Properties.QuestionId}-month";
     var yearId = $"{Model.Properties.QuestionId}-year";
+
+    var errorId = $"{Model.Properties.QuestionId}-error";
 }
 
-<fieldset class="input-memorable-date" aria-describedby="@hintId">
-    <legend><h2>@Model.Properties.Label</h2></legend>
-    <p id="@hintId">@Model.Properties.Hint</p>
-    
+    <fieldset class="input-memorable-date" aria-describedby="@hintId @(!Model.IsValid ? errorId : String.Empty)">
+        <legend><h2>@Model.Properties.Label</h2></legend>
+        <p id="@hintId">@Model.Properties.Hint</p>
+
         <div>
             <label for="@dayId">
                 Day
             </label>
-            <input id="@dayId" name="@dayId" type="number" maxlength=2 />
+            <input id="@dayId" name="@dayId" type="text" maxlength="2" @*pattern="^([01][1-9]|[1-9]|1[0-9]|2[0-9]|3[0-1])$"*@ />
         </div>
         <div>
             <label for="@monthId">
                 Month
             </label>
-            <input id="@monthId" name="@monthId" type="number" maxlength=2 />
+            <input id="@monthId" name="@monthId" type="text" maxlength="2" />
         </div>
         <div>
             <label for="@yearId">
                 Year
             </label>
-            <input id="@yearId" name="@yearId" type="number" maxlength=4 />
+            <input id="@yearId" name="@yearId" type="text" maxlength="4" />
         </div>
-</fieldset>
+
+        @if (!Model.IsValid)
+        {
+            var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+            <p class="input-error-content text-area-validation" id="@errorId">@validationMessage</p>
+        }
+    </fieldset>
