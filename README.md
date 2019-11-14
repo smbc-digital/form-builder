@@ -409,7 +409,7 @@ Date Input example:
           "Label": "When was your passport issued?",
           "Hint": "For example, 12 11 2007",
           "RestrictFutureDate": true,
-          "RestrictCurrentDate": true
+          "RestrictCurrentDate": true,
           "CustomValidationMessage": "A date is required, please enter a date",
           "ValidationMessageRestrictFutureDate": "Date in the future not allowed, please enter a date in the past",
           "ValidationMessageRestrictCurrentDate": "Today's date not allowed, please enter a date in the past"
