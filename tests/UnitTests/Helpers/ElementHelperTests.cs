@@ -134,7 +134,6 @@ namespace form_builder_tests.UnitTests.Helpers
             // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
-                .WithQuestionId("test")
                 .WithRestrictCurrentDate(true)
                 .Build();
 
@@ -151,7 +150,6 @@ namespace form_builder_tests.UnitTests.Helpers
             // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
-                .WithQuestionId("test")
                 .WithRestrictCurrentDate(true)
                 .WithRestrictFutureDate(true)
                 .WithRestrictPastDate(true)
