@@ -10,6 +10,8 @@ namespace form_builder.Helpers.ElementHelpers
 
         bool CheckForLabel(Element element, Dictionary<string, string> viewModel);
 
+        bool CheckForQuestionId(Element element);
+
         bool CheckForMaxLength(Element element, Dictionary<string, string> viewModel);
 
         bool CheckIfLabelAndTextEmpty(Element element, Dictionary<string, string> viewModel);
@@ -17,6 +19,8 @@ namespace form_builder.Helpers.ElementHelpers
         bool CheckForRadioOptions(Element element);
         bool CheckForSelectOptions(Element element);
         bool CheckForCheckBoxListValues(Element element);
+
+        bool CheckAllDateRestrictionsAreNotEnabled(Element element);
         void ReSelectPreviousSelectedOptions(Element element);
         void ReCheckPreviousRadioOptions(Element element);
     }
@@ -35,6 +39,16 @@ namespace form_builder.Helpers.ElementHelpers
             if (string.IsNullOrEmpty(element.Properties.Label))
             {
                 throw new Exception("No label found for element. Cannot render form.");
+            }
+
+            return true;
+        }
+
+        public bool CheckForQuestionId(Element element)
+        { 
+            if(string.IsNullOrEmpty(element.Properties.QuestionId))
+            {
+                throw new Exception("No question id found for element. Cannot render form.");
             }
 
             return true;
@@ -93,7 +107,16 @@ namespace form_builder.Helpers.ElementHelpers
             return true;
         }
 
-        public void ReSelectPreviousSelectedOptions(Element element)
+        public bool CheckAllDateRestrictionsAreNotEnabled(Element element)
+        {
+            if (element.Properties.RestrictCurrentDate && element.Properties.RestrictPastDate && element.Properties.RestrictFutureDate)
+            {
+                throw new Exception("Cannot set all date restrictions to true");
+            }
+            return true;
+        }
+
+            public void ReSelectPreviousSelectedOptions(Element element)
         {
             foreach (var option in element.Properties.Options)
             {

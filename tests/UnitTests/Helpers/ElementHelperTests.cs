@@ -95,6 +95,73 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Theory]
+        [InlineData(EElementType.DateInput)]
+        [InlineData(EElementType.Textbox)]
+        [InlineData(EElementType.Textarea)]
+        public void CheckForQuestionId_ReturnsTrue_IfQuestionIdExists(EElementType elementType)
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(elementType)
+                .WithQuestionId("test")
+                .Build();
+
+            // Act
+            var result = _elementHelper.CheckForQuestionId(element);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Theory]
+        [InlineData(EElementType.DateInput)]
+        [InlineData(EElementType.Textbox)]
+        [InlineData(EElementType.Textarea)]
+        public void CheckForQuestionId_ThrowsException_IfQuestionIdDoesNotExist(EElementType elementType)
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(elementType)
+                .Build();
+
+            // Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckForQuestionId(element));
+        }
+
+        [Fact]
+        public void CheckAllDateRestrictionsAreNotEnabled_ReturnsTrue_IfNotAllRestrictionsAreTrue()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test")
+                .WithRestrictCurrentDate(true)
+                .Build();
+
+            // Act
+            var result = _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void CheckAllDateRestrictionsAreNotEnabled_ThrowsException_IfAllRestrictionsAreTrue()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test")
+                .WithRestrictCurrentDate(true)
+                .WithRestrictFutureDate(true)
+                .WithRestrictPastDate(true)
+                .Build();
+
+            //Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element));
+        }
+
+        [Theory]
         [InlineData(EElementType.Textbox)]
         [InlineData(EElementType.Textarea)]
         public void CheckForLabel_ThrowsException_IfLabelIsEmpty(EElementType elementType)

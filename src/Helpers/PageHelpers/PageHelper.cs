@@ -105,17 +105,20 @@ namespace form_builder.Helpers.PageHelpers
                         _elementHelper.CheckIfLabelAndTextEmpty(element, viewModel);
                         break;
                     case EElementType.Textbox:
+                        _elementHelper.CheckForQuestionId(element);
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                         _elementHelper.CheckForLabel(element, viewModel);
                         formModel.RawHTML += await _viewRender.RenderAsync("Textbox", element);
                         break;
                     case EElementType.Textarea:
+                        _elementHelper.CheckForQuestionId(element);
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                         _elementHelper.CheckForLabel(element, viewModel);
                         _elementHelper.CheckForMaxLength(element, viewModel);
                         formModel.RawHTML += await _viewRender.RenderAsync("Textarea", element);
                         break;
                     case EElementType.Radio:
+                        _elementHelper.CheckForQuestionId(element);
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                         _elementHelper.CheckForLabel(element, viewModel);
                         _elementHelper.CheckForRadioOptions(element);
@@ -127,6 +130,7 @@ namespace form_builder.Helpers.PageHelpers
                         formModel.RawHTML += await _viewRender.RenderAsync("Button", element, viewData);
                         break;
                     case EElementType.Select:
+                        _elementHelper.CheckForQuestionId(element);
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                         _elementHelper.ReSelectPreviousSelectedOptions(element);
                         _elementHelper.CheckForLabel(element, viewModel);
@@ -134,14 +138,17 @@ namespace form_builder.Helpers.PageHelpers
                         formModel.RawHTML += await _viewRender.RenderAsync("Select", element);
                         break;
                     case EElementType.Checkbox:
+                        _elementHelper.CheckForQuestionId(element);
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                         _elementHelper.CheckForLabel(element, viewModel);
                         _elementHelper.CheckForCheckBoxListValues(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Checkbox", element);
                         break;
                     case EElementType.DateInput:
+                        _elementHelper.CheckForQuestionId(element);
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                         _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("DateInput", element);
                         break;
                     default:

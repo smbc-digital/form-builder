@@ -86,5 +86,23 @@ namespace form_builder_tests.Builders
             _property.Checked = isChecked;
             return this;
         }
+
+        public ElementBuilder WithRestrictFutureDate(bool value)
+        {
+            _property.RestrictFutureDate = value;
+            return this;
+        }
+
+        public ElementBuilder WithRestrictPastDate(bool value)
+        {
+            _property.RestrictPastDate = value;
+            return this;
+        }
+
+        public ElementBuilder WithRestrictCurrentDate(bool value)
+        {
+            _property.RestrictCurrentDate = value;
+            return this;
+        }
     }
 }
