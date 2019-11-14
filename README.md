@@ -396,6 +396,7 @@ Image JSON example:
     * RestrictPastDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the past)
     * RestrictCurrentDate (*boolean*) (Defaults to false. If true, it will prevent users entering today's date)
     * CustomValidationMessage (*string*) (Set a custom validation message for when a user doesn't input a date)
+    * ValidationMessageInvalidDate (*string*) (Set a custom validation message for when a user enters an invalid date)
     * ValidationMessageRestrictFutureDate (*string*) (Set a custom validation message for when a user enters a date in the future)
     * ValidationMessageRestrictPastDate (*string*) (Set a custom validation message for when a user enters a date in the past)
     * ValidationMessageRestrictCurrentDate (*string*) (Set a custom validation message for when a user enters today's date)
