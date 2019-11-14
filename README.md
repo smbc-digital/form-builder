@@ -381,9 +381,9 @@ Image JSON example:
   {
     "Type": "img",
     "Properties": {
-     "Source": "http://url.com/image",
-            "AltText": "alt image text",
-            "ClassName": "image-class"
+       "Source": "http://url.com/image",
+       "AltText": "alt image text",
+       "ClassName": "image-class"
     }
   }
 ```
@@ -392,7 +392,29 @@ Image JSON example:
     * Label (*string*) __*__
     * QuestionId (*string*) __*__
     * Hint (*string*)
-    
+    * RestrictFutureDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the future)
+    * RestrictPastDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the past)
+    * RestrictCurrentDate (*boolean*) (Defaults to false. If true, it will prevent users entering today's date)
+    * CustomValidationMessage (*string*) (Set a custom validation message for when a user doesn't input a date)
+    * ValidationMessageRestrictFutureDate (*string*) (Set a custom validation message for when a user enters a date in the future)
+    * ValidationMessageRestrictPastDate (*string*) (Set a custom validation message for when a user enters a date in the past)
+    * ValidationMessageRestrictCurrentDate (*string*) (Set a custom validation message for when a user enters today's date)
+
+Date Input example:
+```json
+    {
+      "Type": "DateInput",
+      "Properties": {
+          "QuestionId": "passportIssued",
+          "Label": "When was your passport issued?",
+          "Hint": "For example, 12 11 2007",
+          "RestrictFutureDate": true,
+          "CustomValidationMessage": "im a custom validation message",
+          "ValidationMessageRestrictFutureDate": "custom restrict future date message",
+          "ValidationMessageRestrictPastDate": "custom restrict past date message",
+          "ValidationMessageRestrictCurrentDate": "custom restrict current date message"
+       }
+    }
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>
 Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer:
