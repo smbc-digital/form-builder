@@ -75,7 +75,7 @@ namespace form_builder.Controllers
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Error", new { ex = ex.Message, form = form });
+                return RedirectToAction("Error", new { ex = ex.Message, form });
             }
         }
 

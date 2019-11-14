@@ -124,6 +124,12 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.False(BrowserSession.FindCss(className).Exists());
         }
 
+        [Then(@"I should see a ""(.*)"" html element")]
+        public void ThenIShouldSeeAHtmlElementWithClassName(string className)
+        {
+            Assert.True(BrowserSession.FindCss(className).Exists());
+        }
+
         [When(@"I enter ""(.*)"" in ""(.*)""")]
         public void WhenIEnter(string value, string fieldName)
         {

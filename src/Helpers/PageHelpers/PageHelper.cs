@@ -106,18 +106,18 @@ namespace form_builder.Helpers.PageHelpers
                         break;
                     case EElementType.Textbox:
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
-                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForLabel(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Textbox", element);
                         break;
                     case EElementType.Textarea:
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
-                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckForMaxLength(element, viewModel);
                         formModel.RawHTML += await _viewRender.RenderAsync("Textarea", element);
                         break;
                     case EElementType.Radio:
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
-                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckForRadioOptions(element);
                         _elementHelper.ReCheckPreviousRadioOptions(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Radio", element);
@@ -129,19 +129,19 @@ namespace form_builder.Helpers.PageHelpers
                     case EElementType.Select:
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                         _elementHelper.ReSelectPreviousSelectedOptions(element);
-                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckForSelectOptions(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Select", element);
                         break;
                     case EElementType.Checkbox:
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
-                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckForCheckBoxListValues(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Checkbox", element);
                         break;
                     case EElementType.DateInput:
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
-                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForLabel(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("DateInput", element);
                         break;
                     default:

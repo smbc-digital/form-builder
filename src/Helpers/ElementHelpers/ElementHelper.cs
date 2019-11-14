@@ -8,7 +8,7 @@ namespace form_builder.Helpers.ElementHelpers
     {
         string CurrentValue(Element element, Dictionary<string, string> viewModel);
 
-        bool CheckForLabel(Element element, Dictionary<string, string> viewModel);
+        bool CheckForLabel(Element element);
 
         bool CheckForMaxLength(Element element, Dictionary<string, string> viewModel);
 
@@ -30,7 +30,7 @@ namespace form_builder.Helpers.ElementHelpers
             return currentValue ? viewModel[element.Properties.QuestionId] : string.Empty;
         }
 
-        public bool CheckForLabel(Element element, Dictionary<string, string> viewModel)
+        public bool CheckForLabel(Element element)
         {
             if (string.IsNullOrEmpty(element.Properties.Label))
             {
