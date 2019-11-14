@@ -1,0 +1,32 @@
+﻿@using form_builder.Helpers
+@model Tuple<form_builder.Models.Element, List<AddressSearchResult>>
+@{
+    var hintId = $"{Model.Item1.Properties.QuestionId}-hint";
+    var errorId = $"{Model.Item1.Properties.QuestionId}-error";
+}
+@await Html.BeginFieldSet(Model.Item1)
+<legend>
+    <label @Model.Item1.WriteOptional() for="@Model.Item1.Properties.QuestionId">@Model.Item1.Properties.Label</label>
+    @if (Model.Item1.Properties?.Optional ?? true)
+    {
+        <p class="optional">(optional)</p>
+    }
+</legend>
+
+@if (!string.IsNullOrEmpty(Model.Item1.Properties.Hint))
+{
+    <p id=@hintId>@Html.Raw(Model.Item1.Properties.Hint)</p>
+}
+
+<select id="@Model.Item1.Properties.QuestionId" name="@Model.Item1.Properties.QuestionId">
+    <partial name="AddressSelectOptions" model="@Model.Item2" />
+</select>
+
+@if (!Model.Item1.IsValid)
+{
+    {
+        var validationMessage = string.IsNullOrEmpty(Model.Item1.Properties.CustomValidationMessage) ? Model.Item1.ValidationMessage : Model.Item1.Properties.CustomValidationMessage;
+        <p class="input-error-content" id="@errorId">@validationMessage</p>
+    }
+}
+@await Html.EndFieldSet()

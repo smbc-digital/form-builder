@@ -19,7 +19,7 @@ using System.Linq;
 
 namespace form_builder.Controllers
 {
-    public class HomeController : Controller
+    public class AddressController : Controller
     {
         private readonly IDistributedCacheWrapper _distributedCache;
 
@@ -35,7 +35,7 @@ namespace form_builder.Controllers
 
         private readonly IEnumerable<IAddressProvider> _addressProviders;
 
-        public HomeController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper, IEnumerable<IAddressProvider> addressProviders)
+        public AddressController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper, IEnumerable<IAddressProvider> addressProviders)
         {
             _distributedCache = distributedCache;
             _validators = validators;
@@ -47,8 +47,7 @@ namespace form_builder.Controllers
         }
 
         [HttpGet]
-        [Route("{form}")]
-        [Route("{form}/{path}")]
+        [Route("{form}/{path}/address")]
         public async Task<IActionResult> Index(string form, string path, [FromQuery] Guid guid)
         {
             try
@@ -71,22 +70,9 @@ namespace form_builder.Controllers
                     return RedirectToAction("Error");
                 }
 
-                if (page.Elements.Any(_ => _.Type == EElementType.Address))
-                {
-                    return RedirectToAction("Index", "Address",
-                        new
-                        {
-                            guid,
-                            form,
-                            path
-                        }
-                    );
-                }
-
                 var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
+                viewModel.AddressStatus = "Search";
 
-                viewModel.Path = path;
-                viewModel.Guid = guid;
                 return View(viewModel);
             }
             catch (Exception ex)
@@ -97,12 +83,17 @@ namespace form_builder.Controllers
 
         [HttpPost]
         [Route("{form}")]
-        [Route("{form}/{path}")]
+        [Route("{form}/{path}/address")]
         public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData)
         {
+            // Search
+            // Selection
+
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var currentPage = baseForm.GetPage(path);
             var viewModel = NormaliseFormData(formData);
+
+            var journey = viewModel["AddressStatus"];
 
             var guid = Guid.Parse(viewModel["Guid"]);
 
@@ -123,15 +114,45 @@ namespace form_builder.Controllers
             var behaviour = currentPage.GetNextPage(viewModel);
             _pageHelper.SaveAnswers(viewModel);
 
+            switch (journey)
+            {
+                case "Search":
+                    var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
+                    try
+                    {
+                        var result = await _addressProviders.ToList()
+                            .Where(_ => _.ProviderName == addressElement.Properties.AddressProvider)
+                            .FirstOrDefault()
+                            .SearchAsync(viewModel[addressElement.Properties.QuestionId]);
+
+                        var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, result);
+
+                        return View(adddressViewModel);
+
+                    }
+                    catch (Exception  e)
+                    {
+                        return RedirectToAction("Error");
+                    }
+                    break;
+                case "Select":
+                    break;
+                case "Manual":
+                    break;
+                default:
+                    break;
+            }
+                
             switch (behaviour.BehaviourType)
             {
                 case EBehaviourType.GoToExternalPage:
                     return Redirect(behaviour.pageURL);
                 case EBehaviourType.GoToPage:
-                    return RedirectToAction("Index", "Home", new
+                    return RedirectToAction("Index", "Address", new
                     {
                         path = behaviour.pageURL,
-                        guid
+                        guid,
+                        form
                     });
                 case EBehaviourType.SubmitForm:
                     return RedirectToAction("Submit", "Home", new
@@ -143,58 +164,6 @@ namespace form_builder.Controllers
                     return RedirectToAction("Error");
             }
         }
-
-        [HttpGet]
-        [Route("{form}/submit")]
-        public async Task<IActionResult> Submit(string form, [FromQuery] Guid guid)
-        {
-            if (guid == Guid.Empty)
-            {
-                return RedirectToAction("Error", new { form });
-            }
-
-            var baseForm = await _schemaProvider.Get<FormSchema>(form);
-            var formData = _distributedCache.GetString(guid.ToString());
-            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
-            var currentPage = baseForm.GetPage(convertedAnswers.Path);
-            var postUrl = currentPage.GetSubmitFormEndpoint(convertedAnswers);
-
-            if (string.IsNullOrEmpty(postUrl))
-            {
-                _logger.LogError("HomeController, Submit: No postUrl supplied for submit form");
-                return RedirectToAction("Error", new { form });
-            }
-
-            try
-            {
-                var response = await _gateway.PostAsync(postUrl, convertedAnswers);
-
-                if (response.StatusCode != HttpStatusCode.OK)
-                {
-                    _logger.LogError($"HomeController, Submit: Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
-                    return RedirectToAction("Error", new { form });
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Exception Message: {e.Message}");
-                return RedirectToAction("Error", new { form });
-            }
-
-            _distributedCache.Remove(guid.ToString());
-            return View("Submit", convertedAnswers);
-        }
-
-        [HttpGet]
-        [Route("{form}/error")]
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error(string ex)
-        {
-            ViewData["Error"] = ex;
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
 
         protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)
         {

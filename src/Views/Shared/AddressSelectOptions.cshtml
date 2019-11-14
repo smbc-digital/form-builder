@@ -1,0 +1,7 @@
+﻿@model List<form_builder.Models.AddressSearchResult>
+
+<option value="">Select an option...</option>
+@for (var i = 0; i < Model.Count; i++)
+{
+    <option value="@Model[i].Uprn">@Model[i].Description</option>
+}

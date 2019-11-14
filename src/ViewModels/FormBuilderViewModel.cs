@@ -11,6 +11,7 @@ namespace form_builder.ViewModels
         public string Path { get; set; }
 
         public string FeedbackForm { get; set; }
+        public string AddressStatus { get; set; }
 
         public Guid Guid { get; set; }
     }

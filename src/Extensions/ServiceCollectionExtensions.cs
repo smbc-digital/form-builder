@@ -4,6 +4,7 @@ using form_builder.Configuration;
 using form_builder.Gateways;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Providers.Address;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Validators;
@@ -56,6 +57,11 @@ namespace form_builder.Extensions
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            return services;
+        }
+        public static IServiceCollection ConfigureAddressProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IAddressProvider, FakeAddressProvider>();
             return services;
         }
 

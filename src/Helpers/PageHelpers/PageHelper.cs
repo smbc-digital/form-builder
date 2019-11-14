@@ -17,13 +17,13 @@ namespace form_builder.Helpers.PageHelpers
     {
         void CheckForDuplicateQuestionIDs(Page page);
 
-        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm);
+        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, IEnumerable<AddressSearchResult> addressSearchResults = null);
 
         void SaveAnswers(Dictionary<string, string> viewModel);
 
         bool CheckForStartPage(FormSchema form, Page page);
     }
-    
+
     public class PageHelper : IPageHelper
     {
         private readonly IViewRender _viewRender;
@@ -52,7 +52,7 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
-        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm)
+        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, IEnumerable<AddressSearchResult> addressSearchResults = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
             formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new Property { Text = baseForm.Name } });
@@ -93,7 +93,7 @@ namespace form_builder.Helpers.PageHelpers
                         break;
                     case EElementType.UL:
                         formModel.RawHTML += await _viewRender.RenderAsync("UL", element);
-                            break;
+                        break;
                     case EElementType.Span:
                         formModel.RawHTML += await _viewRender.RenderAsync("Span", element);
                         break;
@@ -141,6 +141,9 @@ namespace form_builder.Helpers.PageHelpers
                         _elementHelper.CheckForLabel(element, viewModel);
                         formModel.RawHTML += await _viewRender.RenderAsync("DateInput", element);
                         break;
+                    case EElementType.Address:
+                        formModel.RawHTML += await GenerateAddressHtml(viewModel, element, addressSearchResults);
+                        break;
                     default:
                         break;
                 }
@@ -149,11 +152,22 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
+        private async Task<string> GenerateAddressHtml(Dictionary<string, string> viewModel, Element element, IEnumerable<AddressSearchResult> searchResults)
+        {
+            if (viewModel.ContainsKey(element.Properties.QuestionId))
+            {
+                return await _viewRender.RenderAsync("AddressSelect", new Tuple<Element, List<AddressSearchResult>>(element, searchResults.ToList()));
+            }
+            
+            return await _viewRender.RenderAsync("AddressSearch", element);
+        }
+
+
         public void SaveAnswers(Dictionary<string, string> viewModel)
         {
             var guid = viewModel["Guid"];
             var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers {Pages = new List<PageAnswers>() };
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
             if (!string.IsNullOrEmpty(formData))
             {
