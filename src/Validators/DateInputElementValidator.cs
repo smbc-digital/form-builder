@@ -9,15 +9,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
-            if (element.Type != EElementType.DateInput)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
-
-            if ((element.Properties.Optional.HasValue && element.Properties.Optional.Value))
+            if (element.Type != EElementType.DateInput || element.Properties.Optional)
             {
                 return new ValidationResult
                 {
@@ -53,7 +45,7 @@ namespace form_builder.Validators
             return new ValidationResult
             {
                 IsValid = isValidDate,
-                Message = isValidDate ? string.Empty : $"Invalid date input"
+                Message = isValidDate ? string.Empty : !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidDate) ? element.Properties.ValidationMessageInvalidDate : $"Check the date and try again"
             };
         }
     }

@@ -28,6 +28,14 @@ namespace form_builder.Validators
                 ? viewModel[$"{element.Properties.QuestionId}-year"]
                 : null;
 
+            if (element.Properties.Optional && string.IsNullOrEmpty(valueDay) && string.IsNullOrEmpty(valueMonth) && string.IsNullOrEmpty(valueYear))
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            }
+
             var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out _);
 
             if (!isValidDate)
@@ -40,10 +48,6 @@ namespace form_builder.Validators
             }
 
             var date = DateTime.Today;
-            if (!element.Properties.RestrictCurrentDate)
-            {
-                date.AddDays(-1);
-            }
 
             var dateOutput = DateTime.Parse($"{valueDay}/{valueMonth}/{valueYear}");
 
@@ -52,7 +56,7 @@ namespace form_builder.Validators
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = "Invalid date in past"
+                    Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageRestrictPastDate) ? element.Properties.ValidationMessageRestrictPastDate : "Past date not allowed. Please enter a valid date"
                 };
             }
 

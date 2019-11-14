@@ -4,11 +4,11 @@ using form_builder.Models;
 
 namespace form_builder.Validators
 {
-    public class RestrictFutureDateValidator : IElementValidator
+    public class RestrictCurrentDateValidator : IElementValidator
     {
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
-            if (!element.Properties.RestrictFutureDate)
+            if (!element.Properties.RestrictCurrentDate)
             {
                 return new ValidationResult
                 {
@@ -48,15 +48,14 @@ namespace form_builder.Validators
             }
 
             var date = DateTime.Today;
-
             var dateOutput = DateTime.Parse($"{valueDay}/{valueMonth}/{valueYear}");
 
-            if (dateOutput > date)
+            if (element.Properties.RestrictCurrentDate && dateOutput == date)
             {
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageRestrictFutureDate) ? element.Properties.ValidationMessageRestrictFutureDate : "Future date not allowed. Please enter a valid date"
+                    Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageRestrictCurrentDate) ? element.Properties.ValidationMessageRestrictCurrentDate : "Today's date not allowed. Please enter a valid date."
                 };
             }
 

@@ -31,12 +31,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\DateInput.feature.cs">
+      <DependentUpon>DateInput.feature</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Update="Features\Select.feature.cs">
       <DependentUpon>Select.feature</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\DateInput.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>DateInput.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\Select.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

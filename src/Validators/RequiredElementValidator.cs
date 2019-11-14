@@ -10,15 +10,7 @@ namespace form_builder.Validators
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
 
-            if (element.Type == EElementType.DateInput || element.Properties.Optional.HasValue && element.Properties.Optional.Value)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
-
-            if (element.Properties.Optional.HasValue && element.Properties.Optional.Value)
+            if (element.Type == EElementType.DateInput || element.Properties.Optional)
             {
                 return new ValidationResult
                 {

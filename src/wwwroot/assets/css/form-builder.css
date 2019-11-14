@@ -14,6 +14,10 @@ ul li {
     width: 100%;
 }
 
+fieldset.input-memorable-date {
+    margin-bottom: 24px;
+}
+
 .input-memorable-date div input[type=text] {
     display: inline-block;
     width: 55px;

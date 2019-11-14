@@ -10,7 +10,7 @@ namespace form_builder.Models
         
         public string Label { get; set; }
 
-        public bool? Optional { get; set; } = false;
+        public bool Optional { get; set; } = false;
 
         public bool? Numeric { get; set; }
         
@@ -27,6 +27,12 @@ namespace form_builder.Models
         public string CustomValidationMessage { get; set; } = string.Empty;
 
         public string ValidationMessageRestrictFutureDate { get; set; } = string.Empty;
+
+        public string ValidationMessageRestrictPastDate { get; set; } = string.Empty;
+
+        public string ValidationMessageRestrictCurrentDate { get; set; } = string.Empty;
+
+        public string ValidationMessageInvalidDate { get; set; } = string.Empty;
 
         public string ClassName { get; set; }
 

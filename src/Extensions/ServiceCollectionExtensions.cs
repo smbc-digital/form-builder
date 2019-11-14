@@ -24,6 +24,7 @@ namespace form_builder.Extensions
             services.AddTransient<IElementValidator, DateInputElementValidator>();
             services.AddTransient<IElementValidator, RestrictPastDateValidator>();
             services.AddTransient<IElementValidator, RestrictFutureDateValidator>();
+            services.AddTransient<IElementValidator, RestrictCurrentDateValidator>();
 
             return services;
         }
