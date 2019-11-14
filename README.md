@@ -415,6 +415,7 @@ Date Input example:
           "ValidationMessageRestrictCurrentDate": "custom restrict current date message"
        }
     }
+```
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>
 Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer:
