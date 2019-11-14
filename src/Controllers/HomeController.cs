@@ -167,7 +167,23 @@ namespace form_builder.Controllers
             }
 
             _distributedCache.Remove(guid.ToString());
-            return View("Submit", convertedAnswers);
+
+            var page = baseForm.GetPage("success");
+            if(page == null)
+            {
+                return View("Submit", convertedAnswers);
+            }
+
+            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
+            var success = new Success { 
+                FormName = baseForm.Name,
+                Reference = "(Reference Placeholder)",
+                FormAnswers = convertedAnswers,
+                PageContent = viewModel.RawHTML,
+                SecondaryHeader = page.Title
+            };
+            ViewData["BannerTypeformUrl"] = "http://bbc.co.uk";
+            return View("Success", success);
         }
 
         [HttpGet]

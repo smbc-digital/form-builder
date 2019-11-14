@@ -55,7 +55,10 @@ namespace form_builder.Helpers.PageHelpers
         public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
-            formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new Property { Text = baseForm.Name } });
+            if (page.PageURL.ToLower() != "success")
+            {
+                formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new Property { Text = baseForm.Name } });
+            }
             formModel.FeedbackForm = baseForm.FeedbackForm;
 
             CheckForDuplicateQuestionIDs(page);
