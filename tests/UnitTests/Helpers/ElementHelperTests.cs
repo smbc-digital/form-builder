@@ -405,5 +405,24 @@ namespace form_builder_tests.UnitTests.Helpers
             // Assert
             var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
         }
+
+        //[Fact]
+        //public void ElementBuilder_ShouldReselectOnReturn_IfErroredElseWhere()
+        //{
+        //    // Arrange
+        //    var element = new ElementBuilder()
+        //        .WithType(EElementType.Select)
+        //        .WithQuestionId("questionId")
+        //         .WithOptions(new List<Option>
+        //        { new Option { Value = "option1", Text = "Option 1"},
+        //          new Option { Value = "option2", Text = "Option 2"} })
+        //        .Build();
+        //
+        //    var viewModel = new Dictionary<string, string>();
+        //    viewModel.Add("questionId", "option1");
+        //
+        //    // Assert
+        //    var ex = _elementHelper.ResetSelected(element);
+        //}
     }
 }

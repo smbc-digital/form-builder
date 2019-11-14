@@ -149,8 +149,8 @@ namespace form_builder_tests.UnitTests.Controllers
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            var viewModel = new Dictionary<string, string>();
-            viewModel.Add("Guid", Guid.NewGuid().ToString());
+            var viewModel = new Dictionary<string, string[]>();
+            viewModel.Add("Guid", new string[] { Guid.NewGuid().ToString() });
 
             // Act
             var result = await _homeController.Index("form", "page-one", viewModel);
@@ -188,9 +188,9 @@ namespace form_builder_tests.UnitTests.Controllers
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                .ReturnsAsync(schema);
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, string[]>();
             var guid = Guid.NewGuid();
-            viewModel.Add("Guid", guid.ToString());
+            viewModel.Add("Guid", new string[] { guid.ToString()} );
 
             // Act
             var result = await _homeController.Index("form", "page-one", viewModel);
@@ -232,9 +232,9 @@ namespace form_builder_tests.UnitTests.Controllers
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                .ReturnsAsync(schema);
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, string[]>();
             var guid = Guid.NewGuid();
-            viewModel.Add("Guid", guid.ToString());
+            viewModel.Add("Guid", new string[] { guid.ToString() });
 
             // Act
             var result = await _homeController.Index("form", "page-one", viewModel);
@@ -274,9 +274,9 @@ namespace form_builder_tests.UnitTests.Controllers
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                .ReturnsAsync(schema);
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, string[]>();
             var guid = Guid.NewGuid();
-            viewModel.Add("Guid", guid.ToString());
+            viewModel.Add("Guid", new string[] { guid.ToString() });
 
             // Act
             var result = await _homeController.Index("form", "page-one", viewModel);

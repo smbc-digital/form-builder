@@ -46,7 +46,6 @@ namespace form_builder.Controllers
         [Route("{form}")]
         [Route("{form}/{path}")]
         public async Task<IActionResult> Index(string form, string path, [FromQuery] Guid guid)
-        
         {
             try
             {
@@ -83,10 +82,12 @@ namespace form_builder.Controllers
         [HttpPost]
         [Route("{form}")]
         [Route("{form}/{path}")]
-        public async Task<IActionResult> Index(string form, string path, Dictionary<string, string> viewModel)
+        public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData)
         {
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var currentPage = baseForm.GetPage(path);
+            var viewModel = NormaliseFormData(formData);
+
             var guid = Guid.Parse(viewModel["Guid"]);
 
             if (currentPage == null)
@@ -166,7 +167,23 @@ namespace form_builder.Controllers
             }
 
             _distributedCache.Remove(guid.ToString());
-            return View("Submit", convertedAnswers);
+
+            var page = baseForm.GetPage("success");
+            if(page == null)
+            {
+                return View("Submit", convertedAnswers);
+            }
+
+            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
+            var success = new Success { 
+                FormName = baseForm.Name,
+                Reference = "(Reference Placeholder)",
+                FormAnswers = convertedAnswers,
+                PageContent = viewModel.RawHTML,
+                SecondaryHeader = page.Title
+            };
+            ViewData["BannerTypeformUrl"] = "http://bbc.co.uk";
+            return View("Success", success);
         }
 
         [HttpGet]
@@ -176,6 +193,28 @@ namespace form_builder.Controllers
         {
             ViewData["Error"] = ex;
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+
+        protected Dictionary<string, string> NormaliseFormData(Dictionary<string,string[]> formData)
+        {
+
+            var normaisedFormData = new Dictionary<string, string>();
+            
+            foreach(var item in formData)
+            {
+                if (item.Value.Length == 1)
+                {
+                    normaisedFormData.Add(item.Key, item.Value[0]);
+                }
+                else
+                {
+                    normaisedFormData.Add(item.Key, string.Join(", ", item.Value));
+                }
+    
+            }
+
+            return normaisedFormData;
         }
     }
 }

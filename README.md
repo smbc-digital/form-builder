@@ -9,7 +9,7 @@
 - [Base JSON Structure](##BaseJSONStructure)
 - [UI Tests](#UI_Tests)
 
-## Requirments
+## Requirements
 - dotnet core 2.2
 - gpg key added to accepted contributors
 
@@ -71,7 +71,7 @@ Example JSON:
     }
 ```
 * **Type** (*string*) (HTML element)
-    * [H1-H6](#headingprops) (Heading levels)
+    * [H2-H6](#headingprops) (Heading levels)
     * [P](#ptextprops) (Paragraph text)
     * [Textbox](#textboxprops)
     * [Textarea](#textareaprops) (Large text box)
@@ -90,7 +90,7 @@ Example JSON:
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)
 #
-   * <a name="headingprops">**H1-H6** (Heading levels)</a>
+   * <a name="headingprops">**H2-H6** (Heading levels)</a>
         * Text (*string*) __*__
 #
    * <a name="ptextprops">**P** (Paragraph text)</a>
@@ -249,6 +249,51 @@ Textarea JSON example:
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * Optional (*boolean*)
+
+  Checkbox JSON example:
+  ```json
+  {
+    "Type": "Checkbox",
+    "Properties": {
+      "Hint": "You can select <strong>more than one option</strong>",
+      "Label": "Select your favorite fruits",
+      "CustomValidationMessage": "Please select at least one option",
+      "QuestionId": "CheckBoxList",
+      "Options": [
+        {
+          "Text": "Apples",
+          "Value": "Apples",
+          "Hint": "Usually green or red"
+        },
+        {
+          "Text": "Oranges",
+          "Value": "Oranges",
+          "Hint": "Nothing rhymes with orange"
+        },
+        {
+          "Text": "Bananas",
+          "Value": "Bananas",
+          "Hint": "High in potassium"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "Checkbox",
+    "Properties": {
+      "Label": "Declaration",
+      "Hint": "Macaroon candy canes bear claw pie cupcake sweet roll macaroon. Jelly-o cheesecake danish cheesecake marzipan fruitcake pastry chocolate cake. Gingerbread jelly pudding cheesecake donut sugar plum. Cake chocolate cake jelly-o cheesecake gummies.",
+      "CustomValidationMessage": "You must check this box before proceeding",
+      "QuestionId": "Declaration",
+      "Options": [
+        {
+          "Text": "I agree to the terms and conditions regarding fruit selection",
+          "Value": true
+        }
+      ]
+    }
+  }
+ ```  
 #
    * <a name="linkprops">**Link**</a>
         * Text (*string*) __*__
@@ -336,9 +381,9 @@ Image JSON example:
   {
     "Type": "img",
     "Properties": {
-     "Source": "http://url.com/image",
-            "AltText": "alt image text",
-            "ClassName": "image-class"
+       "Source": "http://url.com/image",
+       "AltText": "alt image text",
+       "ClassName": "image-class"
     }
   }
 ```
@@ -347,7 +392,30 @@ Image JSON example:
     * Label (*string*) __*__
     * QuestionId (*string*) __*__
     * Hint (*string*)
-    
+    * RestrictFutureDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the future)
+    * RestrictPastDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the past)
+    * RestrictCurrentDate (*boolean*) (Defaults to false. If true, it will prevent users entering today's date)
+    * CustomValidationMessage (*string*) (Set a custom validation message for when a user doesn't input a date)
+    * ValidationMessageRestrictFutureDate (*string*) (Set a custom validation message for when a user enters a date in the future)
+    * ValidationMessageRestrictPastDate (*string*) (Set a custom validation message for when a user enters a date in the past)
+    * ValidationMessageRestrictCurrentDate (*string*) (Set a custom validation message for when a user enters today's date)
+
+Date Input example:
+```json
+    {
+      "Type": "DateInput",
+      "Properties": {
+          "QuestionId": "passportIssued",
+          "Label": "When was your passport issued?",
+          "Hint": "For example, 12 11 2007",
+          "RestrictFutureDate": true,
+          "RestrictCurrentDate": true,
+          "CustomValidationMessage": "A date is required, please enter a date",
+          "ValidationMessageRestrictFutureDate": "Date in the future not allowed, please enter a date in the past",
+          "ValidationMessageRestrictCurrentDate": "Today's date not allowed, please enter a date in the past"
+       }
+    }
+```
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>
 Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer:
@@ -387,7 +455,7 @@ Example where if a user selects yes they will continue on with the form, otherwi
 
 The form builder app has UI tests to ensure that the UI is expected. Our UI Tests are written using SpecFlow
 
-### Requirments
+### Requirements
 - chromdrivers.exe
 - make (not required)
 

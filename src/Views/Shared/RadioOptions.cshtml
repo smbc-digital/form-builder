@@ -7,7 +7,7 @@
     var itemId = $"{Model.Properties.QuestionId}-{i}";
 
     <div class="input-radio-container">
-        @Html.RadioButton(Model.Properties.QuestionId, Model.Properties.Options[i].Value, @Model.GenerateElementProperties(i))
+        @Html.RadioButton(Model.Properties.QuestionId, Model.Properties.Options[i].Value, Model.Properties.Options[i].Checked, @Model.GenerateElementProperties(i))
         <label for="@itemId">@item.Text</label>
 
         @if (!string.IsNullOrEmpty(item.Hint))

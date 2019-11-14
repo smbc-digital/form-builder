@@ -55,7 +55,10 @@ namespace form_builder.Helpers.PageHelpers
         public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
-            formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new Property { Text = baseForm.Name } });
+            if (page.PageURL.ToLower() != "success")
+            {
+                formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new Property { Text = baseForm.Name } });
+            }
             formModel.FeedbackForm = baseForm.FeedbackForm;
 
             CheckForDuplicateQuestionIDs(page);
@@ -116,6 +119,7 @@ namespace form_builder.Helpers.PageHelpers
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                         _elementHelper.CheckForLabel(element, viewModel);
                         _elementHelper.CheckForRadioOptions(element);
+                        _elementHelper.ReCheckPreviousRadioOptions(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Radio", element);
                         break;
                     case EElementType.Button:
@@ -124,12 +128,13 @@ namespace form_builder.Helpers.PageHelpers
                         break;
                     case EElementType.Select:
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        _elementHelper.ReSelectPreviousSelectedOptions(element);
                         _elementHelper.CheckForLabel(element, viewModel);
                         _elementHelper.CheckForSelectOptions(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Select", element);
-                        break;                   
+                        break;
                     case EElementType.Checkbox:
-                        //element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                         _elementHelper.CheckForLabel(element, viewModel);
                         _elementHelper.CheckForCheckBoxListValues(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Checkbox", element);
