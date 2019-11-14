@@ -82,7 +82,6 @@ namespace form_builder.Controllers
         }
 
         [HttpPost]
-        [Route("{form}")]
         [Route("{form}/{path}/address")]
         public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData)
         {
@@ -120,10 +119,12 @@ namespace form_builder.Controllers
                     var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
                     try
                     {
-                        var result = await _addressProviders.ToList()
+
+                        var provider = _addressProviders.ToList()
                             .Where(_ => _.ProviderName == addressElement.Properties.AddressProvider)
-                            .FirstOrDefault()
-                            .SearchAsync(viewModel[addressElement.Properties.QuestionId]);
+                            .FirstOrDefault();
+
+                        var result = await provider.SearchAsync(viewModel[addressElement.Properties.QuestionId]);
 
                         var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, result);
 

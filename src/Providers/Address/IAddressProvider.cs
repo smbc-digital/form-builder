@@ -1,6 +1,6 @@
+using StockportGovUK.NetStandard.Models.Addresses;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using form_builder.Models;
 
 namespace form_builder.Providers.Address
 {
@@ -9,7 +9,7 @@ namespace form_builder.Providers.Address
 
         string ProviderName { get; }
 
-        Task<ICollection<AddressSearchResult>> SearchAsync(string postcode);
+        Task<IEnumerable<AddressSearchResult>> SearchAsync(string postcode);
 
         //AddressSearchResult Search(string postcode);
 

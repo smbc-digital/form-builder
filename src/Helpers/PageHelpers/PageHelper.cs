@@ -6,6 +6,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.Addresses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -142,7 +143,7 @@ namespace form_builder.Helpers.PageHelpers
                         formModel.RawHTML += await _viewRender.RenderAsync("DateInput", element);
                         break;
                     case EElementType.Address:
-                        formModel.RawHTML += await GenerateAddressHtml(viewModel, element, addressSearchResults);
+                        formModel.RawHTML += await GenerateAddressHtml(viewModel, page, element, addressSearchResults);
                         break;
                     default:
                         break;
@@ -152,13 +153,14 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        private async Task<string> GenerateAddressHtml(Dictionary<string, string> viewModel, Element element, IEnumerable<AddressSearchResult> searchResults)
+        private async Task<string> GenerateAddressHtml(Dictionary<string, string> viewModel, Page page, Element element, IEnumerable<AddressSearchResult> searchResults)
         {
-            if (viewModel.ContainsKey(element.Properties.QuestionId))
+            if (viewModel.ContainsKey(element.Properties.QuestionId) && !string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && page.IsValid)
             {
                 return await _viewRender.RenderAsync("AddressSelect", new Tuple<Element, List<AddressSearchResult>>(element, searchResults.ToList()));
             }
-            
+
+            element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
             return await _viewRender.RenderAsync("AddressSearch", element);
         }
 

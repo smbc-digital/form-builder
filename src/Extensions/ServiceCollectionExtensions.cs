@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StockportGovUK.AspNetCore.Gateways;
+using StockportGovUK.AspNetCore.Gateways.VerintServiceGateway;
 
 namespace form_builder.Extensions
 {
@@ -29,6 +31,7 @@ namespace form_builder.Extensions
         public static IServiceCollection AddGateways(this IServiceCollection services)
         {
             services.AddSingleton<IS3Gateway, S3Gateway>();
+            // services.AddSingleton<IVerintServiceGateway, VerintServiceGateway>();
 
             return services;
         }
@@ -44,7 +47,6 @@ namespace form_builder.Extensions
         {
             services.AddSingleton<IPageHelper, PageHelper>();
             services.AddSingleton<IElementHelper, ElementHelper>();
-
 
             return services;
         }
@@ -62,6 +64,7 @@ namespace form_builder.Extensions
         public static IServiceCollection ConfigureAddressProviders(this IServiceCollection services)
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
+            services.AddSingleton<IAddressProvider, CRMAddressProvider>();
             return services;
         }
 
