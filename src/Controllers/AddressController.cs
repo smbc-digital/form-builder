@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using form_builder.Models;
-using form_builder.ViewModels;
-using Newtonsoft.Json;
 using form_builder.Enum;
 using form_builder.Validators;
 using System.Threading.Tasks;
@@ -13,9 +10,9 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Logging;
-using System.Net;
 using form_builder.Providers.Address;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace form_builder.Controllers
 {
@@ -87,24 +84,38 @@ namespace form_builder.Controllers
         {
             // Search
             // Selection
-
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var currentPage = baseForm.GetPage(path);
-            var viewModel = NormaliseFormData(formData);
-
-            var journey = viewModel["AddressStatus"];
-
-            var guid = Guid.Parse(viewModel["Guid"]);
 
             if (currentPage == null)
             {
                 return RedirectToAction("Error");
             }
 
+            var viewModel = NormaliseFormData(formData);
+            var guid = Guid.Parse(viewModel["Guid"]);
+            var cachedAnswers = _distributedCache.GetString(guid.ToString());
+            var convertedAnswers = cachedAnswers == null
+                ? new FormAnswers { Pages = new List<PageAnswers>() }
+                : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+            
+            var journey = viewModel["AddressStatus"];
+
+            var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
+            var provider = _addressProviders.ToList()
+                    .Where(_ => _.ProviderName == addressElement.Properties.AddressProvider)
+                    .FirstOrDefault();
+
+            var postcode = journey == "Select" 
+                ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageUrl == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response 
+                : viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
+
+            var addressResults = await provider.SearchAsync(postcode);
+
             currentPage.Validate(viewModel, _validators);
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm);
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, addressResults);
                 formModel.Path = currentPage.PageURL;
                 formModel.Guid = guid;
                 return View(formModel);
@@ -116,54 +127,30 @@ namespace form_builder.Controllers
             switch (journey)
             {
                 case "Search":
-                    var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
                     try
                     {
-
-                        var provider = _addressProviders.ToList()
-                            .Where(_ => _.ProviderName == addressElement.Properties.AddressProvider)
-                            .FirstOrDefault();
-
-                        var result = await provider.SearchAsync(viewModel[addressElement.Properties.QuestionId]);
-
-                        var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, result);
+                        var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, addressResults);
+                        adddressViewModel.AddressStatus = "Select";
 
                         return View(adddressViewModel);
-
                     }
-                    catch (Exception  e)
+                    catch (Exception e)
                     {
                         return RedirectToAction("Error");
-                    }
-                    break;
+                    };
                 case "Select":
+                    //var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, result);
+
+                    //return View(adddressViewModel);
                     break;
                 case "Manual":
                     break;
                 default:
+                    return RedirectToAction("Error");
                     break;
             }
-                
-            switch (behaviour.BehaviourType)
-            {
-                case EBehaviourType.GoToExternalPage:
-                    return Redirect(behaviour.pageURL);
-                case EBehaviourType.GoToPage:
-                    return RedirectToAction("Index", "Address", new
-                    {
-                        path = behaviour.pageURL,
-                        guid,
-                        form
-                    });
-                case EBehaviourType.SubmitForm:
-                    return RedirectToAction("Submit", "Home", new
-                    {
-                        form = baseForm.BaseURL,
-                        guid
-                    });
-                default:
-                    return RedirectToAction("Error");
-            }
+
+            return RedirectToAction("Error");
         }
 
         protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)

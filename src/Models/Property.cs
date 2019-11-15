@@ -35,7 +35,7 @@ namespace form_builder.Models
         public string AltText { get; set; }
 
         public bool Checked { get; set; }
-
         public string AddressProvider { get; set; }
+        public string EnteredPostcode { get; set; } = string.Empty;
     }
 }

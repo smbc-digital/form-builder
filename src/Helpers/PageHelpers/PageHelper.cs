@@ -155,8 +155,11 @@ namespace form_builder.Helpers.PageHelpers
 
         private async Task<string> GenerateAddressHtml(Dictionary<string, string> viewModel, Page page, Element element, IEnumerable<AddressSearchResult> searchResults)
         {
-            if (viewModel.ContainsKey(element.Properties.QuestionId) && !string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && page.IsValid)
+            var postcodeKey = $"{element.Properties.QuestionId}-postcode";
+            if (viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
             {
+                element.Properties.AddressJourney = "Select";
+                element.Properties.EnteredPostcode = _elementHelper.CurrentValue(element, viewModel);
                 return await _viewRender.RenderAsync("AddressSelect", new Tuple<Element, List<AddressSearchResult>>(element, searchResults.ToList()));
             }
 
@@ -197,6 +200,7 @@ namespace form_builder.Helpers.PageHelpers
                 Answers = answers
             });
             convertedAnswers.Path = viewModel["Path"];
+            convertedAnswers.AddressStatus = viewModel["AddressStatus"];
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }

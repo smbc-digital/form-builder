@@ -1,7 +1,8 @@
 ﻿@model form_builder.Models.Element
 @{
-    var hintId = $"{Model.Properties.QuestionId}-hint";
-    var errorId = $"{Model.Properties.QuestionId}-error";
+    var questionId = $"{Model.Properties.QuestionId}-postcode";
+    var hintId = $"{questionId}-hint";
+    var errorId = $"{questionId}-error";
 }
 
 <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
@@ -16,7 +17,7 @@
     <p class="description" id=@hintId>@Model.Properties.Hint</p>
 }
 
-@Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())
+@Html.TextBox(questionId, Model.Properties.Value, Model.GenerateElementProperties())
 
 @if (!Model.IsValid)
 {

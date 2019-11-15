@@ -2,12 +2,14 @@
 @using StockportGovUK.NetStandard.Models.Addresses;
 @model Tuple<form_builder.Models.Element, List<AddressSearchResult>>
 @{
-    var hintId = $"{Model.Item1.Properties.QuestionId}-hint";
-    var errorId = $"{Model.Item1.Properties.QuestionId}-error";
+    var questionId = $"{Model.Item1.Properties.QuestionId}-address";
+    var hintId = $"{questionId}-hint";
+    var errorId = $"{questionId}-error";
 }
+
 @await Html.BeginFieldSet(Model.Item1)
 <legend>
-    <label @Model.Item1.WriteOptional() for="@Model.Item1.Properties.QuestionId">@Model.Item1.Properties.Label</label>
+    <label @Model.Item1.WriteOptional() for="@questionId">@Model.Item1.Properties.Label</label>
     @if (Model.Item1.Properties?.Optional ?? true)
     {
         <p class="optional">(optional)</p>
@@ -19,9 +21,15 @@
     <p id=@hintId>@Html.Raw(Model.Item1.Properties.Hint)</p>
 }
 
-<select id="@Model.Item1.Properties.QuestionId" name="@Model.Item1.Properties.QuestionId">
-    <partial name="AddressSelectOptions" model="@Model.Item2" />
+<select id="@questionId" name="@questionId">
+    <option value="">Select an option...</option>
+    @for (var i = 0; i < Model.Item2.Count; i++)
+    {
+        <option value="@Model.Item2[i].UniqueId">@Model.Item2[i].Name</option>
+    }
 </select>
+
+<p><a class="back-button" href="#">I can't find my address in the list</a></p>
 
 @if (!Model.Item1.IsValid)
 {

@@ -46,7 +46,8 @@ namespace form_builder.Models
                                                     element.Type == EElementType.Textarea ||
                                                     element.Type == EElementType.Select ||
                                                     element.Type == EElementType.Textbox ||
-                                                    element.Type == EElementType.Checkbox
+                                                    element.Type == EElementType.Checkbox ||
+                                                    element.Type == EElementType.Address
                                                     );
             }
         }

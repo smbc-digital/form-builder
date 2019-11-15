@@ -1,8 +1,0 @@
-﻿@using StockportGovUK.NetStandard.Models.Addresses;
-@model List<AddressSearchResult>;
-
-<option value="">Select an option...</option>
-@for (var i = 0; i < Model.Count; i++)
-{
-    <option value="@Model[i].UniqueId">@Model[i].Name</option>
-}
