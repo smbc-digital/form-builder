@@ -182,7 +182,7 @@ namespace form_builder.Controllers
                 PageContent = viewModel.RawHTML,
                 SecondaryHeader = page.Title
             };
-            ViewData["BannerTypeformUrl"] = "http://bbc.co.uk";
+            ViewData["BannerTypeformUrl"] = baseForm.FeedbackForm;
             return View("Success", success);
         }
 

@@ -125,7 +125,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var result = _elementHelper.CheckForMaxLength(element, viewModel);
+            var result = _elementHelper.CheckForMaxLength(element);
 
             // Assert
             Assert.True(result);
@@ -143,7 +143,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element, viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element));
         }
 
         [Fact]
@@ -159,7 +159,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var result = _elementHelper.CheckForMaxLength(element, viewModel);
+            var result = _elementHelper.CheckForMaxLength(element);
 
             // Assert
             Assert.True(result);
@@ -178,7 +178,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element, viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element));
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var result = _elementHelper.CheckIfLabelAndTextEmpty(element, viewModel);
+            var result = _elementHelper.CheckIfLabelAndTextEmpty(element);
 
             // Assert
             Assert.True(result);
@@ -211,7 +211,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckIfLabelAndTextEmpty(element, viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckIfLabelAndTextEmpty(element));
         }
 
 

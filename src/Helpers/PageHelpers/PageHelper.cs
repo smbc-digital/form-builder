@@ -102,7 +102,7 @@ namespace form_builder.Helpers.PageHelpers
                         break;
                     case EElementType.InlineAlert:
                         formModel.RawHTML += await _viewRender.RenderAsync("InlineAlert", element);
-                        _elementHelper.CheckIfLabelAndTextEmpty(element, viewModel);
+                        _elementHelper.CheckIfLabelAndTextEmpty(element);
                         break;
                     case EElementType.Textbox:
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
@@ -112,7 +112,7 @@ namespace form_builder.Helpers.PageHelpers
                     case EElementType.Textarea:
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                         _elementHelper.CheckForLabel(element);
-                        _elementHelper.CheckForMaxLength(element, viewModel);
+                        _elementHelper.CheckForMaxLength(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Textarea", element);
                         break;
                     case EElementType.Radio:

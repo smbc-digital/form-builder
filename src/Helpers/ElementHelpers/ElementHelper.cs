@@ -10,9 +10,9 @@ namespace form_builder.Helpers.ElementHelpers
 
         bool CheckForLabel(Element element);
 
-        bool CheckForMaxLength(Element element, Dictionary<string, string> viewModel);
+        bool CheckForMaxLength(Element element);
 
-        bool CheckIfLabelAndTextEmpty(Element element, Dictionary<string, string> viewModel);
+        bool CheckIfLabelAndTextEmpty(Element element);
 
         bool CheckForRadioOptions(Element element);
         bool CheckForSelectOptions(Element element);
@@ -40,7 +40,7 @@ namespace form_builder.Helpers.ElementHelpers
             return true;
         }
 
-        public bool CheckForMaxLength(Element element, Dictionary<string, string> viewModel)
+        public bool CheckForMaxLength(Element element)
         {
             if (string.IsNullOrEmpty(element.Properties.MaxLength))
             {
@@ -55,7 +55,7 @@ namespace form_builder.Helpers.ElementHelpers
             return true;
         }
 
-        public bool CheckIfLabelAndTextEmpty(Element element, Dictionary<string, string> viewModel)
+        public bool CheckIfLabelAndTextEmpty(Element element)
         {
             if(string.IsNullOrEmpty(element.Properties.Label) && string.IsNullOrEmpty(element.Properties.Text))
             {
