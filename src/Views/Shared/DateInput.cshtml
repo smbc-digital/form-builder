@@ -43,7 +43,7 @@
 {
     //var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
     var validationMessage = Model.ValidationMessage;
-    <p class="input-error-content text-area-validation" id="@errorId">@validationMessage</p>
+    <p class="input-error-content" id="@errorId">@validationMessage</p>
 }
 @await Html.EndFieldSet()
 @*</fieldset>*@

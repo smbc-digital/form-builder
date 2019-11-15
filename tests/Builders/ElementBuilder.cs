@@ -104,5 +104,10 @@ namespace form_builder_tests.Builders
             _property.RestrictCurrentDate = value;
             return this;
         }
+        public ElementBuilder WithOptional(bool value)
+        {
+            _property.Optional = value;
+            return this;
+        }
     }
 }
