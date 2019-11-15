@@ -452,6 +452,25 @@ Example where if a user selects yes they will continue on with the form, otherwi
 
 **PageSlug** (*string*) __*__ - The PageSlug the form will redirect to
 
+## Success Page
+
+The success page is a page with with the pageurl of success it is of the form it should be at the end of the form afte the submit.
+
+```json
+{
+      "Title": "Thank you for submitting your views on fruit",
+      "PageURL": "success",
+      "Elements": [
+        {
+          "Type": "p",
+          "Properties": {
+            "Text": "The wikipedia page on fruit is at <a href="https://en.wikipedia.org/wiki/fruit">Fruits</a>"
+          }
+        }        
+```
+It will also diplay the form name and the FeedbackUrl if one is specified.
+
+
 ## UI_Tests
 
 The form builder app has UI tests to ensure that the UI is expected. Our UI Tests are written using SpecFlow
