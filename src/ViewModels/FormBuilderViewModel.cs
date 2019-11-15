@@ -12,6 +12,8 @@ namespace form_builder.ViewModels
 
         public string FeedbackForm { get; set; }
 
+        public string FormName { get; set; }
+
         public Guid Guid { get; set; }
     }
 }

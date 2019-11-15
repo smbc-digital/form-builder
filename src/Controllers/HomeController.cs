@@ -71,6 +71,7 @@ namespace form_builder.Controllers
 
                 viewModel.Path = path;
                 viewModel.Guid = guid;
+                viewModel.FormName = baseForm.Name;
                 return View(viewModel);
             }
             catch (Exception ex)
