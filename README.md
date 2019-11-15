@@ -466,7 +466,8 @@ The success page is a page with with the pageurl of success it is of the form it
           "Properties": {
             "Text": "The wikipedia page on fruit is at <a href="https://en.wikipedia.org/wiki/fruit">Fruits</a>"
           }
-        }        
+        }]
+}
 ```
 It will also diplay the form name and the FeedbackUrl if one is specified.
 
