@@ -112,6 +112,15 @@ namespace form_builder.Controllers
                     .Where(_ => _.ProviderName == addressElement.Properties.AddressProvider)
                     .FirstOrDefault();
 
+                if (provider == null)
+                {
+                    return RedirectToAction("Error", "Home", new
+                    {
+                        form = baseForm.BaseURL,
+                        ex = $"No address provider configure for {addressElement.Properties.AddressProvider}"
+                    });
+                }
+
                 var postcode = journey == "Select"
                     ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageUrl == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
                     : viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
