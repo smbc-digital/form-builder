@@ -44,11 +44,11 @@ namespace form_builder.Models
 
         public bool Checked { get; set; }
 
-        public string Day { get; set; }
+        public string Day { get; set; } = string.Empty;
 
-        public string Month { get; set; }
+        public string Month { get; set; } = string.Empty;
 
-        public string Year { get; set; }
+        public string Year { get; set; } = string.Empty;
 
         public bool RestrictFutureDate { get; set; } = false;
 

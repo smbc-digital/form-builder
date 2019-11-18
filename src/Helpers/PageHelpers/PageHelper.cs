@@ -146,7 +146,9 @@ namespace form_builder.Helpers.PageHelpers
                         break;
                     case EElementType.DateInput:
                         _elementHelper.CheckForQuestionId(element);
-                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        element.Properties.Day = _elementHelper.CurrentDateValue(element, viewModel, "-day");
+                        element.Properties.Month = _elementHelper.CurrentDateValue(element, viewModel, "-month");
+                        element.Properties.Year = _elementHelper.CurrentDateValue(element, viewModel, "-year");
                         _elementHelper.CheckForLabel(element, viewModel);
                         _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("DateInput", element);

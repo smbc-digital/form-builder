@@ -8,6 +8,8 @@ namespace form_builder.Helpers.ElementHelpers
     {
         string CurrentValue(Element element, Dictionary<string, string> viewModel);
 
+        string CurrentDateValue(Element element, Dictionary<string, string> viewModel, string suffix);
+
         bool CheckForLabel(Element element, Dictionary<string, string> viewModel);
 
         bool CheckForQuestionId(Element element);
@@ -45,8 +47,8 @@ namespace form_builder.Helpers.ElementHelpers
         }
 
         public bool CheckForQuestionId(Element element)
-        { 
-            if(string.IsNullOrEmpty(element.Properties.QuestionId))
+        {
+            if (string.IsNullOrEmpty(element.Properties.QuestionId))
             {
                 throw new Exception("No question id found for element. Cannot render form.");
             }
@@ -71,7 +73,7 @@ namespace form_builder.Helpers.ElementHelpers
 
         public bool CheckIfLabelAndTextEmpty(Element element, Dictionary<string, string> viewModel)
         {
-            if(string.IsNullOrEmpty(element.Properties.Label) && string.IsNullOrEmpty(element.Properties.Text))
+            if (string.IsNullOrEmpty(element.Properties.Label) && string.IsNullOrEmpty(element.Properties.Text))
             {
                 throw new Exception("An inline alert requires either a label or text or both to be present. Both can not be empty");
             }
@@ -81,7 +83,7 @@ namespace form_builder.Helpers.ElementHelpers
 
         public bool CheckForRadioOptions(Element element)
         {
-            if(element.Properties.Options == null || element.Properties.Options.Count <= 1)
+            if (element.Properties.Options == null || element.Properties.Options.Count <= 1)
             {
                 throw new Exception("A radio element requires two or more options to be present.");
             }
@@ -116,7 +118,7 @@ namespace form_builder.Helpers.ElementHelpers
             return true;
         }
 
-            public void ReSelectPreviousSelectedOptions(Element element)
+        public void ReSelectPreviousSelectedOptions(Element element)
         {
             foreach (var option in element.Properties.Options)
             {
@@ -144,6 +146,14 @@ namespace form_builder.Helpers.ElementHelpers
                     option.Checked = false;
                 }
             }
+        }
+
+        public string CurrentDateValue(Element element, Dictionary<string, string> viewModel, string idSuffix)
+        {
+
+            var currentValue = viewModel.ContainsKey(element.Properties.QuestionId + idSuffix);
+
+            return currentValue ? viewModel[element.Properties.QuestionId + idSuffix] : string.Empty;
         }
     }
 }
