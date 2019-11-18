@@ -29,6 +29,21 @@ namespace form_builder_tests_ui.StepDefinitions
 
         }
 
+        [Then(@"I should see todays date refilled in the date input")]
+        public void ThenIShouldSeeTodaysDateRefilledInTheDateInput()
+        {
+            // Arrange
+            DateTime currentDate = DateTime.Today;
+
+            var dayValue = BrowserSession.FindId("passportIssued-day").Value;
+            var monthValue = BrowserSession.FindId("passportIssued-month").Value;
+            var yearValue = BrowserSession.FindId("passportIssued-year").Value;
+
+            Assert.Equal(currentDate.Day.ToString(), dayValue);
+            Assert.Equal(currentDate.Month.ToString(), monthValue);
+            Assert.Equal(currentDate.Year.ToString(), yearValue);
+        }
+
         [Then(@"I should not see a validation message for ""(.*)"" input")]
         public void ThenIShouldNotSeeValidationMessageForInput(string inputName)
         {
@@ -40,6 +55,18 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenIShouldSeeValidationMessageForInput(string inputName)
         {
             Assert.True(BrowserSession.FindId(inputName).Exists());
+        }
+
+        [Then(@"I should see the values ""(.*)"", ""(.*)"" and ""(.*)"" in the date input")]
+        public void ThenIShouldSeeEnteredValues(string expectedDayValue, string expectedMonthValue, string expectedYearValue)
+        {
+            var dayValue = BrowserSession.FindId("passportIssued-day").Value;
+            var monthValue = BrowserSession.FindId("passportIssued-month").Value;
+            var yearValue = BrowserSession.FindId("passportIssued-year").Value;
+
+            Assert.Equal(expectedDayValue, dayValue);
+            Assert.Equal(expectedMonthValue, monthValue);
+            Assert.Equal(expectedYearValue, yearValue);
         }
 
     }

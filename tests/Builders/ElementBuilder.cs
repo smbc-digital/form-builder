@@ -109,5 +109,23 @@ namespace form_builder_tests.Builders
             _property.Optional = value;
             return this;
         }
+
+        public ElementBuilder WithDayValue(string value)
+        {
+            _property.Day = value;
+            return this;
+        }
+
+        public ElementBuilder WithMonthValue(string value)
+        {
+            _property.Month = value;
+            return this;
+        }
+
+        public ElementBuilder WithYearValue(string value)
+        {
+            _property.Year = value;
+            return this;
+        }
     }
 }

@@ -471,6 +471,63 @@ namespace form_builder_tests.UnitTests.Helpers
             var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
         }
 
+        [Fact]
+        public void CurrentDateValue_ReturnsCurrentValueOfElement()
+        {
+            // Arrange
+            var questionId = "passportIssued";
+            var dayId = questionId + "-day";
+            var monthId = questionId + "-month";
+            var yearId = questionId + "-year";
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId(questionId)
+                .WithDayValue("14")
+                .WithMonthValue("09")
+                .WithYearValue("2010")
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add(dayId, "14");
+            viewModel.Add(monthId, "09");
+            viewModel.Add(yearId, "2010");
+
+            // Act
+            var dayResult = _elementHelper.CurrentDateValue(element, viewModel, "-day");
+            var monthResult = _elementHelper.CurrentDateValue(element, viewModel, "-month");
+            var yearResult = _elementHelper.CurrentDateValue(element, viewModel, "-year");
+
+            // Assert
+            Assert.Equal("14", dayResult);
+            Assert.Equal("09", monthResult);
+            Assert.Equal("2010", yearResult);
+        }
+
+        [Fact]
+        public void CurrentDateValue_ReturnsEmptyStringWhenNoQuestionIdFound()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithDayValue("14")
+                .WithMonthValue("09")
+                .WithYearValue("2010")
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+
+            // Act
+            var dayResult = _elementHelper.CurrentDateValue(element, viewModel, "-day");
+            var monthResult = _elementHelper.CurrentDateValue(element, viewModel, "-month");
+            var yearResult = _elementHelper.CurrentDateValue(element, viewModel, "-year");
+
+            // Assert
+            Assert.Equal("", dayResult);
+            Assert.Equal("", monthResult);
+            Assert.Equal("", yearResult);
+        }
+
         //[Fact]
         //public void ElementBuilder_ShouldReselectOnReturn_IfErroredElseWhere()
         //{

@@ -14,21 +14,26 @@ Scenario: User enters strings in the day, month and year
 	Then I fill the day with "aa" value, month with "bb" value and year with "cccc" value
 	When I click the "nextPage" button
 	Then I should see a validation message for "passportIssued-error" input
+	Then I should see the values "aa", "bb" and "cccc" in the date input
+
 
 Scenario: User enters today's date
 	Given I navigate to "/dateinput/page1"
 	Then I fill the date input with today's date
 	When I click the "nextPage" button
 	Then I should see a validation message for "passportIssued-error" input
+	Then I should see todays date refilled in the date input
 
 Scenario: User enters a date in the past
 	Given I navigate to "/dateinput/page2"
 	Then I fill the day with "01" value, month with "01" value and year with "2010" value
 	When I click the "nextPage2" button
 	Then I should see a validation message for "passportIssued-error" input
+	Then I should see the values "01", "01" and "2010" in the date input
 
 Scenario: User enters a date in the future
 	Given I navigate to "/dateinput/page3"
 	Then I fill the day with "01" value, month with "01" value and year with "2022" value
 	When I click the "submit" button
 	Then I should see a validation message for "passportIssued-error" input
+	Then I should see the values "01", "01" and "2022" in the date input
