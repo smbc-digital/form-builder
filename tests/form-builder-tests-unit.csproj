@@ -25,4 +25,8 @@
     <ProjectReference Include="..\src\form-builder.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UnitTests\Validators\" />
+  </ItemGroup>
+
 </Project>

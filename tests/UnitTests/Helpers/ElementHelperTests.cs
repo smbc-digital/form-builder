@@ -71,7 +71,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var result = _elementHelper.CheckForLabel(element, viewModel);
+            var result = _elementHelper.CheckForLabel(element);
 
             // Assert
             Assert.True(result);
@@ -91,7 +91,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
         }
 
         [Theory]
@@ -174,7 +174,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
         }
 
         [Fact]
@@ -190,7 +190,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var result = _elementHelper.CheckForMaxLength(element, viewModel);
+            var result = _elementHelper.CheckForMaxLength(element);
 
             // Assert
             Assert.True(result);
@@ -208,7 +208,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element, viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element));
         }
 
         [Fact]
@@ -224,7 +224,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var result = _elementHelper.CheckForMaxLength(element, viewModel);
+            var result = _elementHelper.CheckForMaxLength(element);
 
             // Assert
             Assert.True(result);
@@ -243,7 +243,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element, viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element));
         }
 
         [Fact]
@@ -259,7 +259,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var result = _elementHelper.CheckIfLabelAndTextEmpty(element, viewModel);
+            var result = _elementHelper.CheckIfLabelAndTextEmpty(element);
 
             // Assert
             Assert.True(result);
@@ -276,7 +276,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckIfLabelAndTextEmpty(element, viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckIfLabelAndTextEmpty(element));
         }
 
 
@@ -468,7 +468,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
+            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
         }
 
         [Fact]

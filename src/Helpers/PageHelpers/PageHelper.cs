@@ -102,25 +102,25 @@ namespace form_builder.Helpers.PageHelpers
                         break;
                     case EElementType.InlineAlert:
                         formModel.RawHTML += await _viewRender.RenderAsync("InlineAlert", element);
-                        _elementHelper.CheckIfLabelAndTextEmpty(element, viewModel);
+                        _elementHelper.CheckIfLabelAndTextEmpty(element);
                         break;
                     case EElementType.Textbox:
                         _elementHelper.CheckForQuestionId(element);
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
-                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForLabel(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Textbox", element);
                         break;
                     case EElementType.Textarea:
                         _elementHelper.CheckForQuestionId(element);
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
-                        _elementHelper.CheckForLabel(element, viewModel);
-                        _elementHelper.CheckForMaxLength(element, viewModel);
+                        _elementHelper.CheckForLabel(element);
+                        _elementHelper.CheckForMaxLength(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Textarea", element);
                         break;
                     case EElementType.Radio:
                         _elementHelper.CheckForQuestionId(element);
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
-                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckForRadioOptions(element);
                         _elementHelper.ReCheckPreviousRadioOptions(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Radio", element);
@@ -133,14 +133,14 @@ namespace form_builder.Helpers.PageHelpers
                         _elementHelper.CheckForQuestionId(element);
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                         _elementHelper.ReSelectPreviousSelectedOptions(element);
-                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckForSelectOptions(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Select", element);
                         break;
                     case EElementType.Checkbox:
                         _elementHelper.CheckForQuestionId(element);
                         element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
-                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckForCheckBoxListValues(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Checkbox", element);
                         break;
@@ -149,7 +149,7 @@ namespace form_builder.Helpers.PageHelpers
                         element.Properties.Day = _elementHelper.CurrentDateValue(element, viewModel, "-day");
                         element.Properties.Month = _elementHelper.CurrentDateValue(element, viewModel, "-month");
                         element.Properties.Year = _elementHelper.CurrentDateValue(element, viewModel, "-year");
-                        _elementHelper.CheckForLabel(element, viewModel);
+                        _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("DateInput", element);
                         break;

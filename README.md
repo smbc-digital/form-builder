@@ -396,6 +396,7 @@ Image JSON example:
     * RestrictPastDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the past)
     * RestrictCurrentDate (*boolean*) (Defaults to false. If true, it will prevent users entering today's date)
     * CustomValidationMessage (*string*) (Set a custom validation message for when a user doesn't input a date)
+    * ValidationMessageInvalidDate (*string*) (Set a custom validation message for when a user enters an invalid date)
     * ValidationMessageRestrictFutureDate (*string*) (Set a custom validation message for when a user enters a date in the future)
     * ValidationMessageRestrictPastDate (*string*) (Set a custom validation message for when a user enters a date in the past)
     * ValidationMessageRestrictCurrentDate (*string*) (Set a custom validation message for when a user enters today's date)
@@ -450,6 +451,26 @@ Example where if a user selects yes they will continue on with the form, otherwi
 * 2 = GoToExternalPage
 
 **PageSlug** (*string*) __*__ - The PageSlug the form will redirect to
+
+## Success Page
+
+The success page is a page with with the pageurl of success it is of the form it should be at the end of the form afte the submit.
+
+```json
+{
+      "Title": "Thank you for submitting your views on fruit",
+      "PageURL": "success",
+      "Elements": [
+        {
+          "Type": "p",
+          "Properties": {
+            "Text": "The wikipedia page on fruit is at <a href=\"https://en.wikipedia.org/wiki/fruit\">Fruits</a>"
+          }
+        }]
+}
+```
+It will also diplay the form name and the FeedbackUrl if one is specified.
+
 
 ## UI_Tests
 

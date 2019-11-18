@@ -71,11 +71,12 @@ namespace form_builder.Controllers
 
                 viewModel.Path = path;
                 viewModel.Guid = guid;
+                viewModel.FormName = baseForm.Name;
                 return View(viewModel);
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Error", new { ex = ex.Message, form = form });
+                return RedirectToAction("Error", new { ex = ex.Message, form });
             }
         }
 
@@ -182,7 +183,7 @@ namespace form_builder.Controllers
                 PageContent = viewModel.RawHTML,
                 SecondaryHeader = page.Title
             };
-            ViewData["BannerTypeformUrl"] = "http://bbc.co.uk";
+            ViewData["BannerTypeformUrl"] = baseForm.FeedbackForm;
             return View("Success", success);
         }
 

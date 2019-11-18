@@ -10,13 +10,13 @@ namespace form_builder.Helpers.ElementHelpers
 
         string CurrentDateValue(Element element, Dictionary<string, string> viewModel, string suffix);
 
-        bool CheckForLabel(Element element, Dictionary<string, string> viewModel);
-
         bool CheckForQuestionId(Element element);
 
-        bool CheckForMaxLength(Element element, Dictionary<string, string> viewModel);
+        bool CheckForLabel(Element element);
 
-        bool CheckIfLabelAndTextEmpty(Element element, Dictionary<string, string> viewModel);
+        bool CheckForMaxLength(Element element);
+
+        bool CheckIfLabelAndTextEmpty(Element element);
 
         bool CheckForRadioOptions(Element element);
         bool CheckForSelectOptions(Element element);
@@ -36,7 +36,7 @@ namespace form_builder.Helpers.ElementHelpers
             return currentValue ? viewModel[element.Properties.QuestionId] : string.Empty;
         }
 
-        public bool CheckForLabel(Element element, Dictionary<string, string> viewModel)
+        public bool CheckForLabel(Element element)
         {
             if (string.IsNullOrEmpty(element.Properties.Label))
             {
@@ -56,7 +56,7 @@ namespace form_builder.Helpers.ElementHelpers
             return true;
         }
 
-        public bool CheckForMaxLength(Element element, Dictionary<string, string> viewModel)
+        public bool CheckForMaxLength(Element element)
         {
             if (string.IsNullOrEmpty(element.Properties.MaxLength))
             {
@@ -71,7 +71,7 @@ namespace form_builder.Helpers.ElementHelpers
             return true;
         }
 
-        public bool CheckIfLabelAndTextEmpty(Element element, Dictionary<string, string> viewModel)
+        public bool CheckIfLabelAndTextEmpty(Element element)
         {
             if (string.IsNullOrEmpty(element.Properties.Label) && string.IsNullOrEmpty(element.Properties.Text))
             {
