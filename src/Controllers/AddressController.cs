@@ -69,6 +69,7 @@ namespace form_builder.Controllers
 
                 var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
                 viewModel.AddressStatus = "Search";
+                viewModel.Guid = guid;
 
                 return View(viewModel);
             }
@@ -118,6 +119,7 @@ namespace form_builder.Controllers
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, addressResults);
                 formModel.Path = currentPage.PageURL;
                 formModel.Guid = guid;
+                formModel.AddressStatus = journey;
                 return View(formModel);
             }
 
@@ -131,7 +133,7 @@ namespace form_builder.Controllers
                     {
                         var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, addressResults);
                         adddressViewModel.AddressStatus = "Select";
-
+                        adddressViewModel.Guid = guid;
                         return View(adddressViewModel);
                     }
                     catch (Exception e)
@@ -139,10 +141,26 @@ namespace form_builder.Controllers
                         return RedirectToAction("Error");
                     };
                 case "Select":
-                    //var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, result);
-
-                    //return View(adddressViewModel);
-                    break;
+                    switch (behaviour.BehaviourType)
+                    {
+                        case EBehaviourType.GoToExternalPage:
+                            return Redirect(behaviour.pageURL);
+                        case EBehaviourType.GoToPage:
+                            return RedirectToAction("Index", "Home", new
+                            {
+                                path = behaviour.pageURL,
+                                guid,
+                                form = baseForm.BaseURL
+                            });
+                        case EBehaviourType.SubmitForm:
+                            return RedirectToAction("Submit", "Home", new
+                            {
+                                form = baseForm.BaseURL,
+                                guid
+                            });
+                        default:
+                            return RedirectToAction("Error");
+                    }
                 case "Manual":
                     break;
                 default:

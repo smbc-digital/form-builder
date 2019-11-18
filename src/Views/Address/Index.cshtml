@@ -5,13 +5,13 @@
     ViewData["BannerTypeformUrl"] = Model.FeedbackForm;
 }
 
-    <div id="root" class="text-center">
-        @using (Html.BeginForm("Index", "Address", FormMethod.Post))
-        {
-            @Html.Raw(Model.RawHTML)
+<div id="root" class="text-center">
+    @using (Html.BeginForm("Index", "Address", FormMethod.Post))
+    {
+        @Html.Raw(Model.RawHTML)
 
-            @Html.HiddenFor(_ => _.Guid)
-            @Html.HiddenFor(_ => _.Path)
-            @Html.HiddenFor(_ => _.AddressStatus)
-        }
-    </div>
+        @Html.HiddenFor(_ => _.Guid)
+        @Html.HiddenFor(_ => _.Path)
+        <input type="hidden" id="AddressStatus" name="AddressStatus" value="@Model.AddressStatus">
+    }
+</div>

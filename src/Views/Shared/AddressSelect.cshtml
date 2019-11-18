@@ -7,9 +7,9 @@
     var errorId = $"{questionId}-error";
 }
 
-@await Html.BeginFieldSet(Model.Item1)
+@await Html.BeginFieldSet(Model.Item1, "-address")
 <legend>
-    <label @Model.Item1.WriteOptional() for="@questionId">@Model.Item1.Properties.Label</label>
+    <label @Model.Item1.WriteOptional() for="@questionId">@Model.Item1.Properties.AddressLabel</label>
     @if (Model.Item1.Properties?.Optional ?? true)
     {
         <p class="optional">(optional)</p>
@@ -29,8 +29,6 @@
     }
 </select>
 
-<p><a class="back-button" href="#">I can't find my address in the list</a></p>
-
 @if (!Model.Item1.IsValid)
 {
     {
@@ -38,4 +36,7 @@
         <p class="input-error-content" id="@errorId">@validationMessage</p>
     }
 }
+
+<p><a class="back-button" href="#">I can't find my address in the list</a></p>
+
 @await Html.EndFieldSet()

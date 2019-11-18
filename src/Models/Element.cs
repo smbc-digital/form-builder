@@ -107,16 +107,26 @@ namespace form_builder.Models
 
         public string DescribedByValue()
         {
+            return DescribeValue($"{Properties.QuestionId}");
+        }
+
+        public string DescribedByValue(string prefix)
+        {
+            return DescribeValue($"{Properties.QuestionId}{prefix}");
+        }
+
+        private string DescribeValue(string key)
+        {
             var describedByValue = string.Empty;
 
             if (!string.IsNullOrEmpty(Properties.Hint))
             {
-                describedByValue += $"{Properties.QuestionId}-hint ";
+                describedByValue += $"{key}-hint ";
             }
 
             if (!IsValid)
             {
-                describedByValue += $"{Properties.QuestionId}-error";
+                describedByValue += $"{key}-error";
             }
 
             return describedByValue;

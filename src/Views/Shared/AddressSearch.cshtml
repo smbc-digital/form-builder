@@ -5,7 +5,7 @@
     var errorId = $"{questionId}-error";
 }
 
-<label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+<label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.PostcodeLabel</label>
 
 @if (Model.Properties?.Optional ?? true)
 {

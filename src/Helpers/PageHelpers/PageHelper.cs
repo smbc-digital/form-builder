@@ -156,9 +156,9 @@ namespace form_builder.Helpers.PageHelpers
         private async Task<string> GenerateAddressHtml(Dictionary<string, string> viewModel, Page page, Element element, IEnumerable<AddressSearchResult> searchResults)
         {
             var postcodeKey = $"{element.Properties.QuestionId}-postcode";
-            if (viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
+
+            if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
             {
-                element.Properties.AddressJourney = "Select";
                 element.Properties.EnteredPostcode = _elementHelper.CurrentValue(element, viewModel);
                 return await _viewRender.RenderAsync("AddressSelect", new Tuple<Element, List<AddressSearchResult>>(element, searchResults.ToList()));
             }
