@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using form_builder.Providers.Address;
 using System.Linq;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.Addresses;
 
 namespace form_builder.Controllers
 {
@@ -83,8 +84,6 @@ namespace form_builder.Controllers
         [Route("{form}/{path}/address")]
         public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData)
         {
-            // Search
-            // Selection
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var currentPage = baseForm.GetPage(path);
 
@@ -95,25 +94,32 @@ namespace form_builder.Controllers
 
             var viewModel = NormaliseFormData(formData);
             var guid = Guid.Parse(viewModel["Guid"]);
-            var cachedAnswers = _distributedCache.GetString(guid.ToString());
-            var convertedAnswers = cachedAnswers == null
-                ? new FormAnswers { Pages = new List<PageAnswers>() }
-                : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-            
-            var journey = viewModel["AddressStatus"];
 
-            var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
-            var provider = _addressProviders.ToList()
+            var journey = viewModel["AddressStatus"];
+            var addressResults = new List<AddressSearchResult>();
+
+            currentPage.Validate(viewModel, _validators);
+
+            if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
+            {
+                var cachedAnswers = _distributedCache.GetString(guid.ToString());
+                var convertedAnswers = cachedAnswers == null
+                    ? new FormAnswers { Pages = new List<PageAnswers>() }
+                    : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+
+                var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
+                var provider = _addressProviders.ToList()
                     .Where(_ => _.ProviderName == addressElement.Properties.AddressProvider)
                     .FirstOrDefault();
 
-            var postcode = journey == "Select" 
-                ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageUrl == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response 
-                : viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
+                var postcode = journey == "Select"
+                    ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageUrl == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
+                    : viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
 
-            var addressResults = await provider.SearchAsync(postcode);
+                var result = await provider.SearchAsync(postcode);
+                addressResults = result.ToList();
+            }
 
-            currentPage.Validate(viewModel, _validators);
             if (!currentPage.IsValid)
             {
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, addressResults);
@@ -165,7 +171,6 @@ namespace form_builder.Controllers
                     break;
                 default:
                     return RedirectToAction("Error");
-                    break;
             }
 
             return RedirectToAction("Error");
