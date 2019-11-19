@@ -159,7 +159,7 @@ namespace form_builder.Helpers.PageHelpers
 
             if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
             {
-                element.Properties.EnteredPostcode = _elementHelper.CurrentValue(element, viewModel);
+                element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
                 return await _viewRender.RenderAsync("AddressSelect", new Tuple<Element, List<AddressSearchResult>>(element, searchResults.ToList()));
             }
 
