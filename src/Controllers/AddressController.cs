@@ -125,8 +125,15 @@ namespace form_builder.Controllers
                     ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageUrl == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
                     : viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
 
-                var result = await provider.SearchAsync(postcode);
-                addressResults = result.ToList();
+                try
+                {
+                    var result = await provider.SearchAsync(postcode);
+                    addressResults = result.ToList();
+                }
+                catch (Exception e)
+                {
+                    return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+                }
             }
 
             if (!currentPage.IsValid)
@@ -153,7 +160,7 @@ namespace form_builder.Controllers
                     }
                     catch (Exception e)
                     {
-                        return RedirectToAction("Error");
+                        return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
                     };
                 case "Select":
                     switch (behaviour.BehaviourType)
@@ -174,15 +181,15 @@ namespace form_builder.Controllers
                                 guid
                             });
                         default:
-                            return RedirectToAction("Error");
+                            return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
                     }
                 case "Manual":
                     break;
                 default:
-                    return RedirectToAction("Error");
+                    return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
             }
 
-            return RedirectToAction("Error");
+            return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
         }
 
         protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)

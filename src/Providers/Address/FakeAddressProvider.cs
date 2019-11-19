@@ -14,15 +14,15 @@ namespace form_builder.Providers.Address
             return new List<AddressSearchResult> {
                 new AddressSearchResult {
                     Name = "address 1",
-                    UniqueId = "111111"
+                    UniqueId = "123456789012"
                 },
                  new AddressSearchResult {
                     Name = "address 2",
-                    UniqueId = "222222"
+                    UniqueId = "098765432109"
                 },
                  new AddressSearchResult {
                     Name = "address 3",
-                    UniqueId = "333333"
+                    UniqueId = "564737838937"
                 }
             };
         }

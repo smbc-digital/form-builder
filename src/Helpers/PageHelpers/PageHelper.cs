@@ -179,7 +179,6 @@ namespace form_builder.Helpers.PageHelpers
             return await _viewRender.RenderAsync("AddressSearch", element);
         }
 
-
         public void SaveAnswers(Dictionary<string, string> viewModel)
         {
             var guid = viewModel["Guid"];

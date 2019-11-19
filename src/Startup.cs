@@ -36,7 +36,6 @@ namespace form_builder
                 .ConfigureAddressProviders()
                 .AddHelpers();
 
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddScoped<IViewRender, ViewRender>();
             services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
