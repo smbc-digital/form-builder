@@ -71,7 +71,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var result = _elementHelper.CheckForLabel(element, viewModel);
+            var result = _elementHelper.CheckForLabel(element);
 
             // Assert
             Assert.True(result);
@@ -91,7 +91,72 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
+        }
+
+        [Theory]
+        [InlineData(EElementType.DateInput)]
+        [InlineData(EElementType.Textbox)]
+        [InlineData(EElementType.Textarea)]
+        public void CheckForQuestionId_ReturnsTrue_IfQuestionIdExists(EElementType elementType)
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(elementType)
+                .WithQuestionId("test")
+                .Build();
+
+            // Act
+            var result = _elementHelper.CheckForQuestionId(element);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Theory]
+        [InlineData(EElementType.DateInput)]
+        [InlineData(EElementType.Textbox)]
+        [InlineData(EElementType.Textarea)]
+        public void CheckForQuestionId_ThrowsException_IfQuestionIdDoesNotExist(EElementType elementType)
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(elementType)
+                .Build();
+
+            // Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckForQuestionId(element));
+        }
+
+        [Fact]
+        public void CheckAllDateRestrictionsAreNotEnabled_ReturnsTrue_IfNotAllRestrictionsAreTrue()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithRestrictCurrentDate(true)
+                .Build();
+
+            // Act
+            var result = _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void CheckAllDateRestrictionsAreNotEnabled_ThrowsException_IfAllRestrictionsAreTrue()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithRestrictCurrentDate(true)
+                .WithRestrictFutureDate(true)
+                .WithRestrictPastDate(true)
+                .Build();
+
+            //Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element));
         }
 
         [Theory]
@@ -109,7 +174,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
         }
 
         [Fact]
@@ -125,7 +190,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var result = _elementHelper.CheckForMaxLength(element, viewModel);
+            var result = _elementHelper.CheckForMaxLength(element);
 
             // Assert
             Assert.True(result);
@@ -143,7 +208,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element, viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element));
         }
 
         [Fact]
@@ -159,7 +224,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var result = _elementHelper.CheckForMaxLength(element, viewModel);
+            var result = _elementHelper.CheckForMaxLength(element);
 
             // Assert
             Assert.True(result);
@@ -178,7 +243,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element, viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element));
         }
 
         [Fact]
@@ -194,7 +259,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var result = _elementHelper.CheckIfLabelAndTextEmpty(element, viewModel);
+            var result = _elementHelper.CheckIfLabelAndTextEmpty(element);
 
             // Assert
             Assert.True(result);
@@ -211,7 +276,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckIfLabelAndTextEmpty(element, viewModel));
+            Assert.Throws<Exception>(() => _elementHelper.CheckIfLabelAndTextEmpty(element));
         }
 
 
@@ -403,26 +468,112 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Assert
-            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element, viewModel));
+            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
         }
 
-        //[Fact]
-        //public void ElementBuilder_ShouldReselectOnReturn_IfErroredElseWhere()
-        //{
-        //    // Arrange
-        //    var element = new ElementBuilder()
-        //        .WithType(EElementType.Select)
-        //        .WithQuestionId("questionId")
-        //         .WithOptions(new List<Option>
-        //        { new Option { Value = "option1", Text = "Option 1"},
-        //          new Option { Value = "option2", Text = "Option 2"} })
-        //        .Build();
-        //
-        //    var viewModel = new Dictionary<string, string>();
-        //    viewModel.Add("questionId", "option1");
-        //
-        //    // Assert
-        //    var ex = _elementHelper.ResetSelected(element);
-        //}
+        [Fact]
+        public void CurrentDateValue_ReturnsCurrentValueOfElement()
+        {
+            // Arrange
+            var questionId = "passportIssued";
+            var dayId = questionId + "-day";
+            var monthId = questionId + "-month";
+            var yearId = questionId + "-year";
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId(questionId)
+                .WithDayValue("14")
+                .WithMonthValue("09")
+                .WithYearValue("2010")
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add(dayId, "14");
+            viewModel.Add(monthId, "09");
+            viewModel.Add(yearId, "2010");
+
+            // Act
+            var dayResult = _elementHelper.CurrentDateValue(element, viewModel, "-day");
+            var monthResult = _elementHelper.CurrentDateValue(element, viewModel, "-month");
+            var yearResult = _elementHelper.CurrentDateValue(element, viewModel, "-year");
+
+            // Assert
+            Assert.Equal("14", dayResult);
+            Assert.Equal("09", monthResult);
+            Assert.Equal("2010", yearResult);
+        }
+
+        [Fact]
+        public void CurrentDateValue_ReturnsEmptyStringWhenNoQuestionIdFound()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithDayValue("14")
+                .WithMonthValue("09")
+                .WithYearValue("2010")
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+
+            // Act
+            var dayResult = _elementHelper.CurrentDateValue(element, viewModel, "-day");
+            var monthResult = _elementHelper.CurrentDateValue(element, viewModel, "-month");
+            var yearResult = _elementHelper.CurrentDateValue(element, viewModel, "-year");
+
+            // Assert
+            Assert.Equal("", dayResult);
+            Assert.Equal("", monthResult);
+            Assert.Equal("", yearResult);
+        }
+
+        [Fact]
+        public void ElementBuilder_ShouldReselectOnReturn_IfErroredElseWhere()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Select)
+                .WithQuestionId("questionId")
+                .WithValue("option1")
+                 .WithOptions(new List<Option>
+                { new Option { Value = "option1", Text = "Option 1"},
+                  new Option { Value = "option2", Text = "Option 2"} })
+                .Build();
+
+            //      var viewModel = new Dictionary<string, string>();
+            //      viewModel.Add("questionId", "option1");
+            // Act
+            _elementHelper.ReSelectPreviousSelectedOptions(element);
+
+            // Assert
+
+            Assert.True(element.Properties.Options[0].Selected);
+            Assert.False(element.Properties.Options[1].Selected);
+        }
+
+        [Fact]
+        public void ElementBuilder_ShouldRecheckRadioOnReturn_IfErroredElseWhere()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Radio)
+                .WithQuestionId("questionId")
+                .WithValue("option1")
+                 .WithOptions(new List<Option>
+                { new Option { Value = "option1", Text = "Option 1"},
+                  new Option { Value = "option2", Text = "Option 2"} })
+                .Build();
+
+            //      var viewModel = new Dictionary<string, string>();
+            //      viewModel.Add("questionId", "option1");
+            // Act
+            _elementHelper.ReCheckPreviousRadioOptions(element);
+
+            // Assert
+
+            Assert.True(element.Properties.Options[0].Checked);
+            Assert.False(element.Properties.Options[1].Checked);
+        }
     }
 }

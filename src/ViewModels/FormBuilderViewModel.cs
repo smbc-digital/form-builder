@@ -1,5 +1,4 @@
 using System;
-using form_builder.Enum;
 
 namespace form_builder.ViewModels
 {
@@ -12,6 +11,8 @@ namespace form_builder.ViewModels
         public string FeedbackForm { get; set; }
 
         public string AddressStatus { get; set; }
+
+        public string FormName { get; set; }
 
         public Guid Guid { get; set; }
     }

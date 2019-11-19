@@ -1,31 +1,46 @@
-﻿@model form_builder.Models.Element
+﻿@using form_builder.Helpers
+@model form_builder.Models.Element
 @{
     var hintId = $"{Model.Properties.QuestionId}-hint";
+
     var dayId = $"{Model.Properties.QuestionId}-day";
     var monthId = $"{Model.Properties.QuestionId}-month";
     var yearId = $"{Model.Properties.QuestionId}-year";
+
+    var errorId = $"{Model.Properties.QuestionId}-error";
 }
 
-<fieldset class="input-memorable-date" aria-describedby="@hintId">
-    <legend><h2>@Model.Properties.Label</h2></legend>
-    <p id="@hintId">@Model.Properties.Hint</p>
-    
-        <div>
-            <label for="@dayId">
-                Day
-            </label>
-            <input id="@dayId" name="@dayId" type="number" maxlength=2 />
-        </div>
-        <div>
-            <label for="@monthId">
-                Month
-            </label>
-            <input id="@monthId" name="@monthId" type="number" maxlength=2 />
-        </div>
-        <div>
-            <label for="@yearId">
-                Year
-            </label>
-            <input id="@yearId" name="@yearId" type="number" maxlength=4 />
-        </div>
-</fieldset>
+@await Html.BeginFieldSet(Model, "input-memorable-date")
+<legend>
+    <label @Model.WriteOptional()>@Model.Properties.Label</label>
+    @if (Model.Properties?.Optional ?? true)
+    {
+        <p class="optional">(optional)</p>
+    }
+</legend>
+<p id="@hintId">@Model.Properties.Hint</p>
+<div>
+    <label for="@dayId">
+        Day
+    </label>
+    @Html.TextBox(dayId, Model.Properties.Day, new { maxlength = "2" })
+</div>
+<div>
+    <label for="@monthId">
+        Month
+    </label>
+    @Html.TextBox(monthId, Model.Properties.Month, new { maxlength = "2" })
+</div>
+<div>
+    <label for="@yearId">
+        Year
+    </label>
+    @Html.TextBox(yearId, Model.Properties.Year, new { maxlength = "4" })
+</div>
+
+@if (!Model.IsValid)
+{
+    var validationMessage = Model.ValidationMessage;
+    <p class="input-error-content" id="@errorId">@validationMessage</p>
+}
+@await Html.EndFieldSet()

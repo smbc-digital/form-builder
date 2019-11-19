@@ -67,6 +67,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData(EElementType.Checkbox)]
         [InlineData(EElementType.Select)]
         [InlineData(EElementType.Button)]
+        [InlineData(EElementType.DateInput)]
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial(EElementType type)
         {
             //Arrange

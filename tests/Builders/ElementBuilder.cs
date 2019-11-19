@@ -46,7 +46,7 @@ namespace form_builder_tests.Builders
 
         public ElementBuilder WithValue(string value)
         {
-            _property.Label = value;
+            _property.Value = value;
             return this;
         }
 
@@ -84,6 +84,47 @@ namespace form_builder_tests.Builders
         public ElementBuilder WithChecked(bool isChecked)
         {
             _property.Checked = isChecked;
+            return this;
+        }
+
+        public ElementBuilder WithRestrictFutureDate(bool value)
+        {
+            _property.RestrictFutureDate = value;
+            return this;
+        }
+
+        public ElementBuilder WithRestrictPastDate(bool value)
+        {
+            _property.RestrictPastDate = value;
+            return this;
+        }
+
+        public ElementBuilder WithRestrictCurrentDate(bool value)
+        {
+            _property.RestrictCurrentDate = value;
+            return this;
+        }
+        public ElementBuilder WithOptional(bool value)
+        {
+            _property.Optional = value;
+            return this;
+        }
+
+        public ElementBuilder WithDayValue(string value)
+        {
+            _property.Day = value;
+            return this;
+        }
+
+        public ElementBuilder WithMonthValue(string value)
+        {
+            _property.Month = value;
+            return this;
+        }
+
+        public ElementBuilder WithYearValue(string value)
+        {
+            _property.Year = value;
             return this;
         }
     }
