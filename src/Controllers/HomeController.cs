@@ -46,7 +46,6 @@ namespace form_builder.Controllers
         [Route("{form}")]
         [Route("{form}/{path}")]
         public async Task<IActionResult> Index(string form, string path, [FromQuery] Guid guid)
-        
         {
             try
             {
@@ -72,11 +71,12 @@ namespace form_builder.Controllers
 
                 viewModel.Path = path;
                 viewModel.Guid = guid;
+                viewModel.FormName = baseForm.Name;
                 return View(viewModel);
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Error", "Home", new { ex = ex.Message });
+                return RedirectToAction("Error", new { ex = ex.Message, form });
             }
         }
 
@@ -168,7 +168,23 @@ namespace form_builder.Controllers
             }
 
             _distributedCache.Remove(guid.ToString());
-            return View("Submit", convertedAnswers);
+
+            var page = baseForm.GetPage("success");
+            if(page == null)
+            {
+                return View("Submit", convertedAnswers);
+            }
+
+            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
+            var success = new Success { 
+                FormName = baseForm.Name,
+                Reference = "(Reference Placeholder)",
+                FormAnswers = convertedAnswers,
+                PageContent = viewModel.RawHTML,
+                SecondaryHeader = page.Title
+            };
+            ViewData["BannerTypeformUrl"] = baseForm.FeedbackForm;
+            return View("Success", success);
         }
 
         [HttpGet]

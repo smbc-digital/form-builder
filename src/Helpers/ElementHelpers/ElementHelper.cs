@@ -8,15 +8,21 @@ namespace form_builder.Helpers.ElementHelpers
     {
         string CurrentValue(Element element, Dictionary<string, string> viewModel);
 
-        bool CheckForLabel(Element element, Dictionary<string, string> viewModel);
+        string CurrentDateValue(Element element, Dictionary<string, string> viewModel, string suffix);
 
-        bool CheckForMaxLength(Element element, Dictionary<string, string> viewModel);
+        bool CheckForQuestionId(Element element);
 
-        bool CheckIfLabelAndTextEmpty(Element element, Dictionary<string, string> viewModel);
+        bool CheckForLabel(Element element);
+
+        bool CheckForMaxLength(Element element);
+
+        bool CheckIfLabelAndTextEmpty(Element element);
 
         bool CheckForRadioOptions(Element element);
         bool CheckForSelectOptions(Element element);
         bool CheckForCheckBoxListValues(Element element);
+
+        bool CheckAllDateRestrictionsAreNotEnabled(Element element);
         void ReSelectPreviousSelectedOptions(Element element);
         void ReCheckPreviousRadioOptions(Element element);
     }
@@ -30,7 +36,7 @@ namespace form_builder.Helpers.ElementHelpers
             return currentValue ? viewModel[element.Properties.QuestionId] : string.Empty;
         }
 
-        public bool CheckForLabel(Element element, Dictionary<string, string> viewModel)
+        public bool CheckForLabel(Element element)
         {
             if (string.IsNullOrEmpty(element.Properties.Label))
             {
@@ -40,7 +46,17 @@ namespace form_builder.Helpers.ElementHelpers
             return true;
         }
 
-        public bool CheckForMaxLength(Element element, Dictionary<string, string> viewModel)
+        public bool CheckForQuestionId(Element element)
+        {
+            if (string.IsNullOrEmpty(element.Properties.QuestionId))
+            {
+                throw new Exception("No question id found for element. Cannot render form.");
+            }
+
+            return true;
+        }
+
+        public bool CheckForMaxLength(Element element)
         {
             if (string.IsNullOrEmpty(element.Properties.MaxLength))
             {
@@ -55,9 +71,9 @@ namespace form_builder.Helpers.ElementHelpers
             return true;
         }
 
-        public bool CheckIfLabelAndTextEmpty(Element element, Dictionary<string, string> viewModel)
+        public bool CheckIfLabelAndTextEmpty(Element element)
         {
-            if(string.IsNullOrEmpty(element.Properties.Label) && string.IsNullOrEmpty(element.Properties.Text))
+            if (string.IsNullOrEmpty(element.Properties.Label) && string.IsNullOrEmpty(element.Properties.Text))
             {
                 throw new Exception("An inline alert requires either a label or text or both to be present. Both can not be empty");
             }
@@ -67,7 +83,7 @@ namespace form_builder.Helpers.ElementHelpers
 
         public bool CheckForRadioOptions(Element element)
         {
-            if(element.Properties.Options == null || element.Properties.Options.Count <= 1)
+            if (element.Properties.Options == null || element.Properties.Options.Count <= 1)
             {
                 throw new Exception("A radio element requires two or more options to be present.");
             }
@@ -89,6 +105,15 @@ namespace form_builder.Helpers.ElementHelpers
             if (element.Properties.Options == null || element.Properties.Options.Count < 1)
             {
                 throw new Exception("A checkbox list requires one or more options to be present.");
+            }
+            return true;
+        }
+
+        public bool CheckAllDateRestrictionsAreNotEnabled(Element element)
+        {
+            if (element.Properties.RestrictCurrentDate && element.Properties.RestrictPastDate && element.Properties.RestrictFutureDate)
+            {
+                throw new Exception("Cannot set all date restrictions to true");
             }
             return true;
         }
@@ -121,6 +146,14 @@ namespace form_builder.Helpers.ElementHelpers
                     option.Checked = false;
                 }
             }
+        }
+
+        public string CurrentDateValue(Element element, Dictionary<string, string> viewModel, string idSuffix)
+        {
+
+            var currentValue = viewModel.ContainsKey(element.Properties.QuestionId + idSuffix);
+
+            return currentValue ? viewModel[element.Properties.QuestionId + idSuffix] : string.Empty;
         }
     }
 }

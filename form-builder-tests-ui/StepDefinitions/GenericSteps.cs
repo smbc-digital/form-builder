@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 using TechTalk.SpecFlow;
 using Xunit;
 
@@ -122,6 +121,12 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenIShouldNotSeeAnyHtmlElementWithClassName(string className)
         {
             Assert.False(BrowserSession.FindCss(className).Exists());
+        }
+
+        [Then(@"I should see a ""(.*)"" html element")]
+        public void ThenIShouldSeeAHtmlElementWithClassName(string className)
+        {
+            Assert.True(BrowserSession.FindCss(className).Exists());
         }
 
         [When(@"I enter ""(.*)"" in ""(.*)""")]

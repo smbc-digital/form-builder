@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using form_builder.Enum;
 using form_builder.Models;
 
 namespace form_builder.Validators
@@ -8,9 +9,11 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
-            if((element.Properties.Optional.HasValue && element.Properties.Optional.Value))
+
+            if (element.Type == EElementType.DateInput || element.Properties.Optional)
             {
-                return new ValidationResult{
+                return new ValidationResult
+                {
                     IsValid = true
                 };
             }
@@ -20,8 +23,9 @@ namespace form_builder.Validators
                 : null;
 
             var isValid = !string.IsNullOrEmpty(value);
-            
-            return new ValidationResult{
+
+            return new ValidationResult
+            {
                 IsValid = isValid,
                 Message = isValid ? string.Empty : $"{element.Properties.Label} is required"
             };
