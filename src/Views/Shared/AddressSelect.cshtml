@@ -5,6 +5,7 @@
     var questionId = $"{Model.Item1.Properties.QuestionId}-address";
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
+    var addresSearchCount = $"{Model.Item2.Count} addresses found";
 }
 
 @await Html.BeginFieldSet(Model.Item1, "-address")
@@ -16,13 +17,13 @@
     }
 </legend>
 
-@if (!string.IsNullOrEmpty(Model.Item1.Properties.Hint))
+@if (!string.IsNullOrEmpty(Model.Item1.Properties.SelectHint))
 {
-    <p id=@hintId>@Html.Raw(Model.Item1.Properties.Hint)</p>
+    <p id=@hintId>@Html.Raw(Model.Item1.Properties.SelectHint)</p>
 }
 
 <select id="@questionId" name="@questionId">
-    <option value="">Select an option...</option>
+    <option value="">@addresSearchCount</option>
     @for (var i = 0; i < Model.Item2.Count; i++)
     {
         <option value="@Model.Item2[i].UniqueId">@Model.Item2[i].Name</option>

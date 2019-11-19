@@ -58,12 +58,13 @@ namespace form_builder.Models
         public Dictionary<string, object> GenerateElementProperties()
         {
             var maxLength = string.IsNullOrEmpty(Properties.MaxLength) ? "200" : Properties.MaxLength;
+            var properties = new Dictionary<string, object>();
 
             switch (Type)
             {
                 case EElementType.Textbox:
                 case EElementType.Textarea:
-                    var properties = new Dictionary<string, object>()
+                    properties = new Dictionary<string, object>()
                     {
                         { "name", Properties.QuestionId },
                         { "id", Properties.QuestionId },
@@ -76,6 +77,18 @@ namespace form_builder.Models
                         properties.Add("aria-describedby", DescribedByValue());
                     }
 
+                    return properties;
+                case EElementType.Address:
+                    properties = new Dictionary<string, object>()
+                    {
+                        { "id", $"{Properties.QuestionId}-postcode" },
+                        { "maxlength", maxLength }
+                    };
+
+                    if (DisplayAriaDescribedby)
+                    {
+                        properties.Add("aria-describedby", DescribedByValue("-postcode"));
+                    }
                     return properties;
                 default:
                     return null;
@@ -129,7 +142,7 @@ namespace form_builder.Models
                 describedByValue += $"{key}-error";
             }
 
-            return describedByValue;
+            return describedByValue.Trim();
         }
 
         public string WriteOptional()
