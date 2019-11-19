@@ -528,23 +528,52 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal("", yearResult);
         }
 
-        //[Fact]
-        //public void ElementBuilder_ShouldReselectOnReturn_IfErroredElseWhere()
-        //{
-        //    // Arrange
-        //    var element = new ElementBuilder()
-        //        .WithType(EElementType.Select)
-        //        .WithQuestionId("questionId")
-        //         .WithOptions(new List<Option>
-        //        { new Option { Value = "option1", Text = "Option 1"},
-        //          new Option { Value = "option2", Text = "Option 2"} })
-        //        .Build();
-        //
-        //    var viewModel = new Dictionary<string, string>();
-        //    viewModel.Add("questionId", "option1");
-        //
-        //    // Assert
-        //    var ex = _elementHelper.ResetSelected(element);
-        //}
+        [Fact]
+        public void ElementBuilder_ShouldReselectOnReturn_IfErroredElseWhere()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Select)
+                .WithQuestionId("questionId")
+                .WithValue("option1")
+                 .WithOptions(new List<Option>
+                { new Option { Value = "option1", Text = "Option 1"},
+                  new Option { Value = "option2", Text = "Option 2"} })
+                .Build();
+
+            //      var viewModel = new Dictionary<string, string>();
+            //      viewModel.Add("questionId", "option1");
+            // Act
+            _elementHelper.ReSelectPreviousSelectedOptions(element);
+
+            // Assert
+
+            Assert.True(element.Properties.Options[0].Selected);
+            Assert.False(element.Properties.Options[1].Selected);
+        }
+
+        [Fact]
+        public void ElementBuilder_ShouldRecheckRadioOnReturn_IfErroredElseWhere()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Radio)
+                .WithQuestionId("questionId")
+                .WithValue("option1")
+                 .WithOptions(new List<Option>
+                { new Option { Value = "option1", Text = "Option 1"},
+                  new Option { Value = "option2", Text = "Option 2"} })
+                .Build();
+
+            //      var viewModel = new Dictionary<string, string>();
+            //      viewModel.Add("questionId", "option1");
+            // Act
+            _elementHelper.ReCheckPreviousRadioOptions(element);
+
+            // Assert
+
+            Assert.True(element.Properties.Options[0].Checked);
+            Assert.False(element.Properties.Options[1].Checked);
+        }
     }
 }

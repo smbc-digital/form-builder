@@ -46,7 +46,7 @@ namespace form_builder_tests.Builders
 
         public ElementBuilder WithValue(string value)
         {
-            _property.Label = value;
+            _property.Value = value;
             return this;
         }
 
