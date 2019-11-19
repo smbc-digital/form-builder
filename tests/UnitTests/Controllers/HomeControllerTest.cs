@@ -17,6 +17,8 @@ using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using StockportGovUK.NetStandard.Models.Addresses;
+using form_builder.Providers.Address;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -24,6 +26,7 @@ namespace form_builder_tests.UnitTests.Controllers
     {
         private HomeController _homeController;
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<IEnumerable<IAddressProvider>> _mockAddressProvider = new Mock<IEnumerable<IAddressProvider>>();
         private readonly Mock<IEnumerable<IElementValidator>> _validators = new Mock<IEnumerable<IElementValidator>>();
         private readonly Mock<ISchemaProvider> _schemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IGateway> _gateWay = new Mock<IGateway>();
@@ -34,7 +37,7 @@ namespace form_builder_tests.UnitTests.Controllers
         {
             _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<IEnumerable<AddressSearchResult>>()))
              .ReturnsAsync(new FormBuilderViewModel());
 
             var cacheData = new FormAnswers
@@ -44,7 +47,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            _homeController = new HomeController(_logger.Object, _mockDistributedCache.Object, _validators.Object, _schemaProvider.Object, _gateWay.Object, _pageHelper.Object);
+            _homeController = new HomeController(_logger.Object, _mockDistributedCache.Object, _validators.Object, _schemaProvider.Object, _gateWay.Object, _pageHelper.Object, _mockAddressProvider.Object);
         }
 
         [Fact]

@@ -211,7 +211,6 @@ namespace form_builder.Helpers.PageHelpers
                 Answers = answers
             });
             convertedAnswers.Path = viewModel["Path"];
-            convertedAnswers.AddressStatus = viewModel["AddressStatus"];
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
