@@ -141,6 +141,7 @@ namespace form_builder.Controllers
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var formData = _distributedCache.GetString(guid.ToString());
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+            convertedAnswers.FormName = form;
 
             var currentPage = baseForm.GetPage(convertedAnswers.Path);
             var postUrl = currentPage.GetSubmitFormEndpoint(convertedAnswers);
@@ -151,9 +152,12 @@ namespace form_builder.Controllers
                 return RedirectToAction("Error", new { form });
             }
 
+            var postData = CreatePostData(convertedAnswers);
+            
+
             try
             {
-                var response = await _gateway.PostAsync(postUrl, convertedAnswers);
+                var response = await _gateway.PostAsync(postUrl, postData);
 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
@@ -216,6 +220,22 @@ namespace form_builder.Controllers
             }
 
             return normaisedFormData;
+        }
+
+        protected PostData CreatePostData(FormAnswers formAnswers)
+        {
+            var postData = new PostData() { Form = formAnswers.FormName };
+
+            foreach(var page in formAnswers.Pages)
+            {
+                foreach(var a in page.Answers)
+                {
+                    postData.Answers.Add(a);
+                }
+            }
+
+            return postData;
+
         }
     }
 }

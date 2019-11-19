@@ -10,6 +10,7 @@ namespace form_builder.Models
 
     public class FormAnswers
     {
+        public string FormName { get; set; }
         public string Path { get; set; }
         public List<PageAnswers> Pages { get; set; }
     }
