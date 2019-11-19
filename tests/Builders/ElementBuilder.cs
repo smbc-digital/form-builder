@@ -127,5 +127,11 @@ namespace form_builder_tests.Builders
             _property.Year = value;
             return this;
         }
+
+        public ElementBuilder WithAddressProvider(string value)
+        {
+            _property.AddressProvider = value;
+            return this;
+        }
     }
 }

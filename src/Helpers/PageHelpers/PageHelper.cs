@@ -18,7 +18,7 @@ namespace form_builder.Helpers.PageHelpers
     {
         void CheckForDuplicateQuestionIDs(Page page);
 
-        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, IEnumerable<AddressSearchResult> addressSearchResults = null);
+        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, List<AddressSearchResult> addressSearchResults = null);
 
         void SaveAnswers(Dictionary<string, string> viewModel);
 
@@ -53,7 +53,7 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
-        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, IEnumerable<AddressSearchResult> addressSearchResults = null)
+        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, List<AddressSearchResult> addressSearchResults = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
             if (page.PageURL.ToLower() != "success")
@@ -165,14 +165,14 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        private async Task<string> GenerateAddressHtml(Dictionary<string, string> viewModel, Page page, Element element, IEnumerable<AddressSearchResult> searchResults)
+        private async Task<string> GenerateAddressHtml(Dictionary<string, string> viewModel, Page page, Element element, List<AddressSearchResult> searchResults)
         {
             var postcodeKey = $"{element.Properties.QuestionId}-postcode";
 
             if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
             {
                 element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
-                return await _viewRender.RenderAsync("AddressSelect", new Tuple<Element, List<AddressSearchResult>>(element, searchResults.ToList()));
+                return await _viewRender.RenderAsync("AddressSelect", new Tuple<Element, List<AddressSearchResult>>(element, searchResults));
             }
 
             element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);

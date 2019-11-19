@@ -145,7 +145,6 @@ namespace form_builder.Controllers
                 return View(formModel);
             }
 
-            var behaviour = currentPage.GetNextPage(viewModel);
             _pageHelper.SaveAnswers(viewModel);
 
             switch (journey)
@@ -163,6 +162,7 @@ namespace form_builder.Controllers
                         return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
                     };
                 case "Select":
+                    var behaviour = currentPage.GetNextPage(viewModel);
                     switch (behaviour.BehaviourType)
                     {
                         case EBehaviourType.GoToExternalPage:

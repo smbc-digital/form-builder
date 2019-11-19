@@ -33,9 +33,7 @@ namespace form_builder.Controllers
 
         private readonly ILogger<HomeController> _logger;
 
-        private readonly IEnumerable<IAddressProvider> _addressProviders;
-
-        public HomeController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper, IEnumerable<IAddressProvider> addressProviders)
+        public HomeController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper)
         {
             _distributedCache = distributedCache;
             _validators = validators;
@@ -43,7 +41,6 @@ namespace form_builder.Controllers
             _gateway = gateway;
             _pageHelper = pageHelper;
             _logger = logger;
-            _addressProviders = addressProviders;
         }
 
         [HttpGet]
