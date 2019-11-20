@@ -159,7 +159,7 @@ namespace form_builder.Controllers
             try
             {
                 var response = await _gateway.PostAsync(postUrl, postData);
-                reference = await response.Content.ReadAsStringAsync() ?? "(Reference Placeholder)";
+                reference = await response.Content.ReadAsStringAsync() ?? "Reference Not found";
 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {

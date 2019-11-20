@@ -17,6 +17,7 @@ using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using System.Net.Http;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -327,7 +328,7 @@ namespace form_builder_tests.UnitTests.Controllers
             // Arrange
             var questionId = "test-question";
             var questionResponse = "test-response";
-            var callbackValue = new FormAnswers();
+            var callbackValue = new PostData();
             var guid = Guid.NewGuid();
             var cacheData = new FormAnswers
             {
@@ -372,7 +373,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 {
                     StatusCode = HttpStatusCode.OK
                 })
-                .Callback<string, object>((x, y) => callbackValue = (FormAnswers)y);
+                .Callback<string, object>((x, y) => callbackValue = (PostData)y);
             // Act
             await _homeController.Submit("form", guid);
 
@@ -381,8 +382,8 @@ namespace form_builder_tests.UnitTests.Controllers
             _gateWay.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
 
             Assert.NotNull(callbackValue);
-            Assert.Equal(questionId, callbackValue.Pages[0].Answers[0].QuestionId);
-            Assert.Equal(questionResponse, callbackValue.Pages[0].Answers[0].Response);
+            Assert.Equal(questionId, callbackValue.Answers[0].QuestionId);
+            Assert.Equal(questionResponse, callbackValue.Answers[0].Response);
         }
 
         [Fact]
@@ -441,10 +442,11 @@ namespace form_builder_tests.UnitTests.Controllers
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _gateWay.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+            _gateWay.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<PostData>()))
                .ReturnsAsync(new System.Net.Http.HttpResponseMessage
                {
-                   StatusCode = HttpStatusCode.OK
+                   StatusCode = HttpStatusCode.OK,
+                   Content = new StringContent("1234456")
                });
 
 
