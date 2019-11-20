@@ -12,6 +12,8 @@ namespace form_builder.Models
 
         public bool Optional { get; set; } = false;
 
+        public bool? Email { get; set; }
+
         public bool? Numeric { get; set; }
         
         public List<Option> Options { get; set; }
