@@ -6,6 +6,15 @@ ul li {
     margin: 0;
 }
 
+ol.indented-list {
+    margin: 0 0 20px 35px;
+}
+
+ol {
+    margin: 0 0 20px 15px;
+    padding-left: 0px;
+}
+
 .text-area-validation {
     top: -10px;
 }
