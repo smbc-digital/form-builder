@@ -7,6 +7,7 @@
 
 ## Table of Contents
 - [Base JSON Structure](##BaseJSONStructure)
+- [Address Providers](#Address_Providers)
 - [UI Tests](#UI_Tests)
 
 ## Requirements
@@ -86,6 +87,7 @@ Example JSON:
     * [OL](#olprops) (Ordered List)
     * [Img](#Imgprops) (Image)
     * [DateInput](#DateInputprops)
+    * [Address](#Address)
     
 
 
@@ -430,17 +432,43 @@ Image JSON example:
 Date Input example:
 ```json
     {
-      "Type": "DateInput",
-      "Properties": {
-          "QuestionId": "passportIssued",
-          "Label": "When was your passport issued?",
-          "Hint": "For example, 12 11 2007",
-          "RestrictFutureDate": true,
-          "RestrictCurrentDate": true,
-          "CustomValidationMessage": "A date is required, please enter a date",
-          "ValidationMessageRestrictFutureDate": "Date in the future not allowed, please enter a date in the past",
-          "ValidationMessageRestrictCurrentDate": "Today's date not allowed, please enter a date in the past"
-       }
+        "Type": "DateInput",
+        "Properties": {
+            "QuestionId": "passportIssued",
+            "Label": "When was your passport issued?",
+            "Hint": "For example, 12 11 2007",
+            "RestrictFutureDate": true,
+            "RestrictCurrentDate": true,
+            "CustomValidationMessage": "A date is required, please enter a date",
+            "ValidationMessageRestrictFutureDate": "Date in the future not allowed, please enter a date in the past",
+            "ValidationMessageRestrictCurrentDate": "Today's date not allowed, please enter a date in the past"
+        }
+    }
+```
+
+#
+  * <a name="Address">**Address**</a>
+    * QuestionId (*string*) __*__
+    * AddressProvider (*string*) __*__
+    * PostcodeLabel (*string*) __*__
+    * AddressLabel (*string*) __*__
+    * Hint (*string*) (hint which appears above the postcode input)
+    * SelectHint (*string*) (hint which appears above the select input)
+    * MaxLength (*string*)
+
+Address example:
+```json
+    {
+        "Type": "Address",
+            "Properties": {
+                "QuestionId": "customers-address",
+                "AddressProvider": "Fake",
+                "PostcodeLabel": "Postcode",
+                "AddressLabel": "Address",
+                "Hint": "This is an additional hint",
+                "SelectHint": "Select the address below",
+                "MaxLength": "10"
+            }
     }
 ```
 
@@ -497,6 +525,9 @@ The success page is a page with with the pageurl of success it is of the form it
 ```
 It will also diplay the form name and the FeedbackUrl if one is specified.
 
+## Address_Providers
+
+Any address service to be used needs to implement `IAddressProvider` which requires a SearchAsync method as well as a ProviderName. Within the address JSON the `AddressProvider` key is used to specifiy which provider to use.
 
 ## UI_Tests
 
