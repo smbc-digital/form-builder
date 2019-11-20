@@ -13,8 +13,9 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Logging;
-using System.Linq;
 using System.Net;
+using form_builder.Providers.Address;
+using System.Linq;
 
 namespace form_builder.Controllers
 {
@@ -65,6 +66,18 @@ namespace form_builder.Controllers
                 if (page == null)
                 {
                     return RedirectToAction("Error");
+                }
+
+                if (page.Elements.Any(_ => _.Type == EElementType.Address))
+                {
+                    return RedirectToAction("Index", "Address",
+                        new
+                        {
+                            guid,
+                            form,
+                            path
+                        }
+                    );
                 }
 
                 var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
@@ -197,12 +210,12 @@ namespace form_builder.Controllers
         }
 
 
-        protected Dictionary<string, string> NormaliseFormData(Dictionary<string,string[]> formData)
+        protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)
         {
 
             var normaisedFormData = new Dictionary<string, string>();
-            
-            foreach(var item in formData)
+
+            foreach (var item in formData)
             {
                 if (item.Value.Length == 1)
                 {
@@ -212,7 +225,7 @@ namespace form_builder.Controllers
                 {
                     normaisedFormData.Add(item.Key, string.Join(", ", item.Value));
                 }
-    
+
             }
 
             return normaisedFormData;

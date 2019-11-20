@@ -33,8 +33,8 @@ namespace form_builder
                 .AddAmazonS3Client(Configuration.GetSection("AmazonS3Configuration")["AccessKey"], Configuration.GetSection("AmazonS3Configuration")["SecretKey"])
                 .AddGateways()
                 .AddIOptionsConfiguration(Configuration)
+                .ConfigureAddressProviders()
                 .AddHelpers();
-
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddScoped<IViewRender, ViewRender>();

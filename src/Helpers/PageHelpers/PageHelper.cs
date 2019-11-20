@@ -6,6 +6,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.Addresses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,13 +18,13 @@ namespace form_builder.Helpers.PageHelpers
     {
         void CheckForDuplicateQuestionIDs(Page page);
 
-        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm);
+        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, List<AddressSearchResult> addressSearchResults = null);
 
         void SaveAnswers(Dictionary<string, string> viewModel);
 
         bool CheckForStartPage(FormSchema form, Page page);
     }
-    
+
     public class PageHelper : IPageHelper
     {
         private readonly IViewRender _viewRender;
@@ -52,7 +53,7 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
-        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm)
+        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, List<AddressSearchResult> addressSearchResults = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
             if (page.PageURL.ToLower() != "success")
@@ -96,7 +97,7 @@ namespace form_builder.Helpers.PageHelpers
                         break;
                     case EElementType.UL:
                         formModel.RawHTML += await _viewRender.RenderAsync("UL", element);
-                            break;
+                        break;
                     case EElementType.Span:
                         formModel.RawHTML += await _viewRender.RenderAsync("Span", element);
                         break;
@@ -153,6 +154,9 @@ namespace form_builder.Helpers.PageHelpers
                         _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("DateInput", element);
                         break;
+                    case EElementType.Address:
+                        formModel.RawHTML += await GenerateAddressHtml(viewModel, page, element, addressSearchResults);
+                        break;
                     default:
                         break;
                 }
@@ -161,11 +165,25 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
+        private async Task<string> GenerateAddressHtml(Dictionary<string, string> viewModel, Page page, Element element, List<AddressSearchResult> searchResults)
+        {
+            var postcodeKey = $"{element.Properties.QuestionId}-postcode";
+
+            if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
+            {
+                element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                return await _viewRender.RenderAsync("AddressSelect", new Tuple<Element, List<AddressSearchResult>>(element, searchResults));
+            }
+
+            element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+            return await _viewRender.RenderAsync("AddressSearch", element);
+        }
+
         public void SaveAnswers(Dictionary<string, string> viewModel)
         {
             var guid = viewModel["Guid"];
             var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers {Pages = new List<PageAnswers>() };
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
             if (!string.IsNullOrEmpty(formData))
             {

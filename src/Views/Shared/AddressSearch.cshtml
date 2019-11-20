@@ -1,0 +1,26 @@
+﻿@model form_builder.Models.Element
+@{
+    var questionId = $"{Model.Properties.QuestionId}-postcode";
+    var hintId = $"{questionId}-hint";
+    var errorId = $"{questionId}-error";
+}
+
+<label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.PostcodeLabel</label>
+
+@if (Model.Properties?.Optional ?? true)
+{
+    <p class="optional">(optional)</p>
+}
+
+@if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
+{
+    <p class="description" id=@hintId>@Model.Properties.Hint</p>
+}
+
+@Html.TextBox(questionId, Model.Properties.Value, Model.GenerateElementProperties())
+
+@if (!Model.IsValid)
+{
+    var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+    <p class="input-error-content" id="@errorId">@validationMessage</p>
+}

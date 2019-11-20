@@ -8,9 +8,10 @@
     var yearId = $"{Model.Properties.QuestionId}-year";
 
     var errorId = $"{Model.Properties.QuestionId}-error";
+    var classes = new string[] { "input-memorable-date" };
 }
 
-@await Html.BeginFieldSet(Model, "input-memorable-date")
+@await Html.BeginFieldSet(Model, classes)
 <legend>
     <label @Model.WriteOptional()>@Model.Properties.Label</label>
     @if (Model.Properties?.Optional ?? true)
