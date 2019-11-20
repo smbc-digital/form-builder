@@ -28,6 +28,8 @@ namespace form_builder.Extensions
             services.AddTransient<IElementValidator, RestrictFutureDateValidator>();
             services.AddTransient<IElementValidator, RestrictCurrentDateValidator>();
             services.AddTransient<IElementValidator, EmailElementValidator>();
+            services.AddTransient<IElementValidator, PostcodeElementValidator>();
+            services.AddTransient<IElementValidator, StockportPostcodeElementValidator>();
 
             return services;
         }
