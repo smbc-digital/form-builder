@@ -7,7 +7,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
-            if((!element.Properties.Numeric.HasValue || !element.Properties.Numeric.Value) || !viewModel.ContainsKey(element.Properties.QuestionId))
+            if((!element.Properties.Numeric) || !viewModel.ContainsKey(element.Properties.QuestionId))
             {
                 return new ValidationResult{
                     IsValid = true

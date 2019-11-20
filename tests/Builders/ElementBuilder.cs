@@ -37,7 +37,6 @@ namespace form_builder_tests.Builders
             return this;
         }
 
-
         public ElementBuilder WithLabel(string label)
         {
             _property.Label = label;
@@ -138,6 +137,11 @@ namespace form_builder_tests.Builders
         public ElementBuilder WithAddressProvider(string value)
         {
             _property.AddressProvider = value;
+            return this;
+        }
+        public ElementBuilder WithNumeric(bool value)
+        {
+            _property.Numeric = value;
             return this;
         }
     }

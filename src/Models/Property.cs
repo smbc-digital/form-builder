@@ -11,7 +11,7 @@ namespace form_builder.Models
         public bool? Email { get; set; }
         public bool? Postcode { get; set; }
         public bool? StockportPostcode { get; set; }
-        public bool? Numeric { get; set; }
+        public bool Numeric { get; set; } = false;
         public List<Option> Options { get; set; }
         public string ButtonId { get; set; }
         public string MaxLength { get; set; }
