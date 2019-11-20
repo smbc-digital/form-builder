@@ -39,6 +39,9 @@
     <Compile Update="Features\Select.feature.cs">
       <DependentUpon>Select.feature</DependentUpon>
     </Compile>
+    <Compile Update="Features\Email.feature.cs">
+      <DependentUpon>Email.feature</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -49,6 +52,10 @@
       <LastGenOutput>DateInput.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\Select.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\Email.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
