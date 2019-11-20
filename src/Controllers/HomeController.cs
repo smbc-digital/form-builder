@@ -153,11 +153,13 @@ namespace form_builder.Controllers
             }
 
             var postData = CreatePostData(convertedAnswers);
-            
+
+            var reference = "(Reference Placeholder)";
 
             try
             {
                 var response = await _gateway.PostAsync(postUrl, postData);
+                reference = await response.Content.ReadAsStringAsync() ?? "(Reference Placeholder)";
 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
@@ -180,13 +182,15 @@ namespace form_builder.Controllers
             }
 
             var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
+
             var success = new Success { 
                 FormName = baseForm.Name,
-                Reference = "(Reference Placeholder)",
+                Reference = reference,
                 FormAnswers = convertedAnswers,
                 PageContent = viewModel.RawHTML,
                 SecondaryHeader = page.Title
             };
+
             ViewData["BannerTypeformUrl"] = baseForm.FeedbackForm;
             return View("Success", success);
         }
@@ -224,7 +228,10 @@ namespace form_builder.Controllers
 
         protected PostData CreatePostData(FormAnswers formAnswers)
         {
-            var postData = new PostData() { Form = formAnswers.FormName };
+            var postData = new PostData() { Form = formAnswers.FormName, Answers= new List<Answers>()};
+
+            if (formAnswers.Pages == null)
+                return postData;
 
             foreach(var page in formAnswers.Pages)
             {
