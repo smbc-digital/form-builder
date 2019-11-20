@@ -71,6 +71,7 @@ namespace form_builder.Controllers
                 var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
                 viewModel.AddressStatus = "Search";
                 viewModel.Guid = guid;
+                viewModel.FormName = baseForm.Name;
 
                 return View(viewModel);
             }
@@ -143,6 +144,8 @@ namespace form_builder.Controllers
                 formModel.Path = currentPage.PageURL;
                 formModel.Guid = guid;
                 formModel.AddressStatus = journey;
+                formModel.FormName = baseForm.Name;
+
                 return View(formModel);
             }
 
@@ -156,6 +159,8 @@ namespace form_builder.Controllers
                         var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, addressResults);
                         adddressViewModel.AddressStatus = "Select";
                         adddressViewModel.Guid = guid;
+                        adddressViewModel.FormName = baseForm.Name;
+
                         return View(adddressViewModel);
                     }
                     catch (Exception e)
