@@ -59,6 +59,36 @@ namespace form_builder_tests.UnitTests.Controllers
             _schemaProvider.Verify(_ => _.Get<FormSchema>(It.Is<string>(x => x == "form")));
         }
 
+
+        [Fact]
+        public async Task Index_ShouldRedirectToAddressController_WhenTypeContainsAddress()
+        {
+            var element = new ElementBuilder()
+                 .WithType(EElementType.Address)
+                 .WithQuestionId("address-test")
+                 .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageUrl("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            // Act
+            var result = await _homeController.Index("form", "page-one", Guid.NewGuid());
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Index", redirectResult.ActionName);
+            Assert.Equal("Address", redirectResult.ControllerName);
+        }
+
         [Fact]
         public async Task Index_ShouldGenerateGuidWhenGuidIsEmpty()
         {

@@ -1,13 +1,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using form_builder.Models;
 using StockportGovUK.NetStandard.Models.Addresses;
 
 namespace form_builder.Providers.Address
 {
     public class FakeAddressProvider: IAddressProvider
     {
-
         public string ProviderName { get => "Fake"; }
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string postcode)
         {
