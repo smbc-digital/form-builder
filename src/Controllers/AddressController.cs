@@ -132,6 +132,7 @@ namespace form_builder.Controllers
                 }
                 catch (Exception e)
                 {
+                    _logger.LogError($"AddressController: An exception has occured while attempting to perform postcode lookup, Exception: {e.Message}");
                     return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
                 }
             }
@@ -159,6 +160,7 @@ namespace form_builder.Controllers
                     }
                     catch (Exception e)
                     {
+                        _logger.LogError($"AddressController: An exception has occured while attempting to generate Html, Exception: {e.Message}");
                         return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
                     };
                 case "Select":
