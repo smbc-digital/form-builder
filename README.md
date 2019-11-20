@@ -74,6 +74,7 @@ Example JSON:
     * [H2-H6](#headingprops) (Heading levels)
     * [P](#ptextprops) (Paragraph text)
     * [Textbox](#textboxprops)
+    * [Textbox(Email)](#textboxemailprops)
     * [Textarea](#textareaprops) (Large text box)
     * [Radio](#radioprops)
     * [Select](#selectprops)
@@ -129,6 +130,31 @@ Textbox JSON example:
   }
 ```
 #
+   * <a name="textboxemailprops">**Textbox(Email)**</a>
+        * Label (*string*) __*__
+        * QuestionId (*string*) __*__
+        * CustomValidationMessage (*string*)
+        * Hint (*string*)
+        * MaxLength (*int*) (defaulted to 200)
+        * Optional (*boolean*) (defaults to false)
+        * Email (*boolean*) (need this to validate it as an email address)
+        
+Textbox JSON example:
+```json
+  {
+    "Type": "Textbox",
+    "Properties": {
+      "QuestionId": "emailAddress",
+      "Label": "Email address",
+      "Hint": "ie: someone@example.com",
+      "CustomValidationMessage": "Check the email address and try again",
+      "Optional": false,
+      "MaxLength": 60,
+      "Email": true
+    }
+  }
+```
+#
    * <a name="textareaprops">**Textarea**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
@@ -137,7 +163,7 @@ Textbox JSON example:
         * MaxLength (*int*) (defaults to 200)
         * Optional (*boolean*) (defaults to false)
 
-Textarea JSON example:
+Textarea (Email) JSON example:
 ```json
   {
     "Type": "Textarea",
