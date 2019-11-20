@@ -8,6 +8,7 @@ namespace form_builder.Models
         public string QuestionId { get; set; }
         public string Label { get; set; }
         public bool Optional { get; set; } = false;
+        public bool? Email { get; set; }
         public bool? Numeric { get; set; }
         public List<Option> Options { get; set; }
         public string ButtonId { get; set; }
