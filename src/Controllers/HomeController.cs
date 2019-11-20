@@ -75,7 +75,7 @@ namespace form_builder.Controllers
                         {
                             guid,
                             form,
-                            path
+                            path,
                         }
                     );
                 }
@@ -115,6 +115,7 @@ namespace form_builder.Controllers
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm);
                 formModel.Path = currentPage.PageURL;
                 formModel.Guid = guid;
+                formModel.FormName = baseForm.Name;
                 return View(formModel);
             }
 
