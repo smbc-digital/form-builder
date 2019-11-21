@@ -12,6 +12,9 @@ namespace form_builder.Models
     {
         public string FormName { get; set; }
         public string Path { get; set; }
+
+        public string AddressStatus { get; set; }
+
         public List<PageAnswers> Pages { get; set; }
     }
 }

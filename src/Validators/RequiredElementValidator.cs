@@ -18,8 +18,26 @@ namespace form_builder.Validators
                 };
             }
 
-            var value = viewModel.ContainsKey(element.Properties.QuestionId)
-                ? viewModel[element.Properties.QuestionId]
+            var key = element.Properties.QuestionId;
+
+            var validationMessage = $"{element.Properties.Label} is required";
+
+            if (element.Type == Enum.EElementType.Address)
+            {
+                if (viewModel["AddressStatus"] == "Select")
+                {
+                    key = $"{element.Properties.QuestionId}-address";
+                    validationMessage = $"{ element.Properties.AddressLabel} is required";
+                }
+                else
+                {
+                    key = $"{element.Properties.QuestionId}-postcode";
+                    validationMessage = $"{ element.Properties.PostcodeLabel} is required";
+                }
+            }
+
+            var value = viewModel.ContainsKey(key)
+                ? viewModel[key]
                 : null;
 
             var isValid = !string.IsNullOrEmpty(value);
@@ -27,7 +45,7 @@ namespace form_builder.Validators
             return new ValidationResult
             {
                 IsValid = isValid,
-                Message = isValid ? string.Empty : $"{element.Properties.Label} is required"
+                Message = isValid ? string.Empty : validationMessage
             };
         }
     }

@@ -21,6 +21,7 @@
         Button,
         Select,
         Checkbox,
-        DateInput
+        DateInput,
+        Address
     }
 }

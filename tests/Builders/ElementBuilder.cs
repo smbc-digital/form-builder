@@ -37,7 +37,6 @@ namespace form_builder_tests.Builders
             return this;
         }
 
-
         public ElementBuilder WithLabel(string label)
         {
             _property.Label = label;
@@ -104,6 +103,13 @@ namespace form_builder_tests.Builders
             _property.RestrictCurrentDate = value;
             return this;
         }
+
+        public ElementBuilder WithEmail(bool value)
+        {
+            _property.Email = value;
+            return this;
+        }
+
         public ElementBuilder WithOptional(bool value)
         {
             _property.Optional = value;
@@ -125,6 +131,17 @@ namespace form_builder_tests.Builders
         public ElementBuilder WithYearValue(string value)
         {
             _property.Year = value;
+            return this;
+        }
+
+        public ElementBuilder WithAddressProvider(string value)
+        {
+            _property.AddressProvider = value;
+            return this;
+        }
+        public ElementBuilder WithNumeric(bool value)
+        {
+            _property.Numeric = value;
             return this;
         }
     }

@@ -8,6 +8,7 @@ namespace form_builder.Extensions
         {
             switch (value)
             {
+                case "ui-test":
                 case "local":
                 case "int":
                     return "Int";

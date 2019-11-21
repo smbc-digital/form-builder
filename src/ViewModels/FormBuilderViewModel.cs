@@ -1,6 +1,4 @@
 using System;
-using form_builder.Models;
-using System.Collections.Generic;
 
 namespace form_builder.ViewModels
 {
@@ -11,6 +9,8 @@ namespace form_builder.ViewModels
         public string Path { get; set; }
 
         public string FeedbackForm { get; set; }
+
+        public string AddressStatus { get; set; }
 
         public string FormName { get; set; }
 

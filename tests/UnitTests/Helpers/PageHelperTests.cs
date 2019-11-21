@@ -6,10 +6,10 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder_tests.Builders;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.Addresses;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -90,6 +90,60 @@ namespace form_builder_tests.UnitTests.Helpers
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenAddressSelect()
+        {
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Address)
+                .WithPropertyText("text")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add("AddressStatus", "Select");
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            //Act
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+
+            //Assert
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<Tuple<Element, List<AddressSearchResult>>>(), null), Times.Once);
+        }
+
+        [Fact]
+        public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenAddressSearch()
+        {
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Address)
+                .WithPropertyText("text")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add("AddressStatus", "Search");
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            //Act
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+
+            //Assert
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Theory]

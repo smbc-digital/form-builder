@@ -157,5 +157,16 @@ namespace form_builder_tests_ui.StepDefinitions
             var webDriver = BrowserSession.Native as IWebDriver;
             Assert.True(webDriver.FindElement(By.XPath($"//{elementType}[text() = '{elementText}']")).Displayed);
         }
+
+        [Then(@"I should see ""(.*)"" is selected in ""(.*)"" dropdown with the value ""(.*)""")]
+        public void TheSelectedOptionShouldBeSelected(string text, string selectId, string value)
+        {
+            //Arrange
+            var webDriver = BrowserSession.Native as IWebDriver;
+
+            //Assert
+            Assert.Equal(text, BrowserSession.FindId(selectId).SelectedOption);
+            Assert.Equal(value, BrowserSession.FindId(selectId).Value);
+        }
     }
 }

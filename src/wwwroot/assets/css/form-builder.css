@@ -6,6 +6,15 @@ ul li {
     margin: 0;
 }
 
+ol.indented-list {
+    margin: 0 0 20px 35px;
+}
+
+ol {
+    margin: 0 0 20px 15px;
+    padding-left: 0px;
+}
+
 .text-area-validation {
     top: -10px;
 }
@@ -31,4 +40,10 @@ fieldset.input-memorable-date {
 
 .input-memorable-date div:last-of-type input[type=text] {
     width: 110px;
+}
+
+@media only screen and (max-width: 767px) {
+    ol.indented-list {
+        margin-left: 25px;
+    }
 }

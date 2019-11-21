@@ -10,9 +10,9 @@ Scenario: Renders HTML tags on the page
 
 Scenario: User selects Tuesday on page1
 	Given I navigate to "/select/page1"
-	Then I should see "Select an option..." is selected in dropdown with the value ""
+	Then I should see "Select an option..." is selected in "select" dropdown with the value ""
 	When I select "tuesday" in "select" dropdown
-	Then I should see "Tuesday" is selected in dropdown with the value "tuesday"
+	Then I should see "Tuesday" is selected in "select" dropdown with the value "tuesday"
 
 Scenario: User enters nothing on page1
 	Given I navigate to "/select/page1"
@@ -22,7 +22,7 @@ Scenario: User enters nothing on page1
 Scenario: User enters nothing on second select on page1
 	Given I navigate to "/select/page1"
 	When I select "tuesday" in "select" dropdown
-	Then I should see "Tuesday" is selected in dropdown with the value "tuesday"
+	Then I should see "Tuesday" is selected in "select" dropdown with the value "tuesday"
 	When I click the "submit" button
 	Then I should see a validation message for "favFood-error" input
-	Then I should see "Tuesday" is selected in dropdown with the value "tuesday"
+	Then I should see "Tuesday" is selected in "select" dropdown with the value "tuesday"

@@ -16,17 +16,13 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="77.0.3865.4000" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
-    <PackageReference Include="StockportGovUK.AspNetCore.Gateways" Version="0.4.11-prerelease32" />
+    <PackageReference Include="StockportGovUK.AspNetCore.Gateways" Version="0.7.5" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\src\form-builder.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="UnitTests\Validators\" />
   </ItemGroup>
 
 </Project>

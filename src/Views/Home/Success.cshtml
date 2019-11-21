@@ -1,19 +1,20 @@
 ﻿@model Success
 @{
     ViewData["Title"] = Model.FormName;
-   
-}
-    <div class="success-page">
-        <section class="header-container">
-            <h1>@Model.FormName</h1>
-            <p class="h2">@Model.SecondaryHeader</p>           
-        </section>
 
-        <section class="body-container">
-            @if (!string.IsNullOrWhiteSpace(Model.Reference))
-            {
-                <p><strong>Your reference number is:</strong>  <span class="verint-reference">@Model.Reference</span></p>
-            }
-            @Html.Raw(Model.PageContent)          
-        </section>
-    </div>
+}
+<div class="success-page">
+    <section class="header-container">
+        <h1>@Model.FormName</h1>
+        <p class="h2">@Model.SecondaryHeader</p>
+    </section>
+
+    <section class="body-container">
+        @if (!string.IsNullOrWhiteSpace(Model.Reference))
+        {
+            <p><strong>Your reference number is:</strong> @Model.Reference</p>
+        }
+        @Html.Raw(Model.PageContent)
+    </section>
+</div>
+

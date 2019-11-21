@@ -4,6 +4,7 @@ using form_builder.Configuration;
 using form_builder.Gateways;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Providers.Address;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Validators;
@@ -12,20 +13,25 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace form_builder.Extensions
 {
+    [ExcludeFromCodeCoverage]
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddValidators(this IServiceCollection services)
         {
             services.AddTransient<IElementValidator, RequiredElementValidator>();
             services.AddTransient<IElementValidator, NumericValueElementValidator>();
+            services.AddTransient<IElementValidator, AutomaticAddressElementValidator>();
             services.AddTransient<IElementValidator, DateInputElementValidator>();
             services.AddTransient<IElementValidator, RestrictPastDateValidator>();
             services.AddTransient<IElementValidator, RestrictFutureDateValidator>();
             services.AddTransient<IElementValidator, RestrictCurrentDateValidator>();
             services.AddTransient<IElementValidator, EmailElementValidator>();
+            services.AddTransient<IElementValidator, PostcodeElementValidator>();
+            services.AddTransient<IElementValidator, StockportPostcodeElementValidator>();
 
             return services;
         }
@@ -49,7 +55,6 @@ namespace form_builder.Extensions
             services.AddSingleton<IPageHelper, PageHelper>();
             services.AddSingleton<IElementHelper, ElementHelper>();
 
-
             return services;
         }
 
@@ -61,6 +66,12 @@ namespace form_builder.Extensions
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            return services;
+        }
+        public static IServiceCollection ConfigureAddressProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IAddressProvider, FakeAddressProvider>();
+            services.AddSingleton<IAddressProvider, CRMAddressProvider>();
             return services;
         }
 
