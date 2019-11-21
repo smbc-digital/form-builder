@@ -168,12 +168,16 @@ namespace form_builder.Controllers
 
             var postData = CreatePostData(convertedAnswers);
 
-            var reference = "(Reference Placeholder)";
+            var reference = string.Empty;
 
             try
             {
                 var response = await _gateway.PostAsync(postUrl, postData);
-                reference = await response.Content.ReadAsStringAsync() ?? "Reference Not found";
+                if (response.Content != null)
+                {
+                    var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
+                    reference = (string)JsonConvert.DeserializeObject(content);
+                }
 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
