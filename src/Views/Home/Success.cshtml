@@ -12,7 +12,7 @@
     <section class="body-container">
         @if (!string.IsNullOrWhiteSpace(Model.Reference))
         {
-            <p><strong>Your reference number is:</strong> @Model.Reference</p>
+            <p><strong>Your reference number is:</strong> @Html.Raw(Model.Reference)</p>
         }
         @Html.Raw(Model.PageContent)
     </section>
