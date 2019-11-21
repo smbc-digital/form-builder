@@ -17,12 +17,10 @@ using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Logging;
 using System.Net;
-<<<<<<< HEAD
 using System.Net.Http;
-=======
 using StockportGovUK.NetStandard.Models.Addresses;
 using form_builder.Providers.Address;
->>>>>>> master
+
 
 namespace form_builder_tests.UnitTests.Controllers
 {
