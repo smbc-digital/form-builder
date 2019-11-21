@@ -477,7 +477,7 @@ namespace form_builder_tests.UnitTests.Controllers
                .ReturnsAsync(new System.Net.Http.HttpResponseMessage
                {
                    StatusCode = HttpStatusCode.OK,
-                   Content = new StringContent("1234456")
+                   Content = new StringContent("\"1234456\"")
                });
 
 
