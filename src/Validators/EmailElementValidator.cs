@@ -8,7 +8,23 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
-            if((!element.Properties.Email.HasValue || !element.Properties.Email.Value) || !viewModel.ContainsKey(element.Properties.QuestionId))
+            if(element.Properties.Email != true)
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            }
+
+            if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && element.Properties.Optional)
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            }
+
+            if ((!element.Properties.Email.HasValue || !element.Properties.Email.Value) || !viewModel.ContainsKey(element.Properties.QuestionId))
             {
                 return new ValidationResult{
                     IsValid = true

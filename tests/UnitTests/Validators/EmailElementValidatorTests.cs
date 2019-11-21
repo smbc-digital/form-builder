@@ -68,5 +68,25 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.False(result.IsValid);
             Assert.Equal("Enter your email is required", result.Message);
         }
+
+        [Fact]
+        public void Validate_ShouldShowNoValidationMessageWhenEmailFieldIsEmptyAndOptional()
+        {
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("email")
+                .WithLabel("Enter your email")
+                .WithEmail(true)
+                .WithOptional(true)
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add("email", "");
+
+            //Assert
+            var result = _emailElementValidator.Validate(element, viewModel);
+            Assert.True(result.IsValid);
+        }
     }
 }

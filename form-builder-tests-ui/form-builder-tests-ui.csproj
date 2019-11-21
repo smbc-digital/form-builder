@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Email - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\PageContent - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Postcode - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\RadioButton - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Textbox - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\YourDetails - Copy.feature.cs" />
@@ -36,6 +38,12 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
+    <Compile Update="Features\StockportPostcode.feature.cs">
+      <DependentUpon>StockportPostcode.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\Postcode.feature.cs">
+      <DependentUpon>Postcode.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\Select.feature.cs">
       <DependentUpon>Select.feature</DependentUpon>
     </Compile>
@@ -53,6 +61,14 @@
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>DateInput.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\StockportPostcode.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\Postcode.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\Select.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>

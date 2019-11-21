@@ -8,13 +8,30 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
-            if((!element.Properties.Postcode.HasValue || !element.Properties.Postcode.Value) || !viewModel.ContainsKey(element.Properties.QuestionId))
+            if (element.Properties.Postcode != true)
             {
-                return new ValidationResult{
+                return new ValidationResult
+                {
                     IsValid = true
                 };
             }
-        
+
+            if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && element.Properties.Optional)
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            }
+
+            if ((!element.Properties.Postcode.HasValue || !element.Properties.Postcode.Value) || !viewModel.ContainsKey(element.Properties.QuestionId))
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            }
+
             var value = viewModel[element.Properties.QuestionId];
 
             var isValid = true;
@@ -27,10 +44,11 @@ namespace form_builder.Validators
                 isValid = false;
             }
 
-            return new ValidationResult{
-                    IsValid = isValid,
-                    Message = isValid ? string.Empty : $"{ element.Properties.Label} must be a valid postcode"
-                }; 
+            return new ValidationResult
+            {
+                IsValid = isValid,
+                Message = isValid ? string.Empty : $"{ element.Properties.Label} must be a valid postcode"
+            };
         }
     }
 }
