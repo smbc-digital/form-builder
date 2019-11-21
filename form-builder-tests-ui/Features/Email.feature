@@ -13,5 +13,5 @@ Scenario: I enter an incorrect email i see the error
 	Given I navigate to "/email/page1"
 	Then I fill in page1
 	Then I click the "nextStep" button
-	Then I should see a validation message for "email" input
+	Then I should see a validation message for "emaild" input
 
