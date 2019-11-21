@@ -76,6 +76,8 @@ Example JSON:
     * [P](#ptextprops) (Paragraph text)
     * [Textbox](#textboxprops)
     * [Textbox(Email)](#textboxemailprops)
+    * [Textbox(Postcode)](#textboxpostcodeprops)
+    * [Textbox(Stockport postcode)](#textboxstockportpostcodeprops)
     * [Textarea](#textareaprops) (Large text box)
     * [Radio](#radioprops)
     * [Select](#selectprops)
@@ -153,6 +155,56 @@ Textbox JSON example:
       "Optional": false,
       "MaxLength": 60,
       "Email": true
+    }
+  }
+```
+#
+   * <a name="textboxpostcodeprops">**Textbox(Postcode)**</a>
+        * Label (*string*) __*__
+        * QuestionId (*string*) __*__
+        * CustomValidationMessage (*string*)
+        * Hint (*string*)
+        * MaxLength (*int*) (defaulted to 200)
+        * Optional (*boolean*) (defaults to false)
+        * Postcode (*boolean*) (need this to validate it as a postcode e.g. L15 3HJ)
+        
+Textbox JSON example:
+```json
+  {
+    "Type": "Textbox",
+    "Properties": {
+      "QuestionId": "emailAddress",
+      "Label": "Email address",
+      "Hint": "ie: someone@example.com",
+      "CustomValidationMessage": "Check the email address and try again",
+      "Optional": false,
+      "MaxLength": 60,
+      "Postcode": true
+    }
+  }
+```
+#
+   * <a name="textboxstockportpostcodeprops">**Textbox(Stockport postcode)**</a>
+        * Label (*string*) __*__
+        * QuestionId (*string*) __*__
+        * CustomValidationMessage (*string*)
+        * Hint (*string*)
+        * MaxLength (*int*) (defaulted to 200)
+        * Optional (*boolean*) (defaults to false)
+        * StockportPostcode (*boolean*) (need this to validate it as a Stockport postcode e.g. SK1 3HJ)
+        
+Textbox JSON example:
+```json
+  {
+    "Type": "Textbox",
+    "Properties": {
+      "QuestionId": "emailAddress",
+      "Label": "Email address",
+      "Hint": "ie: someone@example.com",
+      "CustomValidationMessage": "Check the email address and try again",
+      "Optional": false,
+      "MaxLength": 60,
+      "StockportPostcode": true
     }
   }
 ```
