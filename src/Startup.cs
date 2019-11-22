@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using form_builder.Extensions;
 using form_builder.Helpers;
 using StockportGovUK.AspNetCore.Gateways;
+using form_builder.Configuration;
 
 namespace form_builder
 {
@@ -36,6 +37,7 @@ namespace form_builder
                 .ConfigureAddressProviders()
                 .AddHelpers();
 
+            services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddScoped<IViewRender, ViewRender>();
             services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
