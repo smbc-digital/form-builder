@@ -16,10 +16,15 @@
     <p class="description" id=@hintId>@Model.Properties.Hint</p>
 }
 
-@Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())
-@Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())
-@Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())
-@Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())
+<label for="addressManualLine1">Address line 1</label>
+<input name="addressManualLine1" id="addressManualLine1" type="text" />
+<label class="optional" for="addressManualLine2">Address line 2</label>
+<p class="optional">(optional)</p>
+<input name="addressManualLine2" id="addressManualLine2" type="text" />
+<label for="addressManualTown">Town</label>
+<input name="addressManualTown" id="addressManualTown" type="text" />
+<label for="addressManualPostcode">Postcode</label>
+<input name="addressManualPostcode" id="addressManualPostcode" type="text" />
 
 
 @if (!Model.IsValid)

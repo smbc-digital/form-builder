@@ -12,7 +12,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "postcode"
+      "launchUrl": "address"
     },
     "form_builder": {
       "commandName": "Project",
