@@ -605,3 +605,44 @@ $ dotnet test ./form-builder-tests-ui/form-builder-tests-ui.csproj
 ```
 
 It is possible to change the default browser the UI Tests are run from, to do this you need to modify the BrowserConfiguration to run with firefox or another browser of your choice.
+
+# AWS Architecture Decisions #
+This section will be used to document the decisions made throughout the development process.
+
+## Form Builder Storage Stack
+The formbuilder storage components will be provisioned by a Cloudformation stack. Jon H & Jake decided that the stack would include an S3 Bucket, IAM User and a User Policy to handle the storage of json files. 
+
+### IAM User Policy Example
+The example below shows the policy we manually created and applied to a test user:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutAccountPublicAccessBlock",
+                "s3:GetAccountPublicAccessBlock",
+                "s3:ListAllMyBuckets",
+                "s3:ListJobs",
+                "s3:CreateJob",
+                "s3:HeadBucket"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::bucketname/*",
+                "arn:aws:s3:::bucketname"
+            ]
+        }
+    ]
+}
+```
+## FormBuilder Bucket Config
+The S3 bucket used during testing was cofigured to 'Block all public access' to 'On'.
+
+The bucket will be created using a Cloudformation template with the folder structure created by the template. 

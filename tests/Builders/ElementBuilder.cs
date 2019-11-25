@@ -144,5 +144,11 @@ namespace form_builder_tests.Builders
             _property.Numeric = value;
             return this;
         }
+
+        public ElementBuilder WithHint(string value)
+        {
+            _property.Hint = value;
+            return this;
+        }
     }
 }
