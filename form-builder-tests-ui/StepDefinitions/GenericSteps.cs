@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using Coypu;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 using Xunit;
@@ -72,7 +73,7 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then(@"I click the ""(.*)"" button")]
         public void WhenIClickTheButton(string name)
         {
-            BrowserSession.ClickButton(name);
+            BrowserSession.ClickButton(name, new Options { WaitBeforeClick = TimeSpan.FromMilliseconds(0.2) });
         }
 
         [Then(@"I should see the ""(.*)"" button")]
