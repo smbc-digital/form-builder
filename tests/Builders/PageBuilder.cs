@@ -6,7 +6,7 @@ namespace form_builder_tests.Builders
     public class PageBuilder
     {
         private string _title = "TestTitle";
-        private string _pageURL = "test-url";
+        private string _PageSlug = "test-url";
         private List<Element> _elements = new List<Element>();
         private List<Behaviour> _behaviours = new List<Behaviour>();
 
@@ -16,7 +16,7 @@ namespace form_builder_tests.Builders
             return new Page
             {
                 Title = _title,
-                PageURL = _pageURL,
+                PageSlug = _PageSlug,
                 Behaviours = _behaviours,
                 Elements = _elements
             };
@@ -29,9 +29,9 @@ namespace form_builder_tests.Builders
             return this;
         }
 
-        public PageBuilder WithPageUrl(string url)
+        public PageBuilder WithPageSlug(string url)
         {
-            _pageURL = url;
+            _PageSlug = url;
 
             return this;
         }

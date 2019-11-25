@@ -59,7 +59,7 @@ namespace form_builder.Controllers
 
                 if (string.IsNullOrEmpty(path))
                 {
-                    path = baseForm.StartPage;
+                    path = baseForm.StartPageSlug;
                 }
 
                 var page = baseForm.GetPage(path);
@@ -84,7 +84,7 @@ namespace form_builder.Controllers
 
                 viewModel.Path = path;
                 viewModel.Guid = guid;
-                viewModel.FormName = baseForm.Name;
+                viewModel.FormName = baseForm.FormName;
                 return View(viewModel);
             }
             catch (Exception ex)
@@ -113,9 +113,9 @@ namespace form_builder.Controllers
             if (!currentPage.IsValid)
             {
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm);
-                formModel.Path = currentPage.PageURL;
+                formModel.Path = currentPage.PageSlug;
                 formModel.Guid = guid;
-                formModel.FormName = baseForm.Name;
+                formModel.FormName = baseForm.FormName;
                 return View(formModel);
             }
 
@@ -125,11 +125,11 @@ namespace form_builder.Controllers
             switch (behaviour.BehaviourType)
             {
                 case EBehaviourType.GoToExternalPage:
-                    return Redirect(behaviour.pageURL);
+                    return Redirect(behaviour.PageSlug);
                 case EBehaviourType.GoToPage:
                     return RedirectToAction("Index", "Home", new
                     {
-                        path = behaviour.pageURL,
+                        path = behaviour.PageSlug,
                         guid
                     });
                 case EBehaviourType.SubmitForm:
@@ -176,7 +176,7 @@ namespace form_builder.Controllers
                 if (response.Content != null)
                 {
                     var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
-                    reference = (string)JsonConvert.DeserializeObject(content);
+                    reference = JsonConvert.DeserializeObject<string>(content);
                 }
 
                 if (response.StatusCode != HttpStatusCode.OK)
@@ -202,7 +202,7 @@ namespace form_builder.Controllers
             var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
 
             var success = new Success { 
-                FormName = baseForm.Name,
+                FormName = baseForm.FormName,
                 Reference = reference,
                 FormAnswers = convertedAnswers,
                 PageContent = viewModel.RawHTML,

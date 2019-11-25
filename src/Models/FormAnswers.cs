@@ -4,7 +4,7 @@ namespace form_builder.Models
 {
     public class PageAnswers
     {
-        public string PageUrl { get; set; }
+        public string PageSlug { get; set; }
         public List<Answers> Answers { get; set; }
     }
 

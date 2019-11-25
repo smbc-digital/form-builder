@@ -72,7 +72,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -103,7 +103,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -135,7 +135,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -165,12 +165,12 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.GoToExternalPage)
-                .WithPageUrl("https://www.bbc.co.uk/weather/2636882")
+                .WithPageSlug("https://www.bbc.co.uk/weather/2636882")
                 .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .WithBehaviour(behaviour)
                 .Build();
 
@@ -203,12 +203,12 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithPageUrl("page-two")
+                .WithPageSlug("page-two")
                 .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .WithBehaviour(behaviour)
                 .Build();
 
@@ -253,7 +253,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .WithBehaviour(behaviour)
                 .Build();
 
@@ -295,7 +295,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .WithBehaviour(behaviour)
                 .Build();
 
@@ -331,12 +331,12 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageUrl("testUrl")
+                .WithPageSlug("testUrl")
                 .Build();
 
             var page = new PageBuilder()
                 .WithBehaviour(formData)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -367,7 +367,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 {
                     new PageAnswers
                     {
-                        PageUrl = "page-one",
+                        PageSlug = "page-one",
                         Answers = new List<Answers>
                         {
                             new Answers
@@ -383,12 +383,12 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageUrl("testUrl")
+                .WithPageSlug("testUrl")
                 .Build();
 
             var page = new PageBuilder()
                 .WithBehaviour(formData)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -425,12 +425,12 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageUrl("testUrl")
+                .WithPageSlug("testUrl")
                 .Build();
 
             var page = new PageBuilder()
                 .WithBehaviour(formData)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -458,12 +458,12 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageUrl("testUrl")
+                .WithPageSlug("testUrl")
                 .Build();
 
             var page = new PageBuilder()
                 .WithBehaviour(formData)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -514,13 +514,13 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageUrl(null)
+                .WithPageSlug(null)
                 .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithBehaviour(behaviour)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -551,13 +551,13 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageUrl("test-url")
+                .WithPageSlug("test-url")
                 .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithBehaviour(behaviour)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()

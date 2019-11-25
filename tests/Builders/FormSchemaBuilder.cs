@@ -7,9 +7,9 @@ namespace form_builder_tests.Builders
     {
         private string _baseUrl = "base-url";
         private string _feedbackForm = "www.feedback.com";
-        private string _name = "formname";
+        private string _formName = "formname";
         private List<Page> _pages = new List<Page>();
-        private string _startPage = "page-one";
+        private string _startPageSlug = "page-one";
 
         public FormSchema Build()
         {
@@ -17,9 +17,9 @@ namespace form_builder_tests.Builders
             {
                 BaseURL = _baseUrl,
                 FeedbackForm = _feedbackForm,
-                Name = _name,
+                FormName = _formName,
                 Pages = _pages,
-                StartPage = _startPage
+                StartPageSlug = _startPageSlug
             };
         }
 
@@ -37,7 +37,7 @@ namespace form_builder_tests.Builders
 
         public FormSchemaBuilder WithName(string name)
         {
-            _name = name;
+            _formName = name;
             return this;
         }
     }

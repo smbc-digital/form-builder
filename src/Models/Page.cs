@@ -13,7 +13,7 @@ namespace form_builder.Models
         }
 
         public string Title { get; set; }
-        public string PageURL { get; set; }
+        public string PageSlug { get; set; }
         public List<Element> Elements { get; set; }
         public List<Behaviour> Behaviours { get; set; }
 
@@ -78,17 +78,17 @@ namespace form_builder.Models
 
             if (Behaviours.Count > 1)
             {
-                var previousPage = formAnswers.Pages.Where(_ => _.PageUrl == formAnswers.Path)
+                var previousPage = formAnswers.Pages.Where(_ => _.PageSlug == formAnswers.Path)
                     .FirstOrDefault();
 
                 var viewModel = new Dictionary<string, string>();
                 previousPage.Answers.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
-                return GetNextPage(viewModel).pageURL;
+                return GetNextPage(viewModel).PageSlug;
             }
 
             return pageSubmitBehaviours.Count == 0 
                 ? null 
-                : pageSubmitBehaviours.FirstOrDefault().pageURL;
+                : pageSubmitBehaviours.FirstOrDefault().PageSlug;
         }
 
         private List<Behaviour> GetBehavioursByType(EBehaviourType type)

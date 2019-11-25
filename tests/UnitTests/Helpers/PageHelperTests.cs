@@ -235,7 +235,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 {
                     new PageAnswers
                     {
-                        PageUrl = "path",
+                        PageSlug = "path",
                         Answers = new List<Answers>
                         {
                              new Answers { QuestionId = "Item1", Response = "old-answer" },

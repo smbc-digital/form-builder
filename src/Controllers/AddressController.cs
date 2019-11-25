@@ -59,7 +59,7 @@ namespace form_builder.Controllers
 
                 if (string.IsNullOrEmpty(path))
                 {
-                    path = baseForm.StartPage;
+                    path = baseForm.StartPageSlug;
                 }
 
                 var page = baseForm.GetPage(path);
@@ -71,7 +71,7 @@ namespace form_builder.Controllers
                 var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
                 viewModel.AddressStatus = "Search";
                 viewModel.Guid = guid;
-                viewModel.FormName = baseForm.Name;
+                viewModel.FormName = baseForm.FormName;
 
                 return View(viewModel);
             }
@@ -123,7 +123,7 @@ namespace form_builder.Controllers
                 }
 
                 var postcode = journey == "Select"
-                    ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageUrl == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
+                    ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
                     : viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
 
                 try
@@ -141,10 +141,10 @@ namespace form_builder.Controllers
             if (!currentPage.IsValid)
             {
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, addressResults);
-                formModel.Path = currentPage.PageURL;
+                formModel.Path = currentPage.PageSlug;
                 formModel.Guid = guid;
                 formModel.AddressStatus = journey;
-                formModel.FormName = baseForm.Name;
+                formModel.FormName = baseForm.FormName;
 
                 return View(formModel);
             }
@@ -159,7 +159,7 @@ namespace form_builder.Controllers
                         var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, addressResults);
                         adddressViewModel.AddressStatus = "Select";
                         adddressViewModel.Guid = guid;
-                        adddressViewModel.FormName = baseForm.Name;
+                        adddressViewModel.FormName = baseForm.FormName;
 
                         return View(adddressViewModel);
                     }
@@ -173,11 +173,11 @@ namespace form_builder.Controllers
                     switch (behaviour.BehaviourType)
                     {
                         case EBehaviourType.GoToExternalPage:
-                            return Redirect(behaviour.pageURL);
+                            return Redirect(behaviour.PageSlug);
                         case EBehaviourType.GoToPage:
                             return RedirectToAction("Index", "Home", new
                             {
-                                path = behaviour.pageURL,
+                                path = behaviour.PageSlug,
                                 guid,
                                 form = baseForm.BaseURL
                             });

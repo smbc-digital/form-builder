@@ -79,7 +79,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -119,7 +119,7 @@ namespace form_builder_tests.UnitTests.Controllers
                                 Response = "sk11aa"
                             }
                         },
-                        PageUrl = "page-one"
+                        PageSlug = "page-one"
                     }
                 }
             };
@@ -136,7 +136,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -169,7 +169,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -210,7 +210,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -249,7 +249,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -290,7 +290,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -323,7 +323,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -362,7 +362,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -402,12 +402,12 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(behaviourType)
-                .WithPageUrl("url")
+                .WithPageSlug("url")
                 .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .WithBehaviour(behaviour)
                 .Build();
 
@@ -445,12 +445,12 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.GoToExternalPage)
-                .WithPageUrl("submit-url")
+                .WithPageSlug("submit-url")
                 .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithPageUrl("page-one")
+                .WithPageSlug("page-one")
                 .WithBehaviour(behaviour)
                 .Build();
 

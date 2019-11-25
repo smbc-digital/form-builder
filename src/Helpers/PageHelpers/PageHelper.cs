@@ -22,7 +22,7 @@ namespace form_builder.Helpers.PageHelpers
 
         void SaveAnswers(Dictionary<string, string> viewModel);
 
-        bool CheckForStartPage(FormSchema form, Page page);
+        bool CheckForStartPageSlug(FormSchema form, Page page);
     }
 
     public class PageHelper : IPageHelper
@@ -56,9 +56,9 @@ namespace form_builder.Helpers.PageHelpers
         public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, List<AddressSearchResult> addressSearchResults = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
-            if (page.PageURL.ToLower() != "success")
+            if (page.PageSlug.ToLower() != "success")
             {
-                formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new Property { Text = baseForm.Name } });
+                formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new Property { Text = baseForm.FormName } });
             }
             formModel.FeedbackForm = baseForm.FeedbackForm;
 
@@ -127,7 +127,7 @@ namespace form_builder.Helpers.PageHelpers
                         formModel.RawHTML += await _viewRender.RenderAsync("Radio", element);
                         break;
                     case EElementType.Button:
-                        var viewData = new Dictionary<string, object> { { "displayAnchor", !CheckForStartPage(baseForm, page) } };
+                        var viewData = new Dictionary<string, object> { { "displayAnchor", !CheckForStartPageSlug(baseForm, page) } };
                         formModel.RawHTML += await _viewRender.RenderAsync("Button", element, viewData);
                         break;
                     case EElementType.Select:
@@ -190,9 +190,9 @@ namespace form_builder.Helpers.PageHelpers
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
             }
 
-            if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageUrl == viewModel["Path"].ToLower()))
+            if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == viewModel["Path"].ToLower()))
             {
-                convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageUrl != viewModel["Path"].ToLower()).ToList();
+                convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageSlug != viewModel["Path"].ToLower()).ToList();
             }
 
             var answers = new List<Answers>();
@@ -207,7 +207,7 @@ namespace form_builder.Helpers.PageHelpers
 
             convertedAnswers.Pages.Add(new PageAnswers
             {
-                PageUrl = viewModel["Path"].ToLower(),
+                PageSlug = viewModel["Path"].ToLower(),
                 Answers = answers
             });
             convertedAnswers.Path = viewModel["Path"];
@@ -215,9 +215,9 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
-        public bool CheckForStartPage(FormSchema form, Page page)
+        public bool CheckForStartPageSlug(FormSchema form, Page page)
         {
-            return form.StartPage == page.PageURL;
+            return form.StartPageSlug == page.PageSlug;
         }
     }
 }

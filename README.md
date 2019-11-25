@@ -560,12 +560,12 @@ Example where if a user selects yes they will continue on with the form, otherwi
 
 ## Success Page
 
-The success page is a page with with the pageurl of success it is of the form it should be at the end of the form afte the submit.
+The success page is a page with with the PageSlug of success it is of the form it should be at the end of the form afte the submit.
 
 ```json
 {
       "Title": "Thank you for submitting your views on fruit",
-      "PageURL": "success",
+      "PageSlug": "success",
       "Elements": [
         {
           "Type": "p",
