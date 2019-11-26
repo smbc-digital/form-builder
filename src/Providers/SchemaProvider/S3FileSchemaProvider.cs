@@ -39,13 +39,13 @@ namespace form_builder.Providers.SchemaProvider
             }
             catch (AmazonS3Exception e)
             {
-                _logger.LogError($"S3FileSchemaProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}");
-                throw;
+                var ex = new Exception($"S3FileSchemaProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}", e);
+                throw ex;
             }
             catch (Exception e)
             {
-                _logger.LogError($"S3FileSchemaProvider: An error has occured while attempting to deserialize object, Exception: {e.Message}");
-                throw;
+                var ex = new Exception($"S3FileSchemaProvider: An error has occured while attempting to deserialize object, Exception: {e.Message}", e);
+                throw ex;
             }
         }
 

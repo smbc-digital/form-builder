@@ -72,7 +72,7 @@ namespace form_builder.Controllers
                 var page = baseForm.GetPage(path);
                 if (page == null)
                 {
-                    return RedirectToAction("Error");
+                    throw new NullReferenceException($"Requested path '{path}' object could not be found.");
                 }
 
                if (page.Elements.Any(_ => _.Type == EElementType.Street))
@@ -103,10 +103,25 @@ namespace form_builder.Controllers
                 viewModel.FormName = baseForm.FormName;
                 return View(viewModel);
             }
-            catch (Exception ex)
+
+            if (page.Elements.Any(_ => _.Type == EElementType.Address))
             {
-                return RedirectToAction("Error", new { ex = ex.Message, form });
+                return RedirectToAction("Index", "Address",
+                    new
+                    {
+                        guid,
+                        form,
+                        path,
+                    }
+                );
             }
+
+            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
+
+            viewModel.Path = path;
+            viewModel.Guid = guid;
+            viewModel.FormName = baseForm.FormName;
+            return View(viewModel);
         }
 
         [HttpPost]
@@ -122,7 +137,7 @@ namespace form_builder.Controllers
 
             if (currentPage == null)
             {
-                return RedirectToAction("Error");
+                throw new NullReferenceException($"Current page '{path}' object could not be found.");                
             }
 
             currentPage.Validate(viewModel, _validators);
@@ -152,7 +167,7 @@ namespace form_builder.Controllers
                         form = baseForm.BaseURL
                     });
                 default:
-                    return RedirectToAction("Error");
+                    throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
             }
         }
 
@@ -164,7 +179,7 @@ namespace form_builder.Controllers
 
             if (string.IsNullOrEmpty(sessionGuid))
             {
-                return RedirectToAction("Error", new { form });
+                throw new ApplicationException($"A Session GUID was not provided.");
             }
 
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
@@ -174,46 +189,32 @@ namespace form_builder.Controllers
 
             var currentPage = baseForm.GetPage(convertedAnswers.Path);
             var postUrl = currentPage.GetSubmitFormEndpoint(convertedAnswers);
-
-            if (string.IsNullOrEmpty(postUrl))
-            {
-                _logger.LogError("HomeController, Submit: No postUrl supplied for submit form");
-                return RedirectToAction("Error", new { form });
-            }
-
             var postData = CreatePostData(convertedAnswers);
-
             var reference = string.Empty;
-
-            try
+            var response = await _gateway.PostAsync(postUrl, postData);
+            
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                var response = await _gateway.PostAsync(postUrl, postData);
-                if (response.Content != null)
-                {
-                    var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
-                    reference = JsonConvert.DeserializeObject<string>(content);
-                }
-
-                if (response.StatusCode != HttpStatusCode.OK)
-                {
-                    _logger.LogError($"HomeController, Submit: Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
-                    return RedirectToAction("Error", new { form });
-                }
+                // NOTE: Jon H - Is it correct that this throws an exception or is this expceted behavoiour we need to handle?
+                throw new ApplicationException($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             }
-            catch (Exception e)
+            
+            if (response.Content != null)
             {
-                _logger.LogError($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Exception Message: {e.Message}");
-                return RedirectToAction("Error", new { form });
+                var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
+                reference = JsonConvert.DeserializeObject<string>(content);
             }
 
             _distributedCache.Remove(sessionGuid);
             _sessionHelper.RemoveSessionGuid();
 
             var page = baseForm.GetPage("success");
+
             if(page == null)
             {
                 return View("Submit", convertedAnswers);
             }
+
 
             var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
 
@@ -228,16 +229,6 @@ namespace form_builder.Controllers
             ViewData["BannerTypeformUrl"] = baseForm.FeedbackForm;
             return View("Success", success);
         }
-
-        [HttpGet]
-        [Route("{form}/error")]
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error(string ex)
-        {
-            ViewData["Error"] = ex;
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
 
         protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)
         {
@@ -254,7 +245,6 @@ namespace form_builder.Controllers
                 {
                     normaisedFormData.Add(item.Key, string.Join(", ", item.Value));
                 }
-
             }
 
             return normaisedFormData;
@@ -265,7 +255,9 @@ namespace form_builder.Controllers
             var postData = new PostData() { Form = formAnswers.FormName, Answers= new List<Answers>()};
 
             if (formAnswers.Pages == null)
+            {
                 return postData;
+            }
 
             foreach(var page in formAnswers.Pages)
             {
@@ -276,7 +268,6 @@ namespace form_builder.Controllers
             }
 
             return postData;
-
         }
     }
 }

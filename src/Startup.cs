@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ using form_builder.Extensions;
 using form_builder.Helpers;
 using StockportGovUK.AspNetCore.Gateways;
 using form_builder.Configuration;
-using System;
+using StockportGovUK.AspNetCore.Middleware.App;
 
 namespace form_builder
 {
@@ -53,7 +54,8 @@ namespace form_builder
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseMiddleware<AppExceptionHandling>();
+                
                 app.UseHsts();
             }
 
