@@ -14,8 +14,8 @@ using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Logging;
 using System.Net;
-using form_builder.Providers.Address;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Controllers
 {
@@ -46,16 +46,19 @@ namespace form_builder.Controllers
         [HttpGet]
         [Route("{form}")]
         [Route("{form}/{path}")]
-        public async Task<IActionResult> Index(string form, string path, [FromQuery] Guid guid)
+        public async Task<IActionResult> Index(string form, string path)
         {
             try
             {
-                var baseForm = await _schemaProvider.Get<FormSchema>(form);
+                var sessionGuid = HttpContext.Session.GetString("sessionGuid");
 
-                if (Guid.Empty == guid)
+                if (sessionGuid == null)
                 {
-                    guid = Guid.NewGuid();
+                    sessionGuid = new Guid().ToString();
+                    HttpContext.Session.SetString("sessionGuid", sessionGuid);
                 }
+
+                var baseForm = await _schemaProvider.Get<FormSchema>(form);
 
                 if (string.IsNullOrEmpty(path))
                 {
@@ -73,17 +76,15 @@ namespace form_builder.Controllers
                     return RedirectToAction("Index", "Address",
                         new
                         {
-                            guid,
                             form,
                             path,
                         }
                     );
                 }
 
-                var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
+                var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
 
                 viewModel.Path = path;
-                viewModel.Guid = guid;
                 viewModel.FormName = baseForm.FormName;
                 return View(viewModel);
             }
@@ -102,7 +103,7 @@ namespace form_builder.Controllers
             var currentPage = baseForm.GetPage(path);
             var viewModel = NormaliseFormData(formData);
 
-            var guid = Guid.Parse(viewModel["Guid"]);
+            var sessionGuid = HttpContext.Session.GetString("sessionGuid");
 
             if (currentPage == null)
             {
@@ -112,31 +113,28 @@ namespace form_builder.Controllers
             currentPage.Validate(viewModel, _validators);
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm);
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, sessionGuid);
                 formModel.Path = currentPage.PageSlug;
-                formModel.Guid = guid;
                 formModel.FormName = baseForm.FormName;
                 return View(formModel);
             }
 
             var behaviour = currentPage.GetNextPage(viewModel);
-            _pageHelper.SaveAnswers(viewModel);
+            _pageHelper.SaveAnswers(viewModel, sessionGuid);
 
             switch (behaviour.BehaviourType)
             {
                 case EBehaviourType.GoToExternalPage:
                     return Redirect(behaviour.PageSlug);
                 case EBehaviourType.GoToPage:
-                    return RedirectToAction("Index", "Home", new
+                    return RedirectToAction("Index", new
                     {
-                        path = behaviour.PageSlug,
-                        guid
+                        path = behaviour.PageSlug
                     });
                 case EBehaviourType.SubmitForm:
                     return RedirectToAction("Submit", "Home", new
                     {
-                        form = baseForm.BaseURL,
-                        guid
+                        form = baseForm.BaseURL
                     });
                 default:
                     return RedirectToAction("Error");
@@ -145,15 +143,17 @@ namespace form_builder.Controllers
 
         [HttpGet]
         [Route("{form}/submit")]
-        public async Task<IActionResult> Submit(string form, [FromQuery] Guid guid)
+        public async Task<IActionResult> Submit(string form)
         {
-            if (guid == Guid.Empty)
+            var sessionGuid = HttpContext.Session.GetString("sessionGuid");
+
+            if (string.IsNullOrEmpty(sessionGuid))
             {
                 return RedirectToAction("Error", new { form });
             }
 
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
-            var formData = _distributedCache.GetString(guid.ToString());
+            var formData = _distributedCache.GetString(sessionGuid);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
             convertedAnswers.FormName = form;
 
@@ -191,7 +191,8 @@ namespace form_builder.Controllers
                 return RedirectToAction("Error", new { form });
             }
 
-            _distributedCache.Remove(guid.ToString());
+            _distributedCache.Remove(sessionGuid);
+            HttpContext.Session.Remove("sessionGuid");
 
             var page = baseForm.GetPage("success");
             if(page == null)
@@ -199,7 +200,7 @@ namespace form_builder.Controllers
                 return View("Submit", convertedAnswers);
             }
 
-            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
+            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
 
             var success = new Success { 
                 FormName = baseForm.FormName,

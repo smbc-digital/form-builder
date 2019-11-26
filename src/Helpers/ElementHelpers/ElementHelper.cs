@@ -1,27 +1,23 @@
 ﻿using form_builder.Models;
+using form_builder.Providers.StorageProvider;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace form_builder.Helpers.ElementHelpers
 {
     public interface IElementHelper
     {
-        string CurrentValue(Element element, Dictionary<string, string> viewModel);
-
+        string CurrentValue(Element element, Dictionary<string, string> viewModel, string pageSlug, string guid);
         string CurrentDateValue(Element element, Dictionary<string, string> viewModel, string suffix);
-
         bool CheckForQuestionId(Element element);
-
         bool CheckForLabel(Element element);
-
         bool CheckForMaxLength(Element element);
-
         bool CheckIfLabelAndTextEmpty(Element element);
-
         bool CheckForRadioOptions(Element element);
         bool CheckForSelectOptions(Element element);
         bool CheckForCheckBoxListValues(Element element);
-
         bool CheckAllDateRestrictionsAreNotEnabled(Element element);
         void ReSelectPreviousSelectedOptions(Element element);
         void ReCheckPreviousRadioOptions(Element element);
@@ -29,9 +25,33 @@ namespace form_builder.Helpers.ElementHelpers
 
     public class ElementHelper : IElementHelper
     {
-        public string CurrentValue(Element element, Dictionary<string, string> viewModel)
+        private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public ElementHelper(IDistributedCacheWrapper distributedCacheWrapper, IHttpContextAccessor httpContextAccessor)
+        {
+            _distributedCache = distributedCacheWrapper;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        public string CurrentValue(Element element, Dictionary<string, string> viewModel, string pageSlug, string guid)
         {
             var currentValue = viewModel.ContainsKey(element.Properties.QuestionId);
+            var cacheData = _distributedCache.GetString(guid);
+
+            if (!currentValue && cacheData != null)
+            {
+                var mappedCacheData = Newtonsoft.Json.JsonConvert.DeserializeObject<FormAnswers>(cacheData);
+                var storedValue = mappedCacheData.Pages.FirstOrDefault(_ => _.PageSlug == pageSlug);
+
+                if (storedValue != null)
+                {
+                    var value = storedValue.Answers.FirstOrDefault(_ => _.QuestionId == element.Properties.QuestionId);
+
+                    return value != null ? value.Response : string.Empty;
+                }
+
+                return string.Empty;
+            }
 
             return currentValue ? viewModel[element.Properties.QuestionId] : string.Empty;
         }

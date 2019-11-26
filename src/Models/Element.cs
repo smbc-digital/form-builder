@@ -69,7 +69,8 @@ namespace form_builder.Models
                         { "name", Properties.QuestionId },
                         { "id", Properties.QuestionId },
                         { "maxlength", maxLength },
-                        { "value", Properties.Value}
+                        { "value", Properties.Value},
+                        { "autocomplete", "on" }
                     };
 
                     if (DisplayAriaDescribedby)
