@@ -36,14 +36,11 @@ namespace form_builder
                 .AddGateways()
                 .AddIOptionsConfiguration(Configuration)
                 .ConfigureAddressProviders()
-                .AddHelpers();
-            services.AddHttpContextAccessor();
-
-            services.AddSession(_ => _.IdleTimeout = TimeSpan.FromMinutes(30));
+                .AddHelpers()
+                .AddSession(_ => _.IdleTimeout = TimeSpan.FromMinutes(30));
 
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddScoped<IViewRender, ViewRender>();
             services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
         }
 

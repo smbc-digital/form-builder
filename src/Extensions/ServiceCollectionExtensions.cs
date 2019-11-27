@@ -2,8 +2,10 @@
 using Amazon.S3;
 using form_builder.Configuration;
 using form_builder.Gateways;
+using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Helpers.Session;
 using form_builder.Providers.Address;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace form_builder.Extensions
@@ -55,6 +58,10 @@ namespace form_builder.Extensions
             services.AddSingleton<IPageHelper, PageHelper>();
             services.AddSingleton<IElementHelper, ElementHelper>();
 
+            services.AddScoped<IViewRender, ViewRender>();
+            services.AddHttpContextAccessor();
+            services.AddSingleton<ISessionHelper, SessionHelper>();
+
             return services;
         }
 
@@ -92,6 +99,8 @@ namespace form_builder.Extensions
         public static IServiceCollection AddIOptionsConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<DisallowedAnswerKeysConfiguration>(configuration.GetSection("FormConfig"));
+            services.Configure<DistrbutedCacheConfiguration>(cacheOptions => cacheOptions.Expiration = configuration.GetValue<int>("DistrbutedCacheExpiration"));
+
             return services;
         }
 

@@ -26,11 +26,9 @@ namespace form_builder.Helpers.ElementHelpers
     public class ElementHelper : IElementHelper
     {
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        public ElementHelper(IDistributedCacheWrapper distributedCacheWrapper, IHttpContextAccessor httpContextAccessor)
+        public ElementHelper(IDistributedCacheWrapper distributedCacheWrapper)
         {
             _distributedCache = distributedCacheWrapper;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public string CurrentValue(Element element, Dictionary<string, string> viewModel, string pageSlug, string guid)

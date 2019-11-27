@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using form_builder.Helpers.Session;
 
 namespace form_builder.Controllers
 {
@@ -31,15 +32,18 @@ namespace form_builder.Controllers
 
         private readonly IPageHelper _pageHelper;
 
+        private readonly ISessionHelper _sessionHelper;
+
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper)
+        public HomeController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper)
         {
             _distributedCache = distributedCache;
             _validators = validators;
             _schemaProvider = schemaProvider;
             _gateway = gateway;
             _pageHelper = pageHelper;
+            _sessionHelper = sessionHelper;
             _logger = logger;
         }
 
@@ -50,12 +54,12 @@ namespace form_builder.Controllers
         {
             try
             {
-                var sessionGuid = HttpContext.Session.GetString("sessionGuid");
+                var sessionGuid = _sessionHelper.GetSessionGuid();
 
-                if (sessionGuid == null)
+                if (string.IsNullOrEmpty(sessionGuid))
                 {
-                    sessionGuid = new Guid().ToString();
-                    HttpContext.Session.SetString("sessionGuid", sessionGuid);
+                    sessionGuid = Guid.NewGuid().ToString();
+                    _sessionHelper.SetSessionGuid(sessionGuid);
                 }
 
                 var baseForm = await _schemaProvider.Get<FormSchema>(form);
@@ -103,7 +107,7 @@ namespace form_builder.Controllers
             var currentPage = baseForm.GetPage(path);
             var viewModel = NormaliseFormData(formData);
 
-            var sessionGuid = HttpContext.Session.GetString("sessionGuid");
+            var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (currentPage == null)
             {
@@ -132,7 +136,7 @@ namespace form_builder.Controllers
                         path = behaviour.PageSlug
                     });
                 case EBehaviourType.SubmitForm:
-                    return RedirectToAction("Submit", "Home", new
+                    return RedirectToAction("Submit", new
                     {
                         form = baseForm.BaseURL
                     });
@@ -145,7 +149,7 @@ namespace form_builder.Controllers
         [Route("{form}/submit")]
         public async Task<IActionResult> Submit(string form)
         {
-            var sessionGuid = HttpContext.Session.GetString("sessionGuid");
+            var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (string.IsNullOrEmpty(sessionGuid))
             {
@@ -192,7 +196,7 @@ namespace form_builder.Controllers
             }
 
             _distributedCache.Remove(sessionGuid);
-            HttpContext.Session.Remove("sessionGuid");
+            _sessionHelper.RemoveSessionGuid();
 
             var page = baseForm.GetPage("success");
             if(page == null)
