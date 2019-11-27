@@ -155,7 +155,7 @@ namespace form_builder.Helpers.PageHelpers
                         formModel.RawHTML += await _viewRender.RenderAsync("DateInput", element);
                         break;
                     case EElementType.Address:
-                        formModel.RawHTML += await GenerateAddressHtml(viewModel, page, element, addressSearchResults, guid);
+                        formModel.RawHTML += await GenerateAddressHtml(viewModel, page, element, baseForm.BaseURL, addressSearchResults, guid);
                         break;
                     default:
                         break;
@@ -165,14 +165,22 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        private async Task<string> GenerateAddressHtml(Dictionary<string, string> viewModel, Page page, Element element, List<AddressSearchResult> searchResults, string guid)
+        private async Task<string> GenerateAddressHtml(Dictionary<string, string> viewModel, Page page, Element element, string baseURL, List<AddressSearchResult> searchResults, string guid)
         {
             var postcodeKey = $"{element.Properties.QuestionId}-postcode";
 
             if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
             {
                 element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
-                return await _viewRender.RenderAsync("AddressSelect", new Tuple<Element, List<AddressSearchResult>>(element, searchResults));
+                var url = $"/{baseURL}/{page.PageSlug}/address";
+
+                var viewElement = new ElementViewModel
+                {
+                    Element = element,
+                    ReturnURL = url
+                };
+
+                return await _viewRender.RenderAsync("AddressSelect", new Tuple<ElementViewModel, List<AddressSearchResult>>(viewElement, searchResults));
             }
 
             element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid, "-postcode");
