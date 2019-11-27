@@ -7,6 +7,7 @@ using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -26,6 +27,8 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _mockDisallowedKeysOptions = new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
+        private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
+
         public PageHelperTests()
         {
             _mockDisallowedKeysOptions.Setup(_ => _.Value).Returns(new DisallowedAnswerKeysConfiguration
@@ -36,7 +39,9 @@ namespace form_builder_tests.UnitTests.Helpers
                 }
             });
 
-            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object);
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
+
+            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object);
         }
 
         [Fact]

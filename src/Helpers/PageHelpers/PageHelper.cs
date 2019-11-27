@@ -1,9 +1,11 @@
 ﻿using form_builder.Configuration;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
@@ -31,13 +33,14 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IElementHelper _elementHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
-
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys)
+        private readonly IHostingEnvironment _enviroment;
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
             _distributedCache = distributedCache;
             _disallowedKeys = disallowedKeys.Value;
+            _enviroment = enviroment;
         }
 
         public void CheckForDuplicateQuestionIDs(Page page)
@@ -189,7 +192,7 @@ namespace form_builder.Helpers.PageHelpers
             if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
             {
                 element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
-                var url = $"/{baseURL}/{page.PageSlug}/address";
+                var url = $"{_enviroment.EnvironmentName.ToReturnUrlPrefix()}/{baseURL}/{page.PageSlug}/address";
 
                 var viewElement = new ElementViewModel
                 {
