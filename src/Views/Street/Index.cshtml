@@ -9,7 +9,6 @@
     {
         @Html.Raw(Model.RawHTML)
 
-        @Html.HiddenFor(_ => _.Guid)
         @Html.HiddenFor(_ => _.Path)
         <input type="hidden" id="StreetStatus" name="StreetStatus" value="@Model.StreetStatus">
     }

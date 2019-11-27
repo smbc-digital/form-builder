@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithName("form-name")
                 .Build();
 
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "H1"), It.Is<Element>(x => x.Properties.Text == "form-name"), It.IsAny<Dictionary<string, object>>()));
         }
@@ -86,7 +86,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -113,7 +113,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<Tuple<Element, List<AddressSearchResult>>>(), null), Times.Once);
@@ -140,7 +140,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -169,7 +169,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -196,7 +196,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == EElementType.Img.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -207,7 +207,6 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             var guid = Guid.NewGuid();
             var viewModel = new Dictionary<string, string>();
-            viewModel.Add("Guid", guid.ToString());
             viewModel.Add("Path", "path");
 
             var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
@@ -215,7 +214,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
 
-            _pageHelper.SaveAnswers(viewModel);
+            _pageHelper.SaveAnswers(viewModel, guid.ToString());
 
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())));
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == guid.ToString()), It.IsAny<string>(), It.IsAny<CancellationToken>()));
@@ -253,14 +252,12 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
-            var guid = Guid.NewGuid();
             var viewModel = new Dictionary<string, string>();
-            viewModel.Add("Guid", guid.ToString());
             viewModel.Add("Path", "path");
             viewModel.Add("Item1", item1Data);
             viewModel.Add("Item2", item2Data);
 
-            _pageHelper.SaveAnswers(viewModel);
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString());
 
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
@@ -284,12 +281,10 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
 
-            var guid = Guid.NewGuid();
             var viewModel = new Dictionary<string, string>();
-            viewModel.Add("Guid", guid.ToString());
             viewModel.Add("Path", "path");
 
-            _pageHelper.SaveAnswers(viewModel);
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString());
 
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
@@ -310,14 +305,12 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
-            var guid = Guid.NewGuid();
             var viewModel = new Dictionary<string, string>();
-            viewModel.Add("Guid", guid.ToString());
             viewModel.Add("Path", "path");
             viewModel.Add("Item1", item1Data);
             viewModel.Add("Item2", item2Data);
 
-            _pageHelper.SaveAnswers(viewModel);
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString());
 
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 

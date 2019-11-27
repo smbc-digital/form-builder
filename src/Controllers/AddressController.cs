@@ -14,6 +14,8 @@ using form_builder.Providers.Address;
 using System.Linq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
+using Microsoft.AspNetCore.Http;
+using form_builder.Helpers.Session;
 
 namespace form_builder.Controllers
 {
@@ -29,11 +31,13 @@ namespace form_builder.Controllers
 
         private readonly IPageHelper _pageHelper;
 
+        private readonly ISessionHelper _sessionHelper;
+
         private readonly ILogger<HomeController> _logger;
 
         private readonly IEnumerable<IAddressProvider> _addressProviders;
 
-        public AddressController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper, IEnumerable<IAddressProvider> addressProviders)
+        public AddressController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper, IEnumerable<IAddressProvider> addressProviders, ISessionHelper sessionHelper)
         {
             _distributedCache = distributedCache;
             _validators = validators;
@@ -41,21 +45,25 @@ namespace form_builder.Controllers
             _gateway = gateway;
             _pageHelper = pageHelper;
             _logger = logger;
+            _sessionHelper = sessionHelper;
             _addressProviders = addressProviders;
         }
 
         [HttpGet]
         [Route("{form}/{path}/address")]
-        public async Task<IActionResult> Index(string form, string path, [FromQuery] Guid guid)
+        public async Task<IActionResult> Index(string form, string path)
         {
             try
             {
-                var baseForm = await _schemaProvider.Get<FormSchema>(form);
+                var sessionGuid = _sessionHelper.GetSessionGuid();
 
-                if (Guid.Empty == guid)
+                if (sessionGuid == null)
                 {
-                    guid = Guid.NewGuid();
+                    sessionGuid = Guid.NewGuid().ToString();
+                    _sessionHelper.SetSessionGuid(sessionGuid);
                 }
+
+                var baseForm = await _schemaProvider.Get<FormSchema>(form);
 
                 if (string.IsNullOrEmpty(path))
                 {
@@ -68,9 +76,8 @@ namespace form_builder.Controllers
                     return RedirectToAction("Error");
                 }
 
-                var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
+                var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
                 viewModel.AddressStatus = "Search";
-                viewModel.Guid = guid;
                 viewModel.FormName = baseForm.FormName;
 
                 return View(viewModel);
@@ -94,7 +101,7 @@ namespace form_builder.Controllers
             }
 
             var viewModel = NormaliseFormData(formData);
-            var guid = Guid.Parse(viewModel["Guid"]);
+            var guid = _sessionHelper.GetSessionGuid();
 
             var journey = viewModel["AddressStatus"];
             var addressResults = new List<AddressSearchResult>();
@@ -140,25 +147,23 @@ namespace form_builder.Controllers
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, addressResults);
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults);
                 formModel.Path = currentPage.PageSlug;
-                formModel.Guid = guid;
                 formModel.AddressStatus = journey;
                 formModel.FormName = baseForm.FormName;
 
                 return View(formModel);
             }
 
-            _pageHelper.SaveAnswers(viewModel);
+            _pageHelper.SaveAnswers(viewModel, guid);
 
             switch (journey)
             {
                 case "Search":
                     try
                     {
-                        var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, addressResults);
+                        var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults);
                         adddressViewModel.AddressStatus = "Select";
-                        adddressViewModel.Guid = guid;
                         adddressViewModel.FormName = baseForm.FormName;
 
                         return View(adddressViewModel);
@@ -178,14 +183,12 @@ namespace form_builder.Controllers
                             return RedirectToAction("Index", "Home", new
                             {
                                 path = behaviour.PageSlug,
-                                guid,
                                 form = baseForm.BaseURL
                             });
                         case EBehaviourType.SubmitForm:
                             return RedirectToAction("Submit", "Home", new
                             {
-                                form = baseForm.BaseURL,
-                                guid
+                                form = baseForm.BaseURL
                             });
                         default:
                             return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });

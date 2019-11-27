@@ -15,7 +15,5 @@ namespace form_builder.ViewModels
         public string StreetStatus { get; set; }
 
         public string FormName { get; set; }
-
-        public Guid Guid { get; set; }
     }
 }

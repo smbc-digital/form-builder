@@ -1,7 +1,9 @@
 ﻿using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
+using form_builder.Providers.StorageProvider;
 using form_builder_tests.Builders;
+using Moq;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -10,7 +12,13 @@ namespace form_builder_tests.UnitTests.Helpers
 {
     public class ElementHelperTests
     {
-        private ElementHelper _elementHelper = new ElementHelper();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistrbutedCacheWrapper = new Mock<IDistributedCacheWrapper>();
+        private readonly ElementHelper _elementHelper;
+
+        public ElementHelperTests()
+        {
+            _elementHelper = new ElementHelper(_mockDistrbutedCacheWrapper.Object);
+        }
 
         [Theory]
         [InlineData(EElementType.Textbox)]
@@ -29,7 +37,7 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add("test-id", "this is the value");
 
             // Act
-            var result = _elementHelper.CurrentValue(element, viewModel);
+            var result = _elementHelper.CurrentValue(element, viewModel, "", "");
 
             // Assert
             Assert.Equal("this is the value", result);
@@ -50,7 +58,100 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add("test-id2", "this is the value");
 
             // Act
-            var result = _elementHelper.CurrentValue(element, viewModel);
+            var result = _elementHelper.CurrentValue(element, viewModel, "", "");
+
+            // Assert
+            Assert.Equal(string.Empty, result);
+        }
+
+
+        [Fact]
+        public void CurrentValue_ShouldReturnEmpty_WhenCacheDoesNotContainPageData()
+        {
+            // Arrange
+            _mockDistrbutedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("test-id")
+                .WithLabel("test-text")
+                .WithValue("this is the value")
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+
+            // Act
+            var result = _elementHelper.CurrentValue(element, viewModel, "", "");
+
+            // Assert
+            Assert.Equal(string.Empty, result);
+        }
+
+        [Fact]
+        public void CurrentValue_ShouldReturnStoredValueOfElement_WhenCacheDataContainsElementValue()
+        {
+            // Arrange
+            _mockDistrbutedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers
+                {
+                    Pages = new List<PageAnswers>
+                    {
+                        new PageAnswers {
+                        PageSlug = "test-slug",
+                        Answers = new List<Answers>{
+                            new Answers {
+                                QuestionId = "test-id",
+                                Response = "this is the value"
+                                }
+                            }
+                        }
+                    }
+                }));
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("test-id")
+                .WithLabel("test-text")
+                .WithValue("this is the value")
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+
+            // Act
+            var result = _elementHelper.CurrentValue(element, viewModel, "test-slug", "");
+
+            // Assert
+            Assert.Equal("this is the value", result);
+        }
+
+        [Fact]
+        public void CurrentValue_ShouldReturnEmpty_WhenCacheDataDoesNotContainElementValue()
+        {
+            // Arrange
+            _mockDistrbutedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers
+                {
+                    Pages = new List<PageAnswers>
+                    {
+                        new PageAnswers {
+                        PageSlug = "test-slug",
+                        Answers = new List<Answers>()
+                        }
+                    }
+                }));
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("test-id")
+                .WithLabel("test-text")
+                .WithValue("this is the value")
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+
+            // Act
+            var result = _elementHelper.CurrentValue(element, viewModel, "test-slug", "");
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -472,7 +573,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CurrentDateValue_ReturnsCurrentValueOfElement()
+        public void CurrentValue_ReturnsCurrentDateValueOfElement()
         {
             // Arrange
             var questionId = "passportIssued";
@@ -494,9 +595,9 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add(yearId, "2010");
 
             // Act
-            var dayResult = _elementHelper.CurrentDateValue(element, viewModel, "-day");
-            var monthResult = _elementHelper.CurrentDateValue(element, viewModel, "-month");
-            var yearResult = _elementHelper.CurrentDateValue(element, viewModel, "-year");
+            var dayResult = _elementHelper.CurrentValue(element, viewModel, "", "", "-day");
+            var monthResult = _elementHelper.CurrentValue(element, viewModel, "", "", "-month");
+            var yearResult = _elementHelper.CurrentValue(element, viewModel, "", "", "-year");
 
             // Assert
             Assert.Equal("14", dayResult);
@@ -505,7 +606,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CurrentDateValue_ReturnsEmptyStringWhenNoQuestionIdFound()
+        public void CurrentValue_ReturnsEmptyStringWhenNoQuestionIdFound()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -518,9 +619,9 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var dayResult = _elementHelper.CurrentDateValue(element, viewModel, "-day");
-            var monthResult = _elementHelper.CurrentDateValue(element, viewModel, "-month");
-            var yearResult = _elementHelper.CurrentDateValue(element, viewModel, "-year");
+            var dayResult = _elementHelper.CurrentValue(element, viewModel,"","", "-day");
+            var monthResult = _elementHelper.CurrentValue(element, viewModel,"","", "-month");
+            var yearResult = _elementHelper.CurrentValue(element, viewModel,"","", "-year");
 
             // Assert
             Assert.Equal("", dayResult);

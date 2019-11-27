@@ -8,6 +8,7 @@ using form_builder.Extensions;
 using form_builder.Helpers;
 using StockportGovUK.AspNetCore.Gateways;
 using form_builder.Configuration;
+using System;
 
 namespace form_builder
 {
@@ -36,11 +37,11 @@ namespace form_builder
                 .AddIOptionsConfiguration(Configuration)
                 .ConfigureAddressProviders()
                 .ConfigureStreetProviders()
-                .AddHelpers();
+                .AddHelpers()
+                .AddSession(_ => _.IdleTimeout = TimeSpan.FromMinutes(30));
 
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddScoped<IViewRender, ViewRender>();
             services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
         }
 
@@ -55,6 +56,8 @@ namespace form_builder
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
+            app.UseSession();
 
             app.UseHttpsRedirection();
             app.UseMvc(routes =>
