@@ -90,6 +90,22 @@ namespace form_builder.Models
                     {
                         properties.Add("aria-describedby", DescribedByValue("-postcode"));
                     }
+
+                    return properties;
+                case EElementType.Street:
+
+                    properties = new Dictionary<string, object>()
+                    {
+                        { "id", $"{Properties.QuestionId}-street" },
+                        { "maxlength", maxLength },
+                        { "minlength", "3" }
+                    };
+
+                    if (DisplayAriaDescribedby)
+                    {
+                        properties.Add("aria-describedby", DescribedByValue("-street"));
+                    }
+
                     return properties;
                 default:
                     return null;

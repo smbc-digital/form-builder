@@ -36,6 +36,7 @@ namespace form_builder
                 .AddGateways()
                 .AddIOptionsConfiguration(Configuration)
                 .ConfigureAddressProviders()
+                .ConfigureStreetProviders()
                 .AddHelpers()
                 .AddSession(_ => _.IdleTimeout = TimeSpan.FromMinutes(30));
 

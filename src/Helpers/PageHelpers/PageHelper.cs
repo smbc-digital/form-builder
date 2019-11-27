@@ -157,12 +157,29 @@ namespace form_builder.Helpers.PageHelpers
                     case EElementType.Address:
                         formModel.RawHTML += await GenerateAddressHtml(viewModel, page, element, baseForm.BaseURL, addressSearchResults, guid);
                         break;
+                    case EElementType.Street:
+                        formModel.RawHTML += await GenerateStreetHtml(viewModel, page, element, addressSearchResults, guid);
+                        break;
                     default:
                         break;
                 }
             }
 
             return formModel;
+        }
+
+        private async Task<string> GenerateStreetHtml(Dictionary<string, string> viewModel, Page page, Element element, List<AddressSearchResult> searchResults, string guid)
+        {
+            var streetKey = $"{element.Properties.QuestionId}-street";
+
+            if (viewModel.ContainsKey("StreetStatus") && viewModel["StreetStatus"] == "Select" || viewModel.ContainsKey(streetKey) && !string.IsNullOrEmpty(viewModel[streetKey]))
+            {
+                element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
+                return await _viewRender.RenderAsync("StreetSelect", new Tuple<Element, List<AddressSearchResult>>(element, searchResults));
+            }
+
+            element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
+            return await _viewRender.RenderAsync("StreetSearch", element);
         }
 
         private async Task<string> GenerateAddressHtml(Dictionary<string, string> viewModel, Page page, Element element, string baseURL, List<AddressSearchResult> searchResults, string guid)

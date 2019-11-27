@@ -75,6 +75,17 @@ namespace form_builder.Controllers
                     return RedirectToAction("Error");
                 }
 
+               if (page.Elements.Any(_ => _.Type == EElementType.Street))
+                {
+                    return RedirectToAction("Index", "Street",
+                        new
+                        {
+                            form,
+                            path,
+                        }
+                    );
+                }
+
                 if (page.Elements.Any(_ => _.Type == EElementType.Address))
                 {
                     return RedirectToAction("Index", "Address",
