@@ -22,6 +22,7 @@
         Select,
         Checkbox,
         DateInput,
-        Address
+        Address,
+        Street
     }
 }

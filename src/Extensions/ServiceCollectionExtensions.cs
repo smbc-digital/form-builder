@@ -7,6 +7,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Providers.Address;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
+using form_builder.Providers.Street;
 using form_builder.Validators;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -72,6 +73,13 @@ namespace form_builder.Extensions
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
             services.AddSingleton<IAddressProvider, CRMAddressProvider>();
+            return services;
+        }
+
+        public static IServiceCollection ConfigureStreetProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IStreetProvider, FakeStreetProvider>();
+            //services.AddSingleton<IStreetProvider, CRMStreetProvider>();
             return services;
         }
 

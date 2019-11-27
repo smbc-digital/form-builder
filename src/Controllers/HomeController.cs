@@ -14,7 +14,6 @@ using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Logging;
 using System.Net;
-using form_builder.Providers.Address;
 using System.Linq;
 
 namespace form_builder.Controllers
@@ -66,6 +65,18 @@ namespace form_builder.Controllers
                 if (page == null)
                 {
                     return RedirectToAction("Error");
+                }
+
+               if (page.Elements.Any(_ => _.Type == EElementType.Street))
+                {
+                    return RedirectToAction("Index", "Street",
+                        new
+                        {
+                            guid,
+                            form,
+                            path,
+                        }
+                    );
                 }
 
                 if (page.Elements.Any(_ => _.Type == EElementType.Address))
