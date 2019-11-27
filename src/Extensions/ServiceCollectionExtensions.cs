@@ -86,7 +86,7 @@ namespace form_builder.Extensions
         public static IServiceCollection ConfigureStreetProviders(this IServiceCollection services)
         {
             services.AddSingleton<IStreetProvider, FakeStreetProvider>();
-            //services.AddSingleton<IStreetProvider, CRMStreetProvider>();
+            services.AddSingleton<IStreetProvider, CRMStreetProvider>();
             return services;
         }
 

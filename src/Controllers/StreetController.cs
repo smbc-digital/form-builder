@@ -92,6 +92,7 @@ namespace form_builder.Controllers
         public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData)
         {
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
+
             var currentPage = baseForm.GetPage(path);
 
             if (currentPage == null)

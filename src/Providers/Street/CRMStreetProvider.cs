@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using form_builder.Providers.Street;
 using StockportGovUK.AspNetCore.Gateways.VerintServiceGateway;
 using StockportGovUK.NetStandard.Models.Addresses;
 
 namespace form_builder.Providers.Address
 {
-    public class CRMStreetProvider : IAddressProvider
+    public class CRMStreetProvider : IStreetProvider
     {
         public string ProviderName => "CRMStreet";
 
