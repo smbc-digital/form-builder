@@ -103,7 +103,7 @@ namespace form_builder_tests.UnitTests.Helpers
                             new Answers {
                                 QuestionId = "test-id",
                                 Response = "this is the value"
-                                }   
+                                }
                             }
                         }
                     }
@@ -139,7 +139,7 @@ namespace form_builder_tests.UnitTests.Helpers
                         Answers = new List<Answers>()
                         }
                     }
-                })); 
+                }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
@@ -573,7 +573,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CurrentDateValue_ReturnsCurrentValueOfElement()
+        public void CurrentValue_ReturnsCurrentDateValueOfElement()
         {
             // Arrange
             var questionId = "passportIssued";
@@ -595,9 +595,9 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add(yearId, "2010");
 
             // Act
-            var dayResult = _elementHelper.CurrentDateValue(element, viewModel, "-day");
-            var monthResult = _elementHelper.CurrentDateValue(element, viewModel, "-month");
-            var yearResult = _elementHelper.CurrentDateValue(element, viewModel, "-year");
+            var dayResult = _elementHelper.CurrentValue(element, viewModel, "", "", "-day");
+            var monthResult = _elementHelper.CurrentValue(element, viewModel, "", "", "-month");
+            var yearResult = _elementHelper.CurrentValue(element, viewModel, "", "", "-year");
 
             // Assert
             Assert.Equal("14", dayResult);
@@ -606,7 +606,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CurrentDateValue_ReturnsEmptyStringWhenNoQuestionIdFound()
+        public void CurrentValue_ReturnsEmptyStringWhenNoQuestionIdFound()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -619,9 +619,9 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
 
             // Act
-            var dayResult = _elementHelper.CurrentDateValue(element, viewModel, "-day");
-            var monthResult = _elementHelper.CurrentDateValue(element, viewModel, "-month");
-            var yearResult = _elementHelper.CurrentDateValue(element, viewModel, "-year");
+            var dayResult = _elementHelper.CurrentValue(element, viewModel,"","", "-day");
+            var monthResult = _elementHelper.CurrentValue(element, viewModel,"","", "-month");
+            var yearResult = _elementHelper.CurrentValue(element, viewModel,"","", "-year");
 
             // Assert
             Assert.Equal("", dayResult);

@@ -147,9 +147,9 @@ namespace form_builder.Helpers.PageHelpers
                         break;
                     case EElementType.DateInput:
                         _elementHelper.CheckForQuestionId(element);
-                        element.Properties.Day = _elementHelper.CurrentDateValue(element, viewModel, "-day");
-                        element.Properties.Month = _elementHelper.CurrentDateValue(element, viewModel, "-month");
-                        element.Properties.Year = _elementHelper.CurrentDateValue(element, viewModel, "-year");
+                        element.Properties.Day = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid, "-day");
+                        element.Properties.Month = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid, "-month");
+                        element.Properties.Year = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid, "-year");
                         _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("DateInput", element);
@@ -175,7 +175,7 @@ namespace form_builder.Helpers.PageHelpers
                 return await _viewRender.RenderAsync("AddressSelect", new Tuple<Element, List<AddressSearchResult>>(element, searchResults));
             }
 
-            element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
+            element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid, "-postcode");
             return await _viewRender.RenderAsync("AddressSearch", element);
         }
 

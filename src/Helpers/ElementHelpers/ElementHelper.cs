@@ -9,8 +9,7 @@ namespace form_builder.Helpers.ElementHelpers
 {
     public interface IElementHelper
     {
-        string CurrentValue(Element element, Dictionary<string, string> viewModel, string pageSlug, string guid);
-        string CurrentDateValue(Element element, Dictionary<string, string> viewModel, string suffix);
+        string CurrentValue(Element element, Dictionary<string, string> viewModel, string pageSlug, string guid, string suffix = "");
         bool CheckForQuestionId(Element element);
         bool CheckForLabel(Element element);
         bool CheckForMaxLength(Element element);
@@ -31,9 +30,9 @@ namespace form_builder.Helpers.ElementHelpers
             _distributedCache = distributedCacheWrapper;
         }
 
-        public string CurrentValue(Element element, Dictionary<string, string> viewModel, string pageSlug, string guid)
+        public string CurrentValue(Element element, Dictionary<string, string> viewModel, string pageSlug, string guid, string suffix = "")
         {
-            var currentValue = viewModel.ContainsKey(element.Properties.QuestionId);
+            var currentValue = viewModel.ContainsKey($"{element.Properties.QuestionId}{suffix}");
             var cacheData = _distributedCache.GetString(guid);
 
             if (!currentValue && cacheData != null)
@@ -43,7 +42,7 @@ namespace form_builder.Helpers.ElementHelpers
 
                 if (storedValue != null)
                 {
-                    var value = storedValue.Answers.FirstOrDefault(_ => _.QuestionId == element.Properties.QuestionId);
+                    var value = storedValue.Answers.FirstOrDefault(_ => _.QuestionId == $"{element.Properties.QuestionId}{suffix}");
 
                     return value != null ? value.Response : string.Empty;
                 }
@@ -51,7 +50,7 @@ namespace form_builder.Helpers.ElementHelpers
                 return string.Empty;
             }
 
-            return currentValue ? viewModel[element.Properties.QuestionId] : string.Empty;
+            return currentValue ? viewModel[$"{element.Properties.QuestionId}{suffix}"] : string.Empty;
         }
 
         public bool CheckForLabel(Element element)
@@ -164,14 +163,6 @@ namespace form_builder.Helpers.ElementHelpers
                     option.Checked = false;
                 }
             }
-        }
-
-        public string CurrentDateValue(Element element, Dictionary<string, string> viewModel, string idSuffix)
-        {
-
-            var currentValue = viewModel.ContainsKey(element.Properties.QuestionId + idSuffix);
-
-            return currentValue ? viewModel[element.Properties.QuestionId + idSuffix] : string.Empty;
         }
     }
 }
