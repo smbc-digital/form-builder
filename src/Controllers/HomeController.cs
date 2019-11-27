@@ -52,56 +52,36 @@ namespace form_builder.Controllers
         [Route("{form}/{path}")]
         public async Task<IActionResult> Index(string form, string path)
         {
-            try
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+
+            if (string.IsNullOrEmpty(sessionGuid))
             {
-                var sessionGuid = _sessionHelper.GetSessionGuid();
+                sessionGuid = Guid.NewGuid().ToString();
+                _sessionHelper.SetSessionGuid(sessionGuid);
+            }
 
-                if (string.IsNullOrEmpty(sessionGuid))
-                {
-                    sessionGuid = Guid.NewGuid().ToString();
-                    _sessionHelper.SetSessionGuid(sessionGuid);
-                }
+            var baseForm = await _schemaProvider.Get<FormSchema>(form);
 
-                var baseForm = await _schemaProvider.Get<FormSchema>(form);
+            if (string.IsNullOrEmpty(path))
+            {
+                path = baseForm.StartPageSlug;
+            }
 
-                if (string.IsNullOrEmpty(path))
-                {
-                    path = baseForm.StartPageSlug;
-                }
+            var page = baseForm.GetPage(path);
+            if (page == null)
+            {
+                throw new NullReferenceException($"Requested path '{path}' object could not be found.");
+            }
 
-                var page = baseForm.GetPage(path);
-                if (page == null)
-                {
-                    throw new NullReferenceException($"Requested path '{path}' object could not be found.");
-                }
-
-               if (page.Elements.Any(_ => _.Type == EElementType.Street))
-                {
-                    return RedirectToAction("Index", "Street",
-                        new
-                        {
-                            form,
-                            path,
-                        }
-                    );
-                }
-
-                if (page.Elements.Any(_ => _.Type == EElementType.Address))
-                {
-                    return RedirectToAction("Index", "Address",
-                        new
-                        {
-                            form,
-                            path,
-                        }
-                    );
-                }
-
-                var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
-
-                viewModel.Path = path;
-                viewModel.FormName = baseForm.FormName;
-                return View(viewModel);
+            if (page.Elements.Any(_ => _.Type == EElementType.Street))
+            {
+                return RedirectToAction("Index", "Street",
+                    new
+                    {
+                        form,
+                        path,
+                    }
+                );
             }
 
             if (page.Elements.Any(_ => _.Type == EElementType.Address))
@@ -109,17 +89,15 @@ namespace form_builder.Controllers
                 return RedirectToAction("Index", "Address",
                     new
                     {
-                        guid,
                         form,
                         path,
                     }
                 );
             }
 
-            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
+            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
 
             viewModel.Path = path;
-            viewModel.Guid = guid;
             viewModel.FormName = baseForm.FormName;
             return View(viewModel);
         }
@@ -191,8 +169,8 @@ namespace form_builder.Controllers
             var postUrl = currentPage.GetSubmitFormEndpoint(convertedAnswers);
             var postData = CreatePostData(convertedAnswers);
             var reference = string.Empty;
+
             var response = await _gateway.PostAsync(postUrl, postData);
-            
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 // NOTE: Jon H - Is it correct that this throws an exception or is this expceted behavoiour we need to handle?
@@ -215,9 +193,7 @@ namespace form_builder.Controllers
                 return View("Submit", convertedAnswers);
             }
 
-
             var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
-
             var success = new Success { 
                 FormName = baseForm.FormName,
                 Reference = reference,
