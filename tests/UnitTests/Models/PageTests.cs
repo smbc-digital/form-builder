@@ -1,6 +1,7 @@
 ﻿using form_builder.Enum;
 using form_builder.Models;
 using form_builder_tests.Builders;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -42,9 +43,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour)
                 .Build();
 
-            var result = page.GetSubmitFormEndpoint(new FormAnswers());
-
-            Assert.Null(result);
+            Assert.Throws<NullReferenceException>(() => page.GetSubmitFormEndpoint(new FormAnswers()));
         }
 
         [Fact]
