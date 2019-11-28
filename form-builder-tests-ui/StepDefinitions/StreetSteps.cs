@@ -8,7 +8,7 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then(@"I fill in page1")]
         public void ThenIFillInPage1()
         {
-            BrowserSession.FillIn("street-address-street").With("Test road");
+            BrowserSession.FillIn("street-address-street").With("Green");
         }
     }
 }

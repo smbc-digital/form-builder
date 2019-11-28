@@ -19,21 +19,21 @@ Scenario: I navigate to the selection page when street entered
 	When I click the "nextStep" button
 	Then I should see a ".back-button" html element
 	Then I should see the "street-address-street" input
-	Then I should see "0 streets found" is selected in "street-address-street" dropdown with the value ""
+	Then I should see "3 streets found" is selected in "street-address-street" dropdown with the value ""
 
 Scenario: Trigger select validation on no choice made in dropdown
 	Given I navigate to "/street/page1"
 	Then I fill in page1
 	When I click the "nextStep" button
 	Then I should see the "street-address-street" input
-	Then I should see "0 streets found" is selected in "street-address-street" dropdown with the value ""
+	Then I should see "3 streets found" is selected in "street-address-street" dropdown with the value ""
 	When I click the "nextStep" button
 	Then I should see a ".input-error-content" html element
 
-#Scenario: Selecting an address in the dropdown should display the success page
-#	Given I navigate to "/street/page1"
-#	Then I fill in page1
-#	When I click the "nextStep" button
-#	Then I should see the "street-address-street" input
-#	Then I select "address 0" in "street-address-street" dropdown
-#	Then I should see "address 0" is selected in "street-address-street" dropdown with the value "098765432109"
+Scenario: Selecting a street in the dropdown should display the success page
+	Given I navigate to "/street/page1"
+	Then I fill in page1
+	When I click the "nextStep" button
+	Then I should see the "street-address-street" input
+	Then I select "Green lane" in "street-address-street" dropdown
+	Then I should see "Green lane" is selected in "street-address-street" dropdown with the value "123456789012"
