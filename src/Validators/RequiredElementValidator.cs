@@ -36,6 +36,20 @@ namespace form_builder.Validators
                 }
             }
 
+            if (element.Type == EElementType.Street)
+            {
+                if (viewModel["StreetStatus"] == "Select")
+                {
+                    key = $"{element.Properties.QuestionId}-street";
+                    validationMessage = $"{ element.Properties.SelectLabel} is required";
+                }
+                else
+                {
+                    key = $"{element.Properties.QuestionId}-street";
+                    validationMessage = $"{ element.Properties.StreetLabel} is required";
+                }
+            }
+
             var value = viewModel.ContainsKey(key)
                 ? viewModel[key]
                 : null;
