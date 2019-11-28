@@ -38,7 +38,7 @@ namespace form_builder_tests.UnitTests.Controllers
         {
             _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()))
                         .ReturnsAsync(new FormBuilderViewModel());
 
             var cacheData = new FormAnswers

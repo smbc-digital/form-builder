@@ -19,15 +19,16 @@ using Microsoft.Extensions.Logging;
 using StockportGovUK.NetStandard.Models.Addresses;
 using form_builder.Providers.Address;
 using form_builder.Helpers.Session;
+using form_builder.Providers.Street;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
-    public class AddressControllerTests
+    public class StreetControllerTests
     {
-        private AddressController _controller;
+        private StreetController _controller;
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IEnumerable<IAddressProvider>> _mockAddressProviderList = new Mock<IEnumerable<IAddressProvider>>();
-        private readonly Mock<IAddressProvider> _mockAddressProvider = new Mock<IAddressProvider>();
+        private readonly Mock<IEnumerable<IStreetProvider>> _mockStreetProviderList = new Mock<IEnumerable<IStreetProvider>>();
+        private readonly Mock<IStreetProvider> _mockStreetProvider = new Mock<IStreetProvider>();
         private readonly Mock<IEnumerable<IElementValidator>> _validators = new Mock<IEnumerable<IElementValidator>>();
         private readonly Mock<IElementValidator> _testValidator = new Mock<IElementValidator>();
         private readonly Mock<ISchemaProvider> _schemaProvider = new Mock<ISchemaProvider>();
@@ -36,24 +37,24 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<ILogger<HomeController>> _logger = new Mock<ILogger<HomeController>>();
         private readonly Mock<ISessionHelper> _mockSession = new Mock<ISessionHelper>();
 
-        private const string SearchReusltsUniqueId = "123456";
-        private const string SearchReusltsName = "name, street, county";
+        private const string SearchResultsUniqueId = "123456";
+        private const string SearchResultsReference = "Test street";
 
-        public AddressControllerTests()
+        public StreetControllerTests()
         {
             _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, string>>()))
                 .Returns(new ValidationResult { IsValid = true });
 
-            _mockAddressProvider.Setup(_ => _.ProviderName)
-                .Returns("testAddressProvider");
+            _mockStreetProvider.Setup(_ => _.ProviderName)
+                .Returns("testStreetProvider");
 
-            _mockAddressProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
-                .ReturnsAsync(new List<AddressSearchResult> { new AddressSearchResult { UniqueId = SearchReusltsUniqueId, Name = SearchReusltsName } });
+            _mockStreetProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
+                .ReturnsAsync(new List<StockportGovUK.NetStandard.Models.Models.Verint.Street> { new StockportGovUK.NetStandard.Models.Models.Verint.Street { USRN = SearchResultsUniqueId, Reference = SearchResultsReference } });
 
-            var addressProviderItems = new List<IAddressProvider> { _mockAddressProvider.Object };
+            var streetProviderItems = new List<IStreetProvider> { _mockStreetProvider.Object };
             var elementValidatorItems = new List<IElementValidator> { _testValidator.Object };
 
-            _mockAddressProviderList.Setup(m => m.GetEnumerator()).Returns(() => addressProviderItems.GetEnumerator());
+            _mockStreetProviderList.Setup(m => m.GetEnumerator()).Returns(() => streetProviderItems.GetEnumerator());
             _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
 
             _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
@@ -73,15 +74,15 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            _controller = new AddressController(_logger.Object, _mockDistributedCache.Object, _validators.Object, _schemaProvider.Object, _gateWay.Object, _pageHelper.Object, _mockAddressProviderList.Object, _mockSession.Object);
+            _controller = new StreetController(_logger.Object, _mockDistributedCache.Object, _validators.Object, _schemaProvider.Object, _gateWay.Object, _pageHelper.Object, _mockStreetProviderList.Object, _mockSession.Object);
         }
 
         [Fact]
-        public async Task Index_Get_ShouldSetAddressStatusToSearch()
+        public async Task Index_Get_ShouldSetStreetStatusToSearch()
         {
             var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithQuestionId("test-address")
+               .WithType(EElementType.Street)
+               .WithQuestionId("test-street")
                .Build();
 
             var page = new PageBuilder()
@@ -101,13 +102,13 @@ namespace form_builder_tests.UnitTests.Controllers
             var viewResult = Assert.IsType<ViewResult>(result);
             var viewModel = Assert.IsType<FormBuilderViewModel>(viewResult.Model);
 
-            Assert.Equal("Search", viewModel.AddressStatus);
+            Assert.Equal("Search", viewModel.StreetStatus);
         }
 
         [Theory]
         [InlineData(false, "Select")]
         [InlineData(true, "Search")]
-        public async Task Index_Post_ShouldCallAddressProvider_WhenCorrectJourney(bool isValid, string journey)
+        public async Task Index_Post_ShouldCallStreetProvider_WhenCorrectJourney(bool isValid, string journey)
         {
             var questionId = "test-address";
 
@@ -161,13 +162,13 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var result = await _controller.Index("form", "page-one", viewModel);
 
-            _mockAddressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
         public async Task Index_Post_Should_Provide_SearchResults_ToPageHelper()
         {
-            var searchResultsCallback = new List<AddressSearchResult>();
+            var searchResultsCallback = new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>();
             var element = new ElementBuilder()
                .WithType(EElementType.Address)
                .WithQuestionId("test-address")
@@ -187,7 +188,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(schema);
 
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()))
-                .Callback<Page, Dictionary<string, string>, FormSchema, string, List<AddressSearchResult>>((x, y, z, r, w) => searchResultsCallback = w)
+                .Callback<Page, Dictionary<string, string>, FormSchema, string, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>((x, y, z, r, w) => searchResultsCallback = w)
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var viewModel = new ViewModelBuilder()
@@ -198,12 +199,12 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var result = await _controller.Index("form", "page-one", viewModel);
 
-            _mockAddressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()), Times.Once);
             Assert.NotNull(searchResultsCallback);
             Assert.Single(searchResultsCallback);
-            Assert.Equal(SearchReusltsUniqueId, searchResultsCallback[0].UniqueId);
-            Assert.Equal(SearchReusltsName, searchResultsCallback[0].Name);
+            Assert.Equal(SearchResultsUniqueId, searchResultsCallback[0].USRN);
+            Assert.Equal(SearchResultsReference, searchResultsCallback[0].Reference);
         }
 
         [Fact]
@@ -236,7 +237,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .Build();
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _controller.Index("form", "page-one", viewModel));
-            _mockAddressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
+            _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
             Assert.Equal($"No address provider configure for {addressProvider}", result.Message);
         }
 
@@ -244,7 +245,7 @@ namespace form_builder_tests.UnitTests.Controllers
         public async Task Index_Post_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
         {
 
-            _mockAddressProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
+            _mockStreetProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
                 .Throws<Exception>();
             
             var searchResultsCallback = new List<AddressSearchResult>();
@@ -274,7 +275,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _controller.Index("form", "page-one", viewModel));
 
-            _mockAddressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()), Times.Never);
             Assert.StartsWith($"AddressController: An exception has occured while attempting to perform postcode lookup, Exception: ", result.Message);
         }
@@ -346,7 +347,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var result = await _controller.Index("form", "page-one", viewModel);
 
-            _mockAddressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()), Times.Once);
 
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -386,7 +387,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _controller.Index("form", "page-one", viewModel));
 
-            _mockAddressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()), Times.Once);
             Assert.StartsWith("AddressController: An exception has occured while attempting to generate Html, Exception: ", result.Message);
         }
@@ -429,7 +430,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var result = await _controller.Index("form", "page-one", viewModel);
 
-            _mockAddressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
+            _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()), Times.Never);
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
@@ -472,7 +473,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var result = await _controller.Index("form", "page-one", viewModel);
 
-            _mockAddressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
+            _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()), Times.Never);
 
             var redirectResult = Assert.IsType<RedirectResult>(result);

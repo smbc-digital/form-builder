@@ -216,8 +216,74 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<Tuple<ElementViewModel, List<AddressSearchResult>>>(), null), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<Tuple<Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>>(), null), Times.Once);
         }
+
+        [Fact]
+        public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenStreetSearch()
+        {
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Street)
+                .WithPropertyText("text")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add("StreetStatus", "Search");
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            //Act
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
+
+            //Assert
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSearch"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+        }
+
+        //[Fact]
+        //public async Task GenerateHtml_ShouldGenerateValidUrl_ForStreetSelect()
+        //{
+        //    //Arrange
+
+        //    var elementView = new Element();
+        //    var streetList = new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>();
+        //    var callback = new Tuple<Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>(elementView, streetList);
+
+        //    _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Tuple<Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>>(), null))
+        //        .Callback<string, Tuple<Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>, Dictionary<string, object>>((x, y, z) => callback = y);
+
+        //    var pageSlug = "page-one";
+        //    var baseUrl = "test";
+        //    var element = new ElementBuilder()
+        //        .WithType(EElementType.Street)
+        //        .WithPropertyText("text")
+        //        .Build();
+
+        //    var page = new PageBuilder()
+        //        .WithElement(element)
+        //        .WithPageSlug(pageSlug)
+        //        .Build();
+
+        //    var viewModel = new Dictionary<string, string>();
+        //    viewModel.Add("StreetStatus", "Select");
+
+        //    var schema = new FormSchemaBuilder()
+        //        .WithName("form-name")
+        //        .WithBaseUrl(baseUrl)
+        //        .Build();
+
+        //    //Act
+        //    var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
+
+        //    //Assert
+        //    Assert.Equal($"/{baseUrl}/{pageSlug}/street", callback.Item1.);
+        //}
 
         [Theory]
         [InlineData(EElementType.OL)]
