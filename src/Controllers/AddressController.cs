@@ -73,7 +73,7 @@ namespace form_builder.Controllers
                 var page = baseForm.GetPage(path);
                 if (page == null)
                 {
-                    return RedirectToAction("Error");
+                    throw new ApplicationException($"AddressController: GetPage returned null for path: {path} of form: {form}, while performing Get");
                 }
 
                 var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
@@ -84,7 +84,7 @@ namespace form_builder.Controllers
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Error", "Home", new { ex = ex.Message });
+                throw new ApplicationException($"AddressController: An exception has occured while attempting to return Address view Exception: {ex.Message}");
             }
         }
 
@@ -97,7 +97,7 @@ namespace form_builder.Controllers
 
             if (currentPage == null)
             {
-                return RedirectToAction("Error");
+                throw new ApplicationException($"AddressController: GetPage returned null for path: {path} for form: {form}, while performing Post");
             }
 
             var viewModel = NormaliseFormData(formData);
@@ -122,11 +122,7 @@ namespace form_builder.Controllers
 
                 if (provider == null)
                 {
-                    return RedirectToAction("Error", "Home", new
-                    {
-                        form = baseForm.BaseURL,
-                        ex = $"No address provider configure for {addressElement.Properties.AddressProvider}"
-                    });
+                    throw new ApplicationException($"No address provider configure for {addressElement.Properties.AddressProvider}");
                 }
 
                 var postcode = journey == "Select"
@@ -140,8 +136,7 @@ namespace form_builder.Controllers
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError($"AddressController: An exception has occured while attempting to perform postcode lookup, Exception: {e.Message}");
-                    return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+                    throw new ApplicationException($"AddressController: An exception has occured while attempting to perform postcode lookup, Exception: {e.Message}");
                 }
             }
 
@@ -170,8 +165,7 @@ namespace form_builder.Controllers
                     }
                     catch (Exception e)
                     {
-                        _logger.LogError($"AddressController: An exception has occured while attempting to generate Html, Exception: {e.Message}");
-                        return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+                        throw new ApplicationException($"AddressController: An exception has occured while attempting to generate Html, Exception: {e.Message}");
                     };
                 case "Select":
                     var behaviour = currentPage.GetNextPage(viewModel);
@@ -191,15 +185,15 @@ namespace form_builder.Controllers
                                 form = baseForm.BaseURL
                             });
                         default:
-                            return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+                            throw new ApplicationException($"AddressController: Unknown behaviour type");
                     }
                 case "Manual":
                     break;
                 default:
-                    return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+                    throw new ApplicationException($"AddressController: Unknown journey type");
             }
 
-            return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+            throw new ApplicationException($"AddressController: A generic error has occured");
         }
 
         protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)
