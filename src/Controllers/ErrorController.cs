@@ -6,6 +6,7 @@ namespace form_builder.Controllers
     {
         public ActionResult Index()
         {
+            Response.StatusCode = 500;
             return View();
         }
     }
