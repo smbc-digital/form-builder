@@ -20,7 +20,7 @@ namespace form_builder.Helpers.PageHelpers
     {
         void CheckForDuplicateQuestionIDs(Page page);
 
-        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null);
+        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<StockportGovUK.NetStandard.Models.Models.Verint.Street> streetSearchResults = null);
 
         void SaveAnswers(Dictionary<string, string> viewModel, string guid);
 
@@ -37,7 +37,7 @@ namespace form_builder.Helpers.PageHelpers
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment)
         {
             _viewRender = viewRender;
-            _elementHelper = elementHelper;
+            _elementHelper = elementHelper;     
             _distributedCache = distributedCache;
             _disallowedKeys = disallowedKeys.Value;
             _enviroment = enviroment;
@@ -56,7 +56,7 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
-        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null)
+        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<StockportGovUK.NetStandard.Models.Models.Verint.Street> streetSearchResults = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
             if (page.PageSlug.ToLower() != "success")
@@ -161,7 +161,7 @@ namespace form_builder.Helpers.PageHelpers
                         formModel.RawHTML += await GenerateAddressHtml(viewModel, page, element, baseForm.BaseURL, addressSearchResults, guid);
                         break;
                     case EElementType.Street:
-                        formModel.RawHTML += await GenerateStreetHtml(viewModel, page, element, addressSearchResults, guid);
+                        formModel.RawHTML += await GenerateStreetHtml(viewModel, page, element, streetSearchResults, guid);
                         break;
                     default:
                         break;
@@ -171,14 +171,14 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        private async Task<string> GenerateStreetHtml(Dictionary<string, string> viewModel, Page page, Element element, List<AddressSearchResult> searchResults, string guid)
+        private async Task<string> GenerateStreetHtml(Dictionary<string, string> viewModel, Page page, Element element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street> streetSearchResults, string guid)
         {
             var streetKey = $"{element.Properties.QuestionId}-street";
 
             if (viewModel.ContainsKey("StreetStatus") && viewModel["StreetStatus"] == "Select" || viewModel.ContainsKey(streetKey) && !string.IsNullOrEmpty(viewModel[streetKey]))
             {
                 element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
-                return await _viewRender.RenderAsync("StreetSelect", new Tuple<Element, List<AddressSearchResult>>(element, searchResults));
+                return await _viewRender.RenderAsync("StreetSelect", new Tuple<Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>(element, streetSearchResults));
             }
 
             element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);

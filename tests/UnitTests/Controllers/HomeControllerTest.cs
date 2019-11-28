@@ -57,7 +57,7 @@ namespace form_builder_tests.UnitTests.Controllers
         public async Task Index_ShouldCallSchemaProvider_ToGetFormSchema()
         {
             // Act
-            var result = await _homeController.Index("form", "page-one");
+            await Assert.ThrowsAsync<NullReferenceException>(() => _homeController.Index("form", "page-one"));
 
             // Assert
             _schemaProvider.Verify(_ => _.Get<FormSchema>(It.Is<string>(x => x == "form")));
@@ -130,9 +130,11 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task Index_ShouldRedirectToError_WhenPageIsNotWithin_FormSchema()
+        public async Task Index_Application_ShoudlThrowNullException_WhenPageIsNotWithin_FormSchema()
         {
             // Arrange
+            var requestPath = "non-existance-page";
+
             var element = new ElementBuilder()
               .WithType(EElementType.H1)
               .WithQuestionId("test-id")
@@ -152,11 +154,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(schema);
 
             // Act
-            var result = await _homeController.Index("form", "non-existance-page");
-
-            // Assert
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Error", viewResult.ActionName);
+            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _homeController.Index("form", requestPath));
+            Assert.Equal($"Requested path '{requestPath}' object could not be found.", result.Message);
         }
 
         [Fact]
@@ -275,7 +274,7 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task Index_ShouldRunDefaultBehaviour()
+        public async Task Index_Application_ShoudlThrowApplicationException_ShouldRunDefaultBehaviour()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -303,12 +302,10 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new Dictionary<string, string[]>();
 
-            // Act
-            var result = await _homeController.Index("form", "page-one", viewModel);
+            // Act & Assert
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _homeController.Index("form", "page-one", viewModel));
+            Assert.Equal($"The provided behaviour type 'Unknown' is not valid", result.Message);
 
-            // Assert
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Error", viewResult.ActionName);
         }
 
         [Fact]
@@ -408,7 +405,7 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task Submit_ShouldReturnErrorView_WhenGatewayCallFails()
+        public async Task Submit_Applicaton_ShouldCatchException_WhenGatewayCallThrowsException()
         {
             // Arrange
             var guid = Guid.NewGuid();
@@ -434,10 +431,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ThrowsAsync(new Exception("error"));
 
             // Act & Assert
-            var result = await _homeController.Submit("form");
-
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Error", viewResult.ActionName);
+            await Assert.ThrowsAsync<Exception>(() => _homeController.Submit("form"));
         }
 
         [Fact]
@@ -493,17 +487,13 @@ namespace form_builder_tests.UnitTests.Controllers
             _mockSession.Setup(_ => _.GetSessionGuid())
                 .Returns(guid);
 
-            // Act
-            var result = await _homeController.Submit("form");
-
             // Assert
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Error", viewResult.ActionName);
-
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _homeController.Submit("form"));
+            Assert.Equal("A Session GUID was not provided.", result.Message);
         }
 
         [Fact]
-        public async Task Submit_ShouldRedirectToError_WhenNoSubmitUrlSpecified()
+        public async Task Submit_Application_ShoudlThrowApplicationException_WhenNoSubmitUrlSpecified()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -531,16 +521,15 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(schema);
 
             // Act
-            var result = await _homeController.Submit("form");
+            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _homeController.Submit("form"));
 
             // Assert
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Error", viewResult.ActionName);
+            Assert.Equal("HomeController, Submit: No postUrl supplied for submit form", result.Message);
             _gateWay.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
         }
 
         [Fact]
-        public async Task Submit_ShouldRedirectToError_WhenGatewayResponse_IsNotOk()
+        public async Task Submit__Application_ShoudlThrowApplicationException_WhenGatewayResponse_IsNotOk()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -574,17 +563,17 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            _gateWay.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>())).ReturnsAsync(new System.Net.Http.HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.InternalServerError
-            });
+            _gateWay.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.InternalServerError
+                });
 
             // Act
-            var result = await _homeController.Submit("form");
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _homeController.Submit("form"));
 
             // Assert
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Error", viewResult.ActionName);
+            Assert.StartsWith("HomeController, Submit: An exception has occured while attemping to call ", result.Message);
             _gateWay.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
     }

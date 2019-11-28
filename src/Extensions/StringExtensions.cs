@@ -28,14 +28,14 @@ namespace form_builder.Extensions
         {
             switch (value)
             {
-                case "ui-test":
+                case "uitest":
                 case "local":
+                case "prod":
                     return string.Empty;
                 case "int":
                 case "qa":
                 case "stage":
-                case "prod":
-                    return "formbuilder";
+                    return "/formbuilder";
                 default:
                     throw new Exception("Unknown environment name");
 

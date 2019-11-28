@@ -104,7 +104,7 @@ namespace form_builder.Controllers
             var guid = _sessionHelper.GetSessionGuid();
 
             var journey = viewModel["StreetStatus"];
-            var addressResults = new List<AddressSearchResult>();
+            var addressResults = new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>();
 
             currentPage.Validate(viewModel, _validators);
 
@@ -147,7 +147,7 @@ namespace form_builder.Controllers
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults);
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, addressResults);
                 formModel.Path = currentPage.PageSlug;
                 formModel.StreetStatus = journey;
                 formModel.FormName = baseForm.FormName;
@@ -162,7 +162,7 @@ namespace form_builder.Controllers
                 case "Search":
                     try
                     {
-                        var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults);
+                        var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, addressResults);
                         adddressViewModel.StreetStatus = "Select";
                         adddressViewModel.FormName = baseForm.FormName;
 

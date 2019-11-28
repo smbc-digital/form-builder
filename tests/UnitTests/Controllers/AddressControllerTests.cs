@@ -187,7 +187,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(schema);
 
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()))
-                .Callback<Page, Dictionary<string, string>, FormSchema, string, List < AddressSearchResult>>((x, y, z, r, w) => searchResultsCallback = w);
+                .Callback<Page, Dictionary<string, string>, FormSchema, string, List<AddressSearchResult>>((x, y, z, r, w) => searchResultsCallback = w)
+                .ReturnsAsync(new FormBuilderViewModel());
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
@@ -206,12 +207,13 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task Index_Post_RedirectToError_WhenNoMatchingAddressProvider()
+        public async Task Index_Post_Application_ShouldThrowApplicationException_WhenNoMatchingAddressProvider()
         {
+            var addressProvider = "NON-EXIST-PROVIDER";
             var searchResultsCallback = new List<AddressSearchResult>();
             var element = new ElementBuilder()
                .WithType(EElementType.Address)
-               .WithAddressProvider("NON-EXIST-PROVIDER")
+               .WithAddressProvider(addressProvider)
                .WithQuestionId("test-address")
                .Build();
 
@@ -233,16 +235,13 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
-            var result = await _controller.Index("form", "page-one", viewModel);
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _controller.Index("form", "page-one", viewModel));
             _mockAddressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            Assert.Equal("Error", viewResult.ActionName);
-            Assert.Equal("Home", viewResult.ControllerName);
+            Assert.Equal($"No address provider configure for {addressProvider}", result.Message);
         }
 
         [Fact]
-        public async Task Index_Post_RedirectToError_WhenAddressProvider_ThrowsException()
+        public async Task Index_Post_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
         {
 
             _mockAddressProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
@@ -273,15 +272,12 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
-            var result = await _controller.Index("form", "page-one", viewModel);
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _controller.Index("form", "page-one", viewModel));
 
             _mockAddressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Never);
-            Assert.Equal("Error", viewResult.ActionName);
-            Assert.Equal("Home", viewResult.ControllerName);
+            Assert.StartsWith($"AddressController: An exception has occured while attempting to perform postcode lookup, Exception: ", result.Message);
         }
-
 
         [Fact]
         public async Task Index_Post_ShouldReturnView_WhenPageIsInvalid()
@@ -321,6 +317,7 @@ namespace form_builder_tests.UnitTests.Controllers
             Assert.Equal("Search", viewResultModel.AddressStatus);
         }
 
+        [Fact]
         public async Task Index_Post_Should_CallGenerateHtml_AndReturnView_WhenSuccessfulSearchJourney()
         {
             var element = new ElementBuilder()
@@ -357,7 +354,8 @@ namespace form_builder_tests.UnitTests.Controllers
             Assert.Equal("Select", viewResultModel.AddressStatus);
         }
 
-        public async Task Index_Post_Should_RedirectToError_WhenPageHelper_ThrowsException()
+        [Fact]
+        public async Task Index_Post_ApplicationShould_ThrowApplicationException_WhenPageHelper_ThrowsException()
         {
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()))
                 .Throws<Exception>();
@@ -386,14 +384,11 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
-            var result = await _controller.Index("form", "page-one", viewModel);
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _controller.Index("form", "page-one", viewModel));
 
             _mockAddressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
-
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Error", viewResult.ActionName);
-            Assert.Equal("Home", viewResult.ControllerName);
+            Assert.StartsWith("AddressController: An exception has occured while attempting to generate Html, Exception: ", result.Message);
         }
 
 

@@ -15,8 +15,8 @@
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="2.2.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="StockportGovUK.AspNetCore.Gateways" Version="0.8.3-prerelease77" />
-    <PackageReference Include="StockportGovUK.AspNetCore.Middleware.ExceptionHandling" Version="1.0.0" />
+    <PackageReference Include="StockportGovUK.AspNetCore.Gateways" Version="0.8.3-prerelease78" />
+    <PackageReference Include="StockportGovUK.AspNetCore.Middleware.ExceptionHandling" Version="1.0.1" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="2.2.3" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="2.2.5" />
