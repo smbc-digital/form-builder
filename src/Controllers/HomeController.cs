@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using form_builder.Models;
-using form_builder.ViewModels;
 using Newtonsoft.Json;
 using form_builder.Enum;
 using form_builder.Validators;
@@ -15,7 +13,6 @@ using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
 using form_builder.Helpers.Session;
 
 namespace form_builder.Controllers
