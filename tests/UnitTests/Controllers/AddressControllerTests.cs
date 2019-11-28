@@ -187,7 +187,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(schema);
 
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()))
-                .Callback<Page, Dictionary<string, string>, FormSchema, string, List<AddressSearchResult>>((x, y, z, r, w) => searchResultsCallback = w)
+                .Callback<Page, Dictionary<string, string>, FormSchema, string, List<AddressSearchResult>, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>((x, y, z, r, w, p) => searchResultsCallback = w)
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var viewModel = new ViewModelBuilder()
