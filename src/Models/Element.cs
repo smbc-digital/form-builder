@@ -97,8 +97,7 @@ namespace form_builder.Models
                     properties = new Dictionary<string, object>()
                     {
                         { "id", $"{Properties.QuestionId}-street" },
-                        { "maxlength", maxLength },
-                        { "minlength", "3" }
+                        { "maxlength", maxLength }
                     };
 
                     if (DisplayAriaDescribedby)
