@@ -109,7 +109,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [InlineData(true, "Search")]
         public async Task Index_Post_ShouldCallStreetProvider_WhenCorrectJourney(bool isValid, string journey)
         {
-            var questionId = "test-address";
+            var questionId = "test-street";
 
             var cacheData = new FormAnswers
             {
@@ -122,8 +122,8 @@ namespace form_builder_tests.UnitTests.Controllers
                         {
                             new Answers
                             {
-                                QuestionId = $"{questionId}-postcode",
-                                Response = "sk11aa"
+                                QuestionId = $"{questionId}-street",
+                                Response = "test street"
                             }
                         },
                         PageSlug = "page-one"
@@ -136,9 +136,9 @@ namespace form_builder_tests.UnitTests.Controllers
                 .Returns(new ValidationResult { IsValid = isValid });
 
             var element = new ElementBuilder()
-               .WithType(EElementType.Address)
+               .WithType(EElementType.Street)
                .WithQuestionId(questionId)
-               .WithAddressProvider("testAddressProvider")
+               .WithStreetProvider("testStreetProvider")
                .Build();
 
             var page = new PageBuilder()
@@ -155,8 +155,8 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("AddressStatus", journey)
-                .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
+                .WithEntry("StreetStatus", journey)
+                .WithEntry($"{element.Properties.QuestionId}-street", "test street")
                 .Build();
 
             var result = await _controller.Index("form", "page-one", viewModel);
@@ -169,9 +169,9 @@ namespace form_builder_tests.UnitTests.Controllers
         {
             var searchResultsCallback = new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>();
             var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithQuestionId("test-address")
-               .WithAddressProvider("testAddressProvider")
+               .WithType(EElementType.Street)
+               .WithQuestionId("test-street")
+               .WithStreetProvider("testStreetProvider")
                .Build();
 
             var page = new PageBuilder()
@@ -187,13 +187,13 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(schema);
 
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()))
-                .Callback<Page, Dictionary<string, string>, FormSchema, string, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>((x, y, z, r, w) => searchResultsCallback = w)
+                .Callback<Page, Dictionary<string, string>, FormSchema, string, List<AddressSearchResult>, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>((x, y, z, r, p, w) => searchResultsCallback = w)
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("AddressStatus", "Search")
-                .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
+                .WithEntry("StreetStatus", "Search")
+                .WithEntry($"{element.Properties.QuestionId}-street", "Test street")
                 .Build();
 
             var result = await _controller.Index("form", "page-one", viewModel);
@@ -207,79 +207,6 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task Index_Post_Application_ShouldThrowApplicationException_WhenNoMatchingAddressProvider()
-        {
-            var addressProvider = "NON-EXIST-PROVIDER";
-            var searchResultsCallback = new List<AddressSearchResult>();
-            var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithAddressProvider(addressProvider)
-               .WithQuestionId("test-address")
-               .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            var viewModel = new ViewModelBuilder()
-                .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("AddressStatus", "Search")
-                .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
-                .Build();
-
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _controller.Index("form", "page-one", viewModel));
-            _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            Assert.Equal($"No address provider configure for {addressProvider}", result.Message);
-        }
-
-        [Fact]
-        public async Task Index_Post_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
-        {
-
-            _mockStreetProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
-                .Throws<Exception>();
-            
-            var searchResultsCallback = new List<AddressSearchResult>();
-            var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithAddressProvider("testAddressProvider")
-               .WithQuestionId("test-address")
-               .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            var viewModel = new ViewModelBuilder()
-                .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("AddressStatus", "Search")
-                .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
-                .Build();
-
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _controller.Index("form", "page-one", viewModel));
-
-            _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()), Times.Never);
-            Assert.StartsWith($"AddressController: An exception has occured while attempting to perform postcode lookup, Exception: ", result.Message);
-        }
-
-        [Fact]
         public async Task Index_Post_ShouldReturnView_WhenPageIsInvalid()
         {
             _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, string>>()))
@@ -288,8 +215,8 @@ namespace form_builder_tests.UnitTests.Controllers
             var searchResultsCallback = new List<AddressSearchResult>();
             var element = new ElementBuilder()
                .WithType(EElementType.Address)
-               .WithAddressProvider("testAddressProvider")
-               .WithQuestionId("test-address")
+               .WithStreetProvider("testStreetProvider")
+               .WithQuestionId("test-street")
                .Build();
 
             var page = new PageBuilder()
@@ -306,24 +233,24 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("AddressStatus", "Search")
-                .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
+                .WithEntry("StreetStatus", "Search")
+                .WithEntry($"{element.Properties.QuestionId}-street", "Test street")
                 .Build();
 
             var result = await _controller.Index("form", "page-one", viewModel);
             var viewResult = Assert.IsType<ViewResult>(result);
             var viewResultModel = Assert.IsType<FormBuilderViewModel>(viewResult.Model);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()), Times.Once);
-            Assert.Equal("Search", viewResultModel.AddressStatus);
+            Assert.Equal("Search", viewResultModel.StreetStatus);
         }
 
         [Fact]
         public async Task Index_Post_Should_CallGenerateHtml_AndReturnView_WhenSuccessfulSearchJourney()
         {
             var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithQuestionId("test-address")
-               .WithAddressProvider("testAddressProvider")
+               .WithType(EElementType.Street)
+               .WithQuestionId("test-street")
+               .WithStreetProvider("testStreetProvider")
                .Build();
 
             var page = new PageBuilder()
@@ -340,8 +267,8 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("AddressStatus", "Search")
-                .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
+                .WithEntry("StreetStatus", "Search")
+                .WithEntry($"{element.Properties.QuestionId}-street", "test street")
                 .Build();
 
             var result = await _controller.Index("form", "page-one", viewModel);
@@ -351,46 +278,8 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var viewResultModel = Assert.IsType<FormBuilderViewModel>(viewResult.Model);
-            Assert.Equal("Select", viewResultModel.AddressStatus);
+            Assert.Equal("Select", viewResultModel.StreetStatus);
         }
-
-        [Fact]
-        public async Task Index_Post_ApplicationShould_ThrowApplicationException_WhenPageHelper_ThrowsException()
-        {
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()))
-                .Throws<Exception>();
-
-            var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithQuestionId("test-address")
-               .WithAddressProvider("testAddressProvider")
-               .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            var viewModel = new ViewModelBuilder()
-                .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("AddressStatus", "Search")
-                .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
-                .Build();
-
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _controller.Index("form", "page-one", viewModel));
-
-            _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()), Times.Once);
-            Assert.StartsWith("AddressController: An exception has occured while attempting to generate Html, Exception: ", result.Message);
-        }
-
 
         [Theory]
         [InlineData("Submit", EBehaviourType.SubmitForm)]
@@ -398,9 +287,9 @@ namespace form_builder_tests.UnitTests.Controllers
         public async Task Index_Post_Should_PerformRedirectToAction_WhenPageIsValid_And_SelectJourney_OnBehaviour(string viewName, EBehaviourType behaviourType)
         {
             var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithQuestionId("test-address")
-               .WithAddressProvider("testAddressProvider")
+               .WithType(EElementType.Street)
+               .WithQuestionId("test-street")
+               .WithStreetProvider("testStreetProvider")
                .Build();
 
             var behaviour = new BehaviourBuilder()
@@ -423,8 +312,8 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("AddressStatus", "Select")
-                .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
+                .WithEntry("StreetStatus", "Select")
+                .WithEntry($"{element.Properties.QuestionId}-street", "test street")
                 .Build();
 
             var result = await _controller.Index("form", "page-one", viewModel);
@@ -443,7 +332,7 @@ namespace form_builder_tests.UnitTests.Controllers
             var element = new ElementBuilder()
                .WithType(EElementType.Address)
                .WithQuestionId("test-address")
-               .WithAddressProvider("testAddressProvider")
+               .WithStreetProvider("testStreetProvider")
                .Build();
 
             var behaviour = new BehaviourBuilder()
@@ -466,8 +355,8 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("AddressStatus", "Select")
-                .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
+                .WithEntry("StreetStatus", "Select")
+                .WithEntry($"{element.Properties.QuestionId}-street", "test street")
                 .Build();
 
             var result = await _controller.Index("form", "page-one", viewModel);

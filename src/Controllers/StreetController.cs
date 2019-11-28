@@ -125,7 +125,7 @@ namespace form_builder.Controllers
                     return RedirectToAction("Error", "Home", new
                     {
                         form = baseForm.BaseURL,
-                        ex = $"No address provider configure for {addressElement.Properties.StreetProvider}"
+                        ex = $"No street provider configure for {addressElement.Properties.StreetProvider}"
                     });
                 }
 
@@ -140,7 +140,7 @@ namespace form_builder.Controllers
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError($"StreetController: An exception has occured while attempting to perform postcode lookup, Exception: {e.Message}");
+                    _logger.LogError($"StreetController: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
                     return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
                 }
             }
