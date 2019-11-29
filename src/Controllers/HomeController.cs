@@ -112,7 +112,7 @@ namespace form_builder.Controllers
 
             if (currentPage == null)
             {
-                throw new NullReferenceException($"Current page '{path}' object could not be found.");                
+                throw new NullReferenceException($"Current page '{path}' object could not be found.");
             }
 
             currentPage.Validate(viewModel, _validators);
@@ -173,7 +173,7 @@ namespace form_builder.Controllers
                 // NOTE: Jon H - Is it correct that this throws an exception or is this expceted behavoiour we need to handle?
                 throw new ApplicationException($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             }
-            
+
             if (response.Content != null)
             {
                 var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
@@ -185,13 +185,14 @@ namespace form_builder.Controllers
 
             var page = baseForm.GetPage("success");
 
-            if(page == null)
+            if (page == null)
             {
                 return View("Submit", convertedAnswers);
             }
 
             var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
-            var success = new Success { 
+            var success = new Success
+            {
                 FormName = baseForm.FormName,
                 Reference = reference,
                 FormAnswers = convertedAnswers,
@@ -225,16 +226,20 @@ namespace form_builder.Controllers
 
         protected PostData CreatePostData(FormAnswers formAnswers)
         {
-            var postData = new PostData() { Form = formAnswers.FormName, Answers= new List<Answers>()};
+            var postData = new PostData
+            {
+                Form = formAnswers.FormName,
+                Answers = new List<Answers>()
+            };
 
             if (formAnswers.Pages == null)
             {
                 return postData;
             }
 
-            foreach(var page in formAnswers.Pages)
+            foreach (var page in formAnswers.Pages)
             {
-                foreach(var a in page.Answers)
+                foreach (var a in page.Answers)
                 {
                     postData.Answers.Add(a);
                 }
