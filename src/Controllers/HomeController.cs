@@ -63,7 +63,7 @@ namespace form_builder.Controllers
             {
                 path = baseForm.StartPageSlug;
             }
-
+            
             var page = baseForm.GetPage(path);
             if (page == null)
             {

@@ -13,7 +13,7 @@ namespace form_builder.Models
 
         public Page GetPage(string path)
         {
-            var page = Pages.FirstOrDefault(_ => _.PageSlug.ToLower() == path.ToLower());
+            var page = Pages.FirstOrDefault(_ => _.PageSlug.ToLower().Trim() == path.ToLower().Trim());
 
             return page;
         }

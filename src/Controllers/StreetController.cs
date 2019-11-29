@@ -13,7 +13,6 @@ using Microsoft.Extensions.Logging;
 using form_builder.Providers.Street;
 using System.Linq;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
 using form_builder.Helpers.Session;
 
 namespace form_builder.Controllers
@@ -104,50 +103,86 @@ namespace form_builder.Controllers
             var guid = _sessionHelper.GetSessionGuid();
 
             var journey = viewModel["StreetStatus"];
-            var addressResults = new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>();
+            var streetResults = new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>();
 
             currentPage.Validate(viewModel, _validators);
 
-            if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
+            //temp If the element isn't madatory and it's been left empty.... just go to the next page.
+            var cachedAnswers = _distributedCache.GetString(guid.ToString());
+            var streetElement = currentPage.Elements.Where(_ => _.Type == EElementType.Street).FirstOrDefault();
+            var convertedAnswers = cachedAnswers == null
+                        ? new FormAnswers { Pages = new List<PageAnswers>() }
+                        : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+            var street = journey == "Select"
+                ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}-street").Response
+                : viewModel[$"{streetElement.Properties.QuestionId}-street"];
+            if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
             {
-                var cachedAnswers = _distributedCache.GetString(guid.ToString());
-                var convertedAnswers = cachedAnswers == null
-                    ? new FormAnswers { Pages = new List<PageAnswers>() }
-                    : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-
-                var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Street).FirstOrDefault();
-                var provider = _streetProviders.ToList()
-                    .Where(_ => _.ProviderName == addressElement.Properties.StreetProvider)
-                    .FirstOrDefault();
-
-                if (provider == null)
+                var behaviour = currentPage.GetNextPage(viewModel);
+                switch (behaviour.BehaviourType)
                 {
-                    return RedirectToAction("Error", "Home", new
-                    {
-                        form = baseForm.BaseURL,
-                        ex = $"No street provider configure for {addressElement.Properties.StreetProvider}"
-                    });
-                }
-
-                var postcode = journey == "Select"
-                    ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-street").Response
-                    : viewModel[$"{addressElement.Properties.QuestionId}-street"];
-
-                try
-                {
-                    var result = await provider.SearchAsync(postcode);
-                    addressResults = result.ToList();
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError($"StreetController: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
-                    return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+                    case EBehaviourType.GoToExternalPage:
+                        return Redirect(behaviour.PageSlug);
+                    case EBehaviourType.GoToPage:
+                        return RedirectToAction("Index", "Home", new
+                        {
+                            path = behaviour.PageSlug,
+                            guid,
+                            form = baseForm.BaseURL
+                        });
+                    case EBehaviourType.SubmitForm:
+                        return RedirectToAction("Submit", "Home", new
+                        {
+                            form = baseForm.BaseURL,
+                            guid
+                        });
+                    default:
+                        return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
                 }
             }
 
+            //temp
+
+                if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
+                {
+                    //var cachedAnswers = _distributedCache.GetString(guid.ToString());
+                    //var convertedAnswers = cachedAnswers == null
+                    //    ? new FormAnswers { Pages = new List<PageAnswers>() }
+                    //    : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+                    //
+                    //var streetElement = currentPage.Elements.Where(_ => _.Type == EElementType.Street).FirstOrDefault();
+                    var provider = _streetProviders.ToList()
+                        .Where(_ => _.ProviderName == streetElement.Properties.StreetProvider)
+                        .FirstOrDefault();
+
+                    if (provider == null)
+                    {
+                        return RedirectToAction("Error", "Home", new
+                        {
+                            form = baseForm.BaseURL,
+                            ex = $"No street provider configure for {streetElement.Properties.StreetProvider}"
+                        });
+                    }
+
+                    //var street = journey == "Select"
+                    //    ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}-street").Response
+                    //    : viewModel[$"{streetElement.Properties.QuestionId}-street"];
+
+                    try
+                    {
+                        var result = await provider.SearchAsync(street);
+                        streetResults = result.ToList();
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError($"StreetController: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
+                        return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+                    }
+                }
+
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, addressResults);
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, streetResults);
                 formModel.Path = currentPage.PageSlug;
                 formModel.StreetStatus = journey;
                 formModel.FormName = baseForm.FormName;
@@ -162,11 +197,11 @@ namespace form_builder.Controllers
                 case "Search":
                     try
                     {
-                        var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, addressResults);
-                        adddressViewModel.StreetStatus = "Select";
-                        adddressViewModel.FormName = baseForm.FormName;
+                        var streetViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, streetResults);
+                        streetViewModel.StreetStatus = "Select";
+                        streetViewModel.FormName = baseForm.FormName;
 
-                        return View(adddressViewModel);
+                        return View(streetViewModel);
                     }
                     catch (Exception e)
                     {
@@ -206,7 +241,6 @@ namespace form_builder.Controllers
 
         protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)
         {
-
             var normaisedFormData = new Dictionary<string, string>();
 
             foreach (var item in formData)
