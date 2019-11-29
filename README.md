@@ -90,6 +90,7 @@ Example JSON:
     * [Img](#Imgprops) (Image)
     * [DateInput](#DateInputprops)
     * [Address](#Address)
+    * [Street](#Street)
     
 
 
@@ -521,6 +522,31 @@ Address example:
                 "SelectHint": "Select the address below",
                 "MaxLength": "10"
             }
+    }
+```
+#
+  * <a name="Street">**Street**</a>
+    * QuestionId (*string*) __*__
+    * StreetProvider (*string*) __*__ (FAKEStreet or CRMStreet)
+    * StreetLabel (*string*) __*__
+    * Hint (*string*) 
+    * SelectLabel (*string*) __*__
+    * SelectHint (*string*)
+    * MaxLength (*string*)
+
+Address example:
+```json
+    {
+          "Type": "Street",
+          "Properties": {
+            "QuestionId": "street-address",
+            "StreetLabel": "Search for a street by name",
+            "Hint": "e.g. 'Hibbert' or 'Hibbert Lane'",
+            "SelectLabel": "Street",
+            "SelectHint": "Choose a street",
+            "StreetProvider": "CRMStreet",
+            "MaxLength": "20"
+          }
     }
 ```
 
