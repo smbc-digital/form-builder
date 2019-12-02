@@ -1,9 +1,11 @@
 ﻿using form_builder.Configuration;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
@@ -18,11 +20,11 @@ namespace form_builder.Helpers.PageHelpers
     {
         void CheckForDuplicateQuestionIDs(Page page);
 
-        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, List<AddressSearchResult> addressSearchResults = null);
+        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<StockportGovUK.NetStandard.Models.Models.Verint.Street> streetSearchResults = null);
 
-        void SaveAnswers(Dictionary<string, string> viewModel);
+        void SaveAnswers(Dictionary<string, string> viewModel, string guid);
 
-        bool CheckForStartPage(FormSchema form, Page page);
+        bool CheckForStartPageSlug(FormSchema form, Page page);
     }
 
     public class PageHelper : IPageHelper
@@ -31,13 +33,14 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IElementHelper _elementHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
-
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys)
+        private readonly IHostingEnvironment _enviroment;
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment)
         {
             _viewRender = viewRender;
-            _elementHelper = elementHelper;
+            _elementHelper = elementHelper;     
             _distributedCache = distributedCache;
             _disallowedKeys = disallowedKeys.Value;
+            _enviroment = enviroment;
         }
 
         public void CheckForDuplicateQuestionIDs(Page page)
@@ -53,12 +56,12 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
-        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, List<AddressSearchResult> addressSearchResults = null)
+        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<StockportGovUK.NetStandard.Models.Models.Verint.Street> streetSearchResults = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
-            if (page.PageURL.ToLower() != "success")
+            if (page.PageSlug.ToLower() != "success")
             {
-                formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new Property { Text = baseForm.Name } });
+                formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new Property { Text = baseForm.FormName } });
             }
             formModel.FeedbackForm = baseForm.FeedbackForm;
 
@@ -107,32 +110,32 @@ namespace form_builder.Helpers.PageHelpers
                         break;
                     case EElementType.Textbox:
                         _elementHelper.CheckForQuestionId(element);
-                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
                         _elementHelper.CheckForLabel(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Textbox", element);
                         break;
                     case EElementType.Textarea:
                         _elementHelper.CheckForQuestionId(element);
-                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
                         _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckForMaxLength(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Textarea", element);
                         break;
                     case EElementType.Radio:
                         _elementHelper.CheckForQuestionId(element);
-                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
                         _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckForRadioOptions(element);
                         _elementHelper.ReCheckPreviousRadioOptions(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Radio", element);
                         break;
                     case EElementType.Button:
-                        var viewData = new Dictionary<string, object> { { "displayAnchor", !CheckForStartPage(baseForm, page) } };
+                        var viewData = new Dictionary<string, object> { { "displayAnchor", !CheckForStartPageSlug(baseForm, page) } };
                         formModel.RawHTML += await _viewRender.RenderAsync("Button", element, viewData);
                         break;
                     case EElementType.Select:
                         _elementHelper.CheckForQuestionId(element);
-                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
                         _elementHelper.ReSelectPreviousSelectedOptions(element);
                         _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckForSelectOptions(element);
@@ -140,22 +143,25 @@ namespace form_builder.Helpers.PageHelpers
                         break;
                     case EElementType.Checkbox:
                         _elementHelper.CheckForQuestionId(element);
-                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+                        element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
                         _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckForCheckBoxListValues(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("Checkbox", element);
                         break;
                     case EElementType.DateInput:
                         _elementHelper.CheckForQuestionId(element);
-                        element.Properties.Day = _elementHelper.CurrentDateValue(element, viewModel, "-day");
-                        element.Properties.Month = _elementHelper.CurrentDateValue(element, viewModel, "-month");
-                        element.Properties.Year = _elementHelper.CurrentDateValue(element, viewModel, "-year");
+                        element.Properties.Day = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid, "-day");
+                        element.Properties.Month = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid, "-month");
+                        element.Properties.Year = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid, "-year");
                         _elementHelper.CheckForLabel(element);
                         _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element);
                         formModel.RawHTML += await _viewRender.RenderAsync("DateInput", element);
                         break;
                     case EElementType.Address:
-                        formModel.RawHTML += await GenerateAddressHtml(viewModel, page, element, addressSearchResults);
+                        formModel.RawHTML += await GenerateAddressHtml(viewModel, page, element, baseForm.BaseURL, addressSearchResults, guid);
+                        break;
+                    case EElementType.Street:
+                        formModel.RawHTML += await GenerateStreetHtml(viewModel, page, element, streetSearchResults, guid);
                         break;
                     default:
                         break;
@@ -165,23 +171,44 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        private async Task<string> GenerateAddressHtml(Dictionary<string, string> viewModel, Page page, Element element, List<AddressSearchResult> searchResults)
+        private async Task<string> GenerateStreetHtml(Dictionary<string, string> viewModel, Page page, Element element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street> streetSearchResults, string guid)
+        {
+            var streetKey = $"{element.Properties.QuestionId}-street";
+
+            if (viewModel.ContainsKey("StreetStatus") && viewModel["StreetStatus"] == "Select" || viewModel.ContainsKey(streetKey) && !string.IsNullOrEmpty(viewModel[streetKey]))
+            {
+                element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
+                return await _viewRender.RenderAsync("StreetSelect", new Tuple<Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>(element, streetSearchResults));
+            }
+
+            element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
+            return await _viewRender.RenderAsync("StreetSearch", element);
+        }
+
+        private async Task<string> GenerateAddressHtml(Dictionary<string, string> viewModel, Page page, Element element, string baseURL, List<AddressSearchResult> searchResults, string guid)
         {
             var postcodeKey = $"{element.Properties.QuestionId}-postcode";
 
             if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
             {
-                element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
-                return await _viewRender.RenderAsync("AddressSelect", new Tuple<Element, List<AddressSearchResult>>(element, searchResults));
+                element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
+                var url = $"{_enviroment.EnvironmentName.ToReturnUrlPrefix()}/{baseURL}/{page.PageSlug}/address";
+
+                var viewElement = new ElementViewModel
+                {
+                    Element = element,
+                    ReturnURL = url
+                };
+
+                return await _viewRender.RenderAsync("AddressSelect", new Tuple<ElementViewModel, List<AddressSearchResult>>(viewElement, searchResults));
             }
 
-            element.Properties.Value = _elementHelper.CurrentValue(element, viewModel);
+            element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid, "-postcode");
             return await _viewRender.RenderAsync("AddressSearch", element);
         }
 
-        public void SaveAnswers(Dictionary<string, string> viewModel)
+        public void SaveAnswers(Dictionary<string, string> viewModel, string guid)
         {
-            var guid = viewModel["Guid"];
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
@@ -190,9 +217,9 @@ namespace form_builder.Helpers.PageHelpers
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
             }
 
-            if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageUrl == viewModel["Path"].ToLower()))
+            if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == viewModel["Path"].ToLower()))
             {
-                convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageUrl != viewModel["Path"].ToLower()).ToList();
+                convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageSlug != viewModel["Path"].ToLower()).ToList();
             }
 
             var answers = new List<Answers>();
@@ -207,7 +234,7 @@ namespace form_builder.Helpers.PageHelpers
 
             convertedAnswers.Pages.Add(new PageAnswers
             {
-                PageUrl = viewModel["Path"].ToLower(),
+                PageSlug = viewModel["Path"].ToLower(),
                 Answers = answers
             });
             convertedAnswers.Path = viewModel["Path"];
@@ -215,9 +242,9 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
-        public bool CheckForStartPage(FormSchema form, Page page)
+        public bool CheckForStartPageSlug(FormSchema form, Page page)
         {
-            return form.StartPage == page.PageURL;
+            return form.StartPageSlug == page.PageSlug;
         }
     }
 }

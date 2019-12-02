@@ -1,0 +1,8 @@
+@using form_builder.Configuration;
+@inject ITagManagerConfiguration configuration
+
+@if(!string.IsNullOrEmpty(configuration.TagManagerId))
+{
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=@configuration.TagManagerId"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+}

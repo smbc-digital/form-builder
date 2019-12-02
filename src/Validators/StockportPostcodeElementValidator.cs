@@ -16,23 +16,37 @@ namespace form_builder.Validators
                 };
             }
 
-            if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && element.Properties.Optional)
+            if (element.Properties.QuestionId != "customers-address")
             {
-                return new ValidationResult
+                if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && element.Properties.Optional)
                 {
-                    IsValid = true
-                };
+                    return new ValidationResult
+                    {
+                        IsValid = true
+                    };
+                }
             }
 
-            if ((!element.Properties.StockportPostcode.HasValue || !element.Properties.StockportPostcode.Value) || !viewModel.ContainsKey(element.Properties.QuestionId))
+            if (!viewModel.ContainsKey("customers-address-postcode"))
             {
-                return new ValidationResult
+                if ((!element.Properties.StockportPostcode.HasValue || !element.Properties.StockportPostcode.Value) || !viewModel.ContainsKey(element.Properties.QuestionId))
                 {
-                    IsValid = true
-                };
+                    return new ValidationResult
+                    {
+                        IsValid = true
+                    };
+                }
             }
 
-            var value = viewModel[element.Properties.QuestionId];
+            string value;
+            if (!viewModel.ContainsKey("customers-address-postcode"))
+            {
+                value = viewModel[element.Properties.QuestionId];
+            }
+            else
+            {
+                value = viewModel["customers-address-postcode"];
+            }
 
             var isValid = true;
             var regex = new Regex(@"^(sK|Sk|SK|sk|M|m)[0-9][0-9A-Za-z]?\s?[0-9][A-Za-z]{2}");

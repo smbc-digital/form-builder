@@ -14,6 +14,7 @@ using form_builder.Providers.Address;
 using System.Linq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
+using form_builder.Helpers.Session;
 
 namespace form_builder.Controllers
 {
@@ -29,11 +30,13 @@ namespace form_builder.Controllers
 
         private readonly IPageHelper _pageHelper;
 
+        private readonly ISessionHelper _sessionHelper;
+
         private readonly ILogger<HomeController> _logger;
 
         private readonly IEnumerable<IAddressProvider> _addressProviders;
 
-        public AddressController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper, IEnumerable<IAddressProvider> addressProviders)
+        public AddressController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper, IEnumerable<IAddressProvider> addressProviders, ISessionHelper sessionHelper)
         {
             _distributedCache = distributedCache;
             _validators = validators;
@@ -41,43 +44,46 @@ namespace form_builder.Controllers
             _gateway = gateway;
             _pageHelper = pageHelper;
             _logger = logger;
+            _sessionHelper = sessionHelper;
             _addressProviders = addressProviders;
         }
 
         [HttpGet]
         [Route("{form}/{path}/address")]
-        public async Task<IActionResult> Index(string form, string path, [FromQuery] Guid guid)
+        public async Task<IActionResult> Index(string form, string path)
         {
             try
             {
-                var baseForm = await _schemaProvider.Get<FormSchema>(form);
+                var sessionGuid = _sessionHelper.GetSessionGuid();
 
-                if (Guid.Empty == guid)
+                if (sessionGuid == null)
                 {
-                    guid = Guid.NewGuid();
+                    sessionGuid = Guid.NewGuid().ToString();
+                    _sessionHelper.SetSessionGuid(sessionGuid);
                 }
+
+                var baseForm = await _schemaProvider.Get<FormSchema>(form);
 
                 if (string.IsNullOrEmpty(path))
                 {
-                    path = baseForm.StartPage;
+                    path = baseForm.StartPageSlug;
                 }
 
                 var page = baseForm.GetPage(path);
                 if (page == null)
                 {
-                    return RedirectToAction("Error");
+                    throw new ApplicationException($"AddressController: GetPage returned null for path: {path} of form: {form}, while performing Get");
                 }
 
-                var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm);
+                var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
                 viewModel.AddressStatus = "Search";
-                viewModel.Guid = guid;
-                viewModel.FormName = baseForm.Name;
+                viewModel.FormName = baseForm.FormName;
 
                 return View(viewModel);
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Error", "Home", new { ex = ex.Message });
+                throw new ApplicationException($"AddressController: An exception has occured while attempting to return Address view Exception: {ex.Message}");
             }
         }
 
@@ -90,11 +96,11 @@ namespace form_builder.Controllers
 
             if (currentPage == null)
             {
-                return RedirectToAction("Error");
+                throw new ApplicationException($"AddressController: GetPage returned null for path: {path} for form: {form}, while performing Post");
             }
 
             var viewModel = NormaliseFormData(formData);
-            var guid = Guid.Parse(viewModel["Guid"]);
+            var guid = _sessionHelper.GetSessionGuid();
 
             var journey = viewModel["AddressStatus"];
             var addressResults = new List<AddressSearchResult>();
@@ -115,15 +121,11 @@ namespace form_builder.Controllers
 
                 if (provider == null)
                 {
-                    return RedirectToAction("Error", "Home", new
-                    {
-                        form = baseForm.BaseURL,
-                        ex = $"No address provider configure for {addressElement.Properties.AddressProvider}"
-                    });
+                    throw new ApplicationException($"No address provider configure for {addressElement.Properties.AddressProvider}");
                 }
 
                 var postcode = journey == "Select"
-                    ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageUrl == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
+                    ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
                     : viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
 
                 try
@@ -133,70 +135,64 @@ namespace form_builder.Controllers
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError($"AddressController: An exception has occured while attempting to perform postcode lookup, Exception: {e.Message}");
-                    return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+                    throw new ApplicationException($"AddressController: An exception has occured while attempting to perform postcode lookup, Exception: {e.Message}");
                 }
             }
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, addressResults);
-                formModel.Path = currentPage.PageURL;
-                formModel.Guid = guid;
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults);
+                formModel.Path = currentPage.PageSlug;
                 formModel.AddressStatus = journey;
-                formModel.FormName = baseForm.Name;
+                formModel.FormName = baseForm.FormName;
 
                 return View(formModel);
             }
 
-            _pageHelper.SaveAnswers(viewModel);
+            _pageHelper.SaveAnswers(viewModel, guid);
 
             switch (journey)
             {
                 case "Search":
                     try
                     {
-                        var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, addressResults);
+                        var adddressViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults);
                         adddressViewModel.AddressStatus = "Select";
-                        adddressViewModel.Guid = guid;
-                        adddressViewModel.FormName = baseForm.Name;
+                        adddressViewModel.FormName = baseForm.FormName;
 
                         return View(adddressViewModel);
                     }
                     catch (Exception e)
                     {
-                        _logger.LogError($"AddressController: An exception has occured while attempting to generate Html, Exception: {e.Message}");
-                        return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+                        throw new ApplicationException($"AddressController: An exception has occured while attempting to generate Html, Exception: {e.Message}");
                     };
                 case "Select":
                     var behaviour = currentPage.GetNextPage(viewModel);
                     switch (behaviour.BehaviourType)
                     {
                         case EBehaviourType.GoToExternalPage:
-                            return Redirect(behaviour.pageURL);
+                            return Redirect(behaviour.PageSlug);
                         case EBehaviourType.GoToPage:
                             return RedirectToAction("Index", "Home", new
                             {
-                                path = behaviour.pageURL,
-                                guid,
+                                path = behaviour.PageSlug,
                                 form = baseForm.BaseURL
                             });
                         case EBehaviourType.SubmitForm:
                             return RedirectToAction("Submit", "Home", new
                             {
-                                form = baseForm.BaseURL,
-                                guid
+                                form = baseForm.BaseURL
                             });
                         default:
-                            return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+                            throw new ApplicationException($"AddressController: Unknown behaviour type");
                     }
                 case "Manual":
                     break;
                 default:
-                    return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+                    throw new ApplicationException($"AddressController: Unknown journey type");
             }
 
-            return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+            throw new ApplicationException($"AddressController: A generic error has occured");
         }
 
         protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)

@@ -32,8 +32,9 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
             _mockS3gateway.Setup(_ => _.GetObject(It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new AmazonS3Exception("amazon exception"));
 
-            await Assert.ThrowsAsync<AmazonS3Exception>(() => _s3Schema.Get<string>("name"));
+            var result = await Assert.ThrowsAsync<Exception>(() => _s3Schema.Get<string>("name"));
             _mockS3gateway.Verify(_ => _.GetObject(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            Assert.StartsWith("S3FileSchemaProvider: An error has occured while attempting to get S3 Object, Exception:", result.Message);
         }
 
         [Fact]
@@ -42,8 +43,9 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
             _mockS3gateway.Setup(_ => _.GetObject(It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception("an exception"));
 
-            await Assert.ThrowsAsync<Exception>(() => _s3Schema.Get<string>("name"));
+            var result = await Assert.ThrowsAsync<Exception>(() => _s3Schema.Get<string>("name"));
             _mockS3gateway.Verify(_ => _.GetObject(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            Assert.StartsWith("S3FileSchemaProvider: An error has occured while attempting to deserialize object, Exception:", result.Message);
         }
     }
 }

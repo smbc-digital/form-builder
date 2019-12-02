@@ -1,28 +1,28 @@
 ﻿@using form_builder.Helpers
 @using StockportGovUK.NetStandard.Models.Addresses;
-@model Tuple<form_builder.Models.Element, List<AddressSearchResult>>
+@model Tuple<form_builder.ViewModels.ElementViewModel, List<AddressSearchResult>>
 @{
-    var questionId = $"{Model.Item1.Properties.QuestionId}-address";
+    var questionId = $"{Model.Item1.Element.Properties.QuestionId}-address";
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
     var addresSearchCount = $"{Model.Item2.Count} addresses found";
 }
 
-@await Html.BeginFieldSet(Model.Item1, "-address")
+@await Html.BeginFieldSet(Model.Item1.Element, "-address")
 
-<p><a class="back-button" href="javascript:history.back()">Change</a></p>
+<p><a class="back-button" href="@Model.Item1.ReturnURL">Change</a></p>
 
 <legend>
-    <label @Model.Item1.WriteOptional() for="@questionId">@Model.Item1.Properties.AddressLabel</label>
-    @if (Model.Item1.Properties?.Optional ?? true)
+    <label @Model.Item1.Element.WriteOptional() for="@questionId">@Model.Item1.Element.Properties.AddressLabel</label>
+    @if (Model.Item1.Element.Properties?.Optional ?? true)
     {
         <p class="optional">(optional)</p>
     }
 </legend>
 
-@if (!string.IsNullOrEmpty(Model.Item1.Properties.SelectHint))
+@if (!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectHint))
 {
-    <p id=@hintId>@Html.Raw(Model.Item1.Properties.SelectHint)</p>
+    <p id=@hintId>@Html.Raw(Model.Item1.Element.Properties.SelectHint)</p>
 }
 
 <select id="@questionId" name="@questionId">
@@ -33,10 +33,10 @@
     }
 </select>
 
-@if (!Model.Item1.IsValid)
+@if (!Model.Item1.Element.IsValid)
 {
     {
-        var validationMessage = string.IsNullOrEmpty(Model.Item1.Properties.CustomValidationMessage) ? Model.Item1.ValidationMessage : Model.Item1.Properties.CustomValidationMessage;
+        var validationMessage = string.IsNullOrEmpty(Model.Item1.Element.Properties.CustomValidationMessage) ? Model.Item1.Element.ValidationMessage : Model.Item1.Element.Properties.CustomValidationMessage;
         <p class="input-error-content" id="@errorId">@validationMessage</p>
     }
 }

@@ -90,6 +90,7 @@ Example JSON:
     * [Img](#Imgprops) (Image)
     * [DateInput](#DateInputprops)
     * [Address](#Address)
+    * [Street](#Street)
     
 
 
@@ -523,6 +524,31 @@ Address example:
             }
     }
 ```
+#
+  * <a name="Street">**Street**</a>
+    * QuestionId (*string*) __*__
+    * StreetProvider (*string*) __*__ (FAKEStreet or CRMStreet)
+    * StreetLabel (*string*) __*__
+    * Hint (*string*) 
+    * SelectLabel (*string*) __*__
+    * SelectHint (*string*)
+    * MaxLength (*string*)
+
+Address example:
+```json
+    {
+          "Type": "Street",
+          "Properties": {
+            "QuestionId": "street-address",
+            "StreetLabel": "Search for a street by name",
+            "Hint": "e.g. 'Hibbert' or 'Hibbert Lane'",
+            "SelectLabel": "Street",
+            "SelectHint": "Choose a street",
+            "StreetProvider": "CRMStreet",
+            "MaxLength": "20"
+          }
+    }
+```
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>
 Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer:
@@ -560,12 +586,12 @@ Example where if a user selects yes they will continue on with the form, otherwi
 
 ## Success Page
 
-The success page is a page with with the pageurl of success it is of the form it should be at the end of the form afte the submit.
+The success page is a page with with the PageSlug of success it is of the form it should be at the end of the form afte the submit.
 
 ```json
 {
       "Title": "Thank you for submitting your views on fruit",
-      "PageURL": "success",
+      "PageSlug": "success",
       "Elements": [
         {
           "Type": "p",
@@ -605,3 +631,44 @@ $ dotnet test ./form-builder-tests-ui/form-builder-tests-ui.csproj
 ```
 
 It is possible to change the default browser the UI Tests are run from, to do this you need to modify the BrowserConfiguration to run with firefox or another browser of your choice.
+
+# AWS Architecture Decisions #
+This section will be used to document the decisions made throughout the development process.
+
+## Form Builder Storage Stack
+The formbuilder storage components will be provisioned by a Cloudformation stack. Jon H & Jake decided that the stack would include an S3 Bucket, IAM User and a User Policy to handle the storage of json files. 
+
+### IAM User Policy Example
+The example below shows the policy we manually created and applied to a test user:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutAccountPublicAccessBlock",
+                "s3:GetAccountPublicAccessBlock",
+                "s3:ListAllMyBuckets",
+                "s3:ListJobs",
+                "s3:CreateJob",
+                "s3:HeadBucket"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::bucketname/*",
+                "arn:aws:s3:::bucketname"
+            ]
+        }
+    ]
+}
+```
+## FormBuilder Bucket Config
+The S3 bucket used during testing was cofigured to 'Block all public access' to 'On'.
+
+The bucket will be created using a Cloudformation template with the folder structure created by the template. 

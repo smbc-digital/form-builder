@@ -93,6 +93,27 @@ namespace form_builder_tests.UnitTests.Models
         }
 
         [Fact]
+        public void GenerateElementProperties_ShouldReturnCorrectPropertiesFor_Street()
+        {
+            var questionId = "test-street-question-id";
+            var length = 5;
+
+            var element = new ElementBuilder()
+                            .WithType(EElementType.Street)
+                            .WithQuestionId(questionId)
+                            .WithMaxLength(length)
+                            .Build();
+
+            var result = element.GenerateElementProperties();
+
+            Assert.NotEmpty(result);
+            Assert.True(result.ContainsKey("id"));
+            Assert.True(result.ContainsKey("maxlength"));
+            Assert.True(result.ContainsValue($"{questionId}-street"));
+            Assert.True(result.ContainsValue(length.ToString()));
+        }
+
+        [Fact]
         public void DescribeValue_ShouldReturn_OnlyHint()
         {
             var questionId = "test-question-id";

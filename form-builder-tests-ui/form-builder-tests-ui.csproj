@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Address - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Email - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\PageContent - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Postcode - Copy.feature.cs" />
@@ -33,6 +34,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\Street.feature.cs">
+      <DependentUpon>Street.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\DateInput.feature.cs">
       <DependentUpon>DateInput.feature</DependentUpon>
       <DesignTime>True</DesignTime>
@@ -56,6 +60,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\Street.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\DateInput.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

@@ -12,6 +12,6 @@ namespace form_builder.Models
         [JsonConverter(typeof(StringEnumConverter))]
         public EBehaviourType BehaviourType { get; set; }
 
-        public string pageURL { get; set; }
+        public string PageSlug { get; set; }
     }
 }

@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using form_builder.Configuration;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,10 +15,12 @@ namespace form_builder.Providers.StorageProvider
     public class DistributedCacheWrapper : IDistributedCacheWrapper
     {
         private readonly IDistributedCache _distributedCache;
+        private readonly DistrbutedCacheConfiguration _distributedCacheOptions;
 
-        public DistributedCacheWrapper(IDistributedCache distributedCache)
+        public DistributedCacheWrapper(IDistributedCache distributedCache, IOptions<DistrbutedCacheConfiguration> distributedCacheOptions)
         {
             _distributedCache = distributedCache;
+            _distributedCacheOptions = distributedCacheOptions.Value;
         }
 
         public string GetString(string key)
@@ -60,7 +65,11 @@ namespace form_builder.Providers.StorageProvider
 
         public Task SetStringAsync(string key, string value, CancellationToken token = default)
         {
-            return _distributedCache.SetStringAsync(key, value, token);
+            var distrbutedCacheOptions = new DistributedCacheEntryOptions {
+                AbsoluteExpiration = DateTime.Now.AddMinutes(_distributedCacheOptions.Expiration)
+            };
+
+            return _distributedCache.SetStringAsync(key, value, distrbutedCacheOptions, token);
         }
 
         public byte[] Get(string key)

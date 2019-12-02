@@ -5,7 +5,9 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
+using form_builder.ViewModels;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -25,6 +27,8 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _mockDisallowedKeysOptions = new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
+        private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
+
         public PageHelperTests()
         {
             _mockDisallowedKeysOptions.Setup(_ => _.Value).Returns(new DisallowedAnswerKeysConfiguration
@@ -35,7 +39,9 @@ namespace form_builder_tests.UnitTests.Helpers
                 }
             });
 
-            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object);
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
+
+            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object);
         }
 
         [Fact]
@@ -48,7 +54,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithName("form-name")
                 .Build();
 
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "H1"), It.Is<Element>(x => x.Properties.Text == "form-name"), It.IsAny<Dictionary<string, object>>()));
         }
@@ -86,7 +92,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -113,10 +119,49 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<Tuple<Element, List<AddressSearchResult>>>(), null), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<Tuple<ElementViewModel, List<AddressSearchResult>>>(), null), Times.Once);
+        }
+
+        [Fact]
+        public async Task GenerateHtml_ShouldGenerateValidUrl_ForAddressSelect()
+        {
+            //Arrange
+
+            var elementView = new ElementViewModel();
+            var addressList = new List<AddressSearchResult>();
+            var callback = new Tuple<ElementViewModel, List<AddressSearchResult>>(elementView, addressList);
+
+            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Tuple<ElementViewModel, List<AddressSearchResult>>>(), null))
+                .Callback<string, Tuple<ElementViewModel, List<AddressSearchResult>>, Dictionary<string, object>>((x, y, z) => callback = y);
+
+            var pageSlug = "page-one";
+            var baseUrl = "test";
+            var element = new ElementBuilder()
+                .WithType(EElementType.Address)
+                .WithPropertyText("text")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug(pageSlug)
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add("AddressStatus", "Select");
+            
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .WithBaseUrl(baseUrl)
+                .Build();
+
+            //Act
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
+
+            //Assert
+            Assert.Equal($"/{baseUrl}/{pageSlug}/address", callback.Item1.ReturnURL);
         }
 
         [Fact]
@@ -140,11 +185,105 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
+
+        [Fact]
+        public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenStreetSelect()
+        {
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Street)
+                .WithQuestionId("street")
+                .WithPropertyText("text")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add("StreetStatus", "Select");
+
+            var schema = new FormSchemaBuilder()
+                .WithName("Street name")
+                .Build();
+
+            //Act
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
+
+            //Assert
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<Tuple<Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>>(), null), Times.Once);
+        }
+
+        [Fact]
+        public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenStreetSearch()
+        {
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Street)
+                .WithPropertyText("text")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add("StreetStatus", "Search");
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            //Act
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
+
+            //Assert
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSearch"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+        }
+
+        //[Fact]
+        //public async Task GenerateHtml_ShouldGenerateValidUrl_ForStreetSelect()
+        //{
+        //    //Arrange
+
+        //    var elementView = new Element();
+        //    var streetList = new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>();
+        //    var callback = new Tuple<Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>(elementView, streetList);
+
+        //    _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Tuple<Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>>(), null))
+        //        .Callback<string, Tuple<Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>, Dictionary<string, object>>((x, y, z) => callback = y);
+
+        //    var pageSlug = "page-one";
+        //    var baseUrl = "test";
+        //    var element = new ElementBuilder()
+        //        .WithType(EElementType.Street)
+        //        .WithPropertyText("text")
+        //        .Build();
+
+        //    var page = new PageBuilder()
+        //        .WithElement(element)
+        //        .WithPageSlug(pageSlug)
+        //        .Build();
+
+        //    var viewModel = new Dictionary<string, string>();
+        //    viewModel.Add("StreetStatus", "Select");
+
+        //    var schema = new FormSchemaBuilder()
+        //        .WithName("form-name")
+        //        .WithBaseUrl(baseUrl)
+        //        .Build();
+
+        //    //Act
+        //    var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
+
+        //    //Assert
+        //    Assert.Equal($"/{baseUrl}/{pageSlug}/street", callback.Item1.);
+        //}
 
         [Theory]
         [InlineData(EElementType.OL)]
@@ -169,7 +308,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -196,7 +335,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == EElementType.Img.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -207,7 +346,6 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             var guid = Guid.NewGuid();
             var viewModel = new Dictionary<string, string>();
-            viewModel.Add("Guid", guid.ToString());
             viewModel.Add("Path", "path");
 
             var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
@@ -215,7 +353,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
 
-            _pageHelper.SaveAnswers(viewModel);
+            _pageHelper.SaveAnswers(viewModel, guid.ToString());
 
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())));
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == guid.ToString()), It.IsAny<string>(), It.IsAny<CancellationToken>()));
@@ -235,7 +373,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 {
                     new PageAnswers
                     {
-                        PageUrl = "path",
+                        PageSlug = "path",
                         Answers = new List<Answers>
                         {
                              new Answers { QuestionId = "Item1", Response = "old-answer" },
@@ -253,14 +391,12 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
-            var guid = Guid.NewGuid();
             var viewModel = new Dictionary<string, string>();
-            viewModel.Add("Guid", guid.ToString());
             viewModel.Add("Path", "path");
             viewModel.Add("Item1", item1Data);
             viewModel.Add("Item2", item2Data);
 
-            _pageHelper.SaveAnswers(viewModel);
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString());
 
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
@@ -284,12 +420,10 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
 
-            var guid = Guid.NewGuid();
             var viewModel = new Dictionary<string, string>();
-            viewModel.Add("Guid", guid.ToString());
             viewModel.Add("Path", "path");
 
-            _pageHelper.SaveAnswers(viewModel);
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString());
 
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
@@ -310,14 +444,12 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
-            var guid = Guid.NewGuid();
             var viewModel = new Dictionary<string, string>();
-            viewModel.Add("Guid", guid.ToString());
             viewModel.Add("Path", "path");
             viewModel.Add("Item1", item1Data);
             viewModel.Add("Item2", item2Data);
 
-            _pageHelper.SaveAnswers(viewModel);
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString());
 
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 

@@ -23,5 +23,23 @@ namespace form_builder.Extensions
 
             }
         }
+
+        public static string ToReturnUrlPrefix(this string value)
+        {
+            switch (value)
+            {
+                case "uitest":
+                case "local":
+                case "prod":
+                    return string.Empty;
+                case "int":
+                case "qa":
+                case "stage":
+                    return "/formbuilder";
+                default:
+                    throw new Exception("Unknown environment name");
+
+            }
+        }
     }
 }

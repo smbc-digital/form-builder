@@ -139,6 +139,12 @@ namespace form_builder_tests.Builders
             _property.AddressProvider = value;
             return this;
         }
+
+        public ElementBuilder WithStreetProvider(string value)
+        {
+            _property.StreetProvider = value;
+            return this;
+        }
         public ElementBuilder WithNumeric(bool value)
         {
             _property.Numeric = value;

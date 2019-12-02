@@ -69,7 +69,8 @@ namespace form_builder.Models
                         { "name", Properties.QuestionId },
                         { "id", Properties.QuestionId },
                         { "maxlength", maxLength },
-                        { "value", Properties.Value}
+                        { "value", Properties.Value},
+                        { "autocomplete", "on" }
                     };
 
                     if (DisplayAriaDescribedby)
@@ -89,6 +90,21 @@ namespace form_builder.Models
                     {
                         properties.Add("aria-describedby", DescribedByValue("-postcode"));
                     }
+
+                    return properties;
+                case EElementType.Street:
+
+                    properties = new Dictionary<string, object>()
+                    {
+                        { "id", $"{Properties.QuestionId}-street" },
+                        { "maxlength", maxLength }
+                    };
+
+                    if (DisplayAriaDescribedby)
+                    {
+                        properties.Add("aria-describedby", DescribedByValue("-street"));
+                    }
+
                     return properties;
                 default:
                     return null;

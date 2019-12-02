@@ -5,11 +5,10 @@
 }
 
 <div id="root" class="text-center">
-    @using (Html.BeginForm("Index", "Home", FormMethod.Post))
+    @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { autocomplete ="on" }))
     {
         @Html.Raw(Model.RawHTML)
 
-        @Html.HiddenFor(_ => _.Guid)
         @Html.HiddenFor(_ => _.Path)
     }
 </div>

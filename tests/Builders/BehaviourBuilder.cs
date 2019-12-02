@@ -8,14 +8,14 @@ namespace form_builder_tests.Builders
     {
         private List<Condition> _conditions = new List<Condition>();
         private EBehaviourType _behaviourType = EBehaviourType.GoToExternalPage;
-        private string _pageURL = "test-url";
+        private string _PageSlug = "test-url";
 
         public Behaviour Build()
         {
             return new Behaviour
             {
                 BehaviourType = _behaviourType,
-                pageURL = _pageURL,
+                PageSlug = _PageSlug,
                 Conditions = _conditions
             };
         }
@@ -26,9 +26,9 @@ namespace form_builder_tests.Builders
             return this;
         }
 
-        public BehaviourBuilder WithPageUrl(string pageUrl)
+        public BehaviourBuilder WithPageSlug(string PageSlug)
         {
-            _pageURL = pageUrl;
+            _PageSlug = PageSlug;
             return this;
         }
 
