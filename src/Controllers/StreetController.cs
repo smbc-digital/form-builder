@@ -145,12 +145,7 @@ namespace form_builder.Controllers
 
                 if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
                 {
-                    //var cachedAnswers = _distributedCache.GetString(guid.ToString());
-                    //var convertedAnswers = cachedAnswers == null
-                    //    ? new FormAnswers { Pages = new List<PageAnswers>() }
-                    //    : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-                    //
-                    //var streetElement = currentPage.Elements.Where(_ => _.Type == EElementType.Street).FirstOrDefault();
+                   
                     var provider = _streetProviders.ToList()
                         .Where(_ => _.ProviderName == streetElement.Properties.StreetProvider)
                         .FirstOrDefault();
@@ -163,10 +158,6 @@ namespace form_builder.Controllers
                             ex = $"No street provider configure for {streetElement.Properties.StreetProvider}"
                         });
                     }
-
-                    //var street = journey == "Select"
-                    //    ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}-street").Response
-                    //    : viewModel[$"{streetElement.Properties.QuestionId}-street"];
 
                     try
                     {
