@@ -1,4 +1,5 @@
 ﻿using form_builder.Models;
+using form_builder.Models.Elements;
 using System.Collections.Generic;
 
 namespace form_builder_tests.Builders
@@ -7,7 +8,7 @@ namespace form_builder_tests.Builders
     {
         private string _title = "TestTitle";
         private string _PageSlug = "test-url";
-        private List<Element> _elements = new List<Element>();
+        private List<IElement> _elements = new List<IElement>();
         private List<Behaviour> _behaviours = new List<Behaviour>();
 
 

@@ -1,4 +1,5 @@
 ﻿using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using System;
 using System.Collections.Generic;
@@ -167,8 +168,8 @@ namespace form_builder.Helpers.ElementHelpers
 
         public bool CheckForProvider(Element element)
         {
-            if(string.IsNullOrEmpty(element.Properties.StreetProvider) && element.Type == Enum.EElementType.Street 
-                || string.IsNullOrEmpty(element.Properties.AddressProvider) && element.Type == Enum.EElementType.Address)
+            if (string.IsNullOrEmpty(element.Properties.StreetProvider) && element.Type == Enum.EElementType.Street
+                  || string.IsNullOrEmpty(element.Properties.AddressProvider) && element.Type == Enum.EElementType.Address)
             {
                 throw new Exception($"A {element.Type}Provider must be present.");
             }

@@ -6,6 +6,7 @@ using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
+using form_builder.Models.Elements;
 using form_builder.Providers.Address;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
