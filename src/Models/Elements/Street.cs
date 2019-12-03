@@ -1,6 +1,8 @@
 ﻿using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Addresses;
 using System;
@@ -25,11 +27,11 @@ namespace form_builder.Models.Elements
             if (viewModel.ContainsKey("StreetStatus") && viewModel["StreetStatus"] == "Select" || viewModel.ContainsKey(streetKey) && !string.IsNullOrEmpty(viewModel[streetKey]))
             {
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
-                var url = $"{enviroment.EnvironmentName.ToReturnUrlPrefix()}/{baseURL}/{page.PageSlug}/street";
+                var url = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/street";
 
                 var viewElement = new ElementViewModel
                 {
-                    Element = element,
+                    Element = this,
                     ReturnURL = url
                 };
 

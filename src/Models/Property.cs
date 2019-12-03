@@ -17,12 +17,13 @@ namespace form_builder.Models
         public string MaxLength { get; set; }
         public string Value { get; set; } = string.Empty;
         public string Hint { get; set; } = string.Empty;
-        public string SelectHint {get;set;} = string.Empty;
+        public string SelectHint { get; set; } = string.Empty;
         public string CustomValidationMessage { get; set; } = string.Empty;
         public string ValidationMessageRestrictFutureDate { get; set; } = string.Empty;
         public string ValidationMessageRestrictPastDate { get; set; } = string.Empty;
         public string ValidationMessageRestrictCurrentDate { get; set; } = string.Empty;
         public string ValidationMessageInvalidDate { get; set; } = string.Empty;
+        public string SelectCustomValidationMessage { get; set; } = string.Empty;
         public string ClassName { get; set; }
         public List<string> ListItems = new List<string>();
         public string Source { get; set; }
