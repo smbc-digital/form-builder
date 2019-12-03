@@ -532,6 +532,7 @@ Address example:
     * Hint (*string*) (Hint message when a user is searching for a street)
     * SelectLabel (*string*) (Default: Street)
     * MaxLength (*string*) (Default: 200)
+    * Optional (*boolean*) (Default: false)
 
 Street example:
 ```json
