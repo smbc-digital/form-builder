@@ -1,42 +1,40 @@
 ﻿@using form_builder.Helpers
 @using StockportGovUK.NetStandard.Models.Addresses;
-@model Tuple<form_builder.Models.Elements.Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>
+@model Tuple<form_builder.ViewModels.ElementViewModel, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>
 @{
-    var questionId = $"{Model.Item1.Properties.QuestionId}-street";
+    var questionId = $"{Model.Item1.Element.Properties.QuestionId}-street";
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
-    var addresSearchCount = $"{Model.Item2.Count} streets found";
+    var streetSearchCount = $"{Model.Item2.Count} streets found";
+    var streetSelectLabel = string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectLabel) ? "Street" : Model.Item1.Element.Properties.SelectLabel;
 }
 
-@await Html.BeginFieldSet(Model.Item1, "-street")
+@await Html.BeginFieldSet(Model.Item1.Element, "-street")
 
-<p><a class="back-button" href="javascript:history.back()">Change</a></p>
+<p><a class="back-button" href="@Model.Item1.ReturnURL">Change</a></p>
 
 <legend>
-    <label @Model.Item1.WriteOptional() for="@questionId">@Model.Item1.Properties.SelectLabel</label>
-    @if (Model.Item1.Properties?.Optional ?? true)
+    <label @Model.Item1.Element.WriteOptional() for="@questionId">@streetSelectLabel</label>
+    @if (Model.Item1.Element.Properties?.Optional ?? true)
     {
         <p class="optional">(optional)</p>
     }
 </legend>
 
-@if (!string.IsNullOrEmpty(Model.Item1.Properties.SelectHint))
-{
-    <p id=@hintId>@Html.Raw(Model.Item1.Properties.SelectHint)</p>
-}
+<p id=@hintId>Choose a street</p>
 
 <select id="@questionId" name="@questionId">
-    <option value="">@addresSearchCount</option>
+    <option value="">@streetSearchCount</option>
     @for (var i = 0; i < Model.Item2.Count; i++)
     {
         <option value="@Model.Item2[i].USRN">@Model.Item2[i].Description</option>
     }
 </select>
 
-@if (!Model.Item1.IsValid)
+@if (!Model.Item1.Element.IsValid)
 {
     {
-        var validationMessage = string.IsNullOrEmpty(Model.Item1.Properties.CustomValidationMessage) ? Model.Item1.ValidationMessage : Model.Item1.Properties.CustomValidationMessage;
+        var validationMessage = string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectCustomValidationMessage) ? Model.Item1.Element.ValidationMessage : Model.Item1.Element.Properties.SelectCustomValidationMessage;
         <p class="input-error-content" id="@errorId">@validationMessage</p>
     }
 }
