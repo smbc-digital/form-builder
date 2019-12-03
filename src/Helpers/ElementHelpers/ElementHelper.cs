@@ -19,6 +19,7 @@ namespace form_builder.Helpers.ElementHelpers
         bool CheckAllDateRestrictionsAreNotEnabled(Element element);
         void ReSelectPreviousSelectedOptions(Element element);
         void ReCheckPreviousRadioOptions(Element element);
+        bool CheckForProvider(Element element);
     }
 
     public class ElementHelper : IElementHelper
@@ -162,6 +163,17 @@ namespace form_builder.Helpers.ElementHelpers
                     option.Checked = false;
                 }
             }
+        }
+
+        public bool CheckForProvider(Element element)
+        {
+            if(string.IsNullOrEmpty(element.Properties.StreetProvider) && element.Type == Enum.EElementType.Street 
+                || string.IsNullOrEmpty(element.Properties.AddressProvider) && element.Type == Enum.EElementType.Address)
+            {
+                throw new Exception($"A {element.Type}Provider must be present.");
+            }
+
+            return true;
         }
     }
 }

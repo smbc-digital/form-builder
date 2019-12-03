@@ -161,7 +161,9 @@ namespace form_builder.Helpers.PageHelpers
                         formModel.RawHTML += await GenerateAddressHtml(viewModel, page, element, baseForm.BaseURL, addressSearchResults, guid);
                         break;
                     case EElementType.Street:
-                        formModel.RawHTML += await GenerateStreetHtml(viewModel, page, element, streetSearchResults, guid);
+                        _elementHelper.CheckForQuestionId(element);
+                        _elementHelper.CheckForProvider(element);
+                        formModel.RawHTML += await GenerateStreetHtml(viewModel, page, element, baseForm.BaseURL, streetSearchResults, guid);
                         break;
                     default:
                         break;
@@ -171,17 +173,25 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        private async Task<string> GenerateStreetHtml(Dictionary<string, string> viewModel, Page page, Element element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street> streetSearchResults, string guid)
+        private async Task<string> GenerateStreetHtml(Dictionary<string, string> viewModel, Page page, Element element, string baseURL, List<StockportGovUK.NetStandard.Models.Models.Verint.Street> streetSearchResults, string guid)
         {
             var streetKey = $"{element.Properties.QuestionId}-street";
 
             if (viewModel.ContainsKey("StreetStatus") && viewModel["StreetStatus"] == "Select" || viewModel.ContainsKey(streetKey) && !string.IsNullOrEmpty(viewModel[streetKey]))
             {
                 element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
-                return await _viewRender.RenderAsync("StreetSelect", new Tuple<Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>(element, streetSearchResults));
+                var url = $"{_enviroment.EnvironmentName.ToReturnUrlPrefix()}/{baseURL}/{page.PageSlug}/street";
+
+                var viewElement = new ElementViewModel
+                {
+                    Element = element,
+                    ReturnURL = url
+                };
+
+                return await _viewRender.RenderAsync("StreetSelect", new Tuple<ElementViewModel, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>(viewElement, streetSearchResults));
             }
 
-            element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid);
+            element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid, "-street");
             return await _viewRender.RenderAsync("StreetSearch", element);
         }
 

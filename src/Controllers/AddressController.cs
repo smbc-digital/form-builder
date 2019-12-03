@@ -94,7 +94,7 @@ namespace form_builder.Controllers
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var currentPage = baseForm.GetPage(path);
 
-            if (currentPage == null)
+            if (currentPage == null)    
             {
                 throw new ApplicationException($"AddressController: GetPage returned null for path: {path} for form: {form}, while performing Post");
             }
