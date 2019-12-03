@@ -23,6 +23,7 @@ namespace form_builder.Models
         public string ValidationMessageRestrictPastDate { get; set; } = string.Empty;
         public string ValidationMessageRestrictCurrentDate { get; set; } = string.Empty;
         public string ValidationMessageInvalidDate { get; set; } = string.Empty;
+        public string SelectCustomValidationMessage { get; set; } = string.Empty;
         public string ClassName { get; set; }
         public List<string> ListItems = new List<string>();
         public string Source { get; set; }

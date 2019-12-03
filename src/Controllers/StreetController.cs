@@ -82,7 +82,7 @@ namespace form_builder.Controllers
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Error", "Home", new { ex = ex.Message });
+                throw new ApplicationException($"StreetController: An exception has occured while attempting to return Street view Exception: {ex.Message}");
             }
         }
 
