@@ -1,6 +1,6 @@
 ﻿@using form_builder.Helpers
 @using StockportGovUK.NetStandard.Models.Addresses;
-@model Tuple<form_builder.Models.Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>
+@model Tuple<form_builder.Models.Elements.Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>
 @{
     var questionId = $"{Model.Item1.Properties.QuestionId}-street";
     var hintId = $"{questionId}-hint";
