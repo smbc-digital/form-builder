@@ -107,7 +107,6 @@ namespace form_builder.Controllers
 
             currentPage.Validate(viewModel, _validators);
 
-            //temp If the element isn't madatory and it's been left empty.... just go to the next page.
             var cachedAnswers = _distributedCache.GetString(guid.ToString());
             var streetElement = currentPage.Elements.Where(_ => _.Type == EElementType.Street).FirstOrDefault();
             var convertedAnswers = cachedAnswers == null
@@ -131,6 +130,7 @@ namespace form_builder.Controllers
                             form = baseForm.BaseURL
                         });
                     case EBehaviourType.SubmitForm:
+                        _pageHelper.SaveAnswers(viewModel, guid);
                         return RedirectToAction("Submit", "Home", new
                         {
                             form = baseForm.BaseURL,
@@ -141,35 +141,33 @@ namespace form_builder.Controllers
                 }
             }
 
-            //temp
+            if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
+            {
 
-                if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
+                var provider = _streetProviders.ToList()
+                    .Where(_ => _.ProviderName == streetElement.Properties.StreetProvider)
+                    .FirstOrDefault();
+
+                if (provider == null)
                 {
-                   
-                    var provider = _streetProviders.ToList()
-                        .Where(_ => _.ProviderName == streetElement.Properties.StreetProvider)
-                        .FirstOrDefault();
-
-                    if (provider == null)
+                    return RedirectToAction("Error", "Home", new
                     {
-                        return RedirectToAction("Error", "Home", new
-                        {
-                            form = baseForm.BaseURL,
-                            ex = $"No street provider configure for {streetElement.Properties.StreetProvider}"
-                        });
-                    }
-
-                    try
-                    {
-                        var result = await provider.SearchAsync(street);
-                        streetResults = result.ToList();
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogError($"StreetController: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
-                        return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
-                    }
+                        form = baseForm.BaseURL,
+                        ex = $"No street provider configure for {streetElement.Properties.StreetProvider}"
+                    });
                 }
+
+                try
+                {
+                    var result = await provider.SearchAsync(street);
+                    streetResults = result.ToList();
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError($"StreetController: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
+                    return RedirectToAction("Error", "Home", new { form = baseForm.BaseURL, });
+                }
+            }
 
             if (!currentPage.IsValid)
             {

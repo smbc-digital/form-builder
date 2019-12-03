@@ -3,9 +3,10 @@
     var questionId = $"{Model.Properties.QuestionId}-street";
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
+    var streetLabel = string.IsNullOrEmpty(Model.Properties.StreetLabel) ? "Search for a street" : Model.Properties.StreetLabel;
 }
 
-<label @Model.WriteOptional() for="@questionId">@Model.Properties.StreetLabel</label>
+<label @Model.WriteOptional() for="@questionId">@streetLabel</label>
 
 @if (Model.Properties?.Optional ?? true)
 {
