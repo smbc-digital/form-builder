@@ -2,33 +2,33 @@
 @{
     var hintId = $"{Model.Properties.QuestionId}-hint";
     var errorId = $"{Model.Properties.QuestionId}-error";
+    var line1id = $"{Model.Properties.QuestionId}-AddressManualAddressLine1";
+    var line2id = $"{Model.Properties.QuestionId}-AddressManualAddressLine2";
+    var line3id = $"{Model.Properties.QuestionId}-AddressManualAddressTown";
+    var line4id = $"{Model.Properties.QuestionId}-AddressManualAddressPostcode";
 }
 
-<label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+    <fieldset>
+        <div>@Html.Raw(Model.Properties.AddressManualHint)</div>
 
-@if (Model.Properties?.Optional ?? true)
-{
-    <p class="optional">(optional)</p>
-}
+        @if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
+        {
+            <p class="description" id=@hintId>@Model.Properties.Hint</p>
+        }
 
-@if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
-{
-    <p class="description" id=@hintId>@Model.Properties.Hint</p>
-}
-
-<label for="addressManualLine1">Address line 1</label>
-<input name="addressManualLine1" id="addressManualLine1" type="text" />
-<label class="optional" for="addressManualLine2">Address line 2</label>
-<p class="optional">(optional)</p>
-<input name="addressManualLine2" id="addressManualLine2" type="text" />
-<label for="addressManualTown">Town</label>
-<input name="addressManualTown" id="addressManualTown" type="text" />
-<label for="addressManualPostcode">Postcode</label>
-<input name="addressManualPostcode" id="addressManualPostcode" type="text" />
-
-
-@if (!Model.IsValid)
-{
-    var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
-    <p class="input-error-content" id="@errorId">@validationMessage</p>
-}
+        <label for="@line1id">Address line 1</label>
+        @Html.TextBox(line1id, Model.Properties.AddressManualAddressLine1, Model.GenerateElementProperties())
+        <label class="optional" for="@line2id">Address line 2</label>
+        <p class="optional">(optional)</p>
+        @Html.TextBox(line2id, Model.Properties.AddressManualAddressLine2, Model.GenerateElementProperties())
+        <label for="@line3id">Town</label>
+        @Html.TextBox(line3id, Model.Properties.AddressManualAddressTown, Model.GenerateElementProperties())
+        <label for="@line4id">Postcode</label>
+        @Html.TextBox(line4id, Model.Properties.AddressManualAddressPostcode, Model.GenerateElementProperties())
+        <p><a href="address">Search by postcode</a></p>
+        @if (!Model.IsValid)
+        {
+            var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+            <p class="input-error-content" id="@errorId">@validationMessage</p>
+        }
+    </fieldset>

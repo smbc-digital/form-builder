@@ -35,6 +35,9 @@ namespace form_builder.Models
         public string AddressManualAddressLine2 { get; set; } = string.Empty;
         public string AddressManualAddressTown { get; set; } = string.Empty;
         public string AddressManualAddressPostcode { get; set; } = string.Empty;
+
+        public string AddressManualHint { get; set; } = string.Empty;
+
         public string StreetProvider { get; set; }
         public string SelectLabel { get; set; } = string.Empty;
         public string StreetLabel { get; set; } = string.Empty;

@@ -19,6 +19,8 @@
 
 @Html.TextBox(questionId, Model.Properties.Value, Model.GenerateElementProperties())
 
+<p><a href="address-manual">Enter the address manually</a></p>
+
 @if (!Model.IsValid)
 {
     var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;

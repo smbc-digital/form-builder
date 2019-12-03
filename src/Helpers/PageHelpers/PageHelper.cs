@@ -160,6 +160,9 @@ namespace form_builder.Helpers.PageHelpers
                     case EElementType.Address:
                         formModel.RawHTML += await GenerateAddressHtml(viewModel, page, element, baseForm.BaseURL, addressSearchResults, guid);
                         break;
+                    case EElementType.AddressManual:
+                        formModel.RawHTML += await GenerateAddressManualHtml(viewModel, page, element, baseForm.BaseURL, guid);
+                        break;
                     case EElementType.Street:
                         formModel.RawHTML += await GenerateStreetHtml(viewModel, page, element, streetSearchResults, guid);
                         break;
@@ -205,6 +208,12 @@ namespace form_builder.Helpers.PageHelpers
 
             element.Properties.Value = _elementHelper.CurrentValue(element, viewModel, page.PageSlug, guid, "-postcode");
             return await _viewRender.RenderAsync("AddressSearch", element);
+        }
+
+        private async Task<string> GenerateAddressManualHtml(Dictionary<string, string> viewModel, Page page, Element element, string baseURL, string guid)
+        {
+
+            return await _viewRender.RenderAsync("AddressManual", element);
         }
 
         public void SaveAnswers(Dictionary<string, string> viewModel, string guid)
