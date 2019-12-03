@@ -198,6 +198,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var element = new ElementBuilder()
                 .WithType(EElementType.Street)
                 .WithQuestionId("street")
+                .WithStreetProvider("test")
                 .WithPropertyText("text")
                 .Build();
 
@@ -216,7 +217,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<Tuple<Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>>(), null), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<Tuple<ElementViewModel, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>>(), null), Times.Once);
         }
 
         [Fact]
