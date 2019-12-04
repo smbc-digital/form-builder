@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System;
 using StockportGovUK.AspNetCore.Gateways;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Models.Elements;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Logging;
@@ -113,7 +114,9 @@ namespace form_builder.Controllers
                 {
                     throw new ApplicationException($"AddressController: GetPage returned null for path: {path} of form: {form}, while performing Get");
                 }
-                page.Elements[0].Type = EElementType.AddressManual;
+                
+                var addressManualElememt = new AddressManual() { Properties = page.Elements[0].Properties, Type = EElementType.AddressManual };
+                page.Elements[0] = addressManualElememt;
                 var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
                 viewModel.AddressStatus = "Search";
                 viewModel.FormName = baseForm.FormName;
@@ -133,9 +136,11 @@ namespace form_builder.Controllers
         {
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var currentPage = baseForm.GetPage(path);
-            var viewModel = NormaliseFormData(formData);
-            currentPage.Elements[0].Type = EElementType.AddressManual;
+            var viewModel = NormaliseFormData(formData);            
             var sessionGuid = _sessionHelper.GetSessionGuid();
+
+            var addressManualElememt = new AddressManual() { Properties = currentPage.Elements[0].Properties, Type = EElementType.AddressManual };
+            currentPage.Elements[0] = addressManualElememt;
 
             if (currentPage == null)
             {
@@ -181,7 +186,7 @@ namespace form_builder.Controllers
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var currentPage = baseForm.GetPage(path);
 
-            if (currentPage == null)
+            if (currentPage == null)    
             {
                 throw new ApplicationException($"AddressController: GetPage returned null for path: {path} for form: {form}, while performing Post");
             }

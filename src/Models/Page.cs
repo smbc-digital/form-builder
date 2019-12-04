@@ -1,4 +1,5 @@
 using form_builder.Enum;
+using form_builder.Models.Elements;
 using form_builder.Validators;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace form_builder.Models
         
         public string PageSlug { get; set; }
 
-        public List<Element> Elements { get; set; }
+        public List<IElement> Elements { get; set; }
 
         public List<Behaviour> Behaviours { get; set; }
 
@@ -37,7 +38,7 @@ namespace form_builder.Models
                 throw new System.Exception("Model is not validated, please call Validate()");
             }
         }
-        public IEnumerable<Element> ValidatableElements =>  Elements.Where(element => element.Type == EElementType.Radio   || 
+        public IEnumerable<IElement> ValidatableElements =>  Elements.Where(element => element.Type == EElementType.Radio   || 
                                                                 element.Type == EElementType.Textarea ||
                                                                 element.Type == EElementType.Select ||
                                                                 element.Type == EElementType.Textbox ||

@@ -30,10 +30,21 @@ Scenario: Trigger select validation on no choice made in dropdown
 	When I click the "nextStep" button
 	Then I should see a ".input-error-content" html element
 
-Scenario: Selecting a street in the dropdown should display the success page
+Scenario: Should select a street correctly from the dropdown
 	Given I navigate to "/street/page1"
 	Then I fill in page1
 	When I click the "nextStep" button
 	Then I should see the "street-address-street" input
 	Then I select "Green lane" in "street-address-street" dropdown
 	Then I should see "Green lane" is selected in "street-address-street" dropdown with the value "123456789012"
+
+Scenario: Should go through the journey and hit success page
+	Given I navigate to "/street/page1"
+	Then I fill in page1
+	When I click the "nextStep" button
+	Then I should see the "street-address-street" input
+	Then I select "Green lane" in "street-address-street" dropdown
+	Then I should see "Green lane" is selected in "street-address-street" dropdown with the value "123456789012"
+	When I click the "nextStep" button
+	Then I click the "submit" button
+    Then I should see a "h1" element with "Submit" text

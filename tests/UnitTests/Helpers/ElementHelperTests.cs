@@ -676,5 +676,37 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.True(element.Properties.Options[0].Checked);
             Assert.False(element.Properties.Options[1].Checked);
         }
+
+        [Theory]
+        [InlineData(EElementType.Address)]
+        [InlineData(EElementType.Street)]
+        public void ElementBuilder_ShouldThrowExceptionIfNoProviderGiven(EElementType type)
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(type)
+                .WithQuestionId("Test")
+                .Build();
+
+            //Assert
+            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForProvider(element));
+        }
+
+        [Theory]
+        [InlineData(EElementType.Address)]
+        [InlineData(EElementType.Street)]
+        public void ElementBuilder_ShouldReturnTrue_IfProviderGiven(EElementType type)
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(type)
+                .WithQuestionId("Test")
+                .WithStreetProvider("FakeStreet")
+                .WithAddressProvider("FakeAddress")
+                .Build();
+
+            //Assert
+            Assert.True(_elementHelper.CheckForProvider(element));
+        }
     }
 }
