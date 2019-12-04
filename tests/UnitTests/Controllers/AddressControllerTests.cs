@@ -19,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using StockportGovUK.NetStandard.Models.Addresses;
 using form_builder.Providers.Address;
 using form_builder.Helpers.Session;
+using form_builder.Models.Elements;
 
 namespace form_builder_tests.UnitTests.Controllers
 {

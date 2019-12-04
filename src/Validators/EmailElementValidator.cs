@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using form_builder.Models;
+using form_builder.Models.Elements;
 
 namespace form_builder.Validators
 {

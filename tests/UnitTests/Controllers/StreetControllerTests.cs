@@ -19,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using StockportGovUK.NetStandard.Models.Addresses;
 using form_builder.Helpers.Session;
 using form_builder.Providers.Street;
+using form_builder.Models.Elements;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -212,7 +213,7 @@ namespace form_builder_tests.UnitTests.Controllers
             _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, string>>()))
                 .Returns(new ValidationResult { IsValid = false });
 
-            var searchResultsCallback = new List<Street>();
+            var searchResultsCallback = new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>();
             var element = new ElementBuilder()
                .WithType(EElementType.Street)
                .WithStreetProvider("testStreetProvider")
