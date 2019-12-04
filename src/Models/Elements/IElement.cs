@@ -14,7 +14,7 @@ namespace form_builder.Models.Elements
     [JsonConverter(typeof(JsonSubtypes), "Type")]   
     public interface IElement
     {
-            EElementType Type { get; }
+            EElementType Type { get; set; }
 
             Property Properties { get; set; }
 

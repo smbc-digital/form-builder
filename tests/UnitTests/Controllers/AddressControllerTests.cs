@@ -479,5 +479,34 @@ namespace form_builder_tests.UnitTests.Controllers
             var redirectResult = Assert.IsType<RedirectResult>(result);
             Assert.Equal("submit-url", redirectResult.Url);
         }
+
+        [Fact]
+        public async Task AddressManual_Should_Return_index()
+        {
+            var element = new ElementBuilder()
+                   .WithType(EElementType.Address)
+                   .WithQuestionId("test-address")
+                   .Build();
+
+                var page = new PageBuilder()
+                    .WithElement(element)
+                    .WithPageSlug("page-one")
+                    .Build();
+
+                var schema = new FormSchemaBuilder()
+                    .WithPage(page)
+                    .Build();
+
+                _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                    .ReturnsAsync(schema);
+
+                var result = await _controller.Index("form", "page-one");
+
+                var viewResult = Assert.IsType<ViewResult>(result);
+                var viewModel = Assert.IsType<FormBuilderViewModel>(viewResult.Model);
+
+                Assert.Equal("Search", viewModel.AddressStatus);
+            }
+        }
+
     }
-}

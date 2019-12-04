@@ -32,7 +32,7 @@ namespace form_builder.Helpers.PageHelpers
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment)
         {
             _viewRender = viewRender;
-            _elementHelper = elementHelper;     
+            _elementHelper = elementHelper;
             _distributedCache = distributedCache;
             _disallowedKeys = disallowedKeys.Value;
             _enviroment = enviroment;

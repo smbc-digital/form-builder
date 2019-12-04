@@ -23,6 +23,7 @@
         Checkbox,
         DateInput,
         Address,
+        AddressManual,
         Street
     }
 }
