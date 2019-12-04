@@ -89,7 +89,7 @@ namespace form_builder.Controllers
         }
 
         [HttpGet]
-        [Route("{form}/{path}/address-manual")]
+        [Route("{form}/{path}/manual")]
         public async Task<IActionResult> AddressManual(string form, string path)
         {
             try
@@ -116,6 +116,7 @@ namespace form_builder.Controllers
                 }
                 
                 var addressManualElememt = new AddressManual() { Properties = page.Elements[0].Properties, Type = EElementType.AddressManual };
+              
                 page.Elements[0] = addressManualElememt;
                 var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
                 viewModel.AddressStatus = "Search";
@@ -131,7 +132,7 @@ namespace form_builder.Controllers
 
 
         [HttpPost]
-        [Route("{form}/{path}/address-manual")]
+        [Route("{form}/{path}/manual")]
         public async Task<IActionResult> AddressManual(string form, string path, Dictionary<string, string[]> formData)
         {
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
@@ -140,6 +141,8 @@ namespace form_builder.Controllers
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             var addressManualElememt = new AddressManual() { Properties = currentPage.Elements[0].Properties, Type = EElementType.AddressManual };
+            addressManualElememt.SetAddressProperties(viewModel);
+
             currentPage.Elements[0] = addressManualElememt;
 
             if (currentPage == null)

@@ -9,7 +9,7 @@ namespace form_builder_tests_ui.StepDefinitions
             [When(@"I click the manual link")]
             public void IClickTheManualLink()
             {
-                BrowserSession.ClickLink("address-manual");
+                BrowserSession.ClickLink("manual");
             }
         }
    }

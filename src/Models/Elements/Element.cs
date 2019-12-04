@@ -96,6 +96,12 @@ namespace form_builder.Models.Elements
                     }
 
                     return properties;
+                case EElementType.AddressManual:
+                    properties = new Dictionary<string, object>()
+                    {
+                      
+                    };                    
+                    return properties;
                 case EElementType.Street:
 
                     properties = new Dictionary<string, object>()
