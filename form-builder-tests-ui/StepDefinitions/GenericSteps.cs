@@ -33,7 +33,6 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenIShouldSeeTheHeaderSection()
         {
             ThenIShouldSeeTheLink("myaccount.stockport.gov.uk");
-            //Assert.True(BrowserSession.FindAllCss("[class*='search-button']").Any());
             Assert.True(BrowserSession.FindAllCss("a[href*='https://www.stockport.gov.uk']").Any());
         }
 
@@ -73,7 +72,7 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then(@"I click the ""(.*)"" button")]
         public void WhenIClickTheButton(string name)
         {
-            BrowserSession.ClickButton(name, new Options { WaitBeforeClick = TimeSpan.FromMilliseconds(0.2) });
+            BrowserSession.ClickButton(name, new Options { WaitBeforeClick = TimeSpan.FromSeconds(0.5) });
         }
 
         [Then(@"I should see the ""(.*)"" button")]
@@ -147,7 +146,6 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then(@"I select ""(.*)"" in ""(.*)"" dropdown")]
         public void ThenISelectDropdown(string value, string fieldName)
         {
-            //BrowserSession.Select(value).From(fieldName);
             BrowserSession.FindId(fieldName).SelectOption(value);
             
         }

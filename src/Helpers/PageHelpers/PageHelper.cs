@@ -18,7 +18,7 @@ namespace form_builder.Helpers.PageHelpers
     public interface IPageHelper
     {
         void CheckForDuplicateQuestionIDs(Page page);
-        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<StockportGovUK.NetStandard.Models.Models.Verint.Street> streetSearchResults = null);
+        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null);
         void SaveAnswers(Dictionary<string, string> viewModel, string guid);
     }
 
@@ -32,7 +32,7 @@ namespace form_builder.Helpers.PageHelpers
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment)
         {
             _viewRender = viewRender;
-            _elementHelper = elementHelper;     
+            _elementHelper = elementHelper;
             _distributedCache = distributedCache;
             _disallowedKeys = disallowedKeys.Value;
             _enviroment = enviroment;
@@ -51,7 +51,7 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
-        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<StockportGovUK.NetStandard.Models.Models.Verint.Street> streetSearchResults = null)
+        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
             if (page.PageSlug.ToLower() != "success")
@@ -69,6 +69,7 @@ namespace form_builder.Helpers.PageHelpers
 
             return formModel;
         }
+
         public void SaveAnswers(Dictionary<string, string> viewModel, string guid)
         {
             var formData = _distributedCache.GetString(guid);

@@ -9,7 +9,7 @@ namespace form_builder.Providers.Address
 
         string ProviderName { get; }
 
-        Task<IEnumerable<AddressSearchResult>> SearchAsync(string postcode);
+        Task<IEnumerable<AddressSearchResult>> SearchAsync(string streetOrPostcode);
 
         //AddressSearchResult Search(string postcode);
 

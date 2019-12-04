@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using form_builder.Providers.Street;
 using StockportGovUK.AspNetCore.Gateways.VerintServiceGateway;
+using StockportGovUK.NetStandard.Models.Addresses;
 
 namespace form_builder.Providers.Address
 {
@@ -16,7 +17,7 @@ namespace form_builder.Providers.Address
             _verintServiceGateway = verintServiceGateway;
         }
 
-        public async Task<IEnumerable<StockportGovUK.NetStandard.Models.Models.Verint.Street>> SearchAsync(string street)
+        public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string street)
         {
             var response = await _verintServiceGateway.GetStreetByReference(street);
             return response.ResponseContent;

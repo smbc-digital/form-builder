@@ -1,4 +1,4 @@
-﻿using StockportGovUK.NetStandard.Models.Models.Verint;
+﻿using StockportGovUK.NetStandard.Models.Addresses;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,6 +8,6 @@ namespace form_builder.Providers.Street
     {
         string ProviderName { get; }
 
-        Task<IEnumerable<StockportGovUK.NetStandard.Models.Models.Verint.Street>> SearchAsync(string street);
+        Task<IEnumerable<AddressSearchResult>> SearchAsync(string street);
     }
 }
