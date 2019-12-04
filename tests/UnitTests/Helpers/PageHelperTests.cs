@@ -139,14 +139,12 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Callback<string, Tuple<ElementViewModel, List<AddressSearchResult>>, Dictionary<string, object>>((x, y, z) => callback = y);
 
             var pageSlug = "page-one";
-            var baseUrl = "test";
-            var element = new ElementBuilder()
-                .WithType(EElementType.Address)
-                .WithPropertyText("text")
-                .Build();
+            var baseUrl = "test";        
+
+            var addressElement = new form_builder.Models.Elements.Address { Properties = new Property { Text = "text" } };
 
             var page = new PageBuilder()
-                .WithElement(element)
+                .WithElement(addressElement)
                 .WithPageSlug(pageSlug)
                 .Build();
 
@@ -169,13 +167,10 @@ namespace form_builder_tests.UnitTests.Helpers
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenAddressSearch()
         {
             //Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.Address)
-                .WithPropertyText("text")
-                .Build();
+            var addressElement = new form_builder.Models.Elements.Address { Properties = new Property { Text = "text" } };
 
             var page = new PageBuilder()
-                .WithElement(element)
+                .WithElement(addressElement)
                 .Build();
 
             var viewModel = new Dictionary<string, string>();
