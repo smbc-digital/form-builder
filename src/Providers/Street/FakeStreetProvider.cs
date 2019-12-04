@@ -9,20 +9,20 @@ namespace form_builder.Providers.Street
     public class FakeStreetProvider : IStreetProvider
     {
         public string ProviderName { get => "FakeStreet"; }
-        public async Task<IEnumerable<StockportGovUK.NetStandard.Models.Models.Verint.Street>> SearchAsync(string street)
+        public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string street)
         {
-            return new List<StockportGovUK.NetStandard.Models.Models.Verint.Street> {
-                new StockportGovUK.NetStandard.Models.Models.Verint.Street {
-                    Description = "Green lane",
-                    USRN = "123456789012"
+            return new List<AddressSearchResult> {
+                new AddressSearchResult {
+                    Name = "Green lane",
+                    UniqueId = "123456789012"
                 },
-                 new StockportGovUK.NetStandard.Models.Models.Verint.Street {
-                    Description = "Green road",
-                    USRN = "098765432109"
+                 new AddressSearchResult {
+                    Name = "Green road",
+                    UniqueId = "098765432109"
                 },
-                 new StockportGovUK.NetStandard.Models.Models.Verint.Street {
-                    Description = "Green street",
-                    USRN = "564737838937"
+                 new AddressSearchResult {
+                    Name = "Green street",
+                    UniqueId = "564737838937"
                 }
             };
         }

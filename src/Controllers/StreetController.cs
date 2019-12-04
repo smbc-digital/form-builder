@@ -10,10 +10,12 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Logging;
-using form_builder.Providers.Street;
 using System.Linq;
 using Newtonsoft.Json;
 using form_builder.Helpers.Session;
+using StockportGovUK.NetStandard.Models.Addresses;
+using form_builder.Providers.Address;
+using form_builder.Providers.Street;
 
 namespace form_builder.Controllers
 {
@@ -35,6 +37,7 @@ namespace form_builder.Controllers
 
         private readonly ISessionHelper _sessionHelper;
 
+        
         public StreetController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper, IEnumerable<IStreetProvider> streetProviders, ISessionHelper sessionHelper)
         {
             _distributedCache = distributedCache;
@@ -103,7 +106,7 @@ namespace form_builder.Controllers
             var guid = _sessionHelper.GetSessionGuid();
 
             var journey = viewModel["StreetStatus"];
-            var streetResults = new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>();
+            var streetResults = new List<AddressSearchResult>();
 
             currentPage.Validate(viewModel, _validators);
 
@@ -171,7 +174,7 @@ namespace form_builder.Controllers
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, streetResults);
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, streetResults);
                 formModel.Path = currentPage.PageSlug;
                 formModel.StreetStatus = journey;
                 formModel.FormName = baseForm.FormName;
@@ -186,7 +189,7 @@ namespace form_builder.Controllers
                 case "Search":
                     try
                     {
-                        var streetViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, streetResults);
+                        var streetViewModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, streetResults);
                         streetViewModel.StreetStatus = "Select";
                         streetViewModel.FormName = baseForm.FormName;
 
