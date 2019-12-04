@@ -18,7 +18,7 @@ namespace form_builder_tests_ui.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [TechTalk.SpecRun.FeatureAttribute("AddressManual", new string[] {
-            "address"}, Description="\tIn order to collect address information I have to navigate to Page1", SourceFile="Features\\AddressManual.feature", SourceLine=1)]
+            "addressManual"}, Description="\tIn order to collect address information I have to navigate to Page1", SourceFile="Features\\AddressManual.feature", SourceLine=1)]
     public partial class AddressManualFeature
     {
         
@@ -32,7 +32,7 @@ namespace form_builder_tests_ui.Features
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "AddressManual", "\tIn order to collect address information I have to navigate to Page1", ProgrammingLanguage.CSharp, new string[] {
-                        "address"});
+                        "addressManual"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -85,6 +85,23 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("I should see the \"address-manual\" link", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 11
  testRunner.And("I should see the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [TechTalk.SpecRun.ScenarioAttribute("Renders HTML tags on the manual page", SourceLine=13)]
+        public virtual void RendersHTMLTagsOnTheManualPage()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Renders HTML tags on the manual page", null, ((string[])(null)));
+#line 14
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 15
+ testRunner.Given("I navigate to \"/address/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 16
+ testRunner.Then("I click the manual link", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 17
+ testRunner.Then("I should see the \"customers-address-AddressManualAddressLine1\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
