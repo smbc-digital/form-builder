@@ -43,10 +43,10 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
 
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<Tuple<ElementViewModel, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<Tuple<ElementViewModel, List<AddressSearchResult>>>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSearch"),It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);

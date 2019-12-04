@@ -196,12 +196,8 @@ namespace form_builder_tests.UnitTests.Helpers
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenStreetSelect()
         {
             //Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.Street)
-                .WithQuestionId("street")
-                .WithStreetProvider("test")
-                .WithPropertyText("text")
-                .Build();
+            var element = new form_builder.Models.Elements.Street{ Properties =  new Property { QuestionId = "street", StreetProvider = "FakeStreet" } };
+                
 
             var page = new PageBuilder()
                 .WithElement(element)

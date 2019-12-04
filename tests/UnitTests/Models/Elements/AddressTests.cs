@@ -44,7 +44,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -70,7 +70,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(),viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"),It.IsAny<Tuple<ElementViewModel, List<AddressSearchResult>>>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -109,7 +109,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             Assert.Equal($"/{baseUrl}/{pageSlug}/address", callback.Item1.ReturnURL);
