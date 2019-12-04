@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
 {
-    public class Select : Element
+    public class Select : Element, IElement
     {
         public Select()
         {

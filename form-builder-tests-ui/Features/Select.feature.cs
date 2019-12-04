@@ -140,9 +140,9 @@ this.ScenarioInitialize(scenarioInfo);
 #line 26
  testRunner.When("I click the \"submit\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 27
- testRunner.Then("I should see a validation message for \"favFood-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 28
  testRunner.Then("I should see \"Tuesday\" is selected in \"select\" dropdown with the value \"tuesday\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 28
+ testRunner.Then("I should see a validation message for \"favFood-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
