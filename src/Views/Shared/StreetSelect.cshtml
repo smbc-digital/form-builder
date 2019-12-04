@@ -1,6 +1,6 @@
 ﻿@using form_builder.Helpers
 @using StockportGovUK.NetStandard.Models.Addresses;
-@model Tuple<form_builder.ViewModels.ElementViewModel, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>
+@model Tuple<form_builder.ViewModels.ElementViewModel, List<AddressSearchResult>>
 @{
     var questionId = $"{Model.Item1.Element.Properties.QuestionId}-street";
     var hintId = $"{questionId}-hint";
@@ -27,7 +27,7 @@
     <option value="">@streetSearchCount</option>
     @for (var i = 0; i < Model.Item2.Count; i++)
     {
-        <option value="@Model.Item2[i].USRN">@Model.Item2[i].Description</option>
+        <option value="@Model.Item2[i].UniqueId">@Model.Item2[i].Name</option>
     }
 </select>
 

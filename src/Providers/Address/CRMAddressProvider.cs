@@ -16,9 +16,9 @@ namespace form_builder.Providers.Address
             _verintServiceGateway = verintServiceGateway;
         }
 
-        public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string postcode)
+        public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string streetOrPostcode)
         {
-            var response = await _verintServiceGateway.SearchForPropertyByPostcode(postcode);
+            var response = await _verintServiceGateway.SearchForPropertyByPostcode(streetOrPostcode);
             return response.ResponseContent;
         }
     }
