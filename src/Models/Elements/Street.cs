@@ -17,7 +17,7 @@ namespace form_builder.Models.Elements
         {
             Type = EElementType.Street;
         }
-        public new async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<StockportGovUK.NetStandard.Models.Models.Verint.Street> streetSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public new async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
@@ -39,7 +39,7 @@ namespace form_builder.Models.Elements
                     ReturnURL = url
                 };
 
-                return await viewRender.RenderAsync("StreetSelect", new Tuple<ElementViewModel, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>(viewElement, streetSearchResults));
+                return await viewRender.RenderAsync("StreetSelect", new Tuple<ElementViewModel, List<AddressSearchResult>>(viewElement, addressSearchResults));
             }
 
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);

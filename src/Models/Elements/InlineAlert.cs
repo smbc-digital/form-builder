@@ -15,7 +15,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.InlineAlert;
         }
 
-        public new Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<StockportGovUK.NetStandard.Models.Models.Verint.Street> streetSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public new Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             elementHelper.CheckIfLabelAndTextEmpty(this);
             return viewRender.RenderAsync(Type.ToString(), this);
