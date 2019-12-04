@@ -25,6 +25,7 @@ namespace form_builder.Models.Elements
             if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
             {
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
+                
                 var url = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/address";
 
                 var viewElement = new ElementViewModel

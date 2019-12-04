@@ -27,6 +27,10 @@ namespace form_builder.Models.Elements
             if (viewModel.ContainsKey("StreetStatus") && viewModel["StreetStatus"] == "Select" || viewModel.ContainsKey(streetKey) && !string.IsNullOrEmpty(viewModel[streetKey]))
             {
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
+                if (string.IsNullOrEmpty(Properties.Value))
+                {
+                    Properties.Value = viewModel[streetKey];
+                }
                 var url = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/street";
 
                 var viewElement = new ElementViewModel
