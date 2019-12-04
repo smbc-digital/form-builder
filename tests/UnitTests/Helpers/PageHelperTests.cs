@@ -125,63 +125,6 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "Address"), It.IsAny<Element>(), null), Times.Once);
         }
 
-
-        [Fact]
-        public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenAddressSearch()
-        {
-            //Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.Address)
-                .WithPropertyText("text")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            var viewModel = new Dictionary<string, string>();
-            viewModel.Add("AddressStatus", "Search");
-
-            var schema = new FormSchemaBuilder()
-                .WithName("form-name")
-                .Build();
-
-            //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
-
-            //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenStreetSelect()
-        {
-            //Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.Street)
-                .WithQuestionId("street")
-                .WithStreetProvider("test")
-                .WithPropertyText("text")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            var viewModel = new Dictionary<string, string>();
-            viewModel.Add("StreetStatus", "Select");
-
-            var schema = new FormSchemaBuilder()
-                .WithName("Street name")
-                .Build();
-
-            //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
-
-            //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "Address"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-        }
-
         [Fact]
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenStreetSearch()
         {
