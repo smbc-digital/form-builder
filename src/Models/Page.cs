@@ -43,6 +43,7 @@ namespace form_builder.Models
                                                                 element.Type == EElementType.Textbox ||
                                                                 element.Type == EElementType.Checkbox ||
                                                                 element.Type == EElementType.Address ||
+                                                                element.Type == EElementType.AddressManual ||
                                                                 element.Type == EElementType.DateInput ||
                                                                 element.Type == EElementType.Street);
         

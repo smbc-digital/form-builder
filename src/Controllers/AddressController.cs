@@ -134,7 +134,7 @@ namespace form_builder.Controllers
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var currentPage = baseForm.GetPage(path);
             var viewModel = NormaliseFormData(formData);
-
+            currentPage.Elements[0].Type = EElementType.AddressManual;
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (currentPage == null)
@@ -145,7 +145,7 @@ namespace form_builder.Controllers
             currentPage.Validate(viewModel, _validators);
             if (!currentPage.IsValid)
             {
-                currentPage.Elements[0].Type = EElementType.AddressManual;
+                
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, sessionGuid);
                 formModel.Path = currentPage.PageSlug;
                 formModel.FormName = baseForm.FormName;         
@@ -163,7 +163,12 @@ namespace form_builder.Controllers
                     return RedirectToAction("Index", new
                     {
                         path = behaviour.PageSlug
-                    });               
+                    });
+                case EBehaviourType.SubmitForm:
+                    return RedirectToAction("Submit", "Home", new
+                    {
+                        form = baseForm.BaseURL
+                    });
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
             }

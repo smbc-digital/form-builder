@@ -10,7 +10,7 @@ namespace form_builder.Validators
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
 
-            if (element.Type == EElementType.DateInput || element.Properties.Optional)
+            if (element.Type == EElementType.DateInput || element.Type == EElementType.AddressManual || element.Properties.Optional)
             {
                 return new ValidationResult
                 {

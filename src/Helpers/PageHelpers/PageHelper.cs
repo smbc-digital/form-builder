@@ -212,6 +212,10 @@ namespace form_builder.Helpers.PageHelpers
 
         private async Task<string> GenerateAddressManualHtml(Dictionary<string, string> viewModel, Page page, Element element, string baseURL, string guid)
         {
+            element.Properties.AddressManualAddressLine1 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine1")).Value;
+            element.Properties.AddressManualAddressLine2 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine2")).Value;
+            element.Properties.AddressManualAddressTown = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressTown")).Value;
+            element.Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressPostcode")).Value;
 
             return await _viewRender.RenderAsync("AddressManual", element);
         }
