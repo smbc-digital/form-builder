@@ -528,13 +528,13 @@ Address example:
   * <a name="Street">**Street**</a>
     * QuestionId (*string*) __*__
     * StreetProvider (*string*) __*__ (FAKEStreet or CRMStreet)
-    * StreetLabel (*string*) __*__
-    * Hint (*string*) 
-    * SelectLabel (*string*) __*__
-    * SelectHint (*string*)
-    * MaxLength (*string*)
+    * StreetLabel (*string*) (Default: Search for a street)
+    * Hint (*string*) (Hint message when a user is searching for a street)
+    * SelectLabel (*string*) (Default: Street)
+    * MaxLength (*string*) (Default: 200)
+    * Optional (*boolean*) (Default: false)
 
-Address example:
+Street example:
 ```json
     {
           "Type": "Street",
@@ -543,7 +543,6 @@ Address example:
             "StreetLabel": "Search for a street by name",
             "Hint": "e.g. 'Hibbert' or 'Hibbert Lane'",
             "SelectLabel": "Street",
-            "SelectHint": "Choose a street",
             "StreetProvider": "CRMStreet",
             "MaxLength": "20"
           }

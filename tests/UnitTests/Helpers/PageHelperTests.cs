@@ -4,6 +4,7 @@ using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
@@ -11,7 +12,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -122,47 +122,9 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<Tuple<ElementViewModel, List<AddressSearchResult>>>(), null), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "Address"), It.IsAny<Element>(), null), Times.Once);
         }
 
-        [Fact]
-        public async Task GenerateHtml_ShouldGenerateValidUrl_ForAddressSelect()
-        {
-            //Arrange
-
-            var elementView = new ElementViewModel();
-            var addressList = new List<AddressSearchResult>();
-            var callback = new Tuple<ElementViewModel, List<AddressSearchResult>>(elementView, addressList);
-
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Tuple<ElementViewModel, List<AddressSearchResult>>>(), null))
-                .Callback<string, Tuple<ElementViewModel, List<AddressSearchResult>>, Dictionary<string, object>>((x, y, z) => callback = y);
-
-            var pageSlug = "page-one";
-            var baseUrl = "test";
-            var element = new ElementBuilder()
-                .WithType(EElementType.Address)
-                .WithPropertyText("text")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug(pageSlug)
-                .Build();
-
-            var viewModel = new Dictionary<string, string>();
-            viewModel.Add("AddressStatus", "Select");
-            
-            var schema = new FormSchemaBuilder()
-                .WithName("form-name")
-                .WithBaseUrl(baseUrl)
-                .Build();
-
-            //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
-
-            //Assert
-            Assert.Equal($"/{baseUrl}/{pageSlug}/address", callback.Item1.ReturnURL);
-        }
 
         [Fact]
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenAddressSearch()
@@ -198,6 +160,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var element = new ElementBuilder()
                 .WithType(EElementType.Street)
                 .WithQuestionId("street")
+                .WithStreetProvider("test")
                 .WithPropertyText("text")
                 .Build();
 
@@ -216,7 +179,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<Tuple<Element, List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>>(), null), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "Address"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
@@ -243,7 +206,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSearch"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "Street"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         //[Fact]

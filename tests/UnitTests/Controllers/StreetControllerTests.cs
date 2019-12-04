@@ -19,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using StockportGovUK.NetStandard.Models.Addresses;
 using form_builder.Helpers.Session;
 using form_builder.Providers.Street;
+using form_builder.Models.Elements;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -212,7 +213,7 @@ namespace form_builder_tests.UnitTests.Controllers
             _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, string>>()))
                 .Returns(new ValidationResult { IsValid = false });
 
-            var searchResultsCallback = new List<Street>();
+            var searchResultsCallback = new List<StockportGovUK.NetStandard.Models.Models.Verint.Street>();
             var element = new ElementBuilder()
                .WithType(EElementType.Street)
                .WithStreetProvider("testStreetProvider")
@@ -279,93 +280,6 @@ namespace form_builder_tests.UnitTests.Controllers
             var viewResult = Assert.IsType<ViewResult>(result);
             var viewResultModel = Assert.IsType<FormBuilderViewModel>(viewResult.Model);
             Assert.Equal("Select", viewResultModel.StreetStatus);
-        }
-
-        [Theory(Skip = "broken on street controller 116")]
-        [InlineData("Submit", EBehaviourType.SubmitForm)]
-        [InlineData("Index", EBehaviourType.GoToPage)]
-        public async Task Index_Post_Should_PerformRedirectToAction_WhenPageIsValid_And_SelectJourney_OnBehaviour(string viewName, EBehaviourType behaviourType)
-        {
-            var element = new ElementBuilder()
-               .WithType(EElementType.Street)
-               .WithQuestionId("test-street")
-               .WithStreetProvider("testStreetProvider")
-               .Build();
-
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(behaviourType)
-                .WithPageSlug("url")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .WithBehaviour(behaviour)
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            var viewModel = new ViewModelBuilder()
-                .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("StreetStatus", "Select")
-                .WithEntry($"{element.Properties.QuestionId}-street", "test street")
-                .Build();
-
-            var result = await _controller.Index("form", "page-one", viewModel);
-
-            _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()), Times.Never);
-
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal(viewName, viewResult.ActionName);
-            Assert.Equal("Home", viewResult.ControllerName);
-        }
-
-        [Fact(Skip = "broken on street controller 116")]
-        public async Task Index_Post_Should_PerformGoToExternalPageBehaviour_WhenPageIsValid_And_SelectJourney()
-        {
-            var element = new ElementBuilder()
-               .WithType(EElementType.Street)
-               .WithQuestionId("test-street-street")
-               .WithStreetProvider("testStreetProvider")
-               .Build();
-
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.GoToExternalPage)
-                .WithPageSlug("submit-url")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .WithBehaviour(behaviour)
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            var viewModel = new ViewModelBuilder()
-                .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("StreetStatus", "Select")
-                .WithEntry($"{element.Properties.QuestionId}", "test street")
-                .Build();
-
-            var result = await _controller.Index("form", "page-one", viewModel);
-
-            _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Street>>()), Times.Never);
-
-            var redirectResult = Assert.IsType<RedirectResult>(result);
-            Assert.Equal("submit-url", redirectResult.Url);
         }
     }
 }

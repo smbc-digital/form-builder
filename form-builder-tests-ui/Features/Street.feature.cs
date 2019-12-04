@@ -154,10 +154,10 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Selecting a street in the dropdown should display the success page", SourceLine=32)]
-        public virtual void SelectingAStreetInTheDropdownShouldDisplayTheSuccessPage()
+        [TechTalk.SpecRun.ScenarioAttribute("Should select a street correctly from the dropdown", SourceLine=32)]
+        public virtual void ShouldSelectAStreetCorrectlyFromTheDropdown()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Selecting a street in the dropdown should display the success page", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Should select a street correctly from the dropdown", null, ((string[])(null)));
 #line 33
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
@@ -174,6 +174,36 @@ this.ScenarioInitialize(scenarioInfo);
 #line 39
  testRunner.Then("I should see \"Green lane\" is selected in \"street-address-street\" dropdown with th" +
                     "e value \"123456789012\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [TechTalk.SpecRun.ScenarioAttribute("Should go through the journey and hit success page", SourceLine=40)]
+        public virtual void ShouldGoThroughTheJourneyAndHitSuccessPage()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Should go through the journey and hit success page", null, ((string[])(null)));
+#line 41
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 42
+ testRunner.Given("I navigate to \"/street/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 43
+ testRunner.Then("I fill in page1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 44
+ testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 45
+ testRunner.Then("I should see the \"street-address-street\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 46
+ testRunner.Then("I select \"Green lane\" in \"street-address-street\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 47
+ testRunner.Then("I should see \"Green lane\" is selected in \"street-address-street\" dropdown with th" +
+                    "e value \"123456789012\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 48
+ testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 49
+ testRunner.Then("I click the \"submit\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 50
+    testRunner.Then("I should see a \"h1\" element with \"Submit\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
