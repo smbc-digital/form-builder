@@ -200,7 +200,7 @@ namespace form_builder_tests.UnitTests.Controllers
             var result = await _controller.Index("form", "page-one", viewModel);
 
             _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Once);
             Assert.NotNull(searchResultsCallback);
             Assert.Single(searchResultsCallback);
             Assert.Equal(SearchResultsUniqueId, searchResultsCallback[0].UniqueId);

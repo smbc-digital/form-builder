@@ -64,7 +64,7 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var element in page.Elements)
             {
-                formModel.RawHTML += await element.RenderAsync(_viewRender, _elementHelper, guid, addressSearchResults, streetSearchResults, viewModel, page, baseForm, _enviroment);
+                formModel.RawHTML += await element.RenderAsync(_viewRender, _elementHelper, guid, addressAndStreetSearchResults, viewModel, page, baseForm, _enviroment);
             }
 
             return formModel;

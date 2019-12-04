@@ -314,7 +314,7 @@ namespace form_builder_tests.UnitTests.Controllers
             var result = await _controller.Index("form", "page-one", viewModel);
             var viewResult = Assert.IsType<ViewResult>(result);
             var viewResultModel = Assert.IsType<FormBuilderViewModel>(viewResult.Model);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>()), It.IsAny<List<AddressSearchResult>>()), Times.Once);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
             Assert.Equal("Search", viewResultModel.AddressStatus);
         }
 
