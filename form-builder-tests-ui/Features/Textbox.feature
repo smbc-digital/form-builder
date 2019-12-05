@@ -2,6 +2,14 @@
 Feature: Textbox
 	In order to fill in my details I have to navigate to Page1
 
+Scenario: Goes to page1 if they attempt to go straight to page2
+	Given I navigate to "/textbox/page2"
+	Then I should see the header
+	And I should see the "firstName" input
+	And I should see the "middleName" input
+	And I should see a "p" element with "(optional)" text
+	And I should see the "lastName" input
+	And I should see the "nextStep" button
 
 Scenario: Renders HTML tags on the page
 	Given I navigate to "/textbox/page1"

@@ -59,6 +59,13 @@ namespace form_builder.Controllers
 
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
 
+            var formData = _distributedCache.GetString(sessionGuid);
+            if (formData == null && path != null)
+            {
+                path = baseForm.StartPageSlug;
+                Response.Redirect("/" + form + "/");
+            }
+
             if (string.IsNullOrEmpty(path))
             {
                 path = baseForm.StartPageSlug;

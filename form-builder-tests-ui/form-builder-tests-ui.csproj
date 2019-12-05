@@ -34,6 +34,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\SemiComplexPath.feature.cs">
+      <DependentUpon>SemiComplexPath.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\Street.feature.cs">
       <DependentUpon>Street.feature</DependentUpon>
     </Compile>
@@ -60,6 +63,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\SemiComplexPath.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\Street.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
