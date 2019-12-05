@@ -1,4 +1,5 @@
-﻿using TechTalk.SpecFlow;
+﻿using System.Threading;
+using TechTalk.SpecFlow;
 using Xunit;
 
 namespace form_builder_tests_ui.StepDefinitions
@@ -35,6 +36,12 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenIFillInPostcode()
         {
             BrowserSession.FillIn("customers-address-AddressManualAddressPostcode").With("sk1 3xe");
+        }
+
+        [Then(@"I wait on second")]
+        public void ThenIWaitOneSecond()
+        {
+            Thread.Sleep(1000);
         }
 
         [Then(@"I should see that ""(.*)"" input has value ""(.*)""")]
