@@ -112,10 +112,10 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Shows Error Messages on the manual page when I dont enter amything", SourceLine=22)]
-        public virtual void ShowsErrorMessagesOnTheManualPageWhenIDontEnterAmything()
+        [TechTalk.SpecRun.ScenarioAttribute("Shows Error Messages on the manual page when I dont enter anything", SourceLine=22)]
+        public virtual void ShowsErrorMessagesOnTheManualPageWhenIDontEnterAnything()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Shows Error Messages on the manual page when I dont enter amything", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Shows Error Messages on the manual page when I dont enter anything", null, ((string[])(null)));
 #line 23
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
@@ -127,6 +127,96 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 27
  testRunner.Then("I should see a \"p\" element with \"Please enter Address Line 1\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 28
+ testRunner.And("I should see a \"p\" element with \"Please enter Town\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 29
+ testRunner.And("I should see a \"p\" element with \"Please enter a Postcode\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [TechTalk.SpecRun.ScenarioAttribute("Shows Error Message when Postcode is not entered", SourceLine=30)]
+        public virtual void ShowsErrorMessageWhenPostcodeIsNotEntered()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Shows Error Message when Postcode is not entered", null, ((string[])(null)));
+#line 31
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 32
+ testRunner.Given("I navigate to \"/address/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 33
+ testRunner.Then("I click the manual link", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 34
+ testRunner.Then("I fill in address line one", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 35
+ testRunner.And("I fill in town", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 36
+ testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 37
+ testRunner.Then("I should see a \"p\" element with \"Please enter a Postcode\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [TechTalk.SpecRun.ScenarioAttribute("Shows Error Message when invalid Postcode is entered", SourceLine=38)]
+        public virtual void ShowsErrorMessageWhenInvalidPostcodeIsEntered()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Shows Error Message when invalid Postcode is entered", null, ((string[])(null)));
+#line 39
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 40
+ testRunner.Given("I navigate to \"/address/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 41
+ testRunner.Then("I click the manual link", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 42
+ testRunner.Then("I fill in address line one", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 43
+ testRunner.And("I fill in town", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 44
+ testRunner.And("I fill in invalid postcode", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 45
+ testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 46
+ testRunner.Then("I should see a \"p\" element with \"Please enter a valid Postcode\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 47
+ testRunner.And("I should see that \"customers-address-AddressManualAddressLine1\" input has value \"" +
+                    "test\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 48
+ testRunner.And("I should see that \"customers-address-AddressManualAddressTown\" input has value \"t" +
+                    "own\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [TechTalk.SpecRun.ScenarioAttribute("Submits the page when everything is filled in", SourceLine=49)]
+        public virtual void SubmitsThePageWhenEverythingIsFilledIn()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Submits the page when everything is filled in", null, ((string[])(null)));
+#line 50
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 51
+ testRunner.Given("I navigate to \"/address/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 52
+ testRunner.Then("I click the manual link", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 53
+ testRunner.Then("I fill in address line one", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 54
+ testRunner.And("I fill in town", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 55
+ testRunner.And("I fill in postcode", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 56
+ testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 57
+ testRunner.Then("I should see a \"th\" element with \"customers-address-AddressManualAddressLine1\" te" +
+                    "xt", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 58
+ testRunner.And("I should see a \"th\" element with \"customers-address-AddressManualAddressTown\" tex" +
+                    "t", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 59
+ testRunner.And("I should see a \"th\" element with \"customers-address-AddressManualAddressPostcode\"" +
+                    " text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }

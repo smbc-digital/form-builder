@@ -40,14 +40,21 @@ namespace form_builder.Validators
                 ? viewModel[$"{element.Properties.QuestionId}-AddressManualAddressPostcode"]
                 : null;
 
-            var addressPostcodeValid = !string.IsNullOrEmpty(valueAddressPostcode) && _postCode.IsMatch(valueAddressPostcode);
-           
+            var addressPostcodeMessage = string.Empty;
+            var addressPostcodeValid = true;
 
-            var addressPostcodeMessage = addressPostcodeValid ? string.Empty : "Please enter a Postcode";
+            if (string.IsNullOrEmpty(valueAddressPostcode))
+            {
+                addressPostcodeMessage = "Please enter a Postcode";
+                addressPostcodeValid = false;
+            }
+            else if(!_postCode.IsMatch(valueAddressPostcode))
+            {
+                addressPostcodeMessage = "Please enter a valid Postcode";
+                addressPostcodeValid = false;
+            }
 
             var isValid = addressLine1Valid && addressTownValid && addressPostcodeValid;
-
-          
 
             return new ValidationResult
             {
