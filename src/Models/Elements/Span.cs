@@ -2,7 +2,7 @@
 
 namespace form_builder.Models.Elements
 {
-    public class Span : Element, IElement
+    public class Span : Element
     {
         public Span()
         {

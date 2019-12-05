@@ -2,7 +2,7 @@
 
 namespace form_builder.Models.Elements
 {
-    public class H2 : Element, IElement
+    public class H2 : Element
     {
         public H2()
         {

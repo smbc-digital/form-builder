@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
 {
-    public class DateInput : Element, IElement
+    public class DateInput : Element
     {
         public DateInput()
         {
             Type = EElementType.DateInput;
         }
 
-        public new Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             Properties.Day = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-day");
             Properties.Month = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-month");

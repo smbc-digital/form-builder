@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
 {
-    public class Textbox : Element, IElement
+    public class Textbox : Element
     {
         public Textbox()
         {
             Type = EElementType.Textbox;
         }
 
-        public new Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);

@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
 {
-    public class Street : Element, IElement
+    public class Street : Element
     {
         public Street()
         {
             Type = EElementType.Street;
         }
-        public new async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
