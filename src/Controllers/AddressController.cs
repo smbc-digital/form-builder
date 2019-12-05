@@ -168,9 +168,10 @@ namespace form_builder.Controllers
                 case EBehaviourType.GoToExternalPage:
                     return Redirect(behaviour.PageSlug);
                 case EBehaviourType.GoToPage:
-                    return RedirectToAction("Index", new
+                    return RedirectToAction("Index", "Home", new
                     {
-                        path = behaviour.PageSlug
+                        path = behaviour.PageSlug,
+                        form = baseForm.BaseURL
                     });
                 case EBehaviourType.SubmitForm:
                     return RedirectToAction("Submit", "Home", new
