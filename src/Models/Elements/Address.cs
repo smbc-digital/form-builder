@@ -11,14 +11,14 @@ using form_builder.Extensions;
 
 namespace form_builder.Models.Elements
 {
-    public class Address : Element, IElement
+    public class Address : Element
     {
         public Address()
         {
             Type = EElementType.Address;
         }
 
-        public new async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             var postcodeKey = $"{Properties.QuestionId}-postcode";
 

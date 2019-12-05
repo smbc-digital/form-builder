@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
 {
-    public class InlineAlert : Element, IElement
+    public class InlineAlert : Element
     {
         public InlineAlert()
         {
             Type = EElementType.InlineAlert;
         }
 
-        public new Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             elementHelper.CheckIfLabelAndTextEmpty(this);
             return viewRender.RenderAsync(Type.ToString(), this);
