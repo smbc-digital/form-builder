@@ -85,10 +85,6 @@ namespace form_builder.Controllers
             }
 
             var page = baseForm.GetPage(path);
-            if (page == null)
-            {
-                throw new NullReferenceException($"Requested path '{path}' object could not be found.");
-            }
 
             var viewModel = await _pageService.GetViewModel(page, baseForm, path, sessionGuid);
 
