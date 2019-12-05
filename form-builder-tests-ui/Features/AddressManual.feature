@@ -43,7 +43,7 @@ Scenario: Shows Error Message when invalid Postcode is entered
 	And I fill in town
 	And I fill in invalid postcode
 	When I click the "nextStep" button
-	Then I wait on second
+	Then I wait one second
 	Then I should see a "p" element with "Please enter a valid Postcode" text
 	And I should see that "customers-address-AddressManualAddressLine1" input has value "test"
 	And I should see that "customers-address-AddressManualAddressTown" input has value "town"
@@ -55,7 +55,7 @@ Scenario: Submits the page when everything is filled in
 	And I fill in town
 	And I fill in postcode
 	When I click the "nextStep" button
-	Then I wait on second
+	Then I wait one second
 	Then I should see a "th" element with "customers-address-AddressManualAddressLine1" text
 	And I should see a "th" element with "customers-address-AddressManualAddressTown" text
 	And I should see a "th" element with "customers-address-AddressManualAddressPostcode" text

@@ -38,7 +38,7 @@ namespace form_builder_tests_ui.StepDefinitions
             BrowserSession.FillIn("customers-address-AddressManualAddressPostcode").With("sk1 3xe");
         }
 
-        [Then(@"I wait on second")]
+        [Then(@"I wait one second")]
         public void ThenIWaitOneSecond()
         {
             Thread.Sleep(1000);
