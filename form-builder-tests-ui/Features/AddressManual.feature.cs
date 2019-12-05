@@ -102,6 +102,31 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("I click the manual link", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 17
  testRunner.Then("I should see the \"customers-address-AddressManualAddressLine1\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 18
+ testRunner.Then("I should see the \"customers-address-AddressManualAddressLine2\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 19
+ testRunner.Then("I should see the \"customers-address-AddressManualAddressTown\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 20
+ testRunner.Then("I should see the \"customers-address-AddressManualAddressPostcode\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [TechTalk.SpecRun.ScenarioAttribute("Shows Error Messages on the manual page when I dont enter amything", SourceLine=22)]
+        public virtual void ShowsErrorMessagesOnTheManualPageWhenIDontEnterAmything()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Shows Error Messages on the manual page when I dont enter amything", null, ((string[])(null)));
+#line 23
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 24
+ testRunner.Given("I navigate to \"/address/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 25
+ testRunner.Then("I click the manual link", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 26
+ testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 27
+ testRunner.Then("I should see a \"p\" element with \"Please enter Address Line 1\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
