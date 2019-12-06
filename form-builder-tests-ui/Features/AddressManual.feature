@@ -39,9 +39,10 @@ Scenario: Shows Error Message when Postcode is not entered
 Scenario: Shows Error Message when invalid Postcode is entered
 	Given I navigate to "/address/page1"
 	Then  I click the manual link
+	Then I wait one second
 	Then I fill in address line one
-	And I fill in town
-	And I fill in invalid postcode
+	Then I fill in town
+	Then I fill in invalid postcode
 	When I click the "nextStep" button
 	Then I wait one second
 	Then I should see a "p" element with "Please enter a valid Postcode" text
@@ -50,10 +51,11 @@ Scenario: Shows Error Message when invalid Postcode is entered
 
 Scenario: Submits the page when everything is filled in
 	Given I navigate to "/address/page1"
-	Then  I click the manual link
+	When  I click the manual link
+	Then I wait one second
 	Then I fill in address line one
-	And I fill in town
-	And I fill in postcode
+	Then I fill in town
+	Then I fill in postcode
 	When I click the "nextStep" button
 	Then I wait one second
 	Then I should see a "th" element with "customers-address-AddressManualAddressLine1" text
