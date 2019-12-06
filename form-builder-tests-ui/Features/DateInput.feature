@@ -6,37 +6,41 @@ Feature: DateInput
 Scenario: User does not fill in any fields
 	Given I navigate to "/dateinput/page1"
 	When I click the "nextPage" button
-	Then I should see a validation message for "passportIssued-error" input
-	Then I should not see a validation message for "dob-error" input
+	Then I should see a validation message for "passportIssued1-error" input
+	Then I should not see a validation message for "dob1-error" input
 
 Scenario: User enters strings in the day, month and year
 	Given I navigate to "/dateinput/page1"
-	Then I fill the day with "aa" value, month with "bb" value and year with "cccc" value
+	Then I fill the day with "aa" value, month with "bb" value and year with "cccc" value on "passportIssued1"
 	When I click the "nextPage" button
-	Then I should see a validation message for "passportIssued-error" input
-	Then I should see the values "aa", "bb" and "cccc" in the date input
-
+	Then I should see a validation message for "passportIssued1-error" input
+	Then I should see the values "aa", "bb" and "cccc" in the date input for "passportIssued1" blah
 
 Scenario: User enters today's date
 	Given I navigate to "/dateinput/page1"
-	Then I fill the date input with today's date
+	Then I fill the date input with today's date in "passportIssued1"
 	When I click the "nextPage" button
-	Then I should see a validation message for "passportIssued-error" input
-	Then I should see todays date refilled in the date input
+	Then I should see a validation message for "passportIssued1-error" input
+	Then I should see todays date refilled in the date input in for "passportIssued1" blah
 
 Scenario: User enters a date in the past
 	Given I navigate to "/dateinput/page1"
-	Then I fill the day with "01" value, month with "01" value and year with "2012" value
+	Then I fill the day with "01" value, month with "01" value and year with "2012" value on "passportIssued1"
 	When I click the "nextPage" button
 	Given I navigate to "/dateinput/page2"
-	Then I fill the day with "01" value, month with "01" value and year with "2010" value
+	Then I fill the day with "01" value, month with "01" value and year with "2010" value on "passportIssued2"
 	When I click the "nextPage2" button
-	Then I should see a validation message for "passportIssued-error" input
-	Then I should see the values "01", "01" and "2010" in the date input
+	Then I should see a validation message for "passportIssued2-error" input
+	Then I should see the values "01", "01" and "2010" in the date input for "passportIssued2" blah
 
 Scenario: User enters a date in the future
-	Given I navigate to "/dateinput/page3"
-	Then I fill the day with "01" value, month with "01" value and year with "2022" value
+	Given I navigate to "/dateinput/page1"
+	Then I fill the day with "01" value, month with "01" value and year with "2012" value on "passportIssued1"
 	When I click the "nextPage" button
-	Then I should see a validation message for "passportIssued-error" input
-	Then I should see the values "01", "01" and "2022" in the date input
+	Given I navigate to "/dateinput/page2"
+	Then I fill the day with "01" value, month with "01" value and year with "2110" value on "passportIssued2"
+	Given I navigate to "/dateinput/page3"
+	Then I fill the day with "01" value, month with "01" value and year with "2022" value on "passportIssued3"
+	When I click the "nextPage3" button
+	Then I should see a validation message for "passportIssued3-error" input
+	Then I should see the values "01", "01" and "2022" in the date input for "passportIssued3" blah
