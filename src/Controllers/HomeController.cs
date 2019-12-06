@@ -1,19 +1,17 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using form_builder.Models;
-using Newtonsoft.Json;
 using form_builder.Enum;
-using form_builder.Validators;
 using System.Threading.Tasks;
 using System;
-using StockportGovUK.AspNetCore.Gateways;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Logging;
-using System.Net;
 using System.Linq;
 using form_builder.Helpers.Session;
+using form_builder.Services.PageService;
+using form_builder.Services.SubmtiService;
 
 namespace form_builder.Controllers
 {
@@ -21,27 +19,27 @@ namespace form_builder.Controllers
     {
         private readonly IDistributedCacheWrapper _distributedCache;
 
-        private readonly IEnumerable<IElementValidator> _validators;
-
         private readonly ISchemaProvider _schemaProvider;
-
-        private readonly IGateway _gateway;
 
         private readonly IPageHelper _pageHelper;
 
         private readonly ISessionHelper _sessionHelper;
 
+        private readonly IPageService _pageService;
+
+        private readonly ISubmitService _submitService;
+
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper)
+        public HomeController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, ISchemaProvider schemaProvider, IPageHelper pageHelper, ISessionHelper sessionHelper, IPageService pageService, ISubmitService submitService)
         {
             _distributedCache = distributedCache;
-            _validators = validators;
             _schemaProvider = schemaProvider;
-            _gateway = gateway;
             _pageHelper = pageHelper;
             _sessionHelper = sessionHelper;
             _logger = logger;
+            _pageService = pageService;
+            _submitService = submitService;
         }
 
         [HttpGet]
@@ -77,32 +75,22 @@ namespace form_builder.Controllers
                 throw new NullReferenceException($"Requested path '{path}' object could not be found.");
             }
 
+            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
+            viewModel.FormName = baseForm.FormName;
+            viewModel.Path = path;
+
             if (page.Elements.Any(_ => _.Type == EElementType.Street))
             {
-                return RedirectToAction("Index", "Street",
-                    new
-                    {
-                        form,
-                        path,
-                    }
-                );
+                viewModel.StreetStatus = "Search";
+                return View("../Street/Index", viewModel);
             }
 
             if (page.Elements.Any(_ => _.Type == EElementType.Address))
             {
-                return RedirectToAction("Index", "Address",
-                    new
-                    {
-                        form,
-                        path,
-                    }
-                );
+                viewModel.AddressStatus = "Search";
+                return View("../Address/Index", viewModel);
             }
 
-            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
-
-            viewModel.Path = path;
-            viewModel.FormName = baseForm.FormName;
             return View(viewModel);
         }
 
@@ -111,29 +99,15 @@ namespace form_builder.Controllers
         [Route("{form}/{path}")]
         public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData)
         {
-            var baseForm = await _schemaProvider.Get<FormSchema>(form);
-            var currentPage = baseForm.GetPage(path);
             var viewModel = NormaliseFormData(formData);
+            var currentPageResult = await _pageService.ProcessPage(form, path, viewModel);
 
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-
-            if (currentPage == null)
+            if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
             {
-                throw new NullReferenceException($"Current page '{path}' object could not be found.");
+                return View(currentPageResult.ViewName, currentPageResult.ViewModel);
             }
 
-            currentPage.Validate(viewModel, _validators);
-            if (!currentPage.IsValid)
-            {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, sessionGuid);
-                formModel.Path = currentPage.PageSlug;
-                formModel.FormName = baseForm.FormName;
-                return View(formModel);
-            }
-
-            var behaviour = currentPage.GetNextPage(viewModel);
-            _pageHelper.SaveAnswers(viewModel, sessionGuid);
-
+            var behaviour = currentPageResult.Page.GetNextPage(viewModel);
             switch (behaviour.BehaviourType)
             {
                 case EBehaviourType.GoToExternalPage:
@@ -146,7 +120,7 @@ namespace form_builder.Controllers
                 case EBehaviourType.SubmitForm:
                     return RedirectToAction("Submit", new
                     {
-                        form = baseForm.BaseURL
+                        form
                     });
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
@@ -157,58 +131,10 @@ namespace form_builder.Controllers
         [Route("{form}/submit")]
         public async Task<IActionResult> Submit(string form)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var result = await _submitService.ProcessSubmission(form);
 
-            if (string.IsNullOrEmpty(sessionGuid))
-            {
-                throw new ApplicationException($"A Session GUID was not provided.");
-            }
-
-            var baseForm = await _schemaProvider.Get<FormSchema>(form);
-            var formData = _distributedCache.GetString(sessionGuid);
-            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-            convertedAnswers.FormName = form;
-
-            var currentPage = baseForm.GetPage(convertedAnswers.Path);
-            var postUrl = currentPage.GetSubmitFormEndpoint(convertedAnswers);
-            var postData = CreatePostData(convertedAnswers);
-            var reference = string.Empty;
-
-            var response = await _gateway.PostAsync(postUrl, postData);
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                // NOTE: Jon H - Is it correct that this throws an exception or is this expceted behavoiour we need to handle?
-                throw new ApplicationException($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
-            }
-
-            if (response.Content != null)
-            {
-                var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
-                reference = JsonConvert.DeserializeObject<string>(content);
-            }
-
-            _distributedCache.Remove(sessionGuid);
-            _sessionHelper.RemoveSessionGuid();
-
-            var page = baseForm.GetPage("success");
-
-            if (page == null)
-            {
-                return View("Submit", convertedAnswers);
-            }
-
-            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
-            var success = new Success
-            {
-                FormName = baseForm.FormName,
-                Reference = reference,
-                FormAnswers = convertedAnswers,
-                PageContent = viewModel.RawHTML,
-                SecondaryHeader = page.Title
-            };
-
-            ViewData["BannerTypeformUrl"] = baseForm.FeedbackForm;
-            return View("Success", success);
+            ViewData["BannerTypeformUrl"] = result.FeedbackFormUrl;
+            return View(result.ViewName, result.ViewModel);
         }
 
         protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)

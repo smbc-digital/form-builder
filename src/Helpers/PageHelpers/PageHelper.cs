@@ -3,6 +3,7 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
+using form_builder.Services.PageService.Entities;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
@@ -20,6 +21,7 @@ namespace form_builder.Helpers.PageHelpers
         void CheckForDuplicateQuestionIDs(Page page);
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null);
         void SaveAnswers(Dictionary<string, string> viewModel, string guid);
+        Task<ProcessPageEntity> ProcessStreetAndAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults, bool isAddressJourney);
     }
 
     public class PageHelper : IPageHelper
@@ -105,5 +107,40 @@ namespace form_builder.Helpers.PageHelpers
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
+
+        public async Task<ProcessPageEntity> ProcessStreetAndAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults, bool isAddressJourney)
+        {
+            switch (journey)
+            {
+                case "Search":
+                    try
+                    {
+                        var adddressViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults);
+                        adddressViewModel.AddressStatus = "Select";
+                        adddressViewModel.StreetStatus = "Select";
+                        adddressViewModel.FormName = baseForm.FormName;
+
+                        return new ProcessPageEntity
+                        {
+                            Page = currentPage,
+                            ViewModel = adddressViewModel,
+                            UseGeneratedViewModel = true,
+                            ViewName = isAddressJourney ? "../Address/Index" : "../Street/Index"
+                        };
+                    }
+                    catch (Exception e)
+                    {
+                        throw new ApplicationException($"AddressController: An exception has occured while attempting to generate Html, Exception: {e.Message}");
+                    };
+                case "Select":
+                    return new ProcessPageEntity
+                    {
+                        Page = currentPage
+                    };
+                default:
+                    throw new ApplicationException($"AddressController: Unknown journey type");
+            }
+        }
+
     }
 }

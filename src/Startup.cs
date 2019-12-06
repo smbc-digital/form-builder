@@ -10,6 +10,11 @@ using StockportGovUK.AspNetCore.Gateways;
 using form_builder.Configuration;
 using StockportGovUK.AspNetCore.Middleware.App;
 using form_builder.Models.Elements;
+using form_builder.Services.PageService;
+using form_builder.Services;
+using form_builder.Services.AddressService;
+using form_builder.Services.StreetService;
+using form_builder.Services.SubmtiService;
 
 namespace form_builder
 {
@@ -39,6 +44,7 @@ namespace form_builder
                 .ConfigureAddressProviders()
                 .ConfigureStreetProviders()
                 .AddHelpers()
+                .AddServices()
                 .AddSession(_ => _.IdleTimeout = TimeSpan.FromMinutes(30));
 
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
