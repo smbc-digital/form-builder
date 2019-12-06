@@ -1,4 +1,5 @@
 ﻿using form_builder.Configuration;
+using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -20,6 +21,7 @@ namespace form_builder.Helpers.PageHelpers
         void CheckForDuplicateQuestionIDs(Page page);
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null);
         void SaveAnswers(Dictionary<string, string> viewModel, string guid);
+        bool hasDuplicateQuestionIDs(List<Page> pages);
     }
 
     public class PageHelper : IPageHelper
@@ -105,5 +107,43 @@ namespace form_builder.Helpers.PageHelpers
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
+
+        public bool hasDuplicateQuestionIDs(List<Page> pages)
+        {
+            bool duplicateFound = false;
+            List<string> qIds = new List<string>();
+            foreach (var page in pages)
+            {
+                foreach (var element in page.Elements)
+                {
+                    if (
+                        element.Type == EElementType.Address
+                        || element.Type == EElementType.Textbox
+                        || element.Type == EElementType.Textarea
+                        || element.Type == EElementType.Select
+                        || element.Type == EElementType.Radio
+                        || element.Type == EElementType.Street
+                        || element.Type == EElementType.Checkbox
+                        || element.Type == EElementType.DateInput
+                        )
+                    {
+                        qIds.Add(element.Properties.QuestionId);
+                    }
+                }
+            }
+
+            var hashSet = new HashSet<string>();
+            foreach(var id in qIds)
+            {
+                if (!hashSet.Add(id))
+                {
+                    duplicateFound = true;
+                    return duplicateFound;
+                }
+            }
+
+            return duplicateFound;
+        }
+
     }
 }

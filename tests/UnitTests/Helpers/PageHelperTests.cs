@@ -34,7 +34,7 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             _mockDisallowedKeysOptions.Setup(_ => _.Value).Returns(new DisallowedAnswerKeysConfiguration
             {
-                DisallowedAnswerKeys = new []
+                DisallowedAnswerKeys = new[]
                 {
                     "Guid", "Path"
                 }
@@ -139,7 +139,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Callback<string, Tuple<ElementViewModel, List<AddressSearchResult>>, Dictionary<string, object>>((x, y, z) => callback = y);
 
             var pageSlug = "page-one";
-            var baseUrl = "test";        
+            var baseUrl = "test";
 
             var addressElement = new form_builder.Models.Elements.Address { Properties = new Property { Text = "text" } };
 
@@ -150,7 +150,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var viewModel = new Dictionary<string, string>();
             viewModel.Add("AddressStatus", "Select");
-            
+
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .WithBaseUrl(baseUrl)
@@ -191,8 +191,8 @@ namespace form_builder_tests.UnitTests.Helpers
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenStreetSelect()
         {
             //Arrange
-            var element = new form_builder.Models.Elements.Street{ Properties =  new Property { QuestionId = "street", StreetProvider = "test", Text= "test"} };
-            
+            var element = new form_builder.Models.Elements.Street { Properties = new Property { QuestionId = "street", StreetProvider = "test", Text = "test" } };
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
@@ -450,5 +450,90 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal("Item2", callbackModel.Pages[0].Answers[1].QuestionId);
             Assert.Equal(item2Data, callbackModel.Pages[0].Answers[1].Response);
         }
+
+        [Fact]
+        public void DuplicateIDs_ShouldErrorIfDuplicateQuestionIDsInJSON()
+        {
+            // Arrange
+            var element1 = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("texbox1")
+                .WithLabel("First name")
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("texbox2")
+                .WithLabel("Middle name")
+                .Build();
+
+            var element3 = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("texbox1")
+                .WithLabel("First name")
+                .Build();
+
+            var page1 = new PageBuilder()
+              .WithElement(element1)
+              .WithElement(element2)
+              .Build();
+
+            var page2 = new PageBuilder()
+              .WithElement(element3)
+              .Build();
+
+            List<Page> pages = new List<Page>();
+            pages.Add(page1);
+            pages.Add(page2);
+
+            // Act
+            var foundDuplicates = _pageHelper.hasDuplicateQuestionIDs(pages);
+
+            // Assert
+            Assert.True(foundDuplicates);
+        }
+
+        [Fact]
+        public void DuplicateIDs_ShouldNotErrorIfNoDuplicateQuestionIDsInJSON()
+        {
+            // Arrange
+            var element1 = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("texbox1")
+                .WithLabel("First name")
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("texbox2")
+                .WithLabel("Middle name")
+                .Build();
+
+            var element3 = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("texbox3")
+                .WithLabel("First name")
+                .Build();
+
+            var page1 = new PageBuilder()
+              .WithElement(element1)
+              .WithElement(element2)
+              .Build();
+
+            var page2 = new PageBuilder()
+              .WithElement(element3)
+              .Build();
+
+            List<Page> pages = new List<Page>();
+            pages.Add(page1);
+            pages.Add(page2);
+
+            // Act
+            var foundDuplicates = _pageHelper.hasDuplicateQuestionIDs(pages);
+
+            // Assert
+            Assert.False(foundDuplicates);
+        }
+
     }
 }

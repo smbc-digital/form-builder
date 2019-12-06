@@ -60,6 +60,12 @@ namespace form_builder.Controllers
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
 
             var formData = _distributedCache.GetString(sessionGuid);
+
+            if (_pageHelper.hasDuplicateQuestionIDs(baseForm.Pages))
+            {
+                throw new ApplicationException($"The provided json '{baseForm.FormName}' has duplicate QuestionIDs");
+            }
+
             if (formData == null && path != null)
             {
                 path = baseForm.StartPageSlug;
@@ -70,7 +76,7 @@ namespace form_builder.Controllers
             {
                 path = baseForm.StartPageSlug;
             }
-            
+
             var page = baseForm.GetPage(path);
             if (page == null)
             {
