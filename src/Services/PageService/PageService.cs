@@ -13,12 +13,16 @@ using form_builder.Enum;
 using form_builder.Services.AddressService;
 using form_builder.Services.StreetService;
 using form_builder.Models.Elements;
+using Microsoft.AspNetCore.Mvc;
+using form_builder.ViewModels;
 
 namespace form_builder.Services.PageService
 {
     public interface IPageService
     {
         Task<ProcessPageEntity> ProcessPage(string form, string path, Dictionary<string, string> viewModel, bool processManual = false);
+
+        Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid);
     }
 
     public class PageService : IPageService
@@ -56,7 +60,7 @@ namespace form_builder.Services.PageService
 
             if (processManual)
             {
-                var addressManualElememt = new AddressManual() { Properties = currentPage.Elements[0].Properties, Type = EElementType.AddressManual };                
+                var addressManualElememt = new AddressManual() { Properties = currentPage.Elements[0].Properties, Type = EElementType.AddressManual };
                 currentPage.Elements[0] = addressManualElememt;
             }
 
@@ -94,24 +98,33 @@ namespace form_builder.Services.PageService
             };
         }
 
+        public async Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid)
+        {
+            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
+            viewModel.FormName = baseForm.FormName;
+            viewModel.Path = path;
+
+            return viewModel;
+        }
+
         protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)
-{
-
-    var normaisedFormData = new Dictionary<string, string>();
-
-    foreach (var item in formData)
-    {
-        if (item.Value.Length == 1)
         {
-            normaisedFormData.Add(item.Key, item.Value[0]);
-        }
-        else
-        {
-            normaisedFormData.Add(item.Key, string.Join(", ", item.Value));
-        }
-    }
 
-    return normaisedFormData;
-}
+            var normaisedFormData = new Dictionary<string, string>();
+
+            foreach (var item in formData)
+            {
+                if (item.Value.Length == 1)
+                {
+                    normaisedFormData.Add(item.Key, item.Value[0]);
+                }
+                else
+                {
+                    normaisedFormData.Add(item.Key, string.Join(", ", item.Value));
+                }
+            }
+
+            return normaisedFormData;
+        }
     }
 }
