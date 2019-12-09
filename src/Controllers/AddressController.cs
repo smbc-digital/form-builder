@@ -255,8 +255,7 @@ namespace form_builder.Controllers
             {
                 Properties = currentPage.Elements[0].Properties,
                 Type = EElementType.AddressManual,
-            };
-            addressManualElememt.SetAddressProperties(viewModel);
+            };            
 
             currentPage.Elements[0] = addressManualElememt;
 

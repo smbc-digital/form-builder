@@ -21,7 +21,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.AddressManual;
         }
 
-        public void SetAddressProperties(Dictionary<string, string> viewModel)
+        protected void SetAddressProperties(Dictionary<string, string> viewModel)
         {
             Properties.AddressManualAddressLine1 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine1")).Value;
             Properties.AddressManualAddressLine2 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine2")).Value;
@@ -29,6 +29,13 @@ namespace form_builder.Models.Elements
             Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressPostcode")).Value;
         }
 
-        
+
+        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        {
+
+            SetAddressProperties(viewModel);
+            return viewRender.RenderAsync(Type.ToString(), this, null);
+        }
+
     }
 }
