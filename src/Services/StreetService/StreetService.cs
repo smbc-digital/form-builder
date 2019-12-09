@@ -44,6 +44,7 @@ namespace form_builder.Services.StreetService
             var street = journey == "Select"
                 ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}-street").Response
                 : viewModel[$"{streetElement.Properties.QuestionId}-street"];
+
             if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
             {
                 _pageHelper.SaveAnswers(viewModel, guid);

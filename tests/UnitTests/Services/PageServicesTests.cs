@@ -6,8 +6,10 @@ using form_builder.Models.Elements;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Services.AddressService;
 using form_builder.Services.PageService;
+using form_builder.Services.PageService.Entities;
 using form_builder.Services.StreetService;
 using form_builder.Validators;
+using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -44,7 +46,120 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task Index_Post_ApplicationShould_ThrowApplicationException_WhenGenerateHtml_ThrowsException()
+        public async Task ProcessPage_ShouldCall_Schema_And_Session_Service()
+        {
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()))
+                .ReturnsAsync(new FormBuilderViewModel());
+
+            var element = new ElementBuilder()
+               .WithType(EElementType.Textarea)
+               .WithQuestionId("test-question")
+               .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var viewModel = new Dictionary<string, string>
+            {
+                { "Guid", Guid.NewGuid().ToString() },
+                { "AddressStatus", "Search" },
+                { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
+            };
+
+            var result = await _service.ProcessPage("form", "page-one", viewModel, false);
+
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
+            _schemaProvider.Verify(_ => _.Get<FormSchema>(It.IsAny<string>()), Times.Once);
+            _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
+            Assert.IsType<ProcessPageEntity>(result);
+        }
+
+        [Fact]
+        public async Task ProcessPage_ShouldCallAddressService_WhenAddressElement()
+        {
+            _addressService.Setup(_ => _.ProcesssAddress(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new ProcessPageEntity());
+
+            var element = new ElementBuilder()
+               .WithType(EElementType.Address)
+               .WithQuestionId("test-address-question")
+               .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var viewModel = new Dictionary<string, string>
+            {
+                { "Guid", Guid.NewGuid().ToString() },
+                { "AddressStatus", "Search" },
+                { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
+            };
+
+            var result = await _service.ProcessPage("form", "page-one", viewModel, false);
+
+            _addressService.Verify(_ => _.ProcesssAddress(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            Assert.IsType<ProcessPageEntity>(result);
+        }
+
+        [Fact]
+        public async Task ProcessPage_ShouldCallStreetService_WhenAddressElement()
+        {
+            _streetService.Setup(_ => _.ProcessStreet(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new ProcessPageEntity());
+
+            var element = new ElementBuilder()
+               .WithType(EElementType.Street)
+               .WithQuestionId("test-street-question")
+               .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var viewModel = new Dictionary<string, string>
+            {
+                { "Guid", Guid.NewGuid().ToString() },
+                { "AddressStatus", "Search" },
+                { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
+            };
+
+            var result = await _service.ProcessPage("form", "page-one", viewModel, false);
+
+            _streetService.Verify(_ => _.ProcessStreet(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            Assert.IsType<ProcessPageEntity>(result);
+        }
+
+        [Fact]
+        public async Task ProcessPage_ApplicationShould_ThrowApplicationException_WhenGenerateHtml_ThrowsException()
         {
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()))
                 .Throws<ApplicationException>();

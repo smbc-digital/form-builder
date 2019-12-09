@@ -3,9 +3,11 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
+using form_builder.Services.PageService.Entities;
 using form_builder.Services.StreetService;
 using form_builder_tests.Builders;
 using Moq;
+using StockportGovUK.NetStandard.Models.Addresses;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -21,6 +23,9 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IEnumerable<IStreetProvider>> _streetProviders = new Mock<IEnumerable<IStreetProvider>>();
         private readonly Mock<IStreetProvider> _streetProvider = new Mock<IStreetProvider>();
 
+        private const string SearchResultsUniqueId = "123456";
+        private const string SearchResultsReference = "Test street";
+
         public StreetServiceTests()
         {
             _streetProvider.Setup(_ => _.ProviderName).Returns("testStreetProvider");
@@ -33,7 +38,7 @@ namespace form_builder_tests.UnitTests.Services
 
         [Theory]
         [InlineData(true, "Search")]
-        public async Task Index_Post_ShouldCallStreetProvider_WhenCorrectJourney(bool isValid, string journey)
+        public async Task ProcessStreet_ShouldCallStreetProvider_WhenCorrectJourney(bool isValid, string journey)
         {
             var questionId = "test-street";
 
@@ -87,84 +92,69 @@ namespace form_builder_tests.UnitTests.Services
             _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
         }
 
-        //[Fact]
-        //public async Task Index_Post_Should_Provide_SearchResults_ToPageHelper()
-        //{
-        //    var searchResultsCallback = new List<AddressSearchResult>();
-        //    var element = new ElementBuilder()
-        //       .WithType(EElementType.Street)
-        //       .WithQuestionId("test-street")
-        //       .WithStreetProvider("testStreetProvider")
-        //       .Build();
+        [Fact]
+        public async Task ProcessStreet_Should_Provide_SearchResults_ToPageHelper()
+        {
+            var questionId = "test-street";
+            var cacheData = new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>()
+                {
+                    new PageAnswers
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                QuestionId = $"{questionId}-street",
+                                Response = "test street"
+                            }
+                        },
+                        PageSlug = "page-one"
+                    }
+                }
+            };
+            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(Newtonsoft.Json.JsonConvert.SerializeObject(cacheData));
 
-        //    var page = new PageBuilder()
-        //        .WithElement(element)
-        //        .WithPageSlug("page-one")
-        //        .Build();
+            _streetProvider.Setup(_ => _.SearchAsync(It.IsAny<string>())).ReturnsAsync(new List<AddressSearchResult> { new AddressSearchResult { UniqueId = SearchResultsUniqueId, Name = SearchResultsReference } });
 
-        //    var schema = new FormSchemaBuilder()
-        //        .WithPage(page)
-        //        .Build();
+            var searchResultsCallback = new List<AddressSearchResult>();
+            var element = new ElementBuilder()
+               .WithType(EElementType.Street)
+               .WithQuestionId(questionId)
+               .WithStreetProvider("testStreetProvider")
+               .Build();
 
-        //    _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-        //        .ReturnsAsync(schema);
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
 
-        //    _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()))
-        //        .Callback<Page, Dictionary<string, string>, FormSchema, string, List<AddressSearchResult>>((x, y, z, r, p) => searchResultsCallback = p)
-        //        .ReturnsAsync(new FormBuilderViewModel());
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
 
-        //    var viewModel = new ViewModelBuilder()
-        //        .WithEntry("Guid", Guid.NewGuid().ToString())
-        //        .WithEntry("StreetStatus", "Search")
-        //        .WithEntry($"{element.Properties.QuestionId}-street", "Test street")
-        //        .Build();
+            _pageHelper.Setup(_ => _.ProcessStreetAndAddressJourney(It.Is<string>(x => x == "Search"), It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<bool>()))
+                .Callback<string, Page, Dictionary<string, string>, FormSchema, string, List<AddressSearchResult>, bool>((a, x, y, z, r, p, k) => searchResultsCallback = p)
+                .ReturnsAsync(new ProcessPageEntity());
 
-        //    var result = await _controller.Index("form", "page-one", viewModel);
+            var viewModel = new Dictionary<string, string>
+            {
+                { "Guid", Guid.NewGuid().ToString() },
+                { "StreetStatus", "Search" },
+                { $"{element.Properties.QuestionId}-street", "Test street" },
+            };
 
-        //    _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-        //    _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
-        //    Assert.NotNull(searchResultsCallback);
-        //    Assert.Single(searchResultsCallback);
-        //    Assert.Equal(SearchResultsUniqueId, searchResultsCallback[0].UniqueId);
-        //    Assert.Equal(SearchResultsReference, searchResultsCallback[0].Name);
-        //}
+            var result = await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
 
-
-        //[Fact]
-        //public async Task Index_Post_Should_CallGenerateHtml_AndReturnView_WhenSuccessfulSearchJourney()
-        //{
-        //    var element = new ElementBuilder()
-        //       .WithType(EElementType.Street)
-        //       .WithQuestionId("test-street")
-        //       .WithStreetProvider("testStreetProvider")
-        //       .Build();
-
-        //    var page = new PageBuilder()
-        //        .WithElement(element)
-        //        .WithPageSlug("page-one")
-        //        .Build();
-
-        //    var schema = new FormSchemaBuilder()
-        //        .WithPage(page)
-        //        .Build();
-
-        //    _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-        //        .ReturnsAsync(schema);
-
-        //    var viewModel = new ViewModelBuilder()
-        //        .WithEntry("Guid", Guid.NewGuid().ToString())
-        //        .WithEntry("StreetStatus", "Search")
-        //        .WithEntry($"{element.Properties.QuestionId}-street", "test street")
-        //        .Build();
-
-        //    var result = await _controller.Index("form", "page-one", viewModel);
-
-        //    _mockStreetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-        //    _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
-
-        //    var viewResult = Assert.IsType<ViewResult>(result);
-        //    var viewResultModel = Assert.IsType<FormBuilderViewModel>(viewResult.Model);
-        //    Assert.Equal("Select", viewResultModel.StreetStatus);
-        //}
+            _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _pageHelper.Verify(_ => _.ProcessStreetAndAddressJourney(It.Is<string>(x => x == "Search"), It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<bool>()), Times.Once);
+            Assert.NotNull(searchResultsCallback);
+            Assert.Single(searchResultsCallback);
+            Assert.Equal(SearchResultsUniqueId, searchResultsCallback[0].UniqueId);
+            Assert.Equal(SearchResultsReference, searchResultsCallback[0].Name);
+        }
     }
 }
