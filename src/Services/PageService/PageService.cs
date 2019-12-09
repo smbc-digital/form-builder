@@ -56,8 +56,7 @@ namespace form_builder.Services.PageService
 
             if (processManual)
             {
-                var addressManualElememt = new AddressManual() { Properties = currentPage.Elements[0].Properties, Type = EElementType.AddressManual };
-                addressManualElememt.SetAddressProperties(viewModel);
+                var addressManualElememt = new AddressManual() { Properties = currentPage.Elements[0].Properties, Type = EElementType.AddressManual };                
                 currentPage.Elements[0] = addressManualElememt;
             }
 
