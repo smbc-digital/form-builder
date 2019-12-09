@@ -12,6 +12,7 @@ using System.Linq;
 using form_builder.Helpers.Session;
 using form_builder.Services.PageService;
 using form_builder.Services.SubmtiService;
+using form_builder.Models.Elements;
 
 namespace form_builder.Controllers
 {
@@ -58,15 +59,23 @@ namespace form_builder.Controllers
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
 
             var formData = _distributedCache.GetString(sessionGuid);
-            if (formData == null && path != null)
+
+            if (formData == null && path != baseForm.StartPageSlug)
             {
-                path = baseForm.StartPageSlug;
-                Response.Redirect("/" + form + "/");
+                return RedirectToAction("Index", new
+                {
+                    path = baseForm.StartPageSlug,
+                    form
+                });
             }
 
             if (string.IsNullOrEmpty(path))
             {
-                path = baseForm.StartPageSlug;
+                return RedirectToAction("Index", new
+                {
+                    path = baseForm.StartPageSlug,
+                    form
+                });
             }
             
             var page = baseForm.GetPage(path);
@@ -94,6 +103,48 @@ namespace form_builder.Controllers
             return View(viewModel);
         }
 
+        [HttpGet]
+        [Route("{form}/{path}/manual")]
+        public async Task<IActionResult> AddressManual(string form, string path)
+        {
+            try
+            {
+                var sessionGuid = _sessionHelper.GetSessionGuid();
+
+                if (sessionGuid == null)
+                {
+                    sessionGuid = Guid.NewGuid().ToString();
+                    _sessionHelper.SetSessionGuid(sessionGuid);
+                }
+
+                var baseForm = await _schemaProvider.Get<FormSchema>(form);
+
+                if (string.IsNullOrEmpty(path))
+                {
+                    path = baseForm.StartPageSlug;
+                }
+
+                var page = baseForm.GetPage(path);
+                if (page == null)
+                {
+                    throw new ApplicationException($"AddressController: GetPage returned null for path: {path} of form: {form}, while performing Get");
+                }
+
+                var addressManualElememt = new AddressManual() { Properties = page.Elements[0].Properties, Type = EElementType.AddressManual };
+
+                page.Elements[0] = addressManualElememt;
+                var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
+                viewModel.AddressStatus = "Search";
+                viewModel.FormName = baseForm.FormName;
+
+                return View("../Address/Index", viewModel);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"AddressController: An exception has occured while attempting to return Address view Exception: {ex.Message}");
+            }
+        }
+
         [HttpPost]
         [Route("{form}")]
         [Route("{form}/{path}")]
@@ -116,6 +167,40 @@ namespace form_builder.Controllers
                     return RedirectToAction("Index", new
                     {
                         path = behaviour.PageSlug
+                    });
+                case EBehaviourType.SubmitForm:
+                    return RedirectToAction("Submit", new
+                    {
+                        form
+                    });
+                default:
+                    throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
+            }
+        }
+
+        [HttpPost]
+        [Route("{form}/{path}/manual")]
+        public async Task<IActionResult> AddressManual(string form, string path, Dictionary<string, string[]> formData)
+        {
+            var viewModel = NormaliseFormData(formData);
+            var currentPageResult = await _pageService.ProcessPage(form, path, viewModel, true);
+
+            var behaviour = currentPageResult.Page.GetNextPage(viewModel);
+
+            if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
+            {
+                return View(currentPageResult.ViewName, currentPageResult.ViewModel);
+            }
+
+            switch (behaviour.BehaviourType)
+            {
+                case EBehaviourType.GoToExternalPage:
+                    return Redirect(behaviour.PageSlug);
+                case EBehaviourType.GoToPage:
+                    return RedirectToAction("Index", new
+                    {
+                        path = behaviour.PageSlug,
+                        form
                     });
                 case EBehaviourType.SubmitForm:
                     return RedirectToAction("Submit", new
@@ -155,30 +240,6 @@ namespace form_builder.Controllers
             }
 
             return normaisedFormData;
-        }
-
-        protected PostData CreatePostData(FormAnswers formAnswers)
-        {
-            var postData = new PostData
-            {
-                Form = formAnswers.FormName,
-                Answers = new List<Answers>()
-            };
-
-            if (formAnswers.Pages == null)
-            {
-                return postData;
-            }
-
-            foreach (var page in formAnswers.Pages)
-            {
-                foreach (var a in page.Answers)
-                {
-                    postData.Answers.Add(a);
-                }
-            }
-
-            return postData;
         }
     }
 }

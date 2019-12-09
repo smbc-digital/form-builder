@@ -1,6 +1,5 @@
 ﻿using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
-using form_builder.Models.Elements;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
@@ -47,7 +46,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<ElementViewModel>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
@@ -112,7 +111,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
-            Assert.Equal($"/{baseUrl}/{pageSlug}/address", callback.Item1.ReturnURL);
+            Assert.Equal($"/{baseUrl}/{pageSlug}", callback.Item1.ReturnURL);
         }
     }
 }

@@ -46,6 +46,7 @@ namespace form_builder.Services.StreetService
                 : viewModel[$"{streetElement.Properties.QuestionId}-street"];
             if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
             {
+                _pageHelper.SaveAnswers(viewModel, guid);
                 return new ProcessPageEntity
                 {
                     Page = currentPage
@@ -54,7 +55,6 @@ namespace form_builder.Services.StreetService
 
             if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
             {
-
                 var provider = _streetProviders.ToList()
                     .Where(_ => _.ProviderName == streetElement.Properties.StreetProvider)
                     .FirstOrDefault();

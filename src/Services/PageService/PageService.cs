@@ -12,12 +12,13 @@ using System.Linq;
 using form_builder.Enum;
 using form_builder.Services.AddressService;
 using form_builder.Services.StreetService;
+using form_builder.Models.Elements;
 
 namespace form_builder.Services.PageService
 {
     public interface IPageService
     {
-        Task<ProcessPageEntity> ProcessPage(string form, string path, Dictionary<string, string> viewModel);
+        Task<ProcessPageEntity> ProcessPage(string form, string path, Dictionary<string, string> viewModel, bool processManual = false);
     }
 
     public class PageService : IPageService
@@ -41,7 +42,7 @@ namespace form_builder.Services.PageService
             _addressService = addressService;
         }
 
-        public async Task<ProcessPageEntity> ProcessPage(string form, string path, Dictionary<string, string> viewModel)
+        public async Task<ProcessPageEntity> ProcessPage(string form, string path, Dictionary<string, string> viewModel, bool processManual)
         {
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var currentPage = baseForm.GetPage(path);
@@ -53,9 +54,16 @@ namespace form_builder.Services.PageService
                 throw new NullReferenceException($"Current page '{path}' object could not be found.");
             }
 
+            if (processManual)
+            {
+                var addressManualElememt = new AddressManual() { Properties = currentPage.Elements[0].Properties, Type = EElementType.AddressManual };
+                addressManualElememt.SetAddressProperties(viewModel);
+                currentPage.Elements[0] = addressManualElememt;
+            }
+
             currentPage.Validate(viewModel, _validators);
 
-            if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.Address) && !processManual)
             {
                 return await _addressService.ProcesssAddress(viewModel, currentPage, baseForm, sessionGuid, path);
             }
@@ -74,7 +82,6 @@ namespace form_builder.Services.PageService
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, sessionGuid);
                 formModel.Path = currentPage.PageSlug;
                 formModel.FormName = baseForm.FormName;
-
                 return new ProcessPageEntity
                 {
                     Page = currentPage,
