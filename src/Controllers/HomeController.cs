@@ -60,6 +60,11 @@ namespace form_builder.Controllers
 
             var formData = _distributedCache.GetString(sessionGuid);
 
+            if (_pageHelper.hasDuplicateQuestionIDs(baseForm.Pages))
+            {
+                throw new ApplicationException($"The provided json '{baseForm.FormName}' has duplicate QuestionIDs");
+            }
+
             if (formData == null && path != baseForm.StartPageSlug)
             {
                 return RedirectToAction("Index", new
@@ -77,7 +82,7 @@ namespace form_builder.Controllers
                     form
                 });
             }
-            
+
             var page = baseForm.GetPage(path);
             if (page == null)
             {
