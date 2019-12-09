@@ -84,6 +84,9 @@ namespace form_builder_tests.UnitTests.Controllers
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
+            _pageService.Setup(_ => _.GetViewModel(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
+               .ReturnsAsync(new FormBuilderViewModel());
+
             // Act
             var result = await _homeController.Index("form", "page-one");
 
@@ -360,6 +363,9 @@ namespace form_builder_tests.UnitTests.Controllers
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
+            _pageService.Setup(_ => _.GetViewModel(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new FormBuilderViewModel());
+
             var result = await _homeController.Index("form", "page-one");
 
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -537,6 +543,9 @@ namespace form_builder_tests.UnitTests.Controllers
             var schema = new FormSchemaBuilder()
                 .WithPage(page)
                 .Build();
+
+            _pageService.Setup(_ => _.GetViewModel(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
+               .ReturnsAsync(new FormBuilderViewModel());
 
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);

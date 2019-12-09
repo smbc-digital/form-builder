@@ -14,6 +14,7 @@ using form_builder.Services.PageService;
 using form_builder.Services.SubmtiService;
 using form_builder.Models.Elements;
 
+
 namespace form_builder.Controllers
 {
     public class HomeController : Controller
@@ -89,9 +90,7 @@ namespace form_builder.Controllers
                 throw new NullReferenceException($"Requested path '{path}' object could not be found.");
             }
 
-            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
-            viewModel.FormName = baseForm.FormName;
-            viewModel.Path = path;
+            var viewModel = await _pageService.GetViewModel(page, baseForm, path, sessionGuid);
 
             if (page.Elements.Any(_ => _.Type == EElementType.Street))
             {
@@ -138,9 +137,7 @@ namespace form_builder.Controllers
                 var addressManualElememt = new AddressManual() { Properties = page.Elements[0].Properties, Type = EElementType.AddressManual };
 
                 page.Elements[0] = addressManualElememt;
-                var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
-                viewModel.AddressStatus = "Search";
-                viewModel.FormName = baseForm.FormName;
+                var viewModel = await _pageService.GetViewModel(page, baseForm, path, sessionGuid);
 
                 return View("../Address/Index", viewModel);
             }
