@@ -8,6 +8,7 @@ namespace form_builder_tests.Builders
     {
         private string _title = "TestTitle";
         private string _PageSlug = "test-url";
+        private bool _isValidated = false;
         private List<IElement> _elements = new List<IElement>();
         private List<Behaviour> _behaviours = new List<Behaviour>();
 
@@ -18,6 +19,7 @@ namespace form_builder_tests.Builders
             {
                 Title = _title,
                 PageSlug = _PageSlug,
+                IsValidated = _isValidated,
                 Behaviours = _behaviours,
                 Elements = _elements
             };
@@ -26,6 +28,13 @@ namespace form_builder_tests.Builders
         public PageBuilder WithPageTitle(string title)
         {
             _title = title;
+
+            return this;
+        }
+
+        public PageBuilder WithValidatedModel(bool value)
+        {
+            _isValidated = value;
 
             return this;
         }

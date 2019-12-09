@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace form_builder.Helpers.PageHelpers
+namespace form_builder.Helpers
 {
-    public class Class
+    public class LookupHelper
     {
     }
 }

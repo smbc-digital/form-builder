@@ -5,16 +5,13 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Addresses;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-
-
 namespace form_builder.Models.Elements
 {
-    public class AddressManual : Element, IElement
+    public class AddressManual : Element
     {
         public AddressManual()
         {
@@ -29,13 +26,16 @@ namespace form_builder.Models.Elements
             Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressPostcode")).Value;
         }
 
-
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-
             SetAddressProperties(viewModel);
-            return viewRender.RenderAsync(Type.ToString(), this, null);
-        }
+            var viewElement = new ElementViewModel
+            {
+                Element = this,
+                ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
+            };
 
+            return await viewRender.RenderAsync(Type.ToString(), viewElement);
+        }
     }
 }
