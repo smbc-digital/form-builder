@@ -1,44 +1,44 @@
-﻿@model form_builder.Models.Elements.Element
+﻿@model form_builder.ViewModels.ElementViewModel
 @{
-    var hintId = $"{Model.Properties.QuestionId}-hint";
-    var line1ErrorId = $"{Model.Properties.QuestionId}-addressline1-error";
-    var townErrorId = $"{Model.Properties.QuestionId}-town-error";
-    var PostcodeErrorId = $"{Model.Properties.QuestionId}-postcode-error";
-    var line1id = $"{Model.Properties.QuestionId}-AddressManualAddressLine1";
-    var line2id = $"{Model.Properties.QuestionId}-AddressManualAddressLine2";
-    var line3id = $"{Model.Properties.QuestionId}-AddressManualAddressTown";
-    var line4id = $"{Model.Properties.QuestionId}-AddressManualAddressPostcode";
-    var errorMessages = Model.ValidationMessage.Split(", ");
+    var hintId = $"{Model.Element.Properties.QuestionId}-hint";
+    var line1ErrorId = $"{Model.Element.Properties.QuestionId}-addressline1-error";
+    var townErrorId = $"{Model.Element.Properties.QuestionId}-town-error";
+    var PostcodeErrorId = $"{Model.Element.Properties.QuestionId}-postcode-error";
+    var line1id = $"{Model.Element.Properties.QuestionId}-AddressManualAddressLine1";
+    var line2id = $"{Model.Element.Properties.QuestionId}-AddressManualAddressLine2";
+    var line3id = $"{Model.Element.Properties.QuestionId}-AddressManualAddressTown";
+    var line4id = $"{Model.Element.Properties.QuestionId}-AddressManualAddressPostcode";
+    var errorMessages = Model.Element.ValidationMessage.Split(", ");
 }
 
     <fieldset aria-label="Manual Address" >
-        <div>@Html.Raw(Model.Properties.AddressManualHint)</div>
+        <div>@Html.Raw(Model.Element.Properties.AddressManualHint)</div>
 
-        @if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
+        @if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
         {
-            <p class="description" id=@hintId>@Model.Properties.Hint</p>
+            <p class="description" id=@hintId>@Model.Element.Properties.Hint</p>
         }
 
         <label for="@line1id">Address line 1</label>
-        @Html.TextBox(line1id, Model.Properties.AddressManualAddressLine1, Model.GenerateElementProperties())
-        @if (!Model.IsValid && !string.IsNullOrEmpty(errorMessages[0]))
+        @Html.TextBox(line1id, Model.Element.Properties.AddressManualAddressLine1, Model.Element.GenerateElementProperties())
+        @if (!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[0]))
         {
             <p class="input-error-content" id="@line1ErrorId">@errorMessages[0]</p>
         }
         <label class="optional" for="@line2id">Address line 2</label>
         <p class="optional">(optional)</p>
-        @Html.TextBox(line2id, Model.Properties.AddressManualAddressLine2, Model.GenerateElementProperties())
+        @Html.TextBox(line2id, Model.Element.Properties.AddressManualAddressLine2, Model.Element.GenerateElementProperties())
         <label for="@line3id">Town</label>
-        @Html.TextBox(line3id, Model.Properties.AddressManualAddressTown, Model.GenerateElementProperties())
-        @if (!Model.IsValid && !string.IsNullOrEmpty(errorMessages[1]))
+        @Html.TextBox(line3id, Model.Element.Properties.AddressManualAddressTown, Model.Element.GenerateElementProperties())
+        @if (!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[1]))
         {
             <p class="input-error-content" id="@townErrorId">@errorMessages[1]</p>
         }
         <label for="@line4id">Postcode</label>
-        @Html.TextBox(line4id, Model.Properties.AddressManualAddressPostcode, Model.GenerateElementProperties())
-        @if (!Model.IsValid && !string.IsNullOrEmpty(errorMessages[2]))
+        @Html.TextBox(line4id, Model.Element.Properties.AddressManualAddressPostcode, Model.Element.GenerateElementProperties())
+        @if (!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[2]))
         {
             <p class="input-error-content" id="@PostcodeErrorId">@errorMessages[2]</p>
         }
-        <p><a href="address">Search by postcode</a></p>
+        <p><a href="@Model.ManualAddressURL">Search by postcode</a></p>
     </fieldset>

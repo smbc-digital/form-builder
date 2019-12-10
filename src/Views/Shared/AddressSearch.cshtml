@@ -1,28 +1,28 @@
-﻿@model form_builder.Models.Elements.Element
+﻿@model form_builder.ViewModels.ElementViewModel
 @{
-    var questionId = $"{Model.Properties.QuestionId}-postcode";
+    var questionId = $"{Model.Element.Properties.QuestionId}-postcode";
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
 }
 
-<label @Model.WriteOptional() for="@questionId">@Model.Properties.PostcodeLabel</label>
+<label @Model.Element.WriteOptional() for="@questionId">@Model.Element.Properties.PostcodeLabel</label>
 
-@if (Model.Properties?.Optional ?? true)
+@if (Model.Element.Properties?.Optional ?? true)
 {
     <p class="optional">(optional)</p>
 }
 
-@if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
+@if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
 {
-    <p class="description" id=@hintId>@Model.Properties.Hint</p>
+    <p class="description" id=@hintId>@Model.Element.Properties.Hint</p>
 }
 
-@Html.TextBox(questionId, Model.Properties.Value, Model.GenerateElementProperties())
+@Html.TextBox(questionId, Model.Element.Properties.Value, Model.Element.GenerateElementProperties())
 
-<p><a href="manual">Enter the address manually</a></p>
+<p><a href="@Model.ManualAddressURL">Enter the address manually</a></p>
 
-@if (!Model.IsValid)
+@if (!Model.Element.IsValid)
 {
-    var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+    var validationMessage = string.IsNullOrEmpty(Model.Element.Properties.CustomValidationMessage) ? Model.Element.ValidationMessage : Model.Element.Properties.CustomValidationMessage;
     <p class="input-error-content" id="@errorId">@validationMessage</p>
 }

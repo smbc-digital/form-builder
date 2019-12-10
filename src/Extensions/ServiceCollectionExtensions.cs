@@ -6,18 +6,20 @@ using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
-using form_builder.Models.Elements;
 using form_builder.Providers.Address;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
+using form_builder.Services.AddressService;
+using form_builder.Services.PageService;
+using form_builder.Services.StreetService;
+using form_builder.Services.SubmtiService;
 using form_builder.Validators;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace form_builder.Extensions
@@ -89,6 +91,16 @@ namespace form_builder.Extensions
         {
             services.AddSingleton<IStreetProvider, FakeStreetProvider>();
             services.AddSingleton<IStreetProvider, CRMStreetProvider>();
+            return services;
+        }
+
+        public static IServiceCollection AddServices(this IServiceCollection services)
+        {
+            services.AddSingleton<IAddressService, AddressService>();
+            services.AddSingleton<IPageService, PageService>();
+            services.AddSingleton<IStreetService, StreetService>();
+            services.AddSingleton<ISubmitService, SubmitService>();
+
             return services;
         }
 

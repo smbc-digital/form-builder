@@ -2,11 +2,10 @@
 
 namespace form_builder.ViewModels
 {
-    public class ElementViewModel
+    public class StreetViewModel
     {
-        public Element Element { get; set; }
+        public Street Element { get; set; }
 
         public string ReturnURL { get; set; }
-        public string ManualAddressURL { get; set; }
     }
 }

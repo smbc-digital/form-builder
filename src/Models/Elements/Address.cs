@@ -21,24 +21,25 @@ namespace form_builder.Models.Elements
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             var postcodeKey = $"{Properties.QuestionId}-postcode";
+            var viewElement = new ElementViewModel
+            {
+                Element = this,
+            };
 
             if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
             {
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
                 
-                var url = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/address";
-
-                var viewElement = new ElementViewModel
-                {
-                    Element = this,
-                    ReturnURL = url
-                };
+                viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
+                viewElement.ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
                 return await viewRender.RenderAsync("AddressSelect", new Tuple<ElementViewModel, List<AddressSearchResult>>(viewElement, addressSearchResults));
             }
 
+            viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
+
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
-            return await viewRender.RenderAsync("AddressSearch", this);
+            return await viewRender.RenderAsync("AddressSearch", viewElement);
         }
     }
 }
