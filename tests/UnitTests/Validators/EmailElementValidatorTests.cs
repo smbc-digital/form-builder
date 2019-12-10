@@ -66,7 +66,7 @@ namespace form_builder_tests.UnitTests.Validators
             //Assert
             var result = _requiredElementValidator.Validate(element, viewModel);
             Assert.False(result.IsValid);
-            Assert.Equal("Enter your email is required", result.Message);
+            Assert.Equal("Check the enter your email and try again", result.Message);
         }
 
         [Fact]

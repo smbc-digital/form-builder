@@ -23,5 +23,5 @@ Scenario: I enter a correct postcode i see the next page
 Scenario: I enter no postcode i see error message
 	Given I navigate to "/stockportpostcode/page1"
 	Then I click the "nextStep" button
-	And I should see a "p" element with "Stockport postcode is required" text
+	And I should see a "p" element with "Check the stockport postcode and try again" text
 

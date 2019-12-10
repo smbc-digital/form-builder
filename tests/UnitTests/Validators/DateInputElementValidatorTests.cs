@@ -37,7 +37,7 @@ namespace form_builder_tests.UnitTests.Validators
             //Assert
             var result = _dateInputElementValidator.Validate(element, viewModel);
             Assert.False(result.IsValid);
-            Assert.Equal("Date is required", result.Message);
+            Assert.Equal("Check the date and try again", result.Message);
         }
 
         [Fact]

@@ -19,19 +19,24 @@ namespace form_builder.Validators
 
             var key = element.Properties.QuestionId;
 
-            var validationMessage = $"{element.Properties.Label} is required";
+            var validationMessage = string.Empty;
+
+            if (element.Type != EElementType.Address && element.Type != EElementType.Street)
+            {
+                validationMessage = "Check the " + element.Properties.Label.ToLower() + " and try again";
+            }
 
             if (element.Type == Enum.EElementType.Address)
             {
                 if (viewModel["AddressStatus"] == "Select")
                 {
                     key = $"{element.Properties.QuestionId}-address";
-                    validationMessage = $"{ element.Properties.AddressLabel} is required";
+                    validationMessage = "Check the " + element.Properties.AddressLabel.ToLower() + " and try again";
                 }
                 else
                 {
                     key = $"{element.Properties.QuestionId}-postcode";
-                    validationMessage = $"{ element.Properties.PostcodeLabel} is required";
+                    validationMessage = "Check the " + element.Properties.PostcodeLabel.ToLower() + " and try again";
                 }
             }
 
@@ -40,12 +45,12 @@ namespace form_builder.Validators
                 if (viewModel["StreetStatus"] == "Select")
                 {
                     key = $"{element.Properties.QuestionId}-street";
-                    validationMessage = $"{ element.Properties.SelectLabel} is required";
+                    validationMessage = "Check the " + element.Properties.StreetLabel.ToLower() + " and try again";
                 }
                 else
                 {
                     key = $"{element.Properties.QuestionId}-street";
-                    validationMessage = $"{ element.Properties.StreetLabel} is required";
+                    validationMessage = "Check the " + element.Properties.StreetLabel.ToLower() + " and try again";
                 }
             }
 

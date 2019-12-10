@@ -138,7 +138,8 @@ this.ScenarioInitialize(scenarioInfo);
 #line 25
  testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 26
- testRunner.And("I should see a \"p\" element with \"Stockport postcode is required\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"p\" element with \"Check the stockport postcode and try again\" text" +
+                    "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }
