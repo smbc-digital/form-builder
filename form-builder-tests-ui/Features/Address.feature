@@ -36,4 +36,4 @@ Scenario: Selecting an address in the dropdown should display the success page
 	When I click the "nextStep" button
 	Then I should see the "customers-address-address" input
 	Then I select "address 2" in "customers-address-address" dropdown
-	Then I should see "address 2" is selected in "customers-address-address" dropdown with the value "098765432109"
+	Then I should see "address 2" is selected in "customers-address-address" dropdown with the value "098765432109|address 2"

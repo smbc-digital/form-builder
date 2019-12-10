@@ -29,7 +29,7 @@
     <option value="">@addresSearchCount</option>
     @for (var i = 0; i < Model.Item2.Count; i++)
     {
-        <option value="@Model.Item2[i].UniqueId">@Model.Item2[i].Name</option>
+        <option value="@Model.Item2[i].UniqueId|@Model.Item2[i].Name">@Model.Item2[i].Name</option>
     }
 </select>
 
