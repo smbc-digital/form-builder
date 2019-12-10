@@ -17,7 +17,7 @@ namespace form_builder.Models
             Page page;
             try
             {
-                page = Pages.Single(_ => _.PageSlug.ToLower().Trim() == path.ToLower().Trim());
+                page = Pages.SingleOrDefault(_ => _.PageSlug.ToLower().Trim() == path.ToLower().Trim());
             }
             catch(Exception ex)
             {
