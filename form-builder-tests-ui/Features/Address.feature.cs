@@ -173,7 +173,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("I select \"address 2\" in \"customers-address-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 39
  testRunner.Then("I should see \"address 2\" is selected in \"customers-address-address\" dropdown with" +
-                    " the value \"098765432109\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+                    " the value \"098765432109|address 2\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }

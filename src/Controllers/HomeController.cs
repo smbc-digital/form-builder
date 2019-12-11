@@ -85,9 +85,9 @@ namespace form_builder.Controllers
             }
 
             var page = baseForm.GetPage(path);
-            if (page == null)
+            if(page == null)
             {
-                throw new NullReferenceException($"Requested path '{path}' object could not be found.");
+                throw new ApplicationException($"Requested path '{path}' object could not be found.");
             }
 
             var viewModel = await _pageService.GetViewModel(page, baseForm, path, sessionGuid);
@@ -227,21 +227,36 @@ namespace form_builder.Controllers
         protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)
         {
 
-            var normaisedFormData = new Dictionary<string, string>();
+            var normalisedFormData = new Dictionary<string, string>();
 
             foreach (var item in formData)
             {
                 if (item.Value.Length == 1)
                 {
-                    normaisedFormData.Add(item.Key, item.Value[0]);
+                    if (item.Key.EndsWith("-address") && !string.IsNullOrEmpty(item.Value[0]))
+                    {
+                        string[] addressDetails = item.Value[0].Split('|');
+                        if (!string.IsNullOrEmpty(addressDetails[0]))
+                        {
+                            normalisedFormData.Add($"{item.Key}", addressDetails[0]);
+                        }
+                        if (!string.IsNullOrEmpty(addressDetails[1]))
+                        {
+                            normalisedFormData.Add($"{item.Key}-description", addressDetails[1]);
+                        }
+                    }
+                    else
+                    {
+                        normalisedFormData.Add(item.Key, item.Value[0]);
+                    }
                 }
                 else
                 {
-                    normaisedFormData.Add(item.Key, string.Join(", ", item.Value));
+                    normalisedFormData.Add(item.Key, string.Join(", ", item.Value));
                 }
             }
 
-            return normaisedFormData;
+            return normalisedFormData;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace form_builder.Models
@@ -13,8 +14,16 @@ namespace form_builder.Models
 
         public Page GetPage(string path)
         {
-            var page = Pages.FirstOrDefault(_ => _.PageSlug.ToLower().Trim() == path.ToLower().Trim());
-
+            Page page;
+            try
+            {
+                page = Pages.SingleOrDefault(_ => _.PageSlug.ToLower().Trim() == path.ToLower().Trim());
+            }
+            catch(Exception ex)
+            {
+                throw new ApplicationException($"Requested path '{path}' object could not be found or was not unique.", ex);
+            }
+            
             return page;
         }
     }

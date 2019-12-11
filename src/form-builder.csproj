@@ -17,6 +17,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="StockportGovUK.AspNetCore.Gateways" Version="0.9.4-prerelease90" />
+    
     <PackageReference Include="StockportGovUK.AspNetCore.Middleware.ExceptionHandling" Version="1.0.1" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="2.2.3" />
