@@ -13,3 +13,12 @@ Scenario: Button not on firstpage should display back anchor
     Then I should not see any "back-button" html element
 	When I click the "nextStep1" button
 	Then I should see a "a" element with "Previous" text
+
+Scenario: Button on 3nd page should not display previous link if json says not to
+	Given I navigate to "/button/page1"
+    When I click the "nextStep1" button
+	Then I should see a "a" element with "Previous" text
+	When I click the "nextStep1" button
+	Then I should not see any "back-button" html element
+	
+	

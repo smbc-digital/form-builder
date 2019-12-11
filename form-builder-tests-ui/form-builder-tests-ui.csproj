@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Address - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Button - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Email - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\PageContent - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Postcode - Copy.feature.cs" />
