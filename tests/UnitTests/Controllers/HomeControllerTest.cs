@@ -138,10 +138,10 @@ namespace form_builder_tests.UnitTests.Controllers
             var requestPath = "non-existance-page";
 
             var element = new ElementBuilder()
-              .WithType(EElementType.H1)
-              .WithQuestionId("test-id")
-              .WithPropertyText("test-text")
-              .Build();
+                .WithType(EElementType.H1)
+                .WithQuestionId("test-id")
+                .WithPropertyText("test-text")
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -156,7 +156,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(schema);
 
             // Act
-            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _homeController.Index("form", requestPath));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _homeController.Index("form", requestPath));
             Assert.Equal($"Requested path '{requestPath}' object could not be found.", result.Message);
         }
 

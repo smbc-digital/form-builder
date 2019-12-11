@@ -14,6 +14,7 @@ namespace form_builder.Models
         public bool Numeric { get; set; } = false;
         public List<Option> Options { get; set; }
         public string ButtonId { get; set; }
+        public bool HidePreviousLink { get; set; }
         public string MaxLength { get; set; }
         public string Value { get; set; } = string.Empty;
         public string Hint { get; set; } = string.Empty;

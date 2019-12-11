@@ -287,7 +287,6 @@ namespace form_builder_tests.UnitTests.Services
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 
-
         [Fact]
         public async Task Submit_ShouldReturnModel_OnSuccessfulGatewayCall_And_DeleteCacheEntry()
         {

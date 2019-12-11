@@ -520,7 +520,10 @@ Address example:
                 "AddressLabel": "Address",
                 "Hint": "This is an additional hint",
                 "SelectHint": "Select the address below",
-                "MaxLength": "10"
+                "MaxLength": "10",
+                "Optional": false,
+                "CustomValidationMessage": "This is postcode custom validation message",
+                "SelectCustomValidationMessage": "This is select address custom validation message"
             }
     }
 ```

@@ -157,6 +157,13 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.True(webDriver.FindElement(By.XPath($"//{elementType}[text() = '{elementText}']")).Displayed);
         }
 
+        [Then(@"I should not see a ""(.*)"" element with ""(.*)"" text")]
+        public void ThenIShouldNotSeeAElement(string elementType, string elementText)
+        {
+            var webDriver = BrowserSession.Native as IWebDriver;
+            Assert.False(webDriver.FindElement(By.XPath($"//{elementType}[text() = '{elementText}']")).Displayed);
+        }
+
         [Then(@"I should see ""(.*)"" is selected in ""(.*)"" dropdown with the value ""(.*)""")]
         public void TheSelectedOptionShouldBeSelected(string text, string selectId, string value)
         {
