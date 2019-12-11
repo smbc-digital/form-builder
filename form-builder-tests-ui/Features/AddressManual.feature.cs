@@ -217,12 +217,14 @@ this.ScenarioInitialize(scenarioInfo);
 #line 60
  testRunner.Then("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 61
+ testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 62
  testRunner.Then("I should see a \"th\" element with \"customers-address-AddressManualAddressLine1\" te" +
                     "xt", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 62
+#line 63
  testRunner.And("I should see a \"th\" element with \"customers-address-AddressManualAddressTown\" tex" +
                     "t", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 63
+#line 64
  testRunner.And("I should see a \"th\" element with \"customers-address-AddressManualAddressPostcode\"" +
                     " text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden

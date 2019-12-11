@@ -37,3 +37,35 @@ Scenario: Selecting an address in the dropdown should display the success page
 	Then I should see the "customers-address-address" input
 	Then I select "address 2" in "customers-address-address" dropdown
 	Then I should see "address 2" is selected in "customers-address-address" dropdown with the value "098765432109|address 2"
+
+Scenario: I enter postcode in optional and I don't select an address in the dropdown, should display the success page
+	Given I navigate to "/address/page1"
+	Then I fill in page1
+	When I click the "nextStep" button
+	Then I should see the "customers-address-address" input
+	Then I select "address 2" in "customers-address-address" dropdown
+	When I click the "nextStep" button
+	Then I fill in page2
+	When I click the "nextStep" button
+	Then I should see the "optional-address-address" input
+	When I click the "nextStep" button
+	Then I should see a "th" element with "customers-address-address" text
+	And I should see a "th" element with "customers-address-address-description" text
+	And I should see a "th" element with "optional-address-address" text
+
+Scenario: I enter postcode in optional and select an address in the dropdown should display the success page
+	Given I navigate to "/address/page1"
+	Then I fill in page1
+	When I click the "nextStep" button
+	Then I should see the "customers-address-address" input
+	Then I select "address 2" in "customers-address-address" dropdown
+	When I click the "nextStep" button
+	Then I fill in page2
+	When I click the "nextStep" button
+	Then I should see the "optional-address-address" input
+	Then I select "address 2" in "optional-address-address" dropdown
+	When I click the "nextStep" button
+	Then I should see a "th" element with "customers-address-address" text
+	And I should see a "th" element with "customers-address-address-description" text
+	And I should see a "th" element with "optional-address-address" text
+	And I should see a "th" element with "optional-address-address-description" text

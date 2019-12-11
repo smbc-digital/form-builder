@@ -36,7 +36,7 @@
 @if (!Model.Item1.Element.IsValid)
 {
     {
-        var validationMessage = string.IsNullOrEmpty(Model.Item1.Element.Properties.CustomValidationMessage) ? Model.Item1.Element.ValidationMessage : Model.Item1.Element.Properties.CustomValidationMessage;
+        var validationMessage = string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectCustomValidationMessage) ? Model.Item1.Element.ValidationMessage : Model.Item1.Element.Properties.SelectCustomValidationMessage;
         <p class="input-error-content" id="@errorId">@validationMessage</p>
     }
 }

@@ -58,6 +58,7 @@ Scenario: Submits the page when everything is filled in
 	Then I fill in postcode
 	When I click the "nextStep" button
 	Then I wait one second
+	Then I click the "nextStep" button
 	Then I should see a "th" element with "customers-address-AddressManualAddressLine1" text
 	And I should see a "th" element with "customers-address-AddressManualAddressTown" text
 	And I should see a "th" element with "customers-address-AddressManualAddressPostcode" text

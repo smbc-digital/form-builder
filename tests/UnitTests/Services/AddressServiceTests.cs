@@ -64,7 +64,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                .WithType(EElementType.Address)
                .WithQuestionId(questionId)
-               .WithAddressProvider("testAddressProvider")
+               .WithAddressProvider("testAddressProvider")               
                .Build();
 
             var page = new PageBuilder()
@@ -87,6 +87,63 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.ProcesssAddress(viewModel, page, schema, "", "page-one");
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+        }
+
+
+        [Theory]
+        [InlineData(true, "Search")]
+        public async Task ProcesssAddress_ShouldNotCallAddressProvider_AddressIsOptional(bool isValid, string journey)
+        {
+            var questionId = "test-address";
+
+            var cacheData = new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>()
+                {
+                    new PageAnswers
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                QuestionId = $"{questionId}-postcode",
+                                Response = ""
+                            }
+                        },
+                        PageSlug = "page-one"
+                    }
+                }
+            };
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+
+            var element = new ElementBuilder()
+               .WithType(EElementType.Address)
+               .WithQuestionId(questionId)
+               .WithAddressProvider("testAddressProvider")
+               .WithOptional(true)
+               .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(isValid)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            var viewModel = new Dictionary<string, string>
+            {
+                { "Guid", Guid.NewGuid().ToString() },
+                { "AddressStatus", journey },
+                { $"{element.Properties.QuestionId}-postcode", "" },
+            };
+
+            var result = await _service.ProcesssAddress(viewModel, page, schema, "", "page-one");
+
+            _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]

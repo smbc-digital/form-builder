@@ -58,6 +58,32 @@ namespace form_builder.Services.AddressService
                     ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
                     : viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
 
+                var address = journey != "Select"
+                    ? string.Empty
+                    : viewModel[$"{addressElement.Properties.QuestionId}-address"];
+
+                var emptyPostcode = string.IsNullOrEmpty(postcode);
+                var emptyAddress = string.IsNullOrEmpty(address);
+                var truthstatement = emptyPostcode ^ emptyAddress;
+
+                if (currentPage.IsValid && addressElement.Properties.Optional && emptyPostcode)
+                {
+                    _pageHelper.SaveAnswers(viewModel, guid);
+                    return new ProcessPageEntity
+                    {
+                        Page = currentPage
+                    };
+                }
+
+                if (currentPage.IsValid && addressElement.Properties.Optional && emptyAddress && !emptyPostcode && journey == "Select")
+                {
+                    _pageHelper.SaveAnswers(viewModel, guid);
+                    return new ProcessPageEntity
+                    {
+                        Page = currentPage
+                    };
+                }
+
                 try
                 {
                     var result = await provider.SearchAsync(postcode);
