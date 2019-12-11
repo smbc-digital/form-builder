@@ -92,7 +92,7 @@ namespace form_builder_tests.UnitTests.Services
 
         [Theory]
         [InlineData(true, "Search")]
-        public async Task ProcesssAddress_ShouldNotCallAddressProvider_AddressIsOptional(bool isValid, string journey)
+        public async Task ProcesssAddress_ShouldNotCallAddressProvider_WhenAddressIsOptional(bool isValid, string journey)
         {
             var questionId = "test-address";
 
