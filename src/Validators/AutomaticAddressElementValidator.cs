@@ -8,7 +8,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
-            if (!viewModel.ContainsKey($"{element.Properties.QuestionId}-address") || element.Properties.Optional)
+            if (!viewModel.ContainsKey($"{element.Properties.QuestionId}-address"))
             {
                 return new ValidationResult{
                     IsValid = true
@@ -16,6 +16,16 @@ namespace form_builder.Validators
             }
 
             var value = viewModel[$"{element.Properties.QuestionId}-address"];
+
+            if (element.Properties.Optional && string.IsNullOrEmpty(value))
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            }
+
+
             var isValid = Regex.IsMatch(value, "^[0-9]{12}$"); 
 
             return new ValidationResult{
