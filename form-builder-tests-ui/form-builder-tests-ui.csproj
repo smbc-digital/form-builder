@@ -21,7 +21,8 @@
   <ItemGroup>
     <PackageReference Include="Coypu" Version="3.1.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
-    <PackageReference Include="Selenium.Support" Version="3.141.0" />
+    <PackageReference Include="Selenium.Support" Version="4.0.0-alpha03" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="79.0.3945.3600-beta" />
     <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.0.225" />
     <PackageReference Include="SpecRun.SpecFlow" Version="3.0.391" />
     <PackageReference Include="WireMock.Net" Version="1.0.36" />
