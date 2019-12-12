@@ -2,7 +2,10 @@
 using System.IO;
 using Coypu;
 using Coypu.Drivers;
+using Coypu.Drivers.Selenium;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Remote;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Tracing;
 
@@ -18,6 +21,7 @@ namespace form_builder_tests_ui
         {
             var sessionConfiguration = new SessionConfiguration
             {
+                Driver = typeof(CustomChromeProfileSeleniumWebDriver),
                 AppHost = "http://localhost",
                 Browser = Browser.Chrome,
                 Port = 5001,
@@ -72,6 +76,23 @@ namespace form_builder_tests_ui
 
                 screenshot.SaveAsFile(screenshotFilePath, ScreenshotImageFormat.Png);
             }
+        }
+    }
+    public class CustomChromeProfileSeleniumWebDriver : SeleniumWebDriver
+    {
+        public CustomChromeProfileSeleniumWebDriver(Browser browser)
+            : base(CustomProfile(), browser)
+        {
+        }
+
+        private static RemoteWebDriver CustomProfile()
+        {
+            ChromeOptions chromeOptions = new ChromeOptions();
+            chromeOptions.AcceptInsecureCertificates = true;
+
+
+
+            return new ChromeDriver(chromeOptions);
         }
     }
 }
