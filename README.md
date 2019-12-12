@@ -508,6 +508,9 @@ Date Input example:
     * Hint (*string*) (hint which appears above the postcode input)
     * SelectHint (*string*) (hint which appears above the select input)
     * MaxLength (*string*)
+    * Optional (*boolean*)
+    * CustomValidationMessage (*string*) (Set a custom validation message for when user does not enter a postode)
+    * SelectCustomValidationMessage (*string*) (Set a custom validation message for when user does not select an address from the             dropdown)
 
 Address example:
 ```json
