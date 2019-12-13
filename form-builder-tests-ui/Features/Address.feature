@@ -64,8 +64,8 @@ Scenario: I enter postcode in optional and select an address in the dropdown sho
 	And I click the "nextStep" button
 	And I wait one second
 	Then I should see the "optional-address-address" input
-	And I select "address 2" in "optional-address-address" dropdown
-	And  I click the "nextStep" button
+	Then I select "address 2" in "optional-address-address" dropdown
+	Then  I click the "nextStep" button
 	Then I should see a "th" element with "customers-address-address" text
 	And I should see a "th" element with "customers-address-address-description" text
 	And I should see a "th" element with "optional-address-address" text
