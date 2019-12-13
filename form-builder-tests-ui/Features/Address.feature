@@ -43,10 +43,10 @@ Scenario: I enter postcode in optional and I don't select an address in the drop
 	When  I fill in page1
 	And I click the "nextStep" button
 	Then I should see the "customers-address-address" input
-	Then I select "address 2" in "customers-address-address" dropdown
-	Then I click the "nextStep" button
-	Then I fill in page2
-	Then I click the "nextStep" button
+	And I select "address 2" in "customers-address-address" dropdown
+	And I click the "nextStep" button
+	And I fill in page2
+	And I click the "nextStep" button
 	Then I should see the "optional-address-address" input
 	Then I click the "nextStep" button
 	Then I should see a "th" element with "customers-address-address" text
@@ -59,13 +59,13 @@ Scenario: I enter postcode in optional and select an address in the dropdown sho
 	And I click the "nextStep" button
 	Then I should see the "customers-address-address" input
 	Then I select "address 2" in "customers-address-address" dropdown
-	Then I click the "nextStep" button
-	Then I fill in page2
-	Then I click the "nextStep" button
-	Then I wait one second
+	And I click the "nextStep" button
+	And I fill in page2
+	And I click the "nextStep" button
+	And I wait one second
 	Then I should see the "optional-address-address" input
-	Then I select "address 2" in "optional-address-address" dropdown
-	Then I click the "nextStep" button
+	And I select "address 2" in "optional-address-address" dropdown
+	And  I click the "nextStep" button
 	Then I should see a "th" element with "customers-address-address" text
 	And I should see a "th" element with "customers-address-address-description" text
 	And I should see a "th" element with "optional-address-address" text
