@@ -45,6 +45,7 @@ Scenario: I enter postcode in optional and I don't select an address in the drop
 	Then I should see the "customers-address-address" input
 	Then I select "address 2" in "customers-address-address" dropdown
 	And I click the "nextStep" button
+	And I wait five seconds
 	Then I fill in page2
 	And I click the "nextStep" button
 	And I wait one second
@@ -61,6 +62,7 @@ Scenario: I enter postcode in optional and select an address in the dropdown sho
 	Then I should see the "customers-address-address" input
 	Then I select "address 2" in "customers-address-address" dropdown
 	And I click the "nextStep" button
+	And I wait five seconds
 	Then I fill in page2
 	And I click the "nextStep" button
 	And I wait five seconds
