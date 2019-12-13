@@ -243,18 +243,20 @@ this.ScenarioInitialize(scenarioInfo);
 #line 64
  testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 65
- testRunner.Then("I should see the \"optional-address-address\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 66
- testRunner.Then("I select \"address 2\" in \"optional-address-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see the \"optional-address-address\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 67
- testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I select \"address 2\" in \"optional-address-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 68
- testRunner.Then("I should see a \"th\" element with \"customers-address-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 69
- testRunner.And("I should see a \"th\" element with \"customers-address-address-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.Then("I should see a \"th\" element with \"customers-address-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 70
- testRunner.And("I should see a \"th\" element with \"optional-address-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"th\" element with \"customers-address-address-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 71
+ testRunner.And("I should see a \"th\" element with \"optional-address-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 72
  testRunner.And("I should see a \"th\" element with \"optional-address-address-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
