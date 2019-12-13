@@ -49,7 +49,7 @@ Scenario: I enter postcode in optional and I don't select an address in the drop
 	And I click the "nextStep" button
 	And I wait one second
 	Then I click the "nextStep" button
-	And I wait one second
+	And I wait five seconds
 	Then I should see a "th" element with "customers-address-address" text
 	And I should see a "th" element with "customers-address-address-description" text
 	And I should see a "th" element with "optional-address-address" text
@@ -63,10 +63,10 @@ Scenario: I enter postcode in optional and select an address in the dropdown sho
 	And I click the "nextStep" button
 	Then I fill in page2
 	And I click the "nextStep" button
-	And I wait one second
+	And I wait five seconds
 	And I select "address 2" in "optional-address-address" dropdown
 	Then I click the "nextStep" button
-	And I wait one second
+	And I wait five seconds
 	Then I should see a "th" element with "customers-address-address" text
 	And I should see a "th" element with "customers-address-address-description" text
 	And I should see a "th" element with "optional-address-address" text

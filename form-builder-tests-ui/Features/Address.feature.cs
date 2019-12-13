@@ -208,7 +208,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 51
  testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 52
- testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I wait five seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 53
  testRunner.Then("I should see a \"th\" element with \"customers-address-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 54
@@ -245,13 +245,13 @@ this.ScenarioInitialize(scenarioInfo);
 #line 65
  testRunner.And("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 66
- testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I wait five seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 67
  testRunner.And("I select \"address 2\" in \"optional-address-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 68
  testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 69
- testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I wait five seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 70
  testRunner.Then("I should see a \"th\" element with \"customers-address-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 71

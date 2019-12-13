@@ -25,5 +25,11 @@ namespace form_builder_tests_ui.StepDefinitions
         {
             Thread.Sleep(1000);
         }
+
+        [Then(@"I wait five seconds")]
+        public void ThenIWaitFiveSeconds()
+        {
+            Thread.Sleep(6000);
+        }
     }
 }
