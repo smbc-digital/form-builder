@@ -98,9 +98,9 @@ namespace form_builder.Models.Elements
                     return properties;
                 case EElementType.AddressManual:
                     properties = new Dictionary<string, object>()
-                    {
-                      
-                    };                    
+                    {                      
+                    };
+                    
                     return properties;
                 case EElementType.Street:
 
@@ -142,6 +142,23 @@ namespace form_builder.Models.Elements
                 default:
                     return null;
             }
+        }
+
+        public Dictionary<string, object> GenerateElementProperties(string errorMessage, string errorId)
+        {
+            switch (Type)
+            {
+                case EElementType.AddressManual:
+                    var properties = new Dictionary<string, object>();
+                    if(!IsValid && !string.IsNullOrEmpty(errorMessage))
+                    {
+                        properties.Add("aria-describedby", errorId);
+                    }
+                    return properties;
+                default:
+                    return null;
+            }
+            
         }
 
         public string DescribedByValue()

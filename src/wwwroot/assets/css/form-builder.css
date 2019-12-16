@@ -47,3 +47,24 @@ fieldset.input-memorable-date {
         margin-left: 25px;
     }
 }
+
+
+
+
+legend {
+    font-family: 'Source Sans Pro', sans-serif;
+    color: #1b1b1b;
+    font-size: 1.263em;
+    font-weight: 700;
+    margin: 0 0 26px 0;
+    line-height: 1.25;
+}
+
+
+@media only screen and (max-width: 767px) {    
+
+    legend {
+        font-size: 1.125em;
+        line-height: 1.111;
+    }
+}
