@@ -402,6 +402,7 @@ Textarea (Email) JSON example:
         * Text (*string*) (defaulted to "Next step")
         * ClassName (*string*) (defaulted to "button-primary")
         * ButtonId (*string*)
+        * HidePreviousLink (*bool*) (defaulted to false)
 
 Button JSON example:
 ```json
@@ -410,7 +411,8 @@ Button JSON example:
     "Properties": {
       "ButtonId": "nextStep",
       "Text": "Custom text",
-      "className": "button-secondary"
+      "className": "button-secondary",
+      "HidePreviousLink": true
     }
   }
 ```
