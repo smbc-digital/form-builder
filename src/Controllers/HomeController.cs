@@ -245,6 +245,18 @@ namespace form_builder.Controllers
                             normalisedFormData.Add($"{item.Key}-description", addressDetails[1]);
                         }
                     }
+                    else if (item.Key.EndsWith("-streetaddress") && !string.IsNullOrEmpty(item.Value[0]))
+                    {
+                        string[] streetDetails = item.Value[0].Split('|');
+                        if (!string.IsNullOrEmpty(streetDetails[0]))
+                        {
+                            normalisedFormData.Add($"{item.Key}", streetDetails[0]);
+                        }
+                        if (!string.IsNullOrEmpty(streetDetails[1]))
+                        {
+                            normalisedFormData.Add($"{item.Key}-description", streetDetails[1]);
+                        }
+                    }
                     else
                     {
                         normalisedFormData.Add(item.Key, item.Value[0]);

@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, string>();
             viewModel.Add("StreetStatus", "Select");
-            viewModel.Add("street-street", "");
+            viewModel.Add("street-streetaddress", "");
 
             var schema = new FormSchemaBuilder()
                 .WithName("Street name")

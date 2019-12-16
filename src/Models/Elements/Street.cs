@@ -29,7 +29,16 @@ namespace form_builder.Models.Elements
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
                 if (string.IsNullOrEmpty(Properties.Value))
                 {
-                    Properties.Value = viewModel[streetKey];
+                    if (viewModel["StreetStatus"] == "Select")
+                    {
+                        var streetaddress = $"{Properties.QuestionId}-streetaddress";
+                        Properties.Value = viewModel[streetaddress];
+                    }
+                    else
+                    {
+                        Properties.Value = viewModel[streetKey];
+                    }
+
                 }
                 var url = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/street";
 

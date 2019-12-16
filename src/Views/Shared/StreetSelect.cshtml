@@ -2,14 +2,14 @@
 @using StockportGovUK.NetStandard.Models.Addresses;
 @model Tuple<form_builder.ViewModels.ElementViewModel, List<AddressSearchResult>>
 @{
-    var questionId = $"{Model.Item1.Element.Properties.QuestionId}-street";
+    var questionId = $"{Model.Item1.Element.Properties.QuestionId}-streetaddress";
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
     var streetSearchCount = $"{Model.Item2.Count} streets found";
     var streetSelectLabel = string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectLabel) ? "Street" : Model.Item1.Element.Properties.SelectLabel;
 }
 
-@await Html.BeginFieldSet(Model.Item1.Element, "-street")
+@await Html.BeginFieldSet(Model.Item1.Element, "-streetaddress")
 
 <p>Search term: <strong>@Model.Item1.Element.Properties.Value</strong> <a class="back-button" href="javascript:history.back()">Change</a></p>
 
@@ -27,7 +27,7 @@
     <option value="">@streetSearchCount</option>
     @for (var i = 0; i < Model.Item2.Count; i++)
     {
-        <option value="@Model.Item2[i].UniqueId">@Model.Item2[i].Name</option>
+        <option value="@Model.Item2[i].UniqueId|@Model.Item2[i].Name">@Model.Item2[i].Name</option>
     }
 </select>
 
