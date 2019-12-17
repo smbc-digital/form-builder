@@ -23,7 +23,7 @@ namespace form_builder.Validators
 
             if (element.Type != EElementType.Address && element.Type != EElementType.Street)
             {
-                validationMessage = "Check the " + element.Properties.Label.ToLower() + " and try again";
+                validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
             }
 
             if (element.Type == Enum.EElementType.Address)

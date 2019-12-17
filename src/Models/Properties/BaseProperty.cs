@@ -11,6 +11,7 @@
         public string MaxLength { get; set; }
         public bool? Email { get; set; }
         public bool? Postcode { get; set; }
+        public string Regex { get; set; } = string.Empty;
         public bool? StockportPostcode { get; set; }
         public bool Numeric { get; set; } = false;
         public string Hint { get; set; } = string.Empty;

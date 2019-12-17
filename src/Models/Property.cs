@@ -12,6 +12,9 @@ namespace form_builder.Models
         public bool? Postcode { get; set; }
         public bool? StockportPostcode { get; set; }
         public bool Numeric { get; set; } = false;
+
+        public string Regex { get; set; } = string.Empty;
+        public string RegexValidationMessage { get; set; } = string.Empty;
         public List<Option> Options { get; set; }
         public string ButtonId { get; set; }
         public bool HidePreviousLink { get; set; }
