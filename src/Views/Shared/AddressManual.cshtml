@@ -19,7 +19,7 @@
         <legend>Address details</legend>
         @if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
         {
-            <p class="description" id=@hintId>@Model.Element.Properties.Hint</p>
+            <p id=@hintId>@Model.Element.Properties.Hint</p>
         }
 
         <label for="@line1id">Address line 1</label>
