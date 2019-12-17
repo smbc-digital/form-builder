@@ -43,7 +43,7 @@ namespace form_builder.Validators
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again"
+                    Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the date and try again"
                 };
             }
 
@@ -55,7 +55,7 @@ namespace form_builder.Validators
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageRestrictCurrentDate) ? element.Properties.ValidationMessageRestrictCurrentDate : "Today's date not allowed. Please enter a valid date."
+                    Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageRestrictCurrentDate) ? element.Properties.ValidationMessageRestrictCurrentDate : "Check the date and try again"
                 };
             }
 

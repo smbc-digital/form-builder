@@ -77,7 +77,7 @@ namespace form_builder_tests.UnitTests.Validators
             //Assert
             var result = _restrictPastDateValidator.Validate(element, viewModel);
             Assert.False(result.IsValid);
-            Assert.Equal("Past date not allowed. Please enter a valid date", result.Message);
+            Assert.Equal("Check the date and try again", result.Message);
         }
 
         [Fact]
