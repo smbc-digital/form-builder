@@ -16,7 +16,7 @@ namespace form_builder.Services.AddressService
 {
     public interface IAddressService
     {
-        Task<ProcessPageEntity> ProcesssAddress(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path);
+        Task<ProcessRequestEntity> ProcesssAddress(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path);
     }
 
     public class AddressService : IAddressService
@@ -32,7 +32,7 @@ namespace form_builder.Services.AddressService
             _addressProviders = addressProviders;
         }
 
-        public async Task<ProcessPageEntity> ProcesssAddress(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
+        public async Task<ProcessRequestEntity> ProcesssAddress(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
             var journey = viewModel["AddressStatus"];
             var addressResults = new List<AddressSearchResult>();
@@ -69,7 +69,7 @@ namespace form_builder.Services.AddressService
                 if (currentPage.IsValid && addressElement.Properties.Optional && emptyPostcode)
                 {
                     _pageHelper.SaveAnswers(viewModel, guid);
-                    return new ProcessPageEntity
+                    return new ProcessRequestEntity
                     {
                         Page = currentPage
                     };
@@ -78,7 +78,7 @@ namespace form_builder.Services.AddressService
                 if (currentPage.IsValid && addressElement.Properties.Optional && emptyAddress && !emptyPostcode && journey == "Select")
                 {
                     _pageHelper.SaveAnswers(viewModel, guid);
-                    return new ProcessPageEntity
+                    return new ProcessRequestEntity
                     {
                         Page = currentPage
                     };
@@ -102,7 +102,7 @@ namespace form_builder.Services.AddressService
                 formModel.AddressStatus = journey;
                 formModel.FormName = baseForm.FormName;
 
-                return new ProcessPageEntity
+                return new ProcessRequestEntity
                 {
                     Page = currentPage,
                     ViewModel = formModel,

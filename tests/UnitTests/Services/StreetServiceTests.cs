@@ -138,7 +138,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _pageHelper.Setup(_ => _.ProcessStreetAndAddressJourney(It.Is<string>(x => x == "Search"), It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<bool>()))
                 .Callback<string, Page, Dictionary<string, string>, FormSchema, string, List<AddressSearchResult>, bool>((a, x, y, z, r, p, k) => searchResultsCallback = p)
-                .ReturnsAsync(new ProcessPageEntity());
+                .ReturnsAsync(new ProcessRequestEntity());
 
             var viewModel = new Dictionary<string, string>
             {

@@ -15,7 +15,7 @@ namespace form_builder.Services.StreetService
 {
     public interface IStreetService
     {
-        Task<ProcessPageEntity> ProcessStreet(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path);
+        Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path);
     }
 
     public class StreetService : IStreetService
@@ -31,7 +31,7 @@ namespace form_builder.Services.StreetService
             _streetProviders = streetProviders;
         }
 
-        public async Task<ProcessPageEntity> ProcessStreet(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
+        public async Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
             var journey = viewModel["StreetStatus"];
             var streetResults = new List<AddressSearchResult>();
@@ -48,7 +48,7 @@ namespace form_builder.Services.StreetService
             if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
             {
                 _pageHelper.SaveAnswers(viewModel, guid);
-                return new ProcessPageEntity
+                return new ProcessRequestEntity
                 {
                     Page = currentPage
                 };
@@ -83,7 +83,7 @@ namespace form_builder.Services.StreetService
                 formModel.StreetStatus = journey;
                 formModel.FormName = baseForm.FormName;
 
-                return new ProcessPageEntity
+                return new ProcessRequestEntity
                 {
                     Page = currentPage,
                     ViewModel = formModel,
