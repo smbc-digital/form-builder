@@ -119,6 +119,8 @@ Paragraph text JSON example:
         * Hint (*string*)
         * MaxLength (*int*) (defaulted to 200)
         * Optional (*boolean*) (defaults to false)
+        * Regex (*string*)
+        * RegexValidationMessage (*string*)
         
 Textbox JSON example:
 ```json
