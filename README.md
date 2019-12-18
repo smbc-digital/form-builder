@@ -122,20 +122,22 @@ Paragraph text JSON example:
         * Regex (*string*) - The regex pattern to use
         * RegexValidationMessage (*string*) -  The validation message that appears if the input does not match the Regex pattern         (Default: Check the {Label} and try again)
         
-Textbox JSON example:
+### Textbox JSON example (has to be a valid UK National Insurance Number):
 ```json
   {
     "Type": "Textbox",
     "Properties": {
-      "QuestionId": "emailAddress",
-      "Label": "Email address",
-      "Hint": "ie: someone@example.com",
-      "CustomValidationMessage": "Check the email address and try again",
+      "QuestionId": "niNumber",
+      "Label": "NI Number",
+      "Hint": "e.g: AB123456Z",     
       "Optional": false,
-      "MaxLength": 60
+      "MaxLength": 9,
+      "Regex": "^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$",
+      "RegexValidationMessage": "Enter a valid NI Number"
     }
   }
 ```
+
 #
    * <a name="textboxemailprops">**Textbox(Email)**</a>
         * Label (*string*) __*__
