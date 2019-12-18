@@ -119,8 +119,8 @@ Paragraph text JSON example:
         * Hint (*string*)
         * MaxLength (*int*) (defaulted to 200)
         * Optional (*boolean*) (defaults to false)
-        * Regex (*string*)
-        * RegexValidationMessage (*string*)
+        * Regex (*string*) - The regex pattern to use
+        * RegexValidationMessage (*string*) -  The validation message that appears if the input does not match the Regex pattern         (Default: Check the {Label} and try again
         
 Textbox JSON example:
 ```json
