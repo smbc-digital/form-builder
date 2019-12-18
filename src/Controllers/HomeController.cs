@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System;
 using form_builder.Services.PageService;
 using form_builder.Services.SubmtiService;
+using form_builder.Extensions;
 
 namespace form_builder.Controllers
 {
@@ -59,7 +60,7 @@ namespace form_builder.Controllers
         [Route("{form}/{path}")]
         public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData)
         {
-            var viewModel = NormaliseFormData(formData);
+            var viewModel = formData.ToNormaliseDictionary();
             var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel);
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
@@ -91,7 +92,7 @@ namespace form_builder.Controllers
         [Route("{form}/{path}/manual")]
         public async Task<IActionResult> AddressManual(string form, string path, Dictionary<string, string[]> formData)
         {
-            var viewModel = NormaliseFormData(formData);
+            var viewModel = formData.ToNormaliseDictionary();
             var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, true);
 
             var behaviour = currentPageResult.Page.GetNextPage(viewModel);
@@ -129,53 +130,6 @@ namespace form_builder.Controllers
 
             ViewData["BannerTypeformUrl"] = result.FeedbackFormUrl;
             return View(result.ViewName, result.ViewModel);
-        }
-
-        protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)
-        {
-
-            var normalisedFormData = new Dictionary<string, string>();
-
-            foreach (var item in formData)
-            {
-                if (item.Value.Length == 1)
-                {
-                    if (item.Key.EndsWith("-address") && !string.IsNullOrEmpty(item.Value[0]))
-                    {
-                        string[] addressDetails = item.Value[0].Split('|');
-                        if (!string.IsNullOrEmpty(addressDetails[0]))
-                        {
-                            normalisedFormData.Add($"{item.Key}", addressDetails[0]);
-                        }
-                        if (!string.IsNullOrEmpty(addressDetails[1]))
-                        {
-                            normalisedFormData.Add($"{item.Key}-description", addressDetails[1]);
-                        }
-                    }
-                    else if (item.Key.EndsWith("-streetaddress") && !string.IsNullOrEmpty(item.Value[0]))
-                    {
-                        string[] streetDetails = item.Value[0].Split('|');
-                        if (!string.IsNullOrEmpty(streetDetails[0]))
-                        {
-                            normalisedFormData.Add($"{item.Key}", streetDetails[0]);
-                        }
-                        if (!string.IsNullOrEmpty(streetDetails[1]))
-                        {
-                            normalisedFormData.Add($"{item.Key}-description", streetDetails[1]);
-                        }
-                    }
-                    else
-                    {
-                        normalisedFormData.Add(item.Key, item.Value[0]);
-                    }
-                }
-                else
-                {
-                    normalisedFormData.Add(item.Key, string.Join(", ", item.Value));
-                }
-            }
-
-            return normalisedFormData;
         }
     }
 }
