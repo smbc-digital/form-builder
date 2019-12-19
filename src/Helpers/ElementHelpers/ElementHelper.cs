@@ -32,7 +32,7 @@ namespace form_builder.Helpers.ElementHelpers
         }
 
         public string CurrentValue(Element element, Dictionary<string, string> viewModel, string pageSlug, string guid, string suffix = "")
-        {
+            {
             var currentValue = viewModel.ContainsKey($"{element.Properties.QuestionId}{suffix}");
             var cacheData = _distributedCache.GetString(guid);
 

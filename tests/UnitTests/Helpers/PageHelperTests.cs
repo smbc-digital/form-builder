@@ -200,6 +200,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
             viewModel.Add("StreetStatus", "Select");
             viewModel.Add("street-streetaddress", string.Empty);
+            viewModel.Add("street-street", "street");
 
             var schema = new FormSchemaBuilder()
                 .WithName("Street name")
@@ -263,6 +264,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
             viewModel.Add("StreetStatus", "Select");
             viewModel.Add("-streetaddress", string.Empty);
+            viewModel.Add("-street", "street");
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")

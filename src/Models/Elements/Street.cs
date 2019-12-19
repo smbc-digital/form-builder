@@ -33,6 +33,10 @@ namespace form_builder.Models.Elements
                     {
                         var streetaddress = $"{Properties.QuestionId}-streetaddress";
                         Properties.Value = viewModel[streetaddress];
+                        if(string.IsNullOrEmpty(Properties.Value))
+                        {
+                            Properties.Value = viewModel[streetKey];
+                        }
                     }
                     else
                     {
