@@ -13,20 +13,22 @@ using form_builder.Enum;
 using form_builder.Services.AddressService;
 using form_builder.Services.StreetService;
 using form_builder.Models.Elements;
-using Microsoft.AspNetCore.Mvc;
 using form_builder.ViewModels;
+using form_builder.Providers.StorageProvider;
+using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Services.PageService
 {
     public interface IPageService
     {
-        Task<ProcessPageEntity> ProcessPage(string form, string path, Dictionary<string, string> viewModel, bool processManual = false);
-
+        Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false);
+        Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, string> viewModel, bool processManual = false);
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid);
     }
 
     public class PageService : IPageService
     {
+        private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IEnumerable<IElementValidator> _validators;
         private readonly ISchemaProvider _schemaProvider;
         private readonly IPageHelper _pageHelper;
@@ -35,7 +37,7 @@ namespace form_builder.Services.PageService
         private readonly IStreetService _streetService;
         private readonly IAddressService _addressService;
 
-        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService)
+        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IDistributedCacheWrapper distributedCache)
         {
             _validators = validators;
             _schemaProvider = schemaProvider;
@@ -44,9 +46,91 @@ namespace form_builder.Services.PageService
             _logger = logger;
             _streetService = streetService;
             _addressService = addressService;
+            _distributedCache = distributedCache;
         }
 
-        public async Task<ProcessPageEntity> ProcessPage(string form, string path, Dictionary<string, string> viewModel, bool processManual)
+        public async Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false)
+        {
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+            if (string.IsNullOrEmpty(path))
+            {
+                _sessionHelper.RemoveSessionGuid();
+            }
+
+            if (string.IsNullOrEmpty(sessionGuid))
+            {
+                sessionGuid = Guid.NewGuid().ToString();
+                _sessionHelper.SetSessionGuid(sessionGuid);
+            }
+
+            var baseForm = await _schemaProvider.Get<FormSchema>(form);
+
+            var formData = _distributedCache.GetString(sessionGuid);
+
+            if (_pageHelper.hasDuplicateQuestionIDs(baseForm.Pages))
+            {
+                throw new ApplicationException($"The provided json '{baseForm.FormName}' has duplicate QuestionIDs");
+            }
+
+            if (formData == null && path != baseForm.StartPageSlug)
+            {
+                return new ProcessPageEntity 
+                {
+                    ShouldRedirect = true,
+                    TargetPage = baseForm.StartPageSlug
+                };
+            }
+
+            if (string.IsNullOrEmpty(path))
+            {
+                return new ProcessPageEntity 
+                {
+                    ShouldRedirect = true,
+                    TargetPage = baseForm.StartPageSlug
+                };
+            }
+
+            var page = baseForm.GetPage(path);
+            if (page == null)
+            {
+                throw new ApplicationException($"Requested path '{path}' object could not be found.");
+            }
+
+            if (isAddressManual)
+            {
+                var addressManualElememt = new AddressManual() { Properties = page.Elements[0].Properties, Type = EElementType.AddressManual };
+                page.Elements[0] = addressManualElememt;
+            }
+
+            var viewModel = await GetViewModel(page, baseForm, path, sessionGuid);
+
+            if (page.Elements.Any(_ => _.Type == EElementType.Street))
+            {
+                viewModel.StreetStatus = "Search";
+                return new ProcessPageEntity
+                {
+                    ViewModel = viewModel,
+                    ViewName = "../Street/Index"
+                };
+            }
+
+            if (page.Elements.Any(_ => _.Type == EElementType.Address))
+            {
+                viewModel.AddressStatus = "Search";
+                return new ProcessPageEntity
+                {
+                    ViewModel = viewModel,
+                    ViewName = "../Address/Index"
+                };
+            }
+
+            return new ProcessPageEntity
+            {
+                ViewModel = viewModel
+            };
+        }
+
+        public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, string> viewModel, bool processManual)
         {
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var currentPage = baseForm.GetPage(path);
@@ -85,14 +169,14 @@ namespace form_builder.Services.PageService
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, sessionGuid);
                 formModel.Path = currentPage.PageSlug;
                 formModel.FormName = baseForm.FormName;
-                return new ProcessPageEntity
+                return new ProcessRequestEntity
                 {
                     Page = currentPage,
                     ViewModel = formModel
                 };
             }
 
-            return new ProcessPageEntity
+            return new ProcessRequestEntity
             {
                 Page = currentPage
             };
@@ -105,26 +189,6 @@ namespace form_builder.Services.PageService
             viewModel.Path = path;
 
             return viewModel;
-        }
-
-        protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)
-        {
-
-            var normaisedFormData = new Dictionary<string, string>();
-
-            foreach (var item in formData)
-            {
-                if (item.Value.Length == 1)
-                {
-                    normaisedFormData.Add(item.Key, item.Value[0]);
-                }
-                else
-                {
-                    normaisedFormData.Add(item.Key, string.Join(", ", item.Value));
-                }
-            }
-
-            return normaisedFormData;
         }
     }
 }

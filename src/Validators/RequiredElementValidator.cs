@@ -23,7 +23,7 @@ namespace form_builder.Validators
 
             if (element.Type != EElementType.Address && element.Type != EElementType.Street)
             {
-                validationMessage = "Check the " + element.Properties.Label.ToLower() + " and try again";
+                validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
             }
 
             if (element.Type == Enum.EElementType.Address)
@@ -45,7 +45,7 @@ namespace form_builder.Validators
                 if (viewModel["StreetStatus"] == "Select")
                 {
                     key = $"{element.Properties.QuestionId}-streetaddress";
-                    validationMessage = "Check the " + element.Properties.StreetLabel.ToLower() + " and try again";
+                    validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
                 }
                 else
                 {

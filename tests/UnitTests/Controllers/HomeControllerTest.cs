@@ -4,18 +4,9 @@ using Xunit;
 using Moq;
 using System.Threading.Tasks;
 using System;
-using form_builder.Models;
 using Microsoft.AspNetCore.Mvc;
-using form_builder.ViewModels;
 using form_builder.Enum;
-using form_builder.Helpers.PageHelpers;
-using Newtonsoft.Json;
 using form_builder_tests.Builders;
-using form_builder.Providers.SchemaProvider;
-using form_builder.Providers.StorageProvider;
-using Microsoft.Extensions.Logging;
-using StockportGovUK.NetStandard.Models.Addresses;
-using form_builder.Helpers.Session;
 using form_builder.Services.PageService;
 using form_builder.Services.SubmtiService;
 using form_builder.Services.PageService.Entities;
@@ -26,138 +17,12 @@ namespace form_builder_tests.UnitTests.Controllers
     public class HomeControllerTest
     {
         private HomeController _homeController;
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<ISchemaProvider> _schemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IPageService> _pageService = new Mock<IPageService>();
         private readonly Mock<ISubmitService> _submitService = new Mock<ISubmitService>();
-        private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
-        private readonly Mock<ILogger<HomeController>> _logger = new Mock<ILogger<HomeController>>();
-        private readonly Mock<ISessionHelper> _mockSession = new Mock<ISessionHelper>();
 
         public HomeControllerTest()
         {
-            _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()))
-                        .ReturnsAsync(new FormBuilderViewModel());
-
-            var cacheData = new FormAnswers
-            {
-                Path = "page-one"
-            };
-
-            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
-
-            _mockSession.Setup(_ => _.GetSessionGuid()).Returns(Guid.NewGuid().ToString);
-
-            _homeController = new HomeController(_logger.Object, _mockDistributedCache.Object, _schemaProvider.Object, _pageHelper.Object, _mockSession.Object, _pageService.Object, _submitService.Object);
-        }
-
-        [Fact]
-        public async Task Index_ShouldCallSchemaProvider_ToGetFormSchema()
-        {
-            // Act
-            await Assert.ThrowsAsync<NullReferenceException>(() => _homeController.Index("form", "page-one"));
-
-            // Assert
-            _schemaProvider.Verify(_ => _.Get<FormSchema>(It.Is<string>(x => x == "form")));
-        }
-
-
-        [Fact]
-        public async Task Index_ShouldReturnAddressView_WhenTypeContainsAddress()
-        {
-            var element = new ElementBuilder()
-                 .WithType(EElementType.Address)
-                 .WithQuestionId("address-test")
-                 .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            _pageService.Setup(_ => _.GetViewModel(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
-               .ReturnsAsync(new FormBuilderViewModel());
-
-            // Act
-            var result = await _homeController.Index("form", "page-one");
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("../Address/Index", viewResult.ViewName);
-        }
-
-        [Fact]
-        public async Task Index_ShouldGenerateGuidWhenGuidIsEmpty()
-        {
-            // Arrange
-            var guid = Guid.NewGuid().ToString();
-            _mockSession.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.H1)
-                .WithQuestionId("test-id")
-                .WithPropertyText("test-text")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            // Act
-            var result = await _homeController.Index("form", "page-one");
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            var model = (FormBuilderViewModel)viewResult.Model;
-
-            _mockSession.Verify(_ => _.GetSessionGuid(), Times.Once);
-            _mockSession.Verify(_ => _.SetSessionGuid(It.IsAny<string>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task Index_Application_ShoudlThrowNullException_WhenPageIsNotWithin_FormSchema()
-        {
-            // Arrange
-            var requestPath = "non-existance-page";
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.H1)
-                .WithQuestionId("test-id")
-                .WithPropertyText("test-text")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            // Act
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _homeController.Index("form", requestPath));
-            Assert.Equal($"Requested path '{requestPath}' object could not be found.", result.Message);
+            _homeController = new HomeController(_pageService.Object, _submitService.Object);
         }
 
         [Fact]
@@ -182,15 +47,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithBehaviour(behaviour)
                 .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
-                .ReturnsAsync(new ProcessPageEntity { Page = page });
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page });
 
             var viewModel = new Dictionary<string, string[]>();
 
@@ -223,16 +81,10 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithBehaviour(behaviour)
                 .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
 
             // Arrange
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-               .ReturnsAsync(schema);
-
-            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
-                .ReturnsAsync(new ProcessPageEntity { Page = page });
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page });
 
             var viewModel = new Dictionary<string, string[]>();
 
@@ -267,15 +119,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithBehaviour(behaviour)
                 .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-               .ReturnsAsync(schema);
-
-            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
-                .ReturnsAsync(new ProcessPageEntity { Page = page });
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page });
 
             var viewModel = new Dictionary<string, string[]>();
 
@@ -308,15 +153,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithValidatedModel(true)
                 .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
-                .ReturnsAsync(new ProcessPageEntity { Page = page });
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-               .ReturnsAsync(schema);
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page });
 
             var viewModel = new Dictionary<string, string[]>();
 
@@ -325,55 +163,6 @@ namespace form_builder_tests.UnitTests.Controllers
             Assert.Equal($"The provided behaviour type 'Unknown' is not valid", result.Message);
 
         }
-
-      
-        [Fact]
-        public async Task Submit_ShouldReturnView_OnSuccessfull()
-        {
-            // Arrange
-            _submitService.Setup(_ => _.ProcessSubmission(It.IsAny<string>())).ReturnsAsync(new SubmitServiceEntity { ViewName = "Success" });
-
-            // Act
-            var result = await _homeController.Submit("form");
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-
-            _submitService.Verify(_ => _.ProcessSubmission(It.IsAny<string>()), Times.Once);
-            Assert.Equal("Success", viewResult.ViewName);
-        }
-
-        [Fact]
-        public async Task Index_Get_ShouldSetAddressStatusToSearch()
-        {
-            var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithQuestionId("test-address")
-               .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            _pageService.Setup(_ => _.GetViewModel(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new FormBuilderViewModel());
-
-            var result = await _homeController.Index("form", "page-one");
-
-            var viewResult = Assert.IsType<ViewResult>(result);
-            var viewModel = Assert.IsType<FormBuilderViewModel>(viewResult.Model);
-
-            Assert.Equal("Search", viewModel.AddressStatus);
-        }
-
 
         [Fact]
         public async Task Index_Post_ShouldReturnView_WhenPageIsInvalid()
@@ -390,12 +179,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithValidatedModel(true)
                 .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
-                .ReturnsAsync(new ProcessPageEntity { Page = page, ViewName = "Search", UseGeneratedViewModel = true  });
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page, ViewName = "Search", UseGeneratedViewModel = true });
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
@@ -407,7 +192,6 @@ namespace form_builder_tests.UnitTests.Controllers
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Search", viewResult.ViewName);
         }
-
 
         [Theory]
         [InlineData("Submit", EBehaviourType.SubmitForm)]
@@ -432,21 +216,14 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithBehaviour(behaviour)
                 .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
                 .WithEntry("AddressStatus", "Select")
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
-                .ReturnsAsync(new ProcessPageEntity { Page = page });
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page });
 
             var result = await _homeController.Index("form", "page-one", viewModel);
 
@@ -475,89 +252,121 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithBehaviour(behaviour)
                 .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
                 .WithEntry("AddressStatus", "Select")
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
-                .ReturnsAsync(new ProcessPageEntity { Page = page });
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page });
 
             var result = await _homeController.Index("form", "page-one", viewModel);
-
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Never);
 
             var redirectResult = Assert.IsType<RedirectResult>(result);
             Assert.Equal("submit-url", redirectResult.Url);
         }
 
-        //[Fact]
-        //public async Task AddressManual_Should_Return_index()
-        //{
-        //    var element = new ElementBuilder()
-        //           .WithType(EElementType.Address)
-        //           .WithQuestionId("test-address")
-        //           .Build();
-
-        //    var page = new PageBuilder()
-        //        .WithElement(element)
-        //        .WithPageSlug("page-one")
-        //        .Build();
-
-        //    var schema = new FormSchemaBuilder()
-        //        .WithPage(page)
-        //        .Build();
-
-        //    _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-        //        .ReturnsAsync(schema);
-
-        //    var result = await _homeController.Index("form", "page-one");
-
-        //    var viewResult = Assert.IsType<ViewResult>(result);
-        //    var viewModel = Assert.IsType<FormBuilderViewModel>(viewResult.Model);
-
-        //    Assert.Equal("Search", viewModel.AddressStatus);
-        //}
-
         [Fact]
-        public async Task Index_Get_ShouldSetStreetStatusToSearch()
+        public async Task Index_ShouldCallPageService()
         {
-            var element = new ElementBuilder()
-               .WithType(EElementType.Street)
-               .WithQuestionId("test-street")
-               .Build();
+            //Arrange
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessPageEntity());
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .Build();
+            //Act
+            var result = await _homeController.Index("form", "path");
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
 
-            _pageService.Setup(_ => _.GetViewModel(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
-               .ReturnsAsync(new FormBuilderViewModel());
-
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            var result = await _homeController.Index("form", "page-one");
-
-            var viewResult = Assert.IsType<ViewResult>(result);
-            var viewModel = Assert.IsType<FormBuilderViewModel>(viewResult.Model);
-
-            Assert.Equal("Search", viewModel.StreetStatus);
-            Assert.Equal("../Street/Index", viewResult.ViewName);
+            //Assert
+            _pageService.Verify(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
         }
 
+        [Fact]
+        public async Task Index_ShouldReturnViewResult()
+        {
+            //Arrange
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessPageEntity());
+
+            //Act
+            var result = await _homeController.Index("form", "path");
+
+            //Assert
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public async Task Index_ShouldRedirect_WhenOnRedirectIsTrue()
+        {
+            //Arrange
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessPageEntity {  ShouldRedirect = true });
+
+            //Act
+            var result = await _homeController.Index("form", "path");
+
+            //Assert
+            Assert.IsType<RedirectToActionResult>(result);
+        }
+
+        [Fact]
+        public async Task AddressManual_ShouldCallPageService()
+        {
+            //Arrange
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessPageEntity());
+
+            //Act
+            var result = await _homeController.AddressManual("form", "path");
+
+
+            //Assert
+            _pageService.Verify(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task AddressManual_ShouldReturnViewResult()
+        {
+            //Arrange
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessPageEntity());
+
+            //Act
+            var result = await _homeController.AddressManual("form", "path");
+
+            //Assert
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public async Task AddressManual_ShouldRedirect_WhenOnRedirectIsTrue()
+        {
+            //Arrange
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessPageEntity { ShouldRedirect = true });
+
+            //Act
+            var result = await _homeController.AddressManual("form", "path");
+
+            //Assert
+            Assert.IsType<RedirectToActionResult>(result);
+        }
+
+        [Fact]
+        public async Task Submit_ShouldReturnView_OnSuccessfull()
+        {
+            // Arrange
+            _submitService.Setup(_ => _.ProcessSubmission(It.IsAny<string>())).ReturnsAsync(new SubmitServiceEntity { ViewName = "Success" });
+
+            // Act
+            var result = await _homeController.Submit("form");
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+
+            _submitService.Verify(_ => _.ProcessSubmission(It.IsAny<string>()), Times.Once);
+            Assert.Equal("Success", viewResult.ViewName);
+        }
     }
 }

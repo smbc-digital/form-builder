@@ -119,21 +119,25 @@ Paragraph text JSON example:
         * Hint (*string*)
         * MaxLength (*int*) (defaulted to 200)
         * Optional (*boolean*) (defaults to false)
+        * Regex (*string*) - The regex pattern to use
+        * RegexValidationMessage (*string*) -  The validation message that appears if the input does not match the Regex pattern         (Default: Check the {Label} and try again)
         
-Textbox JSON example:
+### Textbox JSON example (has to be a valid UK National Insurance Number):
 ```json
   {
     "Type": "Textbox",
     "Properties": {
-      "QuestionId": "emailAddress",
-      "Label": "Email address",
-      "Hint": "ie: someone@example.com",
-      "CustomValidationMessage": "Check the email address and try again",
+      "QuestionId": "niNumber",
+      "Label": "NI Number",
+      "Hint": "e.g: AB123456Z",     
       "Optional": false,
-      "MaxLength": 60
+      "MaxLength": 9,
+      "Regex": "^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$",
+      "RegexValidationMessage": "Enter a valid NI Number"
     }
   }
 ```
+
 #
    * <a name="textboxemailprops">**Textbox(Email)**</a>
         * Label (*string*) __*__
@@ -402,6 +406,7 @@ Textarea (Email) JSON example:
         * Text (*string*) (defaulted to "Next step")
         * ClassName (*string*) (defaulted to "button-primary")
         * ButtonId (*string*)
+        * HidePreviousLink (*bool*) (defaulted to false)
 
 Button JSON example:
 ```json
@@ -410,7 +415,8 @@ Button JSON example:
     "Properties": {
       "ButtonId": "nextStep",
       "Text": "Custom text",
-      "className": "button-secondary"
+      "className": "button-secondary",
+      "HidePreviousLink": true
     }
   }
 ```

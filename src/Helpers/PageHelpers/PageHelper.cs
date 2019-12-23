@@ -22,7 +22,7 @@ namespace form_builder.Helpers.PageHelpers
         void CheckForDuplicateQuestionIDs(Page page);
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null);
         void SaveAnswers(Dictionary<string, string> viewModel, string guid);
-        Task<ProcessPageEntity> ProcessStreetAndAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults, bool isAddressJourney);
+        Task<ProcessRequestEntity> ProcessStreetAndAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults, bool isAddressJourney);
         bool hasDuplicateQuestionIDs(List<Page> pages);
     }
 
@@ -110,7 +110,7 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
-        public async Task<ProcessPageEntity> ProcessStreetAndAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults, bool isAddressJourney)
+        public async Task<ProcessRequestEntity> ProcessStreetAndAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults, bool isAddressJourney)
         {
             switch (journey)
             {
@@ -122,7 +122,7 @@ namespace form_builder.Helpers.PageHelpers
                         adddressViewModel.StreetStatus = "Select";
                         adddressViewModel.FormName = baseForm.FormName;
 
-                        return new ProcessPageEntity
+                        return new ProcessRequestEntity
                         {
                             Page = currentPage,
                             ViewModel = adddressViewModel,
@@ -135,7 +135,7 @@ namespace form_builder.Helpers.PageHelpers
                         throw new ApplicationException($"AddressController: An exception has occured while attempting to generate Html, Exception: {e.Message}");
                     };
                 case "Select":
-                    return new ProcessPageEntity
+                    return new ProcessRequestEntity
                     {
                         Page = currentPage
                     };

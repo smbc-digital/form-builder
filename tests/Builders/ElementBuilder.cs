@@ -156,5 +156,17 @@ namespace form_builder_tests.Builders
             _property.Hint = value;
             return this;
         }
+
+        public  ElementBuilder WithRegex(string value)
+        {
+            _property.Regex = value;
+            return this;
+        }
+
+        public ElementBuilder WithRegexValidationMessage(string value)
+        {
+            _property.RegexValidationMessage = value;
+            return this;
+        }
     }
 }

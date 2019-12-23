@@ -1,45 +1,21 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using form_builder.Models;
 using form_builder.Enum;
 using System.Threading.Tasks;
 using System;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Providers.SchemaProvider;
-using form_builder.Providers.StorageProvider;
-using Microsoft.Extensions.Logging;
-using System.Linq;
-using form_builder.Helpers.Session;
 using form_builder.Services.PageService;
 using form_builder.Services.SubmtiService;
-using form_builder.Models.Elements;
-
+using form_builder.Extensions;
 
 namespace form_builder.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IDistributedCacheWrapper _distributedCache;
-
-        private readonly ISchemaProvider _schemaProvider;
-
-        private readonly IPageHelper _pageHelper;
-
-        private readonly ISessionHelper _sessionHelper;
-
         private readonly IPageService _pageService;
-
         private readonly ISubmitService _submitService;
 
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger, IDistributedCacheWrapper distributedCache, ISchemaProvider schemaProvider, IPageHelper pageHelper, ISessionHelper sessionHelper, IPageService pageService, ISubmitService submitService)
+        public HomeController(IPageService pageService, ISubmitService submitService)
         {
-            _distributedCache = distributedCache;
-            _schemaProvider = schemaProvider;
-            _pageHelper = pageHelper;
-            _sessionHelper = sessionHelper;
-            _logger = logger;
             _pageService = pageService;
             _submitService = submitService;
         }
@@ -49,102 +25,34 @@ namespace form_builder.Controllers
         [Route("{form}/{path}")]
         public async Task<IActionResult> Index(string form, string path)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-
-            if (string.IsNullOrEmpty(sessionGuid))
-            {
-                sessionGuid = Guid.NewGuid().ToString();
-                _sessionHelper.SetSessionGuid(sessionGuid);
-            }
-
-            var baseForm = await _schemaProvider.Get<FormSchema>(form);
-
-            var formData = _distributedCache.GetString(sessionGuid);
-
-            if (_pageHelper.hasDuplicateQuestionIDs(baseForm.Pages))
-            {
-                throw new ApplicationException($"The provided json '{baseForm.FormName}' has duplicate QuestionIDs");
-            }
-
-            if (formData == null && path != baseForm.StartPageSlug)
+            var response = await _pageService.ProcessPage(form, path);
+            if (response.ShouldRedirect)
             {
                 return RedirectToAction("Index", new
                 {
-                    path = baseForm.StartPageSlug,
+                    path = response.TargetPage,
                     form
                 });
             }
 
-            if (string.IsNullOrEmpty(path))
-            {
-                return RedirectToAction("Index", new
-                {
-                    path = baseForm.StartPageSlug,
-                    form
-                });
-            }
-
-            var page = baseForm.GetPage(path);
-            if(page == null)
-            {
-                throw new ApplicationException($"Requested path '{path}' object could not be found.");
-            }
-
-            var viewModel = await _pageService.GetViewModel(page, baseForm, path, sessionGuid);
-
-            if (page.Elements.Any(_ => _.Type == EElementType.Street))
-            {
-                viewModel.StreetStatus = "Search";
-                return View("../Street/Index", viewModel);
-            }
-
-            if (page.Elements.Any(_ => _.Type == EElementType.Address))
-            {
-                viewModel.AddressStatus = "Search";
-                return View("../Address/Index", viewModel);
-            }
-
-            return View(viewModel);
+            return View(response.ViewName, response.ViewModel);
         }
 
         [HttpGet]
         [Route("{form}/{path}/manual")]
         public async Task<IActionResult> AddressManual(string form, string path)
         {
-            try
+            var response = await _pageService.ProcessPage(form, path, true);
+            if (response.ShouldRedirect)
             {
-                var sessionGuid = _sessionHelper.GetSessionGuid();
-
-                if (sessionGuid == null)
+                return RedirectToAction("Index", new
                 {
-                    sessionGuid = Guid.NewGuid().ToString();
-                    _sessionHelper.SetSessionGuid(sessionGuid);
-                }
-
-                var baseForm = await _schemaProvider.Get<FormSchema>(form);
-
-                if (string.IsNullOrEmpty(path))
-                {
-                    path = baseForm.StartPageSlug;
-                }
-
-                var page = baseForm.GetPage(path);
-                if (page == null)
-                {
-                    throw new ApplicationException($"AddressController: GetPage returned null for path: {path} of form: {form}, while performing Get");
-                }
-
-                var addressManualElememt = new AddressManual() { Properties = page.Elements[0].Properties, Type = EElementType.AddressManual };
-
-                page.Elements[0] = addressManualElememt;
-                var viewModel = await _pageService.GetViewModel(page, baseForm, path, sessionGuid);
-
-                return View("../Address/Index", viewModel);
+                    path = response.TargetPage,
+                    form
+                });
             }
-            catch (Exception ex)
-            {
-                throw new ApplicationException($"AddressController: An exception has occured while attempting to return Address view Exception: {ex.Message}");
-            }
+
+            return View(response.ViewName, response.ViewModel);
         }
 
         [HttpPost]
@@ -152,8 +60,8 @@ namespace form_builder.Controllers
         [Route("{form}/{path}")]
         public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData)
         {
-            var viewModel = NormaliseFormData(formData);
-            var currentPageResult = await _pageService.ProcessPage(form, path, viewModel);
+            var viewModel = formData.ToNormaliseDictionary();
+            var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel);
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
             {
@@ -184,8 +92,8 @@ namespace form_builder.Controllers
         [Route("{form}/{path}/manual")]
         public async Task<IActionResult> AddressManual(string form, string path, Dictionary<string, string[]> formData)
         {
-            var viewModel = NormaliseFormData(formData);
-            var currentPageResult = await _pageService.ProcessPage(form, path, viewModel, true);
+            var viewModel = formData.ToNormaliseDictionary();
+            var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, true);
 
             var behaviour = currentPageResult.Page.GetNextPage(viewModel);
 
@@ -222,53 +130,6 @@ namespace form_builder.Controllers
 
             ViewData["BannerTypeformUrl"] = result.FeedbackFormUrl;
             return View(result.ViewName, result.ViewModel);
-        }
-
-        protected Dictionary<string, string> NormaliseFormData(Dictionary<string, string[]> formData)
-        {
-
-            var normalisedFormData = new Dictionary<string, string>();
-
-            foreach (var item in formData)
-            {
-                if (item.Value.Length == 1)
-                {
-                    if (item.Key.EndsWith("-address") && !string.IsNullOrEmpty(item.Value[0]))
-                    {
-                        string[] addressDetails = item.Value[0].Split('|');
-                        if (!string.IsNullOrEmpty(addressDetails[0]))
-                        {
-                            normalisedFormData.Add($"{item.Key}", addressDetails[0]);
-                        }
-                        if (!string.IsNullOrEmpty(addressDetails[1]))
-                        {
-                            normalisedFormData.Add($"{item.Key}-description", addressDetails[1]);
-                        }
-                    }
-                    else if (item.Key.EndsWith("-streetaddress") && !string.IsNullOrEmpty(item.Value[0]))
-                    {
-                        string[] streetDetails = item.Value[0].Split('|');
-                        if (!string.IsNullOrEmpty(streetDetails[0]))
-                        {
-                            normalisedFormData.Add($"{item.Key}", streetDetails[0]);
-                        }
-                        if (!string.IsNullOrEmpty(streetDetails[1]))
-                        {
-                            normalisedFormData.Add($"{item.Key}-description", streetDetails[1]);
-                        }
-                    }
-                    else
-                    {
-                        normalisedFormData.Add(item.Key, item.Value[0]);
-                    }
-                }
-                else
-                {
-                    normalisedFormData.Add(item.Key, string.Join(", ", item.Value));
-                }
-            }
-
-            return normalisedFormData;
         }
     }
 }
