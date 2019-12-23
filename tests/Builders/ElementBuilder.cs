@@ -70,7 +70,7 @@ namespace form_builder_tests.Builders
 
         public ElementBuilder WithMaxLength(int maxLength)
         {
-            _property.MaxLength = maxLength.ToString();
+            _property.MaxLength = maxLength;
             return this;
         }
 

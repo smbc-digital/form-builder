@@ -76,12 +76,7 @@ namespace form_builder.Helpers.ElementHelpers
 
         public bool CheckForMaxLength(Element element)
         {
-            if (string.IsNullOrEmpty(element.Properties.MaxLength))
-            {
-                throw new Exception("No Max Length found for element. Cannot render form.");
-            }
-
-            if (Int32.Parse(element.Properties.MaxLength) < 1)
+            if (element.Properties.MaxLength < 1)
             {
                 throw new Exception("Max Length must be greater than zero. Cannot render form.");
             }

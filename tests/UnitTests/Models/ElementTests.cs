@@ -69,7 +69,50 @@ namespace form_builder_tests.UnitTests.Models
             Assert.True(result.ContainsKey("value"));
             Assert.True(result.ContainsValue(questionId));
             Assert.True(result.ContainsValue(value));
-            Assert.True(result.ContainsValue(length.ToString()));
+            Assert.True(result.ContainsValue(length));
+        }
+
+        [Theory]
+        [InlineData(50, "small")]
+        [InlineData(199, "small")]
+        [InlineData(501, "large")]
+        [InlineData(2000, "large")]
+        public void GenerateElementProperties_ShouldReturnCorrectClassValue_When_MaxLengthSupllied(int length, string expectedClassname)
+        {
+            var questionId = "test-question-id";
+            var value = "test-value";
+
+            var element = new ElementBuilder()
+                            .WithType(EElementType.Textarea)
+                            .WithQuestionId(questionId)
+                            .WithValue(value)
+                            .WithMaxLength(length)
+                            .Build();
+
+            var result = element.GenerateElementProperties();
+
+            Assert.NotEmpty(result);
+            Assert.True(result.ContainsKey("class"));
+            Assert.True(result.ContainsValue(expectedClassname));
+        }
+
+        [Fact]
+        public void GenerateElementProperties_ShouldReturnCorrectClassValue_When_UsingDefaultMaxLength()
+        {
+            var questionId = "test-question-id";
+            var value = "test-value";
+
+            var element = new ElementBuilder()
+                            .WithType(EElementType.Textarea)
+                            .WithQuestionId(questionId)
+                            .WithValue(value)
+                            .Build();
+
+            var result = element.GenerateElementProperties();
+
+            Assert.NotEmpty(result);
+            Assert.True(result.ContainsKey("class"));
+            Assert.True(result.ContainsValue("small"));
         }
 
         [Fact]
@@ -90,7 +133,7 @@ namespace form_builder_tests.UnitTests.Models
             Assert.True(result.ContainsKey("id"));
             Assert.True(result.ContainsKey("maxlength"));
             Assert.True(result.ContainsValue($"{questionId}-postcode"));
-            Assert.True(result.ContainsValue(length.ToString()));
+            Assert.True(result.ContainsValue(length));
         }
 
         [Fact]
@@ -111,7 +154,7 @@ namespace form_builder_tests.UnitTests.Models
             Assert.True(result.ContainsKey("id"));
             Assert.True(result.ContainsKey("maxlength"));
             Assert.True(result.ContainsValue($"{questionId}-street"));
-            Assert.True(result.ContainsValue(length.ToString()));
+            Assert.True(result.ContainsValue(length));
         }
 
         [Fact]

@@ -61,21 +61,40 @@ namespace form_builder.Models.Elements
 
         public Dictionary<string, object> GenerateElementProperties()
         {
-            var maxLength = string.IsNullOrEmpty(Properties.MaxLength) ? "200" : Properties.MaxLength;
             var properties = new Dictionary<string, object>();
 
             switch (Type)
             {
                 case EElementType.Textbox:
+                    properties = new Dictionary<string, object>()
+                    {
+                        { "name", Properties.QuestionId },
+                        { "id", Properties.QuestionId },
+                        { "maxlength", Properties.MaxLength },
+                        { "value", Properties.Value},
+                        { "autocomplete", "on" }
+                    };
+
+                    if (DisplayAriaDescribedby)
+                    {
+                        properties.Add("aria-describedby", DescribedByValue());
+                    }
+
+                    return properties;
                 case EElementType.Textarea:
                     properties = new Dictionary<string, object>()
                     {
                         { "name", Properties.QuestionId },
                         { "id", Properties.QuestionId },
-                        { "maxlength", maxLength },
+                        { "maxlength", Properties.MaxLength },
                         { "value", Properties.Value},
                         { "autocomplete", "on" }
                     };
+
+                    if (Properties.MaxLength <= 200 || Properties.MaxLength > 500)
+                    {
+                        properties.Add("class", Properties.MaxLength > 500 ? "large" : "small");
+                    }
 
                     if (DisplayAriaDescribedby)
                     {
@@ -87,7 +106,7 @@ namespace form_builder.Models.Elements
                     properties = new Dictionary<string, object>()
                     {
                         { "id", $"{Properties.QuestionId}-postcode" },
-                        { "maxlength", maxLength }
+                        { "maxlength", Properties.MaxLength }
                     };
 
                     if (DisplayAriaDescribedby)
@@ -107,7 +126,7 @@ namespace form_builder.Models.Elements
                     properties = new Dictionary<string, object>()
                     {
                         { "id", $"{Properties.QuestionId}-street" },
-                        { "maxlength", maxLength }
+                        { "maxlength", Properties.MaxLength }
                     };
 
                     if (DisplayAriaDescribedby)

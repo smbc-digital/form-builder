@@ -298,21 +298,6 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CheckForMaxLength_ThrowsException_IfMaxLengthDoesNotExist()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-               .WithType(EElementType.Textarea)
-               .WithQuestionId("issueOne")
-               .Build();
-
-            var viewModel = new Dictionary<string, string>();
-
-            // Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element));
-        }
-
-        [Fact]
         public void CheckForMaxLength_ReturnsTrue_IfMaxLengthExistsAndAboveZero()
         {
             // Arrange
