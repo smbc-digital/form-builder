@@ -11,6 +11,8 @@ using form_builder.Services.PageService;
 using form_builder.Services.SubmtiService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Services.SubmitService.Entities;
+using form_builder.Helpers.Session;
+using form_builder.Providers.StorageProvider;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -19,10 +21,12 @@ namespace form_builder_tests.UnitTests.Controllers
         private HomeController _homeController;
         private readonly Mock<IPageService> _pageService = new Mock<IPageService>();
         private readonly Mock<ISubmitService> _submitService = new Mock<ISubmitService>();
+        private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
+        private readonly Mock<IDistributedCacheWrapper> _distributedCache = new Mock<IDistributedCacheWrapper>();
 
         public HomeControllerTest()
         {
-            _homeController = new HomeController(_pageService.Object, _submitService.Object);
+            _homeController = new HomeController(_pageService.Object, _submitService.Object, _sessionHelper.Object, _distributedCache.Object);
         }
 
         [Fact]

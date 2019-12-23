@@ -6,6 +6,10 @@ using System;
 using form_builder.Services.PageService;
 using form_builder.Services.SubmtiService;
 using form_builder.Extensions;
+using form_builder.Helpers.Session;
+using form_builder.Providers.StorageProvider;
+using Newtonsoft.Json.Linq;
+using form_builder.Models;
 
 namespace form_builder.Controllers
 {
@@ -13,11 +17,15 @@ namespace form_builder.Controllers
     {
         private readonly IPageService _pageService;
         private readonly ISubmitService _submitService;
+        private readonly ISessionHelper _sessionHelper;
+        private readonly IDistributedCacheWrapper _distributedCache;
 
-        public HomeController(IPageService pageService, ISubmitService submitService)
+        public HomeController(IPageService pageService, ISubmitService submitService, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
         {
             _pageService = pageService;
             _submitService = submitService;
+            _sessionHelper = sessionHelper;
+            _distributedCache = distributedCache;
         }
 
         [HttpGet]
@@ -68,7 +76,19 @@ namespace form_builder.Controllers
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
             }
 
-            var behaviour = currentPageResult.Page.GetNextPage(viewModel);
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var savedData = _distributedCache.GetString(sessionGuid);
+            Behaviour behaviour;
+
+            if (sessionGuid != null)
+            {
+                behaviour = _pageService.GetBehaviour(currentPageResult, savedData);
+            }
+            else
+            {
+                behaviour = currentPageResult.Page.GetNextPage(viewModel);
+            }
+
             switch (behaviour.BehaviourType)
             {
                 case EBehaviourType.GoToExternalPage:

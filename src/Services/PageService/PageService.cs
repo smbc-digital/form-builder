@@ -16,6 +16,7 @@ using form_builder.Models.Elements;
 using form_builder.ViewModels;
 using form_builder.Providers.StorageProvider;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Linq;
 
 namespace form_builder.Services.PageService
 {
@@ -24,6 +25,7 @@ namespace form_builder.Services.PageService
         Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false);
         Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, string> viewModel, bool processManual = false);
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid);
+        Behaviour GetBehaviour(ProcessRequestEntity currentPageResult, string savedData);
     }
 
     public class PageService : IPageService
@@ -189,6 +191,27 @@ namespace form_builder.Services.PageService
             viewModel.Path = path;
 
             return viewModel;
+        }
+
+
+        public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult, string savedData)
+        {
+            Behaviour behaviour;
+            dynamic dynamicSavedData = JValue.Parse(savedData);
+            var pages = dynamicSavedData.Pages;
+            Dictionary<string, string> answers = new Dictionary<string, string>();
+
+            foreach (var item in pages)
+            {
+                foreach (var answer in item.Answers)
+                {
+                    answers.Add(answer["QuestionId"].ToString(), answer["Response"].ToString());
+                }
+
+            }
+
+            behaviour = currentPageResult.Page.GetNextPage(answers);
+            return behaviour;
         }
     }
 }
