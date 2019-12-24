@@ -431,5 +431,20 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal("Search", viewModel.StreetStatus);
             Assert.Equal("../Street/Index", viewResult.ViewName);
         }
+
+        [Fact]
+        public async Task GetBehaviour_ShouldCallSession_And_DistributedCache()
+        {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("12345");
+            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers {  Pages = new List<PageAnswers>() }));
+
+            var page = new PageBuilder()
+                .Build();
+
+            _service.GetBehaviour(new ProcessRequestEntity { Page = page });
+
+            _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
+            _distributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+        }
     }
 }

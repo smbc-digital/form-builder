@@ -203,7 +203,7 @@ namespace form_builder.Services.PageService
             Dictionary<string, string> answers = new Dictionary<string, string>();
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
-            var cachedAnswers = _distributedCache.GetString(_sessionHelper.GetSessionGuid());
+            var cachedAnswers = _distributedCache.GetString(sessionGuid);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
             convertedAnswers.Pages
