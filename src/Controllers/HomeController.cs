@@ -96,7 +96,7 @@ namespace form_builder.Controllers
             var viewModel = formData.ToNormaliseDictionary();
             var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, true);
 
-            var behaviour = currentPageResult.Page.GetNextPage(viewModel);
+            var behaviour = _pageService.GetBehaviour(currentPageResult);
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
             {
