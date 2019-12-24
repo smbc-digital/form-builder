@@ -27,6 +27,7 @@ namespace form_builder.Models
         public string ValidationMessageRestrictPastDate { get; set; } = string.Empty;
         public string ValidationMessageRestrictCurrentDate { get; set; } = string.Empty;
         public string ValidationMessageInvalidDate { get; set; } = string.Empty;
+        public string ValidationMessageInvalidTime { get; set; } = string.Empty;
         public string SelectCustomValidationMessage { get; set; } = string.Empty;
         public string ClassName { get; set; }
         public List<string> ListItems = new List<string>();
@@ -52,5 +53,10 @@ namespace form_builder.Models
         public bool RestrictFutureDate { get; set; } = false;
         public bool RestrictPastDate { get; set; } = false;
         public bool RestrictCurrentDate { get; set; } = false;
+        public string Hours { get; set; } = string.Empty;
+        public string Minutes { get; set; } = string.Empty;
+
+        public string AmPm { get; set; } = string.Empty;
+
     }
 }

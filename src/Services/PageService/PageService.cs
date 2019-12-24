@@ -52,11 +52,14 @@ namespace form_builder.Services.PageService
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+
             if (string.IsNullOrEmpty(path))
             {
                 _sessionHelper.RemoveSessionGuid();
             }
+
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+           
 
             if (string.IsNullOrEmpty(sessionGuid))
             {

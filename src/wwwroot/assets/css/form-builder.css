@@ -23,7 +23,7 @@ ol {
     width: 100%;
 }
 
-fieldset.input-memorable-date {
+fieldset.input-memorable-date, fieldset.input-time {
     margin-bottom: 24px;
 }
 
@@ -42,14 +42,22 @@ fieldset.input-memorable-date {
     width: 110px;
 }
 
+.input-time div input[type=text] {
+    display: inline-block;
+    width: 55px;
+    margin-right: 20px;
+}
+
+.input-time div {
+    display: inline-block;
+    position: relative;
+}
+
 @media only screen and (max-width: 767px) {
     ol.indented-list {
         margin-left: 25px;
     }
 }
-
-
-
 
 legend {
     font-family: 'Source Sans Pro', sans-serif;
@@ -68,3 +76,5 @@ legend {
         line-height: 1.111;
     }
 }
+
+

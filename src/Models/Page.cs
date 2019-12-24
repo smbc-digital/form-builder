@@ -46,6 +46,7 @@ namespace form_builder.Models
                                                                 element.Type == EElementType.Address ||
                                                                 element.Type == EElementType.AddressManual ||
                                                                 element.Type == EElementType.DateInput ||
+                                                                element.Type == EElementType.TimeInput ||
                                                                 element.Type == EElementType.Street);
         
         public void Validate(Dictionary<string, string> viewModel, IEnumerable<IElementValidator> form_builder)
