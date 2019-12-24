@@ -59,6 +59,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldCall_Schema_And_Session_Service()
         {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
@@ -98,6 +99,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldCallAddressService_WhenAddressElement()
         {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
             _addressService.Setup(_ => _.ProcesssAddress(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessRequestEntity());
 
@@ -135,6 +137,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldCallStreetService_WhenAddressElement()
         {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
             _streetService.Setup(_ => _.ProcessStreet(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessRequestEntity());
 
@@ -172,6 +175,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ApplicationShould_ThrowApplicationException_WhenGenerateHtml_ThrowsException()
         {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()))
                 .Throws<ApplicationException>();
 
@@ -203,6 +208,38 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, false));
 
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessRequest_ApplicationShould_ThrowNullException_WhenNoSessionGUid()
+        {
+            var element = new ElementBuilder()
+               .WithType(EElementType.Textarea)
+               .WithQuestionId("test-question")
+               .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var viewModel = new Dictionary<string, string>
+            {
+                { "Guid", Guid.NewGuid().ToString() },
+                { "AddressStatus", "Search" },
+                { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
+            };
+
+            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessRequest("form", "page-one", viewModel, false));
+            Assert.Equal("Session guid null.", result.Message);
         }
 
         [Fact]

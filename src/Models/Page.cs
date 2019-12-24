@@ -60,13 +60,6 @@ namespace form_builder.Models
                 .OrderByDescending(_ => _.Conditions.Count)
                 .FirstOrDefault(_ => _.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]));
 
-        public Behaviour GetNextPage2(Dictionary<string, string> savedData) => Behaviours.Count == 1
-            ? Behaviours.FirstOrDefault()
-            : Behaviours
-                .OrderByDescending(_ => _.Conditions.Count)
-                
-                .FirstOrDefault(_ => _.Conditions.All(x => x.EqualTo == savedData[x.QuestionId]));
-
         public string GetSubmitFormEndpoint(FormAnswers formAnswers)
         {
             var submitBehaviour = string.Empty;

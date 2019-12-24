@@ -15,8 +15,7 @@ using form_builder.Services.StreetService;
 using form_builder.Models.Elements;
 using form_builder.ViewModels;
 using form_builder.Providers.StorageProvider;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace form_builder.Services.PageService
 {
@@ -139,6 +138,11 @@ namespace form_builder.Services.PageService
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
+            if (sessionGuid == null)
+            {
+                throw new NullReferenceException($"Session guid null.");
+            }
+
             if (currentPage == null)
             {
                 throw new NullReferenceException($"Current page '{path}' object could not be found.");
@@ -196,24 +200,18 @@ namespace form_builder.Services.PageService
 
         public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-            var savedData = _distributedCache.GetString(sessionGuid);
-            Behaviour behaviour;
-            dynamic dynamicSavedData = JValue.Parse(savedData);
-            var pages = dynamicSavedData.Pages;
             Dictionary<string, string> answers = new Dictionary<string, string>();
 
-            foreach (var item in pages)
-            {
-                foreach (var answer in item.Answers)
-                {
-                    answers.Add(answer["QuestionId"].ToString(), answer["Response"].ToString());
-                }
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var cachedAnswers = _distributedCache.GetString(_sessionHelper.GetSessionGuid());
+            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-            }
+            convertedAnswers.Pages
+                .SelectMany(_ => _.Answers)
+                .ToList()
+                .ForEach(x => answers.Add(x.QuestionId, x.Response));
 
-            behaviour = currentPageResult.Page.GetNextPage(answers);
-            return behaviour;
+            return currentPageResult.Page.GetNextPage(answers);
         }
     }
 }

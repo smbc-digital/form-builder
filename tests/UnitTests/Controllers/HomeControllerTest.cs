@@ -11,8 +11,7 @@ using form_builder.Services.PageService;
 using form_builder.Services.SubmtiService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Services.SubmitService.Entities;
-using form_builder.Helpers.Session;
-using form_builder.Providers.StorageProvider;
+using form_builder.Models;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -21,8 +20,6 @@ namespace form_builder_tests.UnitTests.Controllers
         private HomeController _homeController;
         private readonly Mock<IPageService> _pageService = new Mock<IPageService>();
         private readonly Mock<ISubmitService> _submitService = new Mock<ISubmitService>();
-        private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<IDistributedCacheWrapper> _distributedCache = new Mock<IDistributedCacheWrapper>();
 
         public HomeControllerTest()
         {
@@ -53,6 +50,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
+            _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.GoToExternalPage, PageSlug = "https://www.bbc.co.uk/weather/2636882" });
 
             var viewModel = new Dictionary<string, string[]>();
 
@@ -89,6 +87,7 @@ namespace form_builder_tests.UnitTests.Controllers
             // Arrange
             _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
+            _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.GoToPage, PageSlug = "page-two" });
 
             var viewModel = new Dictionary<string, string[]>();
 
@@ -125,6 +124,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
+            _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.SubmitForm });
 
             var viewModel = new Dictionary<string, string[]>();
 
@@ -159,6 +159,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
+            _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.Unknown });
 
             var viewModel = new Dictionary<string, string[]>();
 
@@ -228,6 +229,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
+            _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = behaviourType });
 
             var result = await _homeController.Index("form", "page-one", viewModel);
 
@@ -264,6 +266,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
+            _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.GoToExternalPage, PageSlug = "submit-url" });
 
             var result = await _homeController.Index("form", "page-one", viewModel);
 

@@ -6,10 +6,6 @@ using System;
 using form_builder.Services.PageService;
 using form_builder.Services.SubmtiService;
 using form_builder.Extensions;
-using form_builder.Helpers.Session;
-using form_builder.Providers.StorageProvider;
-using Newtonsoft.Json.Linq;
-using form_builder.Models;
 
 namespace form_builder.Controllers
 {
@@ -72,16 +68,7 @@ namespace form_builder.Controllers
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
             }
 
-            Behaviour behaviour;
-
-            if (viewModel == null)
-            {
-                behaviour = _pageService.GetBehaviour(currentPageResult);
-            }
-            else
-            {
-                behaviour = currentPageResult.Page.GetNextPage(viewModel);
-            }
+            var behaviour = _pageService.GetBehaviour(currentPageResult);
 
             switch (behaviour.BehaviourType)
             {
