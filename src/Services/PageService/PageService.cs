@@ -25,7 +25,7 @@ namespace form_builder.Services.PageService
         Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false);
         Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, string> viewModel, bool processManual = false);
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid);
-        Behaviour GetBehaviour(ProcessRequestEntity currentPageResult, string savedData);
+        Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
     }
 
     public class PageService : IPageService
@@ -194,8 +194,10 @@ namespace form_builder.Services.PageService
         }
 
 
-        public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult, string savedData)
+        public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var savedData = _distributedCache.GetString(sessionGuid);
             Behaviour behaviour;
             dynamic dynamicSavedData = JValue.Parse(savedData);
             var pages = dynamicSavedData.Pages;

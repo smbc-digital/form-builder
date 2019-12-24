@@ -17,15 +17,11 @@ namespace form_builder.Controllers
     {
         private readonly IPageService _pageService;
         private readonly ISubmitService _submitService;
-        private readonly ISessionHelper _sessionHelper;
-        private readonly IDistributedCacheWrapper _distributedCache;
 
-        public HomeController(IPageService pageService, ISubmitService submitService, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
+        public HomeController(IPageService pageService, ISubmitService submitService)
         {
             _pageService = pageService;
             _submitService = submitService;
-            _sessionHelper = sessionHelper;
-            _distributedCache = distributedCache;
         }
 
         [HttpGet]
@@ -76,13 +72,11 @@ namespace form_builder.Controllers
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
             }
 
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-            var savedData = _distributedCache.GetString(sessionGuid);
             Behaviour behaviour;
 
-            if (sessionGuid != null)
+            if (viewModel == null)
             {
-                behaviour = _pageService.GetBehaviour(currentPageResult, savedData);
+                behaviour = _pageService.GetBehaviour(currentPageResult);
             }
             else
             {

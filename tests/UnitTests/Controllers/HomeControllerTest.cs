@@ -26,7 +26,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
         public HomeControllerTest()
         {
-            _homeController = new HomeController(_pageService.Object, _submitService.Object, _sessionHelper.Object, _distributedCache.Object);
+            _homeController = new HomeController(_pageService.Object, _submitService.Object);
         }
 
         [Fact]
