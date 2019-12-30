@@ -48,9 +48,17 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValidDate = DateTime.TryParse($"{valueHours}:{valueMinutes}{valueAmPm}", out DateTime result);
+            var isSelected = !string.IsNullOrEmpty(valueAmPm);
+            if (!isSelected)
+            {
+                return new ValidationResult
+                {
+                    IsValid = isSelected,
+                    Message = isSelected ? string.Empty : !string.IsNullOrEmpty(element.Properties.CustomValidationMessageAmPm) ? element.Properties.CustomValidationMessageAmPm : "Choose AM or PM"
+                };
+            }
 
-            var time = result;
+            var isValidDate = DateTime.TryParse($"{valueHours}:{valueMinutes}{valueAmPm}", out _);
 
             return new ValidationResult
             {
@@ -58,5 +66,6 @@ namespace form_builder.Validators
                 Message = isValidDate ? string.Empty : !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidTime) ? element.Properties.ValidationMessageInvalidTime : "Check the time and try again"
             };
         }
+
     }
 }

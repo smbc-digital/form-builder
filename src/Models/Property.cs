@@ -29,6 +29,7 @@ namespace form_builder.Models
         public string ValidationMessageInvalidDate { get; set; } = string.Empty;
         public string ValidationMessageInvalidTime { get; set; } = string.Empty;
         public string SelectCustomValidationMessage { get; set; } = string.Empty;
+        public string CustomValidationMessageAmPm { get; set; } = string.Empty;
         public string ClassName { get; set; }
         public List<string> ListItems = new List<string>();
         public string Source { get; set; }
