@@ -8,9 +8,7 @@
 
     var amid =  $"{Model.Properties.QuestionId}-am";
     var pmid =  $"{Model.Properties.QuestionId}-pm";
-    var ampm_name = $"{Model.Properties.QuestionId}-ampm";
     
-
     var errorId = $"{Model.Properties.QuestionId}-error";
     var classes = new string[] { "input-time" };
 }
@@ -39,11 +37,11 @@
 </div>
 
 <div class="input-radio-container">
-    @Html.RadioButton(ampm_name, "am")
+    @Html.RadioButton(amid, "am")
     <label for="@amid">AM</label>
 </div>
 <div class="input-radio-container">
-    @Html.RadioButton(ampm_name, "pm")
+    @Html.RadioButton(pmid, "pm")
     <label for="@pmid">PM</label>
 </div>
 

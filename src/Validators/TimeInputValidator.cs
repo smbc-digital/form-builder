@@ -25,8 +25,12 @@ namespace form_builder.Validators
                 ? viewModel[$"{element.Properties.QuestionId}-minutes"]
                 : null;
 
-            var valueAmPm = viewModel.ContainsKey($"{element.Properties.QuestionId}-ampm")
-                ? viewModel[$"{element.Properties.QuestionId}-ampm"]
+            var valueAm = viewModel.ContainsKey($"{element.Properties.QuestionId}-am")
+                ? viewModel[$"{element.Properties.QuestionId}-am"]
+                : null;
+
+            var valuePm = viewModel.ContainsKey($"{element.Properties.QuestionId}-pm")
+                ? viewModel[$"{element.Properties.QuestionId}-pm"]
                 : null;
 
             if (string.IsNullOrEmpty(valueHours) && string.IsNullOrEmpty(valueMinutes) && element.Properties.Optional)
@@ -48,7 +52,7 @@ namespace form_builder.Validators
                 };
             }
 
-            var isSelected = !string.IsNullOrEmpty(valueAmPm);
+            var isSelected = (!string.IsNullOrEmpty(valueAm) || !string.IsNullOrEmpty(valuePm));
             if (!isSelected)
             {
                 return new ValidationResult
@@ -58,7 +62,7 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValidDate = DateTime.TryParse($"{valueHours}:{valueMinutes}{valueAmPm}", out _);
+            var isValidDate = DateTime.TryParse($"{valueHours}:{valueMinutes}{valueAm}{valuePm}", out _);
 
             return new ValidationResult
             {
