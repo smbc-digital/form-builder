@@ -8,6 +8,7 @@
 
     var amid =  $"{Model.Properties.QuestionId}-am";
     var pmid =  $"{Model.Properties.QuestionId}-pm";
+    var amPmName = $"{Model.Properties.QuestionId}-ampm";
     
     var errorId = $"{Model.Properties.QuestionId}-error";
     var classes = new string[] { "input-time" };
@@ -37,11 +38,26 @@
 </div>
 
 <div class="input-radio-container">
-    @Html.RadioButton(amid, "am")
+    @if (Model.Properties.AmPm.ToLower() == "am")
+    {
+        <input type="radio" name="@amPmName" id="@amid" value="am" checked />
+    }
+    else
+    {
+        <input type="radio" name="@amPmName" id="@amid" value="am" />
+    }
     <label for="@amid">AM</label>
 </div>
 <div class="input-radio-container">
-    @Html.RadioButton(pmid, "pm")
+    @if (Model.Properties.AmPm.ToLower() == "am")
+    {
+        <input type="radio" name="@amPmName" id="@pmid" value="pm" checked/>
+    }
+    else
+    {
+        <input type="radio" name="@amPmName" id="@pmid" value="pm" />
+    }
+
     <label for="@pmid">PM</label>
 </div>
 
