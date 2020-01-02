@@ -17,7 +17,8 @@ namespace form_builder_tests_ui.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [TechTalk.SpecRun.FeatureAttribute("Timeinput", Description="\tIn order to enter time\r\n\tAs a user\r\n\tI want to be enter time in am or pm", SourceFile="Features\\Timeinput.feature", SourceLine=0)]
+    [TechTalk.SpecRun.FeatureAttribute("Timeinput", new string[] {
+            "timeinput"}, Description="\tIn order to enter time\r\n\tAs a user\r\n\tI want to be enter time in am or pm", SourceFile="Features\\Timeinput.feature", SourceLine=1)]
     public partial class TimeinputFeature
     {
         
@@ -30,7 +31,8 @@ namespace form_builder_tests_ui.Features
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Timeinput", "\tIn order to enter time\r\n\tAs a user\r\n\tI want to be enter time in am or pm", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Timeinput", "\tIn order to enter time\r\n\tAs a user\r\n\tI want to be enter time in am or pm", ProgrammingLanguage.CSharp, new string[] {
+                        "timeinput"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -66,23 +68,44 @@ namespace form_builder_tests_ui.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Renders HTML tags on the page", new string[] {
-                "timeinput"}, SourceLine=6)]
+        [TechTalk.SpecRun.ScenarioAttribute("Renders HTML tags on the page", SourceLine=7)]
         public virtual void RendersHTMLTagsOnThePage()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Renders HTML tags on the page", null, new string[] {
-                        "timeinput"});
-#line 7
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Renders HTML tags on the page", null, ((string[])(null)));
+#line 8
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
-#line 8
- testRunner.Given("I navigate to \"/time/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 9
- testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Given("I navigate to \"/time/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 10
- testRunner.And("I should see the \"timeid-hours\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 11
+ testRunner.And("I should see the \"timeid-hours\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 12
  testRunner.And("I should see the \"timeid-minutes\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [TechTalk.SpecRun.ScenarioAttribute("User enters strings in the day, month and year", SourceLine=14)]
+        public virtual void UserEntersStringsInTheDayMonthAndYear()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters strings in the day, month and year", null, ((string[])(null)));
+#line 15
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 16
+ testRunner.Given("I navigate to \"/time/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 17
+ testRunner.Then("I fill the hours with \"aa\" value, minutes with \"bb\" value and ampm with \"am\" valu" +
+                    "e on \"timeid\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 18
+ testRunner.When("I click the \"nextPage\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 19
+ testRunner.Then("I should see a validation message for \"timeid-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 20
+ testRunner.Then("I should see time refilled in the time input with \"aa\" value, minutes with \"bb\" v" +
+                    "alue and ampm with \"am\"  in for \"timeid\" blah", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }

@@ -18,7 +18,7 @@ namespace form_builder_tests_ui.StepDefinitions
             var webDriver = BrowserSession.Native as IWebDriver;
 
             //Act
-            webDriver.FindElement(By.Id($"{questionId}-{amPm}")).Click();
+            webDriver.FindElement(By.Id(questionId + "-am")).Click();
         }
 
       
@@ -31,11 +31,11 @@ namespace form_builder_tests_ui.StepDefinitions
 
             var hoursValue = BrowserSession.FindId(questionId + "-hours").Value;
             var minutesValue = BrowserSession.FindId(questionId + "-minutes").Value;
-            var ampm = BrowserSession.FindId($"{questionId}-{amPm}").Selected;
+            //var ampmChecked = BrowserSession.FindId(questionId + $"-{amPm}").Selected;
 
             Assert.Equal(hours, hoursValue);
             Assert.Equal(minutes, minutesValue);
-            Assert.True(ampm);
+            //Assert.True(ampmChecked);
         }
 
         [Then(@"I should not see a validation message for ""(.*)"" input")]
