@@ -77,4 +77,9 @@ legend {
     }
 }
 
+.colon-divider {
+    text-align: left;
+    width: 25px;
+    font-weight: 500;
+}
 
