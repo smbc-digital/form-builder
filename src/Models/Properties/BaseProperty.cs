@@ -15,5 +15,6 @@
         public bool? StockportPostcode { get; set; }
         public bool Numeric { get; set; } = false;
         public string Hint { get; set; } = string.Empty;
+        public string RequiredIf { get; set; } = string.Empty;
     }
 }

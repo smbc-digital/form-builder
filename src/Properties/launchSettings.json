@@ -12,7 +12,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "complexpath",
+      "launchUrl": "requiredif",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       }

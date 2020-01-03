@@ -10,10 +10,12 @@
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Address - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Button - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\ComplexPath - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Email - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\PageContent - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Postcode - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\RadioButton - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\SemiComplexPath - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Textbox - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\YourDetails - Copy.feature.cs" />
   </ItemGroup>
@@ -36,6 +38,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\ComplexPath.feature.cs">
+      <DependentUpon>ComplexPath.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\SemiComplexPath.feature.cs">
       <DependentUpon>SemiComplexPath.feature</DependentUpon>
     </Compile>
@@ -65,6 +70,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\RequiredIf.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\ComplexPath.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\SemiComplexPath.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
