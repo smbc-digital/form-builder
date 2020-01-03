@@ -1,0 +1,51 @@
+﻿@using form_builder.Helpers
+@model form_builder.Models.Elements.Element
+@{
+    var hintId = $"{Model.Properties.QuestionId}-hint";
+    var id = Model.Properties.QuestionId;
+    var errorId = $"{Model.Properties.QuestionId}-error";
+    var classes = new string[] { "input-memorable-date" };
+    var minDate = "";
+    var maxDate = "";
+
+    if(Model.Properties.RestrictFutureDate)
+    {
+        maxDate = DateTime.Today.ToString("yyyy-MM-dd");
+    }
+
+    if(Model.Properties.RestrictPastDate)
+    {
+        minDate = DateTime.Today.ToString("yyyy-MM-dd");;
+    }
+
+}
+
+@await Html.BeginFieldSet(Model, classes)
+<legend>
+    <label @Model.WriteOptional()>@Model.Properties.Label</label>
+    @if (Model.Properties?.Optional ?? true)
+    {
+        <p class="optional">(optional)</p>
+    }
+</legend>
+<p id="@hintId">@Model.Properties.Hint</p>
+<div>
+    <label for="@Model.Properties.QuestionId">
+        Date
+    </label>
+    @if (Model.Properties.Optional)
+    {
+    <input type="date" id="@id" name="@id" max="@maxDate" min="@minDate"/>
+    }
+    else
+    {
+<input type="date" id="@id" name="@id" max="@maxDate" min="@minDate" required />
+    }
+</div>
+
+
+@if (!Model.IsValid)
+{
+    <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
+}
+@await Html.EndFieldSet()

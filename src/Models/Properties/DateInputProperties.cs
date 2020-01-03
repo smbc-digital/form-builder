@@ -1,4 +1,4 @@
-﻿namespace form_builder.Models.Properties
+﻿ namespace form_builder.Models.Properties
 {
     public class DateInputProperties : BaseProperty
     {

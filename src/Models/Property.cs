@@ -56,8 +56,9 @@ namespace form_builder.Models
         public bool RestrictCurrentDate { get; set; } = false;
         public string Hours { get; set; } = string.Empty;
         public string Minutes { get; set; } = string.Empty;
-
         public string AmPm { get; set; } = string.Empty;
+
+        public string Date { get; set; } = string.Empty;
 
     }
 }
