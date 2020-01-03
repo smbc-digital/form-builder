@@ -1,0 +1,68 @@
+﻿@using form_builder.Helpers
+@model form_builder.Models.Elements.Element
+@{
+    var hintId = $"{Model.Properties.QuestionId}-hint";
+
+    var hoursid = $"{Model.Properties.QuestionId}-hours";
+    var minutesid = $"{Model.Properties.QuestionId}-minutes";
+
+    var amid =  $"{Model.Properties.QuestionId}-am";
+    var pmid =  $"{Model.Properties.QuestionId}-pm";
+    var amPmName = $"{Model.Properties.QuestionId}-ampm";
+    
+    var errorId = $"{Model.Properties.QuestionId}-error";
+    var classes = new string[] { "input-time" };
+}
+
+@await Html.BeginFieldSet(Model, classes)
+<legend>
+    <label @Model.WriteOptional()>@Model.Properties.Label</label>
+    @if (Model.Properties?.Optional ?? true)
+    {
+        <p class="optional">(optional)</p>
+    }
+</legend>
+<p id="@hintId">@Model.Properties.Hint</p>
+<div>
+    <label for="@hoursid">
+        Hours
+    </label>
+    @Html.TextBox(hoursid, Model.Properties.Hours, new { maxLength = "2", type = "text"})
+</div>
+<div class="colon-divider">:</div>
+<div>
+    <label for="@minutesid">
+        Minutes
+    </label>
+    @Html.TextBox(minutesid, Model.Properties.Minutes, new { maxLength = "2", type = "text"})
+</div>
+
+<div class="input-radio-container">
+    @if (Model.Properties.AmPm.ToLower() == "am")
+    {
+        <input type="radio" name="@amPmName" id="@amid" value="am" checked />
+    }
+    else
+    {
+        <input type="radio" name="@amPmName" id="@amid" value="am" />
+    }
+    <label for="@amid">AM</label>
+</div>
+<div class="input-radio-container">
+    @if (Model.Properties.AmPm.ToLower() == "am")
+    {
+        <input type="radio" name="@amPmName" id="@pmid" value="pm" checked/>
+    }
+    else
+    {
+        <input type="radio" name="@amPmName" id="@pmid" value="pm" />
+    }
+
+    <label for="@pmid">PM</label>
+</div>
+
+@if (!Model.IsValid)
+{
+    <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
+}
+@await Html.EndFieldSet()
