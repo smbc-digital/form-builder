@@ -15,6 +15,8 @@ namespace form_builder.Models
 
         public string Regex { get; set; } = string.Empty;
         public string RegexValidationMessage { get; set; } = string.Empty;
+        public string RequiredIf { get; set; } = string.Empty;
+        public string RequiredIfValidationMessage { get; set; } = string.Empty;
         public List<Option> Options { get; set; }
         public string ButtonId { get; set; }
         public bool HidePreviousLink { get; set; }
