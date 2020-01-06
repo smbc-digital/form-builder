@@ -61,8 +61,11 @@ namespace form_builder.Validators
 
             var isValidTime = DateTime.TryParse($"{valueHours}:{valueMinutes}{valueAmPm}", out _);
 
-            isValidTime = (int.Parse(valueHours) < 13);
+            isValidTime = int.TryParse(valueHours, out int hours);
 
+            isValidTime = (hours < 13 && hours > 0);
+
+           
             return new ValidationResult
             {
                 IsValid = isValidTime,
