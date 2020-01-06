@@ -25,6 +25,7 @@
         Address,
         AddressManual,
         Street,
-        TimeInput
+        TimeInput,
+        DatePicker
     }
 }

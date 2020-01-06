@@ -75,6 +75,15 @@ legend {
         font-size: 1.125em;
         line-height: 1.111;
     }
+
+    .horizontal{
+        display:table-cell !important;
+        width:50%;
+    }
+
+    .ampm {
+        width:100%;
+    }
 }
 
 .colon-divider {
@@ -83,3 +92,16 @@ legend {
     font-weight: 500;
 }
 
+.horizontal > label {
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    font-size: 19px;
+    line-height: 28px;
+    display: inline-block;
+    font-family: Noto Sans, Arial, sans-serif;
+    font-weight: 400;
+    margin: 0;
+    padding: 12px 18px 4px 45px;
+    position: relative;
+}

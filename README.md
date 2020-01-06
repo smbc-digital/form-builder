@@ -91,6 +91,7 @@ Example JSON:
     * [DateInput](#DateInputprops)
     * [Address](#Address)
     * [Street](#Street)
+    * [Time](#Time)
     
 
 
@@ -559,6 +560,33 @@ Street example:
             "MaxLength": "20"
           }
     }
+```
+
+#
+* <a name="Time">**Time**</a>
+  * QuestionId (*string) __*__
+  * Label (*string) __*__
+  * Hint (*string*) 
+  * ValidationMessageInvalidTime (*string*) 
+  * CustomValidationMessage (*string*)
+  * CustomValidationMessageAmPm (*string*)
+  * Optional (*boolean*) defaults to false
+  
+
+Time example
+
+```json
+{
+          "Type": "TimeInput",
+          "Properties": {
+            "QuestionId": "timeid",
+            "Label": "What time did it happen?",
+            "Hint": "For example, 10:30 AM",
+            "CustomValidationMessage": "This field is required",
+            "ValidationMessageInvalidTime": "Enter a valid time",
+            "CustomValidationMessageAmPm": "You must choose AM or PM"
+          }
+
 ```
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>

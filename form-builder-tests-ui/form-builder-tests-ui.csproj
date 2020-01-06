@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <Folder Include="Screenshots\" />
+    <Folder Include="TestResults\" />
   </ItemGroup>
 
   <ItemGroup>

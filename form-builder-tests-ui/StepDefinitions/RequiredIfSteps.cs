@@ -7,6 +7,12 @@ namespace form_builder_tests_ui.StepDefinitions
     [Binding, Scope(Tag = "requiredif")]
     class RequiredIfSteps : UiTestBase
     {
+        [Then(@"I fill in page1")]
+        public void ThenIFillInPage1()
+        {
+            BrowserSession.FillIn("thirdQuestion").With("test data test data");
+        }
+
         [Then(@"I should see a validation message for ""(.*)"" input")]
         public void ThenIShouldSeeValidationMessageForInput(string inputName)
         {
@@ -38,8 +44,6 @@ namespace form_builder_tests_ui.StepDefinitions
             //Arrange
             var webDriver = BrowserSession.Native as IWebDriver;
 
-            //Act
-
             //Assert
             Assert.True(webDriver.FindElement(By.Id(inputId)).Selected);
         }
@@ -49,8 +53,6 @@ namespace form_builder_tests_ui.StepDefinitions
         {
             //Arrange
             var webDriver = BrowserSession.Native as IWebDriver;
-
-            //Act
 
             //Assert
             Assert.False(webDriver.FindElement(By.Id(inputId)).Selected);
