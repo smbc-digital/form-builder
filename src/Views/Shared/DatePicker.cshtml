@@ -33,14 +33,7 @@
     <label for="@Model.Properties.QuestionId">
         Date
     </label>
-    @if (Model.Properties.Optional)
-    {
     <input type="date" id="@id" name="@id" max="@maxDate" min="@minDate"/>
-    }
-    else
-    {
-<input type="date" id="@id" name="@id" max="@maxDate" min="@minDate" required />
-    }
 </div>
 
 
