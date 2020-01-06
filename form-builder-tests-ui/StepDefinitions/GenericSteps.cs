@@ -20,6 +20,12 @@ namespace form_builder_tests_ui.StepDefinitions
             Thread.Sleep(1000);
         }
 
+        [Then(@"I sleep ""(.*)""")]
+        public void GivenISleep(int sleepTime)
+        {
+            Thread.Sleep(sleepTime);
+        }
+
         [Given("I have signed in as UiTest")]
         public static void IHaveSignedIn()
         {
