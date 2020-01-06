@@ -36,31 +36,31 @@
     </label>
     @Html.TextBox(minutesid, Model.Properties.Minutes, new { maxLength = "2", type = "text"})
 </div>
+<div class="ampm">
+    <div class="input-radio-container horizontal">
+        @if (Model.Properties.AmPm.ToLower() == "am")
+        {
+            <input type="radio" name="@amPmName" id="@amid" value="am" checked />
+        }
+        else
+        {
+            <input type="radio" name="@amPmName" id="@amid" value="am" />
+        }
+        <label for="@amid">AM</label>
+    </div>
+    <div class="input-radio-container horizontal">
+        @if (Model.Properties.AmPm.ToLower() == "pm")
+        {
+            <input type="radio" name="@amPmName" id="@pmid" value="pm" checked />
+        }
+        else
+        {
+            <input type="radio" name="@amPmName" id="@pmid" value="pm" />
+        }
 
-<div class="input-radio-container">
-    @if (Model.Properties.AmPm.ToLower() == "am")
-    {
-        <input type="radio" name="@amPmName" id="@amid" value="am" checked />
-    }
-    else
-    {
-        <input type="radio" name="@amPmName" id="@amid" value="am" />
-    }
-    <label for="@amid">AM</label>
+        <label for="@pmid">PM</label>
+    </div>
 </div>
-<div class="input-radio-container">
-    @if (Model.Properties.AmPm.ToLower() == "am")
-    {
-        <input type="radio" name="@amPmName" id="@pmid" value="pm" checked/>
-    }
-    else
-    {
-        <input type="radio" name="@amPmName" id="@pmid" value="pm" />
-    }
-
-    <label for="@pmid">PM</label>
-</div>
-
 @if (!Model.IsValid)
 {
     <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
