@@ -41,6 +41,7 @@ namespace form_builder.Extensions
             services.AddTransient<IElementValidator, PostcodeElementValidator>();
             services.AddTransient<IElementValidator, StockportPostcodeElementValidator>();
             services.AddTransient<IElementValidator, RegexElementValidator>();
+            services.AddTransient<IElementValidator, RequiredIfValidator>();
             services.AddTransient<IElementValidator, TimeInputValidator>();
             services.AddTransient<IElementValidator, RequiredIfValidator>();
             services.AddTransient<IElementValidator, DatePickerElementValidator>();

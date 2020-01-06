@@ -81,6 +81,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.When("I click the \"firstQuestion-0\" radiobutton", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 8
  testRunner.Then("The \"firstQuestion-0\" radiobutton should be checked", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+<<<<<<< HEAD
 #line 9
  testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 10
@@ -105,6 +106,8 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 20
  testRunner.And("I should see a \"h2\" element with \"This is cat-yes\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+=======
+>>>>>>> master
 #line hidden
             this.ScenarioCleanup();
         }

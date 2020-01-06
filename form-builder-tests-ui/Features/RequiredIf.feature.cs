@@ -90,6 +90,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 12
  testRunner.When("I click the \"secondQuestion-0\" radiobutton", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 13
+<<<<<<< HEAD
  testRunner.Then("I sleep \"1000\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 14
  testRunner.Then("The \"secondQuestion-0\" radiobutton should be checked", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -100,11 +101,20 @@ this.ScenarioInitialize(scenarioInfo);
 #line 17
  testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 18
+=======
+ testRunner.Then("The \"secondQuestion-0\" radiobutton should be checked", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 14
+ testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 15
+ testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 16
+>>>>>>> master
  testRunner.And("I should see a \"h2\" element with \"This is a label Required If\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }
         
+<<<<<<< HEAD
         [TechTalk.SpecRun.ScenarioAttribute("User enters no for first question on page1", SourceLine=19)]
         public virtual void UserEntersNoForFirstQuestionOnPage1()
         {
@@ -133,6 +143,34 @@ this.ScenarioInitialize(scenarioInfo);
 #line 30
  testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 31
+=======
+        [TechTalk.SpecRun.ScenarioAttribute("User enters no for first question on page1", SourceLine=17)]
+        public virtual void UserEntersNoForFirstQuestionOnPage1()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters no for first question on page1", null, ((string[])(null)));
+#line 18
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 19
+ testRunner.Given("I navigate to \"/requiredif/first-question\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 20
+ testRunner.When("I click the \"firstQuestion-1\" radiobutton", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 21
+ testRunner.Then("The \"firstQuestion-1\" radiobutton should be checked", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 22
+ testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 23
+ testRunner.Then("I sleep \"1000\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 24
+ testRunner.Then("I should see a validation message for \"thirdQuestion-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 25
+ testRunner.Then("I fill in page1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 26
+ testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 27
+ testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 28
+>>>>>>> master
  testRunner.And("I should see a \"h2\" element with \"This is a label Required If\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
