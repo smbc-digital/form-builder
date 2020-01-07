@@ -19,7 +19,17 @@ namespace form_builder.Validators
 
             string[] requiredIf = element.Properties.RequiredIf.Split(':');
             var requiredKey = requiredIf[0];
-            var answeredValue = viewModel[requiredKey];
+
+            string answeredValue = "";
+            if (!viewModel.TryGetValue(requiredKey, out answeredValue))
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            }
+            
+            answeredValue = viewModel[requiredKey];
 
             if (answeredValue == requiredIf[1])
             {
@@ -33,19 +43,18 @@ namespace form_builder.Validators
                     if (viewModel.TryGetValue(element.Properties.QuestionId, out value))
                     {
                         isValid = true;
-                        if (viewModel[element.Properties.QuestionId] == string.Empty) isValid = false; 
+                        if (value == string.Empty) isValid = false; 
                     }
                     else
                     {
                         isValid = false;
                     }
                 }
-
             }
 
             return new ValidationResult{
                     IsValid = isValid,
-                    Message = isValid ? string.Empty : !string.IsNullOrEmpty(element.Properties.RequiredIfValidationMessage) ? element.Properties.RequiredIfValidationMessage : $"Check the { element.Properties.Label} and try again. Required issue."
+                    Message = isValid ? string.Empty : !string.IsNullOrEmpty(element.Properties.RequiredIfValidationMessage) ? element.Properties.RequiredIfValidationMessage : $"Check the { element.Properties.Label} and try again."
                 }; 
         }
     }
