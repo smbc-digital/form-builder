@@ -12,8 +12,9 @@ Scenario: Can collect date as single field
 	Given I navigate to "/datepicker/page1"
 	Then I select "2022-05-12" on "passportIssued1" date picker
 	When I click the "nextPage" button
+	Then I wait five seconds
 	Then I select "2018-05-12" on "passportIssued2" date picker
-	When I click the "nextPage3" button
+	Then I click the "nextPage3" button
 	Then I wait five seconds
 	Then I should see a "th" element with "passportIssued1" text
 	And I should see a "th" element with "passportIssued2" text
