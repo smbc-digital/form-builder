@@ -59,12 +59,17 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValidDate = DateTime.TryParse($"{valueHours}:{valueMinutes}{valueAmPm}", out _);
+            var isValidTime = DateTime.TryParse($"{valueHours}:{valueMinutes}{valueAmPm}", out _);
 
+            isValidTime = int.TryParse(valueHours, out int hours);
+
+            isValidTime = (hours < 13 && hours > 0);
+
+           
             return new ValidationResult
             {
-                IsValid = isValidDate,
-                Message = isValidDate ? string.Empty : !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidTime) ? element.Properties.ValidationMessageInvalidTime : "Check the time and try again"
+                IsValid = isValidTime,
+                Message = isValidTime ? string.Empty : !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidTime) ? element.Properties.ValidationMessageInvalidTime : "Check the time and try again"
             };
         }
 
