@@ -10,13 +10,30 @@
 
     if(Model.Properties.RestrictFutureDate)
     {
-        maxDate = DateTime.Today.ToString("yyyy-MM-dd");
+
+        if (Model.Properties.RestrictCurrentDate)
+        {
+            maxDate = DateTime.Today.ToString("yyyy-MM-dd");
+        }
+        else
+        {
+             maxDate = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
+        }
     }
 
     if(Model.Properties.RestrictPastDate)
     {
-        minDate = DateTime.Today.ToString("yyyy-MM-dd");;
+         if (Model.Properties.RestrictCurrentDate)
+        {
+            minDate = DateTime.Today.ToString("yyyy-MM-dd");
+        }
+        else
+        {
+             minDate = DateTime.Today.AddDays(1).ToString("yyyy-MM-dd");
+        }      
     }
+
+
 
 }
 
