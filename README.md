@@ -75,6 +75,7 @@ Example JSON:
     * [H2-H6](#headingprops) (Heading levels)
     * [P](#ptextprops) (Paragraph text)
     * [Textbox](#textboxprops)
+    * [RequiredIf](#requiredif)
     * [Textbox(Email)](#textboxemailprops)
     * [Textbox(Postcode)](#textboxpostcodeprops)
     * [Textbox(Stockport postcode)](#textboxstockportpostcodeprops)
@@ -92,8 +93,6 @@ Example JSON:
     * [Address](#Address)
     * [Street](#Street)
     * [Time](#Time)
-    
-
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)
 #
@@ -135,6 +134,27 @@ Paragraph text JSON example:
       "MaxLength": 9,
       "Regex": "^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$",
       "RegexValidationMessage": "Enter a valid NI Number"
+    }
+  }
+```
+#
+   * <a name="requiredif">**Required if**</a>
+        * Label (*string*) __*__
+        * QuestionId (*string*) __*__
+        * MaxLength (*int*) (defaulted to 200)
+        * Optional (*boolean*) (need to be set as true)
+        * RequiredIf (*string*)
+        
+### Textbox JSON example when required if is being used:
+```json
+  {
+    "Type": "Textbox",
+    "Properties": {
+      "QuestionId": "niNumber",
+      "Label": "NI Number",
+      "Optional": true,
+      "MaxLength": 9,
+      "RequiredIf" : "questionOne:yes"
     }
   }
 ```
@@ -612,6 +632,43 @@ Example where if a user selects yes they will continue on with the form, otherwi
         ]
     }
 ```
+
+
+Example where dependant on their answers to certain questions the form navigates to different pages (the questions don't need to have been answered on that page but can have been answered earlier in the form:
+```json
+    {
+        "PageBehaviours": [
+            {
+                "Conditions": [
+                    {
+                        "QuestionID": "DoYouLikeApples",
+                        "EqualTo": "Yes"
+                    },
+                    {
+                        "QuestionID": "DoYouLikeOranges",
+                        "EqualTo": "Yes"
+                    },
+                ],
+                "BehaviourType": GoToPage,
+                "PageSlug": "you-like-apples-oranges"
+            },
+            {
+                "Conditions": [
+                    {
+                        "QuestionID": "DoYouLikeApples",
+                        "EqualTo": "No"
+                    },
+                    {
+                        "QuestionID": "DoYouLikeOranges",
+                        "EqualTo": "No"
+                    },
+                ],
+                "BehaviourType": GoToPage,
+                "PageSlug": "you-dont-like-apples-oranges"
+            },        ]
+    }
+```
+
 **Conditions**[*object*]
 * QuestionID (*string*) - The name of the Radio/Checkbox list to evaluate
 * EqualTo (*string*) - The value it must equal to for the behaviour to happen
