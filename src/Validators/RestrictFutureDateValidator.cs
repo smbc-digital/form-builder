@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using form_builder.Models.Elements;
+using form_builder.Enum;
 
 namespace form_builder.Validators
 {
@@ -8,7 +9,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
-            if (!element.Properties.RestrictFutureDate)
+            if (!element.Properties.RestrictFutureDate || element.Type == EElementType.DatePicker)
             {
                 return new ValidationResult
                 {

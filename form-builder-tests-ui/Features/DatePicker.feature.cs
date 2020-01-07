@@ -18,7 +18,7 @@ namespace form_builder_tests_ui.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [TechTalk.SpecRun.FeatureAttribute("DatePicker", new string[] {
-            "datePicker"}, Description="\tIn order to collect a date users enter a date in the date picker", SourceFile="Features\\DatePicker.feature", SourceLine=1)]
+            "datepicker"}, Description="\tIn order to collect a date users enter a date in the date picker", SourceFile="Features\\DatePicker.feature", SourceLine=1)]
     public partial class DatePickerFeature
     {
         
@@ -32,7 +32,7 @@ namespace form_builder_tests_ui.Features
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "DatePicker", "\tIn order to collect a date users enter a date in the date picker", ProgrammingLanguage.CSharp, new string[] {
-                        "datePicker"});
+                        "datepicker"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -68,17 +68,46 @@ namespace form_builder_tests_ui.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Goes to page1 if they attempt to go straight to page2", SourceLine=5)]
-        public virtual void GoesToPage1IfTheyAttemptToGoStraightToPage2()
+        [TechTalk.SpecRun.ScenarioAttribute("User does not enter a date", SourceLine=4)]
+        public virtual void UserDoesNotEnterADate()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Goes to page1 if they attempt to go straight to page2", null, ((string[])(null)));
-#line 6
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User does not enter a date", null, ((string[])(null)));
+#line 5
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
-#line 7
+#line 6
  testRunner.Given("I navigate to \"/datepicker/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 7
+ testRunner.When("I click the \"nextPage\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 8
- testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see a validation message for \"passportIssued1-error\" date picker", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 9
+ testRunner.And("I should not see a validation message for \"dob1-error\" date picker", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [TechTalk.SpecRun.ScenarioAttribute("Can collect date as single field", SourceLine=10)]
+        public virtual void CanCollectDateAsSingleField()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Can collect date as single field", null, ((string[])(null)));
+#line 11
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 12
+ testRunner.Given("I navigate to \"/datepicker/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 13
+ testRunner.Then("I select \"2022-05-12\" on \"passportIssued1\" date picker", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 14
+ testRunner.When("I click the \"nextPage\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 15
+ testRunner.Then("I select \"2018-05-12\" on \"passportIssued2\" date picker", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 16
+ testRunner.When("I click the \"nextPage3\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 17
+ testRunner.Then("I should see a \"th\" element with \"passportIssued1\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 18
+ testRunner.And("I should see a \"th\" element with \"passportIssued2\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }
