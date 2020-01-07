@@ -93,6 +93,8 @@ Example JSON:
     * [Address](#Address)
     * [Street](#Street)
     * [Time](#Time)
+    * [DatePicker](#DatePicker)
+    
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)
 #
@@ -523,6 +525,31 @@ Date Input example:
             "ValidationMessageRestrictFutureDate": "Date in the future not allowed, please enter a date in the past",
             "ValidationMessageRestrictCurrentDate": "Today's date not allowed, please enter a date in the past"
         }
+    }
+```
+#
+  * <a name="DatePicker">**DatePicker**</a>
+    * Label (*string*) __*__
+    * QuestionId (*string*) __*__
+    * Hint (*string*)
+    * RestrictFutureDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the future)
+    * RestrictPastDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the past)
+    * RestrictCurrentDate (*boolean*) (Defaults to false. If true, it will prevent users entering today's date)
+    * CustomValidationMessage (*string*) (Set a custom validation message for when a user doesn't input a date)
+
+Date Picker example:
+```json
+    {
+          "Type": "DatePicker",
+          "Properties": {
+            "QuestionId": "passportIssued1",
+            "Label": "When was your passport issued?",
+            "Hint": "For example, 12 11 2007",
+            "RestrictFutureDate": false,
+            "RestrictPastDate": true,
+            "RestrictCurrentDate": false,
+            "CustomValidationMessage": "This field is required"
+          }
     }
 ```
 
