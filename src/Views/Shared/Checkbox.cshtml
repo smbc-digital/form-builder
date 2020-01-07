@@ -21,17 +21,15 @@
         <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
     }
 
-    <div class="input">
         <partial name="CheckboxOptions" />
 
-        @if (!Model.IsValid)
+    @if (!Model.IsValid)
+    {
         {
-            {
-                var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+            var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
 
-                <p class="input-error-content" id="@errorId">@validationMessage</p>
-            }
+            <p class="input-error-content" id="@errorId">@validationMessage</p>
         }
-    </div>
+    }
 
 @await Html.EndFieldSet()
