@@ -14,5 +14,6 @@ Scenario: Can collect date as single field
 	When I click the "nextPage" button
 	Then I select "2018-05-12" on "passportIssued2" date picker
 	When I click the "nextPage3" button
+	Then I wait five seconds
 	Then I should see a "th" element with "passportIssued1" text
 	And I should see a "th" element with "passportIssued2" text

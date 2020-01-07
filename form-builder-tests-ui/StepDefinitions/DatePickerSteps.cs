@@ -1,6 +1,7 @@
 ﻿using System;
 using TechTalk.SpecFlow;
 using Xunit;
+using System.Threading;
 
 
 namespace form_builder_tests_ui.StepDefinitions
@@ -27,6 +28,12 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenISelectDateFromDatePicker(string date,string inputName)
         {
             BrowserSession.FindId(inputName).SendKeys(date);
+        }
+
+        [Then(@"I wait five seconds")]
+        public void ThenIWaitFiveSeconds()
+        {
+            Thread.Sleep(6000);
         }
     }
 }
