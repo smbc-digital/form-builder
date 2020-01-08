@@ -7,7 +7,7 @@ using System;
 
 namespace form_builder_tests.UnitTests.Validators
 {
-    public class RestrictCurrentDateValidatorTests
+    public class RestrictCurrentDatepickerValidatorTests
     {
         private readonly RestrictCurrentDatepickerValidator _restrictCurrentDateValidator = new RestrictCurrentDatepickerValidator();
 
@@ -28,7 +28,7 @@ namespace form_builder_tests.UnitTests.Validators
         {
             //Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
+                .WithType(EElementType.DatePicker)
                 .WithRestrictCurrentDate(true)
                 .WithOptional(true)
                 .Build();
@@ -72,7 +72,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, string>();
             var today = DateTime.Today;
-            viewModel.Add("test-date", today.Date.ToString());
+            viewModel.Add("test-date", today.Day.ToString());
 
             //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
@@ -85,16 +85,14 @@ namespace form_builder_tests.UnitTests.Validators
         {
             //Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
+                .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
                 .WithRestrictCurrentDate(true)
                 .Build();
 
             var viewModel = new Dictionary<string, string>();
-            viewModel.Add("test-date-day", "10");
-            viewModel.Add("test-date-month", "10");
-            viewModel.Add("test-date-year", "2012");
-
+            viewModel.Add("test-date", "2019-11-22");
+           
             //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
             Assert.True(result.IsValid);

@@ -23,13 +23,14 @@ namespace form_builder_tests.UnitTests.Validators
             var result = _restrictFutureDateValidator.Validate(element, null);
             Assert.True(result.IsValid);
         }
+
         [Fact]
         public void Validate_ReturnsTrueWhenOptionalFieldsAreEmpty()
         {
             //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
-                .WithRestrictPastDate(true)
+                .WithRestrictFutureDate(true)
                 .WithOptional(true)
                 .Build();
 
@@ -86,9 +87,9 @@ namespace form_builder_tests.UnitTests.Validators
         {
             //Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
+                .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
-                .WithRestrictCurrentDate(true)
+                .WithRestrictFutureDate(true)
                 .Build();
 
             var viewModel = new Dictionary<string, string>();
