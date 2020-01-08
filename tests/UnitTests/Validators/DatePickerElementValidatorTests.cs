@@ -7,7 +7,7 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
 {
-    public class DatePickerValidatorTests
+    public class DatePickerElementValidatorTests
     {
         private readonly DatePickerElementValidator _dateInputElementValidator = new DatePickerElementValidator();
 
@@ -53,7 +53,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, string>();
             viewModel.Add("test-date", "2222aaaa");
-           
+
             //Assert
             var result = _dateInputElementValidator.Validate(element, viewModel);
             Assert.False(result.IsValid);
@@ -74,7 +74,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             //Assert
             var result = _dateInputElementValidator.Validate(element, viewModel);
-            Assert.True(result.IsValid);          
+            Assert.True(result.IsValid);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace form_builder.Models.Elements
 
         public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            Properties.Date = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-day");
+            Properties.Date = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckAllDateRestrictionsAreNotEnabled(this);

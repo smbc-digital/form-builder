@@ -13,10 +13,10 @@
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.6" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
     <PackageReference Include="Moq" Version="4.13.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="79.0.3945.3600-beta" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
-    <PackageReference Include="StockportGovUK.AspNetCore.Gateways" Version="0.9.4-prerelease90" />
+    <PackageReference Include="StockportGovUK.NetStandard.Gateways" Version="1.0.5-prerelease1" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
   </ItemGroup>

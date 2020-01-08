@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using form_builder.Models.Elements;
 using form_builder.Enum;
 
+
 namespace form_builder.Validators
 {
-    public class RestrictFutureDateValidator : IElementValidator
+    public class RestrictPastDatepickerValidator : IElementValidator
     {
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
-            if (!element.Properties.RestrictFutureDate || element.Type == EElementType.DatePicker)
+            if (!element.Properties.RestrictPastDate || element.Type != EElementType.DatePicker || element.Properties.Optional)
             {
                 return new ValidationResult
                 {
@@ -17,27 +18,10 @@ namespace form_builder.Validators
                 };
             }
 
-            var valueDay = viewModel.ContainsKey($"{element.Properties.QuestionId}-day")
-                ? viewModel[$"{element.Properties.QuestionId}-day"]
-                : null;
+            var value = viewModel[element.Properties.QuestionId];
+            
 
-            var valueMonth = viewModel.ContainsKey($"{element.Properties.QuestionId}-month")
-                ? viewModel[$"{element.Properties.QuestionId}-month"]
-                : null;
-
-            var valueYear = viewModel.ContainsKey($"{element.Properties.QuestionId}-year")
-                ? viewModel[$"{element.Properties.QuestionId}-year"]
-                : null;
-
-            if (element.Properties.Optional && string.IsNullOrEmpty(valueDay) && string.IsNullOrEmpty(valueMonth) && string.IsNullOrEmpty(valueYear))
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
-
-            var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out _);
+            var isValidDate = DateTime.TryParse(value, out _);
 
             if (!isValidDate)
             {
@@ -50,9 +34,9 @@ namespace form_builder.Validators
 
             var date = DateTime.Today;
 
-            var dateOutput = DateTime.Parse($"{valueDay}/{valueMonth}/{valueYear}");
+            var dateOutput = DateTime.Parse(value);
 
-            if (dateOutput > date)
+            if (dateOutput < date)
             {
                 return new ValidationResult
                 {
@@ -67,5 +51,7 @@ namespace form_builder.Validators
                 Message = string.Empty
             };
         }
+
+
     }
 }

@@ -33,10 +33,14 @@ namespace form_builder.Extensions
             services.AddTransient<IElementValidator, NumericValueElementValidator>();
             services.AddTransient<IElementValidator, AutomaticAddressElementValidator>();
             services.AddTransient<IElementValidator, ManualAddressValidator>();
-            services.AddTransient<IElementValidator, DateInputElementValidator>();           
+            services.AddTransient<IElementValidator, DateInputElementValidator>();
+            services.AddTransient<IElementValidator, DatePickerElementValidator>();
             services.AddTransient<IElementValidator, RestrictPastDateValidator>();
             services.AddTransient<IElementValidator, RestrictFutureDateValidator>();
             services.AddTransient<IElementValidator, RestrictCurrentDateValidator>();
+            services.AddTransient<IElementValidator, RestrictCurrentDatepickerValidator>();
+            services.AddTransient<IElementValidator, RestrictPastDatepickerValidator>();
+            services.AddTransient<IElementValidator, RestrictFutureDatepickerValidator>();
             services.AddTransient<IElementValidator, EmailElementValidator>();
             services.AddTransient<IElementValidator, PostcodeElementValidator>();
             services.AddTransient<IElementValidator, StockportPostcodeElementValidator>();
@@ -44,7 +48,7 @@ namespace form_builder.Extensions
             services.AddTransient<IElementValidator, RequiredIfValidator>();
             services.AddTransient<IElementValidator, TimeInputValidator>();
             services.AddTransient<IElementValidator, RequiredIfValidator>();
-            services.AddTransient<IElementValidator, DatePickerElementValidator>();
+           
             return services;
         }
 

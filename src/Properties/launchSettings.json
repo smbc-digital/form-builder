@@ -12,7 +12,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "requiredif",
+      "launchUrl": "datepicker",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       }

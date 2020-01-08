@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Providers.Street;
-using StockportGovUK.AspNetCore.Gateways.VerintServiceGateway;
+using StockportGovUK.NetStandard.Gateways.VerintServiceGateway;
 using StockportGovUK.NetStandard.Models.Addresses;
 
 namespace form_builder.Providers.Address

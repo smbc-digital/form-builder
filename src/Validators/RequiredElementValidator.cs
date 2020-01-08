@@ -27,7 +27,7 @@ namespace form_builder.Validators
                 validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
             }
 
-            if (element.Type == Enum.EElementType.Address)
+            if (element.Type == EElementType.Address)
             {
                 if (viewModel["AddressStatus"] == "Select")
                 {

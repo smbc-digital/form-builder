@@ -18,7 +18,7 @@ namespace form_builder.Validators
             }
 
             var date = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId] : string.Empty;
-           
+
             var isValid = !string.IsNullOrEmpty(date);
 
             if (!isValid)

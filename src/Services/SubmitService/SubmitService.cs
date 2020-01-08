@@ -6,7 +6,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.SubmitService.Entities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using StockportGovUK.AspNetCore.Gateways;
+using StockportGovUK.NetStandard.Gateways;
 using System;
 using System.Collections.Generic;
 using System.Net;
