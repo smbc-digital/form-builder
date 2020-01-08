@@ -92,7 +92,7 @@ namespace form_builder.Services.StreetService
             }
 
             _pageHelper.SaveAnswers(viewModel, guid);
-            return await _pageHelper.ProcessStreetAndAddressJourney(journey, currentPage, viewModel, baseForm, guid, streetResults, false);
+            return await _pageHelper.ProcessStreetAndAddressJourney(journey, currentPage, viewModel, baseForm, guid, streetResults, null, false);
         }
     }
 }

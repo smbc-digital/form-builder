@@ -20,9 +20,9 @@ namespace form_builder.Helpers.PageHelpers
     public interface IPageHelper
     {
         void CheckForDuplicateQuestionIDs(Page page);
-        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null);
+        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationSearchResults = null);
         void SaveAnswers(Dictionary<string, string> viewModel, string guid);
-        Task<ProcessRequestEntity> ProcessStreetAndAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults, bool isAddressJourney);
+        Task<ProcessRequestEntity> ProcessStreetAndAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationSearchResults, bool isAddressJourney);
         bool hasDuplicateQuestionIDs(List<Page> pages);
     }
 
@@ -55,7 +55,7 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
-        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null)
+        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationSearchResults = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
             if (page.PageSlug.ToLower() != "success")
@@ -68,7 +68,7 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var element in page.Elements)
             {
-                formModel.RawHTML += await element.RenderAsync(_viewRender, _elementHelper, guid, addressAndStreetSearchResults, viewModel, page, baseForm, _enviroment);
+                formModel.RawHTML += await element.RenderAsync(_viewRender, _elementHelper, guid, addressAndStreetSearchResults, organisationSearchResults, viewModel, page, baseForm, _enviroment);
             }
 
             return formModel;
@@ -110,16 +110,17 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
-        public async Task<ProcessRequestEntity> ProcessStreetAndAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults, bool isAddressJourney)
+        public async Task<ProcessRequestEntity> ProcessStreetAndAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationResults, string viewName)
         {
             switch (journey)
             {
                 case "Search":
                     try
                     {
-                        var adddressViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults);
+                        var adddressViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, organisationResults);
                         adddressViewModel.AddressStatus = "Select";
                         adddressViewModel.StreetStatus = "Select";
+                        adddressViewModel.OrganisationStatus = "Select";
                         adddressViewModel.FormName = baseForm.FormName;
 
                         return new ProcessRequestEntity
@@ -127,12 +128,12 @@ namespace form_builder.Helpers.PageHelpers
                             Page = currentPage,
                             ViewModel = adddressViewModel,
                             UseGeneratedViewModel = true,
-                            ViewName = isAddressJourney ? "../Address/Index" : "../Street/Index"
+                            ViewName = viewName //? "../Address/Index" : "../Street/Index"
                         };
                     }
                     catch (Exception e)
                     {
-                        throw new ApplicationException($"AddressController: An exception has occured while attempting to generate Html, Exception: {e.Message}");
+                        throw new ApplicationException($"PageHelper.ProcessStreetAndAddressJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
                     };
                 case "Select":
                     return new ProcessRequestEntity
@@ -140,7 +141,7 @@ namespace form_builder.Helpers.PageHelpers
                         Page = currentPage
                     };
                 default:
-                    throw new ApplicationException($"AddressController: Unknown journey type");
+                    throw new ApplicationException($"PageHelper.ProcessStreetAndAddressJourney: Unknown journey type");
             }
         }
 
@@ -162,6 +163,7 @@ namespace form_builder.Helpers.PageHelpers
                         || element.Type == EElementType.Checkbox
                         || element.Type == EElementType.DateInput
                         || element.Type == EElementType.TimeInput
+                        || element.Type == EElementType.Organisation
                         )
                     {
                         qIds.Add(element.Properties.QuestionId);

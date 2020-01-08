@@ -110,7 +110,7 @@ namespace form_builder.Services.AddressService
             }
 
             _pageHelper.SaveAnswers(viewModel, guid);
-            return await _pageHelper.ProcessStreetAndAddressJourney(journey, currentPage, viewModel, baseForm, guid, addressResults, true);
+            return await _pageHelper.ProcessStreetAndAddressJourney(journey, currentPage, viewModel, baseForm, guid, addressResults, null, true);
         }
 
     }

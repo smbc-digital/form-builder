@@ -12,7 +12,6 @@ namespace form_builder.Models
         public bool? Postcode { get; set; }
         public bool? StockportPostcode { get; set; }
         public bool Numeric { get; set; } = false;
-
         public string Regex { get; set; } = string.Empty;
         public string RegexValidationMessage { get; set; } = string.Empty;
         public string RequiredIf { get; set; } = string.Empty;
@@ -44,12 +43,11 @@ namespace form_builder.Models
         public string AddressManualAddressLine2 { get; set; } = string.Empty;
         public string AddressManualAddressTown { get; set; } = string.Empty;
         public string AddressManualAddressPostcode { get; set; } = string.Empty;
-
         public string AddressManualHint { get; set; } = string.Empty;
-
         public string StreetProvider { get; set; }
         public string SelectLabel { get; set; } = string.Empty;
         public string StreetLabel { get; set; } = string.Empty;
+
         public string Day { get; set; } = string.Empty;
         public string Month { get; set; } = string.Empty;
         public string Year { get; set; } = string.Empty;
@@ -59,8 +57,7 @@ namespace form_builder.Models
         public string Hours { get; set; } = string.Empty;
         public string Minutes { get; set; } = string.Empty;
         public string AmPm { get; set; } = string.Empty;
-
         public string Date { get; set; } = string.Empty;
-
+        public string OrganisationProvider { get; set; }
     }
 }

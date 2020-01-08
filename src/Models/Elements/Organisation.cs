@@ -1,4 +1,5 @@
 ﻿using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.ViewModels;
@@ -7,39 +8,33 @@ using StockportGovUK.NetStandard.Models.Addresses;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using form_builder.Extensions;
 
 namespace form_builder.Models.Elements
 {
-    public class Address : Element
+    public class Organisation : Element
     {
-        public Address()
+        public Organisation()
         {
-            Type = EElementType.Address;
+            Type = EElementType.Organisation;
         }
 
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            var postcodeKey = $"{Properties.QuestionId}-postcode";
+            var organisationKey = $"{Properties.QuestionId}-searchterm-organisation";
             var viewElement = new ElementViewModel
             {
                 Element = this,
             };
 
-            if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
+            if (viewModel.ContainsKey("OrganisationStatus") && viewModel["OrganisationStatus"] == "Select" || viewModel.ContainsKey(organisationKey) && !string.IsNullOrEmpty(viewModel[organisationKey]))
             {
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
-                
-                viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
-                viewElement.ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
-                return await viewRender.RenderAsync("AddressSelect", new Tuple<ElementViewModel, List<AddressSearchResult>>(viewElement, addressSearchResults));
+                return await viewRender.RenderAsync("OrganisationSelect", new Tuple<ElementViewModel, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>>(viewElement, organisationResults));
             }
 
-            viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
-
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
-            return await viewRender.RenderAsync("AddressSearch", viewElement);
+            return await viewRender.RenderAsync("OrganisationSearch", viewElement);
         }
     }
 }

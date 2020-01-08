@@ -1,0 +1,26 @@
+﻿@model form_builder.ViewModels.ElementViewModel
+@{
+    var questionId = $"{Model.Element.Properties.QuestionId}-searchterm-organisation";
+    var hintId = $"{questionId}-hint";
+    var errorId = $"{questionId}-error";
+}
+
+<label @Model.Element.WriteOptional() for="@questionId">@Model.Element.Properties.Label</label>
+
+@if (Model.Element.Properties?.Optional ?? true)
+{
+    <p class="optional">(optional)</p>
+}
+
+@if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
+{
+    <p class="description" id=@hintId>@Model.Element.Properties.Hint</p>
+}
+
+@Html.TextBox(questionId, Model.Element.Properties.Value, Model.Element.GenerateElementProperties())
+
+@if (!Model.Element.IsValid)
+{
+    var validationMessage = string.IsNullOrEmpty(Model.Element.Properties.CustomValidationMessage) ? Model.Element.ValidationMessage : Model.Element.Properties.CustomValidationMessage;
+    <p class="input-error-content" id="@errorId">@validationMessage</p>
+}

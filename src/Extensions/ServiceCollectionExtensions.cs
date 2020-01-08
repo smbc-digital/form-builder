@@ -7,10 +7,12 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Providers.Address;
+using form_builder.Providers.Organisation;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
 using form_builder.Services.AddressService;
+using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService;
 using form_builder.Services.StreetService;
 using form_builder.Services.SubmtiService;
@@ -101,6 +103,11 @@ namespace form_builder.Extensions
             services.AddSingleton<IStreetProvider, CRMStreetProvider>();
             return services;
         }
+        public static IServiceCollection ConfigureOrganisationProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
+            return services;
+        }
 
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
@@ -108,6 +115,7 @@ namespace form_builder.Extensions
             services.AddSingleton<IPageService, PageService>();
             services.AddSingleton<IStreetService, StreetService>();
             services.AddSingleton<ISubmitService, SubmitService>();
+            services.AddSingleton<IOrganisationService, OrganisationService>();
 
             return services;
         }

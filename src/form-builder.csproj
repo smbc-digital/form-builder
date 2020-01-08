@@ -40,8 +40,5 @@
   <ItemGroup>
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Providers\Organisation\" />
-  </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties dsl_4dateinput_1json__JsonSchema="http://json.schemastore.org/band-manifest" /></VisualStudio></ProjectExtensions>
 </Project>

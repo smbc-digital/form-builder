@@ -16,6 +16,7 @@ using form_builder.Models.Elements;
 using form_builder.ViewModels;
 using form_builder.Providers.StorageProvider;
 using Newtonsoft.Json;
+using form_builder.Services.OrganisationService;
 
 namespace form_builder.Services.PageService
 {
@@ -37,8 +38,9 @@ namespace form_builder.Services.PageService
         private readonly ILogger<PageService> _logger;
         private readonly IStreetService _streetService;
         private readonly IAddressService _addressService;
+        private readonly IOrganisationService _organisationService;
 
-        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IDistributedCacheWrapper distributedCache)
+        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache)
         {
             _validators = validators;
             _schemaProvider = schemaProvider;
@@ -47,6 +49,7 @@ namespace form_builder.Services.PageService
             _logger = logger;
             _streetService = streetService;
             _addressService = addressService;
+            _organisationService = organisationService;
             _distributedCache = distributedCache;
         }
 
@@ -128,6 +131,16 @@ namespace form_builder.Services.PageService
                 };
             }
 
+            if (page.Elements.Any(_ => _.Type == EElementType.Organisation))
+            {
+                viewModel.OrganisationStatus = "Search";
+                return new ProcessPageEntity
+                {
+                    ViewModel = viewModel,
+                    ViewName = "../Organisation/Index"
+                };
+            }
+
             return new ProcessPageEntity
             {
                 ViewModel = viewModel
@@ -167,6 +180,11 @@ namespace form_builder.Services.PageService
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Street))
             {
                 return await _streetService.ProcessStreet(viewModel, currentPage, baseForm, sessionGuid, path);
+            }
+
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.Organisation))
+            {
+                return await _organisationService.ProcesssOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
             }
 
             if (currentPage.IsValid)
