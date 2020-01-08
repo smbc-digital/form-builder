@@ -1,13 +1,13 @@
 ﻿@model form_builder.Models.Elements.Element
-
 @{
+    var behaviour = (bool)ViewData["bType"];
     var displayAnchor = (bool)ViewData["displayAnchor"];
     var text = string.IsNullOrEmpty(Model.Properties.Text) ? "Next step" : Model.Properties.Text;
     var className = string.IsNullOrEmpty(Model.Properties.ClassName) ? "button-primary" : Model.Properties.ClassName;
+    var disableBtn = behaviour ? $"onclick=disableBtn();this.onclick=null;" : null;
 }
 
-<button class="@className" type="submit" id="@Model.Properties.ButtonId">@text</button>
-
+<button class="@className" @disableBtn type="submit" id="@Model.Properties.ButtonId">@text</button>
 
 @if (@displayAnchor)
 {
@@ -16,3 +16,10 @@
         <a class="back-button" href="javascript:history.back(-1)">Previous</a>
     }
 }
+
+<script type="text/javascript">
+    function disableBtn() {
+        var disabledButton = document.getElementById("@Model.Properties.ButtonId");
+        disabledButton.className += " button-loading is-loading";
+    }
+</script>
