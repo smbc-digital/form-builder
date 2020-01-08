@@ -7,7 +7,7 @@ using System;
 
 namespace form_builder_tests.UnitTests.Validators
 {
-    public class RestrictCurrentDatepickerValidatorTests
+    public class RestrictCurrentDateValidatorTests
     {
         private readonly RestrictCurrentDateValidator _restrictCurrentDateValidator = new RestrictCurrentDateValidator();
 
@@ -16,7 +16,7 @@ namespace form_builder_tests.UnitTests.Validators
         {
             //Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.DatePicker)
+                .WithType(EElementType.DateInput)
                 .Build();
 
             //Assert
@@ -28,7 +28,7 @@ namespace form_builder_tests.UnitTests.Validators
         {
             //Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.DatePicker)
+                .WithType(EElementType.DateInput)
                 .WithRestrictCurrentDate(true)
                 .WithOptional(true)
                 .Build();
@@ -71,7 +71,10 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, string>();
             var today = DateTime.Today;
-            viewModel.Add("test-date", today.ToString("yyyy-MM-dd"));            
+            viewModel.Add("test-date-day", today.Day.ToString());
+            viewModel.Add("test-date-month", today.Month.ToString());
+            viewModel.Add("test-date-year", today.Year.ToString());
+
             //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
             Assert.False(result.IsValid);
@@ -89,7 +92,9 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var viewModel = new Dictionary<string, string>();
-            viewModel.Add("test-date", "2012-06-02");           
+            viewModel.Add("test-date-day", "10");
+            viewModel.Add("test-date-month", "10");
+            viewModel.Add("test-date-year", "2012");
 
             //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
