@@ -91,7 +91,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var viewModel = new Dictionary<string, string>();
-            viewModel.Add("test-date", "2019-11-22");
+            viewModel.Add("test-date", DateTime.Today.AddDays(2).ToString("yyyy-MM-dd"));
            
             //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);

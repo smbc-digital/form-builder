@@ -97,20 +97,18 @@ this.ScenarioInitialize(scenarioInfo);
 #line 12
  testRunner.Given("I navigate to \"/datepicker/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 13
- testRunner.When("I select \"2022-05-12\" on \"passportIssued1\" date picker", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("I select \"02082022\" on \"passportIssued1\" date picker", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 14
  testRunner.Then("I click the \"nextPage\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 15
- testRunner.Then("I wait five seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I select \"12052018\" on \"passportIssued2\" date picker", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 16
- testRunner.Then("I select \"2018-05-12\" on \"passportIssued2\" date picker", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 17
  testRunner.Then("I click the \"nextPage3\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 18
+#line 17
  testRunner.Then("I wait five seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 19
+#line 18
  testRunner.Then("I should see a \"th\" element with \"passportIssued1\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 20
+#line 19
  testRunner.And("I should see a \"th\" element with \"passportIssued2\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();

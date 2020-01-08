@@ -9,7 +9,11 @@ namespace form_builder_tests.UnitTests.Validators
 {
     public class RestrictFutureDatepickerValidatorTests
     {
+<<<<<<< HEAD
         private readonly RestrictFutureDatepickerValidator _restrictFutureDateValidator = new RestrictFutureDatepickerValidator();
+=======
+        private readonly RestrictFutureDatepickerValidator _restrictCurrentDateValidator = new RestrictFutureDatepickerValidator();
+>>>>>>> Fixed datepicker tsts
 
         [Fact]
         public void Validate_ShouldCheckRestrictFutureDatePropertyIsNotSet()

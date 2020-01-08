@@ -23,6 +23,7 @@ namespace form_builder_tests.UnitTests.Validators
             var result = _restrictPastDatepickerValidator.Validate(element, null);
             Assert.True(result.IsValid);
         }
+
         [Fact]
         public void Validate_ReturnsTrueWhenOptionalFieldsAreEmpty()
         {

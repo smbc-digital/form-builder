@@ -10,10 +10,9 @@ Scenario: User does not enter a date
 	
 Scenario: Can collect date as single field
 	Given I navigate to "/datepicker/page1"
-	When I select "2022-05-12" on "passportIssued1" date picker
-	Then I click the "nextPage" button
-	Then I wait five seconds
-	Then I select "2018-05-12" on "passportIssued2" date picker
+	When I select "02082022" on "passportIssued1" date picker
+	Then I click the "nextPage" button	
+	Then I select "12052018" on "passportIssued2" date picker
 	Then I click the "nextPage3" button
 	Then I wait five seconds
 	Then I should see a "th" element with "passportIssued1" text
