@@ -97,9 +97,9 @@ this.ScenarioInitialize(scenarioInfo);
 #line 12
  testRunner.Given("I navigate to \"/datepicker/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 13
- testRunner.Then("I select \"2022-05-12\" on \"passportIssued1\" date picker", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.When("I select \"2022-05-12\" on \"passportIssued1\" date picker", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 14
- testRunner.When("I click the \"nextPage\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.Then("I click the \"nextPage\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 15
  testRunner.Then("I wait five seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 16

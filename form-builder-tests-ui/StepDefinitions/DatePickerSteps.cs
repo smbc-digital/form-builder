@@ -25,7 +25,7 @@ namespace form_builder_tests_ui.StepDefinitions
         }
 
         [Then(@"I select ""(.*)"" on ""(.*)"" date picker")]
-        [When(@"I should not see a validation message for ""(.*)"" date picker")]
+        [When(@"I select ""(.*)"" on ""(.*)"" date picker")]
         public void ThenISelectDateFromDatePicker(string date,string inputName)
         {
             BrowserSession.FindId(inputName).SendKeys(date);

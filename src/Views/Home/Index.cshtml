@@ -5,7 +5,7 @@
 }
 
 <div id="root" class="text-center">
-    @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { autocomplete ="on" }))
+    @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { autocomplete ="on", novalidate="novalidate"}))
     {
         @Html.Raw(Model.RawHTML)
 
