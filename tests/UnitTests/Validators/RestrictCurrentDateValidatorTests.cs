@@ -71,7 +71,8 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, string>();
             var today = DateTime.Today;
-            viewModel.Add("test-date", today.ToString("yyyy-MM-dd"));            
+            viewModel.Add("test-date", today.ToString("yyyy-MM-dd"));     
+            
             //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
             Assert.False(result.IsValid);
@@ -83,7 +84,7 @@ namespace form_builder_tests.UnitTests.Validators
         {
             //Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
+                .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
                 .WithRestrictCurrentDate(true)
                 .Build();

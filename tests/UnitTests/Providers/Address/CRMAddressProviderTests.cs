@@ -1,7 +1,7 @@
 ﻿using form_builder.Providers.Address;
 using Moq;
-using StockportGovUK.AspNetCore.Gateways.Response;
-using StockportGovUK.AspNetCore.Gateways.VerintServiceGateway;
+using StockportGovUK.NetStandard.Gateways.Response;
+using StockportGovUK.NetStandard.Gateways.VerintServiceGateway;
 using StockportGovUK.NetStandard.Models.Addresses;
 using System.Collections.Generic;
 using System.Threading.Tasks;

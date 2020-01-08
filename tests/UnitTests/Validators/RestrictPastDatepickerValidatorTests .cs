@@ -52,6 +52,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var viewModel = new Dictionary<string, string>();
+            viewModel.Add("test-date", string.Empty);
 
             //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
@@ -66,7 +67,7 @@ namespace form_builder_tests.UnitTests.Validators
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
-                .WithRestrictCurrentDate(true)
+                .WithRestrictPastDate(true)
                 .Build();
 
             var viewModel = new Dictionary<string, string>();

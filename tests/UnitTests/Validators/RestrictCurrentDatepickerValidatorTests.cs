@@ -45,13 +45,14 @@ namespace form_builder_tests.UnitTests.Validators
         {
             //Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
+                .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
                 .WithRestrictCurrentDate(true)
                 .WithLabel("Date")
                 .Build();
 
             var viewModel = new Dictionary<string, string>();
+             viewModel.Add("test-date", string.Empty);
 
             //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
@@ -64,16 +65,14 @@ namespace form_builder_tests.UnitTests.Validators
         {
             //Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
+                .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
                 .WithRestrictCurrentDate(true)
                 .Build();
 
             var viewModel = new Dictionary<string, string>();
             var today = DateTime.Today;
-            viewModel.Add("test-date-day", today.Day.ToString());
-            viewModel.Add("test-date-month", today.Month.ToString());
-            viewModel.Add("test-date-year", today.Year.ToString());
+            viewModel.Add("test-date", today.Date.ToString());
 
             //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
