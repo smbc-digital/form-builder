@@ -15,10 +15,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="2.2.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="StockportGovUK.AspNetCore.Gateways" Version="0.9.4-prerelease90" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     
     <PackageReference Include="StockportGovUK.AspNetCore.Middleware.ExceptionHandling" Version="1.0.1" />
+    
+    <PackageReference Include="StockportGovUK.NetStandard.Gateways" Version="1.0.5-prerelease1" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="2.2.3" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="2.2.5" />
@@ -38,6 +39,9 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Providers\Organisation\" />
   </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties dsl_4dateinput_1json__JsonSchema="http://json.schemastore.org/band-manifest" /></VisualStudio></ProjectExtensions>
 </Project>
