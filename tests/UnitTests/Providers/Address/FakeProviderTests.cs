@@ -9,7 +9,6 @@ namespace form_builder_tests.UnitTests.Providers.Address
     {
         private readonly FakeAddressProvider _addressProvider;
 
-
         public FakeProviderTests()
         {
             _addressProvider = new FakeAddressProvider();

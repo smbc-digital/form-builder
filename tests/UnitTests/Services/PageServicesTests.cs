@@ -138,7 +138,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessRequest_ShouldCallStreetService_WhenAddressElement()
+        public async Task ProcessRequest_ShouldCallStreetService_WhenStreetElement()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
             _streetService.Setup(_ => _.ProcessStreet(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
@@ -436,7 +436,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task GetBehaviour_ShouldCallSession_And_DistributedCache()
+        public void GetBehaviour_ShouldCallSession_And_DistributedCache()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("12345");
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers {  Pages = new List<PageAnswers>() }));
@@ -448,6 +448,44 @@ namespace form_builder_tests.UnitTests.Services
 
             _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
             _distributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessRequest_ShouldCallProcesssOrganisation_WhenOrganisationElement()
+        {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _organisationService.Setup(_ => _.ProcesssOrganisation(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new ProcessRequestEntity());
+
+            var element = new ElementBuilder()
+               .WithType(EElementType.Organisation)
+               .WithQuestionId("test-org-question")
+               .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var viewModel = new Dictionary<string, string>
+            {
+                { "Guid", Guid.NewGuid().ToString() },
+                { "OrganisationStatus", "Search" },
+                { $"{element.Properties.QuestionId}-organisation-searchterm", "orgName" },
+            };
+
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, false);
+
+            _organisationService.Verify(_ => _.ProcesssOrganisation(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            Assert.IsType<ProcessRequestEntity>(result);
         }
     }
 }

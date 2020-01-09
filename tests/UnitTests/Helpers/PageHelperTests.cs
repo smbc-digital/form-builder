@@ -6,6 +6,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
+using form_builder.Services.PageService.Entities;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
@@ -537,5 +538,79 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.False(foundDuplicates);
         }
 
+       [Fact]
+       public async Task ProcessOrganisationJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
+        {
+            var result = await _pageHelper.ProcessOrganisationJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new Property {  QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>());
+
+            var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
+            Assert.Equal("../Organisation/Index", journeyResult.ViewName);
+            Assert.True(journeyResult.UseGeneratedViewModel);
+        }
+
+        [Fact]
+        public async Task ProcessOrganisationJourney_ShouldGenerteCorrectHtml_WhenSelectJourney()
+        {
+            var result = await _pageHelper.ProcessOrganisationJourney("Select", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>());
+
+            Assert.IsType<ProcessRequestEntity>(result);
+        }
+
+        [Fact]
+        public async Task ProcessOrganisationJourney_ShouldThrowException_WhenUnknownJourneyType()
+        {
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessOrganisationJourney("UnknownType", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>()));
+            Assert.Equal($"PageHelper.ProcessOrganisationJourney: Unknown journey type", result.Message);
+        }
+
+        [Fact]
+        public async Task ProcessAddressJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
+        {
+            var result = await _pageHelper.ProcessAddressJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new Property { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
+
+            var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
+            Assert.Equal("../Address/Index", journeyResult.ViewName);
+            Assert.True(journeyResult.UseGeneratedViewModel);
+        }
+
+        [Fact]
+        public async Task ProcessAddressJourney_ShouldGenerteCorrectHtml_WhenSelectJourney()
+        {
+            var result = await _pageHelper.ProcessAddressJourney("Select", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
+
+            Assert.IsType<ProcessRequestEntity>(result);
+        }
+
+        [Fact]
+        public async Task ProcessAddressJourney_ShouldThrowException_WhenUnknownJourneyType()
+        {
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessAddressJourney("UnknownType", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>()));
+            Assert.Equal($"PageHelper.ProcessAddressJourney: Unknown journey type", result.Message);
+        }
+
+        [Fact]
+        public async Task ProcessStreetJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
+        {
+            var result = await _pageHelper.ProcessStreetJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new Property { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
+
+            var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
+            Assert.Equal("../Street/Index", journeyResult.ViewName);
+            Assert.True(journeyResult.UseGeneratedViewModel);
+        }
+
+        [Fact]
+        public async Task ProcessStreetJourney_ShouldGenerteCorrectHtml_WhenSelectJourney()
+        {
+            var result = await _pageHelper.ProcessStreetJourney("Select", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
+
+            Assert.IsType<ProcessRequestEntity>(result);
+        }
+
+        [Fact]
+        public async Task ProcessStreetJourney_ShouldThrowException_WhenUnknownJourneyType()
+        {
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessStreetJourney("UnknownType", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>()));
+            Assert.Equal($"PageHelper.ProcessStreetJourney: Unknown journey type", result.Message);
+        }
     }
 }

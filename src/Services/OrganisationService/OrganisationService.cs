@@ -89,7 +89,7 @@ namespace form_builder.Services.OrganisationService
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException($"OrganisationService.ProcesssOrganisation:: An exception has occured while attempting to perform postcode lookup, Exception: {e.Message}");
+                    throw new ApplicationException($"OrganisationService.ProcesssOrganisation:: An exception has occured while attempting to perform organisation lookup, Exception: {e.Message}");
                 }
             }
 
