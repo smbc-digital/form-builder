@@ -4,7 +4,7 @@
     var displayAnchor = (bool)ViewData["displayAnchor"];
     var text = string.IsNullOrEmpty(Model.Properties.Text) ? "Next step" : Model.Properties.Text;
     var className = string.IsNullOrEmpty(Model.Properties.ClassName) ? "button-primary" : Model.Properties.ClassName;
-    var disableBtn = behaviour ? $"onclick=disableBtn();this.onclick=null;" : null;
+    var disableBtn = behaviour ? $"onclick=disableBtn();" : null;
 }
 
 <button class="@className" @disableBtn type="submit" id="@Model.Properties.ButtonId">@text</button>
@@ -20,6 +20,12 @@
 <script type="text/javascript">
     function disableBtn() {
         var disabledButton = document.getElementById("@Model.Properties.ButtonId");
-        disabledButton.className += " button-loading is-loading";
+        if (!disabledButton.className.includes("is-loading")) {
+            disabledButton.className += " button-loading is-loading";
+            return;
+        }
+
+        disabledButton.setAttribute("type", "button");
+        return;
     }
 </script>
