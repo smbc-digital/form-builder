@@ -136,8 +136,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _pageHelper.Setup(_ => _.ProcessStreetAndAddressJourney(It.Is<string>(x => x == "Search"), It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<bool>()))
-                .Callback<string, Page, Dictionary<string, string>, FormSchema, string, List<AddressSearchResult>, bool>((a, x, y, z, r, p, k) => searchResultsCallback = p)
+            _pageHelper.Setup(_ => _.ProcessStreetJourney(It.Is<string>(x => x == "Search"), It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()))
+                .Callback<string, Page, Dictionary<string, string>, FormSchema, string, List<AddressSearchResult>>((a, x, y, z, r, p) => searchResultsCallback = p)
                 .ReturnsAsync(new ProcessRequestEntity());
 
             var viewModel = new Dictionary<string, string>
@@ -150,7 +150,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
 
             _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.ProcessStreetAndAddressJourney(It.Is<string>(x => x == "Search"), It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<bool>()), Times.Once);
+            _pageHelper.Verify(_ => _.ProcessStreetJourney(It.Is<string>(x => x == "Search"), It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
             Assert.NotNull(searchResultsCallback);
             Assert.Single(searchResultsCallback);
             Assert.Equal(SearchResultsUniqueId, searchResultsCallback[0].UniqueId);
