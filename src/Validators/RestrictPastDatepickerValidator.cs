@@ -10,7 +10,9 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
-            if (!element.Properties.RestrictPastDate || element.Type != EElementType.DatePicker || element.Properties.Optional)
+            if (!element.Properties.RestrictPastDate
+                || element.Type != EElementType.DatePicker 
+                || element.Properties.Optional)
             {
                 return new ValidationResult
                 {
@@ -18,8 +20,8 @@ namespace form_builder.Validators
                 };
             }
 
-            var value = viewModel[element.Properties.QuestionId];
-            
+            var value = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId] : null;
+
 
             var isValidDate = DateTime.TryParse(value, out _);
 
@@ -36,12 +38,12 @@ namespace form_builder.Validators
 
             var dateOutput = DateTime.Parse(value);
 
-            if (dateOutput < date)
+            if (dateOutput < date && element.Properties.RestrictPastDate)
             {
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageRestrictFutureDate) ? element.Properties.ValidationMessageRestrictFutureDate : "Check the date and try again"
+                    Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageRestrictPastDate) ? element.Properties.ValidationMessageRestrictPastDate : "Check the date and try again"
                 };
             }
 

@@ -9,7 +9,7 @@ namespace form_builder_tests.UnitTests.Validators
 {
     public class RestrictFutureDatepickerValidatorTests
     {
-        private readonly RestrictPastDatepickerValidator _restrictCurrentDateValidator = new RestrictPastDatepickerValidator();
+        private readonly RestrictFutureDatepickerValidator _restrictFutureDateValidator = new RestrictFutureDatepickerValidator();
 
         [Fact]
         public void Validate_ShouldCheckRestrictFutureDatePropertyIsNotSet()
@@ -20,23 +20,24 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             //Assert
-            var result = _restrictCurrentDateValidator.Validate(element, null);
+            var result = _restrictFutureDateValidator.Validate(element, null);
             Assert.True(result.IsValid);
         }
+
         [Fact]
         public void Validate_ReturnsTrueWhenOptionalFieldsAreEmpty()
         {
             //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
-                .WithRestrictPastDate(true)
+                .WithRestrictFutureDate(true)
                 .WithOptional(true)
                 .Build();
 
             var viewModel = new Dictionary<string, string>();
 
             //Assert
-            var result = _restrictCurrentDateValidator.Validate(element, viewModel);
+            var result = _restrictFutureDateValidator.Validate(element, viewModel);
             Assert.True(result.IsValid);
         }
 
@@ -47,14 +48,15 @@ namespace form_builder_tests.UnitTests.Validators
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
-                .WithRestrictPastDate(true)
+                .WithRestrictFutureDate(true)
                 .WithLabel("Date")
                 .Build();
 
             var viewModel = new Dictionary<string, string>();
+            viewModel.Add("test-date", string.Empty);
 
             //Assert
-            var result = _restrictCurrentDateValidator.Validate(element, viewModel);
+            var result = _restrictFutureDateValidator.Validate(element, viewModel);
             Assert.False(result.IsValid);
             Assert.Equal("Check the date and try again", result.Message);
         }
@@ -66,7 +68,7 @@ namespace form_builder_tests.UnitTests.Validators
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
-                .WithRestrictCurrentDate(true)
+                .WithRestrictFutureDate(true)
                 .Build();
 
             var viewModel = new Dictionary<string, string>();
@@ -75,7 +77,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date", tomorrow.ToString("yyyy-MM-dd"));
           
             //Assert
-            var result = _restrictCurrentDateValidator.Validate(element, viewModel);
+            var result = _restrictFutureDateValidator.Validate(element, viewModel);
             Assert.False(result.IsValid);
             Assert.Equal("Check the date and try again", result.Message);
         }
@@ -85,9 +87,9 @@ namespace form_builder_tests.UnitTests.Validators
         {
             //Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
+                .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
-                .WithRestrictCurrentDate(true)
+                .WithRestrictFutureDate(true)
                 .Build();
 
             var viewModel = new Dictionary<string, string>();
@@ -96,7 +98,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date", yesterday.ToString("yyyy-MM-dd"));
 
             //Assert
-            var result = _restrictCurrentDateValidator.Validate(element, viewModel);
+            var result = _restrictFutureDateValidator.Validate(element, viewModel);
             Assert.True(result.IsValid);
         }
     }

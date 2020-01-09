@@ -18,7 +18,7 @@ namespace form_builder.Validators
                 };
             }
 
-            var value = viewModel[element.Properties.QuestionId];
+            var value = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId]:null;
             
 
             var isValidDate = DateTime.TryParse(value, out _);

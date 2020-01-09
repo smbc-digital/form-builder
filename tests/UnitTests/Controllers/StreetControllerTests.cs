@@ -2,6 +2,7 @@
 using form_builder.Controllers;
 using form_builder.Validators;
 using Moq;
+using StockportGovUK.NetStandard.Gateways;
 using System;
 using form_builder.Models;
 using form_builder.ViewModels;
@@ -14,7 +15,6 @@ using StockportGovUK.NetStandard.Models.Addresses;
 using form_builder.Helpers.Session;
 using form_builder.Providers.Street;
 using form_builder.Models.Elements;
-using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
