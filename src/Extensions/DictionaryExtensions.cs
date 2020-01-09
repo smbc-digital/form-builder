@@ -35,6 +35,18 @@ namespace form_builder.Extensions
                             normalisedFormData.Add($"{item.Key}-description", streetDetails[1]);
                         }
                     }
+                    else if (item.Key.EndsWith("-organisation") && !string.IsNullOrEmpty(item.Value[0]))
+                    {
+                        string[] organisationDetails = item.Value[0].Split('|');
+                        if (!string.IsNullOrEmpty(organisationDetails[0]))
+                        {
+                            normalisedFormData.Add($"{item.Key}", organisationDetails[0]);
+                        }
+                        if (!string.IsNullOrEmpty(organisationDetails[1]))
+                        {
+                            normalisedFormData.Add($"{item.Key}-description", organisationDetails[1]);
+                        }
+                    }
                     else
                     {
                         normalisedFormData.Add(item.Key, item.Value[0]);

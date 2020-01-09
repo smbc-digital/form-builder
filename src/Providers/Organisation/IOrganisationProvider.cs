@@ -7,6 +7,6 @@ namespace form_builder.Providers.Organisation
     {
         string ProviderName { get; }
 
-        Task<IEnumerable<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>> SearchAsync(string streetOrPostcode);
+        Task<IEnumerable<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>> SearchAsync(string organisation);
     }
 }

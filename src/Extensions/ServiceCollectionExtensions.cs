@@ -106,6 +106,7 @@ namespace form_builder.Extensions
         public static IServiceCollection ConfigureOrganisationProviders(this IServiceCollection services)
         {
             services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
+            services.AddSingleton<IOrganisationProvider, CRMOrganisationProvider>();
             return services;
         }
 

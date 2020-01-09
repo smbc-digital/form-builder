@@ -5,7 +5,6 @@ using form_builder.Providers.Organisation;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Models.Verint;
 using System;
 using System.Collections.Generic;
@@ -55,8 +54,8 @@ namespace form_builder.Services.OrganisationService
                 }
 
                 var searchTerm = journey == "Select"
-                    ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{organisationElement.Properties.QuestionId}-searchterm-organisation").Response
-                    : viewModel[$"{organisationElement.Properties.QuestionId}-searchterm-organisation"];
+                    ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{organisationElement.Properties.QuestionId}-organisation-searchterm").Response
+                    : viewModel[$"{organisationElement.Properties.QuestionId}-organisation-searchterm"];
 
                 var organisation = journey != "Select"
                     ? string.Empty
@@ -98,7 +97,7 @@ namespace form_builder.Services.OrganisationService
             {
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, organisationResults);
                 formModel.Path = currentPage.PageSlug;
-                formModel.AddressStatus = journey;
+                formModel.OrganisationStatus = journey;
                 formModel.FormName = baseForm.FormName;
 
                 return new ProcessRequestEntity
@@ -110,7 +109,7 @@ namespace form_builder.Services.OrganisationService
             }
 
             _pageHelper.SaveAnswers(viewModel, guid);
-            return await _pageHelper.ProcessStreetAndAddressJourney(journey, currentPage, viewModel, baseForm, guid, null, organisationResults, false);
+            return await _pageHelper.ProcessOrganisationJourney(journey, currentPage, viewModel, baseForm, guid, organisationResults);
         }
     }
 }

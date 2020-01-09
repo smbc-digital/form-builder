@@ -22,7 +22,9 @@ namespace form_builder.Helpers.PageHelpers
         void CheckForDuplicateQuestionIDs(Page page);
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationSearchResults = null);
         void SaveAnswers(Dictionary<string, string> viewModel, string guid);
-        Task<ProcessRequestEntity> ProcessStreetAndAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationSearchResults, bool isAddressJourney);
+        Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationResults);
+        Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
+        Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
         bool hasDuplicateQuestionIDs(List<Page> pages);
     }
 
@@ -110,30 +112,28 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
-        public async Task<ProcessRequestEntity> ProcessStreetAndAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationResults, string viewName)
+        public async Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
         {
             switch (journey)
             {
                 case "Search":
                     try
                     {
-                        var adddressViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, organisationResults);
-                        adddressViewModel.AddressStatus = "Select";
-                        adddressViewModel.StreetStatus = "Select";
-                        adddressViewModel.OrganisationStatus = "Select";
-                        adddressViewModel.FormName = baseForm.FormName;
+                        var streetViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, null);
+                        streetViewModel.StreetStatus = "Select";
+                        streetViewModel.FormName = baseForm.FormName;
 
                         return new ProcessRequestEntity
                         {
                             Page = currentPage,
-                            ViewModel = adddressViewModel,
+                            ViewModel = streetViewModel,
                             UseGeneratedViewModel = true,
-                            ViewName = viewName //? "../Address/Index" : "../Street/Index"
+                            ViewName = "../Street/Index"
                         };
                     }
                     catch (Exception e)
                     {
-                        throw new ApplicationException($"PageHelper.ProcessStreetAndAddressJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
+                        throw new ApplicationException($"PageHelper.ProcessStreetJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
                     };
                 case "Select":
                     return new ProcessRequestEntity
@@ -141,7 +141,73 @@ namespace form_builder.Helpers.PageHelpers
                         Page = currentPage
                     };
                 default:
-                    throw new ApplicationException($"PageHelper.ProcessStreetAndAddressJourney: Unknown journey type");
+                    throw new ApplicationException($"PageHelper.ProcessStreetJourney: Unknown journey type");
+            }
+        }
+        
+        public async Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
+        {
+            switch (journey)
+            {
+                case "Search":
+                    try
+                    {
+                        var adddressViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, null);
+                        adddressViewModel.AddressStatus = "Select";
+                        adddressViewModel.FormName = baseForm.FormName;
+
+                        return new ProcessRequestEntity
+                        {
+                            Page = currentPage,
+                            ViewModel = adddressViewModel,
+                            UseGeneratedViewModel = true,
+                            ViewName = "../Address/Index"
+                        };
+                    }
+                    catch (Exception e)
+                    {
+                        throw new ApplicationException($"PageHelper.ProcessAddressJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
+                    };
+                case "Select":
+                    return new ProcessRequestEntity
+                    {
+                        Page = currentPage
+                    };
+                default:
+                    throw new ApplicationException($"PageHelper.ProcessAddressJourney: Unknown journey type");
+            }
+        }
+
+        public async Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationResults)
+        {
+            switch (journey)
+            {
+                case "Search":
+                    try
+                    {
+                        var organisationViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, null, organisationResults);
+                        organisationViewModel.OrganisationStatus = "Select";
+                        organisationViewModel.FormName = baseForm.FormName;
+
+                        return new ProcessRequestEntity
+                        {
+                            Page = currentPage,
+                            ViewModel = organisationViewModel,
+                            UseGeneratedViewModel = true,
+                            ViewName = "../Organisation/Index"
+                        };
+                    }
+                    catch (Exception e)
+                    {
+                        throw new ApplicationException($"PageHelper.ProcessOrganisationJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
+                    };
+                case "Select":
+                    return new ProcessRequestEntity
+                    {
+                        Page = currentPage
+                    };
+                default:
+                    throw new ApplicationException($"PageHelper.ProcessOrganisationJourney: Unknown journey type");
             }
         }
 

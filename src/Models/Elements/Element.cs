@@ -135,6 +135,20 @@ namespace form_builder.Models.Elements
                     }
 
                     return properties;
+                case EElementType.Organisation:
+
+                    properties = new Dictionary<string, object>()
+                    {
+                        { "id", $"{Properties.QuestionId}-organisation-searchterm" },
+                        { "maxlength", Properties.MaxLength }
+                    };
+
+                    if (DisplayAriaDescribedby)
+                    {
+                        properties.Add("aria-describedby", DescribedByValue("-organisation-searchterm"));
+                    }
+
+                    return properties;
                 default:
                     return null;
             }
@@ -228,7 +242,7 @@ namespace form_builder.Models.Elements
         {
             get
             {
-                return Properties?.Optional ?? true;
+                return Properties.Optional;
             }
         }
     }
