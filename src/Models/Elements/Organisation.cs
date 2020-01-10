@@ -20,32 +20,33 @@ namespace form_builder.Models.Elements
 
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            var streetKey = $"{Properties.QuestionId}-organisation-searchterm";
+            var organisationKey = $"{Properties.QuestionId}-organisation-searchterm";
 
-            if (viewModel.ContainsKey("OrganisationStatus") && viewModel["OrganisationStatus"] == "Select" || viewModel.ContainsKey(streetKey) && !string.IsNullOrEmpty(viewModel[streetKey]))
+            if (viewModel.ContainsKey("OrganisationStatus") && viewModel["OrganisationStatus"] == "Select" || viewModel.ContainsKey(organisationKey) && !string.IsNullOrEmpty(viewModel[organisationKey]))
             {
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
                 if (string.IsNullOrEmpty(Properties.Value))
                 {
                     if (viewModel["OrganisationStatus"] == "Select")
                     {
-                        var streetaddress = $"{Properties.QuestionId}-organisation";
-                        Properties.Value = viewModel[streetaddress];
+                        var organisation = $"{Properties.QuestionId}-organisation";
+                        Properties.Value = viewModel[organisation];
                         if (string.IsNullOrEmpty(Properties.Value))
                         {
-                            Properties.Value = viewModel[streetKey];
+                            Properties.Value = viewModel[organisationKey];
                         }
                     }
                     else
                     {
-                        Properties.Value = viewModel[streetKey];
+                        Properties.Value = viewModel[organisationKey];
                     }
                 }
 
-                return await viewRender.RenderAsync("OrganisationSelect", new Tuple<ElementViewModel, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>>(new ElementViewModel{Element = this}, organisationResults));
+                var returnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
+                return await viewRender.RenderAsync("OrganisationSelect", new Tuple<ElementViewModel, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>>(new ElementViewModel{Element = this, ReturnURL = returnURL }, organisationResults));
             }
 
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
+            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-organisation-searchterm");
 
             var viewElement = new ElementViewModel
             {
