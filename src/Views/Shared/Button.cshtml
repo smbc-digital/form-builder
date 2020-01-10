@@ -1,13 +1,14 @@
 ﻿@model form_builder.Models.Elements.Element
 @{
-    var behaviour = (bool)ViewData["bType"];
+    var addressSpinner = (bool)ViewData["address"];
+    var behaviourTypeSpinner = (bool)ViewData["behaviourType"];
     var displayAnchor = (bool)ViewData["displayAnchor"];
     var text = string.IsNullOrEmpty(Model.Properties.Text) ? "Next step" : Model.Properties.Text;
     var className = string.IsNullOrEmpty(Model.Properties.ClassName) ? "button-primary" : Model.Properties.ClassName;
-    var disableBtn = behaviour ? $"onclick=disableBtn('{@Model.Properties.ButtonId}');" : null;
+    var spinnerButton = behaviourTypeSpinner || addressSpinner ? $"onclick=spinnerButton('{@Model.Properties.ButtonId}');" : null;
 }
 
-<button class="@className" @disableBtn type="submit" id="@Model.Properties.ButtonId">@text</button>
+<button class="@className" @spinnerButton type="submit" id="@Model.Properties.ButtonId">@text</button>
 
 @if (@displayAnchor)
 {
@@ -16,6 +17,3 @@
         <a class="back-button" href="javascript:history.back(-1)">Previous</a>
     }
 }
-
-
-
