@@ -1,6 +1,5 @@
 ﻿function spinnerButton(buttonId) {
     var disabledButton = document.getElementById(buttonId);
-    console.log(buttonId);
     if (!disabledButton.className.includes("is-loading")) {
         disabledButton.className += " button-loading is-loading";
         return;

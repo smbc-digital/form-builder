@@ -18,7 +18,7 @@ namespace form_builder.Models.Elements
 
         public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            var viewData = new Dictionary<string, object> { { "displayAnchor", !CheckForStartPageSlug(formSchema, page) }, { "behaviourType", CheckForBehaviour(page.Behaviours) }, { "address", CheckForAddressElement(page.Elements) } };
+            var viewData = new Dictionary<string, object> { { "displayAnchor", !CheckForStartPageSlug(formSchema, page) }, { "behaviourType", CheckForBehaviour(page.Behaviours) }, { "address", CheckForAddressElement(page.Elements) }, { "street", CheckForStreetElement(page.Elements) } };
 
             return viewRender.RenderAsync("Button", this, viewData);
         }
@@ -37,6 +37,11 @@ namespace form_builder.Models.Elements
         private bool CheckForAddressElement(List<IElement> element)
         {
             return element.Any(_ => _.Type == EElementType.Address);
+        }
+
+        private bool CheckForStreetElement(List<IElement> element)
+        {
+            return element.Any(_ => _.Type == EElementType.Street);
         }
     }
 }
