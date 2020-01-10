@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Extensions;
+using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 
 namespace form_builder.Models.Elements
 {
@@ -18,7 +19,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.Address;
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             var postcodeKey = $"{Properties.QuestionId}-postcode";
             var viewElement = new ElementViewModel

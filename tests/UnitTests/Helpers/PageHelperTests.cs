@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
+using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -541,7 +542,7 @@ namespace form_builder_tests.UnitTests.Helpers
        [Fact]
        public async Task ProcessOrganisationJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
         {
-            var result = await _pageHelper.ProcessOrganisationJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new Property {  QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>());
+            var result = await _pageHelper.ProcessOrganisationJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new Property {  QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
 
             var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
             Assert.Equal("../Organisation/Index", journeyResult.ViewName);
@@ -551,7 +552,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task ProcessOrganisationJourney_ShouldGenerteCorrectHtml_WhenSelectJourney()
         {
-            var result = await _pageHelper.ProcessOrganisationJourney("Select", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>());
+            var result = await _pageHelper.ProcessOrganisationJourney("Select", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
 
             Assert.IsType<ProcessRequestEntity>(result);
         }
@@ -559,7 +560,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task ProcessOrganisationJourney_ShouldThrowException_WhenUnknownJourneyType()
         {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessOrganisationJourney("UnknownType", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>()));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessOrganisationJourney("UnknownType", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>()));
             Assert.Equal($"PageHelper.ProcessOrganisationJourney: Unknown journey type", result.Message);
         }
 
