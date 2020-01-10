@@ -76,7 +76,7 @@ Example JSON:
     * [P](#ptextprops) (Paragraph text)
     * [Textbox](#textboxprops)
     * [RequiredIf](#requiredif)
-    * [TextBox(Numeric)(#textboxnumeric)]
+    * [TextBox(Numeric)](#textboxnumeric)
     * [Textbox(Email)](#textboxemailprops)
     * [Textbox(Postcode)](#textboxpostcodeprops)
     * [Textbox(Stockport postcode)](#textboxstockportpostcodeprops)
@@ -178,12 +178,12 @@ Textbox Numeric JSON example:
   {
     "Type": "Textbox",
     "Properties": {
-      "QuestionId": "emailAddress",
-      "Label": "Email address",
-      "Hint": "ie: someone@example.com",
-      "CustomValidationMessage": "Check the email address and try again",
+      "QuestionId": "howManyChildren",
+      "Label": "How Many Children",
+      "Hint": "3",
+      "CustomValidationMessage": "The children should be between 0 and 20",
       "Optional": false,
-      "Max": 60,
+      "Max": 20,
       "Min": 0,
       "Numeric": true
     }
