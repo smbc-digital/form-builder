@@ -174,5 +174,17 @@ namespace form_builder_tests.Builders
             _property.RegexValidationMessage = value;
             return this;
         }
+
+        public ElementBuilder WithMax(string value)
+        {
+            _property.Max = value;
+            return this;
+        }
+
+        public ElementBuilder WithMin(string value)
+        {
+            _property.Min = value;
+            return this;
+        }
     }
 }

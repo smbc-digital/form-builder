@@ -27,6 +27,7 @@
     <label for="@hoursid">
         Hours
     </label>
+
     @Html.TextBox(hoursid, Model.Properties.Hours, new { maxLength = "2", type = "number", min = "0", max = "12" })
 </div>
 <div class="colon-divider">:</div>
@@ -34,6 +35,7 @@
     <label for="@minutesid">
         Minutes
     </label>
+
     @Html.TextBox(minutesid, Model.Properties.Minutes, new { maxLength = "2", type = "number", min = "0", max = "59" })
 </div>
 <div class="ampm">

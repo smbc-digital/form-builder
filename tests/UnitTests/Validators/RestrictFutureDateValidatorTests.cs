@@ -89,10 +89,13 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithRestrictFutureDate(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
-            viewModel.Add("test-date-day", "10");
-            viewModel.Add("test-date-month", "10");
-            viewModel.Add("test-date-year", "2010");
+            var viewModel = new Dictionary<string, string>()
+            {
+                { "test-date-day", "10"},
+                { "test-date-month", "10" },
+                { "test-date-year", "2010" }
+            };
+           
 
             //Assert
             var result = _restrictFutureDateValidator.Validate(element, viewModel);

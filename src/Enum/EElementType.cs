@@ -27,6 +27,8 @@
         Street,
         TimeInput,
         DatePicker,
-        Organisation
+        Organisation,
+        Numeric
+
     }
 }

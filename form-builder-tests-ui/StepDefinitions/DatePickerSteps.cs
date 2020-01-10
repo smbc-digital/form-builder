@@ -13,8 +13,7 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then(@"I should not see a validation message for ""(.*)"" date picker")]
         public void ThenIShouldNotSeeValidationMessageForInput(string inputName)
         {
-            //Assert
-            var foo = BrowserSession.FindId(inputName).Exists();
+            //Assert           
             Assert.False(BrowserSession.FindId(inputName).Exists());
         }
 

@@ -36,3 +36,5 @@ Scenario: User enters nothing on page1
 	When I click the "nextStep" button
 	Then I should see a validation message for "firstName" input
 	Then I should see a validation message for "lastName" input
+
+
