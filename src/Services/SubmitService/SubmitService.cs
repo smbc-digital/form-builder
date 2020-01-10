@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using StockportGovUK.NetStandard.Gateways.ComplimentsComplaintsServiceGateway;
+using StockportGovUK.NetStandard.Gateways.Response;
 
 namespace form_builder.Services.SubmtiService
 {
@@ -27,17 +29,20 @@ namespace form_builder.Services.SubmtiService
 
         private readonly IGateway _gateway;
 
+        private readonly IComplimentsComplaintsServiceGateway _complimentsComplaintsServiceGateway;
+
         private readonly IPageHelper _pageHelper;
 
         private readonly ISessionHelper _sessionHelper;
 
         private readonly ILogger<SubmitService> _logger;
 
-        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, ISchemaProvider schemaProvider, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper)
+        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, ISchemaProvider schemaProvider, IGateway gateway, IComplimentsComplaintsServiceGateway complimentsComplaintsServiceGateway, IPageHelper pageHelper, ISessionHelper sessionHelper)
         {
             _distributedCache = distributedCache;
             _schemaProvider = schemaProvider;
             _gateway = gateway;
+            _complimentsComplaintsServiceGateway = complimentsComplaintsServiceGateway;
             _pageHelper = pageHelper;
             _sessionHelper = sessionHelper;
             _logger = logger;
@@ -62,17 +67,39 @@ namespace form_builder.Services.SubmtiService
             var postData = CreatePostData(convertedAnswers);
             var reference = string.Empty;
 
-            var response = await _gateway.PostAsync(postUrl, postData);
-            if (response.StatusCode != HttpStatusCode.OK)
+
+            if (postData.Form == "give-a-compliment" || postData.Form == "give-feedback" ||
+                postData.Form == "make-a-formal-complaint")
             {
-                throw new ApplicationException($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                var response = await _complimentsComplaintsServiceGateway.SubmitForm(postUrl, postData);
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new ApplicationException($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                }
+
+                if (response.ResponseContent != null)
+                {
+                    reference = JsonConvert.DeserializeObject<string>(response.ResponseContent);
+                }
+            }
+            else
+            {
+                var response = await _gateway.PostAsync(postUrl, postData);
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new ApplicationException($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                }
+
+                if (response.Content != null)
+                {
+                    var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
+                    reference = JsonConvert.DeserializeObject<string>(content);
+                }
             }
 
-            if (response.Content != null)
-            {
-                var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
-                reference = JsonConvert.DeserializeObject<string>(content);
-            }
+
 
             _distributedCache.Remove(sessionGuid);
             _sessionHelper.RemoveSessionGuid();
