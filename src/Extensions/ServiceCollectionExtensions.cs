@@ -32,7 +32,7 @@ namespace form_builder.Extensions
         public static IServiceCollection AddValidators(this IServiceCollection services)
         {
             services.AddTransient<IElementValidator, RequiredElementValidator>();
-            services.AddTransient<IElementValidator, NumericValueElementValidator>();
+            services.AddTransient<IElementValidator, NumericValueValidator>();
             services.AddTransient<IElementValidator, AutomaticAddressElementValidator>();
             services.AddTransient<IElementValidator, ManualAddressValidator>();
             services.AddTransient<IElementValidator, DateInputElementValidator>();
@@ -50,7 +50,8 @@ namespace form_builder.Extensions
             services.AddTransient<IElementValidator, RequiredIfValidator>();
             services.AddTransient<IElementValidator, TimeInputValidator>();
             services.AddTransient<IElementValidator, RequiredIfValidator>();
-           
+            services.AddTransient<IElementValidator, MaxLengthValidator>();
+
             return services;
         }
 

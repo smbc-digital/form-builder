@@ -59,5 +59,9 @@ namespace form_builder.Models
         public string AmPm { get; set; } = string.Empty;
         public string Date { get; set; } = string.Empty;
         public string OrganisationProvider { get; set; }
+        public string Max { get; set; } = string.Empty;
+
+        public string Min { get; set; } = string.Empty;
+
     }
 }

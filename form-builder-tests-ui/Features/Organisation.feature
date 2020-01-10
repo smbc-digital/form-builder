@@ -37,11 +37,12 @@ Scenario: I enter organisation in optional and I don't select an organisation in
 	Then I should see the "organisation-organisation" input
 	Then I select "Organisation 2" in "organisation-organisation" dropdown
 	And I click the "nextStep" button
+	And I wait five seconds
 	Then I fill in page2
-	Then I wait one second
 	Then I click the "nextStep" button
 	Then I wait one second
 	Then I click the "nextStep" button
+	And I wait five seconds
 	Then I should see a "th" element with "organisation-organisation-searchterm" text
 	And I should see a "th" element with "organisation-organisation" text
 	And I should see a "th" element with "organisation-organisation-description" text
@@ -54,9 +55,10 @@ Scenario: I enter organisation in optional and select an organisation in the dro
 	Then I should see the "organisation-organisation" input
 	Then I select "Organisation 2" in "organisation-organisation" dropdown
 	And I click the "nextStep" button
+	And I wait five seconds
 	Then I fill in page2
-	Then I wait one second
 	Then I click the "nextStep" button
+	And I wait five seconds
 	And I select "Organisation 3" in "opt-organisation-organisation" dropdown
 	And I click the "nextStep" button
 	Then I wait one second

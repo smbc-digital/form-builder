@@ -5,15 +5,11 @@
     var id = Model.Properties.QuestionId;
     var errorId = $"{Model.Properties.QuestionId}-error";
     var classes = new string[] { "input-memorable-date" };
-    
 
-    var maxDate = Model.Properties.RestrictFutureDate ?
-        (Model.Properties.RestrictCurrentDate ? DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd") : DateTime.Today.ToString("yyyy-MM-dd"))
-        : string.Empty;
 
-    var minDate = Model.Properties.RestrictPastDate ?
-        (Model.Properties.RestrictCurrentDate ? DateTime.Today.AddDays(1).ToString("yyyy-MM-dd") : DateTime.Today.ToString("yyyy-MM-dd"))
-        : string.Empty;
+    var max = Model.Properties.Max ?? string.Empty;
+    var min = Model.Properties.Min ?? string.Empty;
+        
 }
 
 @await Html.BeginFieldSet(Model, classes)
@@ -27,9 +23,9 @@
 <p id="@hintId">@Model.Properties.Hint</p>
 <div>
     <label for="@Model.Properties.QuestionId">
-        Date
+        Number
     </label>
-    <input type="date" id="@id" name="@id" max="@maxDate" min="@minDate" value="@Model.Properties.Date"/>
+    <input type="number" id="@id" name="@id" max="@max" min="@min" step="1" value="@Model.Properties.Value" />
 </div>
 
 @if (!Model.IsValid)
