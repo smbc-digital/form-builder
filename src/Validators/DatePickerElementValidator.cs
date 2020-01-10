@@ -30,7 +30,12 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValidDate = DateTime.TryParse(date, out _);
+            var isValidDate = DateTime.TryParse(date, out DateTime  dateValue);
+
+            if(dateValue > DateTime.Today.AddYears(100))
+            {
+                isValidDate = false;
+            }
 
             return new ValidationResult
             {

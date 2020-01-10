@@ -27,14 +27,14 @@
     <label for="@hoursid">
         Hours
     </label>
-    @Html.TextBox(hoursid, Model.Properties.Hours, new { maxLength = "2", type = "text"})
+    @Html.TextBox(hoursid, Model.Properties.Hours, new { maxLength = "2", type = "number", max="12", min ="0"})
 </div>
 <div class="colon-divider">:</div>
 <div>
     <label for="@minutesid">
         Minutes
     </label>
-    @Html.TextBox(minutesid, Model.Properties.Minutes, new { maxLength = "2", type = "text"})
+    @Html.TextBox(minutesid, Model.Properties.Minutes, new { maxLength = "2", type = "number", max="59", min ="0"})
 </div>
 <div class="ampm">
     <div class="input-radio-container horizontal">

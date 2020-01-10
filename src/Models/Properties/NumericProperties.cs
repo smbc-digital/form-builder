@@ -7,5 +7,6 @@ namespace form_builder.Models.Properties
 {
     public class NumericProperties
     {
+      
     }
 }

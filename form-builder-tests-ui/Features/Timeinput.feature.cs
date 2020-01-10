@@ -97,14 +97,14 @@ this.ScenarioInitialize(scenarioInfo);
 #line 16
  testRunner.Given("I navigate to \"/time/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 17
- testRunner.Then("I fill the hours with \"aa\" value, minutes with \"bb\" value and ampm with \"am\" valu" +
+ testRunner.Then("I fill the hours with \"23\" value, minutes with \"34\" value and ampm with \"am\" valu" +
                     "e on \"timeid\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 18
  testRunner.When("I click the \"nextPage\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 19
  testRunner.Then("I should see a validation message for \"timeid-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 20
- testRunner.Then("I should see time refilled in the time input with \"aa\" value, minutes with \"bb\" v" +
+ testRunner.Then("I should see time refilled in the time input with \"23\" value, minutes with \"34\" v" +
                     "alue and ampm with \"am\"  in for \"timeid\" blah", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();

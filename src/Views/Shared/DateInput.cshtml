@@ -24,19 +24,19 @@
     <label for="@dayId">
         Day
     </label>
-    @Html.TextBox(dayId, Model.Properties.Day, new { maxlength = "2" })
+    @Html.TextBox(dayId, Model.Properties.Day, new { maxlength = "2",type="number" })
 </div>
 <div>
     <label for="@monthId">
         Month
     </label>
-    @Html.TextBox(monthId, Model.Properties.Month, new { maxlength = "2" })
+    @Html.TextBox(monthId, Model.Properties.Month, new { maxlength = "2", type="number" })
 </div>
 <div>
     <label for="@yearId">
         Year
     </label>
-    @Html.TextBox(yearId, Model.Properties.Year, new { maxlength = "4" })
+    @Html.TextBox(yearId, Model.Properties.Year, new { maxlength = "4", type="number"})
 </div>
 
 @if (!Model.IsValid)

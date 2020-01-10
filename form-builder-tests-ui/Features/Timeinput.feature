@@ -14,8 +14,8 @@ Scenario: Renders HTML tags on the page
 
 Scenario: User enters strings in the day, month and year
 	Given I navigate to "/time/page1"
-	Then I fill the hours with "aa" value, minutes with "bb" value and ampm with "am" value on "timeid"
+	Then I fill the hours with "23" value, minutes with "34" value and ampm with "am" value on "timeid"
 	When I click the "nextPage" button
 	Then I should see a validation message for "timeid-error" input
-	Then I should see time refilled in the time input with "aa" value, minutes with "bb" value and ampm with "am"  in for "timeid" blah
+	Then I should see time refilled in the time input with "23" value, minutes with "34" value and ampm with "am"  in for "timeid" blah
 	

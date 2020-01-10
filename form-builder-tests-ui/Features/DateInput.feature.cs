@@ -87,24 +87,24 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("User enters strings in the day, month and year", SourceLine=11)]
-        public virtual void UserEntersStringsInTheDayMonthAndYear()
+        [TechTalk.SpecRun.ScenarioAttribute("User enters invalid date value in the day, month and year", SourceLine=11)]
+        public virtual void UserEntersInvalidDateValueInTheDayMonthAndYear()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters strings in the day, month and year", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters invalid date value in the day, month and year", null, ((string[])(null)));
 #line 12
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 13
  testRunner.Given("I navigate to \"/dateinput/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 14
- testRunner.Then("I fill the day with \"aa\" value, month with \"bb\" value and year with \"cccc\" value " +
+ testRunner.Then("I fill the day with \"34\" value, month with \"33\" value and year with \"1234\" value " +
                     "on \"passportIssued1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 15
  testRunner.When("I click the \"nextPage\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 16
  testRunner.Then("I should see a validation message for \"passportIssued1-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 17
- testRunner.Then("I should see the values \"aa\", \"bb\" and \"cccc\" in the date input for \"passportIssu" +
+ testRunner.Then("I should see the values \"34\", \"33\" and \"1234\" in the date input for \"passportIssu" +
                     "ed1\" blah", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
