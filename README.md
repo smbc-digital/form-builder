@@ -94,6 +94,7 @@ Example JSON:
     * [Street](#Street)
     * [Time](#Time)
     * [DatePicker](#DatePicker)
+    * [Organisation](#Organisation)
     
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)
@@ -605,6 +606,33 @@ Street example:
             "SelectLabel": "Street",
             "StreetProvider": "CRMStreet",
             "MaxLength": "20"
+          }
+    }
+```
+
+#
+  * <a name="Organisation">**Organisation**</a>
+    * QuestionId (*string*) __*__
+    * OrganisationProvider (*string*) __*__ (Fake or CRM)
+    * Label (*string*) (Default: Search for a organisation)
+    * SelectLabel (*string*) (Default: Organisation)
+    * Hint (*string*) (Hint message when a user is searching for a organisation)
+    * SelectHint (*string*) (Hint message when a user is selecting an organisation from the dropdown)
+    * MaxLength (*string*) (Default: 200)
+    * Optional (*boolean*) (Default: false)
+
+Street example:
+```json
+    {
+          "Type": "Organisation",
+          "Properties": {
+            "QuestionId": "organisation",
+            "OrganisationProvider": "Fake",
+            "Label": "Enter the organisation",
+            "SelectLabel": "Selecte the organisation",
+            "Hint": "This is an additional hint",
+            "SelectHint": "Select the organisation below",
+            "MaxLength": 60
           }
     }
 ```
