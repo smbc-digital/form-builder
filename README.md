@@ -624,7 +624,7 @@ Street example:
 Street example:
 ```json
     {
-          "Type": "Street",
+          "Type": "Organisation",
           "Properties": {
             "QuestionId": "organisation",
             "OrganisationProvider": "Fake",
