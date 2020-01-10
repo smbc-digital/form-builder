@@ -1,12 +1,10 @@
 ﻿@model form_builder.Models.Elements.Element
 @{
-    var addressSpinner = (bool)ViewData["address"];
-    var streetSpinner = (bool)ViewData["street"];
-    var behaviourTypeSpinner = (bool)ViewData["behaviourType"];
+    var showSpinner = (bool)ViewData["showSpinner"];
     var displayAnchor = (bool)ViewData["displayAnchor"];
     var text = string.IsNullOrEmpty(Model.Properties.Text) ? "Next step" : Model.Properties.Text;
     var className = string.IsNullOrEmpty(Model.Properties.ClassName) ? "button-primary" : Model.Properties.ClassName;
-    var spinnerButton = behaviourTypeSpinner || addressSpinner || streetSpinner ? $"onclick=spinnerButton('{@Model.Properties.ButtonId}');" : null;
+    var spinnerButton = showSpinner ? $"onclick=spinnerButton('{@Model.Properties.ButtonId}');" : null;
 }
 
 <button class="@className" @spinnerButton type="submit" id="@Model.Properties.ButtonId">@text</button>
