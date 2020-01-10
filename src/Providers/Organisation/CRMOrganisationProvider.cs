@@ -1,6 +1,7 @@
 ﻿using StockportGovUK.NetStandard.Gateways.VerintServiceGateway;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 
 namespace form_builder.Providers.Organisation
 {
@@ -14,7 +15,7 @@ namespace form_builder.Providers.Organisation
         {
             _verintServiceGateway = verintServiceGateway;
         }
-        public async Task<IEnumerable<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>> SearchAsync(string organisation)
+        public async Task<IEnumerable<OrganisationSearchResult>> SearchAsync(string organisation)
         {
             var result = await _verintServiceGateway.SearchForOrganisationByName(organisation);
 

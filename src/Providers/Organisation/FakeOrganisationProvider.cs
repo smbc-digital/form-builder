@@ -1,25 +1,28 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 
 namespace form_builder.Providers.Organisation
 {
     public class FakeOrganisationProvider : IOrganisationProvider
     {
         public string ProviderName => "Fake";
-        public async Task<IEnumerable<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>> SearchAsync(string organisation)
+        public async Task<IEnumerable<OrganisationSearchResult>> SearchAsync(string organisation)
         {
-            return new List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> {
-                new StockportGovUK.NetStandard.Models.Models.Verint.Organisation {
+            return new List<OrganisationSearchResult> {
+                new OrganisationSearchResult {
                     Name = "Organisation 1",
                     Reference = "0101010101"
                 },
-                new StockportGovUK.NetStandard.Models.Models.Verint.Organisation {
+                new OrganisationSearchResult {
                     Name = "Organisation 2",
-                    Reference = "0202020202"
+                    Reference = "0202020202",
+                    Address = "1 street, city, sk11aa"
                 },
-                new StockportGovUK.NetStandard.Models.Models.Verint.Organisation {
+                new OrganisationSearchResult {
                     Name = "Organisation 3",
-                    Reference = "030303030303"
+                    Reference = "030303030303",
+                    Address = "3 town hall lane, city, sk11aa"
                 }
             };
         }

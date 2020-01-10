@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 
 namespace form_builder.Providers.Organisation
 {
@@ -7,6 +8,6 @@ namespace form_builder.Providers.Organisation
     {
         string ProviderName { get; }
 
-        Task<IEnumerable<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>> SearchAsync(string organisation);
+        Task<IEnumerable<OrganisationSearchResult>> SearchAsync(string organisation);
     }
 }

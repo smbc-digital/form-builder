@@ -1,5 +1,6 @@
 ﻿@using form_builder.Helpers
-@model Tuple<form_builder.ViewModels.ElementViewModel, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>>
+@using StockportGovUK.NetStandard.Models.Models.Verint.Lookup
+@model Tuple<form_builder.ViewModels.ElementViewModel, List<OrganisationSearchResult>>
 @{
     var questionId = $"{Model.Item1.Element.Properties.QuestionId}-organisation";
     var hiddenId = $"{Model.Item1.Element.Properties.QuestionId}-organisation-searchterm";
@@ -30,7 +31,7 @@
     <option value="">@addresSearchCount</option>
     @for (var i = 0; i < Model.Item2.Count; i++)
     {
-        <option value="@Model.Item2[i].Reference|@Model.Item2[i].Name">@Model.Item2[i].Name</option>
+        <option value="@Model.Item2[i].Reference|@Model.Item2[i].Name">@Model.Item2[i].Name @Model.Item2[i].Address</option>
     }
 </select>
 
