@@ -30,7 +30,7 @@ Scenario: Trigger select validation on no choice made in dropdown
 	When I click the "nextStep" button
 	Then I should see a ".input-error-content" html element
 
-Scenario: I enter organisation in optional and I don't select an address in the dropdown, should display the success page
+Scenario: I enter organisation in optional and I don't select an organisation in the dropdown, should display the success page
 	Given I navigate to "/organisation/page-one"
 	Then  I fill in page1
 	When I click the "nextStep" button
@@ -38,15 +38,16 @@ Scenario: I enter organisation in optional and I don't select an address in the 
 	Then I select "Organisation 2" in "organisation-organisation" dropdown
 	And I click the "nextStep" button
 	Then I fill in page2
+	Then I wait one second
 	Then I click the "nextStep" button
-	And I wait one second
+	Then I wait one second
 	Then I click the "nextStep" button
 	Then I should see a "th" element with "organisation-organisation-searchterm" text
 	And I should see a "th" element with "organisation-organisation" text
 	And I should see a "th" element with "organisation-organisation-description" text
 	And I should see a "th" element with "opt-organisation-organisation-searchterm" text
 
-Scenario: I enter postcode in optional and select an address in the dropdown should display the success page
+Scenario: I enter organisation in optional and select an organisation in the dropdown should display the success page
 	Given I navigate to "/organisation/page1"
 	Then I fill in page1
 	When I click the "nextStep" button
@@ -54,9 +55,11 @@ Scenario: I enter postcode in optional and select an address in the dropdown sho
 	Then I select "Organisation 2" in "organisation-organisation" dropdown
 	And I click the "nextStep" button
 	Then I fill in page2
-	And I click the "nextStep" button
-	And I select "Organisation 3" in "opt-organisation-organisation" dropdown
+	Then I wait one second
 	Then I click the "nextStep" button
+	And I select "Organisation 3" in "opt-organisation-organisation" dropdown
+	And I click the "nextStep" button
+	Then I wait one second
 	Then I should see a "th" element with "organisation-organisation-searchterm" text
 	And I should see a "th" element with "organisation-organisation" text
 	And I should see a "th" element with "organisation-organisation-description" text
