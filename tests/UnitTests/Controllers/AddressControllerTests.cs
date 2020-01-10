@@ -15,6 +15,7 @@ using StockportGovUK.NetStandard.Models.Addresses;
 using form_builder.Providers.Address;
 using form_builder.Helpers.Session;
 using form_builder.Models.Elements;
+using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -59,7 +60,7 @@ namespace form_builder_tests.UnitTests.Controllers
             _mockSession.Setup(_ => _.GetSessionGuid())
                 .Returns(guid.ToString());
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
              .ReturnsAsync(new FormBuilderViewModel());
 
             var cacheData = new FormAnswers

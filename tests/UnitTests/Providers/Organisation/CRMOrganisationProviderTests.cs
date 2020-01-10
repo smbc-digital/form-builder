@@ -2,6 +2,7 @@
 using Moq;
 using StockportGovUK.NetStandard.Gateways.Response;
 using StockportGovUK.NetStandard.Gateways.VerintServiceGateway;
+using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -17,7 +18,7 @@ namespace form_builder_tests.UnitTests.Providers.Organisation
         public CRMOrganisationProviderTests()
         {
             _mockVerintGateway.Setup(_ => _.SearchForOrganisationByName(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponse<List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>> { ResponseContent = new List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> { new StockportGovUK.NetStandard.Models.Models.Verint.Organisation { Name = "org name", Reference = "1234567889" } } });
+                .ReturnsAsync(new HttpResponse<List<OrganisationSearchResult>> { ResponseContent = new List<OrganisationSearchResult> { new OrganisationSearchResult { Name = "org name", Reference = "1234567889" } } });
 
             _organisationProvider = new CRMOrganisationProvider(_mockVerintGateway.Object);
         }
