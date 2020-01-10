@@ -150,7 +150,6 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcesssAddress_ShouldCall_PageHelper_ToProcessSearchResults()
         {
-            var searchResultsCallback = new List<AddressSearchResult>();
             var element = new ElementBuilder()
                .WithType(EElementType.Address)
                .WithQuestionId("test-address")
@@ -168,7 +167,6 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
-                .Callback<Page, Dictionary<string, string>, FormSchema, string, List<AddressSearchResult>, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>>((x, y, z, r, w, k) => searchResultsCallback = w)
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var viewModel = new Dictionary<string, string>

@@ -42,7 +42,7 @@ namespace form_builder_tests.UnitTests.Providers.Organisation
 
             Assert.Single(result);
             Assert.NotNull(result);
-            Assert.IsType<List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>>(result);
+            Assert.IsType<List<OrganisationSearchResult>>(result);
         }
     }
 }
