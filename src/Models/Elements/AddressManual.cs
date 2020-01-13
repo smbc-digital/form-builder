@@ -5,6 +5,7 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Addresses;
+using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace form_builder.Models.Elements
             Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressPostcode")).Value;           
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             SetAddressProperties(viewModel);
             var viewElement = new ElementViewModel

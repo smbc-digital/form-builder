@@ -6,6 +6,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Models.Verint;
+using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace form_builder.Services.OrganisationService
         public async Task<ProcessRequestEntity> ProcesssOrganisation(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
             var journey = viewModel["OrganisationStatus"];
-            var organisationResults = new List<Organisation>();
+            var organisationResults = new List<OrganisationSearchResult>();
 
             if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
             {

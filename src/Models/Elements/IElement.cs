@@ -6,6 +6,7 @@ using JsonSubTypes;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
+using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -22,6 +23,6 @@ namespace form_builder.Models.Elements
 
             void Validate(Dictionary<string, string> viewModel, IEnumerable<IElementValidator> form_builder);
 
-            Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment);
+            Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment);
     }
 }

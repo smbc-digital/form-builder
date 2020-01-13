@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using StockportGovUK.NetStandard.Gateways.ComplimentsComplaintsServiceGateway;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
@@ -27,6 +28,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDistributedCacheWrapper> _mockDistrubutedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<ISchemaProvider> _mockSchemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
+        private readonly Mock<IComplimentsComplaintsServiceGateway> _mockComplimentsComplaintsServiceGateway = new Mock<IComplimentsComplaintsServiceGateway>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
         private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
 
@@ -53,7 +55,7 @@ namespace form_builder_tests.UnitTests.Services
             };
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(Newtonsoft.Json.JsonConvert.SerializeObject(cacheData));
 
-            _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockSchemaProvider.Object, _mockGateway.Object, _pageHelper.Object, _sessionHelper.Object);
+            _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockSchemaProvider.Object, _mockGateway.Object, _mockComplimentsComplaintsServiceGateway.Object, _pageHelper.Object, _sessionHelper.Object);
         }
 
 

@@ -76,6 +76,7 @@ Example JSON:
     * [P](#ptextprops) (Paragraph text)
     * [Textbox](#textboxprops)
     * [RequiredIf](#requiredif)
+    * [TextBox(Numeric)](#textboxnumeric)
     * [Textbox(Email)](#textboxemailprops)
     * [Textbox(Postcode)](#textboxpostcodeprops)
     * [Textbox(Stockport postcode)](#textboxstockportpostcodeprops)
@@ -161,7 +162,33 @@ Paragraph text JSON example:
     }
   }
 ```
-
+#
+   * <a name="textboxnumeric">**Textbox(Numeric)**</a>
+        * Label (*string*) __*__
+        * QuestionId (*string*) __*__
+        * CustomValidationMessage (*string*)
+        * Hint (*string*)        
+        * Optional (*boolean*) (defaults to false)
+        * Numeric (*boolean*) (need this to validate it as an email address)
+        * Max (*string*) (maxium value in integer e.g '25')
+        * Min (*string*) (maxium value in integer e.g '0')
+        
+Textbox Numeric JSON example:
+```json
+  {
+    "Type": "Textbox",
+    "Properties": {
+      "QuestionId": "howManyChildren",
+      "Label": "How Many Children",
+      "Hint": "3",
+      "CustomValidationMessage": "The children should be between 0 and 20",
+      "Optional": false,
+      "Max": 20,
+      "Min": 0,
+      "Numeric": true
+    }
+  }
+```
 #
    * <a name="textboxemailprops">**Textbox(Email)**</a>
         * Label (*string*) __*__

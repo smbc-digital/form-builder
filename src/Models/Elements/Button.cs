@@ -6,6 +6,7 @@ using StockportGovUK.NetStandard.Models.Addresses;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 
 namespace form_builder.Models.Elements
 {
@@ -16,9 +17,9 @@ namespace form_builder.Models.Elements
             Type = EElementType.Button;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            var viewData = new Dictionary<string, object> { { "displayAnchor", !CheckForStartPageSlug(formSchema, page) }, { "behaviourType", CheckForBehaviour(page.Behaviours) }, { "address", CheckForAddressElement(page.Elements) }, { "street", CheckForStreetElement(page.Elements) } };
+            var viewData = new Dictionary<string, object> { { "displayAnchor", !CheckForStartPageSlug(formSchema, page) }, { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) } };
 
             return viewRender.RenderAsync("Button", this, viewData);
         }
@@ -34,15 +35,26 @@ namespace form_builder.Models.Elements
             return behaviour.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm);
         }
 
-        private bool CheckForAddressElement(List<IElement> element)
+        private bool CheckForStreetAddress(List<IElement> element, Dictionary<string, string> viewModel)
         {
-            return element.Any(_ => _.Type == EElementType.Address);
+            bool isStreetAddress = element.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.Street);
+
+            if (isStreetAddress && (viewModel.ContainsKey("AddressStatus") || viewModel.ContainsKey("StreetStatus")))
+            {
+                return false;
+            }
+           
+            return isStreetAddress;
         }
 
-        private bool CheckForStreetElement(List<IElement> element)
+        private bool ShowSpinner(List<Behaviour> behaviour, List<IElement> element, Dictionary<string, string> viewModel)
         {
-            return element.Any(_ => _.Type == EElementType.Street);
+            if (CheckForBehaviour(behaviour) || CheckForStreetAddress(element, viewModel))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
-

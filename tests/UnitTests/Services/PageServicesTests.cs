@@ -22,6 +22,7 @@ using Xunit;
 using Newtonsoft.Json;
 using form_builder.Providers.Organisation;
 using form_builder.Services.OrganisationService;
+using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -46,7 +47,7 @@ namespace form_builder_tests.UnitTests.Services
             var elementValidatorItems = new List<IElementValidator> { _validator.Object };
             _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
                         .ReturnsAsync(new FormBuilderViewModel());
 
             var cacheData = new FormAnswers
@@ -63,7 +64,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessRequest_ShouldCall_Schema_And_Session_Service()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var element = new ElementBuilder()
@@ -93,7 +94,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcessRequest("form", "page-one", viewModel, false);
 
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>>()), Times.Once);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Once);
             _schemaProvider.Verify(_ => _.Get<FormSchema>(It.IsAny<string>()), Times.Once);
             _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
@@ -180,7 +181,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
                 .Throws<ApplicationException>();
 
             var element = new ElementBuilder()
@@ -210,7 +211,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, false));
 
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>>()), Times.Once);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Once);
         }
 
         [Fact]

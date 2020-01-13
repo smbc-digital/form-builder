@@ -30,7 +30,7 @@ namespace form_builder.Validators
                 : null;
 
 
-            if (string.IsNullOrEmpty(valueHours) && string.IsNullOrEmpty(valueMinutes) && element.Properties.Optional)
+            if (string.IsNullOrEmpty(valueHours) && string.IsNullOrEmpty(valueMinutes) && string.IsNullOrEmpty(valueAmPm) && element.Properties.Optional)
             {
                 return new ValidationResult
                 {
@@ -38,7 +38,7 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValid = !string.IsNullOrEmpty(valueHours) || !string.IsNullOrEmpty(valueMinutes);
+            var isValid = !string.IsNullOrEmpty(valueHours) && !string.IsNullOrEmpty(valueMinutes);
 
             if (!isValid)
             {
@@ -59,11 +59,12 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValidTime = DateTime.TryParse($"{valueHours}:{valueMinutes}{valueAmPm}", out _);
+            //var isValidTime = DateTime.TryParse($"{valueHours}:{valueMinutes}{valueAmPm}", out _);
 
-            isValidTime = int.TryParse(valueHours, out int hours);
+            int.TryParse(valueHours, out int hours);
+            int.TryParse(valueMinutes, out int minutes);
 
-            isValidTime = (hours < 13 && hours > 0);
+            var isValidTime = (hours < 13 && hours > 0) && (minutes < 60 && minutes > 0);
 
            
             return new ValidationResult
