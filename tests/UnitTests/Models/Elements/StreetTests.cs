@@ -2,6 +2,7 @@
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
 using form_builder.Models.Elements;
+using form_builder.Models.Properties;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
@@ -29,7 +30,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         [Fact]
         public async Task Street_ShouldCallViewRenderWithCorrectPartial_WhenStreetSearch()
         {
-            var element = new form_builder.Models.Elements.Street { Properties = new Property { Text = "text", QuestionId = "street" } };
+            var element = new form_builder.Models.Elements.Street { Properties = new BaseProperty { Text = "text", QuestionId = "street" } };
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -54,7 +55,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         public async Task Street_ShouldCallViewRenderWithCorrectPartial_WhenStreetSelect()
         {
             //Arrange
-            var element = new form_builder.Models.Elements.Street { Properties = new Property { Text = "text", QuestionId = "street", StreetProvider = "test" } };
+            var element = new form_builder.Models.Elements.Street { Properties = new BaseProperty { Text = "text", QuestionId = "street", StreetProvider = "test" } };
 
             var page = new PageBuilder()
                 .WithElement(element)

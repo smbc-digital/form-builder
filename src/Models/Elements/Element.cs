@@ -1,6 +1,7 @@
 using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Models.Properties;
 using form_builder.Validators;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Addresses;
@@ -21,7 +22,7 @@ namespace form_builder.Models.Elements
 
         public EElementType Type { get; set; }
 
-        public Property Properties { get; set; }
+        public BaseProperty Properties { get; set; }
 
         public bool DisplayAriaDescribedby
         {

@@ -1,5 +1,6 @@
 using form_builder.Enum;
 using form_builder.Models.Elements;
+using form_builder.Models.Properties;
 using form_builder.Validators;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace form_builder.Models
 
         public bool IsValid => !InvalidElements.Any();
 
-        public IEnumerable<Property> InvalidElements
+        public IEnumerable<BaseProperty> InvalidElements
         {
             get
             {

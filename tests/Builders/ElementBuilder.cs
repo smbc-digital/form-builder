@@ -1,6 +1,7 @@
 ﻿using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
+using form_builder.Models.Properties;
 using System.Collections.Generic;
 
 namespace form_builder_tests.Builders
@@ -8,7 +9,7 @@ namespace form_builder_tests.Builders
     public class ElementBuilder
     {
         private EElementType _type = EElementType.H1;
-        private Property _property = new Property();
+        private BaseProperty _property = new BaseProperty();
 
         public Element Build()
         {

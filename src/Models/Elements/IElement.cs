@@ -1,6 +1,7 @@
 ﻿using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Models.Properties;
 using form_builder.Validators;
 using JsonSubTypes;
 using Microsoft.AspNetCore.Hosting;
@@ -17,7 +18,7 @@ namespace form_builder.Models.Elements
     {
             EElementType Type { get; set; }
 
-            Property Properties { get; set; }
+            BaseProperty Properties { get; set; }
 
             bool IsValid { get; }
 
