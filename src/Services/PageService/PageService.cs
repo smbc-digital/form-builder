@@ -187,11 +187,9 @@ namespace form_builder.Services.PageService
                 return await _organisationService.ProcesssOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
             }
 
-            if (currentPage.IsValid)
-            {
-                _pageHelper.SaveAnswers(viewModel, sessionGuid);
-            }
-            else
+            _pageHelper.SaveAnswers(viewModel, sessionGuid);
+
+            if (!currentPage.IsValid)
             {
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, sessionGuid);
                 formModel.Path = currentPage.PageSlug;
