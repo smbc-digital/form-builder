@@ -277,7 +277,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            Assert.Equal($"/{baseUrl}/{pageSlug}/street", callback.Item1.ReturnURL);
+            Assert.Equal($"/{baseUrl}/{pageSlug}", callback.Item1.ReturnURL);
         }
 
         [Theory]

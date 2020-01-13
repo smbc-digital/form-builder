@@ -45,7 +45,7 @@ namespace form_builder.Models.Elements
                     }
 
                 }
-                var url = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/street";
+                var url = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
                 var viewElement = new ElementViewModel
                 {
