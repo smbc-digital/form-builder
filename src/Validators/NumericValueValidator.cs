@@ -36,52 +36,6 @@ namespace form_builder.Validators
                 };
             }
 
-            if (!string.IsNullOrEmpty(element.Properties.Max) && !string.IsNullOrEmpty(element.Properties.Min))
-            {
-                var max = int.Parse(element.Properties.Max);
-                var min = int.Parse(element.Properties.Min);
-
-                if (output > max || output < min)
-                {
-                    return new ValidationResult
-                    {
-                        IsValid = false,
-                        Message = $"{element.Properties.Label} must be between {min} and {max} inclusive"
-                    };
-                }
-
-            }
-
-            if (!string.IsNullOrEmpty(element.Properties.Max))
-            {
-                var max = int.Parse(element.Properties.Max);
-
-                if (output > max)
-                {
-                    return new ValidationResult
-                    {
-                        IsValid = false,
-                        Message = $"{element.Properties.Label} must be less than or equal to {max}"
-                    };
-                }
-
-            }
-
-            if (!string.IsNullOrEmpty(element.Properties.Min))
-            {
-                var min = int.Parse(element.Properties.Min);
-
-                if (output < min)
-                {
-                    return new ValidationResult
-                    {
-                        IsValid = false,
-                        Message = $"{element.Properties.Label} must be greater than or equal to {min}"
-                    };
-                }
-
-            }
-
             return new ValidationResult
             {
                 IsValid = true

@@ -23,6 +23,8 @@ namespace form_builder.Models.Elements
 
             void Validate(Dictionary<string, string> viewModel, IEnumerable<IElementValidator> form_builder);
 
+            List<Element> GetAllQuestionIds(Element element, Dictionary<string, string> viewModel);
+
             Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment);
     }
 }

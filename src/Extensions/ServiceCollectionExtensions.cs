@@ -51,6 +51,7 @@ namespace form_builder.Extensions
             services.AddTransient<IElementValidator, TimeInputValidator>();
             services.AddTransient<IElementValidator, RequiredIfValidator>();
             services.AddTransient<IElementValidator, MaxLengthValidator>();
+            services.AddTransient<IElementValidator, MinMaxValidator>();
 
             return services;
         }

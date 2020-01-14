@@ -16,6 +16,11 @@ namespace form_builder.Models.Elements
             Type = EElementType.DateInput;
         }
 
+        public string[] Ids()
+        {
+            return new string[]{ $"{ this.Properties.QuestionId}-day", "", ""};
+        }
+
         public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             Properties.Day = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-day");

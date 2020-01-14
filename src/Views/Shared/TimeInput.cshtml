@@ -36,7 +36,7 @@
         Minutes
     </label>
 
-    @Html.TextBox(minutesid, Model.Properties.Minutes, new { maxLength = "2", type = "number", pattern="\\d*", min = "0", max = "59"})
+    @Html.TextBox(minutesid, Model.Properties.Minutes, new { maxLength = "2", type = "number", pattern="[0-9]*", min = "0", max = "59"})
 </div>
 <div class="ampm">
     <div class="input-radio-container horizontal">
