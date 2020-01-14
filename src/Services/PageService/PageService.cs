@@ -111,6 +111,7 @@ namespace form_builder.Services.PageService
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid);
 
+
             if (page.Elements.Any(_ => _.Type == EElementType.Street))
             {
                 viewModel.StreetStatus = "Search";
@@ -211,6 +212,7 @@ namespace form_builder.Services.PageService
         {
             var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
             viewModel.FormName = baseForm.FormName;
+            viewModel.PageTitle = page.Title;
             viewModel.Path = path;
 
             return viewModel;
