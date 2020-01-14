@@ -1,11 +1,11 @@
-﻿using form_builder.Models;
-using form_builder.Models.Elements;
+﻿using form_builder.Models.Elements;
+using form_builder.Models.Properties;
 
 namespace form_builder_tests.Builders
 {
     public class AddressBuilder
     {
-        private Property _property = new Property();
+        private BaseProperty _property = new BaseProperty();
 
         public Address Build()
         {

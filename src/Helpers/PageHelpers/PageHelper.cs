@@ -3,6 +3,7 @@ using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
 using form_builder.Models.Elements;
+using form_builder.Models.Properties;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using form_builder.ViewModels;
@@ -63,7 +64,7 @@ namespace form_builder.Helpers.PageHelpers
             FormBuilderViewModel formModel = new FormBuilderViewModel();
             if (page.PageSlug.ToLower() != "success")
             {
-                formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new Property { Text = baseForm.FormName } });
+                formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = baseForm.FormName } });
             }
             formModel.FeedbackForm = baseForm.FeedbackForm;
 
@@ -123,6 +124,7 @@ namespace form_builder.Helpers.PageHelpers
                         var streetViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, null);
                         streetViewModel.StreetStatus = "Select";
                         streetViewModel.FormName = baseForm.FormName;
+                        streetViewModel.PageTitle = currentPage.Title;
 
                         return new ProcessRequestEntity
                         {
@@ -156,6 +158,7 @@ namespace form_builder.Helpers.PageHelpers
                         var adddressViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, null);
                         adddressViewModel.AddressStatus = "Select";
                         adddressViewModel.FormName = baseForm.FormName;
+                        adddressViewModel.PageTitle = currentPage.Title;
 
                         return new ProcessRequestEntity
                         {
@@ -189,6 +192,7 @@ namespace form_builder.Helpers.PageHelpers
                         var organisationViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, null, organisationResults);
                         organisationViewModel.OrganisationStatus = "Select";
                         organisationViewModel.FormName = baseForm.FormName;
+                        organisationViewModel.PageTitle = currentPage.Title;
 
                         return new ProcessRequestEntity
                         {

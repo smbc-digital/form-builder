@@ -17,5 +17,7 @@ namespace form_builder.ViewModels
         public string OrganisationStatus { get; set; }
 
         public string FormName { get; set; }
+
+        public string PageTitle { get; set; }
     }
 }

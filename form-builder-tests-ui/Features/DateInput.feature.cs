@@ -83,114 +83,88 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("I should see a validation message for \"passportIssued1-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 10
  testRunner.Then("I should not see a validation message for \"dob1-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            this.ScenarioCleanup();
-        }
-        
-        [TechTalk.SpecRun.ScenarioAttribute("User enters invalid date value in the day, month and year", SourceLine=11)]
-        public virtual void UserEntersInvalidDateValueInTheDayMonthAndYear()
-        {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters invalid date value in the day, month and year", null, ((string[])(null)));
-#line 12
-this.ScenarioInitialize(scenarioInfo);
-            this.ScenarioStart();
-#line 13
- testRunner.Given("I navigate to \"/dateinput/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 14
+#line 11
  testRunner.Then("I fill the day with \"34\" value, month with \"33\" value and year with \"1234\" value " +
                     "on \"passportIssued1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 15
+#line 12
  testRunner.When("I click the \"nextPage\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 16
+#line 13
  testRunner.Then("I should see a validation message for \"passportIssued1-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 17
+#line 14
  testRunner.Then("I should see the values \"34\", \"33\" and \"1234\" in the date input for \"passportIssu" +
                     "ed1\" blah", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            this.ScenarioCleanup();
-        }
-        
-        [TechTalk.SpecRun.ScenarioAttribute("User enters today\'s date", SourceLine=18)]
-        public virtual void UserEntersTodaysDate()
-        {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters today\'s date", null, ((string[])(null)));
-#line 19
-this.ScenarioInitialize(scenarioInfo);
-            this.ScenarioStart();
-#line 20
- testRunner.Given("I navigate to \"/dateinput/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 21
+#line 15
  testRunner.Then("I fill the date input with today\'s date in \"passportIssued1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 22
+#line 16
  testRunner.When("I click the \"nextPage\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 23
+#line 17
  testRunner.Then("I should see a validation message for \"passportIssued1-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 24
+#line 18
  testRunner.Then("I should see todays date refilled in the date input in for \"passportIssued1\" blah" +
                     "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("User enters a date in the past", SourceLine=25)]
+        [TechTalk.SpecRun.ScenarioAttribute("User enters a date in the past", SourceLine=19)]
         public virtual void UserEntersADateInThePast()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters a date in the past", null, ((string[])(null)));
-#line 26
+#line 20
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
-#line 27
+#line 21
  testRunner.Given("I navigate to \"/dateinput/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 28
+#line 22
  testRunner.Then("I fill the day with \"01\" value, month with \"01\" value and year with \"2012\" value " +
                     "on \"passportIssued1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 29
+#line 23
  testRunner.When("I click the \"nextPage\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 30
+#line 24
  testRunner.Given("I navigate to \"/dateinput/page2\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 31
+#line 25
  testRunner.Then("I fill the day with \"01\" value, month with \"01\" value and year with \"2010\" value " +
                     "on \"passportIssued2\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 32
+#line 26
  testRunner.When("I click the \"nextPage2\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 33
+#line 27
  testRunner.Then("I should see a validation message for \"passportIssued2-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 34
+#line 28
  testRunner.Then("I should see the values \"01\", \"01\" and \"2010\" in the date input for \"passportIssu" +
                     "ed2\" blah", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("User enters a date in the future", SourceLine=35)]
+        [TechTalk.SpecRun.ScenarioAttribute("User enters a date in the future", SourceLine=29)]
         public virtual void UserEntersADateInTheFuture()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters a date in the future", null, ((string[])(null)));
-#line 36
+#line 30
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
-#line 37
+#line 31
  testRunner.Given("I navigate to \"/dateinput/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 38
+#line 32
  testRunner.Then("I fill the day with \"01\" value, month with \"01\" value and year with \"2012\" value " +
                     "on \"passportIssued1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 39
+#line 33
  testRunner.When("I click the \"nextPage\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 40
+#line 34
  testRunner.Given("I navigate to \"/dateinput/page2\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 41
+#line 35
  testRunner.Then("I fill the day with \"01\" value, month with \"01\" value and year with \"2110\" value " +
                     "on \"passportIssued2\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 42
+#line 36
  testRunner.Given("I navigate to \"/dateinput/page3\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 43
+#line 37
  testRunner.Then("I fill the day with \"01\" value, month with \"01\" value and year with \"2022\" value " +
                     "on \"passportIssued3\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 44
+#line 38
  testRunner.When("I click the \"nextPage3\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 45
+#line 39
  testRunner.Then("I should see a validation message for \"passportIssued3-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 46
+#line 40
  testRunner.Then("I should see the values \"01\", \"01\" and \"2022\" in the date input for \"passportIssu" +
                     "ed3\" blah", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

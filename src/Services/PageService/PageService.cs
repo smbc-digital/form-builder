@@ -111,6 +111,7 @@ namespace form_builder.Services.PageService
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid);
 
+
             if (page.Elements.Any(_ => _.Type == EElementType.Street))
             {
                 viewModel.StreetStatus = "Search";
@@ -187,11 +188,9 @@ namespace form_builder.Services.PageService
                 return await _organisationService.ProcesssOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
             }
 
-            if (currentPage.IsValid)
-            {
-                _pageHelper.SaveAnswers(viewModel, sessionGuid);
-            }
-            else
+            _pageHelper.SaveAnswers(viewModel, sessionGuid);
+
+            if (!currentPage.IsValid)
             {
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, sessionGuid);
                 formModel.Path = currentPage.PageSlug;
@@ -213,6 +212,7 @@ namespace form_builder.Services.PageService
         {
             var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
             viewModel.FormName = baseForm.FormName;
+            viewModel.PageTitle = page.Title;
             viewModel.Path = path;
 
             return viewModel;

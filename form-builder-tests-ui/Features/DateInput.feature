@@ -8,16 +8,10 @@ Scenario: User does not fill in any fields
 	When I click the "nextPage" button
 	Then I should see a validation message for "passportIssued1-error" input
 	Then I should not see a validation message for "dob1-error" input
-
-Scenario: User enters invalid date value in the day, month and year
-	Given I navigate to "/dateinput/page1"
 	Then I fill the day with "34" value, month with "33" value and year with "1234" value on "passportIssued1"
 	When I click the "nextPage" button
 	Then I should see a validation message for "passportIssued1-error" input
 	Then I should see the values "34", "33" and "1234" in the date input for "passportIssued1" blah
-
-Scenario: User enters today's date
-	Given I navigate to "/dateinput/page1"
 	Then I fill the date input with today's date in "passportIssued1"
 	When I click the "nextPage" button
 	Then I should see a validation message for "passportIssued1-error" input

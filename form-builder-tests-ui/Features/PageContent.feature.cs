@@ -97,26 +97,15 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("I should see an ordered list with list items", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 15
  testRunner.And("I should see an img element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            this.ScenarioCleanup();
-        }
-        
-        [TechTalk.SpecRun.ScenarioAttribute("Render HTML within P tag elements", new string[] {
-                "pagecontent"}, SourceLine=17)]
-        public virtual void RenderHTMLWithinPTagElements()
-        {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Render HTML within P tag elements", null, new string[] {
-                        "pagecontent"});
+#line 16
+ testRunner.And("I should see a \"h2\" element with \"This is a label\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 17
+ testRunner.And("I should see a \"p\" element with \"This is some text\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 18
-this.ScenarioInitialize(scenarioInfo);
-            this.ScenarioStart();
+ testRunner.And("I should see a strong element within a p tag", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 19
- testRunner.Given("I navigate to \"/pagecontent/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 20
- testRunner.Then("I should see a strong element within a p tag", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 21
  testRunner.And("I should see an image element within a p tag", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 22
+#line 20
  testRunner.And("I should see a link element within a p tag", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();

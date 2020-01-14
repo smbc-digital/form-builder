@@ -8,15 +8,9 @@ Scenario: Renders HTML tags on the page
 	And I should see the "issueOne" input
 	And I should see a "p" element with "Your description can be up to 2000 characters" text
 	And I should see the "nextStep" button
-
-Scenario: User fills in data and clicks next
-	Given I navigate to "/textarea/page1"
+	Then I click the "nextStep" button
+	Then I should see a validation message for "issueOne" input
 	Then I fill in page1
 	Then I click the "nextStep" button
 	Then I fill in page2
 	And I should see the "submit" button
-
-Scenario: User enters nothing on page1
-	Given I navigate to "/textarea/page1"
-	Then I click the "nextStep" button
-	Then I should see a validation message for "issueOne" input

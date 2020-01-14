@@ -4,8 +4,8 @@ using Xunit;
 
 namespace form_builder_tests_ui.StepDefinitions
 {
-    [Binding, Scope(Tag = "checkboxlist")]
-    class CheckBoxListSteps : UiTestBase
+    [Binding, Scope(Tag = "semicomplexpath")]
+    class SemiComplexPathSteps : UiTestBase
     {
         [Then(@"I should see a validation message for ""(.*)"" input")]
         public void ThenIShouldSeeValidationMessageForInput(string inputName)
@@ -21,8 +21,8 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.False(BrowserSession.FindId(inputName).Exists());
         }
 
-        [Then(@"I click the ""(.*)"" checkbox")]
-        [When(@"I click the ""(.*)"" checkbox")]
+        [Then(@"I click the ""(.*)"" radiobutton")]
+        [When(@"I click the ""(.*)"" radiobutton")]
         public void ThenIClickTheRadioButton(string inputId)
         {
             //Arrange
@@ -32,7 +32,7 @@ namespace form_builder_tests_ui.StepDefinitions
             webDriver.FindElement(By.Id(inputId)).Click();
         }
 
-        [Then(@"The ""(.*)"" checkbox should be checked")]
+        [Then(@"The ""(.*)"" radiobutton should be checked")]
         public void TheradioButtonShouldBeChecked(string inputId)
         {
             //Arrange
@@ -44,7 +44,7 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.True(webDriver.FindElement(By.Id(inputId)).Selected);
         }
 
-        [Then(@"The ""(.*)"" checkbox should be unchecked")]
+        [Then(@"The ""(.*)"" radiobutton should be unchecked")]
         public void TheradioButtonShouldNotBeChecked(string inputId)
         {
             //Arrange
@@ -56,16 +56,11 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.False(webDriver.FindElement(By.Id(inputId)).Selected);
         }
 
-        [Then(@"The the previous link is clicked")]
-        public void ThePreviousLinkIsClicked()
+        [Then(@"I should see a ""(.*)"" element with ""(.*)"" text")]
+        public void ThenIShouldSeeAElement(string elementType, string elementText)
         {
-            //Arrange
             var webDriver = BrowserSession.Native as IWebDriver;
-
-            //Act
-
-            //Assert
-            webDriver.FindElement(By.ClassName("back-button")).Click();
+            Assert.True(webDriver.FindElement(By.XPath($"//{elementType}[text() = '{elementText}']")).Displayed);
         }
     }
 }

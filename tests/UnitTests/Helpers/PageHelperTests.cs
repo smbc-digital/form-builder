@@ -5,6 +5,7 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Models.Elements;
+using form_builder.Models.Properties;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using form_builder.ViewModels;
@@ -143,7 +144,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var pageSlug = "page-one";
             var baseUrl = "test";
 
-            var addressElement = new form_builder.Models.Elements.Address { Properties = new Property { Text = "text" } };
+            var addressElement = new form_builder.Models.Elements.Address { Properties = new BaseProperty { Text = "text" } };
 
             var page = new PageBuilder()
                 .WithElement(addressElement)
@@ -169,7 +170,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenAddressSearch()
         {
             //Arrange
-            var addressElement = new form_builder.Models.Elements.Address { Properties = new Property { Text = "text" } };
+            var addressElement = new form_builder.Models.Elements.Address { Properties = new BaseProperty { Text = "text" } };
 
             var page = new PageBuilder()
                 .WithElement(addressElement)
@@ -193,7 +194,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenStreetSelect()
         {
             //Arrange
-            var element = new form_builder.Models.Elements.Street { Properties = new Property { QuestionId = "street", StreetProvider = "test", Text = "test" } };
+            var element = new form_builder.Models.Elements.Street { Properties = new BaseProperty { QuestionId = "street", StreetProvider = "test", Text = "test" } };
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -256,7 +257,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var pageSlug = "page-one";
             var baseUrl = "test";
-            var element = new form_builder.Models.Elements.Street { Properties = new Property { Text = "test" } };
+            var element = new form_builder.Models.Elements.Street { Properties = new BaseProperty { Text = "test" } };
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -542,7 +543,7 @@ namespace form_builder_tests.UnitTests.Helpers
        [Fact]
        public async Task ProcessOrganisationJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
         {
-            var result = await _pageHelper.ProcessOrganisationJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new Property {  QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
+            var result = await _pageHelper.ProcessOrganisationJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty {  QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
 
             var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
             Assert.Equal("../Organisation/Index", journeyResult.ViewName);
@@ -567,7 +568,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task ProcessAddressJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
         {
-            var result = await _pageHelper.ProcessAddressJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new Property { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.ProcessAddressJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
 
             var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
             Assert.Equal("../Address/Index", journeyResult.ViewName);
@@ -592,7 +593,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task ProcessStreetJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
         {
-            var result = await _pageHelper.ProcessStreetJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new Property { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.ProcessStreetJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
 
             var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
             Assert.Equal("../Street/Index", journeyResult.ViewName);
