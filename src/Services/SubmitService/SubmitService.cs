@@ -12,11 +12,10 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Gateways.ComplimentsComplaintsServiceGateway;
-using StockportGovUK.NetStandard.Gateways.Response;
 using System.Dynamic;
 using System.Linq;
 using form_builder.Models.Elements;
-using form_builder.Enum;
+using form_builder.Mappers;
 
 namespace form_builder.Services.SubmtiService
 {
@@ -75,7 +74,7 @@ namespace form_builder.Services.SubmtiService
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new ApplicationException($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             }
 
             if (response.Content != null)
@@ -121,20 +120,11 @@ namespace form_builder.Services.SubmtiService
         {
             var data = new ExpandoObject() as IDictionary<string, object>;
 
-            var keys = formSchema.Pages.SelectMany(_ => _.ValidatableElements)
-               .Select(_ => new
-               {
-                   TargetMapping = string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping,
-                   Element = _
-               })
-               .ToList();
+            formSchema.Pages.SelectMany(_ => _.ValidatableElements)
+                .Select(_ =>
+                    data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data)
+                );
 
-
-            keys.ForEach(_ =>
-            {
-                data = RecursiveCheckAndCreate(_.TargetMapping, _.Element, formAnswers, data);
-            });
-            
             return data;
         }
 
@@ -144,7 +134,16 @@ namespace form_builder.Services.SubmtiService
 
             if (splitTargets.Length == 1)
             {
-                obj.Add(splitTargets[0], GetAnswerValue(element, formAnswers));
+                object objectValue;
+                if (obj.TryGetValue(splitTargets[0], out objectValue))
+                {
+                    var combinedValue = $"{objectValue} {ElementMapper.GetAnswerValue(element, formAnswers)}";
+                    obj.Remove(splitTargets[0]);
+                    obj.Add(splitTargets[0], combinedValue);
+                    return obj;
+                }
+
+                obj.Add(splitTargets[0], ElementMapper.GetAnswerValue(element, formAnswers));
                 return obj;
             }
 
@@ -152,80 +151,12 @@ namespace form_builder.Services.SubmtiService
             if (!obj.TryGetValue(splitTargets[0], out subObject))
                 subObject = new ExpandoObject();
 
-            subObject =  RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", ""), element, formAnswers, subObject as IDictionary<string, object>);
+            subObject = RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", ""), element, formAnswers, subObject as IDictionary<string, object>);
 
             obj.Remove(splitTargets[0]);
             obj.Add(splitTargets[0], subObject);
 
             return obj;
-        }
-
-        private object GetAnswerValue(IElement element, FormAnswers formAnswers)
-        {
-            var key = element.Properties.QuestionId;
-
-            switch (element.Type)
-            {
-                case EElementType.DateInput:
-                    return GetDateElementValue(key, formAnswers);
-                case EElementType.Address:
-                    return GetAddressElementValue(key, formAnswers);
-                default:
-                    var value = formAnswers.Pages.SelectMany(_ => _.Answers)
-                       .Where(_ => _.QuestionId == key)
-                       .ToList()
-                       .FirstOrDefault();
-
-                    return value?.Response ?? "";
-            }
-        }
-
-        private object GetAddressElementValue(string key, FormAnswers formAnswers)
-        {
-            dynamic addressObject = new ExpandoObject();
-            var urpnKey = $"{key}-address";
-            var manualAddressLineOne = $"{key}-AddressManualAddressLine1";
-            var manualAddressLineTwo = $"{key}-AddressManualAddressLine2";
-            var manualAddressLineTown = $"{key}-AddressManualAddressTown";
-            var manualAddressLinePostcode = $"{key}-AddressManualAddressPostcode";
-
-            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
-                .Where(_ => _.QuestionId == manualAddressLineOne || _.QuestionId == manualAddressLineTwo ||
-                            _.QuestionId == manualAddressLineTown || _.QuestionId == manualAddressLinePostcode ||
-                            _.QuestionId == urpnKey)
-                .ToList();
-
-            addressObject.addressLine1 = value.FirstOrDefault(_ => _.QuestionId == manualAddressLineOne)?.Response ?? string.Empty;
-            addressObject.addressLine2 = value.FirstOrDefault(_ => _.QuestionId == manualAddressLineTwo)?.Response ?? string.Empty;
-            addressObject.town = value.FirstOrDefault(_ => _.QuestionId == manualAddressLineTown)?.Response ?? string.Empty;
-            addressObject.postcode = value.FirstOrDefault(_ => _.QuestionId == manualAddressLinePostcode)?.Response ?? string.Empty;
-            addressObject.uprn = value.FirstOrDefault(_ => _.QuestionId == urpnKey)?.Response ?? string.Empty;
-
-            return addressObject;
-        }
-
-        private DateTime GetDateElementValue(string key, FormAnswers formAnswers)
-        {
-            dynamic dateObject = new ExpandoObject();
-            var dateDayKey = $"{key}-day";
-            var dateMonthKey = $"{key}-month";
-            var dateYearKey = $"{key}-year";
-
-            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
-               .Where(_ => _.QuestionId == dateDayKey || _.QuestionId == dateMonthKey ||
-                           _.QuestionId == dateYearKey)
-               .ToList();
-
-            var day = value.FirstOrDefault(_ => _.QuestionId == dateDayKey)?.Response ?? string.Empty;
-            var month = value.FirstOrDefault(_ => _.QuestionId == dateMonthKey)?.Response ?? string.Empty;
-            var year = value.FirstOrDefault(_ => _.QuestionId == dateYearKey)?.Response ?? string.Empty;
-
-            if (!string.IsNullOrEmpty(day) && !string.IsNullOrEmpty(month) && !string.IsNullOrEmpty(year))
-            {
-                return DateTime.Parse($"{day}/{month}/{year}");
-            }
-
-            return new DateTime();
         }
     }
 }
