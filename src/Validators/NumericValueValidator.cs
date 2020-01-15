@@ -54,20 +54,6 @@ namespace form_builder.Validators
 
             }
 
-            if (element.Type == Enum.EElementType.DateInput && element.Properties.QuestionId.EndsWith("-year") && string.IsNullOrEmpty(element.Properties.Max))
-            {
-                var maxYear = DateTime.Now.Year + 100;
-
-                if (output > maxYear)
-                {
-                    return new ValidationResult
-                    {
-                        IsValid = false,
-                        Message = $"Year must be less than or equal to {maxYear}"
-                    };
-                }
-            }
-
             if (!string.IsNullOrEmpty(element.Properties.Max))
             {
                 var max = int.Parse(element.Properties.Max);

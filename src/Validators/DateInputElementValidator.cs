@@ -42,6 +42,16 @@ namespace form_builder.Validators
 
             var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out _);
 
+            var yearIsValid = int.TryParse(valueYear, out int output);
+            var maxYear = DateTime.Now.Year + 100;
+            if (output > maxYear)
+            {
+                    return new ValidationResult
+                    {
+                        IsValid = false,
+                        Message = $"Year must be less than or equal to {maxYear}"
+                    };
+            }
 
             return new ValidationResult
             {

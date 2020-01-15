@@ -120,27 +120,5 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.False(result.IsValid);
             Assert.Equal($"{label} must be between 10 and 20 inclusive", result.Message);
         }
-
-        [Fact]
-        public void Validate_ShouldReturnFalse_WhenYearIsGreaterThanMax()
-        {
-            var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
-                .WithQuestionId("test-id-year")
-                .WithNumeric(true)
-                .WithLabel("max year test")
-                .Build();
-
-            var maxYear = DateTime.Now.Year + 100;
-            var viewModel = new Dictionary<string, string>();
-            viewModel.Add("test-id-year", "43360");
-
-            var result = _validator.Validate(element, viewModel);
-
-            Assert.False(result.IsValid);
-            Assert.Equal($"Year must be less than or equal to { maxYear}", result.Message);
-
-
-        }
     }
 }
