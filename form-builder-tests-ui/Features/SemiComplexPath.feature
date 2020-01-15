@@ -2,7 +2,7 @@
 Feature: SemiComplexPath
 	Checking the path looks at both questions for next page
 
-Scenario: User enters cat and no on page1
+Scenario: Standard use of behaviour when questions on same page
 	Given I navigate to "/semicomplexpath/first-question"
 	When I click the "firstQuestion-0" radiobutton
 	Then The "firstQuestion-0" radiobutton should be checked

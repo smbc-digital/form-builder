@@ -68,10 +68,10 @@ namespace form_builder_tests_ui.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Renders HTML tags on the page", SourceLine=4)]
-        public virtual void RendersHTMLTagsOnThePage()
+        [TechTalk.SpecRun.ScenarioAttribute("Address element standard use", SourceLine=4)]
+        public virtual void AddressElementStandardUse()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Renders HTML tags on the page", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Address element standard use", null, ((string[])(null)));
 #line 5
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
@@ -111,12 +111,10 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("I enter postcode in optional and I don\'t select an address in the dropdown, shoul" +
-            "d display the success page", SourceLine=21)]
-        public virtual void IEnterPostcodeInOptionalAndIDontSelectAnAddressInTheDropdownShouldDisplayTheSuccessPage()
+        [TechTalk.SpecRun.ScenarioAttribute("Address element optional no address selected", SourceLine=21)]
+        public virtual void AddressElementOptionalNoAddressSelected()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("I enter postcode in optional and I don\'t select an address in the dropdown, shoul" +
-                    "d display the success page", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Address element optional no address selected", null, ((string[])(null)));
 #line 22
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
@@ -154,12 +152,10 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("I enter postcode in optional and select an address in the dropdown should display" +
-            " the success page", SourceLine=38)]
-        public virtual void IEnterPostcodeInOptionalAndSelectAnAddressInTheDropdownShouldDisplayTheSuccessPage()
+        [TechTalk.SpecRun.ScenarioAttribute("Address element optional address selected", SourceLine=38)]
+        public virtual void AddressElementOptionalAddressSelected()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("I enter postcode in optional and select an address in the dropdown should display" +
-                    " the success page", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Address element optional address selected", null, ((string[])(null)));
 #line 39
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();

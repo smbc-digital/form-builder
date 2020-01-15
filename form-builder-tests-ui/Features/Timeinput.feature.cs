@@ -68,10 +68,10 @@ namespace form_builder_tests_ui.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Renders HTML tags on the page", SourceLine=6)]
-        public virtual void RendersHTMLTagsOnThePage()
+        [TechTalk.SpecRun.ScenarioAttribute("Time input standard use.", SourceLine=6)]
+        public virtual void TimeInputStandardUse_()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Renders HTML tags on the page", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Time input standard use.", null, ((string[])(null)));
 #line 7
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();

@@ -2,7 +2,7 @@
 Feature: Textbox
 	In order to fill in my details I have to navigate to Page1
 
-Scenario: Goes to page1 if they attempt to go straight to page2
+Scenario: Textbox standard use
 	Given I navigate to "/textbox/page2"
 	Then I should see the header
 	And I should see the "firstName" input

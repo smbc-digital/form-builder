@@ -68,10 +68,12 @@ namespace form_builder_tests_ui.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("User enters cat and yes on page1", SourceLine=4)]
-        public virtual void UserEntersCatAndYesOnPage1()
+        [TechTalk.SpecRun.ScenarioAttribute("Complex path different questions on different pages are referred to for behaviour" +
+            "", SourceLine=4)]
+        public virtual void ComplexPathDifferentQuestionsOnDifferentPagesAreReferredToForBehaviour()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters cat and yes on page1", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Complex path different questions on different pages are referred to for behaviour" +
+                    "", null, ((string[])(null)));
 #line 5
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();

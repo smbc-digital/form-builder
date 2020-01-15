@@ -25,7 +25,7 @@ namespace form_builder_tests_ui.StepDefinitions
         {
             Thread.Sleep(sleepTime);
         }
-
+        
         [Given("I have signed in as UiTest")]
         public static void IHaveSignedIn()
         {

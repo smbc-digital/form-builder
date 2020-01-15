@@ -2,7 +2,7 @@
 Feature: Address
 	In order to collect address information I have to navigate to Page1
 
-Scenario: Renders HTML tags on the page
+Scenario: Address element standard use
 	Given I navigate to "/address/page1"
 	Then I should see the header
 	And I should see the "customers-address-postcode" input
@@ -19,7 +19,7 @@ Scenario: Renders HTML tags on the page
 	Then I select "address 2" in "customers-address-address" dropdown
 	Then I should see "address 2" is selected in "customers-address-address" dropdown with the value "098765432109|address 2"
 
-Scenario: I enter postcode in optional and I don't select an address in the dropdown, should display the success page
+Scenario: Address element optional no address selected
 	Given I navigate to "/address/page1"
 	Then  I fill in page1
 	When I click the "nextStep" button
@@ -36,7 +36,7 @@ Scenario: I enter postcode in optional and I don't select an address in the drop
 	And I should see a "th" element with "customers-address-address-description" text
 	And I should see a "th" element with "optional-address-address" text
 
-Scenario: I enter postcode in optional and select an address in the dropdown should display the success page
+Scenario: Address element optional address selected
 	Given I navigate to "/address/page1"
 	Then I fill in page1
 	When I click the "nextStep" button

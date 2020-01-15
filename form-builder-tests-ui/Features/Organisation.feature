@@ -2,7 +2,7 @@
 Feature: Organisation
 	To allow the collection of an organisation information
 
-Scenario: Renders HTML tags on the page
+Scenario: Organisation standard use
 	Given I navigate to "/organisation/page-one"
 	Then I should see the header
 	And I should see the "organisation-organisation-searchterm" input

@@ -2,7 +2,7 @@
 Feature: ComplexPath
 	Checking the path looks at both questions for next page
 
-Scenario: User enters cat and yes on page1
+Scenario: Complex path different questions on different pages are referred to for behaviour
 	Given I navigate to "/complexpath/first-question"
 	When I click the "firstQuestion-0" radiobutton
 	Then The "firstQuestion-0" radiobutton should be checked

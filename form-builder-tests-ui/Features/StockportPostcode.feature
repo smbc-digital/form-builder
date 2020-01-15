@@ -2,7 +2,7 @@
 Feature: StockportPostcode
 	In order to fill in my details I have to navigate to Page1
 
-Scenario: Renders HTML tags on the page
+Scenario: Postcode validation standard use
 	Given I navigate to "/stockportpostcode/page1"
 	Then I should see the header
 	Then I click the "nextStep" button
