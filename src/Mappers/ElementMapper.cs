@@ -21,6 +21,10 @@ namespace form_builder.Mappers
                     return GetAddressElementValue(key, formAnswers);
                 case EElementType.TimeInput:
                     return GetTimeElementValue(key, formAnswers);
+                case EElementType.Organisation:
+                    return GetOrganisationElementValue(key, formAnswers);
+                case EElementType.Checkbox:
+                    throw new NotImplementedException();
                 default:
                     var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                        .Where(_ => _.QuestionId == key)
@@ -78,7 +82,7 @@ namespace form_builder.Mappers
             return new DateTime();
         }
 
-        private static DateTime GetTimeElementValue(string key, FormAnswers formAnswers)
+        private static TimeSpan GetTimeElementValue(string key, FormAnswers formAnswers)
         {
             dynamic dateObject = new ExpandoObject();
             var timeMinutesKey = $"{key}-minutes";
@@ -96,10 +100,27 @@ namespace form_builder.Mappers
 
             if (!string.IsNullOrEmpty(minutes) && !string.IsNullOrEmpty(hour) && !string.IsNullOrEmpty(amPm))
             {
-                return DateTime.Parse($"{minutes}:{hour}{amPm}");
+                var dateTime = DateTime.Parse($"{hour}:{minutes} {amPm}");
+                return dateTime.TimeOfDay;
             }
 
-            return new DateTime();
+            return new TimeSpan();
         }
+
+        private static string GetOrganisationElementValue(string key, FormAnswers formAnswers)
+        {
+            dynamic dateObject = new ExpandoObject();
+            var organisationKey = $"{key}-organisation";
+
+            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+                .Where(_ => _.QuestionId == organisationKey)
+                .ToList()
+                .FirstOrDefault();
+
+            if (value != null && !string.IsNullOrEmpty(value.Response))
+                return value.Response;
+
+            return string.Empty;
         }
+    }
 }
