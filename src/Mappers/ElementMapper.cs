@@ -4,6 +4,7 @@ using form_builder.Models.Elements;
 using System;
 using System.Dynamic;
 using System.Linq;
+using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
 
 namespace form_builder.Mappers
 {
@@ -36,7 +37,8 @@ namespace form_builder.Mappers
         }
         private static object GetAddressElementValue(string key, FormAnswers formAnswers)
         {
-            dynamic addressObject = new ExpandoObject();
+            var addressObject = new Address();
+
             var urpnKey = $"{key}-address";
             var manualAddressLineOne = $"{key}-AddressManualAddressLine1";
             var manualAddressLineTwo = $"{key}-AddressManualAddressLine2";
@@ -49,15 +51,14 @@ namespace form_builder.Mappers
                             _.QuestionId == urpnKey)
                 .ToList();
 
-            addressObject.addressLine1 = value.FirstOrDefault(_ => _.QuestionId == manualAddressLineOne)?.Response ?? string.Empty;
-            addressObject.addressLine2 = value.FirstOrDefault(_ => _.QuestionId == manualAddressLineTwo)?.Response ?? string.Empty;
-            addressObject.town = value.FirstOrDefault(_ => _.QuestionId == manualAddressLineTown)?.Response ?? string.Empty;
-            addressObject.postcode = value.FirstOrDefault(_ => _.QuestionId == manualAddressLinePostcode)?.Response ?? string.Empty;
-            addressObject.uprn = value.FirstOrDefault(_ => _.QuestionId == urpnKey)?.Response ?? string.Empty;
+            addressObject.AddressLine1 = value.FirstOrDefault(_ => _.QuestionId == manualAddressLineOne)?.Response ?? string.Empty;
+            addressObject.AddressLine2 = value.FirstOrDefault(_ => _.QuestionId == manualAddressLineTwo)?.Response ?? string.Empty;
+            addressObject.Town = value.FirstOrDefault(_ => _.QuestionId == manualAddressLineTown)?.Response ?? string.Empty;
+            addressObject.Postcode = value.FirstOrDefault(_ => _.QuestionId == manualAddressLinePostcode)?.Response ?? string.Empty;
+            addressObject.PlaceRef = value.FirstOrDefault(_ => _.QuestionId == urpnKey)?.Response ?? string.Empty;
 
             return addressObject;
         }
-
         private static DateTime GetDateElementValue(string key, FormAnswers formAnswers)
         {
             dynamic dateObject = new ExpandoObject();
@@ -81,7 +82,6 @@ namespace form_builder.Mappers
 
             return new DateTime();
         }
-
         private static TimeSpan GetTimeElementValue(string key, FormAnswers formAnswers)
         {
             dynamic dateObject = new ExpandoObject();
@@ -106,7 +106,6 @@ namespace form_builder.Mappers
 
             return new TimeSpan();
         }
-
         private static string GetOrganisationElementValue(string key, FormAnswers formAnswers)
         {
             dynamic dateObject = new ExpandoObject();
