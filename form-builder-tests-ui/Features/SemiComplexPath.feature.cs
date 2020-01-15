@@ -68,10 +68,10 @@ namespace form_builder_tests_ui.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("User enters cat and no on page1", SourceLine=4)]
-        public virtual void UserEntersCatAndNoOnPage1()
+        [TechTalk.SpecRun.ScenarioAttribute("Standard use of behaviour when questions on same page", SourceLine=4)]
+        public virtual void StandardUseOfBehaviourWhenQuestionsOnSamePage()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User enters cat and no on page1", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Standard use of behaviour when questions on same page", null, ((string[])(null)));
 #line 5
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();

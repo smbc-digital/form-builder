@@ -4,7 +4,7 @@ Feature: SuccessPage
 	as a User
 	I should see a success page
 
-Scenario: User selects more than one checkbox input and presses submit
+Scenario: Success page standard use
 	Given I navigate to "/checkbox/page1"
 	When I click the "CheckBoxList-0" checkbox
 	Then I click the "CheckBoxList-1" checkbox

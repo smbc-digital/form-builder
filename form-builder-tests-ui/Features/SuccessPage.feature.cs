@@ -68,10 +68,10 @@ namespace form_builder_tests_ui.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("User selects more than one checkbox input and presses submit", SourceLine=6)]
-        public virtual void UserSelectsMoreThanOneCheckboxInputAndPressesSubmit()
+        [TechTalk.SpecRun.ScenarioAttribute("Success page standard use", SourceLine=6)]
+        public virtual void SuccessPageStandardUse()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User selects more than one checkbox input and presses submit", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Success page standard use", null, ((string[])(null)));
 #line 7
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();

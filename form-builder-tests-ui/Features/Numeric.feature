@@ -4,7 +4,6 @@ Feature: Numeric
 	As a mobile device user
 	I want to be have a number input
 
-
 Scenario: number field validates max and min properties
 	Given I navigate to "/numeric/page1"
 	When I fill in in page 1 with incorrect numeric values

@@ -2,7 +2,7 @@
 Feature: RadioButton
 	In order to enter options I need to add option buttons
 
-Scenario: User enters nothing on page1
+Scenario: Radio button standard use
 	Given I navigate to "/radiobutton/page1"
 	When I click the "submit" button
 	Then I should see a validation message for "radButton-error" input

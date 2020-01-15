@@ -23,9 +23,10 @@
         "FeedbackForm": "https://stockportcouncil.typeform.com/to/yzIJEe",
         "Pages": [
           {
+            "Title": "",
             "PageSlug": "",
-            "PageElements": [],
-            "PageBehaviours": []
+            "Elements": [],
+            "Behaviours": []
           }
         ],
     }
@@ -41,17 +42,18 @@
 **Pages**[*object*]:
 
 * **PageSlug** (*string*) - The slug for a page after the BaseURL e.g. stockport.gov.uk/{BaseURL}/{PageSlug}
-* **PageElements**[*object*]- List of HTML elements to display on page
-* [PageBehaviours[*object*]](#pagebehaviours) - List of conditionals & page redirects for the page
+* **Title** (*string*) - The Title is used within the browser tab along with the form name e.g. Page 1 - Contact us - Stockport Council
+* **Elements**[*object*]- List of HTML elements to display on page
+* [Behaviours[*object*]](#pagebehaviours) - List of conditionals & page redirects for the page
 
 
 ## Element Types & Properties
-**PageElements[*object*]**:
+**Elements[*object*]**:
 
 Example JSON:
 ```json
     {
-        "PageElements": [
+        "Elements": [
             {
                 "Type": "H1",
                 "Properties":
@@ -719,7 +721,7 @@ Example where if a user selects yes they will continue on with the form, otherwi
 Example where dependant on their answers to certain questions the form navigates to different pages (the questions don't need to have been answered on that page but can have been answered earlier in the form:
 ```json
     {
-        "PageBehaviours": [
+        "Behaviours": [
             {
                 "Conditions": [
                     {

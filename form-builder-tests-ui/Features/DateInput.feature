@@ -3,7 +3,7 @@ Feature: DateInput
 	In order to collect a date users enter a day, month and year
 
 
-Scenario: User does not fill in any fields
+Scenario: Dateinput standard use
 	Given I navigate to "/dateinput/page1"
 	When I click the "nextPage" button
 	Then I should see a validation message for "passportIssued1-error" input

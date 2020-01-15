@@ -2,7 +2,7 @@
 Feature: Street
 	In order to collect street information I have to navigate to Page1
 
-Scenario: Renders HTML tags on the page
+Scenario: Street lookup standard use
 	Given I navigate to "/street/page1"
 	Then I should see the header
 	And I should see the "customers-street-street" input

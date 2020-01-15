@@ -4,7 +4,7 @@ Feature: Timeinput
 	As a user
 	I want to be enter time in am or pm
 
-Scenario: Renders HTML tags on the page
+Scenario: Time input standard use.
 	Given I navigate to "/time/page1"
 	Then I should see the header
 	And I should see the "timeid-hours" input

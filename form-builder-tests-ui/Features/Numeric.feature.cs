@@ -70,26 +70,26 @@ namespace form_builder_tests_ui.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("number field validates max and min properties", SourceLine=7)]
+        [TechTalk.SpecRun.ScenarioAttribute("number field validates max and min properties", SourceLine=6)]
         public virtual void NumberFieldValidatesMaxAndMinProperties()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("number field validates max and min properties", null, ((string[])(null)));
-#line 8
+#line 7
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
-#line 9
+#line 8
  testRunner.Given("I navigate to \"/numeric/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 10
+#line 9
  testRunner.When("I fill in in page 1 with incorrect numeric values", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 11
+#line 10
  testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 12
+#line 11
  testRunner.Then("I should see a validation message for \"positiveInteger\" numeric input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 13
+#line 12
  testRunner.And("I should see a validation message for \"negativeInteger\" numeric input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 14
+#line 13
  testRunner.And("I should see a validation message for \"rangedInteger\" numeric input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 15
+#line 14
  testRunner.And("I should see a validation message for \"rangedIntegerOptional\" numeric input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
