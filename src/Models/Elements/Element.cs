@@ -252,12 +252,20 @@ namespace form_builder.Models.Elements
             var list = viewModel.Where(x => x.Key.StartsWith(element.Properties.QuestionId)).ToList();
             var elementList = new List<Element>();
 
-            foreach(var value in list)
+            foreach ( var value in list)
             {
-                var newElement = element;
+                var newElement = new Element
+                {
+                    Type = element.Type,
+                    Properties = new BaseProperty
+                    {
+                        Value = element.Properties.Value,
+                        QuestionId = element.Properties.QuestionId
+                    }
+                };
+
                 newElement.Properties.QuestionId = value.Key;
                 newElement.Properties.Value = value.Value;
-
 
                 elementList.Add(newElement);
             }
