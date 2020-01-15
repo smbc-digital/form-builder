@@ -120,10 +120,18 @@ namespace form_builder.Services.SubmtiService
         {
             var data = new ExpandoObject() as IDictionary<string, object>;
 
-            formSchema.Pages.SelectMany(_ => _.ValidatableElements)
-                .Select(_ =>
-                    data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data)
-                );
+            var keys = formSchema.Pages.SelectMany(_ => _.ValidatableElements)
+               .Select(_ => new
+               {
+                   TargetMapping = string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping,
+                   Element = _
+               })
+               .ToList();
+
+            keys.ForEach(_ =>
+            {
+                data = RecursiveCheckAndCreate(_.TargetMapping, _.Element, formAnswers, data);
+            });
 
             return data;
         }
