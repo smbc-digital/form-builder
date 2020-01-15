@@ -243,5 +243,37 @@ namespace form_builder_tests.UnitTests.Models
             Assert.Equal("monthtest", result[1].Properties.Value);
             Assert.Equal("yeartest", result[2].Properties.Value);
         }
+
+        [Fact]
+        public void GetAllQuestionIds_ShouldReturnArrayWithOneItem_WhenElementHasSingleComponent()
+        {
+            var questionId = "checkbox";
+
+            var element = new ElementBuilder()
+                            .WithType(EElementType.Checkbox)
+                            .WithQuestionId(questionId)
+                            .WithLabel("Label")
+                            .WithOptions(new List<Option>
+                            { new Option 
+                                 { Value = "option1", Text = "Option 1"},
+                                 new Option
+                                 { Value = "option2", Text = "Option 2"} 
+                            })
+                            .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add(questionId + "-0", "option1");
+            viewModel.Add(questionId + "-1", "option2");
+
+            var result = element.GetAllQuestionIds(element, viewModel);
+
+            Assert.NotNull(result);
+            Assert.True(result.Count == 1);
+
+            Assert.Equal("checkbox", result[0].Properties.QuestionId);
+            Assert.Equal("option1", result[0].Properties.Options[0].Value);
+            Assert.Equal("option2", result[0].Properties.Options[1].Value);
+
+        }
     }
 }
