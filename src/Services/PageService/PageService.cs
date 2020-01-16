@@ -52,17 +52,14 @@ namespace form_builder.Services.PageService
             _organisationService = organisationService;
             _distributedCache = distributedCache;
         }
-
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false)
         {
-
             if (string.IsNullOrEmpty(path))
             {
                 _sessionHelper.RemoveSessionGuid();
             }
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
-           
 
             if (string.IsNullOrEmpty(sessionGuid))
             {
@@ -73,11 +70,6 @@ namespace form_builder.Services.PageService
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
 
             var formData = _distributedCache.GetString(sessionGuid);
-
-            if (_pageHelper.hasDuplicateQuestionIDs(baseForm.Pages))
-            {
-                throw new ApplicationException($"The provided json '{baseForm.FormName}' has duplicate QuestionIDs");
-            }
 
             if (formData == null && path != baseForm.StartPageSlug)
             {
@@ -102,6 +94,8 @@ namespace form_builder.Services.PageService
             {
                 throw new ApplicationException($"Requested path '{path}' object could not be found.");
             }
+
+            baseForm.ValidateFormSchema(_pageHelper, form, path);
 
             if (isAddressManual)
             {
@@ -217,8 +211,6 @@ namespace form_builder.Services.PageService
 
             return viewModel;
         }
-
-
         public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
             Dictionary<string, string> answers = new Dictionary<string, string>();
