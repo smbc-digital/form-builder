@@ -17,25 +17,25 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then(@"I fill in address line one")]
         public void ThenIFillInAddressLineOne()
         {
-            BrowserSession.FillIn("customers-address-AddressManualAddressLine1").With("test");
+            BrowserSession.FillIn("customersaddress-AddressManualAddressLine1").With("test");
         }
 
         [Then(@"I fill in town")]
         public void ThenIFillInTown()
         {
-            BrowserSession.FillIn("customers-address-AddressManualAddressTown").With("town");
+            BrowserSession.FillIn("customersaddress-AddressManualAddressTown").With("town");
         }
 
         [Then(@"I fill in invalid postcode")]
         public void ThenIFillInInvalidPostcode()
         {
-            BrowserSession.FillIn("customers-address-AddressManualAddressPostcode").With("ahskdoen");
+            BrowserSession.FillIn("customersaddress-AddressManualAddressPostcode").With("ahskdoen");
         }
 
         [Then(@"I fill in postcode")]
         public void ThenIFillInPostcode()
         {
-            BrowserSession.FillIn("customers-address-AddressManualAddressPostcode").With("sk1 3xe");
+            BrowserSession.FillIn("customersaddress-AddressManualAddressPostcode").With("sk1 3xe");
         }
 
         [Then(@"I wait one second")]
