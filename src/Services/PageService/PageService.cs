@@ -89,6 +89,13 @@ namespace form_builder.Services.PageService
                 };
             }
 
+            if (formData != null && path == baseForm.StartPageSlug)
+            {
+                var convertedFormData = JsonConvert.DeserializeObject<FormAnswers>(formData);
+                if (form != convertedFormData.FormName)
+                    _distributedCache.Remove(sessionGuid);
+            }
+
             var page = baseForm.GetPage(path);
             if (page == null)
             {
@@ -104,7 +111,6 @@ namespace form_builder.Services.PageService
             }
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid);
-
 
             if (page.Elements.Any(_ => _.Type == EElementType.Street))
             {
@@ -182,7 +188,7 @@ namespace form_builder.Services.PageService
                 return await _organisationService.ProcesssOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
             }
 
-            _pageHelper.SaveAnswers(viewModel, sessionGuid);
+            _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL);
 
             if (!currentPage.IsValid)
             {

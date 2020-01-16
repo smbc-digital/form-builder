@@ -24,7 +24,7 @@ namespace form_builder.Helpers.PageHelpers
     {
         void hasDuplicateQuestionIDs(List<Page> pages, string formName);
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null);
-        void SaveAnswers(Dictionary<string, string> viewModel, string guid);
+        void SaveAnswers(Dictionary<string, string> viewModel, string guid, string form);
         Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults);
         Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
         Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
@@ -64,7 +64,7 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        public void SaveAnswers(Dictionary<string, string> viewModel, string guid)
+        public void SaveAnswers(Dictionary<string, string> viewModel, string guid, string form)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -96,6 +96,7 @@ namespace form_builder.Helpers.PageHelpers
             });
 
             convertedAnswers.Path = viewModel["Path"];
+            convertedAnswers.FormName = form;
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
