@@ -24,8 +24,6 @@ namespace form_builder.Mappers
                     return GetTimeElementValue(key, formAnswers);
                 case EElementType.Organisation:
                     return GetOrganisationElementValue(key, formAnswers);
-                case EElementType.Checkbox:
-                    throw new NotImplementedException();
                 default:
                     var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                        .Where(_ => _.QuestionId == key)
