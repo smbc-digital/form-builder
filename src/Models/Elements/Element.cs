@@ -6,7 +6,9 @@ using form_builder.Validators;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
@@ -53,6 +55,7 @@ namespace form_builder.Models.Elements
             foreach (var validator in form_builder)
             {
                 var result = validator.Validate(this, viewModel);
+
                 if (!result.IsValid)
                 {
                     validationResult = result;

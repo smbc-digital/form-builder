@@ -1,6 +1,7 @@
 ﻿using form_builder.Enum;
 using form_builder.Validators;
 using form_builder_tests.Builders;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -58,6 +59,26 @@ namespace form_builder_tests.UnitTests.Validators
             var result = _dateInputElementValidator.Validate(element, viewModel);
             Assert.False(result.IsValid);
             Assert.Equal("Check the date and try again", result.Message);
+        }
+
+        [Fact]
+        public void Validate_ShouldReturnFalse_WhenYearIsGreaterThanMax()
+        {
+            var element = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test")
+                .Build();
+
+            var maxYear = DateTime.Now.Year + 100;
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add("test-day", "12");
+            viewModel.Add("test-month", "12");
+            viewModel.Add("test-year", "43360");
+
+            var result = _dateInputElementValidator.Validate(element, viewModel);
+
+            Assert.False(result.IsValid);
+            Assert.Equal($"Year must be less than or equal to { maxYear}", result.Message);
         }
     }
 }

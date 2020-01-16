@@ -8,6 +8,10 @@ Scenario: Dateinput standard use
 	When I click the "nextPage" button
 	Then I should see a validation message for "passportIssued1-error" input
 	Then I should not see a validation message for "dob1-error" input
+	Then I fill the day with "12" value, month with "12" value and year with "4300" value on "passportIssued1"
+	When I click the "nextPage" button
+	Then I should see a validation message for "passportIssued1-error" input
+	Then I should not see a validation message for "dob1-error" input
 	Then I fill the day with "34" value, month with "33" value and year with "1234" value on "passportIssued1"
 	When I click the "nextPage" button
 	Then I should see a validation message for "passportIssued1-error" input

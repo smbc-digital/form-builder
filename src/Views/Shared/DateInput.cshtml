@@ -6,6 +6,7 @@
     var dayId = $"{Model.Properties.QuestionId}-day";
     var monthId = $"{Model.Properties.QuestionId}-month";
     var yearId = $"{Model.Properties.QuestionId}-year";
+    var maxYear = DateTime.Now.Year + 100;
 
     var errorId = $"{Model.Properties.QuestionId}-error";
     var classes = new string[] { "input-memorable-date" };
@@ -36,7 +37,7 @@
     <label for="@yearId">
         Year
     </label>
-    @Html.TextBox(yearId, Model.Properties.Year, new { maxlength = "4", type="number"})
+    @Html.TextBox(yearId, Model.Properties.Year, new { maxlength = "4", type = "number", max = maxYear })
 </div>
 
 @if (!Model.IsValid)

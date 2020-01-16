@@ -184,7 +184,10 @@ namespace form_builder_tests.UnitTests.Models
                             .WithQuestionId(questionId)
                             .Build();
 
-            element.Validate(null, _validators.Object);
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add(questionId, "test");
+
+            element.Validate(viewModel, _validators.Object);
             var result = element.DescribedByValue();
 
             Assert.NotNull(result);
@@ -201,8 +204,10 @@ namespace form_builder_tests.UnitTests.Models
                             .WithQuestionId(questionId)
                             .WithHint("hint")
                             .Build();
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add(questionId, "test");
 
-            element.Validate(null, _validators.Object);
+            element.Validate(viewModel, _validators.Object);
             var result = element.DescribedByValue();
 
             Assert.NotNull(result);
