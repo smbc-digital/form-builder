@@ -252,6 +252,11 @@ namespace form_builder.Helpers.PageHelpers
                 {
                     throw new ApplicationException($"The provided json '{formName}' contains invalid QuestionIDs or TargetMapping, {_.ToString()} contains invalid characters");
                 }
+
+                if (_.ToString().EndsWith(".") || _.ToString().StartsWith("."))
+                {
+                    throw new ApplicationException($"The provided json '{formName}' contains invalid QuestionIDs or TargetMapping, {_.ToString()} contains invalid characters");
+                }
             });
         }
     }
