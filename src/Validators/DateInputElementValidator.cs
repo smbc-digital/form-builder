@@ -40,11 +40,10 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out _);
+            var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out DateTime date);
 
-            var yearIsValid = int.TryParse(valueYear, out int output);
             var maxYear = DateTime.Now.Year + 100;
-            if (output > maxYear)
+            if (date.Year > maxYear)
             {
                     return new ValidationResult
                     {
