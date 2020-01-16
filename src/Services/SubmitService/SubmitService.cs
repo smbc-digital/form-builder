@@ -70,17 +70,34 @@ namespace form_builder.Services.SubmtiService
             var postData = CreatePostData(convertedAnswers, baseForm);
             var reference = string.Empty;
 
-            var response = await _gateway.PostAsync(postUrl, postData);
-
-            if (response.StatusCode != HttpStatusCode.OK)
+            if (form == "give-a-compliment" || form == "give-feedback" || form == "make-a-formal-complaint")
             {
-                throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                var response = await _complimentsComplaintsServiceGateway.SubmitForm(postUrl, postData);
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                }
+
+                if (response.ResponseContent != null)
+                {
+                    reference = JsonConvert.DeserializeObject<string>(response.ResponseContent);
+                }
             }
-
-            if (response.Content != null)
+            else
             {
-                var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
-                reference = JsonConvert.DeserializeObject<string>(content);
+                var response = await _gateway.PostAsync(postUrl, postData);
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                }
+
+                if (response.Content != null)
+                {
+                    var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
+                    reference = JsonConvert.DeserializeObject<string>(content);
+                }
             }
 
             _distributedCache.Remove(sessionGuid);
