@@ -73,7 +73,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, string>();
             viewModel.Add("test-day", "12");
             viewModel.Add("test-month", "12");
-            viewModel.Add("test-year", "43360");
+            viewModel.Add("test-year", "2920");
 
             var result = _dateInputElementValidator.Validate(element, viewModel);
 
