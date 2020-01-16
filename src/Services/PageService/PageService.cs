@@ -52,17 +52,14 @@ namespace form_builder.Services.PageService
             _organisationService = organisationService;
             _distributedCache = distributedCache;
         }
-
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false)
         {
-
             if (string.IsNullOrEmpty(path))
             {
                 _sessionHelper.RemoveSessionGuid();
             }
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
-           
 
             if (string.IsNullOrEmpty(sessionGuid))
             {
@@ -73,11 +70,6 @@ namespace form_builder.Services.PageService
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
 
             var formData = _distributedCache.GetString(sessionGuid);
-
-            if (_pageHelper.hasDuplicateQuestionIDs(baseForm.Pages))
-            {
-                throw new ApplicationException($"The provided json '{baseForm.FormName}' has duplicate QuestionIDs");
-            }
 
             if (formData == null && path != baseForm.StartPageSlug)
             {
@@ -97,11 +89,20 @@ namespace form_builder.Services.PageService
                 };
             }
 
+            if (formData != null && path == baseForm.StartPageSlug)
+            {
+                var convertedFormData = JsonConvert.DeserializeObject<FormAnswers>(formData);
+                if (form != convertedFormData.FormName)
+                    _distributedCache.Remove(sessionGuid);
+            }
+
             var page = baseForm.GetPage(path);
             if (page == null)
             {
                 throw new ApplicationException($"Requested path '{path}' object could not be found.");
             }
+
+            baseForm.ValidateFormSchema(_pageHelper, form, path);
 
             if (isAddressManual)
             {
@@ -110,7 +111,6 @@ namespace form_builder.Services.PageService
             }
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid);
-
 
             if (page.Elements.Any(_ => _.Type == EElementType.Street))
             {
@@ -188,7 +188,7 @@ namespace form_builder.Services.PageService
                 return await _organisationService.ProcesssOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
             }
 
-            _pageHelper.SaveAnswers(viewModel, sessionGuid);
+            _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL);
 
             if (!currentPage.IsValid)
             {
@@ -217,8 +217,6 @@ namespace form_builder.Services.PageService
 
             return viewModel;
         }
-
-
         public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
             Dictionary<string, string> answers = new Dictionary<string, string>();

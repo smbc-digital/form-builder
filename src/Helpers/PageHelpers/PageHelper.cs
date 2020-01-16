@@ -15,19 +15,20 @@ using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace form_builder.Helpers.PageHelpers
 {
     public interface IPageHelper
     {
-        void CheckForDuplicateQuestionIDs(Page page);
+        void hasDuplicateQuestionIDs(List<Page> pages, string formName);
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null);
-        void SaveAnswers(Dictionary<string, string> viewModel, string guid);
+        void SaveAnswers(Dictionary<string, string> viewModel, string guid, string form);
         Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults);
         Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
         Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
-        bool hasDuplicateQuestionIDs(List<Page> pages);
+        void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName);
     }
 
     public class PageHelper : IPageHelper
@@ -46,19 +47,6 @@ namespace form_builder.Helpers.PageHelpers
             _enviroment = enviroment;
         }
 
-        public void CheckForDuplicateQuestionIDs(Page page)
-        {
-            var numberOfDuplicates = page.Elements.GroupBy(x => x.Properties.QuestionId + x.Properties.Text + x.Type)
-                .Where(g => g.Count() > 1)
-                .Select(y => y.Key)
-                .ToList();
-
-            if (numberOfDuplicates.Count > 0)
-            {
-                throw new Exception("Question id, text or type is not unique.");
-            }
-        }
-
         public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
@@ -68,8 +56,6 @@ namespace form_builder.Helpers.PageHelpers
             }
             formModel.FeedbackForm = baseForm.FeedbackForm;
 
-            CheckForDuplicateQuestionIDs(page);
-
             foreach (var element in page.Elements)
             {
                 formModel.RawHTML += await element.RenderAsync(_viewRender, _elementHelper, guid, addressAndStreetSearchResults, organisationSearchResults, viewModel, page, baseForm, _enviroment);
@@ -78,7 +64,7 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        public void SaveAnswers(Dictionary<string, string> viewModel, string guid)
+        public void SaveAnswers(Dictionary<string, string> viewModel, string guid, string form)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -110,6 +96,7 @@ namespace form_builder.Helpers.PageHelpers
             });
 
             convertedAnswers.Path = viewModel["Path"];
+            convertedAnswers.FormName = form;
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
@@ -216,9 +203,8 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
-        public bool hasDuplicateQuestionIDs(List<Page> pages)
+        public void hasDuplicateQuestionIDs(List<Page> pages, string formName)
         {
-            bool duplicateFound = false;
             List<string> qIds = new List<string>();
             foreach (var page in pages)
             {
@@ -247,12 +233,31 @@ namespace form_builder.Helpers.PageHelpers
             {
                 if (!hashSet.Add(id))
                 {
-                    duplicateFound = true;
-                    return duplicateFound;
+                    throw new ApplicationException($"The provided json '{formName}' has duplicate QuestionIDs");
                 }
             }
+        }
 
-            return duplicateFound;
+        public void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName)
+        {
+            var questionIds = pages.Where(_ => _.Elements != null)
+                .SelectMany(_ => _.ValidatableElements)
+                .Select(_ => string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping)
+                .ToList();
+
+            questionIds.ForEach(_ =>
+            {
+                var regex = new Regex(@"^[a-zA-Z.]+$", RegexOptions.IgnoreCase);
+                if (!regex.IsMatch(_.ToString()))
+                {
+                    throw new ApplicationException($"The provided json '{formName}' contains invalid QuestionIDs or TargetMapping, {_.ToString()} contains invalid characters");
+                }
+
+                if (_.ToString().EndsWith(".") || _.ToString().StartsWith("."))
+                {
+                    throw new ApplicationException($"The provided json '{formName}' contains invalid QuestionIDs or TargetMapping, {_.ToString()} contains invalid characters");
+                }
+            });
         }
     }
 }

@@ -437,6 +437,66 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task ProcessPage_ShouldCallDistrbutedCache_ToDeleteSessionData_WhenNavigating_ToDifferentForm()
+        {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { FormName = "other-form" }));
+
+            var element = new ElementBuilder()
+                          .WithType(EElementType.Street)
+                          .WithQuestionId("test-street")
+                          .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithStartPageSlug("page-one")
+                .WithBaseUrl("new-form")
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var result = await _service.ProcessPage("new-form", "page-one");
+
+            _distributedCache.Verify(_ => _.Remove(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessPage_ShouldNotCallDistrbutedCache_ToDeleteSessionData_WhenNavigating_ToDifferentForm()
+        {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { FormName = "new-form" }));
+
+            var element = new ElementBuilder()
+                          .WithType(EElementType.Street)
+                          .WithQuestionId("test-street")
+                          .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithStartPageSlug("page-one")
+                .WithBaseUrl("new-form")
+                .Build();
+
+            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var result = await _service.ProcessPage("new-form", "page-one");
+
+            _distributedCache.Verify(_ => _.Remove(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
         public void GetBehaviour_ShouldCallSession_And_DistributedCache()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("12345");

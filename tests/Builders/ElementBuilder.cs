@@ -38,6 +38,11 @@ namespace form_builder_tests.Builders
             return this;
         }
 
+        public ElementBuilder WithTargetMapping(string targetMapping)
+        {
+            _property.TargetMapping = targetMapping;
+            return this;
+        }
         public ElementBuilder WithLabel(string label)
         {
             _property.Label = label;

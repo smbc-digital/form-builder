@@ -349,7 +349,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
 
-            _pageHelper.SaveAnswers(viewModel, guid.ToString());
+            _pageHelper.SaveAnswers(viewModel, guid.ToString(), "formName");
 
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())));
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == guid.ToString()), It.IsAny<string>(), It.IsAny<CancellationToken>()));
@@ -392,7 +392,7 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add("Item1", item1Data);
             viewModel.Add("Item2", item2Data);
 
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString());
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName");
 
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
@@ -419,7 +419,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, string>();
             viewModel.Add("Path", "path");
 
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString());
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName");
 
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
@@ -445,7 +445,7 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add("Item1", item1Data);
             viewModel.Add("Item2", item2Data);
 
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString());
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName");
 
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
@@ -457,7 +457,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void DuplicateIDs_ShouldErrorIfDuplicateQuestionIDsInJSON()
+        public void DuplicateIDs_ShouldThrowException_IfDuplicateQuestionIDsInJSON()
         {
             // Arrange
             var element1 = new ElementBuilder()
@@ -492,14 +492,11 @@ namespace form_builder_tests.UnitTests.Helpers
             pages.Add(page2);
 
             // Act
-            var foundDuplicates = _pageHelper.hasDuplicateQuestionIDs(pages);
-
-            // Assert
-            Assert.True(foundDuplicates);
+            Assert.Throws<ApplicationException>(() => _pageHelper.hasDuplicateQuestionIDs(pages, "form"));
         }
 
         [Fact]
-        public void DuplicateIDs_ShouldNotErrorIfNoDuplicateQuestionIDsInJSON()
+        public void DuplicateIDs_ShouldNotThrowException_IfNoDuplicateQuestionIDsInJSON()
         {
             // Arrange
             var element1 = new ElementBuilder()
@@ -534,10 +531,7 @@ namespace form_builder_tests.UnitTests.Helpers
             pages.Add(page2);
 
             // Act
-            var foundDuplicates = _pageHelper.hasDuplicateQuestionIDs(pages);
-
-            // Assert
-            Assert.False(foundDuplicates);
+            _pageHelper.hasDuplicateQuestionIDs(pages, "form");
         }
 
        [Fact]
@@ -613,6 +607,87 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessStreetJourney("UnknownType", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>()));
             Assert.Equal($"PageHelper.ProcessStreetJourney: Unknown journey type", result.Message);
+        }
+
+        [Theory]
+        [InlineData("invalid-questionId", "")]
+        [InlineData("question4", "")]
+        [InlineData("question£", "")]
+        [InlineData("que!stion", "")]
+        [InlineData("quest%ion", "")]
+        [InlineData("question.", "")]
+        [InlineData(".question", "")]
+        [InlineData("", "invalid-tagretMapping")]
+        [InlineData("", "tagret4")]
+        [InlineData("", "target$")]
+        [InlineData("", "target.")]
+        [InlineData("", ".target")]
+        public void CheckForInvalidQuestionOrTargetMappingValue_ShouldThrowExceptionWhen_InvalidQuestionId_OrTargetMapping(string questionId, string targetMapping)
+        {
+            var pages = new List<Page>();
+
+            var validElement = new ElementBuilder()
+                .WithQuestionId("question")
+                .WithType(EElementType.Textarea)
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithQuestionId(questionId)
+                .WithType(EElementType.Textarea)
+                .WithTargetMapping(targetMapping)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(validElement)
+                .WithElement(element2)
+                .Build();
+
+            pages.Add(page);
+            page = new PageBuilder()
+                .WithElement(validElement)
+                .Build();
+
+            pages.Add(page);
+
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForInvalidQuestionOrTargetMappingValue(pages, "formName"));
+            Assert.StartsWith("The provided json 'formName' contains invalid QuestionIDs or TargetMapping, ", result.Message);
+        }
+
+        [Theory]
+        [InlineData("validquestionId", "")]
+        [InlineData("valid.question", "")]
+        [InlineData("valid.question.id", "")]
+        [InlineData("", "validtagretMapping")]
+        [InlineData("", "valid.target")]
+        [InlineData("", "valid.target.mapping")]
+        public void CheckForInvalidQuestionOrTargetMappingValue_ShouldNotThrowExceptionWhen_ValidQuestionId_OrTargetMapping(string questionId, string targetMapping)
+        {
+            var pages = new List<Page>();
+
+            var validElement = new ElementBuilder()
+                .WithQuestionId("question")
+                .WithType(EElementType.Textarea)
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithQuestionId(questionId)
+                .WithType(EElementType.Textarea)
+                .WithTargetMapping(targetMapping)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(validElement)
+                .WithElement(element2)
+                .Build();
+
+            pages.Add(page);
+            page = new PageBuilder()
+                .WithElement(validElement)
+                .Build();
+
+            pages.Add(page);
+
+            _pageHelper.CheckForInvalidQuestionOrTargetMappingValue(pages, "formName");
         }
     }
 }

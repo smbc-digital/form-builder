@@ -18,6 +18,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Gateways.ComplimentsComplaintsServiceGateway;
 using Xunit;
+using System.Dynamic;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -146,9 +147,9 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
-            var questionId = "test-question";
-            var questionResponse = "test-response";
-            var callbackValue = new PostData();
+            var questionId = "testQuestion";
+            var questionResponse = "testResponse";
+            var callbackValue = new ExpandoObject() as IDictionary<string, object>;
             var cacheData = new FormAnswers
             {
                 Pages = new List<PageAnswers>
@@ -169,6 +170,11 @@ namespace form_builder_tests.UnitTests.Services
                 Path = "page-one"
             };
 
+            var element = new ElementBuilder()
+                .WithQuestionId(questionId)
+                .WithType(EElementType.Textarea)
+                .Build();
+
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
                 .WithPageSlug("testUrl")
@@ -176,6 +182,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var page = new PageBuilder()
                 .WithBehaviour(formData)
+                .WithElement(element)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -192,7 +199,7 @@ namespace form_builder_tests.UnitTests.Services
                 {
                     StatusCode = HttpStatusCode.OK
                 })
-                .Callback<string, object>((x, y) => callbackValue = (PostData)y);
+                .Callback<string, object>((x, y) => callbackValue = (ExpandoObject)y);
             // Act
             await _service.ProcessSubmission("form");
 
@@ -201,8 +208,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
 
             Assert.NotNull(callbackValue);
-            Assert.Equal(questionId, callbackValue.Answers[0].QuestionId);
-            Assert.Equal(questionResponse, callbackValue.Answers[0].Response);
+            Assert.Equal(questionResponse, callbackValue[questionId]);
         }
 
         [Fact]
@@ -285,7 +291,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessSubmission("form"));
 
             // Assert
-            Assert.StartsWith("HomeController, Submit: An exception has occured while attemping to call ", result.Message);
+            Assert.StartsWith("SubmitService::ProcessSubmission, An exception has occured while attemping to call ", result.Message);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 
@@ -313,7 +319,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<PostData>()))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                .ReturnsAsync(new HttpResponseMessage
                {
                    StatusCode = HttpStatusCode.OK,

@@ -12,7 +12,10 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Gateways.ComplimentsComplaintsServiceGateway;
-using StockportGovUK.NetStandard.Gateways.Response;
+using System.Dynamic;
+using System.Linq;
+using form_builder.Models.Elements;
+using form_builder.Mappers;
 
 namespace form_builder.Services.SubmtiService
 {
@@ -64,18 +67,16 @@ namespace form_builder.Services.SubmtiService
 
             var currentPage = baseForm.GetPage(convertedAnswers.Path);
             var postUrl = currentPage.GetSubmitFormEndpoint(convertedAnswers);
-            var postData = CreatePostData(convertedAnswers);
+            var postData = CreatePostData(convertedAnswers, baseForm);
             var reference = string.Empty;
 
-
-            if (postData.Form == "give-a-compliment" || postData.Form == "give-feedback" ||
-                postData.Form == "make-a-formal-complaint")
+            if (form == "give-a-compliment" || form == "give-feedback" || form == "make-a-formal-complaint")
             {
                 var response = await _complimentsComplaintsServiceGateway.SubmitForm(postUrl, postData);
 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    throw new ApplicationException($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
                 }
 
                 if (response.ResponseContent != null)
@@ -89,7 +90,7 @@ namespace form_builder.Services.SubmtiService
 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    throw new ApplicationException($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
                 }
 
                 if (response.Content != null)
@@ -98,8 +99,6 @@ namespace form_builder.Services.SubmtiService
                     reference = JsonConvert.DeserializeObject<string>(content);
                 }
             }
-
-
 
             _distributedCache.Remove(sessionGuid);
             _sessionHelper.RemoveSessionGuid();
@@ -134,28 +133,46 @@ namespace form_builder.Services.SubmtiService
             };
         }
 
-        private PostData CreatePostData(FormAnswers formAnswers)
+        private object CreatePostData(FormAnswers formAnswers, FormSchema formSchema)
         {
-            var postData = new PostData
-            {
-                Form = formAnswers.FormName,
-                Answers = new List<Answers>()
-            };
+            var data = new ExpandoObject() as IDictionary<string, object>;
 
-            if (formAnswers.Pages == null)
-            {
-                return postData;
-            }
+            formSchema.Pages.SelectMany(_ => _.ValidatableElements)
+                .ToList()
+                .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
 
-            foreach (var page in formAnswers.Pages)
+            return data;
+        }
+
+        private IDictionary<string, object> RecursiveCheckAndCreate(string targetMapping, IElement element, FormAnswers formAnswers, IDictionary<string, object> obj)
+        {
+            var splitTargets = targetMapping.Split(".");
+
+            if (splitTargets.Length == 1)
             {
-                foreach (var a in page.Answers)
+                object objectValue;
+                if (obj.TryGetValue(splitTargets[0], out objectValue))
                 {
-                    postData.Answers.Add(a);
+                    var combinedValue = $"{objectValue} {ElementMapper.GetAnswerValue(element, formAnswers)}";
+                    obj.Remove(splitTargets[0]);
+                    obj.Add(splitTargets[0], combinedValue);
+                    return obj;
                 }
+
+                obj.Add(splitTargets[0], ElementMapper.GetAnswerValue(element, formAnswers));
+                return obj;
             }
 
-            return postData;
+            object subObject;
+            if (!obj.TryGetValue(splitTargets[0], out subObject))
+                subObject = new ExpandoObject();
+
+            subObject = RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", ""), element, formAnswers, subObject as IDictionary<string, object>);
+
+            obj.Remove(splitTargets[0]);
+            obj.Add(splitTargets[0], subObject);
+
+            return obj;
         }
     }
 }

@@ -137,7 +137,7 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task Index_Application_ShoudlThrowApplicationException_ShouldRunDefaultBehaviour()
+        public async Task Index_ShouldThrowApplicationException_ShouldRunDefaultBehaviour()
         {
             // Arrange
             var element = new ElementBuilder()
