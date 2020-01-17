@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using form_builder.Enum;
 using form_builder_tests.Builders;
 using form_builder.Services.PageService;
-using form_builder.Services.SubmtiService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Services.SubmitService.Entities;
 using form_builder.Models;
+using form_builder.Workflows;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -19,11 +19,11 @@ namespace form_builder_tests.UnitTests.Controllers
     {
         private HomeController _homeController;
         private readonly Mock<IPageService> _pageService = new Mock<IPageService>();
-        private readonly Mock<ISubmitService> _submitService = new Mock<ISubmitService>();
+        private readonly Mock<ISubmitWorkflow> _submitWorkflow = new Mock<ISubmitWorkflow>();
 
         public HomeControllerTest()
         {
-            _homeController = new HomeController(_pageService.Object, _submitService.Object);
+            _homeController = new HomeController(_pageService.Object, _submitWorkflow.Object);
         }
 
         [Fact]
@@ -364,7 +364,7 @@ namespace form_builder_tests.UnitTests.Controllers
         public async Task Submit_ShouldReturnView_OnSuccessfull()
         {
             // Arrange
-            _submitService.Setup(_ => _.ProcessSubmission(It.IsAny<string>())).ReturnsAsync(new SubmitServiceEntity { ViewName = "Success" });
+            _submitWorkflow.Setup(_ => _.Submit(It.IsAny<string>())).ReturnsAsync(new SubmitServiceEntity { ViewName = "Success" });
 
             // Act
             var result = await _homeController.Submit("form");
@@ -372,7 +372,7 @@ namespace form_builder_tests.UnitTests.Controllers
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
 
-            _submitService.Verify(_ => _.ProcessSubmission(It.IsAny<string>()), Times.Once);
+            _submitWorkflow.Verify(_ => _.Submit(It.IsAny<string>()), Times.Once);
             Assert.Equal("Success", viewResult.ViewName);
         }
     }

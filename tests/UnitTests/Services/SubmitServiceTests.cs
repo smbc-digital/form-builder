@@ -2,7 +2,6 @@
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
-using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.SubmitService.Entities;
 using form_builder.Services.SubmtiService;
@@ -19,6 +18,7 @@ using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Gateways.ComplimentsComplaintsServiceGateway;
 using Xunit;
 using System.Dynamic;
+using form_builder.Services.MappingService.Entities;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -27,7 +27,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly SubmitService _service;
         private readonly Mock<ILogger<SubmitService>> _mockLogger = new Mock<ILogger<SubmitService>>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistrubutedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<ISchemaProvider> _mockSchemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
         private readonly Mock<IComplimentsComplaintsServiceGateway> _mockComplimentsComplaintsServiceGateway = new Mock<IComplimentsComplaintsServiceGateway>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
@@ -56,21 +55,8 @@ namespace form_builder_tests.UnitTests.Services
             };
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(Newtonsoft.Json.JsonConvert.SerializeObject(cacheData));
 
-            _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockSchemaProvider.Object, _mockGateway.Object, _mockComplimentsComplaintsServiceGateway.Object, _pageHelper.Object, _sessionHelper.Object);
+            _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockGateway.Object, _mockComplimentsComplaintsServiceGateway.Object, _pageHelper.Object, _sessionHelper.Object);
         }
-
-
-        [Fact]
-        public async Task ProcessSubmission_Application_ShouldThrowApplicationException_WhenNoSessionGuid()
-        {
-            // Act
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessSubmission("form"));
-
-            // Assert
-            Assert.Equal("A Session GUID was not provided.", result.Message);
-            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
-        }
-
 
         [Fact]
         public async Task ProcessSubmission_Application_ShoudlThrowApplicationException_WhenNoSubmitUrlSpecified()
@@ -99,17 +85,13 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
             // Act
-            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessSubmission("form"));
+            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one"} }, "form", ""));
 
             // Assert
             Assert.Equal("HomeController, Submit: No postUrl supplied for submit form", result.Message);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
         }
-
 
         [Fact]
         public async Task ProcessSubmission_Applicaton_ShouldCatchException_WhenGatewayCallThrowsException()
@@ -132,21 +114,17 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ThrowsAsync(new Exception("error"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<Exception>(() => _service.ProcessSubmission("form"));
+            await Assert.ThrowsAsync<Exception>(() => _service.ProcessSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
         }
 
         [Fact]
         public async Task Submit_ShouldCallGateway_WithFormData()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
             var questionId = "testQuestion";
             var questionResponse = "testResponse";
             var callbackValue = new ExpandoObject() as IDictionary<string, object>;
@@ -190,9 +168,6 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
@@ -201,48 +176,12 @@ namespace form_builder_tests.UnitTests.Services
                 })
                 .Callback<string, object>((x, y) => callbackValue = (ExpandoObject)y);
             // Act
-            await _service.ProcessSubmission("form");
+            await _service.ProcessSubmission(new MappingEntity { Data = new ExpandoObject(), BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "123454");
 
             // Assert
-            _mockDistrubutedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
 
             Assert.NotNull(callbackValue);
-            Assert.Equal(questionResponse, callbackValue[questionId]);
-        }
-
-        [Fact]
-        public async Task Submit_ShouldCallCacheProvider_ToGetFormData()
-        {
-            // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>())).ReturnsAsync(new HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.OK
-            });
-
-            var formData = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageSlug("testUrl")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithBehaviour(formData)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            // Act
-            await _service.ProcessSubmission("form");
-
-            // Assert
-            _mockDistrubutedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -271,8 +210,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
+            //_mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            //    .ReturnsAsync(schema);
 
             var cacheData = new FormAnswers
             {
@@ -288,7 +227,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             // Act
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessSubmission("form"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
             // Assert
             Assert.StartsWith("SubmitService::ProcessSubmission, An exception has occured while attemping to call ", result.Message);
@@ -300,7 +239,6 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             var guid = Guid.NewGuid();
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -316,8 +254,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
+            //_mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            //    .ReturnsAsync(schema);
 
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                .ReturnsAsync(new HttpResponseMessage
@@ -326,12 +264,8 @@ namespace form_builder_tests.UnitTests.Services
                    Content = new StringContent("\"1234456\"")
                });
 
-            _sessionHelper.Setup(_ => _.GetSessionGuid())
-                .Returns(guid.ToString());
-
-
             // Act
-            var result = await _service.ProcessSubmission("form");
+            var result = await _service.ProcessSubmission((new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }), "form", guid.ToString());
 
             // Assert
             var viewResult = Assert.IsType<SubmitServiceEntity>(result);

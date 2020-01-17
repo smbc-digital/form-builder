@@ -40,6 +40,7 @@ namespace form_builder
                 .ConfigureOrganisationProviders()
                 .AddHelpers()
                 .AddServices()
+                .AddWorkflows()
                 .AddSession(_ => _.IdleTimeout = TimeSpan.FromMinutes(30));
 
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();

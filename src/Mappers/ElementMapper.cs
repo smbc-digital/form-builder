@@ -60,8 +60,6 @@ namespace form_builder.Mappers
             return addressObject;
 
         }
-
-
         private static Address GetStreetElementValue(string key, FormAnswers formAnswers)
         {
             var addressObject = new Address();
