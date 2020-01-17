@@ -195,6 +195,7 @@ namespace form_builder.Services.PageService
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, sessionGuid);
                 formModel.Path = currentPage.PageSlug;
                 formModel.FormName = baseForm.FormName;
+                formModel.PageTitle = currentPage.Title;
                 return new ProcessRequestEntity
                 {
                     Page = currentPage,

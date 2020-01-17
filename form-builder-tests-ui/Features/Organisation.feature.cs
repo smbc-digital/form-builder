@@ -125,7 +125,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 29
  testRunner.And("I should see a \"th\" element with \"organisation-organisation-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 30
- testRunner.And("I should see a \"th\" element with \"opt-organisation-organisation-searchterm\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"th\" element with \"optorganisation-organisation-searchterm\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -160,7 +160,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 42
  testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 43
- testRunner.And("I select \"Organisation 3\" in \"opt-organisation-organisation\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I select \"Organisation 3\" in \"optorganisation-organisation\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 44
  testRunner.And("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 45
@@ -172,12 +172,11 @@ this.ScenarioInitialize(scenarioInfo);
 #line 48
  testRunner.And("I should see a \"th\" element with \"organisation-organisation-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 49
- testRunner.And("I should see a \"th\" element with \"opt-organisation-organisation-searchterm\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"th\" element with \"optorganisation-organisation-searchterm\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 50
- testRunner.And("I should see a \"th\" element with \"opt-organisation-organisation\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"th\" element with \"optorganisation-organisation\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 51
- testRunner.And("I should see a \"th\" element with \"opt-organisation-organisation-description\" text" +
-                    "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"th\" element with \"optorganisation-organisation-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }

@@ -15,7 +15,7 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then(@"I fill in page2")]
         public void ThenIFillInPage2()
         {
-            BrowserSession.FillIn("opt-organisation-organisation-searchterm").With("test org optional");
+            BrowserSession.FillIn("optorganisation-organisation-searchterm").With("test org optional");
         }
 
         [Then(@"I wait one second")]
