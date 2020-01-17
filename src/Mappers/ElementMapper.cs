@@ -18,10 +18,12 @@ namespace form_builder.Mappers
             {
                 case EElementType.DateInput:
                     return GetDateElementValue(key, formAnswers);
-                case EElementType.Address:
-                    return GetAddressElementValue(key, formAnswers);
                 case EElementType.TimeInput:
                     return GetTimeElementValue(key, formAnswers);
+                case EElementType.Address:
+                    return GetAddressElementValue(key, formAnswers);
+                case EElementType.Street:
+                    return GetStreetElementValue(key, formAnswers);
                 case EElementType.Organisation:
                     return GetOrganisationElementValue(key, formAnswers);
                 default:
@@ -33,7 +35,7 @@ namespace form_builder.Mappers
                     return value?.Response ?? "";
             }
         }
-        private static object GetAddressElementValue(string key, FormAnswers formAnswers)
+        private static Address GetAddressElementValue(string key, FormAnswers formAnswers)
         {
             var addressObject = new Address();
 
@@ -54,6 +56,25 @@ namespace form_builder.Mappers
             addressObject.Town = value.FirstOrDefault(_ => _.QuestionId == manualAddressLineTown)?.Response ?? string.Empty;
             addressObject.Postcode = value.FirstOrDefault(_ => _.QuestionId == manualAddressLinePostcode)?.Response ?? string.Empty;
             addressObject.PlaceRef = value.FirstOrDefault(_ => _.QuestionId == urpnKey)?.Response ?? string.Empty;
+
+            return addressObject;
+
+        }
+
+
+        private static Address GetStreetElementValue(string key, FormAnswers formAnswers)
+        {
+            var addressObject = new Address();
+
+            var uspnKey = $"{key}-streetaddress";
+            var streetDescription= $"{key}-streetaddress-description";
+
+            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+                .Where(_ => _.QuestionId == uspnKey || _.QuestionId == streetDescription)
+                .ToList();
+
+            addressObject.PlaceRef = value.FirstOrDefault(_ => _.QuestionId == uspnKey)?.Response ?? string.Empty;
+            addressObject.SelectedAddress = value.FirstOrDefault(_ => _.QuestionId == streetDescription)?.Response ?? string.Empty;
 
             return addressObject;
         }
