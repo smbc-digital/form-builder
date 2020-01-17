@@ -23,7 +23,7 @@ namespace form_builder.Models.Properties
         public string SelectLabel { get; set; } = string.Empty;
         public string Max { get; set; } = string.Empty;
         public string Min { get; set; } = string.Empty;
-
         public string TargetMapping { get; set; }
+        public string UpperLimitValidationMessage { get; set; } = string.Empty;
     }
 }

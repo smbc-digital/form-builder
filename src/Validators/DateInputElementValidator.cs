@@ -50,7 +50,7 @@ namespace form_builder.Validators
                         return new ValidationResult
                         {
                             IsValid = false,
-                            Message = $"Year must be less than or equal to {maxYear}"
+                            Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) ? element.Properties.UpperLimitValidationMessage : $"Year must be less than or equal to {maxYear}"
                         };
                 }
             }
