@@ -540,7 +540,7 @@ Image JSON example:
     * ValidationMessageRestrictFutureDate (*string*) (Set a custom validation message for when a user enters a date in the future)
     * ValidationMessageRestrictPastDate (*string*) (Set a custom validation message for when a user enters a date in the past)
     * ValidationMessageRestrictCurrentDate (*string*) (Set a custom validation message for when a user enters today's date)
-    * UpperLimitValidationMessage (*string*) (Set a custom validation message for when a user enters the year more than 100 years from         today)
+    * UpperLimitValidationMessage (*string*) (Set a custom validation message for when a user enters the year greater than 100 years           from today)
 
 Date Input example:
 ```json
