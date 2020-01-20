@@ -106,8 +106,10 @@ namespace form_builder.Services.PageService
 
             if (isAddressManual)
             {
-                var addressManualElememt = new AddressManual() { Properties = page.Elements[0].Properties, Type = EElementType.AddressManual };
-                page.Elements[0] = addressManualElememt;
+                var addressElement = page.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
+                var addressIndex = page.Elements.IndexOf(addressElement);
+                var manualAddressElement = new AddressManual { Properties = addressElement.Properties };
+                page.Elements[addressIndex] = manualAddressElement;
             }
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid);
