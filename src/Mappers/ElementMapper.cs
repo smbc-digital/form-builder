@@ -123,20 +123,20 @@ namespace form_builder.Mappers
 
             return new TimeSpan();
         }
-        private static string GetOrganisationElementValue(string key, FormAnswers formAnswers)
+        private static StockportGovUK.NetStandard.Models.Models.Verint.Organisation GetOrganisationElementValue(string key, FormAnswers formAnswers)
         {
-            dynamic dateObject = new ExpandoObject();
+            var dateObject = new StockportGovUK.NetStandard.Models.Models.Verint.Organisation();
             var organisationKey = $"{key}-organisation";
+            var organisationDescriptionKey = $"{key}-organisation-description";
 
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
-                .Where(_ => _.QuestionId == organisationKey)
-                .ToList()
-                .FirstOrDefault();
+                .Where(_ => _.QuestionId == organisationKey || _.QuestionId == organisationDescriptionKey)
+                .ToList();
 
-            if (value != null && !string.IsNullOrEmpty(value.Response))
-                return value.Response;
+            dateObject.Reference = value.FirstOrDefault(_ => _.QuestionId == organisationKey)?.Response ?? string.Empty;
+            dateObject.Name = value.FirstOrDefault(_ => _.QuestionId == organisationDescriptionKey)?.Response ?? string.Empty;
 
-            return string.Empty;
+            return dateObject;
         }
     }
 }
