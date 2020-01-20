@@ -17,7 +17,9 @@ namespace form_builder.Mappers
             switch (element.Type)
             {
                 case EElementType.DateInput:
-                    return GetDateElementValue(key, formAnswers);
+                    return GetDateInputElementValue(key, formAnswers);
+                case EElementType.DatePicker:
+                    return GetDatePickerElementValue(key, formAnswers);
                 case EElementType.TimeInput:
                     return GetTimeElementValue(key, formAnswers);
                 case EElementType.Address:
@@ -27,6 +29,10 @@ namespace form_builder.Mappers
                 case EElementType.Organisation:
                     return GetOrganisationElementValue(key, formAnswers);
                 default:
+                    if (element.Properties.Numeric)
+                    {
+                        return GetNumericElementValue(key, formAnswers);
+                    }
                     var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                        .Where(_ => _.QuestionId == key)
                        .ToList()
@@ -76,7 +82,7 @@ namespace form_builder.Mappers
 
             return addressObject;
         }
-        private static DateTime GetDateElementValue(string key, FormAnswers formAnswers)
+        private static DateTime GetDateInputElementValue(string key, FormAnswers formAnswers)
         {
             dynamic dateObject = new ExpandoObject();
             var dateDayKey = $"{key}-day";
@@ -137,6 +143,32 @@ namespace form_builder.Mappers
             dateObject.Name = value.FirstOrDefault(_ => _.QuestionId == organisationDescriptionKey)?.Response ?? string.Empty;
 
             return dateObject;
+        }
+        private static int? GetNumericElementValue(string key, FormAnswers formAnswers)
+        {
+            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+                .Where(_ => _.QuestionId == key)
+                .FirstOrDefault();
+
+            if (value == null || string.IsNullOrEmpty(value.Response))
+            {
+                return null;
+            }
+            return int.Parse(value.Response);
+        }
+
+        private static DateTime? GetDatePickerElementValue(string key, FormAnswers formAnswers)
+        {
+            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+                .Where(_ => _.QuestionId == key) 
+                .FirstOrDefault();
+
+            if (value == null || string.IsNullOrEmpty(value.Response))
+            {
+                return null;
+            }
+
+            return DateTime.Parse(value.Response);
         }
     }
 }
