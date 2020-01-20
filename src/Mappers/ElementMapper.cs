@@ -2,6 +2,7 @@
 using form_builder.Models;
 using form_builder.Models.Elements;
 using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
@@ -20,6 +21,8 @@ namespace form_builder.Mappers
                     return GetDateInputElementValue(key, formAnswers);
                 case EElementType.DatePicker:
                     return GetDatePickerElementValue(key, formAnswers);
+                case EElementType.Checkbox:
+                    return GetCheckboxElementValue(key, formAnswers); 
                 case EElementType.TimeInput:
                     return GetTimeElementValue(key, formAnswers);
                 case EElementType.Address:
@@ -82,7 +85,7 @@ namespace form_builder.Mappers
 
             return addressObject;
         }
-        private static DateTime GetDateInputElementValue(string key, FormAnswers formAnswers)
+        private static DateTime? GetDateInputElementValue(string key, FormAnswers formAnswers)
         {
             dynamic dateObject = new ExpandoObject();
             var dateDayKey = $"{key}-day";
@@ -103,9 +106,9 @@ namespace form_builder.Mappers
                 return DateTime.Parse($"{day}/{month}/{year}");
             }
 
-            return new DateTime();
+            return null;
         }
-        private static TimeSpan GetTimeElementValue(string key, FormAnswers formAnswers)
+        private static TimeSpan? GetTimeElementValue(string key, FormAnswers formAnswers)
         {
             dynamic dateObject = new ExpandoObject();
             var timeMinutesKey = $"{key}-minutes";
@@ -127,7 +130,7 @@ namespace form_builder.Mappers
                 return dateTime.TimeOfDay;
             }
 
-            return new TimeSpan();
+            return null;
         }
         private static StockportGovUK.NetStandard.Models.Models.Verint.Organisation GetOrganisationElementValue(string key, FormAnswers formAnswers)
         {
@@ -156,7 +159,6 @@ namespace form_builder.Mappers
             }
             return int.Parse(value.Response);
         }
-
         private static DateTime? GetDatePickerElementValue(string key, FormAnswers formAnswers)
         {
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
@@ -169,6 +171,18 @@ namespace form_builder.Mappers
             }
 
             return DateTime.Parse(value.Response);
+        }
+        private static List<string> GetCheckboxElementValue(string key, FormAnswers formAnswers)
+        {
+            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+                .Where(_ => _.QuestionId == key)
+                .FirstOrDefault();
+
+            if (value == null || string.IsNullOrEmpty(value.Response))
+            {
+                return new List<string>();
+            }
+            return value.Response.Split(",").ToList();
         }
     }
 }
