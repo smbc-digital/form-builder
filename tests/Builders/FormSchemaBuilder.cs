@@ -40,5 +40,11 @@ namespace form_builder_tests.Builders
             _formName = name;
             return this;
         }
+
+        public FormSchemaBuilder WithStartPageSlug(string slug)
+        {
+            _startPageSlug = slug;
+            return this;
+        }
     }
 }

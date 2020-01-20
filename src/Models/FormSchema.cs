@@ -1,4 +1,5 @@
-﻿using System;
+﻿using form_builder.Helpers.PageHelpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -25,6 +26,15 @@ namespace form_builder.Models
             }
             
             return page;
+        }
+
+        public void ValidateFormSchema(IPageHelper pageHelper, string form, string path)
+        {
+            if (path != StartPageSlug)
+                return;
+
+            pageHelper.hasDuplicateQuestionIDs(Pages, form);
+            pageHelper.CheckForInvalidQuestionOrTargetMappingValue(Pages, form);
         }
     }
 }

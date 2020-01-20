@@ -1,7 +1,6 @@
 ﻿using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
-using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.SubmitService.Entities;
 using Microsoft.Extensions.Logging;
@@ -12,20 +11,17 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Gateways.ComplimentsComplaintsServiceGateway;
-using StockportGovUK.NetStandard.Gateways.Response;
+using form_builder.Services.MappingService.Entities;
 
 namespace form_builder.Services.SubmtiService
 {
     public interface ISubmitService
     {
-        Task<SubmitServiceEntity> ProcessSubmission(string form);
+        Task<SubmitServiceEntity> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
     }
-
     public class SubmitService : ISubmitService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
-
-        private readonly ISchemaProvider _schemaProvider;
 
         private readonly IGateway _gateway;
 
@@ -37,10 +33,9 @@ namespace form_builder.Services.SubmtiService
 
         private readonly ILogger<SubmitService> _logger;
 
-        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, ISchemaProvider schemaProvider, IGateway gateway, IComplimentsComplaintsServiceGateway complimentsComplaintsServiceGateway, IPageHelper pageHelper, ISessionHelper sessionHelper)
+        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IComplimentsComplaintsServiceGateway complimentsComplaintsServiceGateway, IPageHelper pageHelper, ISessionHelper sessionHelper)
         {
             _distributedCache = distributedCache;
-            _schemaProvider = schemaProvider;
             _gateway = gateway;
             _complimentsComplaintsServiceGateway = complimentsComplaintsServiceGateway;
             _pageHelper = pageHelper;
@@ -48,34 +43,20 @@ namespace form_builder.Services.SubmtiService
             _logger = logger;
         }
 
-        public async Task<SubmitServiceEntity> ProcessSubmission(string form)
+        public async Task<SubmitServiceEntity> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-
-            if (string.IsNullOrEmpty(sessionGuid))
-            {
-                throw new ApplicationException($"A Session GUID was not provided.");
-            }
-
-            var baseForm = await _schemaProvider.Get<FormSchema>(form);
-            var formData = _distributedCache.GetString(sessionGuid);
-            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-            convertedAnswers.FormName = form;
-
-            var currentPage = baseForm.GetPage(convertedAnswers.Path);
-            var postUrl = currentPage.GetSubmitFormEndpoint(convertedAnswers);
-            var postData = CreatePostData(convertedAnswers);
             var reference = string.Empty;
 
+            var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
+            var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers);
 
-            if (postData.Form == "give-a-compliment" || postData.Form == "give-feedback" ||
-                postData.Form == "make-a-formal-complaint")
+            if (form == "give-a-compliment" || form == "give-feedback" || form == "make-a-formal-complaint")
             {
-                var response = await _complimentsComplaintsServiceGateway.SubmitForm(postUrl, postData);
+                var response = await _complimentsComplaintsServiceGateway.SubmitForm(postUrl, mappingEntity.Data);
 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    throw new ApplicationException($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
                 }
 
                 if (response.ResponseContent != null)
@@ -85,11 +66,11 @@ namespace form_builder.Services.SubmtiService
             }
             else
             {
-                var response = await _gateway.PostAsync(postUrl, postData);
+                var response = await _gateway.PostAsync(postUrl, mappingEntity.Data);
 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    throw new ApplicationException($"HomeController, Submit: An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
                 }
 
                 if (response.Content != null)
@@ -99,29 +80,27 @@ namespace form_builder.Services.SubmtiService
                 }
             }
 
-
-
             _distributedCache.Remove(sessionGuid);
             _sessionHelper.RemoveSessionGuid();
 
-            var page = baseForm.GetPage("success");
+            var page = mappingEntity.BaseForm.GetPage("success");
 
             if (page == null)
             {
                 return new SubmitServiceEntity
                 {
                     ViewName = "Submit",
-                    ViewModel = convertedAnswers,
-                    FeedbackFormUrl = baseForm.FeedbackForm
+                    ViewModel = mappingEntity.FormAnswers,
+                    FeedbackFormUrl = mappingEntity.BaseForm.FeedbackForm
                 };
             }
 
-            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
+            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), mappingEntity.BaseForm, sessionGuid);
             var success = new Success
             {
-                FormName = baseForm.FormName,
+                FormName = mappingEntity.BaseForm.FormName,
                 Reference = reference,
-                FormAnswers = convertedAnswers,
+                FormAnswers = mappingEntity.FormAnswers,
                 PageContent = viewModel.RawHTML,
                 SecondaryHeader = page.Title
             };
@@ -130,32 +109,8 @@ namespace form_builder.Services.SubmtiService
             {
                 ViewName = "Success",
                 ViewModel = success,
-                FeedbackFormUrl = baseForm.FeedbackForm
+                FeedbackFormUrl = mappingEntity.BaseForm.FeedbackForm
             };
-        }
-
-        private PostData CreatePostData(FormAnswers formAnswers)
-        {
-            var postData = new PostData
-            {
-                Form = formAnswers.FormName,
-                Answers = new List<Answers>()
-            };
-
-            if (formAnswers.Pages == null)
-            {
-                return postData;
-            }
-
-            foreach (var page in formAnswers.Pages)
-            {
-                foreach (var a in page.Answers)
-                {
-                    postData.Answers.Add(a);
-                }
-            }
-
-            return postData;
         }
     }
 }

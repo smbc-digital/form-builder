@@ -6,9 +6,7 @@ using form_builder.Validators;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
@@ -54,16 +52,12 @@ namespace form_builder.Models.Elements
         {
             foreach (var validator in form_builder)
             {
-                var fields = GetAllQuestionIds(this, viewModel);
-                foreach (var field in fields)
-                {
-                    var result = validator.Validate(this, viewModel);
+                var result = validator.Validate(this, viewModel);
 
-                    if (!result.IsValid)
-                    {
-                        validationResult = result;
-                        return;
-                    }
+                if (!result.IsValid)
+                {
+                    validationResult = result;
+                    return;
                 }
             }
         }
@@ -245,32 +239,6 @@ namespace form_builder.Models.Elements
            
             
             return viewRender.RenderAsync(Type.ToString(), this, null);
-        }
-
-        public List<Element> GetAllQuestionIds(Element element, Dictionary<string, string> viewModel)
-        {
-            var list = viewModel.Where(x => x.Key.StartsWith(element.Properties.QuestionId)).ToList();
-            var elementList = new List<Element>();
-
-            foreach ( var value in list)
-            {
-                var newElement = new Element
-                {
-                    Type = element.Type,
-                    Properties = new BaseProperty
-                    {
-                        Value = element.Properties.Value,
-                        QuestionId = element.Properties.QuestionId
-                    }
-                };
-
-                newElement.Properties.QuestionId = value.Key;
-                newElement.Properties.Value = value.Value;
-
-                elementList.Add(newElement);
-            }
-
-            return elementList;
         }
 
         private bool DisplayOptional

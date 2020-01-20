@@ -47,7 +47,7 @@ namespace form_builder.Services.StreetService
 
             if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
             {
-                _pageHelper.SaveAnswers(viewModel, guid);
+                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL);
                 return new ProcessRequestEntity
                 {
                     Page = currentPage
@@ -91,7 +91,7 @@ namespace form_builder.Services.StreetService
                 };
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid);
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL);
             return await _pageHelper.ProcessStreetJourney(journey, currentPage, viewModel, baseForm, guid, streetResults);
         }
     }

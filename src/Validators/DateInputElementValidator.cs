@@ -40,8 +40,20 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out _);
+            var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out DateTime date);
 
+            if (isValidDate)
+            {
+                var maxYear = DateTime.Now.Year + 100;
+                if (date.Year > maxYear)
+                {
+                        return new ValidationResult
+                        {
+                            IsValid = false,
+                            Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) ? element.Properties.UpperLimitValidationMessage : $"Year must be less than or equal to {maxYear}"
+                        };
+                }
+            }
 
             return new ValidationResult
             {

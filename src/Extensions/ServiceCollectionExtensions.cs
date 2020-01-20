@@ -12,11 +12,13 @@ using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
 using form_builder.Services.AddressService;
+using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService;
 using form_builder.Services.StreetService;
 using form_builder.Services.SubmtiService;
 using form_builder.Validators;
+using form_builder.Workflows;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -49,7 +51,6 @@ namespace form_builder.Extensions
             services.AddTransient<IElementValidator, RegexElementValidator>();
             services.AddTransient<IElementValidator, RequiredIfValidator>();
             services.AddTransient<IElementValidator, TimeInputValidator>();
-            services.AddTransient<IElementValidator, RequiredIfValidator>();
             services.AddTransient<IElementValidator, MaxLengthValidator>();
 
             return services;
@@ -118,6 +119,14 @@ namespace form_builder.Extensions
             services.AddSingleton<IStreetService, StreetService>();
             services.AddSingleton<ISubmitService, SubmitService>();
             services.AddSingleton<IOrganisationService, OrganisationService>();
+            services.AddSingleton<IMappingService, MappingService>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddWorkflows(this IServiceCollection services)
+        {
+            services.AddSingleton<ISubmitWorkflow, SubmitWorkflow>();
 
             return services;
         }

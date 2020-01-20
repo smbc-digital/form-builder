@@ -27,7 +27,7 @@ Scenario: Organisation standard use
 	Then I should see a "th" element with "organisation-organisation-searchterm" text
 	And I should see a "th" element with "organisation-organisation" text
 	And I should see a "th" element with "organisation-organisation-description" text
-	And I should see a "th" element with "opt-organisation-organisation-searchterm" text
+	And I should see a "th" element with "optorganisation-organisation-searchterm" text
 
 Scenario: I enter organisation in optional and select an organisation in the dropdown should display the success page
 	Given I navigate to "/organisation/page1"
@@ -40,12 +40,12 @@ Scenario: I enter organisation in optional and select an organisation in the dro
 	Then I fill in page2
 	Then I click the "nextStep" button
 	And I wait one second
-	And I select "Organisation 3" in "opt-organisation-organisation" dropdown
+	And I select "Organisation 3" in "optorganisation-organisation" dropdown
 	And I click the "nextStep" button
 	Then I wait one second
 	Then I should see a "th" element with "organisation-organisation-searchterm" text
 	And I should see a "th" element with "organisation-organisation" text
 	And I should see a "th" element with "organisation-organisation-description" text
-	And I should see a "th" element with "opt-organisation-organisation-searchterm" text
-	And I should see a "th" element with "opt-organisation-organisation" text
-	And I should see a "th" element with "opt-organisation-organisation-description" text
+	And I should see a "th" element with "optorganisation-organisation-searchterm" text
+	And I should see a "th" element with "optorganisation-organisation" text
+	And I should see a "th" element with "optorganisation-organisation-description" text

@@ -4,20 +4,20 @@ using form_builder.Enum;
 using System.Threading.Tasks;
 using System;
 using form_builder.Services.PageService;
-using form_builder.Services.SubmtiService;
 using form_builder.Extensions;
+using form_builder.Workflows;
 
 namespace form_builder.Controllers
 {
     public class HomeController : Controller
     {
         private readonly IPageService _pageService;
-        private readonly ISubmitService _submitService;
+        private readonly ISubmitWorkflow _submitWorkflow;
 
-        public HomeController(IPageService pageService, ISubmitService submitService)
+        public HomeController(IPageService pageService, ISubmitWorkflow submitWorkflow)
         {
             _pageService = pageService;
-            _submitService = submitService;
+            _submitWorkflow = submitWorkflow;
         }
 
         [HttpGet]
@@ -128,7 +128,7 @@ namespace form_builder.Controllers
         [Route("{form}/submit")]
         public async Task<IActionResult> Submit(string form)
         {
-            var result = await _submitService.ProcessSubmission(form);
+            var result = await _submitWorkflow.Submit(form);
 
             ViewData["BannerTypeformUrl"] = result.FeedbackFormUrl;
             return View(result.ViewName, result.ViewModel);

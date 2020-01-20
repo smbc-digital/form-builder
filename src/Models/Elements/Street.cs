@@ -56,7 +56,7 @@ namespace form_builder.Models.Elements
                 return await viewRender.RenderAsync("StreetSelect", new Tuple<ElementViewModel, List<AddressSearchResult>>(viewElement, addressSearchResults));
             }
 
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
+            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-street");
             return await viewRender.RenderAsync("StreetSearch", this);
         }
     }

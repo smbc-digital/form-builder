@@ -54,7 +54,7 @@ namespace form_builder.Extensions
                 }
                 else
                 {
-                    normalisedFormData.Add(item.Key, string.Join(", ", item.Value));
+                    normalisedFormData.Add(item.Key, string.Join(",", item.Value));
                 }
             }
 

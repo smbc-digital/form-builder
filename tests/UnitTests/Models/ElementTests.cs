@@ -214,34 +214,5 @@ namespace form_builder_tests.UnitTests.Models
             Assert.Contains($"{questionId}-hint", result);
             Assert.Contains($"{questionId}-error", result);
         }
-
-        [Fact]
-        public void GetAllQuestionIds_ShouldReturnArrayWithThreeItems_WhenElementHasThreeInputs()
-        {
-            var questionId = "date";
-
-            var element = new ElementBuilder()
-                            .WithType(EElementType.DateInput)
-                            .WithQuestionId(questionId)
-                            .Build();
-
-            var viewModel = new Dictionary<string, string>();
-            viewModel.Add(questionId + "-day", "daytest");
-            viewModel.Add(questionId + "-month", "monthtest");
-            viewModel.Add(questionId + "-year", "yeartest");
-
-            var result = element.GetAllQuestionIds(element, viewModel);
-
-            Assert.NotNull(result);
-            Assert.Equal(3, result.Count);
-
-            Assert.Equal("date-day", result[0].Properties.QuestionId);
-            Assert.Equal("date-month", result[1].Properties.QuestionId);
-            Assert.Equal("date-year", result[2].Properties.QuestionId);
-
-            Assert.Equal("daytest", result[0].Properties.Value);
-            Assert.Equal("monthtest", result[1].Properties.Value);
-            Assert.Equal("yeartest", result[2].Properties.Value);
-        }
     }
 }

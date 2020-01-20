@@ -14,7 +14,7 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then(@"I fill in page1")]
         public void ThenIFillInPage1()
         {
-            BrowserSession.FillIn("customers-street-street").With("Green");
+            BrowserSession.FillIn("customersstreet-street").With("Green");
         }
 
         [Then(@"I should see a ""(.*)"" element with ""(.*)"" text")]
