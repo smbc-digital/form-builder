@@ -33,7 +33,7 @@ namespace form_builder.Validators
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = $"{element.Properties.Label} must be a number"
+                    Message = $"{element.Properties.Label} must be a whole number"
                 };
             }
 
