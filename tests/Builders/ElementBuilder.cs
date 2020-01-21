@@ -72,8 +72,7 @@ namespace form_builder_tests.Builders
             _property.AltText = alt;
             return this;
         }
-
-
+        
         public ElementBuilder WithMaxLength(int maxLength)
         {
             _property.MaxLength = maxLength;
@@ -190,6 +189,12 @@ namespace form_builder_tests.Builders
         public ElementBuilder WithMin(string value)
         {
             _property.Min = value;
+            return this;
+        }
+
+        public ElementBuilder WithButtonId(string buttonId)
+        {
+            _property.ButtonId = buttonId;
             return this;
         }
     }

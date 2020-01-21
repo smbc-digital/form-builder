@@ -108,7 +108,7 @@ namespace form_builder.Services.PageService
             {
                 var addressElement = page.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
                 var addressIndex = page.Elements.IndexOf(addressElement);
-                var manualAddressElement = new AddressManual { Properties = addressElement.Properties };
+                var manualAddressElement = new AddressManual { Properties = addressElement.Properties, Type = EElementType.AddressManual };
                 page.Elements[addressIndex] = manualAddressElement;
             }
 
@@ -124,7 +124,7 @@ namespace form_builder.Services.PageService
                 };
             }
 
-            if (page.Elements.Any(_ => _.Type == EElementType.Address))
+            if (page.Elements.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.AddressManual))
             {
                 viewModel.AddressStatus = "Search";
                 return new ProcessPageEntity
@@ -169,8 +169,10 @@ namespace form_builder.Services.PageService
 
             if (processManual)
             {
-                var addressManualElememt = new AddressManual() { Properties = currentPage.Elements[0].Properties, Type = EElementType.AddressManual };
-                currentPage.Elements[0] = addressManualElememt;
+                var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
+                var addressIndex = currentPage.Elements.IndexOf(addressElement);
+                var manualAddressElement = new AddressManual { Properties = addressElement.Properties, Type = EElementType.AddressManual };
+                currentPage.Elements[addressIndex] = manualAddressElement;
             }
 
             currentPage.Validate(viewModel, _validators);
