@@ -37,6 +37,15 @@ namespace form_builder.Validators
                 };
             }
 
+            if(value.Length > element.Properties.MaxLength)
+            {
+                return new ValidationResult
+                {
+                    IsValid = false,
+                    Message = $"{element.Properties.Label} must be {element.Properties.MaxLength} digits or less"
+                };
+            }
+
             if (!string.IsNullOrEmpty(element.Properties.Max) && !string.IsNullOrEmpty(element.Properties.Min))
             {
                 var max = int.Parse(element.Properties.Max);
