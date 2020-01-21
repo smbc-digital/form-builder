@@ -21,7 +21,7 @@
 }
 @if (Model.Properties.Numeric)
 {
-    <input type="number" id="@id" name="@id" max="@max" min="@min" step="1" value="@Model.Properties.Value" maxlength="@Model.Properties.MaxLength.ToString()"/>
+    <input type="number" id="@id" name="@id" max="@max" min="@min" value="@Model.Properties.Value" maxlength="@Model.Properties.MaxLength.ToString()"/>
 }
 else
 {
