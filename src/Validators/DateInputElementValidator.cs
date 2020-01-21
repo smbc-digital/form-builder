@@ -9,7 +9,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
-            if (element.Type != EElementType.DateInput || element.Properties.Optional)
+            if (element.Type != EElementType.DateInput)
             {
                 return new ValidationResult
                 {
@@ -28,6 +28,16 @@ namespace form_builder.Validators
             var valueYear = viewModel.ContainsKey($"{element.Properties.QuestionId}-year")
                 ? viewModel[$"{element.Properties.QuestionId}-year"]
                 : null;
+
+            var isOptional = string.IsNullOrEmpty(valueDay) && string.IsNullOrEmpty(valueMonth) && string.IsNullOrEmpty(valueYear) && element.Properties.Optional;
+
+            if (isOptional)
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            }
 
             var isValid = !string.IsNullOrEmpty(valueDay) || !string.IsNullOrEmpty(valueMonth) || !string.IsNullOrEmpty(valueYear);
 
