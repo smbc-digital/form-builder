@@ -73,6 +73,90 @@ Example JSON:
         ]
     }
 ```
+## Target Mapping
+
+Example JSON:
+```json
+    {
+        "Elements": [
+            {
+                "Type": "Textbox",
+                "Properties":
+                {
+                    "Label": "Enter your first name",
+                    "Name": "firstName",
+                    "QuestionId": "first-name",
+                    "TargetMapping": "customer.firstname"
+                }
+            }
+        ]
+    }
+```
+When building elements you have the ability to map the answer to custom properties. To allow for this you can specify a `"TargetMapping"` property which will be used to map the answer too. The example above would map the firstName textbox to a Customer object with the firstname property. The ability to map multiple questions to the same field is also posibile. An example below shows a custom mapping.
+
+Target Mapping EXample:
+```json
+    {
+        "Elements": [
+            {
+                ...
+                "Properties":
+                {
+                    ...
+                    "TargetMapping": "customer.firstname"
+                }
+            },
+            {
+                ...
+                "Properties":
+                {
+                    ...
+                    "TargetMapping": "customer.lastname"
+                }
+            },
+            {
+                ...
+                "Properties":
+                {
+                    ...
+                    "TargetMapping": "customer.additionalinfomation"
+                }
+            },
+            {
+                ...
+                "Properties":
+                {
+                    ...
+                    "TargetMapping": "customer.additionalinfomation"
+                }
+            },
+             {
+                ...
+                "Properties":
+                {
+                    ...
+                    "TargetMapping": "one.two.three"
+                }
+            }
+        ]
+    }
+```
+The target mapping above would produce this object
+```json
+    {
+        customer: {
+            lastname: "",
+            firstname: "",
+            additionalinfomation: ""
+        },
+        one: {
+            two: {
+                three: ""
+            }
+        }
+    }
+```
+
 * **Type** (*string*) (HTML element)
     * [H2-H6](#headingprops) (Heading levels)
     * [P](#ptextprops) (Paragraph text)
@@ -686,8 +770,8 @@ Street example:
 
 #
 * <a name="Time">**Time**</a>
-  * QuestionId (*string) __*__
-  * Label (*string) __*__
+  * QuestionId (*string*) __*__
+  * Label (*string*) __*__
   * Hint (*string*) 
   * ValidationMessageInvalidTime (*string*) 
   * CustomValidationMessage (*string*)
