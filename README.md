@@ -144,14 +144,14 @@ Target Mapping EXample:
 The target mapping above would produce this object
 ```json
     {
-        customer: {
-            lastname: "",
-            firstname: "",
-            additionalinfomation: ""
+        "customer": {
+            "lastname": "",
+            "firstname": "",
+            "additionalinfomation": ""
         },
-        one: {
-            two: {
-                three: ""
+        "one": {
+            "two": {
+                "three": ""
             }
         }
     }
