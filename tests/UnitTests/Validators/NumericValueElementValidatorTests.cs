@@ -120,5 +120,25 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.False(result.IsValid);
             Assert.Equal($"{label} must be between 10 and 20 inclusive", result.Message);
         }
+
+        [Fact]
+        public void Validate_ShouldReturnFalseValidationResult_WhenGreaterThanMaxLength()
+        {
+            var label = "Test label";
+            var element = new ElementBuilder()
+                .WithQuestionId("test-id")
+                .WithNumeric(true)
+                .WithLabel(label)
+                .WithMaxLength(7)
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add("test-id", "12345678");
+
+            var result = _validator.Validate(element, viewModel);
+
+            Assert.False(result.IsValid);
+            Assert.Equal($"{label} must be 7 digits or less", result.Message);
+        }
     }
 }
