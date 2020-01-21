@@ -127,6 +127,7 @@ Paragraph text JSON example:
         * Optional (*boolean*) (defaults to false)
         * Regex (*string*) - The regex pattern to use
         * RegexValidationMessage (*string*) -  The validation message that appears if the input does not match the Regex pattern         (Default: Check the {Label} and try again)
+        * TargetMapping (*string*)  
         
 ### Textbox JSON example (has to be a valid UK National Insurance Number):
 ```json
@@ -140,6 +141,7 @@ Paragraph text JSON example:
       "MaxLength": 9,
       "Regex": "^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$",
       "RegexValidationMessage": "Enter a valid NI Number"
+      "TargetMapping": "customer.ninumber"
     }
   }
 ```
@@ -150,6 +152,7 @@ Paragraph text JSON example:
         * MaxLength (*int*) (defaulted to 200)
         * Optional (*boolean*) (need to be set as true)
         * RequiredIf (*string*)
+        * TargetMapping (*string*)  
         
 ### Textbox JSON example when required if is being used:
 ```json
@@ -174,6 +177,7 @@ Paragraph text JSON example:
         * Numeric (*boolean*) (need this to validate it as an email address)
         * Max (*string*) (maxium value in integer e.g '25')
         * Min (*string*) (maxium value in integer e.g '0')
+        * TargetMapping (*string*)  
         
 Textbox Numeric JSON example:
 ```json
@@ -200,6 +204,7 @@ Textbox Numeric JSON example:
         * MaxLength (*int*) (defaulted to 200)
         * Optional (*boolean*) (defaults to false)
         * Email (*boolean*) (need this to validate it as an email address)
+        * TargetMapping (*string*)  
         
 Textbox JSON example:
 ```json
@@ -225,6 +230,7 @@ Textbox JSON example:
         * MaxLength (*int*) (defaulted to 200)
         * Optional (*boolean*) (defaults to false)
         * Postcode (*boolean*) (need this to validate it as a postcode e.g. L15 3HJ)
+        * TargetMapping (*string*)  
         
 Textbox JSON example:
 ```json
@@ -250,6 +256,7 @@ Textbox JSON example:
         * MaxLength (*int*) (defaulted to 200)
         * Optional (*boolean*) (defaults to false)
         * StockportPostcode (*boolean*) (need this to validate it as a Stockport postcode e.g. SK1 3HJ)
+        * TargetMapping (*string*)  
         
 Textbox JSON example:
 ```json
@@ -274,6 +281,7 @@ Textbox JSON example:
         * Hint (*string*)
         * MaxLength (*int*) (defaults to 200)
         * Optional (*boolean*) (defaults to false)
+        * TargetMapping (*string*)  
 
 Textarea (Email) JSON example:
 ```json
@@ -300,6 +308,7 @@ Textarea (Email) JSON example:
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * Optional (*boolean*)
+        * TargetMapping (*string*)  
  
  Radio JSON example:
  ```json
@@ -334,6 +343,7 @@ Textarea (Email) JSON example:
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * Optional (*boolean*)
+        * TargetMapping (*string*)  
 ```json
 {
           "Type": "Select",
@@ -387,6 +397,7 @@ Textarea (Email) JSON example:
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * Optional (*boolean*)
+        * TargetMapping (*string*)  
 
   Checkbox JSON example:
   ```json
@@ -541,6 +552,7 @@ Image JSON example:
     * ValidationMessageRestrictPastDate (*string*) (Set a custom validation message for when a user enters a date in the past)
     * ValidationMessageRestrictCurrentDate (*string*) (Set a custom validation message for when a user enters today's date)
     * UpperLimitValidationMessage (*string*) (Set a custom validation message for when a user enters the year greater than 100 years           from today)
+    * TargetMapping (*string*)  
 
 Date Input example:
 ```json
@@ -568,6 +580,7 @@ Date Input example:
     * RestrictPastDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the past)
     * RestrictCurrentDate (*boolean*) (Defaults to false. If true, it will prevent users entering today's date)
     * CustomValidationMessage (*string*) (Set a custom validation message for when a user doesn't input a date)
+    * TargetMapping (*string*)  
 
 Date Picker example:
 ```json
@@ -597,6 +610,7 @@ Date Picker example:
     * Optional (*boolean*)
     * CustomValidationMessage (*string*) (Set a custom validation message for when user does not enter a postode)
     * SelectCustomValidationMessage (*string*) (Set a custom validation message for when user does not select an address from the             dropdown)
+    * TargetMapping (*string*)  
 
 Address example:
 ```json
@@ -625,6 +639,7 @@ Address example:
     * SelectLabel (*string*) (Default: Street)
     * MaxLength (*string*) (Default: 200)
     * Optional (*boolean*) (Default: false)
+    * TargetMapping (*string*)  
 
 Street example:
 ```json
@@ -651,6 +666,7 @@ Street example:
     * SelectHint (*string*) (Hint message when a user is selecting an organisation from the dropdown)
     * MaxLength (*string*) (Default: 200)
     * Optional (*boolean*) (Default: false)
+    * TargetMapping (*string*)  
 
 Street example:
 ```json
@@ -677,6 +693,7 @@ Street example:
   * CustomValidationMessage (*string*)
   * CustomValidationMessageAmPm (*string*)
   * Optional (*boolean*) defaults to false
+  * TargetMapping (*string*)  
   
 
 Time example
