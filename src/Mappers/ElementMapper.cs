@@ -182,7 +182,8 @@ namespace form_builder.Mappers
             {
                 return new List<string>();
             }
-            return value.Response.Split(",").ToList();
+            var val =  value.Response.Split(",").ToList();
+            return val;
         }
     }
 }
