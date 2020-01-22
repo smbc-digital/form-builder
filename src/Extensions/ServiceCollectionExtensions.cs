@@ -16,6 +16,7 @@ using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService;
 using form_builder.Services.StreetService;
+using form_builder.Services.SubmitAndPayService;
 using form_builder.Services.SubmtiService;
 using form_builder.Validators;
 using form_builder.Workflows;
@@ -118,6 +119,7 @@ namespace form_builder.Extensions
             services.AddSingleton<IPageService, PageService>();
             services.AddSingleton<IStreetService, StreetService>();
             services.AddSingleton<ISubmitService, SubmitService>();
+            services.AddSingleton<ISubmitAndPayService, SubmitAndPayService>();
             services.AddSingleton<IOrganisationService, OrganisationService>();
             services.AddSingleton<IMappingService, MappingService>();
 
@@ -148,6 +150,7 @@ namespace form_builder.Extensions
         public static IServiceCollection AddIOptionsConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<DisallowedAnswerKeysConfiguration>(configuration.GetSection("FormConfig"));
+            services.Configure<PaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
             services.Configure<DistrbutedCacheConfiguration>(cacheOptions => cacheOptions.Expiration = configuration.GetValue<int>("DistrbutedCacheExpiration"));
 
             return services;

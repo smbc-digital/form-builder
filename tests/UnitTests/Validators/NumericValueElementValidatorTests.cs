@@ -57,7 +57,7 @@ namespace form_builder_tests.UnitTests.Validators
             var result = _validator.Validate(element, viewModel);
 
             Assert.False(result.IsValid);
-            Assert.Equal($"{label} must be a number", result.Message);
+            Assert.Equal($"{label} must be a whole number", result.Message);
         }
 
         [Fact]

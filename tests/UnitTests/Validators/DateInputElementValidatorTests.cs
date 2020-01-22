@@ -80,5 +80,26 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.False(result.IsValid);
             Assert.Equal($"Year must be less than or equal to { maxYear}", result.Message);
         }
+
+        [Fact]
+        public void Validate_ShouldReturnFalse_WhenYearIsGreaterThanMax_AndIsOptional()
+        {
+            var element = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithOptional(true)
+                .WithQuestionId("test")
+                .Build();
+
+            var maxYear = DateTime.Now.Year + 100;
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add("test-day", "12");
+            viewModel.Add("test-month", "12");
+            viewModel.Add("test-year", "2920");
+
+            var result = _dateInputElementValidator.Validate(element, viewModel);
+
+            Assert.False(result.IsValid);
+            Assert.Equal($"Year must be less than or equal to { maxYear}", result.Message);
+        }
     }
 }

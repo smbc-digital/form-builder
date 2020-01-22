@@ -904,6 +904,11 @@ The form builder app has UI tests to ensure that the UI is expected. Our UI Test
 $ make ui-test
 ```
 
+It is also possible to run just a specific test case rather then running the whole ui-test suite, this is made possible by running the `ui-test-feature` make command. with a FEATURE paramater as the test suite to run. The example below runs only the organisation ui-tests.
+```console
+$ make FEATURE=organisation ui-test-feature
+```
+
 without make you can also run the UI Test locally by running the two commands listed below
 
 ```console
