@@ -67,7 +67,12 @@ namespace form_builder.Models
         public string GetSubmitFormEndpoint(FormAnswers formAnswers)
         {
             var submitBehaviour = string.Empty;
+
             var pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitForm);
+            if (pageSubmitBehaviours.Count == 0)
+            {
+                pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitAndPay);
+            }
 
             if (Behaviours.Count > 1)
             {

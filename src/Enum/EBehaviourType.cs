@@ -5,6 +5,7 @@
         Unknown,
         GoToPage,
         SubmitForm,
-        GoToExternalPage
+        GoToExternalPage,
+        SubmitAndPay
     }
 }

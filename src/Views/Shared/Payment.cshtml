@@ -1,0 +1,9 @@
+﻿@model form_builder.Models.Elements.Element
+
+<p>@Html.Raw(Model.Properties.QuestionId)</p>
+<p>@Html.Raw(Model.Properties.Label)</p>
+<p>@Html.Raw(Model.Properties.Hint)</p>
+@Html.Hidden("CatalogueId", Model.Properties.QuestionId)
+@Html.Hidden("AccountReference", Model.Properties.Label)
+@Html.Hidden("Cost", Model.Properties.Hint)
+
