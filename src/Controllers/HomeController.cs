@@ -152,10 +152,9 @@ namespace form_builder.Controllers
             var catId = ((form_builder.Models.Success)result.ViewModel).FormAnswers.Pages[1].Answers[1].Response;
             var accRef = ((form_builder.Models.Success)result.ViewModel).FormAnswers.Pages[1].Answers[2].Response;
             var payAmount = ((form_builder.Models.Success)result.ViewModel).FormAnswers.Pages[1].Answers[3].Response;
+            var path = ((Models.Success)result.ViewModel).FormAnswers.Path;
 
-            return Redirect(await _submitAndPayService.GeneratePaymentUrl(reference, form, "page-two", catId, accRef, payAmount));
-            //ViewData["BannerTypeformUrl"] = result.FeedbackFormUrl;
-            //return View(result.ViewName, result.ViewModel);
+            return Redirect(await _submitAndPayService.GeneratePaymentUrl(reference, form, path, catId, accRef, payAmount));
         }
 
         [HttpGet]

@@ -99,9 +99,6 @@ namespace form_builder.Services.SubmitAndPayService
             //var payResponse = GeneratePaymentUrl(reference, form, "page-two");
 
             
-            //_distributedCache.Remove(sessionGuid);
-            //_sessionHelper.RemoveSessionGuid();
-
             var page = baseForm.GetPage("success");
 
             if (page == null)
@@ -172,8 +169,11 @@ namespace form_builder.Services.SubmitAndPayService
             if (civicaResponse.StatusCode != HttpStatusCode.OK)
                 throw new System.Exception();
 
-            return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, sessionGuid);
+            //is this the right time and place to clear down the guid if an unsuccessful payment was made.
+            _distributedCache.Remove(sessionGuid);
+            _sessionHelper.RemoveSessionGuid();
 
+            return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, sessionGuid);
         }
 
         private object CreatePostData(FormAnswers formAnswers, FormSchema formSchema)
