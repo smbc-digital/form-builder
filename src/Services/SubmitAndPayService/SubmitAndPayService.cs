@@ -45,9 +45,12 @@ namespace form_builder.Services.SubmitAndPayService
         private readonly ICivicaPayGateway _civicaPayGateway;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _environment;
-        private readonly PaymentConfiguration _paymentConfig;
+        private readonly CivicaPaymentConfiguration _paymentConfig;
+        private readonly PaymentInformationConfiguration _paymentInformationConfig;
 
-        public SubmitAndPayService(ILogger<SubmitAndPayService> logger, IDistributedCacheWrapper distributedCache, ISchemaProvider schemaProvider, IGateway gateway, IComplimentsComplaintsServiceGateway complimentsComplaintsServiceGateway, IPageHelper pageHelper, ISessionHelper sessionHelper, ICivicaPayGateway civicaPayGateway, IHttpContextAccessor httpContextAccessor, IHostingEnvironment environment, IOptions<PaymentConfiguration> paymentConfiguration)
+
+
+        public SubmitAndPayService(ILogger<SubmitAndPayService> logger, IDistributedCacheWrapper distributedCache, ISchemaProvider schemaProvider, IGateway gateway, IComplimentsComplaintsServiceGateway complimentsComplaintsServiceGateway, IPageHelper pageHelper, ISessionHelper sessionHelper, ICivicaPayGateway civicaPayGateway, IHttpContextAccessor httpContextAccessor, IHostingEnvironment environment, IOptions<CivicaPaymentConfiguration> paymentConfiguration, IOptions<PaymentInformationConfiguration> paymentInformationConfiguration)
         {
             _distributedCache = distributedCache;
             _schemaProvider = schemaProvider;
@@ -60,6 +63,7 @@ namespace form_builder.Services.SubmitAndPayService
             _httpContextAccessor = httpContextAccessor;
             _environment = environment;
             _paymentConfig = paymentConfiguration.Value;
+            _paymentInformationConfig = paymentInformationConfiguration.Value;
         }
 
         public async Task<SubmitAndPayServiceEntity> ProcessSubmission(string form)
@@ -137,6 +141,13 @@ namespace form_builder.Services.SubmitAndPayService
             var pageData = formData.GetPage(path);
             //var pageSlug = pageData.GetNextPage(new Dictionary<string, string>()).PageSlug;
             //var pageProperties = pageData.Elements.First(_ => _.Type == EElementType.Payment);
+
+            //linq statement to pull out account ref, amount and cat id when you give it a form name 
+            // var paymentInfo = _paymentInformationConfig.PaymentInformationConfigurations; returns null, is it not correctly pulling from the json?
+
+            var paymentInfo = _paymentInformationConfig.PaymentInformationConfigurations.Select(x => x).Where(config => config.formName == form);
+
+            //_paymentInformationConfig.PaymentInformationConfigurations[0].settings.accountReference;
 
             var bucket = new CreateImmediateBasketRequest
             {

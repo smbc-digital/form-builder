@@ -1,6 +1,6 @@
 ﻿namespace form_builder.Configuration
 {
-    public class PaymentConfiguration
+    public class CivicaPaymentConfiguration
     {
         public string CustomerId { get; set; }
         public string ApiPassword { get; set; }

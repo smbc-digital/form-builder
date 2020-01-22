@@ -150,7 +150,8 @@ namespace form_builder.Extensions
         public static IServiceCollection AddIOptionsConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<DisallowedAnswerKeysConfiguration>(configuration.GetSection("FormConfig"));
-            services.Configure<PaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
+            services.Configure<CivicaPaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
+            services.Configure<PaymentInformationConfiguration>(configuration.GetSection("PaymentInformationConfiguration"));
             services.Configure<DistrbutedCacheConfiguration>(cacheOptions => cacheOptions.Expiration = configuration.GetValue<int>("DistrbutedCacheExpiration"));
 
             return services;
