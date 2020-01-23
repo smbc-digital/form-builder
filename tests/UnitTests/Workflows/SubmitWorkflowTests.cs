@@ -40,7 +40,7 @@ namespace form_builder_tests.UnitTests.Workflows
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
 
             // Act
-            var result = _workflow.Submit("form");
+            var result = await _workflow.Submit("form");
 
             // Assert
             _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Once);

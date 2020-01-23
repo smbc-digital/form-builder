@@ -156,7 +156,7 @@ namespace form_builder.Controllers
 
         [HttpGet]
         [Route("{form}/{path}/payment-response")]
-        public async Task<IActionResult> HandlePaymentResponse(string form, string path, [FromQuery]string responseCode, [FromQuery]string callingAppTxnRef)
+        public IActionResult HandlePaymentResponse(string form, string path, [FromQuery]string responseCode, [FromQuery]string callingAppTxnRef)
         {
             //Not currently handled.
             if (responseCode != "00000")
