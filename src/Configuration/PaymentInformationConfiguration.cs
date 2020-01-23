@@ -4,19 +4,20 @@ namespace form_builder.Configuration
 {
     public class PaymentInformationConfiguration
     {
-        public List<PaymentInformation> PaymentInformationConfigurations { get; set; }
+        public List<PaymentInformation> PaymentConfigs { get; set; }
 
-        public class PaymentInformation
-        {
-            public string formName { get; set; }
-            public Settings settings { get; set; }
-        }
+    }
 
-        public class Settings
-        {
-            public string accountReference { get; set; }
-            public string amount { get; set; }
-            public string catalogueId { get; set; }
-        }
+    public class PaymentInformation
+    {
+        public string FormName { get; set; }
+        public Settings Settings { get; set; }
+    }
+
+    public class Settings
+    {
+        public string AccountReference { get; set; }
+        public string Amount { get; set; }
+        public string CatalogueId { get; set; }
     }
 }

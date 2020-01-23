@@ -30,7 +30,7 @@ namespace form_builder.Services.SubmitAndPayService
     public interface ISubmitAndPayService
     {
         Task<SubmitAndPayServiceEntity> ProcessSubmission(string form);
-        Task<string> GeneratePaymentUrl(string reference, string form, string path, string catId, string accRef, string payAmount);
+        Task<string> GeneratePaymentUrl(string reference, string form, string path);
     }
 
     public class SubmitAndPayService : ISubmitAndPayService
@@ -47,8 +47,6 @@ namespace form_builder.Services.SubmitAndPayService
         private readonly IHostingEnvironment _environment;
         private readonly CivicaPaymentConfiguration _paymentConfig;
         private readonly PaymentInformationConfiguration _paymentInformationConfig;
-
-
 
         public SubmitAndPayService(ILogger<SubmitAndPayService> logger, IDistributedCacheWrapper distributedCache, ISchemaProvider schemaProvider, IGateway gateway, IComplimentsComplaintsServiceGateway complimentsComplaintsServiceGateway, IPageHelper pageHelper, ISessionHelper sessionHelper, ICivicaPayGateway civicaPayGateway, IHttpContextAccessor httpContextAccessor, IHostingEnvironment environment, IOptions<CivicaPaymentConfiguration> paymentConfiguration, IOptions<PaymentInformationConfiguration> paymentInformationConfiguration)
         {
@@ -99,10 +97,6 @@ namespace form_builder.Services.SubmitAndPayService
                 reference = JsonConvert.DeserializeObject<string>(content);
             }
 
-            //Make payment to civica
-            //var payResponse = GeneratePaymentUrl(reference, form, "page-two");
-
-            
             var page = baseForm.GetPage("success");
 
             if (page == null)
@@ -133,21 +127,22 @@ namespace form_builder.Services.SubmitAndPayService
             };
         }
 
-        public async Task<string> GeneratePaymentUrl(string reference, string form, string path, string catId, string accRef, string payAmount)
+        public async Task<string> GeneratePaymentUrl(string reference, string form, string path)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid().ToString();
-
             var formData = _schemaProvider.Get(form);
             var pageData = formData.GetPage(path);
-            //var pageSlug = pageData.GetNextPage(new Dictionary<string, string>()).PageSlug;
-            //var pageProperties = pageData.Elements.First(_ => _.Type == EElementType.Payment);
+            var paymentInfo = _paymentInformationConfig.PaymentConfigs.Select(x => x).Where(c => c.FormName == form);
+            var catalogueId = string.Empty; ;
+            var accountReference = string.Empty;
+            var amount = string.Empty; ;
 
-            //linq statement to pull out account ref, amount and cat id when you give it a form name 
-            // var paymentInfo = _paymentInformationConfig.PaymentInformationConfigurations; returns null, is it not correctly pulling from the json?
-
-            var paymentInfo = _paymentInformationConfig.PaymentInformationConfigurations.Select(x => x).Where(config => config.formName == form);
-
-            //_paymentInformationConfig.PaymentInformationConfigurations[0].settings.accountReference;
+            foreach (var payInfo in paymentInfo)
+            {
+                accountReference = payInfo.Settings.AccountReference;
+                catalogueId = payInfo.Settings.CatalogueId;
+                amount = payInfo.Settings.Amount;
+            }
 
             var bucket = new CreateImmediateBasketRequest
             {
@@ -163,9 +158,9 @@ namespace form_builder.Services.SubmitAndPayService
                     {
                         PaymentDetails = new PaymentDetail
                         {
-                            CatalogueID = catId,
-                            AccountReference = accRef, 
-                            PaymentAmount = payAmount, 
+                            CatalogueID = catalogueId,
+                            AccountReference = accountReference, 
+                            PaymentAmount = amount, 
                             Quantity = "1",
                             PaymentNarrative = formData.FormName,
                             CallingAppTranReference = sessionGuid

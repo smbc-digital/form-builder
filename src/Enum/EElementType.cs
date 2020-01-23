@@ -28,7 +28,6 @@
         TimeInput,
         DatePicker,
         Organisation,
-        Numeric,
-        Payment
+        Numeric
     }
 }

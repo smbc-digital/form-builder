@@ -148,19 +148,17 @@ namespace form_builder.Controllers
         {
             var result = await _submitAndPayService.ProcessSubmission(form);
 
-            var reference = ((form_builder.Models.Success)result.ViewModel).Reference;
-            var catId = ((form_builder.Models.Success)result.ViewModel).FormAnswers.Pages[1].Answers[1].Response;
-            var accRef = ((form_builder.Models.Success)result.ViewModel).FormAnswers.Pages[1].Answers[2].Response;
-            var payAmount = ((form_builder.Models.Success)result.ViewModel).FormAnswers.Pages[1].Answers[3].Response;
+            var reference = ((Models.Success)result.ViewModel).Reference;
             var path = ((Models.Success)result.ViewModel).FormAnswers.Path;
 
-            return Redirect(await _submitAndPayService.GeneratePaymentUrl(reference, form, path, catId, accRef, payAmount));
+            return Redirect(await _submitAndPayService.GeneratePaymentUrl(reference, form, path));
         }
 
         [HttpGet]
         [Route("{form}/{path}/payment-response")]
         public async Task<IActionResult> HandlePaymentResponse(string form, string path, [FromQuery]string responseCode, [FromQuery]string callingAppTxnRef)
         {
+            //Not currently handled.
             if (responseCode != "00000")
             {
                 throw new Exception("Payment failed");
