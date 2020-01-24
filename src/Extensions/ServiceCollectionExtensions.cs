@@ -137,6 +137,7 @@ namespace form_builder.Extensions
         public static IServiceCollection AddWorkflows(this IServiceCollection services)
         {
             services.AddSingleton<ISubmitWorkflow, SubmitWorkflow>();
+            services.AddSingleton<IPaymentWorkflow, PaymentWorkflow>();
 
             return services;
         }

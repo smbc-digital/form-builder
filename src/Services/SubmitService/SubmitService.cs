@@ -18,6 +18,7 @@ namespace form_builder.Services.SubmtiService
     public interface ISubmitService
     {
         Task<SubmitServiceEntity> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
+        Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
     }
     public class SubmitService : ISubmitService
     {
@@ -112,5 +113,28 @@ namespace form_builder.Services.SubmtiService
                 FeedbackFormUrl = mappingEntity.BaseForm.FeedbackForm
             };
         }
+        public async Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
+        {
+            var reference = string.Empty;
+
+            var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
+            var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers);
+
+            var response = await _gateway.PostAsync(postUrl, mappingEntity.Data);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+            }
+
+            if (response.Content != null)
+            {
+                var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
+                return JsonConvert.DeserializeObject<string>(content);
+            }
+
+            throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured when response content from {postUrl} is null, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+        }
+
     }
 }

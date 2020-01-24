@@ -20,6 +20,7 @@ namespace form_builder.Providers.PaymentProvider
         {
             _civicaPayGateway = civicaPayGateway;
             _httpContextAccessor = httpContextAccessor;
+            _paymentConfig = paymentConfiguration.Value;
         }
         public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation)
         {

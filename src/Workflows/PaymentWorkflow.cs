@@ -9,7 +9,7 @@ namespace form_builder.Workflows
 {
     public interface IPaymentWorkflow
     {
-        Task<string> Submit(string form);
+        Task<string> Submit(string form, string path);
     }
 
     public class PaymentWorkflow : IPaymentWorkflow
@@ -19,14 +19,15 @@ namespace form_builder.Workflows
         private readonly IPayService _payService;
         private readonly ISessionHelper _sessionHelper;
 
-        public PaymentWorkflow(IPayService _payService, ISubmitService submitService, IMappingService mappingService, ISessionHelper sessionHelper)
+        public PaymentWorkflow(IPayService payService, ISubmitService submitService, IMappingService mappingService, ISessionHelper sessionHelper)
         {
             _submitService = submitService;
             _mappingService = mappingService;
             _sessionHelper = sessionHelper;
+            _payService = payService;
         }
 
-        public async Task<string> Submit(string form)
+        public async Task<string> Submit(string form, string path)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
@@ -37,9 +38,9 @@ namespace form_builder.Workflows
 
             var data = await _mappingService.Map(sessionGuid, form);
 
-            var paymentReference = await _payService.ProcessSubmission(data, form, sessionGuid);
+            var paymentReference = await _submitService.PaymentSubmission(data, form, sessionGuid);
 
-            return await _payService.ProcessPayment(form, "", paymentReference, sessionGuid);
+            return await _payService.ProcessPayment(form, path, paymentReference, sessionGuid);
         }
     }
 }

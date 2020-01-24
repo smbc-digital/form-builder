@@ -5,7 +5,6 @@ namespace form_builder.Configuration
     public class PaymentInformationConfiguration
     {
         public List<PaymentInformation> PaymentConfigs { get; set; }
-
     }
 
     public class PaymentInformation
