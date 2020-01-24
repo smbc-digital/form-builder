@@ -12,7 +12,6 @@ using form_builder.Services.PageService.Entities;
 using form_builder.Services.SubmitService.Entities;
 using form_builder.Models;
 using form_builder.Workflows;
-using form_builder.Services.SubmitAndPayService;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -21,11 +20,11 @@ namespace form_builder_tests.UnitTests.Controllers
         private HomeController _homeController;
         private readonly Mock<IPageService> _pageService = new Mock<IPageService>();
         private readonly Mock<ISubmitWorkflow> _submitWorkflow = new Mock<ISubmitWorkflow>();
-        private readonly Mock<ISubmitAndPayService> _submitAndPayService = new Mock<ISubmitAndPayService>();
+        private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new Mock<IPaymentWorkflow>();
 
         public HomeControllerTest()
         {
-            _homeController = new HomeController(_pageService.Object, _submitWorkflow.Object, _submitAndPayService.Object);
+            _homeController = new HomeController(_pageService.Object, _submitWorkflow.Object, _paymentWorkflow.Object);
         }
 
         [Fact]

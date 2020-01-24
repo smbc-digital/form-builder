@@ -11,6 +11,7 @@ namespace form_builder.Configuration
     public class PaymentInformation
     {
         public string FormName { get; set; }
+        public string PaymentProvider {get; set; }
         public Settings Settings { get; set; }
     }
 

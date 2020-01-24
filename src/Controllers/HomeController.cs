@@ -6,7 +6,6 @@ using System;
 using form_builder.Services.PageService;
 using form_builder.Extensions;
 using form_builder.Workflows;
-using form_builder.Services.SubmitAndPayService;
 
 namespace form_builder.Controllers
 {
@@ -14,13 +13,13 @@ namespace form_builder.Controllers
     {
         private readonly IPageService _pageService;
         private readonly ISubmitWorkflow _submitWorkflow;
-        private readonly ISubmitAndPayService _submitAndPayService;
+        private readonly IPaymentWorkflow _paymentWorkflow;
 
-        public HomeController(IPageService pageService, ISubmitWorkflow submitWorkflow, ISubmitAndPayService submitAndPayService)
+        public HomeController(IPageService pageService, ISubmitWorkflow submitWorkflow, IPaymentWorkflow paymentWorkflow)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
-            _submitAndPayService = submitAndPayService;
+            _paymentWorkflow = paymentWorkflow;
         }
 
         [HttpGet]
@@ -146,12 +145,9 @@ namespace form_builder.Controllers
         [Route("{form}/submitandpay")]
         public async Task<IActionResult> SubmitAndPay(string form)
         {
-            var result = await _submitAndPayService.ProcessSubmission(form);
+            var result = await _paymentWorkflow.Submit(form);
 
-            var reference = ((Models.Success)result.ViewModel).Reference;
-            var path = ((Models.Success)result.ViewModel).FormAnswers.Path;
-
-            return Redirect(await _submitAndPayService.GeneratePaymentUrl(reference, form, path));
+            return Redirect(result);
         }
 
         [HttpGet]
