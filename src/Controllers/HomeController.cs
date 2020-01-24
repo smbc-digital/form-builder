@@ -6,7 +6,6 @@ using System;
 using form_builder.Services.PageService;
 using form_builder.Extensions;
 using form_builder.Workflows;
-using form_builder.Services.SubmitAndPayService;
 
 namespace form_builder.Controllers
 {
@@ -14,13 +13,13 @@ namespace form_builder.Controllers
     {
         private readonly IPageService _pageService;
         private readonly ISubmitWorkflow _submitWorkflow;
-        private readonly ISubmitAndPayService _submitAndPayService;
+        private readonly IPaymentWorkflow _paymentWorkflow;
 
-        public HomeController(IPageService pageService, ISubmitWorkflow submitWorkflow, ISubmitAndPayService submitAndPayService)
+        public HomeController(IPageService pageService, ISubmitWorkflow submitWorkflow, IPaymentWorkflow paymentWorkflow)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
-            _submitAndPayService = submitAndPayService;
+            _paymentWorkflow = paymentWorkflow;
         }
 
         [HttpGet]
@@ -90,7 +89,8 @@ namespace form_builder.Controllers
                 case EBehaviourType.SubmitAndPay:
                     return RedirectToAction("SubmitAndPay", new
                     {
-                        form
+                        form,
+                        path
                     });
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
@@ -125,7 +125,14 @@ namespace form_builder.Controllers
                 case EBehaviourType.SubmitForm:
                     return RedirectToAction("Submit", new
                     {
-                        form
+                        form,
+                        path 
+                    });
+                case EBehaviourType.SubmitAndPay:
+                    return RedirectToAction("SubmitAndPay", new
+                    {
+                        form,
+                        path
                     });
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
@@ -143,15 +150,11 @@ namespace form_builder.Controllers
         }
 
         [HttpGet]
-        [Route("{form}/submitandpay")]
-        public async Task<IActionResult> SubmitAndPay(string form)
+        [Route("{form}/{path}/submitandpay")]
+        public async Task<IActionResult> SubmitAndPay(string form, string path)
         {
-            var result = await _submitAndPayService.ProcessSubmission(form);
-
-            var reference = ((Models.Success)result.ViewModel).Reference;
-            var path = ((Models.Success)result.ViewModel).FormAnswers.Path;
-
-            return Redirect(await _submitAndPayService.GeneratePaymentUrl(reference, form, path));
+            var result = await _paymentWorkflow.Submit(form, path);
+            return Redirect(result);
         }
 
         [HttpGet]

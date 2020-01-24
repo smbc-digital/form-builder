@@ -18,7 +18,7 @@ namespace form_builder
             .AddJsonFile($"./Config/appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? string.Empty}.json", optional: false)
             .AddJsonFile("./Config/Secrets/appsettings.secrets.json", optional: false, reloadOnChange: true)
             .AddJsonFile($"./Config/Secrets/appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? string.Empty}.secrets.json", optional: false)
-            //.AddJsonFile("./Config/Secrets/paymentconfiguration.json", optional: false, reloadOnChange: true)
+            .AddJsonFile("./Config/Secrets/paymentconfiguration.json", optional: false, reloadOnChange: true)
             .AddEnvironmentVariables()
             .Build();
 
