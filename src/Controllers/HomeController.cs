@@ -87,11 +87,8 @@ namespace form_builder.Controllers
                         form
                     });
                 case EBehaviourType.SubmitAndPay:
-                    return RedirectToAction("SubmitAndPay", new
-                    {
-                        form,
-                        path
-                    });
+                    var result = await _paymentWorkflow.Submit(form, path);
+                    return Redirect(result);
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
             }
@@ -103,7 +100,6 @@ namespace form_builder.Controllers
         {
             var viewModel = formData.ToNormaliseDictionary();
             var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, true);
-
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
             {
@@ -129,11 +125,8 @@ namespace form_builder.Controllers
                         path 
                     });
                 case EBehaviourType.SubmitAndPay:
-                    return RedirectToAction("SubmitAndPay", new
-                    {
-                        form,
-                        path
-                    });
+                    var result = await _paymentWorkflow.Submit(form, path);
+                    return Redirect(result);
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
             }
@@ -147,30 +140,6 @@ namespace form_builder.Controllers
 
             ViewData["BannerTypeformUrl"] = result.FeedbackFormUrl;
             return View(result.ViewName, result.ViewModel);
-        }
-
-        [HttpGet]
-        [Route("{form}/{path}/submitandpay")]
-        public async Task<IActionResult> SubmitAndPay(string form, string path)
-        {
-            var result = await _paymentWorkflow.Submit(form, path);
-            return Redirect(result);
-        }
-
-        [HttpGet]
-        [Route("{form}/{path}/payment-response")]
-        public IActionResult HandlePaymentResponse(string form, string path, [FromQuery]string responseCode, [FromQuery]string callingAppTxnRef)
-        {
-            //Not currently handled.
-            if (responseCode != "00000")
-            {
-                throw new Exception("Payment failed");
-            }
-
-            return RedirectToAction("Success", new
-            {
-                path
-            });
         }
     }
 }

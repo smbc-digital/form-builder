@@ -1,5 +1,4 @@
-﻿using form_builder.Helpers.PageHelpers;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using StockportGovUK.NetStandard.Gateways;
 using System;
 using System.Collections.Generic;
@@ -19,15 +18,13 @@ namespace form_builder.Services.PayService
     public class PayService : IPayService
     {
         private readonly IGateway _gateway;
-        private readonly IPageHelper _pageHelper;
         private readonly ILogger<PayService> _logger;
         private readonly PaymentInformationConfiguration _paymentInformationConfig;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
 
-        public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger, IGateway gateway, IPageHelper pageHelper, IOptions<PaymentInformationConfiguration> paymentInformationConfiguration)
+        public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger, IGateway gateway, IOptions<PaymentInformationConfiguration> paymentInformationConfiguration)
         {
             _gateway = gateway;
-            _pageHelper = pageHelper;
             _logger = logger;
             _paymentInformationConfig = paymentInformationConfiguration.Value;
             _paymentProviders = paymentProviders;
@@ -39,13 +36,18 @@ namespace form_builder.Services.PayService
                 .Where(c => c.FormName == form)
                 .FirstOrDefault();
 
+            if (paymentInfo == null)
+            {
+                throw new ApplicationException($"PayService::ProcessPayment: No payment information found for {form}");
+            }
+
             var paymentProvider = _paymentProviders.ToList()
                 .Where(_ => _.ProviderName == paymentInfo.PaymentProvider)
                 .FirstOrDefault();
 
             if (paymentProvider == null)
             {
-                throw new ApplicationException($"No payment provider configure for {paymentInfo.PaymentProvider}");
+                throw new ApplicationException($"PayService::ProcessPayment: No payment provider configure for {paymentInfo.PaymentProvider}");
             }
 
            return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, paymentInfo);

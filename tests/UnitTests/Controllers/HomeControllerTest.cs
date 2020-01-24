@@ -376,5 +376,77 @@ namespace form_builder_tests.UnitTests.Controllers
             _submitWorkflow.Verify(_ => _.Submit(It.IsAny<string>()), Times.Once);
             Assert.Equal("Success", viewResult.ViewName);
         }
+
+        [Fact]
+        public async Task Index_ShouldRedirectToUrlWhen_SubmitAndPay()
+        {
+            var element = new ElementBuilder()
+               .WithType(EElementType.Textbox)
+               .WithQuestionId("test")
+               .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .WithPageSlug("url")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
+                .Build();
+
+            var viewModel = new ViewModelBuilder()
+                .WithEntry("Guid", Guid.NewGuid().ToString())
+                .WithEntry($"test", "test")
+                .Build();
+
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page });
+            _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.SubmitAndPay });
+            _paymentWorkflow.Setup(_ => _.Submit(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync("https://www.return.url");
+
+            var result = await _homeController.Index("form", "page-one", viewModel);
+
+            Assert.IsType<RedirectResult>(result);
+        }
+
+        [Fact]
+        public async Task AddressManual_Post_ShouldRedirectToUrlWhen_SubmitAndPay()
+        {
+            var element = new ElementBuilder()
+               .WithType(EElementType.Textbox)
+               .WithQuestionId("test")
+               .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .WithPageSlug("url")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
+                .Build();
+
+            var viewModel = new ViewModelBuilder()
+                .WithEntry("Guid", Guid.NewGuid().ToString())
+                .WithEntry($"test", "test")
+                .Build();
+
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page });
+            _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.SubmitAndPay });
+            _paymentWorkflow.Setup(_ => _.Submit(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync("https://www.return.url");
+
+            var result = await _homeController.AddressManual("form", "page-one", viewModel);
+
+            Assert.IsType<RedirectResult>(result);
+        }
     }
 }

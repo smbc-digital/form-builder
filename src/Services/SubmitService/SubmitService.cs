@@ -113,6 +113,7 @@ namespace form_builder.Services.SubmtiService
                 FeedbackFormUrl = mappingEntity.BaseForm.FeedbackForm
             };
         }
+
         public async Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
             var reference = string.Empty;
@@ -135,6 +136,5 @@ namespace form_builder.Services.SubmtiService
 
             throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured when response content from {postUrl} is null, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
         }
-
     }
 }
