@@ -64,7 +64,7 @@ namespace form_builder.Validators
             int.TryParse(valueHours, out int hours);
             int.TryParse(valueMinutes, out int minutes);
 
-            var isValidTime = (hours < 13 && hours > 0) && (minutes < 60 && minutes > 0);
+            var isValidTime = (hours < 13 && hours > 0) && (minutes < 60 && minutes >= 0);
 
            
             return new ValidationResult
