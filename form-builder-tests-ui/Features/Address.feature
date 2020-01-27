@@ -54,3 +54,10 @@ Scenario: Address element optional address selected
 	And I should see a "th" element with "customersaddress-address-description" text
 	And I should see a "th" element with "optionaladdress-address" text
 	And I should see a "th" element with "optionaladdress-address-description" text
+
+
+Scenario: Validation message should apear if I Enter Invalid Postcode
+	Given I navigate to "/address/page1"
+	When I fill in page1 with invalid postcode
+	Then I click the "nextStep" button
+	Then I should see a validation message for "customersaddress-postcode-error" input

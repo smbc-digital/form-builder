@@ -16,27 +16,39 @@ namespace form_builder.Models.Elements
     {
         public Address()
         {
-            Type = EElementType.Address;
+            Type = EElementType.Address;          
         }
 
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
+            
+            
             var postcodeKey = $"{Properties.QuestionId}-postcode";
+            
             var viewElement = new ElementViewModel
             {
-                Element = this,
+                Element = this,                
             };
 
+            if(!IsValid && viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Search")
+            {
+                viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
+
+                Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
+                return await viewRender.RenderAsync("AddressSearch", viewElement);
+            }
+           
             if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
             {
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
-                
+
                 viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
                 viewElement.ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
                 return await viewRender.RenderAsync("AddressSelect", new Tuple<ElementViewModel, List<AddressSearchResult>>(viewElement, addressSearchResults));
             }
-
+                                   
+            
             viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");

@@ -29,7 +29,7 @@ namespace form_builder.Validators
 
             if (element.Type == EElementType.Address)
             {
-                if (viewModel["AddressStatus"] == "Select")
+                if (viewModel.ContainsKey("AddressStatus") &&viewModel["AddressStatus"] == "Select")
                 {
                     key = $"{element.Properties.QuestionId}-address";
                     validationMessage = "Check the " + element.Properties.AddressLabel.ToLower() + " and try again";
