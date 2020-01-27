@@ -243,7 +243,8 @@ namespace form_builder.Helpers.PageHelpers
 
         public void CheckForPaymentConfiguration(List<Page> pages, string formName)
         {
-            var containsPayment = pages.SelectMany(x => x.Behaviours)
+            var containsPayment = pages.Where(x => x.Behaviours != null)
+                .SelectMany(x => x.Behaviours)
                 .Any(x => x.BehaviourType == EBehaviourType.SubmitAndPay);
 
                 if(!containsPayment)
