@@ -31,6 +31,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _mockDisallowedKeysOptions = new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
+        private readonly Mock<IOptions<PaymentInformationConfiguration>> _mockPaymentInfomation = new Mock<IOptions<PaymentInformationConfiguration>>();
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
 
         public PageHelperTests()
@@ -43,9 +44,19 @@ namespace form_builder_tests.UnitTests.Helpers
                 }
             });
 
+            _mockPaymentInfomation.Setup(_ => _.Value).Returns(new PaymentInformationConfiguration
+            {
+                PaymentConfigs = new List<PaymentInformation> 
+                {
+                    new PaymentInformation {
+                        FormName = "test-form"
+                    }
+                }
+            });
+
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
 
-            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object);
+            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object,_mockPaymentInfomation.Object, _mockHostingEnv.Object);
         }
 
         [Fact]
@@ -688,6 +699,43 @@ namespace form_builder_tests.UnitTests.Helpers
             pages.Add(page);
 
             _pageHelper.CheckForInvalidQuestionOrTargetMappingValue(pages, "formName");
+        }
+
+        [Fact]
+        public void CheckForPaymentConfiguration_ShouldThrowException_WhenNoConfigFound_ForForm()
+        {
+            var pages = new List<Page>();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            pages.Add(page);
+            
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForPaymentConfiguration(pages, "no-form-config"));
+            Assert.Equal("No payment infomation configured for no-form-config form", result.Message);
+        }
+
+                [Fact]
+        public void CheckForPaymentConfiguration_ShouldNot_ThrowException_WhenConfigFound_ForForm()
+        {
+            var pages = new List<Page>();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            pages.Add(page);
+
+            _pageHelper.CheckForPaymentConfiguration(pages, "test-form");
         }
     }
 }
