@@ -247,8 +247,8 @@ namespace form_builder.Helpers.PageHelpers
                 .SelectMany(x => x.Behaviours)
                 .Any(x => x.BehaviourType == EBehaviourType.SubmitAndPay);
 
-                if(!containsPayment)
-                    return;
+            if(!containsPayment)
+                return;
             
             var config = _paymentInformationConfiguration.PaymentConfigs.Where(x => x.FormName == formName)
                 .FirstOrDefault();

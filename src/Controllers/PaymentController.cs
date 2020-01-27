@@ -1,29 +1,31 @@
+using form_builder.Services.PayService;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using System.Threading.Tasks;
 
 namespace form_builder.Controllers
 {
     public class PaymentController : Controller
     {
+        private readonly IPayService _payService;
 
-        public PaymentController()
+        public PaymentController(IPayService payService)
         {
+            _payService = payService;
         }
 
         [HttpGet]
         [Route("{form}/{path}/payment-response")]
         public IActionResult HandlePaymentResponse(string form, string path, [FromQuery]string responseCode, [FromQuery]string callingAppTxnRef)
         {
-            //Not currently handled.
-            if (responseCode != "00000")
-            {
-                throw new Exception("Payment failed");
-            }
+            _payService.ProcessPaymentResponse(form, responseCode);
 
-            return RedirectToAction("Success", new
+            return RedirectToAction("Success", "Home", new
             {
-                path
+                path = "success",
+                form
             });
+
+            //return View("./Payment/Index", result);
         }
     }
 }

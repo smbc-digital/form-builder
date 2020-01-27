@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using form_builder.Configuration;
 using form_builder.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StockportGovUK.NetStandard.Gateways.Civica.Pay;
 using StockportGovUK.NetStandard.Models.Civica.Pay.Request;
@@ -18,13 +20,15 @@ namespace form_builder.Providers.PaymentProvider
         private readonly CivicaPaymentConfiguration _paymentConfig;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _environment;
+        private readonly ILogger<CivicaPayProvider> _logger;
 
-        public CivicaPayProvider(ICivicaPayGateway civicaPayGateway, IOptions<CivicaPaymentConfiguration> paymentConfiguration, IHttpContextAccessor httpContextAccessor, IHostingEnvironment environment)
+        public CivicaPayProvider(ICivicaPayGateway civicaPayGateway, IOptions<CivicaPaymentConfiguration> paymentConfiguration, IHttpContextAccessor httpContextAccessor, IHostingEnvironment environment, ILogger<CivicaPayProvider> logger)
         {
             _civicaPayGateway = civicaPayGateway;
             _httpContextAccessor = httpContextAccessor;
             _paymentConfig = paymentConfiguration.Value;
             _environment = environment;
+            _logger = logger;
         }
         public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation)
         {
@@ -35,7 +39,7 @@ namespace form_builder.Providers.PaymentProvider
                 ApiPassword = _paymentConfig.ApiPassword,
                 ReturnURL = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response",
                 NotifyURL = string.Empty,
-                CallingAppTranReference = reference,
+                CallingAppTranReference = $"{reference}",
                 PaymentItems = new List<PaymentItem>
                 {
                     new PaymentItem
@@ -47,7 +51,7 @@ namespace form_builder.Providers.PaymentProvider
                             PaymentAmount = paymentInformation.Settings.Amount, 
                             Quantity = "1",
                             PaymentNarrative = form,
-                            CallingAppTranReference = sessionGuid
+                            CallingAppTranReference = $"{reference}"
                         },
                         AddressDetails = new AddressDetail()
                     }
@@ -57,14 +61,17 @@ namespace form_builder.Providers.PaymentProvider
             var civicaResponse = await _civicaPayGateway.CreateImmediateBasketAsync(bucket);
 
             if (civicaResponse.StatusCode != HttpStatusCode.OK)
-                throw new System.Exception();
+                throw new System.Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code {civicaResponse.StatusCode}, HttpResponse: {civicaResponse}");
 
             return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, sessionGuid);
         }
 
-        public void VerifyPaymentResponse()
+        public void VerifyPaymentResponse(string responseCode)
         {
-            throw new System.NotImplementedException();
+            if (responseCode != "00000")
+            {
+                throw new Exception("Payment failed");
+            }
         }
     }
 }
