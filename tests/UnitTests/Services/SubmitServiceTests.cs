@@ -122,7 +122,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task Submit_ShouldCallGateway_WithFormData()
+        public async Task ProcessSubmission_ShouldCallGateway_WithFormData()
         {
             // Arrange
             var questionId = "testQuestion";
@@ -185,7 +185,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task Submit__Application_ShoudlThrowApplicationException_WhenGatewayResponse_IsNotOk()
+        public async Task ProcessSubmission__Application_ShoudlThrowApplicationException_WhenGatewayResponse_IsNotOk()
         {
             // Arrange
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
@@ -210,9 +210,6 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            //_mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-            //    .ReturnsAsync(schema);
-
             var cacheData = new FormAnswers
             {
                 Path = "page-one"
@@ -235,7 +232,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task Submit_ShouldReturnModel_OnSuccessfulGatewayCall_And_DeleteCacheEntry()
+        public async Task ProcessSubmission_ShouldReturnModel_OnSuccessfulGatewayCall_And_DeleteCacheEntry()
         {
             // Arrange
             var guid = Guid.NewGuid();
@@ -254,9 +251,6 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            //_mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-            //    .ReturnsAsync(schema);
-
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                .ReturnsAsync(new HttpResponseMessage
                {
@@ -273,6 +267,111 @@ namespace form_builder_tests.UnitTests.Services
             _sessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
             _mockDistrubutedCache.Verify(_ => _.Remove(It.Is<string>(x => x == guid.ToString())), Times.Once);
             Assert.Equal("Submit", viewResult.ViewName);
+        }
+
+        [Fact]
+        public async Task PaymentSubmission_ShouldCallGateway_AndReturn_Reference()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageSlug("testUrl")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+               .ReturnsAsync(new HttpResponseMessage
+               {
+                   StatusCode = HttpStatusCode.OK,
+                   Content = new StringContent("\"1234456\"")
+               });
+
+            // Act
+            var result = await _service.PaymentSubmission((new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }), "form", guid.ToString());
+
+            // Assert
+            Assert.IsType<string>(result);
+
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()));
+        }
+
+        [Fact]
+        public async Task PaymentSubmission_ShouldThrowApplicationException_WhenNotOkResponse()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageSlug("testUrl")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.InternalServerError
+                });
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
+
+            // Assert
+            Assert.StartsWith("SubmitService::PaymentSubmission, An exception has occured while attemping to call ", result.Message);
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task PaymentSubmission_ShouldThrowApplicationException_WhenNoContentFromGateway()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageSlug("testUrl")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+               .ReturnsAsync(new HttpResponseMessage
+               {
+                   StatusCode = HttpStatusCode.OK,
+                   Content = null
+               });
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
+
+            // Assert
+            Assert.StartsWith("SubmitService::PaymentSubmission, An exception has occured when response content from ", result.Message);
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
     }
 }

@@ -38,6 +38,7 @@ namespace form_builder
                 .ConfigureAddressProviders()
                 .ConfigureStreetProviders()
                 .ConfigureOrganisationProviders()
+                .ConfigurePaymentProviders()
                 .AddHelpers()
                 .AddServices()
                 .AddWorkflows()

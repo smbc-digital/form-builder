@@ -35,6 +35,7 @@ namespace form_builder.Models
 
             pageHelper.hasDuplicateQuestionIDs(Pages, form);
             pageHelper.CheckForInvalidQuestionOrTargetMappingValue(Pages, form);
+            pageHelper.CheckForPaymentConfiguration(Pages, form);
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using TechTalk.SpecFlow;
+﻿using OpenQA.Selenium;
+using TechTalk.SpecFlow;
 using System.Threading;
+using Xunit;
 
 namespace form_builder_tests_ui.StepDefinitions
 {
@@ -11,6 +13,20 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenIFillInPage1()
         {
             BrowserSession.FillIn("customersaddress-postcode").With("sk1 1aa");
+        }
+
+        [Then(@"I fill in page1 with invalid postcode")]
+        [When(@"I fill in page1 with invalid postcode")]
+        public void ThenIFillInPage1WithInvalidPostcode()
+        {
+            BrowserSession.FillIn("customersaddress-postcode").With("elephant");
+        }
+
+        [Then(@"I should see a validation message for ""(.*)"" input")]
+        public void ThenIShouldSeeValidationMessageForInput(string inputName)
+        {
+            //Assert
+            Assert.True(BrowserSession.FindId(inputName).Exists());
         }
 
         [Then(@"I fill in page2")]
