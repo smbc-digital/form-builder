@@ -1,6 +1,5 @@
 using form_builder.Services.PayService;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace form_builder.Controllers
 {
@@ -17,15 +16,14 @@ namespace form_builder.Controllers
         [Route("{form}/{path}/payment-response")]
         public IActionResult HandlePaymentResponse(string form, string path, [FromQuery]string responseCode, [FromQuery]string callingAppTxnRef)
         {
-            _payService.ProcessPaymentResponse(form, responseCode);
+            var reference = _payService.ProcessPaymentResponse(form, responseCode);
 
             return RedirectToAction("Success", "Home", new
             {
                 path = "success",
-                form
+                form,
+                reference
             });
-
-            //return View("./Payment/Index", result);
         }
     }
 }

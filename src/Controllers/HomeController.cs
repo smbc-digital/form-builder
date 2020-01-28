@@ -145,12 +145,10 @@ namespace form_builder.Controllers
 
         [HttpGet]
         [Route("{form}/success")]
-        public async Task<IActionResult> Success(string form)
+        public async Task<IActionResult> Success(string form, [FromQuery] string reference)
         {
-            var result = await _submitWorkflow.Submit(form);
-
-            ViewData["BannerTypeformUrl"] = result.FeedbackFormUrl;
-            return View(result.ViewName, result.ViewModel);
+            //var result = await _submitWorkflow.Submit(form);
+            return View("Success");
         }
     }
 }

@@ -66,12 +66,14 @@ namespace form_builder.Providers.PaymentProvider
             return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, sessionGuid);
         }
 
-        public void VerifyPaymentResponse(string responseCode)
+        public string VerifyPaymentResponse(string responseCode)
         {
             if (responseCode != "00000")
             {
                 throw new Exception("Payment failed");
             }
+
+            return "00000-00000-0000-0000";
         }
     }
 }
