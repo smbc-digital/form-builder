@@ -2,7 +2,6 @@ using form_builder.Exceptions;
 using form_builder.Services.PayService;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace form_builder.Controllers
 {

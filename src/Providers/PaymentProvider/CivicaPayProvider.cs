@@ -33,7 +33,7 @@ namespace form_builder.Providers.PaymentProvider
         }
         public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation)
         {
-            var bucket = new CreateImmediateBasketRequest
+            var basket = new CreateImmediateBasketRequest
             {
                 CallingAppIdentifier = "Basket",
                 CustomerID = _paymentConfig.CustomerId,
@@ -59,10 +59,10 @@ namespace form_builder.Providers.PaymentProvider
                 }
             };
 
-            var civicaResponse = await _civicaPayGateway.CreateImmediateBasketAsync(bucket);
+            var civicaResponse = await _civicaPayGateway.CreateImmediateBasketAsync(basket);
 
             if (civicaResponse.StatusCode != HttpStatusCode.OK)
-                throw new System.Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code {civicaResponse.StatusCode}, HttpResponse: {civicaResponse}");
+                throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code {civicaResponse.StatusCode}, HttpResponse: {civicaResponse}");
 
             return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, sessionGuid);
         }
@@ -76,7 +76,7 @@ namespace form_builder.Providers.PaymentProvider
 
             if (responseCode != "00000")
             {
-                throw new PaymentFailureException("CivicaPayProvider:Payment failed");
+                throw new PaymentFailureException("CivicaPayProvider::Payment failed");
             }
 
             return "00000-00000-0000-0000";
