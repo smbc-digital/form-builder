@@ -13,7 +13,6 @@ namespace form_builder.Services.PayService
     public interface IPayService
     {
         Task<string> ProcessPayment(string form, string path, string reference, string sessionGuid);
-
         string ProcessPaymentResponse(string form, string responseCode);
     }
 
@@ -45,7 +44,11 @@ namespace form_builder.Services.PayService
             var paymentInformation = GetFormPaymentInformation(form);
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
-            return paymentProvider.VerifyPaymentResponse(responseCode);
+            try {
+                return paymentProvider.VerifyPaymentResponse(responseCode);
+            } catch(Exception e){
+                throw e;
+            }
         }
 
         private PaymentInformation GetFormPaymentInformation(string form)

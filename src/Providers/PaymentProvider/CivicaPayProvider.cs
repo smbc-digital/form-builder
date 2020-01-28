@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using form_builder.Configuration;
+using form_builder.Exceptions;
 using form_builder.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -39,7 +40,7 @@ namespace form_builder.Providers.PaymentProvider
                 ApiPassword = _paymentConfig.ApiPassword,
                 ReturnURL = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response",
                 NotifyURL = string.Empty,
-                CallingAppTranReference = $"{reference}",
+                CallingAppTranReference = $"{reference}|{sessionGuid}",
                 PaymentItems = new List<PaymentItem>
                 {
                     new PaymentItem
@@ -51,7 +52,7 @@ namespace form_builder.Providers.PaymentProvider
                             PaymentAmount = paymentInformation.Settings.Amount, 
                             Quantity = "1",
                             PaymentNarrative = form,
-                            CallingAppTranReference = $"{reference}"
+                            CallingAppTranReference = $"{reference}|{sessionGuid}"
                         },
                         AddressDetails = new AddressDetail()
                     }
@@ -68,9 +69,14 @@ namespace form_builder.Providers.PaymentProvider
 
         public string VerifyPaymentResponse(string responseCode)
         {
+            if (responseCode == "00022" || responseCode == "00023")
+            {
+                throw new PaymentDeclinedException("CivicaPayProvider::Declined payment");
+            }
+
             if (responseCode != "00000")
             {
-                throw new Exception("Payment failed");
+                throw new PaymentFailureException("CivicaPayProvider:Payment failed");
             }
 
             return "00000-00000-0000-0000";

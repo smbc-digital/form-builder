@@ -1,4 +1,4 @@
-﻿@model form_builder.ViewModels.PaymentSuccessViewModel
+﻿@model form_builder.ViewModels.PaymentFailureViewModel
 @{
     ViewData["Title"] = Model.FormName;
     ViewData["PageTitle"] = Model.PageTitle;
@@ -6,6 +6,5 @@
 }
 
 <div id="root" class="text-center">
-    <h1>Payment Successful</h1>
-    <p>@Model.Reference</p>
+    <h1>Payment Failure</h1>
 </div>
