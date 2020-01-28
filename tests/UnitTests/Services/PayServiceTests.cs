@@ -99,7 +99,7 @@ namespace form_builder_tests.UnitTests.Services
             _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
                 .Throws<Exception>();
 
-            Assert.Throws<Exception>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345"));
+            Assert.Throws<Exception>(() => _service.ProcessPaymentResponse("testForm", "12345"));
         }
 
         [Fact]

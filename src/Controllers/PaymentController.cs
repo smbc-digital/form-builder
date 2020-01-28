@@ -48,7 +48,6 @@ namespace form_builder.Controllers
         [Route("{form}/payment-success")]
         public IActionResult PaymentSuccess(string form, [FromQuery] string reference)
         {
-            //var result = await _submitWorkflow.Submit(form);
             var paymentSuccessViewModel = new PaymentSuccessViewModel
             {
                 Reference = reference,
