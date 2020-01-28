@@ -59,7 +59,7 @@ namespace form_builder.Services.PayService
 
             if (paymentInfo == null)
             {
-                throw new ApplicationException($"PayService::ProcessPaymentResponse: No payment information found for {form}");
+                throw new ApplicationException($"PayService:: No payment information found for {form}");
             }
 
             return paymentInfo;
@@ -73,7 +73,7 @@ namespace form_builder.Services.PayService
 
             if (paymentProvider == null)
             {
-                throw new ApplicationException($"PayService::ProcessPaymentResponse: No payment provider configure for {paymentInfo.PaymentProvider}");
+                throw new ApplicationException($"PayService:: No payment provider configure for {paymentInfo.PaymentProvider}");
             }
 
             return paymentProvider;
