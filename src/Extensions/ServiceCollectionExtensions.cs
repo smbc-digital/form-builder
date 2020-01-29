@@ -151,7 +151,7 @@ namespace form_builder.Extensions
             }
             else
             {
-                services.AddSingleton<ISchemaProvider, S3FileSchemaProvider>();
+              services.AddSingleton<ISchemaProvider, S3FileSchemaProvider>();
             }
 
             return services;
