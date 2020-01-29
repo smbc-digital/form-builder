@@ -7,7 +7,7 @@ Scenario: Textbox standard use
 	Then I should see the header
 	And I should see the "firstName" input
 	And I should see the "middleName" input
-	And I should see a "p" element with "(optional)" text
+	And I should see a "span" element with "(optional)" text
 	And I should see the "lastName" input
 	And I should see the "nextStep" button
 	When I click the "nextStep" button
