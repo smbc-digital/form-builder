@@ -59,22 +59,7 @@ fieldset.input-memorable-date, fieldset.input-time {
     }
 }
 
-/*legend {
-    font-family: 'Source Sans Pro', sans-serif;
-    color: #1b1b1b;
-    font-size: 1.263em;
-    font-weight: 700;
-    margin: 0 0 26px 0;
-    line-height: 1.25;
-}*/
-
-
-@media only screen and (max-width: 767px) {    
-
-    legend {
-        font-size: 1.125em;
-        line-height: 1.111;
-    }
+@media only screen and (max-width: 767px) {
 
     .horizontal{
         display:table-cell !important;
@@ -108,4 +93,19 @@ fieldset.input-memorable-date, fieldset.input-time {
 .fa .fa-angle-down{
     color:red;
     font-size:0.8em;
+}
+
+legend > span.optional {
+    padding-left: 10px;
+    font-size: 0.875em;
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+@media only screen and (max-width: 767px) {
+    legend > span.optional {
+        display: block;
+        padding: 0;
+        margin-bottom: 16px;
+    }
 }
