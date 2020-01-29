@@ -28,7 +28,8 @@ namespace form_builder.Providers.SchemaProvider
         {
             try
             {
-                var s3Result = await _s3Gateway.GetObject("form-json", $"{_enviroment.EnvironmentName.ToS3EnvPrefix()}/{schemaName}.json");
+                //var s3Result = await _s3Gateway.GetObject("formbuilder-test123", $"{_enviroment.EnvironmentName.ToS3EnvPrefix()}/{schemaName}.json");
+                var s3Result = await _s3Gateway.GetObject("formbuilder-json", $"{_enviroment.EnvironmentName.ToS3EnvPrefix()}/{schemaName}.json");
 
                 using (Stream responseStream = s3Result.ResponseStream)
                 using (StreamReader reader = new StreamReader(responseStream))
