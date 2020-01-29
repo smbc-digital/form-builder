@@ -7,29 +7,29 @@
 
 
 @await Html.BeginFieldSet(Model)
-    <legend>
-        <label @Model.WriteOptional()>@Model.Properties.Label</label>
-        @if (Model.Properties?.Optional ?? true)
-        {
-            <p class="optional">(optional)</p>
-        }
-    </legend>
-
-
-    @if (!string.IsNullOrEmpty(Model.Properties.Hint))
+<legend>
+    <label @Model.WriteOptional()>@Model.Properties.Label</label>
+    @if (Model.Properties.Optional)
     {
-        <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
+        <span class="optional">(optional)</span>
     }
+</legend>
 
-        <partial name="CheckboxOptions" />
 
-    @if (!Model.IsValid)
+@if (!string.IsNullOrEmpty(Model.Properties.Hint))
+{
+    <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
+}
+
+    <partial name="CheckboxOptions" />
+
+@if (!Model.IsValid)
+{
     {
-        {
-            var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+        var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
 
-            <p class="input-error-content" id="@errorId">@validationMessage</p>
-        }
+        <p class="input-error-content" id="@errorId">@validationMessage</p>
     }
+}
 
 @await Html.EndFieldSet()

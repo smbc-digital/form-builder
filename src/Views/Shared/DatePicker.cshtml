@@ -19,9 +19,9 @@
 @await Html.BeginFieldSet(Model, classes)
 <legend>
     <label @Model.WriteOptional()>@Model.Properties.Label</label>
-    @if (Model.Properties?.Optional ?? true)
+    @if (Model.Properties.Optional)
     {
-        <p class="optional">(optional)</p>
+        <span class="optional">(optional)</span>
     }
 </legend>
 <p id="@hintId">@Model.Properties.Hint</p>

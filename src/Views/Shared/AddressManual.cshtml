@@ -15,33 +15,42 @@
     }
 }
 
-    <fieldset aria-describedby=@hintId>
-        <legend>Address details</legend>
-        @if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
-        {
-            <p id=@hintId>@Model.Element.Properties.Hint</p>
-        }
+<fieldset aria-describedby=@hintId>
+    <legend>
+        <label>
+            Address details
+        </label>
+    </legend>
 
-        <label for="@line1id">Address line 1</label>
-        @Html.TextBox(line1id, Model.Element.Properties.AddressManualAddressLine1, Model.Element.GenerateElementProperties(errorMessages[0],line1ErrorId))
-        @if (!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[0]))
-        {
-            <p class="input-error-content" id="@line1ErrorId">@errorMessages[0]</p>
-        }
-        <label class="optional" for="@line2id">Address line 2</label>
-        <p class="optional">(optional)</p>
-        @Html.TextBox(line2id, Model.Element.Properties.AddressManualAddressLine2, Model.Element.GenerateElementProperties())
-        <label for="@line3id">Town</label>
-        @Html.TextBox(line3id, Model.Element.Properties.AddressManualAddressTown, Model.Element.GenerateElementProperties(errorMessages[1],townErrorId))
-        @if (!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[1]))
-        {
-            <p class="input-error-content" id="@townErrorId">@errorMessages[1]</p>
-        }
-        <label for="@line4id">Postcode</label>
-        @Html.TextBox(line4id, Model.Element.Properties.AddressManualAddressPostcode, Model.Element.GenerateElementProperties(errorMessages[2], postcodeErrorId))
-        @if (!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[2]))
-        {
-            <p class="input-error-content" id="@postcodeErrorId">@errorMessages[2]</p>
-        }
-        <p><a href="@Model.ManualAddressURL">Search by postcode</a></p>
-    </fieldset>
+    @if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
+    {
+        <p id=@hintId>@Model.Element.Properties.Hint</p>
+    }
+
+    <label for="@line1id">Address line 1</label>
+    @Html.TextBox(line1id, Model.Element.Properties.AddressManualAddressLine1, Model.Element.GenerateElementProperties(errorMessages[0],line1ErrorId))
+    @if (!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[0]))
+    {
+        <p class="input-error-content" id="@line1ErrorId">@errorMessages[0]</p>
+    }
+    
+    <label class="optional" for="@line2id">Address line 2</label>
+    <p class="optional">(optional)</p>
+    @Html.TextBox(line2id, Model.Element.Properties.AddressManualAddressLine2, Model.Element.GenerateElementProperties())
+
+    <label for="@line3id">Town</label>
+    @Html.TextBox(line3id, Model.Element.Properties.AddressManualAddressTown, Model.Element.GenerateElementProperties(errorMessages[1],townErrorId))
+    @if (!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[1]))
+    {
+        <p class="input-error-content" id="@townErrorId">@errorMessages[1]</p>
+    }
+
+    <label for="@line4id">Postcode</label>
+    @Html.TextBox(line4id, Model.Element.Properties.AddressManualAddressPostcode, Model.Element.GenerateElementProperties(errorMessages[2], postcodeErrorId))
+    @if (!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[2]))
+    {
+        <p class="input-error-content" id="@postcodeErrorId">@errorMessages[2]</p>
+    }
+
+    <p><a href="@Model.ManualAddressURL">Search by postcode</a></p>
+</fieldset>
