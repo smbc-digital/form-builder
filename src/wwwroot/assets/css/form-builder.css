@@ -61,10 +61,16 @@ legend > span.optional {
 }
 
 @media only screen and (max-width: 767px) {
+    legend {
+        font-size: 1.125em;
+        line-height: 1.111;
+    }
+
     legend > span.optional {
         display: block;
         padding: 0;
         margin-bottom: 16px;
+        line-height: 1.75;
     }
 
     ol.indented-list {
