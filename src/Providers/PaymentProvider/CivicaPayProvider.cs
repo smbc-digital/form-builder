@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using form_builder.Configuration;
+using form_builder.Exceptions;
 using form_builder.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -32,14 +33,14 @@ namespace form_builder.Providers.PaymentProvider
         }
         public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation)
         {
-            var bucket = new CreateImmediateBasketRequest
+            var basket = new CreateImmediateBasketRequest
             {
                 CallingAppIdentifier = "Basket",
                 CustomerID = _paymentConfig.CustomerId,
                 ApiPassword = _paymentConfig.ApiPassword,
                 ReturnURL = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response",
                 NotifyURL = string.Empty,
-                CallingAppTranReference = $"{reference}",
+                CallingAppTranReference = $"{reference}|{sessionGuid}",
                 PaymentItems = new List<PaymentItem>
                 {
                     new PaymentItem
@@ -51,27 +52,34 @@ namespace form_builder.Providers.PaymentProvider
                             PaymentAmount = paymentInformation.Settings.Amount, 
                             Quantity = "1",
                             PaymentNarrative = form,
-                            CallingAppTranReference = $"{reference}"
+                            CallingAppTranReference = $"{reference}|{sessionGuid}"
                         },
                         AddressDetails = new AddressDetail()
                     }
                 }
             };
 
-            var civicaResponse = await _civicaPayGateway.CreateImmediateBasketAsync(bucket);
+            var civicaResponse = await _civicaPayGateway.CreateImmediateBasketAsync(basket);
 
             if (civicaResponse.StatusCode != HttpStatusCode.OK)
-                throw new System.Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code {civicaResponse.StatusCode}, HttpResponse: {civicaResponse}");
+                throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code {civicaResponse.StatusCode}, HttpResponse: {civicaResponse}");
 
             return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, sessionGuid);
         }
 
-        public void VerifyPaymentResponse(string responseCode)
+        public string VerifyPaymentResponse(string responseCode)
         {
+            if (responseCode == "00022" || responseCode == "00023")
+            {
+                throw new PaymentDeclinedException("CivicaPayProvider::Declined payment");
+            }
+
             if (responseCode != "00000")
             {
-                throw new Exception("Payment failed");
+                throw new PaymentFailureException("CivicaPayProvider::Payment failed");
             }
+
+            return "00000-00000-0000-0000";
         }
     }
 }

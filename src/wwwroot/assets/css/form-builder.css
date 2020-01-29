@@ -53,27 +53,22 @@ fieldset.input-memorable-date, fieldset.input-time {
     position: relative;
 }
 
-@media only screen and (max-width: 767px) {
-    ol.indented-list {
-        margin-left: 25px;
-    }
+legend > span.optional {
+    padding-left: 10px;
+    font-size: 0.875em;
+    display: inline-block;
+    margin-bottom: 0;
 }
 
-/*legend {
-    font-family: 'Source Sans Pro', sans-serif;
-    color: #1b1b1b;
-    font-size: 1.263em;
-    font-weight: 700;
-    margin: 0 0 26px 0;
-    line-height: 1.25;
-}*/
+@media only screen and (max-width: 767px) {
+    legend > span.optional {
+        display: block;
+        padding: 0;
+        margin-bottom: 16px;
+    }
 
-
-@media only screen and (max-width: 767px) {    
-
-    legend {
-        font-size: 1.125em;
-        line-height: 1.111;
+    ol.indented-list {
+        margin-left: 25px;
     }
 
     .horizontal{
@@ -103,9 +98,4 @@ fieldset.input-memorable-date, fieldset.input-time {
     margin: 0;
     padding: 12px 18px 4px 45px;
     position: relative;
-}
-
-.fa .fa-angle-down{
-    color:red;
-    font-size:0.8em;
 }

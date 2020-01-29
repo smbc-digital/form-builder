@@ -7,7 +7,7 @@
 
 <label @Model.Element.WriteOptional() for="@questionId">@Model.Element.Properties.Label</label>
 
-@if (Model.Element.Properties?.Optional ?? true)
+@if (Model.Element.Properties.Optional)
 {
     <p class="optional">(optional)</p>
 }

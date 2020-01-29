@@ -1,17 +1,10 @@
 ﻿using form_builder.Configuration;
-using form_builder.Enum;
-using form_builder.Models;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Services.PayService;
-using form_builder.ViewModels;
-using form_builder_tests.Builders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -61,7 +54,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPayment("nonexistanceform", "page-one", "12345", "guid"));
 
-            Assert.Equal("PayService::ProcessPayment: No payment information found for nonexistanceform", result.Message);
+            Assert.Equal("PayService:: No payment information found for nonexistanceform", result.Message);
         }
 
         [Fact]
@@ -69,7 +62,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPayment("testFormwithnovalidpayment", "page-one", "12345", "guid"));
 
-            Assert.Equal("PayService::ProcessPayment: No payment provider configure for invalidPaymentPorvider", result.Message);
+            Assert.Equal("PayService:: No payment provider configure for invalidPaymentPorvider", result.Message);
         }
 
         [Fact]
@@ -82,6 +75,43 @@ namespace form_builder_tests.UnitTests.Services
 
             _paymentProvider.Verify(_ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<PaymentInformation>()), Times.Once);
             Assert.IsType<string>(result);
+        }
+
+        [Fact]
+        public void ProcessPaymentResponse_ShouldThrowApplicationException_WhenPaymentConfig_IsNull()
+        {
+            var result = Assert.Throws<ApplicationException>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345"));
+
+            Assert.Equal("PayService:: No payment information found for nonexistanceform", result.Message);
+        }
+
+        [Fact]
+        public void ProcessPaymentResponse_ShouldThrowApplicationException_WhenPaymentProvider_IsNull()
+        {
+            var result = Assert.Throws<ApplicationException>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345"));
+
+            Assert.Equal("PayService:: No payment information found for nonexistanceform", result.Message);
+        }
+
+        [Fact]
+        public void ProcessPaymentResponse_ShouldThrowException_WhenPaymentProviderThrows()
+        {
+            _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
+                .Throws<Exception>();
+
+            Assert.Throws<Exception>(() => _service.ProcessPaymentResponse("testForm", "12345"));
+        }
+
+        [Fact]
+        public void ProcessPaymentResponse_ShouldReturnPaymentReference_OnSuccessfull_PaymentProviderCall()
+        {
+            _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
+                .Returns("12345");
+
+            var result = _service.ProcessPaymentResponse("testForm", "12345");
+
+            Assert.IsType<string>(result);
+            Assert.NotNull(result);
         }
     }
 }

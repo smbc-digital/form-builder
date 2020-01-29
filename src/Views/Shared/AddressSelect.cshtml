@@ -14,9 +14,9 @@
 
 <legend>
     <label @Model.Item1.Element.WriteOptional() for="@questionId">@Model.Item1.Element.Properties.AddressLabel</label>
-    @if (Model.Item1.Element.Properties?.Optional ?? true)
+    @if (Model.Item1.Element.Properties.Optional)
     {
-        <p class="optional">(optional)</p>
+        <span class="optional">(optional)</span>
     }
 </legend>
 
