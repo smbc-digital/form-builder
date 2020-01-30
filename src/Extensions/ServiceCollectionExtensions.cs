@@ -145,14 +145,14 @@ namespace form_builder.Extensions
 
         public static IServiceCollection AddSchemaProvider(this IServiceCollection services, IHostingEnvironment HostingEnvironment)
         {
-            if (HostingEnvironment.IsEnvironment("local") || HostingEnvironment.IsEnvironment("uitest"))
-            {
-                services.AddSingleton<ISchemaProvider, LocalFileSchemaProvider>();
-            }
-            else
-            {
-              services.AddSingleton<ISchemaProvider, S3FileSchemaProvider>();
-            }
+            //if (/*HostingEnvironment.IsEnvironment("local") ||*/ HostingEnvironment.IsEnvironment("uitest"))
+            //{
+            //    services.AddSingleton<ISchemaProvider, LocalFileSchemaProvider>();
+            //}
+            //else
+            //{
+                 services.AddSingleton<ISchemaProvider, S3FileSchemaProvider>();
+            //}
 
             return services;
         }

@@ -1,7 +1,9 @@
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties;
 using form_builder.Validators;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +12,8 @@ namespace form_builder.Models
 {
     public class Page
     {
-        public Page()
+       
+        public Page(IHostingEnvironment environment)
         {
             IsValidated = false;
         }
@@ -64,7 +67,7 @@ namespace form_builder.Models
                 .OrderByDescending(_ => _.Conditions.Count)
                 .FirstOrDefault(_ => _.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]));
 
-        public string GetSubmitFormEndpoint(FormAnswers formAnswers)
+        public string GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)
         {
             var submitBehaviour = string.Empty;
 
@@ -81,11 +84,34 @@ namespace form_builder.Models
 
                 var viewModel = new Dictionary<string, string>();
                 previousPage.Answers.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
-                submitBehaviour = GetNextPage(viewModel).PageSlugs[0].URL;
+                submitBehaviour = GetNextPage(viewModel).PageSlug;
             }
             else
             {
-                submitBehaviour = pageSubmitBehaviours.FirstOrDefault()?.PageSlugs[0].URL;
+                int blah = 0;
+                switch (environment.ToLower())
+                {
+                    case "local":
+                        blah = 0;
+                        break;
+                    case "int":
+                        blah = 1;
+                        break;
+                    case "qa":
+                        blah = 2;
+                        break;
+                    case "staging":
+                        blah = 3;
+                        break;
+                    case "prod":
+                        blah = 4;
+                        break;
+                    default:
+                        blah = 0;
+                        break;
+                }
+
+                submitBehaviour = pageSubmitBehaviours.FirstOrDefault()?.SubmitSlugs[blah].URL;
             }
 
             if (string.IsNullOrEmpty(submitBehaviour))

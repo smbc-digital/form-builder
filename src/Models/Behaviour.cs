@@ -12,10 +12,12 @@ namespace form_builder.Models
         [JsonConverter(typeof(StringEnumConverter))]
         public EBehaviourType BehaviourType { get; set; }
 
-        public List<PageSlug> PageSlugs { get; set; }
+        public string PageSlug { get; set; }
+
+        public List<SubmitSlug> SubmitSlugs { get; set; }
     }
 
-    public class PageSlug
+    public class SubmitSlug
     {
         public string Location { get; set; }
         public string URL { get; set; }
