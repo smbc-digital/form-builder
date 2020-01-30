@@ -81,11 +81,11 @@ namespace form_builder.Models
 
                 var viewModel = new Dictionary<string, string>();
                 previousPage.Answers.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
-                submitBehaviour = GetNextPage(viewModel).PageSlug;
+                submitBehaviour = GetNextPage(viewModel).PageSlugs[0].URL;
             }
             else
             {
-                submitBehaviour = pageSubmitBehaviours.FirstOrDefault()?.PageSlug;
+                submitBehaviour = pageSubmitBehaviours.FirstOrDefault()?.PageSlugs[0].URL;
             }
 
             if (string.IsNullOrEmpty(submitBehaviour))

@@ -75,11 +75,11 @@ namespace form_builder.Controllers
             switch (behaviour.BehaviourType)
             {
                 case EBehaviourType.GoToExternalPage:
-                    return Redirect(behaviour.PageSlug);
+                    return Redirect(behaviour.PageSlugs[0].URL);
                 case EBehaviourType.GoToPage:
                     return RedirectToAction("Index", new
                     {
-                        path = behaviour.PageSlug
+                        path = behaviour.PageSlugs[0].URL
                     });
                 case EBehaviourType.SubmitForm:
                     return RedirectToAction("Submit", new
@@ -111,11 +111,11 @@ namespace form_builder.Controllers
             switch (behaviour.BehaviourType)
             {
                 case EBehaviourType.GoToExternalPage:
-                    return Redirect(behaviour.PageSlug);
+                    return Redirect(behaviour.PageSlugs[0].URL);
                 case EBehaviourType.GoToPage:
                     return RedirectToAction("Index", new
                     {
-                        path = behaviour.PageSlug,
+                        path = behaviour.PageSlugs[0].URL,
                         form
                     });
                 case EBehaviourType.SubmitForm:
