@@ -9,6 +9,7 @@ namespace form_builder_tests.Builders
         private List<Condition> _conditions = new List<Condition>();
         private EBehaviourType _behaviourType = EBehaviourType.GoToExternalPage;
         private string _PageSlug = "test-url";
+        private List<SubmitSlug> _submitSlugs = new List<SubmitSlug>();
 
         public Behaviour Build()
         {
@@ -29,6 +30,12 @@ namespace form_builder_tests.Builders
         public BehaviourBuilder WithPageSlug(string PageSlug)
         {
             _PageSlug = PageSlug;
+            return this;
+        }
+
+        public BehaviourBuilder WithSubmitSlug(List<SubmitSlug> SubmitSlugs)
+        {
+            _submitSlugs = SubmitSlugs;
             return this;
         }
 

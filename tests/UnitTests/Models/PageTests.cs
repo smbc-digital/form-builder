@@ -11,22 +11,44 @@ namespace form_builder_tests.UnitTests.Models
     {
 
         [Fact]
-        public void GetSubmitFormEndpoint_ShouldReturnFirstBehviourSubmitUrl_WhenOnlyOneBehaviourExists()
+        public void GetSubmitFormEndpoint_ShouldReturnFirstBehaviourSubmitUrl_WhenOnlyOneBehaviourExists()
         {
-            var PageSlug = "page-one";
+            var SubmitSlug = "page-one";
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageSlug(PageSlug)
+                .WithPageSlug(SubmitSlug)
                 .Build();
 
             var page = new PageBuilder()
                 .WithBehaviour(behaviour)
                 .Build();
 
-            var result = page.GetSubmitFormEndpoint(new FormAnswers());
+            var result = page.GetSubmitFormEndpoint(new FormAnswers(), "");
 
-            Assert.Equal(PageSlug, result);
+            Assert.Equal(SubmitSlug, result);
+
+            //var submitSlug = new List<SubmitSlug>
+            //{
+            //    new SubmitSlug
+            //    {
+            //        URL = "local",
+            //        Location = "page-two"
+            //    }
+            //};
+
+            //var behaviour = new BehaviourBuilder()
+            //    .WithBehaviourType(EBehaviourType.SubmitForm)
+            //    .WithSubmitSlug(submitSlug)
+            //    .Build();
+
+            //var page = new PageBuilder()
+            //    .WithBehaviour(behaviour)
+            //    .Build();
+
+            //var result = page.GetSubmitFormEndpoint(new FormAnswers(), submitSlug.ToString());
+
+            //Assert.Equal(submitSlug.ToString(), result);
         }
 
         [Fact]
@@ -43,7 +65,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour)
                 .Build();
 
-            Assert.Throws<NullReferenceException>(() => page.GetSubmitFormEndpoint(new FormAnswers()));
+            Assert.Throws<NullReferenceException>(() => page.GetSubmitFormEndpoint(new FormAnswers(), null));
         }
 
         [Fact]
@@ -67,7 +89,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour2)
                 .Build();
 
-            var result = page.GetSubmitFormEndpoint(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "test", Response = "test" } } } } });
+            var result = page.GetSubmitFormEndpoint(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "test", Response = "test" } } } } }, null);
 
             Assert.Equal(PageSlug, result);
         }

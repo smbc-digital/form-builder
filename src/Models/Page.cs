@@ -1,9 +1,7 @@
 using form_builder.Enum;
-using form_builder.Extensions;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties;
 using form_builder.Validators;
-using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +11,7 @@ namespace form_builder.Models
     public class Page
     {
        
-        public Page(IHostingEnvironment environment)
+        public Page()
         {
             IsValidated = false;
         }
@@ -88,30 +86,29 @@ namespace form_builder.Models
             }
             else
             {
-                int blah = 0;
+                int index = 0;
                 switch (environment.ToLower())
                 {
                     case "local":
-                        blah = 0;
+                        index = 0;
                         break;
                     case "int":
-                        blah = 1;
+                        index = 1;
                         break;
                     case "qa":
-                        blah = 2;
+                        index = 2;
                         break;
                     case "staging":
-                        blah = 3;
+                        index = 3;
                         break;
                     case "prod":
-                        blah = 4;
+                        index = 4;
                         break;
                     default:
-                        blah = 0;
+                        index = 0;
                         break;
                 }
-
-                submitBehaviour = pageSubmitBehaviours.FirstOrDefault()?.SubmitSlugs[blah].URL;
+                submitBehaviour = pageSubmitBehaviours.FirstOrDefault()?.SubmitSlugs[index].URL;
             }
 
             if (string.IsNullOrEmpty(submitBehaviour))
