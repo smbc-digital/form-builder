@@ -84,7 +84,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 9
  testRunner.And("I should see the \"middleName\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 10
- testRunner.And("I should see a \"p\" element with \"(optional)\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"span\" element with \"(optional)\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 11
  testRunner.And("I should see the \"lastName\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 12

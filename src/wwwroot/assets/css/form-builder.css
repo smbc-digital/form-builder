@@ -53,19 +53,7 @@ fieldset.input-memorable-date, fieldset.input-time {
     position: relative;
 }
 
-legend > span.optional {
-    padding-left: 10px;
-    font-size: 0.875em;
-    display: inline-block;
-    margin-bottom: 0;
-}
-
 @media only screen and (max-width: 767px) {
-    legend > span.optional {
-        display: block;
-        padding: 0;
-        margin-bottom: 16px;
-    }
 
     ol.indented-list {
         margin-left: 25px;
