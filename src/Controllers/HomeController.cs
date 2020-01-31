@@ -122,7 +122,7 @@ namespace form_builder.Controllers
                     return RedirectToAction("Submit", new
                     {
                         form,
-                        path 
+                        path
                     });
                 case EBehaviourType.SubmitAndPay:
                     var result = await _paymentWorkflow.Submit(form, path);

@@ -108,7 +108,7 @@ namespace form_builder.Extensions
             services.AddSingleton<IStreetProvider, CRMStreetProvider>();
             return services;
         }
-        
+
         public static IServiceCollection ConfigurePaymentProviders(this IServiceCollection services)
         {
             services.AddSingleton<IPaymentProvider, CivicaPayProvider>();
@@ -174,7 +174,7 @@ namespace form_builder.Extensions
             switch (storageProviderConfiguration["Type"])
             {
                 case "Redis":
-                    services.AddStackExchangeRedisCache(options => 
+                    services.AddStackExchangeRedisCache(options =>
                     {
                         options.Configuration = storageProviderConfiguration["Address"];
                         options.InstanceName = storageProviderConfiguration["InstanceName"];
