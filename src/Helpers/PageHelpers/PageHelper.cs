@@ -1,4 +1,4 @@
-﻿using form_builder.Configuration;
+﻿ using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
@@ -30,6 +30,7 @@ namespace form_builder.Helpers.PageHelpers
         Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
         void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName);
         void CheckForPaymentConfiguration(List<Page> pages, string formName);
+        void CheckForEmptyBehaviourSlugs(List<Page> pages, string formName);
     }
 
     public class PageHelper : IPageHelper
@@ -237,6 +238,30 @@ namespace form_builder.Helpers.PageHelpers
                 if (!hashSet.Add(id))
                 {
                     throw new ApplicationException($"The provided json '{formName}' has duplicate QuestionIDs");
+                }
+            }
+        }
+
+        public void CheckForEmptyBehaviourSlugs(List<Page> pages, string formName)
+        {
+            List<Behaviour> behaviours = new List<Behaviour>();
+
+            foreach (var page in pages)
+            {
+                if (page.Behaviours != null)
+                {
+                    foreach (var behaviour in page.Behaviours)
+                    {
+                        behaviours.Add(behaviour);
+                    }
+                }
+            }
+
+            foreach (var item in behaviours)
+            {
+                if (string.IsNullOrEmpty(item.PageSlug) && (item.SubmitSlugs == null || item.SubmitSlugs.Count == 0))
+                {
+                        throw new ApplicationException($"Incorrectly configured behaviour slug was discovered in {formName} form");
                 }
             }
         }
