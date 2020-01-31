@@ -11,7 +11,7 @@ namespace form_builder_tests.UnitTests.Extensions
 
         [Theory]
         [InlineData("ui-test", "Int")]
-        [InlineData("local", "Int")]
+        [InlineData("local", "local")]
         [InlineData("int", "Int")]
         [InlineData("qa", "QA")]
         [InlineData("stage", "Staging")]
@@ -23,7 +23,7 @@ namespace form_builder_tests.UnitTests.Extensions
             Assert.Equal(expectedResult, testString.ToS3EnvPrefix());
         }
 
-        [Fact]
+        [Fact(Skip="no longer throwing an error, returning a default of local")]
         public void ToS3EnvPrefix_ShouldThrowException_WhenUnknownEnv()
         {
             var testString = "unkown-env";

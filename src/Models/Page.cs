@@ -10,14 +10,14 @@ namespace form_builder.Models
 {
     public class Page
     {
-       
+
         public Page()
         {
             IsValidated = false;
         }
 
         public string Title { get; set; }
-        
+
         public string PageSlug { get; set; }
 
         public List<IElement> Elements { get; set; }
@@ -32,29 +32,29 @@ namespace form_builder.Models
         {
             get
             {
-                if(IsValidated)
+                if (IsValidated)
                 {
                     return ValidatableElements.Where(element => !element.IsValid).Select(element => element.Properties);
                 }
-                
+
                 throw new System.Exception("Model is not validated, please call Validate()");
             }
         }
-        public IEnumerable<IElement> ValidatableElements =>  Elements.Where(element => element.Type == EElementType.Radio   || 
-                                                                element.Type == EElementType.Textarea ||
-                                                                element.Type == EElementType.Select ||
-                                                                element.Type == EElementType.Textbox ||
-                                                                element.Type == EElementType.Checkbox ||
-                                                                element.Type == EElementType.Address ||
-                                                                element.Type == EElementType.AddressManual ||
-                                                                element.Type == EElementType.DateInput ||
-                                                                element.Type == EElementType.TimeInput ||
-                                                                element.Type == EElementType.DatePicker ||
-                                                                element.Type == EElementType.Street ||
-                                                                element.Type == EElementType.Organisation);
-        
+        public IEnumerable<IElement> ValidatableElements => Elements.Where(element => element.Type == EElementType.Radio ||
+                                                               element.Type == EElementType.Textarea ||
+                                                               element.Type == EElementType.Select ||
+                                                               element.Type == EElementType.Textbox ||
+                                                               element.Type == EElementType.Checkbox ||
+                                                               element.Type == EElementType.Address ||
+                                                               element.Type == EElementType.AddressManual ||
+                                                               element.Type == EElementType.DateInput ||
+                                                               element.Type == EElementType.TimeInput ||
+                                                               element.Type == EElementType.DatePicker ||
+                                                               element.Type == EElementType.Street ||
+                                                               element.Type == EElementType.Organisation);
+
         public void Validate(Dictionary<string, string> viewModel, IEnumerable<IElementValidator> form_builder)
-        {   
+        {
             ValidatableElements.ToList().ForEach(element => element.Validate(viewModel, form_builder));
             IsValidated = true;
         }
@@ -86,29 +86,19 @@ namespace form_builder.Models
             }
             else
             {
-                int index = 0;
-                switch (environment.ToLower())
+                if (pageSubmitBehaviours.FirstOrDefault()?.SubmitSlugs == null)
                 {
-                    case "local":
-                        index = 0;
-                        break;
-                    case "int":
-                        index = 1;
-                        break;
-                    case "qa":
-                        index = 2;
-                        break;
-                    case "staging":
-                        index = 3;
-                        break;
-                    case "prod":
-                        index = 4;
-                        break;
-                    default:
-                        index = 0;
-                        break;
+                    submitBehaviour = pageSubmitBehaviours.FirstOrDefault()?.PageSlug;
                 }
-                submitBehaviour = pageSubmitBehaviours.FirstOrDefault()?.SubmitSlugs[index].URL;
+                else
+                {
+                    var behaviour = pageSubmitBehaviours.SelectMany(x => x.SubmitSlugs).Where(x => x.Location.ToLower() == environment.ToLower()).FirstOrDefault();
+                    if (behaviour == null)
+                    {
+                        throw new NullReferenceException("HomeController, Submit: No Url supplied for submit form");
+                    }
+                    submitBehaviour = behaviour.URL;
+                }
             }
 
             if (string.IsNullOrEmpty(submitBehaviour))
