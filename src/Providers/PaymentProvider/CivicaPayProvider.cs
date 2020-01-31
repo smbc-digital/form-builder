@@ -48,8 +48,8 @@ namespace form_builder.Providers.PaymentProvider
                         PaymentDetails = new PaymentDetail
                         {
                             CatalogueID = paymentInformation.Settings.CatalogueId,
-                            AccountReference = paymentInformation.Settings.AccountReference, 
-                            PaymentAmount = paymentInformation.Settings.Amount, 
+                            AccountReference = paymentInformation.Settings.AccountReference,
+                            PaymentAmount = paymentInformation.Settings.Amount,
                             Quantity = "1",
                             PaymentNarrative = form,
                             CallingAppTranReference = $"{reference}|{sessionGuid}"

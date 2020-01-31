@@ -61,7 +61,7 @@ namespace form_builder
             else
             {
                 app.UseMiddleware<AppExceptionHandling>();
-                
+
                 app.UseHsts();
             }
 
