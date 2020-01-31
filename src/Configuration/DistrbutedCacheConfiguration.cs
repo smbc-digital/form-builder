@@ -2,6 +2,6 @@ namespace form_builder.Configuration
 {
     public class DistrbutedCacheConfiguration
     {
-        public int Expiration { get; set; }
+        public bool UseDistrbutedCache { get; set; }
     }
 }

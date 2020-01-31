@@ -102,7 +102,7 @@ namespace form_builder.Services.PageService
                 throw new ApplicationException($"Requested path '{path}' object could not be found.");
             }
 
-            baseForm.ValidateFormSchema(_pageHelper, form, path);
+            await baseForm.ValidateFormSchema(_pageHelper, form, path);
 
             if (isAddressManual)
             {

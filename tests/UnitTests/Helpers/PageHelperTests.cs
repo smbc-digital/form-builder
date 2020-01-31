@@ -1,4 +1,5 @@
-﻿using form_builder.Configuration;
+﻿using form_builder.Cache;
+using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
@@ -31,8 +32,10 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _mockDisallowedKeysOptions = new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
-        private readonly Mock<IOptions<PaymentInformationConfiguration>> _mockPaymentInfomation = new Mock<IOptions<PaymentInformationConfiguration>>();
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
+        private readonly Mock<ICache> _mockCache = new Mock<ICache>();
+        private readonly Mock<IOptions<DistrbutedCacheConfiguration>> _mockDistrbutedCacheSettings = new Mock<IOptions<DistrbutedCacheConfiguration>>();
+        private readonly Mock<IOptions<DistrbutedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings = new Mock<IOptions<DistrbutedCacheExpirationConfiguration>>();
 
         public PageHelperTests()
         {
@@ -44,19 +47,26 @@ namespace form_builder_tests.UnitTests.Helpers
                 }
             });
 
-            _mockPaymentInfomation.Setup(_ => _.Value).Returns(new PaymentInformationConfiguration
-            {
-                PaymentConfigs = new List<PaymentInformation> 
-                {
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(new List<PaymentInformation> {
                     new PaymentInformation {
                         FormName = "test-form"
-                    }
-                }
+                    } });
+
+            _mockDistrbutedCacheSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheConfiguration
+            {
+                UseDistrbutedCache = true
+            });
+
+            _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheExpirationConfiguration
+            {
+                UserData = 30,
+                PaymentConfiguration = 5
             });
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
 
-            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object,_mockPaymentInfomation.Object, _mockHostingEnv.Object);
+            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object, _mockCache.Object, _mockDistrbutedCacheSettings.Object, _mockDistrbutedCacheExpirationSettings.Object);
         }
 
         [Fact]
@@ -702,7 +712,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CheckForPaymentConfiguration_ShouldThrowException_WhenNoConfigFound_ForForm()
+        public async Task CheckForPaymentConfiguration_ShouldThrowException_WhenNoConfigFound_ForForm()
         {
             var pages = new List<Page>();
 
@@ -716,12 +726,12 @@ namespace form_builder_tests.UnitTests.Helpers
 
             pages.Add(page);
             
-            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForPaymentConfiguration(pages, "no-form-config"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.CheckForPaymentConfiguration(pages, "no-form-config"));
             Assert.Equal("No payment infomation configured for no-form-config form", result.Message);
         }
 
-                [Fact]
-        public void CheckForPaymentConfiguration_ShouldNot_ThrowException_WhenConfigFound_ForForm()
+        [Fact]
+        public async Task CheckForPaymentConfiguration_ShouldNot_ThrowException_WhenConfigFound_ForForm()
         {
             var pages = new List<Page>();
 
@@ -735,7 +745,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             pages.Add(page);
 
-            _pageHelper.CheckForPaymentConfiguration(pages, "test-form");
+            await _pageHelper.CheckForPaymentConfiguration(pages, "test-form");
         }
     }
 }

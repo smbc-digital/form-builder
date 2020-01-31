@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace form_builder.Models
 {
@@ -28,14 +29,14 @@ namespace form_builder.Models
             return page;
         }
 
-        public void ValidateFormSchema(IPageHelper pageHelper, string form, string path)
+        public async Task ValidateFormSchema(IPageHelper pageHelper, string form, string path)
         {
             if (path != StartPageSlug)
                 return;
 
             pageHelper.hasDuplicateQuestionIDs(Pages, form);
             pageHelper.CheckForInvalidQuestionOrTargetMappingValue(Pages, form);
-            pageHelper.CheckForPaymentConfiguration(Pages, form);
+            await pageHelper.CheckForPaymentConfiguration(Pages, form);
         }
     }
 }
