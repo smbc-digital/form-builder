@@ -8,6 +8,7 @@ using form_builder.Configuration;
 using Microsoft.Extensions.Options;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Cache;
+using form_builder.Enum;
 
 namespace form_builder.Services.PayService
 {

@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
@@ -6,12 +7,6 @@ using Newtonsoft.Json;
 
 namespace form_builder.Cache
 {
-    public enum ESchemaType {
-        Unknown,
-        FormJson,
-        PaymentConfiguration
-    }
-
     public interface ICache
     {
         Task<T> GetFromCacheOrDirectlyFromSchemaAsync<T>(string cacheKey, int minutes, bool useDistrbutedCache, ESchemaType type);
