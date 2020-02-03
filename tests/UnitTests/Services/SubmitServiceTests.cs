@@ -378,5 +378,41 @@ namespace form_builder_tests.UnitTests.Services
             Assert.StartsWith("SubmitService::PaymentSubmission, An exception has occured when response content from ", result.Message);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
+        
+        [Fact]
+        public async Task PaymentSubmission_ShouldThrowApplicationException_WhenGatewayResponseContent_IsEmpty()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+            var postUrl = "www.post.url";
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageSlug(postUrl)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+               .ReturnsAsync(new HttpResponseMessage
+               {
+                   StatusCode = HttpStatusCode.OK,
+                   Content = new StringContent("")
+               });
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
+
+            // Assert
+            Assert.StartsWith($"SubmitService::PaymentSubmission, Gateway {postUrl} responsed with empty reference", result.Message);
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
+        }
     }
 }
