@@ -1,4 +1,5 @@
-﻿ using form_builder.Configuration;
+﻿using form_builder.Cache;
+using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
@@ -29,7 +30,7 @@ namespace form_builder.Helpers.PageHelpers
         Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
         Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
         void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName);
-        void CheckForPaymentConfiguration(List<Page> pages, string formName);
+        Task CheckForPaymentConfiguration(List<Page> pages, string formName);
         void CheckForEmptyBehaviourSlugs(List<Page> pages, string formName);
     }
 
@@ -40,15 +41,21 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
         private readonly IHostingEnvironment _enviroment;
-        private readonly PaymentInformationConfiguration _paymentInformationConfiguration;
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IOptions<PaymentInformationConfiguration> paymentInformationConfiguration, IHostingEnvironment enviroment)
+
+        private readonly DistrbutedCacheConfiguration _distrbutedCacheConfiguration;
+        private readonly DistrbutedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly ICache _cache;
+        
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache, IOptions<DistrbutedCacheConfiguration> distrbutedCacheConfiguration, IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
             _distributedCache = distributedCache;
             _disallowedKeys = disallowedKeys.Value;
             _enviroment = enviroment;
-            _paymentInformationConfiguration = paymentInformationConfiguration.Value;
+            _cache = cache;
+            _distrbutedCacheConfiguration = distrbutedCacheConfiguration.Value;
+            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null)
@@ -266,7 +273,7 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
-        public void CheckForPaymentConfiguration(List<Page> pages, string formName)
+        public async Task CheckForPaymentConfiguration(List<Page> pages, string formName)
         {
             var containsPayment = pages.Where(x => x.Behaviours != null)
                 .SelectMany(x => x.Behaviours)
@@ -275,7 +282,9 @@ namespace form_builder.Helpers.PageHelpers
             if(!containsPayment)
                 return;
             
-            var config = _paymentInformationConfiguration.PaymentConfigs.Where(x => x.FormName == formName)
+            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>("paymentconfiguration", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, _distrbutedCacheConfiguration.UseDistrbutedCache, ESchemaType.PaymentConfiguration);
+
+            var config = paymentInformation.Where(x => x.FormName == formName)
                 .FirstOrDefault();
 
             if(config == null){

@@ -9,6 +9,7 @@ using form_builder.Extensions;
 using form_builder.Configuration;
 using StockportGovUK.AspNetCore.Middleware.App;
 using StockportGovUK.NetStandard.Gateways;
+using form_builder.Cache;
 
 namespace form_builder
 {
@@ -44,6 +45,8 @@ namespace form_builder
                 .AddWorkflows()
                 .AddSession(_ => _.IdleTimeout = TimeSpan.FromMinutes(30));
 
+            services.AddTransient<ICache, form_builder.Cache.Cache>();
+
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
@@ -58,7 +61,7 @@ namespace form_builder
             else
             {
                 app.UseMiddleware<AppExceptionHandling>();
-                
+
                 app.UseHsts();
             }
 

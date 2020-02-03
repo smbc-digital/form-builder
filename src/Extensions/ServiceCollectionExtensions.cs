@@ -108,7 +108,7 @@ namespace form_builder.Extensions
             services.AddSingleton<IStreetProvider, CRMStreetProvider>();
             return services;
         }
-        
+
         public static IServiceCollection ConfigurePaymentProviders(this IServiceCollection services)
         {
             services.AddSingleton<IPaymentProvider, CivicaPayProvider>();
@@ -161,20 +161,20 @@ namespace form_builder.Extensions
         {
             services.Configure<DisallowedAnswerKeysConfiguration>(configuration.GetSection("FormConfig"));
             services.Configure<CivicaPaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
-            services.Configure<PaymentInformationConfiguration>(configuration.GetSection("PaymentInformationConfiguration"));
-            services.Configure<DistrbutedCacheConfiguration>(cacheOptions => cacheOptions.Expiration = configuration.GetValue<int>("DistrbutedCacheExpiration"));
+            services.Configure<DistrbutedCacheExpirationConfiguration>(configuration.GetSection("DistrbutedCacheExpiration"));
+            services.Configure<DistrbutedCacheConfiguration>(cacheOptions => cacheOptions.UseDistrbutedCache = configuration.GetValue<bool>("UseDistrbutedCache"));
 
             return services;
         }
 
         public static IServiceCollection AddStorageProvider(this IServiceCollection services, IConfiguration configuration)
         {
-              var storageProviderConfiguration = configuration.GetSection("StorageProvider");
+            var storageProviderConfiguration = configuration.GetSection("StorageProvider");
 
             switch (storageProviderConfiguration["Type"])
             {
                 case "Redis":
-                    services.AddStackExchangeRedisCache(options => 
+                    services.AddStackExchangeRedisCache(options =>
                     {
                         options.Configuration = storageProviderConfiguration["Address"];
                         options.InstanceName = storageProviderConfiguration["InstanceName"];

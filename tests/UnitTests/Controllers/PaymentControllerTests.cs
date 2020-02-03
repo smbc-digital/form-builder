@@ -29,7 +29,7 @@ namespace form_builder_tests.UnitTests.Controllers
         public void HandlePaymentResponse_ShouldCallService_AndRedirectToSuccessAction()
         {
             _payService.Setup(_ => _.ProcessPaymentResponse(It.IsAny<string>(),It.IsAny<string>()))
-                .Returns("1234");
+                .ReturnsAsync("1234");
 
             var result = _controller.HandlePaymentResponse("form", "page-one", "0000", "123456");
 
