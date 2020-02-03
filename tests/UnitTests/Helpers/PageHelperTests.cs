@@ -331,7 +331,6 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
-
         [Fact]
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartialForImg()
         {
@@ -555,10 +554,10 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.hasDuplicateQuestionIDs(pages, "form");
         }
 
-       [Fact]
-       public async Task ProcessOrganisationJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
+        [Fact]
+        public async Task ProcessOrganisationJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
         {
-            var result = await _pageHelper.ProcessOrganisationJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty {  QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
+            var result = await _pageHelper.ProcessOrganisationJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
 
             var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
             Assert.Equal("../Organisation/Index", journeyResult.ViewName);
@@ -746,6 +745,70 @@ namespace form_builder_tests.UnitTests.Helpers
             pages.Add(page);
 
             await _pageHelper.CheckForPaymentConfiguration(pages, "test-form");
+        }
+
+        [Fact]
+        public void CheckForEmptyBehaviourSlugs_ShouldThrowAnException_WhenSubmitSlugAndPageSlugAreEmpty()
+        {
+            var pages = new List<Page>();
+
+            var behaviour = new BehaviourBuilder()
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            pages.Add(page);
+
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForEmptyBehaviourSlugs(pages, "end-point"));
+            Assert.Equal($"Incorrectly configured behaviour slug was discovered in end-point form", result.Message);
+        }
+
+        [Fact]
+        public void CheckForEmptyBehaviourSlugs_ShouldNotThrowAnException_WhenSubmitSlugIsNotEmpty()
+        {
+            var pages = new List<Page>();
+
+            var submitSlug = new SubmitSlug
+            {
+                Location = "local",
+                URL = "test-url"
+            };
+
+            var behaviour = new BehaviourBuilder()
+                .WithSubmitSlug(submitSlug)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            pages.Add(page);
+
+            _pageHelper.CheckForEmptyBehaviourSlugs(pages, "end-point");
+
+            Assert.Single(pages[0].Behaviours[0].SubmitSlugs);
+        }
+
+        [Fact]
+        public void CheckForEmptyBehaviourSlugs_ShouldNotThrowAnException_WhenPageSlugIsNotEmpty()
+        {
+            var pages = new List<Page>();
+
+            var behaviour = new BehaviourBuilder()
+                .WithPageSlug("page-slug")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            pages.Add(page);
+
+            _pageHelper.CheckForEmptyBehaviourSlugs(pages, "end-point");
+
+            Assert.Equal("page-slug", pages[0].Behaviours[0].PageSlug);
         }
     }
 }

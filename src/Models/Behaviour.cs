@@ -13,5 +13,13 @@ namespace form_builder.Models
         public EBehaviourType BehaviourType { get; set; }
 
         public string PageSlug { get; set; }
+
+        public List<SubmitSlug> SubmitSlugs { get; set; }
+    }
+
+    public class SubmitSlug
+    {
+        public string Location { get; set; }
+        public string URL { get; set; }
     }
 }

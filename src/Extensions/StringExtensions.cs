@@ -8,8 +8,9 @@ namespace form_builder.Extensions
         {
             switch (value)
             {
-                case "ui-test":
                 case "local":
+                    return "local";
+                case "uitest":
                 case "int":
                     return "Int";
                 case "qa":
@@ -20,7 +21,6 @@ namespace form_builder.Extensions
                     return "Prod";
                 default:
                     throw new Exception("Unknown environment name");
-
             }
         }
 

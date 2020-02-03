@@ -21,7 +21,7 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
 
         public S3FileSchemaProviderTests()
         {
-            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("ui-test");
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("uitest");
 
             _s3Schema = new S3FileSchemaProvider(_mockS3gateway.Object, _mockLogger.Object, _mockHostingEnv.Object);
         }

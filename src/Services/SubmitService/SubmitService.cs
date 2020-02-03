@@ -12,6 +12,8 @@ using System.Net;
 using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Gateways.ComplimentsComplaintsServiceGateway;
 using form_builder.Services.MappingService.Entities;
+using Microsoft.AspNetCore.Hosting;
+using form_builder.Extensions;
 
 namespace form_builder.Services.SubmtiService
 {
@@ -34,7 +36,11 @@ namespace form_builder.Services.SubmtiService
 
         private readonly ILogger<SubmitService> _logger;
 
-        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IComplimentsComplaintsServiceGateway complimentsComplaintsServiceGateway, IPageHelper pageHelper, ISessionHelper sessionHelper)
+        private readonly IHostingEnvironment _environment;
+
+
+
+        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IComplimentsComplaintsServiceGateway complimentsComplaintsServiceGateway, IPageHelper pageHelper, ISessionHelper sessionHelper, IHostingEnvironment environment)
         {
             _distributedCache = distributedCache;
             _gateway = gateway;
@@ -42,6 +48,7 @@ namespace form_builder.Services.SubmtiService
             _pageHelper = pageHelper;
             _sessionHelper = sessionHelper;
             _logger = logger;
+            _environment = environment;
         }
 
         public async Task<SubmitServiceEntity> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
@@ -49,7 +56,7 @@ namespace form_builder.Services.SubmtiService
             var reference = string.Empty;
 
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
-            var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers);
+            var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers , _environment.EnvironmentName.ToS3EnvPrefix());
 
             if (form == "give-a-compliment" || form == "give-feedback" || form == "make-a-formal-complaint")
             {
@@ -119,7 +126,8 @@ namespace form_builder.Services.SubmtiService
             var reference = string.Empty;
 
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
-            var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers);
+
+            var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
             var response = await _gateway.PostAsync(postUrl, mappingEntity.Data);
 

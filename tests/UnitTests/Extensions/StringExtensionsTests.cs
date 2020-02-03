@@ -10,8 +10,8 @@ namespace form_builder_tests.UnitTests.Extensions
     {
 
         [Theory]
-        [InlineData("ui-test", "Int")]
-        [InlineData("local", "Int")]
+        [InlineData("uitest", "Int")]
+        [InlineData("local", "local")]
         [InlineData("int", "Int")]
         [InlineData("qa", "QA")]
         [InlineData("stage", "Staging")]
