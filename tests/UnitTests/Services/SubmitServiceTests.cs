@@ -36,6 +36,9 @@ namespace form_builder_tests.UnitTests.Services
 
         public SubmitServiceTests()
         {
+            _mockEnvironment.Setup(_ => _.EnvironmentName)
+                .Returns("local"); 
+
             var cacheData = new FormAnswers
             {
                 Path = "page-one",

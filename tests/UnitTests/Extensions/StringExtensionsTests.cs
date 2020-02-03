@@ -23,7 +23,7 @@ namespace form_builder_tests.UnitTests.Extensions
             Assert.Equal(expectedResult, testString.ToS3EnvPrefix());
         }
 
-        [Fact(Skip="no longer throwing an error, returning a default of local")]
+        [Fact]
         public void ToS3EnvPrefix_ShouldThrowException_WhenUnknownEnv()
         {
             var testString = "unkown-env";
