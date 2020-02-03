@@ -11,7 +11,7 @@ namespace form_builder_tests.UnitTests.Models
     {
 
         [Fact]
-        public void GetSubmitFormEndpoint_ShouldReturnFirstBehaviourSubmitUrl_WhenOnlyOneBehaviourExists()
+        public void GetSubmitFormEndpoint_ShouldReturnPageSlug_WhenOnlyOneBehaviourExistsAndNoSubmitSlugs()
         {
             var SubmitSlug = "page-one";
 
@@ -27,28 +27,6 @@ namespace form_builder_tests.UnitTests.Models
             var result = page.GetSubmitFormEndpoint(new FormAnswers(), "");
 
             Assert.Equal(SubmitSlug, result);
-
-            //var submitSlug = new List<SubmitSlug>
-            //{
-            //    new SubmitSlug
-            //    {
-            //        URL = "local",
-            //        Location = "page-two"
-            //    }
-            //};
-
-            //var behaviour = new BehaviourBuilder()
-            //    .WithBehaviourType(EBehaviourType.SubmitForm)
-            //    .WithSubmitSlug(submitSlug)
-            //    .Build();
-
-            //var page = new PageBuilder()
-            //    .WithBehaviour(behaviour)
-            //    .Build();
-
-            //var result = page.GetSubmitFormEndpoint(new FormAnswers(), submitSlug.ToString());
-
-            //Assert.Equal(submitSlug.ToString(), result);
         }
 
         [Fact]

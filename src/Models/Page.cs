@@ -86,7 +86,7 @@ namespace form_builder.Models
             }
             else
             {
-                if (pageSubmitBehaviours.FirstOrDefault()?.SubmitSlugs == null)
+                if (pageSubmitBehaviours.FirstOrDefault()?.SubmitSlugs.Count == 0)
                 {
                     submitBehaviour = pageSubmitBehaviours.FirstOrDefault()?.PageSlug;
                 }
