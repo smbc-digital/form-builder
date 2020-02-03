@@ -10,7 +10,7 @@ namespace form_builder.Extensions
             {
                 case "local":
                     return "local";
-                case "ui-test":
+                case "uitest":
                 case "int":
                     return "Int";
                 case "qa":
@@ -20,8 +20,7 @@ namespace form_builder.Extensions
                 case "prod":
                     return "Prod";
                 default:
-                    return "local";
-                    //throw new Exception("Unknown environment name");
+                    throw new Exception("Unknown environment name");
             }
         }
 
