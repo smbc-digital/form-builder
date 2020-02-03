@@ -87,3 +87,7 @@ fieldset.input-memorable-date, fieldset.input-time {
     padding: 12px 18px 4px 45px;
     position: relative;
 }
+
+::-webkit-clear-button {
+    display: none;
+}
