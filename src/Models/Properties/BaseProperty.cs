@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace form_builder.Models.Properties
@@ -21,7 +22,7 @@ namespace form_builder.Models.Properties
         public List<string> ListItems = new List<string>();
         public bool Checked { get; set; }
         public string SelectLabel { get; set; } = string.Empty;
-        public string Max { get; set; } = string.Empty;
+        public string Max { get; set; } = (DateTime.Now.Year + 100).ToString();
         public string Min { get; set; } = string.Empty;
         public string TargetMapping { get; set; }
         public string UpperLimitValidationMessage { get; set; } = string.Empty;
