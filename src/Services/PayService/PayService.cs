@@ -15,8 +15,8 @@ namespace form_builder.Services.PayService
     public interface IPayService
     {
         Task<string> ProcessPayment(string form, string path, string reference, string sessionGuid);
-        Task<string> ProcessPaymentResponse(string form, string responseCode);
-        
+        Task<string> ProcessPaymentResponse(string form, string responseCode, string reference);
+
     }
 
     public class PayService : IPayService
@@ -46,13 +46,13 @@ namespace form_builder.Services.PayService
             return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, paymentInformation);
         }
 
-        public async Task<string> ProcessPaymentResponse(string form, string responseCode)
+        public async Task<string> ProcessPaymentResponse(string form, string responseCode, string reference)
         {
             var paymentInformation = await GetFormPaymentInformation(form);
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
             try {
-                var result = paymentProvider.VerifyPaymentResponse(responseCode);
+                var result = paymentProvider.VerifyPaymentResponse(responseCode, reference);
                 return result;
             } catch(Exception e){
                 throw e;

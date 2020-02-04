@@ -21,7 +21,7 @@ namespace form_builder.Controllers
         {
             try
             {
-                var reference = await _payService.ProcessPaymentResponse(form, responseCode);
+                var reference = await _payService.ProcessPaymentResponse(form, responseCode, callingAppTxnRef);
 
                 return RedirectToAction("PaymentSuccess", new
                 {
@@ -63,7 +63,7 @@ namespace form_builder.Controllers
         [Route("{form}/payment-failure")]
         public IActionResult PaymentFailure(string form)
         {
-            var paymentFailureViewModel = new PaymentFailureViewModel 
+            var paymentFailureViewModel = new PaymentFailureViewModel
             {
                 FormName = form,
                 PageTitle = "Failure",
