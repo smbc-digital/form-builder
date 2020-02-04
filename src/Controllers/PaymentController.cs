@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using form_builder.Exceptions;
 using form_builder.Services.PayService;
 using form_builder.ViewModels;
@@ -16,11 +17,11 @@ namespace form_builder.Controllers
 
         [HttpGet]
         [Route("{form}/{path}/payment-response")]
-        public IActionResult HandlePaymentResponse(string form, string path, [FromQuery]string responseCode, [FromQuery]string callingAppTxnRef)
+        public async Task<IActionResult> HandlePaymentResponse(string form, string path, [FromQuery]string responseCode, [FromQuery]string callingAppTxnRef)
         {
             try
             {
-                var reference = _payService.ProcessPaymentResponse(form, responseCode);
+                var reference = await _payService.ProcessPaymentResponse(form, responseCode);
 
                 return RedirectToAction("PaymentSuccess", new
                 {

@@ -138,7 +138,12 @@ namespace form_builder.Services.SubmtiService
 
             if (response.Content != null)
             {
-                var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
+                var content = await response.Content.ReadAsStringAsync();
+
+                if(string.IsNullOrWhiteSpace(content)){
+                    throw new ApplicationException($"SubmitService::PaymentSubmission, Gateway {postUrl} responsed with empty reference");
+                }
+                
                 return JsonConvert.DeserializeObject<string>(content);
             }
 

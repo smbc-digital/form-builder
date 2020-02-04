@@ -40,7 +40,7 @@ namespace form_builder.Providers.PaymentProvider
                 ApiPassword = _paymentConfig.ApiPassword,
                 ReturnURL = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response",
                 NotifyURL = string.Empty,
-                CallingAppTranReference = $"{reference}|{sessionGuid}",
+                CallingAppTranReference = reference,
                 PaymentItems = new List<PaymentItem>
                 {
                     new PaymentItem
@@ -52,7 +52,7 @@ namespace form_builder.Providers.PaymentProvider
                             PaymentAmount = paymentInformation.Settings.Amount,
                             Quantity = "1",
                             PaymentNarrative = form,
-                            CallingAppTranReference = $"{reference}|{sessionGuid}"
+                            CallingAppTranReference = reference
                         },
                         AddressDetails = new AddressDetail()
                     }
