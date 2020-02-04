@@ -92,7 +92,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowApplicationException_WhenPaymentConfig_IsNull()
         {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345", "reference"));
 
             Assert.Equal("PayService:: No payment information found for nonexistanceform", result.Message);
         }
@@ -100,7 +100,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowApplicationException_WhenPaymentProvider_IsNull()
         {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345", "reference"));
 
             Assert.Equal("PayService:: No payment information found for nonexistanceform", result.Message);
         }
@@ -108,19 +108,19 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowException_WhenPaymentProviderThrows()
         {
-            _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
+            _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws<Exception>();
 
-            await Assert.ThrowsAsync<Exception>(() => _service.ProcessPaymentResponse("testForm", "12345"));
+            await Assert.ThrowsAsync<Exception>(() => _service.ProcessPaymentResponse("testForm", "12345", "reference"));
         }
 
         [Fact]
         public async Task ProcessPaymentResponse_ShouldReturnPaymentReference_OnSuccessfull_PaymentProviderCall()
         {
-            _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
+            _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("12345");
 
-            var result = await _service.ProcessPaymentResponse("testForm", "12345");
+            var result = await _service.ProcessPaymentResponse("testForm", "12345", "reference");
 
             Assert.IsType<string>(result);
             Assert.NotNull(result);
