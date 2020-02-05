@@ -14,6 +14,7 @@ using StockportGovUK.NetStandard.Gateways.ComplimentsComplaintsServiceGateway;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
 using form_builder.Extensions;
+using System.Linq;
 
 namespace form_builder.Services.SubmtiService
 {
@@ -56,15 +57,18 @@ namespace form_builder.Services.SubmtiService
             var reference = string.Empty;
 
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
-            var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers , _environment.EnvironmentName.ToS3EnvPrefix());
+            var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers , _environment.EnvironmentName.ToS3EnvPrefix());
+            //string[] blah = postUrlAndAuthToken.Split("**");
+            //var postUrl = blah[0];
+            //var authToken = blah[1];
 
             if (form == "give-a-compliment" || form == "give-feedback" || form == "make-a-formal-complaint")
             {
-                var response = await _complimentsComplaintsServiceGateway.SubmitForm(postUrl, mappingEntity.Data);
+                var response = await _complimentsComplaintsServiceGateway.SubmitForm(submitSlug.URL, mappingEntity.Data);
 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
                 }
 
                 if (response.ResponseContent != null)
@@ -74,11 +78,13 @@ namespace form_builder.Services.SubmtiService
             }
             else
             {
-                var response = await _gateway.PostAsync(postUrl, mappingEntity.Data);
+ //               _gateway.ChangeAuthenticationHeader("1eb7b2b9b7184408bd3244b05cc67a33");
+                _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
+                var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
                 }
 
                 if (response.Content != null)
@@ -129,7 +135,7 @@ namespace form_builder.Services.SubmtiService
 
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
-            var response = await _gateway.PostAsync(postUrl, mappingEntity.Data);
+            var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
