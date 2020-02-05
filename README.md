@@ -797,7 +797,10 @@ Time example
 ```
 
 ## <a name="pagebehaviours">PageBehaviours[*object*]</a>
-Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer:
+Example where if a user selects yes they will continue on with the form, otherwise they will submit their answer.
+In the instance of a GoToPage it will expect a "PageSlug": "[url]" 
+If it is a SubmitForm behaviour we have submitslugs which will (using the environment the form is running in e.g. local/Int/qa etc) determine the URL that the form will submit to.
+:
 ```json
     {
         "PageBehaviours": [
@@ -808,13 +811,27 @@ Example where if a user selects yes they will continue on with the form, otherwi
                         "EqualTo": "Yes"
                     }
                 ],
-                "BehaviourType": 0,
+                "BehaviourType": GoToPage,
                 "PageSlug": "why-do-you-like-apples"
             },
             {
                 "Conditions": [],
-                "BehaviourType": 1,
-                "PageSlug": "form-submission"
+                "BehaviourType": SubmitForm,
+                "PageSlug": "",
+                "SubmitSlugs": [
+                  {
+                      "Location": "local",
+                      "URL": "https://localhost:44359/api/v1/home"
+                  },
+                  {
+                       "Location": "Int",
+                       "URL": "http://scninthub-int1.stockport.gov.uk/formbuilderservice/api/v1/home"
+                   },
+                   {
+                        "Location": "QA",
+                        "URL": "http://scninthub-qa1.stockport.gov.uk/formbuilderservice/api/v1/home"
+                    }
+                    ]
             }
         ]
     }
