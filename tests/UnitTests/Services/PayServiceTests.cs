@@ -22,14 +22,13 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider = new Mock<IEnumerable<IPaymentProvider>>();
         private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
-        private readonly Mock<IOptions<DistrbutedCacheConfiguration>> _mockDistrbutedCacheSettings = new Mock<IOptions<DistrbutedCacheConfiguration>>();
         private readonly Mock<IOptions<DistrbutedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings = new Mock<IOptions<DistrbutedCacheExpirationConfiguration>>();
 
         public PayServiceTests()
         {
             _paymentProvider.Setup(_ => _.ProviderName).Returns("testPaymentProvider");
 
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<ESchemaType>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
 
             .ReturnsAsync(new List<PaymentInformation> {
                 new PaymentInformation
@@ -44,11 +43,6 @@ namespace form_builder_tests.UnitTests.Services
                 }
             });
 
-            _mockDistrbutedCacheSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheConfiguration
-            {
-                UseDistrbutedCache = true
-            });
-
             _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheExpirationConfiguration
             {
                 UserData = 30,
@@ -58,7 +52,7 @@ namespace form_builder_tests.UnitTests.Services
             var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
             _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
 
-            _service = new PayService(_mockPaymentProvider.Object, _mockLogger.Object, _mockGateway.Object, _mockCache.Object, _mockDistrbutedCacheExpirationSettings.Object, _mockDistrbutedCacheSettings.Object);
+            _service = new PayService(_mockPaymentProvider.Object, _mockLogger.Object, _mockGateway.Object, _mockCache.Object, _mockDistrbutedCacheExpirationSettings.Object);
         }
 
         [Fact]

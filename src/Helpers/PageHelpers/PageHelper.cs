@@ -42,11 +42,10 @@ namespace form_builder.Helpers.PageHelpers
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
         private readonly IHostingEnvironment _enviroment;
 
-        private readonly DistrbutedCacheConfiguration _distrbutedCacheConfiguration;
         private readonly DistrbutedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly ICache _cache;
         
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache, IOptions<DistrbutedCacheConfiguration> distrbutedCacheConfiguration, IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache, IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -54,7 +53,6 @@ namespace form_builder.Helpers.PageHelpers
             _disallowedKeys = disallowedKeys.Value;
             _enviroment = enviroment;
             _cache = cache;
-            _distrbutedCacheConfiguration = distrbutedCacheConfiguration.Value;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
         }
 
@@ -282,7 +280,7 @@ namespace form_builder.Helpers.PageHelpers
             if(!containsPayment)
                 return;
             
-            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>("paymentconfiguration", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, _distrbutedCacheConfiguration.UseDistrbutedCache, ESchemaType.PaymentConfiguration);
+            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>("paymentconfiguration", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
 
             var config = paymentInformation.Where(x => x.FormName == formName)
                 .FirstOrDefault();

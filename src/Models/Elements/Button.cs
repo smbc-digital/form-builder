@@ -29,7 +29,6 @@ namespace form_builder.Models.Elements
             return form.StartPageSlug == page.PageSlug;
         }
 
-
         private bool CheckForBehaviour(List<Behaviour> behaviour)
         {
             return behaviour.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay);
