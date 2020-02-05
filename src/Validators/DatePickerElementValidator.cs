@@ -9,7 +9,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
         {
-            if (element.Type != EElementType.DatePicker || element.Properties.Optional)
+            if (element.Type != EElementType.DatePicker || !viewModel.ContainsKey(element.Properties.QuestionId))
             {
                 return new ValidationResult
                 {
@@ -17,11 +17,19 @@ namespace form_builder.Validators
                 };
             }
 
-            var date = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId] : string.Empty;
+            var date = viewModel[element.Properties.QuestionId];
 
             var isValid = !string.IsNullOrEmpty(date);
 
-            if (!isValid)
+            if (!isValid && element.Properties.Optional)
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            }
+
+            if (!isValid && !element.Properties.Optional)
             {
                 return new ValidationResult
                 {
@@ -31,8 +39,10 @@ namespace form_builder.Validators
             }
 
             var isValidDate = DateTime.TryParse(date, out DateTime  dateValue);
+            var todaysDate = DateTime.Now;
+            var maxDate = string.IsNullOrEmpty(element.Properties.Max) ? todaysDate.AddYears(100) : new DateTime(int.Parse(element.Properties.Max), todaysDate.Month, todaysDate.Day);
 
-            if(dateValue > DateTime.Today.AddYears(100))
+            if(dateValue > maxDate)
             {
                 isValidDate = false;
             }
