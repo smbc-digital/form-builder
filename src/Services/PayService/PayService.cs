@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Cache;
 using form_builder.Enum;
+using form_builder.Services.MappingService.Entities;
 
 namespace form_builder.Services.PayService
 {
@@ -51,9 +52,10 @@ namespace form_builder.Services.PayService
             var paymentInformation = await GetFormPaymentInformation(form);
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
-            try {
-                var result = paymentProvider.VerifyPaymentResponse(responseCode, reference);
-                return result;
+             try {
+                paymentProvider.VerifyPaymentResponse(responseCode);
+                var response = await _gateway.PatchAsync("https://localhost:44359/api/v1/Verint/customerupdate", new { CaseReference = reference, EPaymentStatus = (int)EPaymentStatus.Success});
+                return reference;
             } catch(Exception e){
                 throw e;
             }
