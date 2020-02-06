@@ -54,7 +54,8 @@ namespace form_builder.Services.PayService
 
              try {
                 paymentProvider.VerifyPaymentResponse(responseCode);
-                var response = await _gateway.PatchAsync("https://localhost:44359/api/v1/Verint/customerupdate", new { CaseReference = reference, EPaymentStatus = (int)EPaymentStatus.Success});
+                string url = "Verint/customerupdate";
+                var response = await _gateway.PostAsync(url, new { CaseReference = reference, EPaymentStatus = (int)EPaymentStatus.Success});
                 return reference;
             } catch(Exception e){
                 throw e;
