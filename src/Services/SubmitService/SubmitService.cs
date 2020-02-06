@@ -57,10 +57,11 @@ namespace form_builder.Services.SubmtiService
             var reference = string.Empty;
 
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
-            var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers , _environment.EnvironmentName.ToS3EnvPrefix());
-            //string[] blah = postUrlAndAuthToken.Split("**");
-            //var postUrl = blah[0];
-            //var authToken = blah[1];
+            var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
+            if (string.IsNullOrEmpty(submitSlug.AuthToken) || string.IsNullOrEmpty(submitSlug.URL))
+            {
+                throw new ApplicationException($"The AuthToken or URL is empty for this form: { form }");
+            }
 
             if (form == "give-a-compliment" || form == "give-feedback" || form == "make-a-formal-complaint")
             {
@@ -78,7 +79,6 @@ namespace form_builder.Services.SubmtiService
             }
             else
             {
- //               _gateway.ChangeAuthenticationHeader("1eb7b2b9b7184408bd3244b05cc67a33");
                 _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
                 var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
 
