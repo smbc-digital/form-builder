@@ -65,9 +65,9 @@ namespace form_builder.Models
                 .OrderByDescending(_ => _.Conditions.Count)
                 .FirstOrDefault(_ => _.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]));
 
-        public string GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)
+        public SubmitSlug GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)
         {
-            var submitBehaviour = string.Empty;
+            var submitBehaviour = new SubmitSlug();
 
             var pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitForm);
             if (pageSubmitBehaviours.Count == 0)
@@ -82,26 +82,30 @@ namespace form_builder.Models
 
                 var viewModel = new Dictionary<string, string>();
                 previousPage.Answers.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
-                submitBehaviour = GetNextPage(viewModel).PageSlug;
+                submitBehaviour.URL = GetNextPage(viewModel).PageSlug;
             }
             else
             {
                 if (pageSubmitBehaviours.FirstOrDefault()?.SubmitSlugs.Count == 0)
                 {
-                    submitBehaviour = pageSubmitBehaviours.FirstOrDefault()?.PageSlug;
+                    submitBehaviour.URL = pageSubmitBehaviours.FirstOrDefault()?.PageSlug;
                 }
                 else
                 {
-                    var behaviour = pageSubmitBehaviours.SelectMany(x => x.SubmitSlugs).Where(x => x.Location.ToLower() == environment.ToLower()).FirstOrDefault();
+                    var behaviour = pageSubmitBehaviours.SelectMany(x => x.SubmitSlugs)
+                            .Where(x => x.Location.ToLower() == environment.ToLower())
+                            .FirstOrDefault();
+                            
                     if (behaviour == null)
                     {
                         throw new NullReferenceException("HomeController, Submit: No Url supplied for submit form");
                     }
-                    submitBehaviour = behaviour.URL;
+                    submitBehaviour.URL = behaviour.URL;
+                    submitBehaviour.AuthToken = behaviour.AuthToken;
                 }
             }
 
-            if (string.IsNullOrEmpty(submitBehaviour))
+            if (string.IsNullOrEmpty(submitBehaviour.URL))
             {
                 throw new NullReferenceException("HomeController, Submit: No postUrl supplied for submit form");
             }

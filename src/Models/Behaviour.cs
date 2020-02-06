@@ -21,5 +21,6 @@ namespace form_builder.Models
     {
         public string Location { get; set; }
         public string URL { get; set; }
+        public string AuthToken { get; set; }
     }
 }

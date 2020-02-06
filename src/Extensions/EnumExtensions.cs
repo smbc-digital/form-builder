@@ -10,12 +10,11 @@ namespace form_builder.Extensions
             switch (value)
             {
                 case ESchemaType.FormJson:
-                    return "form-";
+                    return "form-json-";
                 case ESchemaType.PaymentConfiguration:
                     return "paymentconfig-";
                 default:
                     throw new Exception("Unknown schema type");
-
             }
         }
     }

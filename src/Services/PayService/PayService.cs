@@ -26,16 +26,14 @@ namespace form_builder.Services.PayService
         private readonly ILogger<PayService> _logger;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly ICache _cache;
-        private readonly DistrbutedCacheConfiguration _distrbutedCacheConfiguration;
         private readonly DistrbutedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
 
-        public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger, IGateway gateway, ICache cache, IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IOptions<DistrbutedCacheConfiguration> distrbutedCacheConfiguration)
+        public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger, IGateway gateway, ICache cache, IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
         {
             _gateway = gateway;
             _logger = logger;
             _paymentProviders = paymentProviders;
             _cache = cache;
-            _distrbutedCacheConfiguration = distrbutedCacheConfiguration.Value;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
         }
 
@@ -64,7 +62,7 @@ namespace form_builder.Services.PayService
 
         private async Task<PaymentInformation> GetFormPaymentInformation(string form)
         {
-            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>("paymentconfiguration", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, _distrbutedCacheConfiguration.UseDistrbutedCache, ESchemaType.PaymentConfiguration);
+            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>("paymentconfiguration", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
 
             var paymentInfo = paymentInformation.Select(x => x)
                .Where(c => c.FormName == form)
