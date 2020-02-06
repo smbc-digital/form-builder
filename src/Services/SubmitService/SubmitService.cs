@@ -134,6 +134,11 @@ namespace form_builder.Services.SubmtiService
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
 
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
+            if (string.IsNullOrEmpty(postUrl.AuthToken) || string.IsNullOrEmpty(postUrl.URL))
+            {
+                throw new ApplicationException($"The AuthToken or URL is empty for this form: { form }");
+            }
+            _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
 
             var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
 
@@ -149,7 +154,7 @@ namespace form_builder.Services.SubmtiService
                 if(string.IsNullOrWhiteSpace(content)){
                     throw new ApplicationException($"SubmitService::PaymentSubmission, Gateway {postUrl} responsed with empty reference");
                 }
-                
+
                 return JsonConvert.DeserializeObject<string>(content);
             }
 
