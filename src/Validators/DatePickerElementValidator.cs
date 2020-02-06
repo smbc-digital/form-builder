@@ -44,7 +44,10 @@ namespace form_builder.Validators
 
             if(dateValue > maxDate)
             {
-                isValidDate = false;
+                return new ValidationResult {
+                    IsValid = false,
+                    Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) ? element.Properties.UpperLimitValidationMessage : $"Year must be less than or equal to {maxDate.Year}"
+                };
             }
 
             return new ValidationResult
