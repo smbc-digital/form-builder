@@ -92,7 +92,10 @@ namespace form_builder.Models
                 }
                 else
                 {
-                    var behaviour = pageSubmitBehaviours.SelectMany(x => x.SubmitSlugs).Where(x => x.Location.ToLower() == environment.ToLower()).FirstOrDefault();
+                    var behaviour = pageSubmitBehaviours.SelectMany(x => x.SubmitSlugs)
+                            .Where(x => x.Location.ToLower() == environment.ToLower())
+                            .FirstOrDefault();
+                            
                     if (behaviour == null)
                     {
                         throw new NullReferenceException("HomeController, Submit: No Url supplied for submit form");

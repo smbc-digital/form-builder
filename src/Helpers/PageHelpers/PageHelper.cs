@@ -5,6 +5,7 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties;
+using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using form_builder.ViewModels;
@@ -41,11 +42,11 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
         private readonly IHostingEnvironment _enviroment;
-
         private readonly DistrbutedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly ICache _cache;
-        
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache, IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
+        private readonly IEnumerable<IPaymentProvider> _paymentProviders;
+
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache, IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IEnumerable<IPaymentProvider> paymentProviders)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -54,6 +55,7 @@ namespace form_builder.Helpers.PageHelpers
             _enviroment = enviroment;
             _cache = cache;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _paymentProviders = paymentProviders;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null)
@@ -287,6 +289,13 @@ namespace form_builder.Helpers.PageHelpers
 
             if(config == null){
                 throw new ApplicationException($"No payment infomation configured for {formName} form");
+            }
+
+            var paymentProvider = _paymentProviders.Where(_ => _.ProviderName == config.PaymentProvider)
+                .FirstOrDefault();
+
+            if(paymentProvider == null){
+                throw new ApplicationException($"No payment provider configured for provider {config.PaymentProvider}");
             }
         }
 
