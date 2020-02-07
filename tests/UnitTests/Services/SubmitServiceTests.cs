@@ -123,7 +123,10 @@ namespace form_builder_tests.UnitTests.Services
                 .ThrowsAsync(new Exception("error"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<Exception>(() => _service.ProcessSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
+            //var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
+            var result = await Assert.ThrowsAsync<Exception>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
+
+            Assert.StartsWith("error", result.Message);
         }
 
         [Fact]
@@ -158,9 +161,11 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Textarea)
                 .Build();
 
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
+
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageSlug("testUrl")
+                .WithSubmitSlug(submitSlug)
                 .Build();
 
             var page = new PageBuilder()
@@ -200,9 +205,11 @@ namespace form_builder_tests.UnitTests.Services
                  .WithPropertyText("test-text")
                  .Build();
 
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
+
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageSlug("test-url")
+                .WithSubmitSlug(submitSlug)
                 .Build();
 
             var page = new PageBuilder()
@@ -242,9 +249,11 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var guid = Guid.NewGuid();
 
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
+
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageSlug("testUrl")
+                .WithSubmitSlug(submitSlug)
                 .Build();
 
             var page = new PageBuilder()
@@ -411,7 +420,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
             // Assert
-            Assert.Equal($"SubmitService::PaymentSubmission, Gateway {postUrl} responsed with empty reference", result.Message);
+            Assert.StartsWith($"SubmitService::PaymentSubmission, Gateway", result.Message);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
     }
