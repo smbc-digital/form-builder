@@ -1,9 +1,9 @@
 ﻿using form_builder.Enum;
 using form_builder.Validators;
 using form_builder_tests.Builders;
+using System;
 using System.Collections.Generic;
 using Xunit;
-
 
 namespace form_builder_tests.UnitTests.Validators
 {
@@ -22,24 +22,6 @@ namespace form_builder_tests.UnitTests.Validators
             //Assert
             var result = _dateInputElementValidator.Validate(element, null);
             Assert.True(result.IsValid);
-        }
-
-        [Fact]
-        public void Validate_ShouldShowValidationMessageWhenFieldsAreEmpty()
-        {
-            //Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.DatePicker)
-                .WithQuestionId("test-date")
-                .WithLabel("Date")
-                .Build();
-
-            var viewModel = new Dictionary<string, string>();
-
-            //Assert
-            var result = _dateInputElementValidator.Validate(element, viewModel);
-            Assert.False(result.IsValid);
-            Assert.Equal("Check the date and try again", result.Message);
         }
 
         [Fact]
@@ -75,6 +57,45 @@ namespace form_builder_tests.UnitTests.Validators
             //Assert
             var result = _dateInputElementValidator.Validate(element, viewModel);
             Assert.True(result.IsValid);
+        }
+
+        [Fact]
+        public void Validate_ShouldCheckDate_IsNotMoreThanOneHundredYears_InFuture_WhenNoMaxSet()
+        {
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.DatePicker)
+                .WithQuestionId("test-date")
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add("test-date", "2230-01-01");
+
+            //Assert
+            var result = _dateInputElementValidator.Validate(element, viewModel);
+            Assert.False(result.IsValid);
+            Assert.Equal($"Year must be less than or equal to {DateTime.Now.AddYears(100).Year}", result.Message);
+        }
+
+        [Fact]
+        public void Validate_ShouldReturnCustomerValidationMessage_WhenDateIsTooFarInFuture()
+        {
+            //Arrange
+            var upperLimitMessage = "customer upper limit";
+            var element = new ElementBuilder()
+                .WithType(EElementType.DatePicker)
+                .WithQuestionId("test-date")
+                .WithMax("2025")
+                .WithUpperLimitValidationMessage(upperLimitMessage)
+                .Build();
+
+            var viewModel = new Dictionary<string, string>();
+            viewModel.Add("test-date", "2050-01-01");
+
+            //Assert
+            var result = _dateInputElementValidator.Validate(element, viewModel);
+            Assert.False(result.IsValid);
+            Assert.Equal(upperLimitMessage, result.Message);
         }
     }
 }
