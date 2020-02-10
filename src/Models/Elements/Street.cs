@@ -59,21 +59,5 @@ namespace form_builder.Models.Elements
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-street");
             return await viewRender.RenderAsync("StreetSearch", this);
         }
-
-        public override Dictionary<string, object> GenerateElementProperties()
-        {
-            var properties = new Dictionary<string, object>()
-            {
-                { "id", $"{Properties.QuestionId}-street" },
-                { "maxlength", Properties.MaxLength }
-            };
-
-            if (DisplayAriaDescribedby)
-            {
-                properties.Add("aria-describedby", DescribedByValue("-street"));
-            }
-
-            return properties;
-        }
     }
 }

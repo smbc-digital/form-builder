@@ -24,29 +24,5 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForMaxLength(this);
             return viewRender.RenderAsync(Type.ToString(), this);
         }
-
-        public override Dictionary<string, object> GenerateElementProperties()
-        {
-            var properties = new Dictionary<string, object>()
-            {
-                { "name", Properties.QuestionId },
-                { "id", Properties.QuestionId },
-                { "maxlength", Properties.MaxLength },
-                { "value", Properties.Value},
-                { "autocomplete", "on" }
-            };
-
-            if (Properties.MaxLength <= 200 || Properties.MaxLength > 500)
-            {
-                properties.Add("class", Properties.MaxLength > 500 ? "large" : "small");
-            }
-
-            if (DisplayAriaDescribedby)
-            {
-                properties.Add("aria-describedby", DescribedByValue());
-            }
-
-            return properties;
-        }
     }
 }

@@ -62,9 +62,99 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public virtual Dictionary<string, object> GenerateElementProperties()
+        public Dictionary<string, object> GenerateElementProperties()
         {
-            return new Dictionary<string, object>();
+            var properties = new Dictionary<string, object>();
+
+            switch (Type)
+            {
+                case EElementType.Textbox:
+                    properties = new Dictionary<string, object>()
+                    {
+                        { "name", Properties.QuestionId },
+                        { "id", Properties.QuestionId },
+                        { "maxlength", Properties.MaxLength },
+                        { "value", Properties.Value},
+                        { "autocomplete", "on" }
+                    };
+
+                    if (DisplayAriaDescribedby)
+                    {
+                        properties.Add("aria-describedby", DescribedByValue());
+                    }
+
+                    return properties;
+                case EElementType.Textarea:
+                    properties = new Dictionary<string, object>()
+                    {
+                        { "name", Properties.QuestionId },
+                        { "id", Properties.QuestionId },
+                        { "maxlength", Properties.MaxLength },
+                        { "value", Properties.Value},
+                        { "autocomplete", "on" }
+                    };
+
+                    if (Properties.MaxLength <= 200 || Properties.MaxLength > 500)
+                    {
+                        properties.Add("class", Properties.MaxLength > 500 ? "large" : "small");
+                    }
+
+                    if (DisplayAriaDescribedby)
+                    {
+                        properties.Add("aria-describedby", DescribedByValue());
+                    }
+
+                    return properties;
+                case EElementType.Address:
+                    properties = new Dictionary<string, object>()
+                    {
+                        { "id", $"{Properties.QuestionId}-postcode" },
+                        { "maxlength", Properties.MaxLength }
+                    };
+
+                    if (DisplayAriaDescribedby)
+                    {
+                        properties.Add("aria-describedby", DescribedByValue("-postcode"));
+                    }
+
+                    return properties;
+                case EElementType.AddressManual:
+                    properties = new Dictionary<string, object>()
+                    {                      
+                    };
+                    
+                    return properties;
+                case EElementType.Street:
+
+                    properties = new Dictionary<string, object>()
+                    {
+                        { "id", $"{Properties.QuestionId}-street" },
+                        { "maxlength", Properties.MaxLength }
+                    };
+
+                    if (DisplayAriaDescribedby)
+                    {
+                        properties.Add("aria-describedby", DescribedByValue("-street"));
+                    }
+
+                    return properties;
+                case EElementType.Organisation:
+
+                    properties = new Dictionary<string, object>()
+                    {
+                        { "id", $"{Properties.QuestionId}-organisation-searchterm" },
+                        { "maxlength", Properties.MaxLength }
+                    };
+
+                    if (DisplayAriaDescribedby)
+                    {
+                        properties.Add("aria-describedby", DescribedByValue("-organisation-searchterm"));
+                    }
+
+                    return properties;
+                default:
+                    return null;
+            }
         }
 
         public Dictionary<string, object> GenerateElementProperties(int index)
@@ -146,6 +236,8 @@ namespace form_builder.Models.Elements
 
         public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
+           
+            
             return viewRender.RenderAsync(Type.ToString(), this, null);
         }
 

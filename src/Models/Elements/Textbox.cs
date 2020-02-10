@@ -23,24 +23,5 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForLabel(this);
             return viewRender.RenderAsync(Type.ToString(), this);
         }
-
-        public override Dictionary<string, object> GenerateElementProperties()
-        {
-            var properties = new Dictionary<string, object>()
-            {
-                { "name", Properties.QuestionId },
-                { "id", Properties.QuestionId },
-                { "maxlength", Properties.MaxLength },
-                { "value", Properties.Value},
-                { "autocomplete", "on" }
-            };
-
-            if (DisplayAriaDescribedby)
-            {
-                properties.Add("aria-describedby", DescribedByValue());
-            }
-
-            return properties;
-        }
     }
 }
