@@ -2,18 +2,8 @@
 @model form_builder.Models.Elements.Element
 @{
     var hintId = $"{Model.Properties.QuestionId}-hint";
-    var id = Model.Properties.QuestionId;
     var errorId = $"{Model.Properties.QuestionId}-error";
     var classes = new string[] { "input-memorable-date" };
-    var todaysDate = DateTime.Now;
-
-    var maxDate = Model.Properties.RestrictFutureDate ?
-        (Model.Properties.RestrictCurrentDate ? DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd") : DateTime.Today.ToString("yyyy-MM-dd"))
-        : string.IsNullOrEmpty(Model.Properties.Max) ? todaysDate.AddYears(100).ToString("yyyy-MM-dd") : new DateTime(int.Parse(Model.Properties.Max), todaysDate.Month, todaysDate.Day).ToString("yyyy-MM-dd");
-
-    var minDate = Model.Properties.RestrictPastDate ?
-        (Model.Properties.RestrictCurrentDate ? DateTime.Today.AddDays(1).ToString("yyyy-MM-dd") : DateTime.Today.ToString("yyyy-MM-dd"))
-        : string.Empty;
 }
 
 @await Html.BeginFieldSet(Model, classes)
@@ -29,7 +19,7 @@
     <label for="@Model.Properties.QuestionId">
         Date
     </label>
-    <input type="date" id="@id" name="@id" max="@maxDate" min="@minDate" value="@Model.Properties.Date"/>
+     @Html.TextBox(Model.Properties.QuestionId, Model.Properties.Date, Model.GenerateElementProperties())
 </div>
 
 @if (!Model.IsValid)

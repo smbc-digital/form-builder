@@ -54,5 +54,21 @@ namespace form_builder.Models.Elements
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
             return await viewRender.RenderAsync("AddressSearch", viewElement);
         }
+
+        public override Dictionary<string, object> GenerateElementProperties()
+        {
+            var properties = new Dictionary<string, object>()
+            {
+                { "id", $"{Properties.QuestionId}-postcode" },
+                { "maxlength", Properties.MaxLength }
+            };
+
+            if (DisplayAriaDescribedby)
+            {
+                properties.Add("aria-describedby", DescribedByValue("-postcode"));
+            }
+
+            return properties;
+        }
     }
 }
