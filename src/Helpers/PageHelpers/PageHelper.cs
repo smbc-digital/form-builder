@@ -1,6 +1,7 @@
 ﻿using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -349,7 +350,7 @@ namespace form_builder.Helpers.PageHelpers
                         var foundEnviromentSubmitSlug = false;
                         foreach (var subItem in item.SubmitSlugs)
                         {
-                            if (subItem.Location.ToLower() == _enviroment.EnvironmentName.ToLower())
+                            if (subItem.Location.ToLower() == _enviroment.EnvironmentName.ToS3EnvPrefix().ToLower())
                             {
                                 foundEnviromentSubmitSlug = true;
                             }
