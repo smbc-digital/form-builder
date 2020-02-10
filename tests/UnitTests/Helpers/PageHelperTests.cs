@@ -153,14 +153,13 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "Address"), It.IsAny<Element>(), null), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<Tuple<ElementViewModel, List<AddressSearchResult>>>(), null), Times.Once);
         }
 
         [Fact]
         public async Task GenerateHtml_ShouldGenerateValidUrl_ForAddressSelect()
         {
             //Arrange
-
             var elementView = new ElementViewModel();
             var addressList = new List<AddressSearchResult>();
             var callback = new Tuple<ElementViewModel, List<AddressSearchResult>>(elementView, addressList);
@@ -267,7 +266,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "Street"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSearch"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]

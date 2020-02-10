@@ -56,5 +56,21 @@ namespace form_builder.Models.Elements
 
             return await viewRender.RenderAsync("OrganisationSearch", viewElement);
         }
+
+        public override Dictionary<string, object> GenerateElementProperties()
+        {
+            var properties = new Dictionary<string, object>()
+            {
+                { "id", $"{Properties.QuestionId}-organisation-searchterm" },
+                { "maxlength", Properties.MaxLength }
+            };
+
+            if (DisplayAriaDescribedby)
+            {
+                properties.Add("aria-describedby", DescribedByValue("-organisation-searchterm"));
+            }
+
+            return properties;
+        }
     }
 }
