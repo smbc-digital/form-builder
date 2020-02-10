@@ -5,11 +5,11 @@
     var id = Model.Properties.QuestionId;
     var errorId = $"{Model.Properties.QuestionId}-error";
     var classes = new string[] { "input-memorable-date" };
-    
+    var todaysDate = DateTime.Now;
 
     var maxDate = Model.Properties.RestrictFutureDate ?
         (Model.Properties.RestrictCurrentDate ? DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd") : DateTime.Today.ToString("yyyy-MM-dd"))
-        : string.Empty;
+        : string.IsNullOrEmpty(Model.Properties.Max) ? todaysDate.AddYears(100).ToString("yyyy-MM-dd") : new DateTime(int.Parse(Model.Properties.Max), todaysDate.Month, todaysDate.Day).ToString("yyyy-MM-dd");
 
     var minDate = Model.Properties.RestrictPastDate ?
         (Model.Properties.RestrictCurrentDate ? DateTime.Today.AddDays(1).ToString("yyyy-MM-dd") : DateTime.Today.ToString("yyyy-MM-dd"))

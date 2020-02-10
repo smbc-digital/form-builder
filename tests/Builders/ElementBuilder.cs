@@ -197,5 +197,11 @@ namespace form_builder_tests.Builders
             _property.ButtonId = buttonId;
             return this;
         }
+
+        public ElementBuilder WithUpperLimitValidationMessage(string message)
+        {
+            _property.UpperLimitValidationMessage = message;
+            return this;
+        }
     }
 }

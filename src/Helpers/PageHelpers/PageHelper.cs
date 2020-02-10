@@ -231,6 +231,7 @@ namespace form_builder.Helpers.PageHelpers
                         || element.Type == EElementType.Street
                         || element.Type == EElementType.Checkbox
                         || element.Type == EElementType.DateInput
+                        || element.Type == EElementType.DatePicker
                         || element.Type == EElementType.TimeInput
                         || element.Type == EElementType.Organisation
                         )
