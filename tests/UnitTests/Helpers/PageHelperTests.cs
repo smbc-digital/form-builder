@@ -7,6 +7,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties;
+using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using form_builder.ViewModels;
@@ -34,8 +35,9 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _mockDisallowedKeysOptions = new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
-        private readonly Mock<IOptions<DistrbutedCacheConfiguration>> _mockDistrbutedCacheSettings = new Mock<IOptions<DistrbutedCacheConfiguration>>();
         private readonly Mock<IOptions<DistrbutedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings = new Mock<IOptions<DistrbutedCacheExpirationConfiguration>>();
+        private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider = new Mock<IEnumerable<IPaymentProvider>>();
+        private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
 
         public PageHelperTests()
         {
@@ -47,16 +49,16 @@ namespace form_builder_tests.UnitTests.Helpers
                 }
             });
 
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<ESchemaType>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(new List<PaymentInformation> {
                     new PaymentInformation {
-                        FormName = "test-form"
+                        FormName = "test-form",
+                        PaymentProvider = "testProvider"
+                    },
+                    new PaymentInformation {
+                        FormName = "test-form-with-invorrect-provider",
+                        PaymentProvider = "invalidProvider"
                     } });
-
-            _mockDistrbutedCacheSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheConfiguration
-            {
-                UseDistrbutedCache = true
-            });
 
             _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheExpirationConfiguration
             {
@@ -66,7 +68,11 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
 
-            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object, _mockCache.Object, _mockDistrbutedCacheSettings.Object, _mockDistrbutedCacheExpirationSettings.Object);
+            _paymentProvider.Setup(_ => _.ProviderName).Returns("testProvider");
+            var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
+            _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
+
+            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object, _mockCache.Object, _mockDistrbutedCacheExpirationSettings.Object, _mockPaymentProvider.Object);
         }
 
         [Fact]
@@ -730,7 +736,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public async Task CheckForPaymentConfiguration_ShouldNot_ThrowException_WhenConfigFound_ForForm()
+        public async Task CheckForPaymentConfiguration_ShouldNot_ThrowException_WhenConfigFound_ForForm_WithProvider()
         {
             var pages = new List<Page>();
 
@@ -745,6 +751,25 @@ namespace form_builder_tests.UnitTests.Helpers
             pages.Add(page);
 
             await _pageHelper.CheckForPaymentConfiguration(pages, "test-form");
+        }
+
+        [Fact]
+        public async Task CheckForPaymentConfiguration_ShouldThrowException_WhenPaymentProvider_DoesNotExists_WhenConfig_IsFound()
+        {
+            var pages = new List<Page>();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            pages.Add(page);
+            
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.CheckForPaymentConfiguration(pages, "test-form-with-invorrect-provider"));
+            Assert.Equal("No payment provider configured for provider invalidProvider", result.Message);
         }
 
         [Fact]

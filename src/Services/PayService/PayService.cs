@@ -15,8 +15,8 @@ namespace form_builder.Services.PayService
     public interface IPayService
     {
         Task<string> ProcessPayment(string form, string path, string reference, string sessionGuid);
-        Task<string> ProcessPaymentResponse(string form, string responseCode);
-        
+        Task<string> ProcessPaymentResponse(string form, string responseCode, string reference);
+
     }
 
     public class PayService : IPayService
@@ -25,16 +25,14 @@ namespace form_builder.Services.PayService
         private readonly ILogger<PayService> _logger;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly ICache _cache;
-        private readonly DistrbutedCacheConfiguration _distrbutedCacheConfiguration;
         private readonly DistrbutedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
 
-        public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger, IGateway gateway, ICache cache, IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IOptions<DistrbutedCacheConfiguration> distrbutedCacheConfiguration)
+        public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger, IGateway gateway, ICache cache, IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
         {
             _gateway = gateway;
             _logger = logger;
             _paymentProviders = paymentProviders;
             _cache = cache;
-            _distrbutedCacheConfiguration = distrbutedCacheConfiguration.Value;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
         }
 
@@ -46,13 +44,13 @@ namespace form_builder.Services.PayService
             return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, paymentInformation);
         }
 
-        public async Task<string> ProcessPaymentResponse(string form, string responseCode)
+        public async Task<string> ProcessPaymentResponse(string form, string responseCode, string reference)
         {
             var paymentInformation = await GetFormPaymentInformation(form);
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
             try {
-                var result = paymentProvider.VerifyPaymentResponse(responseCode);
+                var result = paymentProvider.VerifyPaymentResponse(responseCode, reference);
                 return result;
             } catch(Exception e){
                 throw e;
@@ -61,7 +59,7 @@ namespace form_builder.Services.PayService
 
         private async Task<PaymentInformation> GetFormPaymentInformation(string form)
         {
-            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>("paymentconfiguration", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, _distrbutedCacheConfiguration.UseDistrbutedCache, ESchemaType.PaymentConfiguration);
+            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>("paymentconfiguration", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
 
             var paymentInfo = paymentInformation.Select(x => x)
                .Where(c => c.FormName == form)

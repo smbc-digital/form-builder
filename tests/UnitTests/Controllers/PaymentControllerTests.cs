@@ -28,40 +28,40 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task HandlePaymentResponse_ShouldCallService_AndRedirectToSuccessAction()
         {
-            _payService.Setup(_ => _.ProcessPaymentResponse(It.IsAny<string>(),It.IsAny<string>()))
+            _payService.Setup(_ => _.ProcessPaymentResponse(It.IsAny<string>(),It.IsAny<string>(),  It.IsAny<string>()))
                 .ReturnsAsync("1234");
 
             var result = await _controller.HandlePaymentResponse("form", "page-one", "0000", "123456");
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("PaymentSuccess", redirectResult.ActionName);
-            _payService.Verify(_ => _.ProcessPaymentResponse(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _payService.Verify(_ => _.ProcessPaymentResponse(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
         public async Task HandlePaymentResponse_Should_RedirectToFailureAction_WhenPaymentFailureException()
         {
-            _payService.Setup(_ => _.ProcessPaymentResponse(It.IsAny<string>(),It.IsAny<string>()))
+            _payService.Setup(_ => _.ProcessPaymentResponse(It.IsAny<string>(),It.IsAny<string>(), It.IsAny<string>()))
                 .Throws(new PaymentFailureException("payment failure"));
 
             var result = await _controller.HandlePaymentResponse("form", "page-one", "0000", "123456");
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("PaymentFailure", redirectResult.ActionName);
-            _payService.Verify(_ => _.ProcessPaymentResponse(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _payService.Verify(_ => _.ProcessPaymentResponse(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
         public async Task HandlePaymentResponse_Should_RedirectToFailureAction_WhenPaymentDeclinedException()
         {
-            _payService.Setup(_ => _.ProcessPaymentResponse(It.IsAny<string>(),It.IsAny<string>()))
+            _payService.Setup(_ => _.ProcessPaymentResponse(It.IsAny<string>(),It.IsAny<string>(), It.IsAny<string>()))
                 .Throws(new PaymentDeclinedException("payment declined"));
 
             var result = await _controller.HandlePaymentResponse("form", "page-one", "0000", "123456");
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("PaymentFailure", redirectResult.ActionName);
-            _payService.Verify(_ => _.ProcessPaymentResponse(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _payService.Verify(_ => _.ProcessPaymentResponse(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace form_builder.Controllers
         {
             try
             {
-                var reference = await _payService.ProcessPaymentResponse(form, responseCode);
+                var reference = await _payService.ProcessPaymentResponse(form, responseCode, callingAppTxnRef);
 
                 return RedirectToAction("PaymentSuccess", new
                 {
@@ -33,14 +33,16 @@ namespace form_builder.Controllers
             {
                 return RedirectToAction("PaymentFailure", new
                 {
-                    form
+                    form,
+                    reference = callingAppTxnRef
                 });
             }
             catch (PaymentDeclinedException)
             {
                 return RedirectToAction("PaymentFailure", new
                 {
-                    form
+                    form,
+                    reference = callingAppTxnRef
                 });
             }
         }
@@ -61,12 +63,13 @@ namespace form_builder.Controllers
 
         [HttpGet]
         [Route("{form}/payment-failure")]
-        public IActionResult PaymentFailure(string form)
+        public IActionResult PaymentFailure(string form, [FromQuery] string reference)
         {
-            var paymentFailureViewModel = new PaymentFailureViewModel 
+            var paymentFailureViewModel = new PaymentFailureViewModel
             {
                 FormName = form,
                 PageTitle = "Failure",
+                Reference = reference
             };
 
             return View("./Failure", paymentFailureViewModel);

@@ -26,7 +26,7 @@ namespace form_builder_tests.UnitTests.Models
 
             var result = page.GetSubmitFormEndpoint(new FormAnswers(), "");
 
-            Assert.Equal(SubmitSlug, result);
+            Assert.Equal(SubmitSlug, result.URL);
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace form_builder_tests.UnitTests.Models
 
             var result = page.GetSubmitFormEndpoint(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "test", Response = "test" } } } } }, null);
 
-            Assert.Equal(PageSlug, result);
+            Assert.Equal(PageSlug, result.URL);
         }
     }
 }

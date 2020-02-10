@@ -22,14 +22,13 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider = new Mock<IEnumerable<IPaymentProvider>>();
         private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
-        private readonly Mock<IOptions<DistrbutedCacheConfiguration>> _mockDistrbutedCacheSettings = new Mock<IOptions<DistrbutedCacheConfiguration>>();
         private readonly Mock<IOptions<DistrbutedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings = new Mock<IOptions<DistrbutedCacheExpirationConfiguration>>();
 
         public PayServiceTests()
         {
             _paymentProvider.Setup(_ => _.ProviderName).Returns("testPaymentProvider");
 
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<ESchemaType>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
 
             .ReturnsAsync(new List<PaymentInformation> {
                 new PaymentInformation
@@ -44,11 +43,6 @@ namespace form_builder_tests.UnitTests.Services
                 }
             });
 
-            _mockDistrbutedCacheSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheConfiguration
-            {
-                UseDistrbutedCache = true
-            });
-
             _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheExpirationConfiguration
             {
                 UserData = 30,
@@ -58,7 +52,7 @@ namespace form_builder_tests.UnitTests.Services
             var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
             _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
 
-            _service = new PayService(_mockPaymentProvider.Object, _mockLogger.Object, _mockGateway.Object, _mockCache.Object, _mockDistrbutedCacheExpirationSettings.Object, _mockDistrbutedCacheSettings.Object);
+            _service = new PayService(_mockPaymentProvider.Object, _mockLogger.Object, _mockGateway.Object, _mockCache.Object, _mockDistrbutedCacheExpirationSettings.Object);
         }
 
         [Fact]
@@ -92,7 +86,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowApplicationException_WhenPaymentConfig_IsNull()
         {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345", "reference"));
 
             Assert.Equal("PayService:: No payment information found for nonexistanceform", result.Message);
         }
@@ -100,7 +94,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowApplicationException_WhenPaymentProvider_IsNull()
         {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345", "reference"));
 
             Assert.Equal("PayService:: No payment information found for nonexistanceform", result.Message);
         }
@@ -108,19 +102,19 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowException_WhenPaymentProviderThrows()
         {
-            _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
+            _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws<Exception>();
 
-            await Assert.ThrowsAsync<Exception>(() => _service.ProcessPaymentResponse("testForm", "12345"));
+            await Assert.ThrowsAsync<Exception>(() => _service.ProcessPaymentResponse("testForm", "12345", "reference"));
         }
 
         [Fact]
         public async Task ProcessPaymentResponse_ShouldReturnPaymentReference_OnSuccessfull_PaymentProviderCall()
         {
-            _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
+            _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("12345");
 
-            var result = await _service.ProcessPaymentResponse("testForm", "12345");
+            var result = await _service.ProcessPaymentResponse("testForm", "12345", "reference");
 
             Assert.IsType<string>(result);
             Assert.NotNull(result);
