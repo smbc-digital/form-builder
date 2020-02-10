@@ -835,5 +835,31 @@ namespace form_builder_tests.UnitTests.Helpers
 
             Assert.Equal("page-slug", pages[0].Behaviours[0].PageSlug);
         }
+
+        [Fact]
+        public void CheckForCurrentEnvironmentSubmitSlugs_ShouldThrowAnException_WhenPageSlugIsNotPresentFor()
+        {
+            var pages = new List<Page>();
+
+            var submitSlug = new SubmitSlug
+            {
+                Location = "mysteryLocation",
+                URL = "test-url"
+            };
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlug)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            pages.Add(page);
+
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForCurrentEnvironmentSubmitSlugs(pages, "end-point"));
+            Assert.Equal($"No SubmitSlug found for end-point form for local", result.Message);
+        }
     }
 }

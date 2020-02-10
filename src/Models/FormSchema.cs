@@ -37,6 +37,7 @@ namespace form_builder.Models
             pageHelper.hasDuplicateQuestionIDs(Pages, form);
             pageHelper.CheckForEmptyBehaviourSlugs(Pages, form);
             pageHelper.CheckForInvalidQuestionOrTargetMappingValue(Pages, form);
+            pageHelper.CheckForCurrentEnvironmentSubmitSlugs(Pages, form);
             await pageHelper.CheckForPaymentConfiguration(Pages, form);
         }
     }

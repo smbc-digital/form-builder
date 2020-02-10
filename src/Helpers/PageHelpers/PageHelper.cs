@@ -33,6 +33,7 @@ namespace form_builder.Helpers.PageHelpers
         void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName);
         Task CheckForPaymentConfiguration(List<Page> pages, string formName);
         void CheckForEmptyBehaviourSlugs(List<Page> pages, string formName);
+        void CheckForCurrentEnvironmentSubmitSlugs(List<Page> pages, string formName);
     }
 
     public class PageHelper : IPageHelper
@@ -145,7 +146,7 @@ namespace form_builder.Helpers.PageHelpers
                     throw new ApplicationException($"PageHelper.ProcessStreetJourney: Unknown journey type");
             }
         }
-        
+
         public async Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
         {
             switch (journey)
@@ -240,7 +241,7 @@ namespace form_builder.Helpers.PageHelpers
             }
 
             var hashSet = new HashSet<string>();
-            foreach(var id in qIds)
+            foreach (var id in qIds)
             {
                 if (!hashSet.Add(id))
                 {
@@ -268,7 +269,7 @@ namespace form_builder.Helpers.PageHelpers
             {
                 if (string.IsNullOrEmpty(item.PageSlug) && (item.SubmitSlugs == null || item.SubmitSlugs.Count == 0))
                 {
-                        throw new ApplicationException($"Incorrectly configured behaviour slug was discovered in {formName} form");
+                    throw new ApplicationException($"Incorrectly configured behaviour slug was discovered in {formName} form");
                 }
             }
         }
@@ -279,22 +280,24 @@ namespace form_builder.Helpers.PageHelpers
                 .SelectMany(x => x.Behaviours)
                 .Any(x => x.BehaviourType == EBehaviourType.SubmitAndPay);
 
-            if(!containsPayment)
+            if (!containsPayment)
                 return;
-            
+
             var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>("paymentconfiguration", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
 
             var config = paymentInformation.Where(x => x.FormName == formName)
                 .FirstOrDefault();
 
-            if(config == null){
+            if (config == null)
+            {
                 throw new ApplicationException($"No payment infomation configured for {formName} form");
             }
 
             var paymentProvider = _paymentProviders.Where(_ => _.ProviderName == config.PaymentProvider)
                 .FirstOrDefault();
 
-            if(paymentProvider == null){
+            if (paymentProvider == null)
+            {
                 throw new ApplicationException($"No payment provider configured for provider {config.PaymentProvider}");
             }
         }
@@ -319,6 +322,45 @@ namespace form_builder.Helpers.PageHelpers
                     throw new ApplicationException($"The provided json '{formName}' contains invalid QuestionIDs or TargetMapping, {_.ToString()} contains invalid characters");
                 }
             });
+        }
+
+        public void CheckForCurrentEnvironmentSubmitSlugs(List<Page> pages, string formName)
+        {
+            List<Behaviour> behaviours = new List<Behaviour>();
+
+            foreach (var page in pages)
+            {
+                if (page.Behaviours != null)
+                {
+                    foreach (var behaviour in page.Behaviours)
+                    {
+                        behaviours.Add(behaviour);
+                    }
+                }
+            }
+
+            foreach (var item in behaviours)
+            {
+                if (item.BehaviourType == EBehaviourType.SubmitForm || item.BehaviourType == EBehaviourType.SubmitAndPay)
+                {
+                    if (item.SubmitSlugs.Count > 0)
+                    {
+                        var foundEnviromentSubmitSlug = false;
+                        foreach (var subItem in item.SubmitSlugs)
+                        {
+                            if (subItem.Location.ToLower() == _enviroment.EnvironmentName.ToLower())
+                            {
+                                foundEnviromentSubmitSlug = true;
+                            }
+                        }
+
+                        if (!foundEnviromentSubmitSlug)
+                        {
+                            throw new ApplicationException($"No SubmitSlug found for {formName} form for {_enviroment.EnvironmentName}");
+                        }
+                    }
+                }
+            }
         }
     }
 }
