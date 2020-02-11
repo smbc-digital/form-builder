@@ -12,6 +12,10 @@ coverage.info
 !.vscode/launch.json
 !.vscode/extensions.json
 
+form-builder-tests-ui/Published
+src/Published
+tests/Published
+
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history

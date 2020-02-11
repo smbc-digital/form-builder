@@ -21,8 +21,6 @@ namespace form_builder.Models.Elements
 
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            
-            
             var postcodeKey = $"{Properties.QuestionId}-postcode";
             
             var viewElement = new ElementViewModel
@@ -53,6 +51,22 @@ namespace form_builder.Models.Elements
 
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
             return await viewRender.RenderAsync("AddressSearch", viewElement);
+        }
+
+        public override Dictionary<string, object> GenerateElementProperties()
+        {
+            var properties = new Dictionary<string, object>()
+            {
+                { "id", $"{Properties.QuestionId}-postcode" },
+                { "maxlength", Properties.MaxLength }
+            };
+
+            if (DisplayAriaDescribedby)
+            {
+                properties.Add("aria-describedby", DescribedByValue("-postcode"));
+            }
+
+            return properties;
         }
     }
 }

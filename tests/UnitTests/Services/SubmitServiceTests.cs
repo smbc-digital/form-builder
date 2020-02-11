@@ -37,7 +37,7 @@ namespace form_builder_tests.UnitTests.Services
         public SubmitServiceTests()
         {
             _mockEnvironment.Setup(_ => _.EnvironmentName)
-                .Returns("local"); 
+                .Returns("local");
 
             var cacheData = new FormAnswers
             {
@@ -104,10 +104,12 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var guid = Guid.NewGuid();
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
                 .WithPageSlug("testUrl")
+                .WithSubmitSlug(submitSlug)
                 .Build();
 
             var page = new PageBuilder()
@@ -289,9 +291,12 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var guid = Guid.NewGuid();
 
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
+
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
                 .WithPageSlug("testUrl")
+                .WithSubmitSlug(submitSlug)
                 .Build();
 
             var page = new PageBuilder()
@@ -324,9 +329,11 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             var guid = Guid.NewGuid();
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlug)
                 .WithPageSlug("testUrl")
                 .Build();
 
@@ -358,10 +365,11 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             var guid = Guid.NewGuid();
-
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
                 .WithPageSlug("testUrl")
+                .WithSubmitSlug(submitSlug)
                 .Build();
 
             var page = new PageBuilder()
@@ -387,16 +395,18 @@ namespace form_builder_tests.UnitTests.Services
             Assert.StartsWith("SubmitService::PaymentSubmission, An exception has occured when response content from ", result.Message);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
-        
+
         [Fact]
         public async Task PaymentSubmission_ShouldThrowApplicationException_WhenGatewayResponseContent_IsEmpty()
         {
             // Arrange
             var guid = Guid.NewGuid();
             var postUrl = "www.post.url";
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlug)
                 .WithPageSlug(postUrl)
                 .Build();
 

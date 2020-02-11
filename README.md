@@ -664,6 +664,7 @@ Date Input example:
     * RestrictPastDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the past)
     * RestrictCurrentDate (*boolean*) (Defaults to false. If true, it will prevent users entering today's date)
     * CustomValidationMessage (*string*) (Set a custom validation message for when a user doesn't input a date)
+    * UpperLimitValidationMessage (*string*) (Set a custom validation message for when a user enters the year greater than 100 years from today)
     * TargetMapping (*string*)  
 
 Date Picker example:

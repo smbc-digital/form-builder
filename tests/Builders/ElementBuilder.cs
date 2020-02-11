@@ -2,7 +2,10 @@
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace form_builder_tests.Builders
 {
@@ -13,11 +16,15 @@ namespace form_builder_tests.Builders
 
         public Element Build()
         {
-            return new Element
-            {
-                Properties = _property,
-                Type = _type
-            };
+            var elementType =  typeof(IElement).GetTypeInfo().Assembly
+                .GetTypes()
+                .Where(type => type.Name == _type.ToString())
+                .FirstOrDefault();
+
+            var element = (Element)Activator.CreateInstance(elementType);
+
+            element.Properties = _property;
+            return element;
         }
 
         public ElementBuilder WithType(EElementType type)
