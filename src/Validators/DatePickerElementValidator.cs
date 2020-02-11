@@ -2,6 +2,7 @@
 using form_builder.Models.Elements;
 using System;
 using System.Collections.Generic;
+using form_builder.Constants;
 
 namespace form_builder.Validators
 {
@@ -34,7 +35,7 @@ namespace form_builder.Validators
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the date and try again"
+                    Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : ValidationConstants.DatePickerDefault
                 };
             }
 
@@ -46,14 +47,14 @@ namespace form_builder.Validators
             {
                 return new ValidationResult {
                     IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) ? element.Properties.UpperLimitValidationMessage : $"Year must be less than or equal to {maxDate.Year}"
+                    Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) ? element.Properties.UpperLimitValidationMessage : ValidationConstants.DatePickerDefault
                 };
             }
 
             return new ValidationResult
             {
                 IsValid = isValidDate,
-                Message = isValidDate ? string.Empty : !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidDate) ? element.Properties.ValidationMessageInvalidDate : "Check the date and try again"
+                Message = isValidDate ? string.Empty : !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidDate) ? element.Properties.ValidationMessageInvalidDate : ValidationConstants.DatePickerDefault
             };
         }
     }
