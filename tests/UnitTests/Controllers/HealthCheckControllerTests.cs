@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using form_builder.Controllers.HealthCheck;
+using form_builder.Controllers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace form_builder_tests.UnitTests.Controllers
