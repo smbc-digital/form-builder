@@ -53,9 +53,13 @@ namespace form_builder.Services.PayService
              try {
                 paymentProvider.VerifyPaymentResponse(responseCode);
                 string url = "Verint/customerupdate";
-                var response = await _gateway.PostAsync(url, new { CaseReference = reference, EPaymentStatus = (int)EPaymentStatus.Success});
+                _gateway.ChangeAuthenticationHeader("1eb7b2b9b7184408bd3244b05cc67a33");
+                var response = await _gateway.PostAsync(url, new { CaseReference = reference});
                 return reference;
-            } catch(Exception e){
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e, "The payment callback failed");
                 throw e;
             }
         }
