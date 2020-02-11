@@ -1,0 +1,19 @@
+﻿@model form_builder.ViewModels.PaymentDeclinedViewModel
+@{
+    ViewData["Title"] = Model.FormName;
+    ViewData["PageTitle"] = Model.PageTitle;
+    ViewData["BannerTypeformUrl"] = Model.FeedbackForm;
+}
+
+    <div id="root" class="text-center">
+        <h1>Payment Declined</h1>
+        <h3>
+            We're sorry, the payment was unsuccessful. We're sorry, there was a problem with the form
+        </h3>
+        <p>Your reference is: <strong>@Model.Reference</strong></p>
+        <p className="no-margin-bottom">
+            Something went wrong. Please try again if you want to continue with the order.
+            No money has been taken from your account, please try again if you want to continue.
+        </p>
+        <a className="button-primary" href=@Model.PaymentUrl>Go back to try the payment again</a>
+    </div>

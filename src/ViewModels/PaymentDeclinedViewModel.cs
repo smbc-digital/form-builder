@@ -1,6 +1,6 @@
-namespace form_builder.ViewModels
+﻿namespace form_builder.ViewModels
 {
-    public class PaymentFailureViewModel
+    public class PaymentDeclinedViewModel
     {
         public string FeedbackForm { get; set; }
         public string FormName { get; set; }
