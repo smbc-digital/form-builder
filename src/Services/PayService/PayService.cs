@@ -52,9 +52,9 @@ namespace form_builder.Services.PayService
 
              try {
                 paymentProvider.VerifyPaymentResponse(responseCode);
-                string url = "Verint/customerupdate";
+                string url = "Verint/paymentstatusupdate";
                 _gateway.ChangeAuthenticationHeader("1eb7b2b9b7184408bd3244b05cc67a33");
-                var response = await _gateway.PostAsync(url, new { CaseReference = reference});
+                var response = await _gateway.PostAsync(url, new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString()});
                 return reference;
             }
             catch(Exception e)
