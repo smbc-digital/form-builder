@@ -70,7 +70,7 @@ namespace form_builder.Providers.PaymentProvider
             return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, reference);
         }
 
-        public string VerifyPaymentResponse(string responseCode, string reference)
+        public void VerifyPaymentResponse(string responseCode)
         {
             if (responseCode == "00022" || responseCode == "00023")
             {
@@ -81,8 +81,6 @@ namespace form_builder.Providers.PaymentProvider
             {
                 throw new PaymentFailureException("CivicaPayProvider::Payment failed");
             }
-
-            return reference;
         }
     }
 }

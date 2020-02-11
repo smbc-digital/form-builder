@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Cache;
 using form_builder.Enum;
+using form_builder.Services.MappingService.Entities;
 
 namespace form_builder.Services.PayService
 {
@@ -49,10 +50,16 @@ namespace form_builder.Services.PayService
             var paymentInformation = await GetFormPaymentInformation(form);
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
-            try {
-                var result = paymentProvider.VerifyPaymentResponse(responseCode, reference);
-                return result;
-            } catch(Exception e){
+             try {
+                paymentProvider.VerifyPaymentResponse(responseCode);
+                string url = "Verint/paymentstatusupdate";
+                _gateway.ChangeAuthenticationHeader("1eb7b2b9b7184408bd3244b05cc67a33");
+                var response = await _gateway.PostAsync(url, new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString()});
+                return reference;
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e, "The payment callback failed");
                 throw e;
             }
         }
