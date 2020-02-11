@@ -102,7 +102,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowException_WhenPaymentProviderThrows()
         {
-            _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>(), It.IsAny<string>()))
+            _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
                 .Throws<Exception>();
 
             await Assert.ThrowsAsync<Exception>(() => _service.ProcessPaymentResponse("testForm", "12345", "reference"));
@@ -111,9 +111,6 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldReturnPaymentReference_OnSuccessfull_PaymentProviderCall()
         {
-            _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>(), It.IsAny<string>()))
-                .Returns("12345");
-
             var result = await _service.ProcessPaymentResponse("testForm", "12345", "reference");
 
             Assert.IsType<string>(result);
