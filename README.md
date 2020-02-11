@@ -877,6 +877,7 @@ Example where dependant on their answers to certain questions the form navigates
 **Conditions**[*object*]
 * QuestionID (*string*) - The name of the Radio/Checkbox list to evaluate
 * EqualTo (*string*) - The value it must equal to for the behaviour to happen
+* CheckboxContains (*string*) - The value will be checked against the list supplied by the checkbox. If it is found it will go to the behaviour 
 
 **BehaviourType** (*enum*) __*__
 * 0 = GoToPage
