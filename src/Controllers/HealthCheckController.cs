@@ -4,15 +4,14 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using form_builder.Controllers.HealthCheck;
 
-namespace form_builder.Controllers.HealthCheck
+namespace form_builder.Controllers
 {
-    [Produces("application/json")]
-    [Route("api/v1/[Controller]")]
-    [ApiController]
-    public class HealthCheckController : ControllerBase
+    public class HealthCheckController : Controller
     {
         [HttpGet]
+        [Route("healthcheck")]
         public IActionResult Get()
         {
             var name = Assembly.GetEntryAssembly()?.GetName().Name;
