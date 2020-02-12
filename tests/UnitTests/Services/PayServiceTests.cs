@@ -14,6 +14,8 @@ using form_builder.Helpers.Session;
 using form_builder.Services.MappingService;
 using Microsoft.AspNetCore.Hosting;
 using Xunit;
+using form_builder.Services.MappingService.Entities;
+using form_builder.Models;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -55,10 +57,35 @@ namespace form_builder_tests.UnitTests.Services
                 PaymentConfiguration = 5
             });
 
+            var pages = new List<Page>();
+            var mockPage = new Mock<Page>();
+            var submitSlugs = new List<SubmitSlug>();
 
+            mockPage.Object.PageSlug = "customer-pay";
+            pages.Add(mockPage.Object);
+            var mockFormSchema = new Mock<FormSchema>();
+            mockFormSchema.SetReturnsDefault(mockPage.Object);
+            mockFormSchema.Object.Pages = pages;
+            var formAnswers = new FormAnswers();
+            var behaviours = new List<Behaviour>();
+            var behaviour = new Behaviour { BehaviourType = EBehaviourType.SubmitAndPay};
+            mockPage.Object.Behaviours = behaviours;
+            formAnswers.Path = "customer-pay";
+            var slug = new SubmitSlug { AuthToken = "testToken", Location = "local", URL = "customer-pay" };
+            submitSlugs.Add(slug);
+            behaviour.SubmitSlugs = submitSlugs;
+            behaviours.Add(behaviour);
 
+            var mappingEntity = new MappingEntity();
+            mappingEntity.BaseForm = mockFormSchema.Object;
+            mappingEntity.FormAnswers = formAnswers;
+            
             var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
             _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
+            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
+            _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testForm"))
+                .ReturnsAsync(mappingEntity);
+            _mockHostingEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
 
             _service = new PayService(_mockPaymentProvider.Object, _mockLogger.Object, _mockGateway.Object, _mockCache.Object,
                 _mockDistrbutedCacheExpirationSettings.Object, _mockSessionHelper.Object, _mockMappingService.Object, _mockHostingEnvironment.Object);
