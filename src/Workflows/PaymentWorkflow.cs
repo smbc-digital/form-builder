@@ -1,10 +1,7 @@
 using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService;
 using form_builder.Services.PayService;
 using form_builder.Services.SubmtiService;
-using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
@@ -42,6 +39,8 @@ namespace form_builder.Workflows
             var data = await _mappingService.Map(sessionGuid, form);
 
             var paymentReference = await _submitService.PaymentSubmission(data, form, sessionGuid);
+
+            var paymentInfo = await _payService.GetFormPaymentInformation(form);
 
             return await _payService.ProcessPayment(form, path, paymentReference, sessionGuid);
         }

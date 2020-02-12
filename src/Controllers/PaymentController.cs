@@ -99,5 +99,20 @@ namespace form_builder.Controllers
 
             return View("./Declined", paymentDeclinedViewModel);
         }
+
+        [HttpGet]
+        [Route("{form}/payment-summary")]
+        public IActionResult PaymentSummary(string form, [FromQuery] string reference)
+        {
+            var paymentSummaryViewModel = new PaymentSummaryViewModel
+            {
+                FormName = form,
+                PageTitle = "Summary",
+                Amount = "12", // need to get the amount from congif
+                Description = "bin" // need to get the description from config
+            };
+
+            return View("./Summary", paymentSummaryViewModel);
+        }
     }
 }
