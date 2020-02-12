@@ -6,14 +6,11 @@
 }
 
     <div id="root" class="text-center">
-        <h1>Payment Declined</h1>
-        <h3>
-            We're sorry, the payment was unsuccessful. We're sorry, there was a problem with the form
-        </h3>
-        <p>Your reference is: <strong>@Model.Reference</strong></p>
+        <h1>Your Payment was declined</h1>
         <p className="no-margin-bottom">
-            Something went wrong. Please try again if you want to continue with the order.
-            No money has been taken from your account, please try again if you want to continue.
+            Contact your bank for more details. No money has been taken from your account.
         </p>
         <a className="button-primary" href=@Model.PaymentUrl>Go back to try the payment again</a>
+        <br>
+        <a className="button-secondary" href="https://www.stockport.gov.uk">Go to home page</a>
     </div>
