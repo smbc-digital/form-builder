@@ -11,7 +11,7 @@ namespace form_builder.Controllers
     public class HealthCheckController : Controller
     {
         [HttpGet]
-        [Route("healthcheck")]
+        [Route("_healthcheck")]
         public IActionResult Get()
         {
             var name = Assembly.GetEntryAssembly()?.GetName().Name;
