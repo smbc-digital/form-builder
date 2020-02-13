@@ -102,14 +102,16 @@ namespace form_builder.Controllers
 
         [HttpGet]
         [Route("{form}/payment-summary")]
-        public IActionResult PaymentSummary(string form, [FromQuery] string reference)
+        public async Task<IActionResult> PaymentSummary(string form)
         {
+            var paymentInfo = await _payService.GetFormPaymentInformation(form);
+
             var paymentSummaryViewModel = new PaymentSummaryViewModel
             {
                 FormName = form,
                 PageTitle = "Summary",
-                Amount = "12", // need to get the amount from congif
-                Description = "bin" // need to get the description from config
+                Amount = paymentInfo.Settings.Amount, 
+                Description = paymentInfo.Settings.Description 
             };
 
             return View("./Summary", paymentSummaryViewModel);

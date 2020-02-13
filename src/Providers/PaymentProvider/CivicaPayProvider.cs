@@ -55,7 +55,8 @@ namespace form_builder.Providers.PaymentProvider
                             PaymentAmount = paymentInformation.Settings.Amount,
                             Quantity = "1",
                             PaymentNarrative = form,
-                            CallingAppTranReference = reference
+                            CallingAppTranReference = reference,
+                            ServicePayItemDesc = paymentInformation.Settings.Description
                         },
                         AddressDetails = new AddressDetail()
                     }

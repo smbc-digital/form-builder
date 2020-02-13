@@ -40,8 +40,6 @@ namespace form_builder.Workflows
 
             var paymentReference = await _submitService.PaymentSubmission(data, form, sessionGuid);
 
-            var paymentInfo = await _payService.GetFormPaymentInformation(form);
-
             return await _payService.ProcessPayment(form, path, paymentReference, sessionGuid);
         }
     }
