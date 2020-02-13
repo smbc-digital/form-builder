@@ -57,42 +57,38 @@ namespace form_builder_tests.UnitTests.Services
                 PaymentConfiguration = 5
             });
 
-            var formAnswers = new FormAnswers
-            {
-                Path = "customer-pay"
-            };
-
-            var formSchema = new FormSchema
-            {
-                Pages = new List<Page>
-                {
-                    new Page
-                    {
-                        Behaviours = new List<Behaviour>
-                        {
-                            new Behaviour
-                            {
-                                BehaviourType = EBehaviourType.SubmitAndPay,
-                                SubmitSlugs = new List<SubmitSlug>
-                                {
-                                    new SubmitSlug
-                                    {
-                                        AuthToken = "testToken",
-                                        Location = "local",
-                                        URL = "customer-pay"
-                                    }
-                                }
-                            }
-                        },
-                        PageSlug = "customer-pay"
-                    }
-                }
-            };
-
             var mappingEntity = new MappingEntity
             {
-                BaseForm = formSchema,
-                FormAnswers = formAnswers
+                BaseForm = new FormSchema
+                {
+                    Pages = new List<Page>
+                    {
+                        new Page
+                        {
+                            Behaviours = new List<Behaviour>
+                            {
+                                new Behaviour
+                                {
+                                    BehaviourType = EBehaviourType.SubmitAndPay,
+                                    SubmitSlugs = new List<SubmitSlug>
+                                    {
+                                        new SubmitSlug
+                                        {
+                                            AuthToken = "testToken",
+                                            Location = "local",
+                                            URL = "customer-pay"
+                                        }
+                                    }
+                                }
+                            },
+                            PageSlug = "customer-pay"
+                        }
+                    }
+                },
+                FormAnswers = new FormAnswers
+                {
+                    Path = "customer-pay"
+                }
             };
 
             var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
