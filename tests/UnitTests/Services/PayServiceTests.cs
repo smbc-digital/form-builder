@@ -57,29 +57,44 @@ namespace form_builder_tests.UnitTests.Services
                 PaymentConfiguration = 5
             });
 
-            var pages = new List<Page>();
-            var mockPage = new Mock<Page>();
-            var submitSlugs = new List<SubmitSlug>();
+            var formAnswers = new FormAnswers
+            {
+                Path = "customer-pay"
+            };
 
-            mockPage.Object.PageSlug = "customer-pay";
-            pages.Add(mockPage.Object);
-            var mockFormSchema = new Mock<FormSchema>();
-            mockFormSchema.SetReturnsDefault(mockPage.Object);
-            mockFormSchema.Object.Pages = pages;
-            var formAnswers = new FormAnswers();
-            var behaviours = new List<Behaviour>();
-            var behaviour = new Behaviour { BehaviourType = EBehaviourType.SubmitAndPay};
-            mockPage.Object.Behaviours = behaviours;
-            formAnswers.Path = "customer-pay";
-            var slug = new SubmitSlug { AuthToken = "testToken", Location = "local", URL = "customer-pay" };
-            submitSlugs.Add(slug);
-            behaviour.SubmitSlugs = submitSlugs;
-            behaviours.Add(behaviour);
+            var formSchema = new FormSchema
+            {
+                Pages = new List<Page>
+                {
+                    new Page
+                    {
+                        Behaviours = new List<Behaviour>
+                        {
+                            new Behaviour
+                            {
+                                BehaviourType = EBehaviourType.SubmitAndPay,
+                                SubmitSlugs = new List<SubmitSlug>
+                                {
+                                    new SubmitSlug
+                                    {
+                                        AuthToken = "testToken",
+                                        Location = "local",
+                                        URL = "customer-pay"
+                                    }
+                                }
+                            }
+                        },
+                        PageSlug = "customer-pay"
+                    }
+                }
+            };
 
-            var mappingEntity = new MappingEntity();
-            mappingEntity.BaseForm = mockFormSchema.Object;
-            mappingEntity.FormAnswers = formAnswers;
-            
+            var mappingEntity = new MappingEntity
+            {
+                BaseForm = formSchema,
+                FormAnswers = formAnswers
+            };
+
             var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
             _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
             _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
