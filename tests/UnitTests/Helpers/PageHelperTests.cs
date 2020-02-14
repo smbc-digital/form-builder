@@ -796,7 +796,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var submitSlug = new SubmitSlug
             {
-                Location = "local",
+                Environment = "local",
                 URL = "test-url"
             };
 
@@ -842,7 +842,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var submitSlug = new SubmitSlug
             {
-                Location = "mysteryLocation",
+                Environment = "mysteryEnvironment",
                 URL = "test-url"
             };
 
