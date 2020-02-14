@@ -940,6 +940,7 @@ This can be set up using the following config
 ### Redis
 For a truly distributed we support Redis, this can be setup using the StorageProvider config below.
 
+```json
 {
   "StorageProvider": {
       "Type": "Redis",
@@ -947,6 +948,7 @@ For a truly distributed we support Redis, this can be setup using the StoragePro
       "Instance": "YourPreferredInstanceNameHere"
   }
 }
+```
 
 ### Running High Availability/Load Balancing
 If running in a load balanced environment you will need to be running a truly distributed cache (i.e. Redis).
