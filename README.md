@@ -6,17 +6,20 @@
 </div>
 
 ## Table of Contents
+- [Requirements & Prereqs](#requirements-&-prereqs)
 - [Base JSON Structure](#base-json-structure)
-- [Address Providers](#Address_Providers)
+- [Validators](#validators)
+- [Address/Street/Organisation Providers](#address-providers)
+- [Payment Providers](#payment-providers)
 - [Storage Providers](#storage-providers)
 - [Running High Availability](#running-high-availability)
-- [UI Tests](#UI_Tests)
+- [UI Tests](#ui-Tests)
 
-## Requirements
+# Requirements & Prereqs
 - dotnet core 2.2
-- gpg key added to accepted contributors
 
-## Base JSON Structure
+
+# Base JSON Structure
 ```json
     {
         "FormName": "",
@@ -895,28 +898,117 @@ The success page is a page with with the PageSlug of success it is of the form i
 
 ```json
 {
-      "Title": "Thank you for submitting your views on fruit",
-      "PageSlug": "success",
-      "Elements": [
-        {
-          "Type": "p",
-          "Properties": {
-            "Text": "The wikipedia page on fruit is at <a href=\"https://en.wikipedia.org/wiki/fruit\">Fruits</a>"
-          }
-        }]
+  "Title": "Thank you for submitting your views on fruit",
+  "PageSlug": "success",
+  "Elements": [
+    {
+      "Type": "p",
+      "Properties": {
+        "Text": "The wikipedia page on fruit is at <a href=\"https://en.wikipedia.org/wiki/fruit\">Fruits</a>"
+      }
+    }]
 }
 ```
 It will also diplay the form name and the FeedbackUrl if one is specified.
 
-## Address_Providers
+# Validators
 
-Any address service to be used needs to implement `IAddressProvider` which requires a SearchAsync method as well as a ProviderName. Within the address JSON the `AddressProvider` key is used to specifiy which provider to use.
+Comming Soon...
+
+# Providers
+## Address Providers
+
+`IAddressProvider` is provided to enable integration with different address data sources. 
+
+The interface requires a ProviderName and a SearchAsync method which must return an `AddressSearchResult` object. 
+
+```c#
+string ProviderName { get; }
+
+Task<IEnumerable<AddressSearchResult>> SearchAsync(string streetOrPostcode);
+```
+
+You can register new/multiple address providers in startup 
+
+```c#
+services.AddSingleton<IAddressProvider, FakeAddressProvider>();
+services.AddSingleton<IAddressProvider, CRMAddressProvider>();
+services.AddSingleton<IAddressProvider, MyCustomAddressProvider>();
+```
+
+You can specify in the JSON form defenition for Address elements, which address provider you want use. To do this set `AddressProvider` to the value of the required `IAddressProvider.ProviderName`, for example to use a Provider with a ProviderName of "Fake";
+
+```json
+{
+  "Type": "Address",
+  "Properties": {
+    "QuestionId": "address",
+    "AddressProvider": "Fake",
+  }
+}
+```
+
+## Street Providers
+
+`IStreetProvider` is provided to enable integration with different street level data sources. 
+
+Implementation is almost identical to that described in the AddressProvider
+
+Register for use 
+
+```c#
+services.AddSingleton<IStreetProvider, FakeStreetProvider>();
+services.AddSingleton<IStreetProvider, CRMStreetProvider>();
+return services;
+```
+
+Specify which street provider to use.
+
+```json
+"Elements": [
+  {
+    "Type": "Street",
+    "Properties": {
+      "QuestionId": "customersstreet",
+      "StreetProvider": "Fake",
+    }
+```
+
+
+## Organisation Providers
+
+`IOrganisationProvider` is provided to enable integration with different organisation data sources. 
+
+Implementation is almost identical to that described in the AddressProvider/StreetProvider, however Organisation Providers return an `OrganisationSearchResult`
+
+Register for user
+
+```c#
+services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
+services.AddSingleton<IOrganisationProvider, CRMOrganisationProvider>();
+return services;
+```
+
+Specify which organisation provider to use.
+
+```json
+{
+  "Type": "Organisation",
+  "Properties": {
+    "QuestionId": "organisation",
+    "Label": "Enter the organisation",
+    "OrganisationProvider": "Fake",
+  }
+```
+## Payment Providers
+
+Comming Soon...
 
 ## Storage Providers
 
 As users submit data and move through forms the data they are submitting is temporarily stored before submission.
 
-This function uses [IDistributedCache](https://docs.microsoft.com/en-us/aspnet/core/performance/caching/distributed?view=aspnetcore-3.1) as provided by the .NetCore Framework to enable this.
+This function uses [IDistributedCache](https://docs.microsoft.com/en-us/aspnet/core/performance/caching/distributed?view=aspnetcore-3.1).
 
 Storage providers can be added from config and registered on app startup using.
 
@@ -962,7 +1054,7 @@ Distributed cache and DataProtecton key storage specification is wrapped up in t
   services.AddDataProtection().PersistKeysToStackExchangeRedis(redis, $"{storageProviderConfiguration["InstanceName"]}DataProtection-Keys");
 ```
 
-## UI_Tests
+# UI Tests
 
 The form builder app has UI tests to ensure that the UI is expected. Our UI Tests are written using SpecFlow
 
