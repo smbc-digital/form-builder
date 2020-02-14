@@ -147,7 +147,7 @@ The target mapping above would produce this object
         "customer": {
             "lastname": "",
             "firstname": "",
-            "additionalinfomation": ""
+            "additionalinformation": ""
         },
         "one": {
             "two": {
@@ -224,7 +224,7 @@ Paragraph text JSON example:
       "Optional": false,
       "MaxLength": 9,
       "Regex": "^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$",
-      "RegexValidationMessage": "Enter a valid NI Number"
+      "RegexValidationMessage": "Enter a valid NI Number",
       "TargetMapping": "customer.ninumber"
     }
   }
@@ -818,7 +818,7 @@ If it is a SubmitForm behaviour we have submitslugs which will (using the enviro
             },
             {
                 "Conditions": [],
-                "BehaviourType": SubmitForm,
+                "BehaviourType": "SubmitForm",
                 "PageSlug": "",
                 "SubmitSlugs": [
                   {
@@ -855,7 +855,7 @@ Example where dependant on their answers to certain questions the form navigates
                         "EqualTo": "Yes"
                     },
                 ],
-                "BehaviourType": GoToPage,
+                "BehaviourType": "GoToPage",
                 "PageSlug": "you-like-apples-oranges"
             },
             {
