@@ -6,7 +6,7 @@
 </div>
 
 ## Table of Contents
-- [Base JSON Structure](##BaseJSONStructure)
+- [Base JSON Structure](#base-json-structure)
 - [Address Providers](#Address_Providers)
 - [UI Tests](#UI_Tests)
 
@@ -147,7 +147,7 @@ The target mapping above would produce this object
         "customer": {
             "lastname": "",
             "firstname": "",
-            "additionalinfomation": ""
+            "additionalinformation": ""
         },
         "one": {
             "two": {
@@ -224,7 +224,7 @@ Paragraph text JSON example:
       "Optional": false,
       "MaxLength": 9,
       "Regex": "^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$",
-      "RegexValidationMessage": "Enter a valid NI Number"
+      "RegexValidationMessage": "Enter a valid NI Number",
       "TargetMapping": "customer.ninumber"
     }
   }
@@ -663,8 +663,9 @@ Date Input example:
     * RestrictFutureDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the future)
     * RestrictPastDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the past)
     * RestrictCurrentDate (*boolean*) (Defaults to false. If true, it will prevent users entering today's date)
+    * Max (*integer*) (The maximum year the user can enter, e.g. if max is set 2500, the maximum date a user can enter is today's date  in the year 2500
     * CustomValidationMessage (*string*) (Set a custom validation message for when a user doesn't input a date)
-    * UpperLimitValidationMessage (*string*) (Set a custom validation message for when a user enters the year greater than 100 years from today)
+    * UpperLimitValidationMessage (*string*) (Set a custom validation message for when a user enters a date greater than today's date 100 years from now OR if a max value has been specified, the validation message when a user enters a date greater than today's date in the year stated by the max value)
     * TargetMapping (*string*)  
 
 Date Picker example:
@@ -817,7 +818,7 @@ If it is a SubmitForm behaviour we have submitslugs which will (using the enviro
             },
             {
                 "Conditions": [],
-                "BehaviourType": SubmitForm,
+                "BehaviourType": "SubmitForm",
                 "PageSlug": "",
                 "SubmitSlugs": [
                   {
@@ -854,7 +855,7 @@ Example where dependant on their answers to certain questions the form navigates
                         "EqualTo": "Yes"
                     },
                 ],
-                "BehaviourType": GoToPage,
+                "BehaviourType": "GoToPage",
                 "PageSlug": "you-like-apples-oranges"
             },
             {
