@@ -6,7 +6,7 @@
 </div>
 
 ## Table of Contents
-- [Base JSON Structure](##BaseJSONStructure)
+- [Base JSON Structure](#BaseJSONStructure)
 - [Address Providers](#Address_Providers)
 - [UI Tests](#UI_Tests)
 
@@ -663,8 +663,9 @@ Date Input example:
     * RestrictFutureDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the future)
     * RestrictPastDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the past)
     * RestrictCurrentDate (*boolean*) (Defaults to false. If true, it will prevent users entering today's date)
+    * Max (*integer*) (The maximum year the user can enter, e.g. if max is set 2500, the maximum date a user can enter is today's date  in the year 2500
     * CustomValidationMessage (*string*) (Set a custom validation message for when a user doesn't input a date)
-    * UpperLimitValidationMessage (*string*) (Set a custom validation message for when a user enters the year greater than 100 years from today)
+    * UpperLimitValidationMessage (*string*) (Set a custom validation message for when a user enters a date greater than today's date 100 years from now OR if a max value has been specified, the validation message when a user enters a date greater than today's date in the year stated by the max value)
     * TargetMapping (*string*)  
 
 Date Picker example:
