@@ -6,7 +6,7 @@
 </div>
 
 ## Table of Contents
-- [Base JSON Structure](#BaseJSONStructure)
+- [Base JSON Structure](#base-json-structure)
 - [Address Providers](#Address_Providers)
 - [UI Tests](#UI_Tests)
 
