@@ -8,6 +8,8 @@
 ## Table of Contents
 - [Base JSON Structure](#base-json-structure)
 - [Address Providers](#Address_Providers)
+- [Storage Providers](#storage-providers)
+- [Running High Availability](#running-high-availability)
 - [UI Tests](#UI_Tests)
 
 ## Requirements
@@ -909,6 +911,54 @@ It will also diplay the form name and the FeedbackUrl if one is specified.
 ## Address_Providers
 
 Any address service to be used needs to implement `IAddressProvider` which requires a SearchAsync method as well as a ProviderName. Within the address JSON the `AddressProvider` key is used to specifiy which provider to use.
+
+## Storage Providers
+
+As users submit data and move through forms the data they are submitting is temporarily stored before submission.
+
+This function uses [IDistributedCache](https://docs.microsoft.com/en-us/aspnet/core/performance/caching/distributed?view=aspnetcore-3.1) as provided by the .NetCore Framework to enable this.
+
+Storage providers can be added from config and registered on app startup using.
+
+```c#
+services.AddStorageProvider(Configuration);
+```
+
+### Application
+By default setup using config currently supports "Application", Distributed In Memory Cache (which ironically isn't actually distributed!), but allows us to develop locally and deploy to single instances.
+
+This can be set up using the following config
+
+```json
+  {
+    "StorageProvider": {
+      "Type": "Application"
+    }
+  }
+```
+
+### Redis
+For a truly distributed we support Redis, this can be setup using the StorageProvider config below.
+
+{
+  "StorageProvider": {
+      "Type": "Redis",
+      "Address": "YourRedisUrlHere",
+      "Instance": "YourPreferredInstanceNameHere"
+  }
+}
+
+### Running High Availability/Load Balancing
+If running in a load balanced environment you will need to be running a truly distributed cache (i.e. Redis).
+
+In this case it's worth noting that for sessions to work correctly there needs to be a shared keystore.
+
+Distributed cache and DataProtecton key storage specification is wrapped up in the ```services.AddStorageProvider(Configuration);``` service registration (we should seperate this out!) so when you set storage provider to 'Redis' it also shares the data protection keys in redis as well (as per the code below).
+
+```c#
+  var redis = ConnectionMultiplexer.Connect(storageProviderConfiguration["Address"]);
+  services.AddDataProtection().PersistKeysToStackExchangeRedis(redis, $"{storageProviderConfiguration["InstanceName"]}DataProtection-Keys");
+```
 
 ## UI_Tests
 
