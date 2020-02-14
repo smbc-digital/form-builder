@@ -95,7 +95,7 @@ Example JSON:
 When building elements you have the ability to map the answer to custom properties. To allow for this you can specify a `"TargetMapping"` property which will be used to map the answer too. The example above would map the firstName textbox to a Customer object with the firstname property. The ability to map multiple questions to the same field is also posibile. An example below shows a custom mapping.
 
 Target Mapping EXample:
-```json
+```
     {
         "Elements": [
             {
@@ -813,7 +813,7 @@ If it is a SubmitForm behaviour we have submitslugs which will (using the enviro
                         "EqualTo": "Yes"
                     }
                 ],
-                "BehaviourType": GoToPage,
+                "BehaviourType": "GoToPage",
                 "PageSlug": "why-do-you-like-apples"
             },
             {
@@ -869,7 +869,7 @@ Example where dependant on their answers to certain questions the form navigates
                         "EqualTo": "No"
                     },
                 ],
-                "BehaviourType": GoToPage,
+                "BehaviourType": "GoToPage",
                 "PageSlug": "you-dont-like-apples-oranges"
             },        ]
     }
