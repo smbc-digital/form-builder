@@ -119,7 +119,7 @@ namespace form_builder.Models
                 else
                 {
                     var behaviour = pageSubmitBehaviours.SelectMany(x => x.SubmitSlugs)
-                            .Where(x => x.Location.ToLower() == environment.ToLower())
+                            .Where(x => x.Environment.ToLower() == environment.ToLower())
                             .FirstOrDefault();
 
                     if (behaviour == null)

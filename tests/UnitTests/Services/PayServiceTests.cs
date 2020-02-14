@@ -75,7 +75,7 @@ namespace form_builder_tests.UnitTests.Services
                                         new SubmitSlug
                                         {
                                             AuthToken = "testToken",
-                                            Location = "local",
+                                            Environment = "local",
                                             URL = "customer-pay"
                                         }
                                     }
