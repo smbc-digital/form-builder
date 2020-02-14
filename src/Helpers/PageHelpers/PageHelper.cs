@@ -350,7 +350,7 @@ namespace form_builder.Helpers.PageHelpers
                         var foundEnviromentSubmitSlug = false;
                         foreach (var subItem in item.SubmitSlugs)
                         {
-                            if (subItem.Location.ToLower() == _enviroment.EnvironmentName.ToS3EnvPrefix().ToLower())
+                            if (subItem.Environment.ToLower() == _enviroment.EnvironmentName.ToS3EnvPrefix().ToLower())
                             {
                                 foundEnviromentSubmitSlug = true;
                             }

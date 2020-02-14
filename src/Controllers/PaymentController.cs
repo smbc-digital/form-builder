@@ -99,5 +99,22 @@ namespace form_builder.Controllers
 
             return View("./Declined", paymentDeclinedViewModel);
         }
+
+        [HttpGet]
+        [Route("{form}/payment-summary")]
+        public async Task<IActionResult> PaymentSummary(string form)
+        {
+            var paymentInfo = await _payService.GetFormPaymentInformation(form);
+
+            var paymentSummaryViewModel = new PaymentSummaryViewModel
+            {
+                FormName = form,
+                PageTitle = "Summary",
+                Amount = paymentInfo.Settings.Amount, 
+                Description = paymentInfo.Settings.Description 
+            };
+
+            return View("./Summary", paymentSummaryViewModel);
+        }
     }
 }

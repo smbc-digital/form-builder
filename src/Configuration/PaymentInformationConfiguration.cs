@@ -12,5 +12,6 @@
         public string AccountReference { get; set; }
         public string Amount { get; set; }
         public string CatalogueId { get; set; }
+        public string Description { get; set; }
     }
 }

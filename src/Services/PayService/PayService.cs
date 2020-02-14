@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Cache;
 using form_builder.Enum;
-using form_builder.Services.MappingService.Entities;
 using form_builder.Exceptions;
 using form_builder.Extensions;
 using form_builder.Helpers.Session;
@@ -22,7 +21,7 @@ namespace form_builder.Services.PayService
     {
         Task<string> ProcessPayment(string form, string path, string reference, string sessionGuid);
         Task<string> ProcessPaymentResponse(string form, string responseCode, string reference);
-
+        Task<PaymentInformation> GetFormPaymentInformation(string form);
     }
 
     public class PayService : IPayService
@@ -94,7 +93,7 @@ namespace form_builder.Services.PayService
             }
         }
 
-        private async Task<PaymentInformation> GetFormPaymentInformation(string form)
+        public async Task<PaymentInformation> GetFormPaymentInformation(string form)
         {
             var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>("paymentconfiguration", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
 
