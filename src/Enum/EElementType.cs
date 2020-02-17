@@ -28,6 +28,7 @@
         TimeInput,
         DatePicker,
         Organisation,
-        Numeric
+        Numeric,
+        FileUpload
     }
 }

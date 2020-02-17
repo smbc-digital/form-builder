@@ -7,7 +7,7 @@ namespace form_builder.Validators
 { 
     public class TimeInputValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
             if (element.Type != EElementType.TimeInput)
             {

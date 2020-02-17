@@ -33,7 +33,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithOptional(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
@@ -51,7 +51,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithLabel("Date")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
@@ -69,7 +69,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithRestrictCurrentDate(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             var today = DateTime.Today;
             viewModel.Add("test-date", today.ToString("yyyy-MM-dd"));     
 
@@ -89,7 +89,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithRestrictCurrentDate(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-date-day", "10");
             viewModel.Add("test-date-month", "10");
             viewModel.Add("test-date-year", "2012");

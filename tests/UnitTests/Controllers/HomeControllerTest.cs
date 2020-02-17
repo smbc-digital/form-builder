@@ -49,14 +49,14 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithBehaviour(behaviour)
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.GoToExternalPage, PageSlug = "https://www.bbc.co.uk/weather/2636882" });
 
             var viewModel = new Dictionary<string, string[]>();
 
             // Act
-            var result = await _homeController.Index("form", "page-one", viewModel);
+            var result = await _homeController.Index("form", "page-one", viewModel, null);
 
             // Assert
             var viewResult = Assert.IsType<RedirectResult>(result);
@@ -86,14 +86,14 @@ namespace form_builder_tests.UnitTests.Controllers
 
 
             // Arrange
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.GoToPage, PageSlug = "page-two" });
 
             var viewModel = new Dictionary<string, string[]>();
 
             // Act
-            var result = await _homeController.Index("form", "page-one", viewModel);
+            var result = await _homeController.Index("form", "page-one", viewModel, null);
 
             // Assert
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
@@ -123,14 +123,14 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithBehaviour(behaviour)
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.SubmitForm });
 
             var viewModel = new Dictionary<string, string[]>();
 
             // Act
-            var result = await _homeController.Index("form", "page-one", viewModel);
+            var result = await _homeController.Index("form", "page-one", viewModel,null);
 
             // Assert
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
@@ -158,14 +158,14 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithValidatedModel(true)
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.Unknown });
 
             var viewModel = new Dictionary<string, string[]>();
 
             // Act & Assert
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _homeController.Index("form", "page-one", viewModel));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _homeController.Index("form", "page-one", viewModel,null));
             Assert.Equal($"The provided behaviour type 'Unknown' is not valid", result.Message);
 
         }
@@ -185,7 +185,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithValidatedModel(true)
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page, ViewName = "Search", UseGeneratedViewModel = true });
 
             var viewModel = new ViewModelBuilder()
@@ -194,7 +194,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
-            var result = await _homeController.Index("form", "page-one", viewModel);
+            var result = await _homeController.Index("form", "page-one", viewModel, null);
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Search", viewResult.ViewName);
         }
@@ -228,11 +228,11 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = behaviourType });
 
-            var result = await _homeController.Index("form", "page-one", viewModel);
+            var result = await _homeController.Index("form", "page-one", viewModel, null);
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal(viewName, viewResult.ActionName);
@@ -265,11 +265,11 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.GoToExternalPage, PageSlug = "submit-url" });
 
-            var result = await _homeController.Index("form", "page-one", viewModel);
+            var result = await _homeController.Index("form", "page-one", viewModel, null);
 
             var redirectResult = Assert.IsType<RedirectResult>(result);
             Assert.Equal("submit-url", redirectResult.Url);
@@ -402,13 +402,13 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"test", "test")
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.SubmitAndPay });
             _paymentWorkflow.Setup(_ => _.Submit(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync("https://www.return.url");
 
-            var result = await _homeController.Index("form", "page-one", viewModel);
+            var result = await _homeController.Index("form", "page-one", viewModel, null);
 
             Assert.IsType<RedirectResult>(result);
         }
@@ -438,7 +438,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"test", "test")
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<bool>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.SubmitAndPay });
             _paymentWorkflow.Setup(_ => _.Submit(It.IsAny<string>(), It.IsAny<string>()))

@@ -182,8 +182,8 @@ namespace form_builder.Mappers
             {
                 return new List<string>();
             }
-            var val =  value.Response.Split(",").ToList();
-            return val;
+            var val = value.Response.Split(",");
+            return new List<string>(val);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace form_builder.Services.OrganisationService
 {
     public interface IOrganisationService
     {
-        Task<ProcessRequestEntity> ProcesssOrganisation(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path);
+        Task<ProcessRequestEntity> ProcesssOrganisation(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path);
     }
 
     public class OrganisationService : IOrganisationService
@@ -32,9 +32,9 @@ namespace form_builder.Services.OrganisationService
             _organisationProviders = organisationProviders;
         }
 
-        public async Task<ProcessRequestEntity> ProcesssOrganisation(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
+        public async Task<ProcessRequestEntity> ProcesssOrganisation(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
-            var journey = viewModel["OrganisationStatus"];
+            var journey = (string)viewModel["OrganisationStatus"];
             var organisationResults = new List<OrganisationSearchResult>();
 
             if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
@@ -56,11 +56,11 @@ namespace form_builder.Services.OrganisationService
 
                 var searchTerm = journey == "Select"
                     ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{organisationElement.Properties.QuestionId}-organisation-searchterm").Response
-                    : viewModel[$"{organisationElement.Properties.QuestionId}-organisation-searchterm"];
+                    : (string)viewModel[$"{organisationElement.Properties.QuestionId}-organisation-searchterm"];
 
                 var organisation = journey != "Select"
                     ? string.Empty
-                    : viewModel[$"{organisationElement.Properties.QuestionId}-organisation"];
+                    : (string)viewModel[$"{organisationElement.Properties.QuestionId}-organisation"];
 
                 var emptySearchTerm = string.IsNullOrEmpty(searchTerm);
                 var emptyOrganisation = string.IsNullOrEmpty(organisation);
@@ -86,7 +86,7 @@ namespace form_builder.Services.OrganisationService
                 try
                 {
                     var result = await provider.SearchAsync(searchTerm);
-                    organisationResults = result.ToList();
+                    organisationResults = result;
                 }
                 catch (Exception e)
                 {
@@ -98,7 +98,7 @@ namespace form_builder.Services.OrganisationService
             {
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, organisationResults);
                 formModel.Path = currentPage.PageSlug;
-                formModel.OrganisationStatus = journey;
+                formModel.OrganisationStatus = (string)journey;
                 formModel.FormName = baseForm.FormName;
 
                 return new ProcessRequestEntity

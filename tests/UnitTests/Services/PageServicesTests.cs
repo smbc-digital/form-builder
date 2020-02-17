@@ -42,12 +42,12 @@ namespace form_builder_tests.UnitTests.Services
 
         public PageServicesTests()
         {
-            _validator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, string>>()))
+            _validator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>()))
                 .Returns(new ValidationResult { IsValid = false });
             var elementValidatorItems = new List<IElementValidator> { _validator.Object };
             _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
                         .ReturnsAsync(new FormBuilderViewModel());
 
             var cacheData = new FormAnswers
@@ -64,7 +64,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessRequest_ShouldCall_Schema_And_Session_Service()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var element = new ElementBuilder()
@@ -85,7 +85,7 @@ namespace form_builder_tests.UnitTests.Services
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "AddressStatus", "Search" },
@@ -94,7 +94,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcessRequest("form", "page-one", viewModel, false);
 
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Once);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Once);
             _schemaProvider.Verify(_ => _.Get<FormSchema>(It.IsAny<string>()), Times.Once);
             _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
@@ -104,7 +104,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessRequest_ShouldCallAddressService_WhenAddressElement()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
-            _addressService.Setup(_ => _.ProcesssAddress(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
+            _addressService.Setup(_ => _.ProcesssAddress(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessRequestEntity());
 
             var element = new ElementBuilder()
@@ -125,7 +125,7 @@ namespace form_builder_tests.UnitTests.Services
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "AddressStatus", "Search" },
@@ -134,7 +134,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcessRequest("form", "page-one", viewModel, false);
 
-            _addressService.Verify(_ => _.ProcesssAddress(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _addressService.Verify(_ => _.ProcesssAddress(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
         }
 
@@ -142,7 +142,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessRequest_ShouldCallStreetService_WhenStreetElement()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
-            _streetService.Setup(_ => _.ProcessStreet(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
+            _streetService.Setup(_ => _.ProcessStreet(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessRequestEntity());
 
             var element = new ElementBuilder()
@@ -163,7 +163,7 @@ namespace form_builder_tests.UnitTests.Services
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "AddressStatus", "Search" },
@@ -172,7 +172,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcessRequest("form", "page-one", viewModel, false);
 
-            _streetService.Verify(_ => _.ProcessStreet(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _streetService.Verify(_ => _.ProcessStreet(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
         }
 
@@ -181,7 +181,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
                 .Throws<ApplicationException>();
 
             var element = new ElementBuilder()
@@ -202,7 +202,7 @@ namespace form_builder_tests.UnitTests.Services
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "AddressStatus", "Search" },
@@ -211,7 +211,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, false));
 
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Once);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Once);
         }
 
         [Fact]
@@ -235,7 +235,7 @@ namespace form_builder_tests.UnitTests.Services
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "AddressStatus", "Search" },
@@ -515,7 +515,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessRequest_ShouldCallProcesssOrganisation_WhenOrganisationElement()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
-            _organisationService.Setup(_ => _.ProcesssOrganisation(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
+            _organisationService.Setup(_ => _.ProcesssOrganisation(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessRequestEntity());
 
             var element = new ElementBuilder()
@@ -536,7 +536,7 @@ namespace form_builder_tests.UnitTests.Services
             _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "OrganisationStatus", "Search" },
@@ -545,7 +545,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcessRequest("form", "page-one", viewModel, false);
 
-            _organisationService.Verify(_ => _.ProcesssOrganisation(It.IsAny<Dictionary<string, string>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _organisationService.Verify(_ => _.ProcesssOrganisation(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
         }
     }

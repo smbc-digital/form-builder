@@ -23,7 +23,7 @@ namespace form_builder.Services.PageService
     public interface IPageService
     {
         Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false);
-        Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, string> viewModel, bool processManual = false);
+        Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, bool processManual = false);
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid);
         Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
     }
@@ -150,7 +150,7 @@ namespace form_builder.Services.PageService
             };
         }
 
-        public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, string> viewModel, bool processManual)
+        public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, bool processManual)
         {
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var currentPage = baseForm.GetPage(path);
@@ -215,7 +215,7 @@ namespace form_builder.Services.PageService
 
         public async Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid)
         {
-            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), baseForm, sessionGuid);
+            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid);
             viewModel.FormName = baseForm.FormName;
             viewModel.PageTitle = page.Title;
             viewModel.Path = path;
@@ -224,7 +224,7 @@ namespace form_builder.Services.PageService
         }
         public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
-            Dictionary<string, string> answers = new Dictionary<string, string>();
+            Dictionary<string, dynamic> answers = new Dictionary<string, dynamic>();
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var cachedAnswers = _distributedCache.GetString(sessionGuid);

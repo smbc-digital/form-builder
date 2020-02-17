@@ -45,7 +45,7 @@ namespace form_builder.Services.MappingService
 
         private object CreatePostData(FormAnswers formAnswers, FormSchema formSchema)
         {
-            var data = new ExpandoObject() as IDictionary<string, object>;
+            var data = new ExpandoObject() as IDictionary<string, dynamic>;
 
             formSchema.Pages.SelectMany(_ => _.ValidatableElements)
                 .ToList()
@@ -54,7 +54,7 @@ namespace form_builder.Services.MappingService
             return data;
         }
 
-        private IDictionary<string, object> RecursiveCheckAndCreate(string targetMapping, IElement element, FormAnswers formAnswers, IDictionary<string, object> obj)
+        private IDictionary<string, dynamic> RecursiveCheckAndCreate(string targetMapping, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
         {
             var splitTargets = targetMapping.Split(".");
 
@@ -77,7 +77,7 @@ namespace form_builder.Services.MappingService
             if (!obj.TryGetValue(splitTargets[0], out subObject))
                 subObject = new ExpandoObject();
 
-            subObject = RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", ""), element, formAnswers, subObject as IDictionary<string, object>);
+            subObject = RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", ""), element, formAnswers, subObject as IDictionary<string, dynamic>);
 
             obj.Remove(splitTargets[0]);
             obj.Add(splitTargets[0], subObject);

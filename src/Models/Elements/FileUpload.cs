@@ -9,19 +9,11 @@ using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
 {
-    public class Textbox : Element
+    public class FileUpload : Element
     {
-        public Textbox()
+        public FileUpload()
         {
-            Type = EElementType.Textbox;
-        }
-
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
-        {
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
-            elementHelper.CheckForQuestionId(this);
-            elementHelper.CheckForLabel(this);
-            return viewRender.RenderAsync(Type.ToString(), this);
+            Type = EElementType.FileUpload;
         }
 
         public override Dictionary<string, dynamic> GenerateElementProperties()
@@ -30,9 +22,7 @@ namespace form_builder.Models.Elements
             {
                 { "name", Properties.QuestionId },
                 { "id", Properties.QuestionId },
-                { "maxlength", Properties.MaxLength },
-                { "value", Properties.Value},
-                { "autocomplete", "on" }
+                {"type", "file" }
             };
 
             if (DisplayAriaDescribedby)
@@ -42,5 +32,7 @@ namespace form_builder.Models.Elements
 
             return properties;
         }
+
+
     }
 }

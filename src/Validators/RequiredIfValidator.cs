@@ -5,7 +5,7 @@ namespace form_builder.Validators
 {
     public class RequiredIfValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
             if(string.IsNullOrEmpty(element.Properties.RequiredIf))
             {
@@ -20,7 +20,7 @@ namespace form_builder.Validators
             string[] requiredIf = element.Properties.RequiredIf.Split(':');
             var requiredKey = requiredIf[0];
 
-            string answeredValue = "";
+            dynamic answeredValue = "";
             if (!viewModel.TryGetValue(requiredKey, out answeredValue))
             {
                 return new ValidationResult
@@ -39,7 +39,7 @@ namespace form_builder.Validators
                 }
                 else
                 {
-                    string value = "";
+                    dynamic value = "";
                     if (viewModel.TryGetValue(element.Properties.QuestionId, out value))
                     {
                         isValid = true;

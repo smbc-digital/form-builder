@@ -9,7 +9,7 @@ namespace form_builder.Helpers.ElementHelpers
 {
     public interface IElementHelper
     {
-        string CurrentValue(Element element, Dictionary<string, string> viewModel, string pageSlug, string guid, string suffix = "");
+        string CurrentValue(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "");
         bool CheckForQuestionId(Element element);
         bool CheckForLabel(Element element);
         bool CheckForMaxLength(Element element);
@@ -31,7 +31,7 @@ namespace form_builder.Helpers.ElementHelpers
             _distributedCache = distributedCacheWrapper;
         }
 
-        public string CurrentValue(Element element, Dictionary<string, string> viewModel, string pageSlug, string guid, string suffix = "")
+        public string CurrentValue(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "")
             {
             var currentValue = viewModel.ContainsKey($"{element.Properties.QuestionId}{suffix}");
             var cacheData = _distributedCache.GetString(guid);

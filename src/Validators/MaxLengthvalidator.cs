@@ -5,9 +5,17 @@ namespace form_builder.Validators
 {
     public class MaxLengthValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
             if (!viewModel.ContainsKey(element.Properties.QuestionId))
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            }
+
+            if(element.Type == Enum.EElementType.FileUpload)
             {
                 return new ValidationResult
                 {

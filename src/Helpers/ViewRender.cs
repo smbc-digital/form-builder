@@ -28,7 +28,7 @@ namespace form_builder.Helpers
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<string> RenderAsync<TModel>(string viewName, TModel model, Dictionary<string, object> viewData = null)
+        public async Task<string> RenderAsync<TModel>(string viewName, TModel model, Dictionary<string, dynamic> viewData = null)
         {
             var httpContext = new DefaultHttpContext { RequestServices = _serviceProvider };
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());

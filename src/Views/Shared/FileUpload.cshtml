@@ -1,0 +1,23 @@
+﻿
+@model form_builder.Models.Elements.Element
+@{
+    var hintId = $"{Model.Properties.QuestionId}-hint";
+    var errorId = $"{Model.Properties.QuestionId}-error";
+}
+
+<label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+
+@if (Model.Properties.Optional)
+{
+    <span class="optional">(optional)</span>
+}
+
+@if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
+{
+    <p class="description" id=@hintId>@Model.Properties.Hint</p>
+}
+@Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())
+@if (!Model.IsValid)
+{
+    <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
+}

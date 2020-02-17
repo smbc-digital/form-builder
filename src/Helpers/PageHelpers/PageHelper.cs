@@ -26,11 +26,11 @@ namespace form_builder.Helpers.PageHelpers
     public interface IPageHelper
     {
         void hasDuplicateQuestionIDs(List<Page> pages, string formName);
-        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null);
-        void SaveAnswers(Dictionary<string, string> viewModel, string guid, string form);
-        Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults);
-        Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
-        Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
+        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null);
+        void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form);
+        Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults);
+        Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
+        Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
         void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName);
         Task CheckForPaymentConfiguration(List<Page> pages, string formName);
         void CheckForEmptyBehaviourSlugs(List<Page> pages, string formName);
@@ -60,7 +60,7 @@ namespace form_builder.Helpers.PageHelpers
             _paymentProviders = paymentProviders;
         }
 
-        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null)
+        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
             if (page.PageSlug.ToLower() != "success")
@@ -77,7 +77,7 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        public void SaveAnswers(Dictionary<string, string> viewModel, string guid, string form)
+        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -114,7 +114,7 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
-        public async Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
+        public async Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
         {
             switch (journey)
             {
@@ -148,7 +148,7 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
-        public async Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
+        public async Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
         {
             switch (journey)
             {
@@ -182,7 +182,7 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
-        public async Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, string> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults)
+        public async Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults)
         {
             switch (journey)
             {

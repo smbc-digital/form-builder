@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using form_builder.Enum;
 using form_builder.Models.Elements;
+using form_builder.Models;
 
 namespace form_builder.Validators
 {
     public class RequiredElementValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
 
             if (element.Type == EElementType.DateInput || element.Type == EElementType.TimeInput ||
@@ -70,12 +71,27 @@ namespace form_builder.Validators
                 }
             }
 
-            var value = viewModel.ContainsKey(key)
+            
+
+            var isValid = true;
+
+            if (element.Type == EElementType.FileUpload)
+            {
+
+                DocumentModel value = viewModel.ContainsKey(key)
                 ? viewModel[key]
                 : null;
 
-            var isValid = !string.IsNullOrEmpty(value);
+                isValid = !(value is null);
 
+            }
+            else
+            {
+                var value = viewModel.ContainsKey(key)
+                ? viewModel[key]
+                : null;
+                isValid = !string.IsNullOrEmpty(value);
+            }
             return new ValidationResult
             {
                 IsValid = isValid,

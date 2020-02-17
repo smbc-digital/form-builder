@@ -33,7 +33,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithLabel("Date")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             //Assert
             var result = _dateInputElementValidator.Validate(element, viewModel);
@@ -50,7 +50,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("test-date")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-date-day", "aa");
             viewModel.Add("test-date-month", "aa");
             viewModel.Add("test-date-year", "aaaa");
@@ -70,7 +70,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var maxYear = DateTime.Now.Year + 100;
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-day", "12");
             viewModel.Add("test-month", "12");
             viewModel.Add("test-year", "2920");
@@ -91,7 +91,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var maxYear = DateTime.Now.Year + 100;
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-day", "12");
             viewModel.Add("test-month", "12");
             viewModel.Add("test-year", "2920");

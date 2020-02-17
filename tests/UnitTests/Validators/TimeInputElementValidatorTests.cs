@@ -32,7 +32,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithLabel("Time")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             //Assert
             var result = _dateInputElementValidator.Validate(element, viewModel);
@@ -49,7 +49,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("test-time")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-time-hours", "aa");
             viewModel.Add("test-time-minutes", "aa");
             viewModel.Add("test-time-ampm", "aaaa");

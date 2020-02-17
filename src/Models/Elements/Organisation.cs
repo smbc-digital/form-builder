@@ -19,7 +19,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.Organisation;
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             var organisationKey = $"{Properties.QuestionId}-organisation-searchterm";
 
@@ -57,9 +57,9 @@ namespace form_builder.Models.Elements
             return await viewRender.RenderAsync("OrganisationSearch", viewElement);
         }
 
-        public override Dictionary<string, object> GenerateElementProperties()
+        public override Dictionary<string, dynamic> GenerateElementProperties()
         {
-            var properties = new Dictionary<string, object>()
+            var properties = new Dictionary<string, dynamic>()
             {
                 { "id", $"{Properties.QuestionId}-organisation-searchterm" },
                 { "maxlength", Properties.MaxLength }

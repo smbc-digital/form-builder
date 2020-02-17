@@ -32,7 +32,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithOptional(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             //Assert
             var result = _restrictFutureDateValidator.Validate(element, viewModel);
@@ -50,7 +50,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithLabel("Date")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             //Assert
             var result = _restrictFutureDateValidator.Validate(element, viewModel);
@@ -68,7 +68,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithRestrictFutureDate(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-date-day", "01");
             viewModel.Add("test-date-month", "01");
             viewModel.Add("test-date-year", "2030");
@@ -89,7 +89,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithRestrictFutureDate(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>()
+            var viewModel = new Dictionary<string, dynamic>()
             {
                 { "test-date-day", "10"},
                 { "test-date-month", "10" },
