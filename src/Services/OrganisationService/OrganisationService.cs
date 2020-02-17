@@ -55,7 +55,7 @@ namespace form_builder.Services.OrganisationService
                 }
 
                 var searchTerm = journey == "Select"
-                    ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{organisationElement.Properties.QuestionId}-organisation-searchterm").Response
+                    ? (string)convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{organisationElement.Properties.QuestionId}-organisation-searchterm").Response
                     : (string)viewModel[$"{organisationElement.Properties.QuestionId}-organisation-searchterm"];
 
                 var organisation = journey != "Select"
@@ -86,7 +86,7 @@ namespace form_builder.Services.OrganisationService
                 try
                 {
                     var result = await provider.SearchAsync(searchTerm);
-                    organisationResults = result;
+                    organisationResults = result.ToList();
                 }
                 catch (Exception e)
                 {
@@ -98,7 +98,7 @@ namespace form_builder.Services.OrganisationService
             {
                 var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, organisationResults);
                 formModel.Path = currentPage.PageSlug;
-                formModel.OrganisationStatus = (string)journey;
+                formModel.OrganisationStatus = journey;
                 formModel.FormName = baseForm.FormName;
 
                 return new ProcessRequestEntity

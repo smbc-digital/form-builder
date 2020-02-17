@@ -61,7 +61,7 @@ namespace form_builder.Models
             IsValidated = true;
         }
 
-        public Behaviour GetNextPage(Dictionary<string, string> viewModel)
+        public Behaviour GetNextPage(Dictionary<string, dynamic> viewModel)
         {
             if (Behaviours.Count == 1)
             {

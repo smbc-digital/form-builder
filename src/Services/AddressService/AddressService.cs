@@ -54,8 +54,8 @@ namespace form_builder.Services.AddressService
                 }
 
                 var postcode = journey == "Select"
-                    ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
-                    : (string)viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
+                    ? (string) convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
+                    : (string) viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
 
                 var address = journey != "Select"
                     ? string.Empty
@@ -86,7 +86,7 @@ namespace form_builder.Services.AddressService
                 try
                 {
                     var result = await provider.SearchAsync(postcode);
-                    addressResults = result;
+                    addressResults = result.ToList();
                 }
                 catch (Exception e)
                 {

@@ -42,8 +42,8 @@ namespace form_builder.Services.StreetService
                         ? new FormAnswers { Pages = new List<PageAnswers>() }
                         : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
             var street = journey == "Select"
-                ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}-street").Response
-                : (string)viewModel[$"{streetElement.Properties.QuestionId}-street"];
+                ? (string) convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}-street").Response
+                : (string) viewModel[$"{streetElement.Properties.QuestionId}-street"];
 
             if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
             {
@@ -68,7 +68,7 @@ namespace form_builder.Services.StreetService
                 try
                 {
                     var result = await provider.SearchAsync(street);
-                    streetResults = result;
+                    streetResults = result.ToList();
                 }
                 catch (Exception e)
                 {
