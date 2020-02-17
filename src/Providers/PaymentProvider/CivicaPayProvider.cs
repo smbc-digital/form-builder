@@ -55,7 +55,8 @@ namespace form_builder.Providers.PaymentProvider
                             PaymentAmount = paymentInformation.Settings.Amount,
                             Quantity = "1",
                             PaymentNarrative = form,
-                            CallingAppTranReference = reference
+                            CallingAppTranReference = reference,
+                            ServicePayItemDesc = paymentInformation.Settings.Description
                         },
                         AddressDetails = new AddressDetail()
                     }
@@ -72,7 +73,7 @@ namespace form_builder.Providers.PaymentProvider
 
         public void VerifyPaymentResponse(string responseCode)
         {
-            if (responseCode == "00022" || responseCode == "00023")
+            if (responseCode == "00022" || responseCode == "00023" || responseCode == "00001")
             {
                 throw new PaymentDeclinedException("CivicaPayProvider::Declined payment");
             }

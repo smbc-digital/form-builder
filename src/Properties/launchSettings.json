@@ -11,7 +11,7 @@
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "customer-pay",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"

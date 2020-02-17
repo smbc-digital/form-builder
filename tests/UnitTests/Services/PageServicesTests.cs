@@ -502,7 +502,13 @@ namespace form_builder_tests.UnitTests.Services
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("12345");
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers {  Pages = new List<PageAnswers>() }));
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("page-duck")
+                .Build();
+
             var page = new PageBuilder()
+                .WithBehaviour(behaviour)
                 .Build();
 
             _service.GetBehaviour(new ProcessRequestEntity { Page = page });

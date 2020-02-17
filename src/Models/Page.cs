@@ -61,11 +61,36 @@ namespace form_builder.Models
             IsValidated = true;
         }
 
-        public Behaviour GetNextPage(Dictionary<string, dynamic> viewModel) => Behaviours.Count == 1
-            ? Behaviours.FirstOrDefault()
-            : Behaviours
-                .OrderByDescending(_ => _.Conditions.Count)
-                .FirstOrDefault(_ => _.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]));
+        public Behaviour GetNextPage(Dictionary<string, string> viewModel)
+        {
+            if (Behaviours.Count == 1)
+            {
+                return Behaviours.FirstOrDefault();
+            }
+            else
+            {
+                foreach (var behaviour in Behaviours)
+                {
+                    foreach (var condition in behaviour.Conditions)
+                    {
+                        if (condition.EqualTo != null)
+                        {
+                            return Behaviours
+                            .OrderByDescending(_ => _.Conditions.Count)
+                            .FirstOrDefault(_ => _.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]));
+                        }
+                        else
+                        //if (condition.CheckboxContains != null)
+                        {
+                            return Behaviours
+                               .OrderByDescending(_ => _.Conditions.Count)
+                               .FirstOrDefault(_ => _.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains)));
+                        }
+                    }
+                }
+            }
+            throw new Exception("Behaviour issues");
+        }
 
         public SubmitSlug GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)
         {
@@ -95,9 +120,9 @@ namespace form_builder.Models
                 else
                 {
                     var behaviour = pageSubmitBehaviours.SelectMany(x => x.SubmitSlugs)
-                            .Where(x => x.Location.ToLower() == environment.ToLower())
+                            .Where(x => x.Environment.ToLower() == environment.ToLower())
                             .FirstOrDefault();
-                            
+
                     if (behaviour == null)
                     {
                         throw new NullReferenceException("HomeController, Submit: No Url supplied for submit form");

@@ -22,10 +22,12 @@ using form_builder.Services.SubmtiService;
 using form_builder.Validators;
 using form_builder.Workflows;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 using System.Diagnostics.CodeAnalysis;
 
 namespace form_builder.Extensions
@@ -151,7 +153,7 @@ namespace form_builder.Extensions
             }
             else
             {
-             services.AddSingleton<ISchemaProvider, S3FileSchemaProvider>();
+                services.AddSingleton<ISchemaProvider, S3FileSchemaProvider>();
             }
 
             return services;
@@ -179,10 +181,15 @@ namespace form_builder.Extensions
                         options.Configuration = storageProviderConfiguration["Address"];
                         options.InstanceName = storageProviderConfiguration["InstanceName"];
                     });
+
+                    var redis = ConnectionMultiplexer.Connect(storageProviderConfiguration["Address"]);
+                    services.AddDataProtection().PersistKeysToStackExchangeRedis(redis, $"{storageProviderConfiguration["InstanceName"]}DataProtection-Keys");
                     break;
+
                 case "Application":
                     services.AddDistributedMemoryCache();
                     break;
+
                 default:
                     services.AddDistributedMemoryCache();
                     break;

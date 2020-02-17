@@ -104,7 +104,7 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var guid = Guid.NewGuid();
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.Environment.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -163,7 +163,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Textarea)
                 .Build();
 
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -207,7 +207,7 @@ namespace form_builder_tests.UnitTests.Services
                  .WithPropertyText("test-text")
                  .Build();
 
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -251,7 +251,7 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var guid = Guid.NewGuid();
 
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -291,7 +291,7 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var guid = Guid.NewGuid();
 
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -329,7 +329,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             var guid = Guid.NewGuid();
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -365,7 +365,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             var guid = Guid.NewGuid();
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
                 .WithPageSlug("testUrl")
@@ -402,7 +402,7 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var guid = Guid.NewGuid();
             var postUrl = "www.post.url";
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Location = "local", URL = "www.location.com" };
+            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)

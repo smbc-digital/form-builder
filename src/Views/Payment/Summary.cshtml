@@ -1,0 +1,15 @@
+﻿@model form_builder.ViewModels.PaymentSummaryViewModel
+@{
+    ViewData["Title"] = Model.FormName;
+    ViewData["PageTitle"] = Model.PageTitle;
+    ViewData["BannerTypeformUrl"] = Model.FeedbackForm;
+}
+
+    <div id="root" class="text-center">
+        <h1>@Model.FormName</h1>
+        <p>You are now about to pay for the @Model.Description, use the button below to go to our payments page.</p>
+        <p>Continue to our payment page to fill in your card details and complete your order.</p>
+        <p>The cost is £@Model.Amount</p>
+        <br>
+        <a className="button-primary" href="change this">Submit and pay</a>
+    </div>

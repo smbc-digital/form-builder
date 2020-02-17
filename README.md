@@ -6,15 +6,20 @@
 </div>
 
 ## Table of Contents
-- [Base JSON Structure](##BaseJSONStructure)
-- [Address Providers](#Address_Providers)
-- [UI Tests](#UI_Tests)
+- [Requirements & Prereqs](#requirements-&-prereqs)
+- [Base JSON Structure](#base-json-structure)
+- [Validators](#validators)
+- [Address/Street/Organisation Providers](#address-providers)
+- [Payment Providers](#payment-providers)
+- [Storage Providers](#storage-providers)
+- [Running High Availability](#running-high-availability)
+- [UI Tests](#ui-Tests)
 
-## Requirements
+# Requirements & Prereqs
 - dotnet core 2.2
-- gpg key added to accepted contributors
 
-## Base JSON Structure
+
+# Base JSON Structure
 ```json
     {
         "FormName": "",
@@ -95,7 +100,7 @@ Example JSON:
 When building elements you have the ability to map the answer to custom properties. To allow for this you can specify a `"TargetMapping"` property which will be used to map the answer too. The example above would map the firstName textbox to a Customer object with the firstname property. The ability to map multiple questions to the same field is also posibile. An example below shows a custom mapping.
 
 Target Mapping EXample:
-```json
+```
     {
         "Elements": [
             {
@@ -147,7 +152,7 @@ The target mapping above would produce this object
         "customer": {
             "lastname": "",
             "firstname": "",
-            "additionalinfomation": ""
+            "additionalinformation": ""
         },
         "one": {
             "two": {
@@ -224,7 +229,7 @@ Paragraph text JSON example:
       "Optional": false,
       "MaxLength": 9,
       "Regex": "^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$",
-      "RegexValidationMessage": "Enter a valid NI Number"
+      "RegexValidationMessage": "Enter a valid NI Number",
       "TargetMapping": "customer.ninumber"
     }
   }
@@ -663,8 +668,9 @@ Date Input example:
     * RestrictFutureDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the future)
     * RestrictPastDate (*boolean*) (Defaults to false. If true, it will prevent users entering a date in the past)
     * RestrictCurrentDate (*boolean*) (Defaults to false. If true, it will prevent users entering today's date)
+    * Max (*integer*) (The maximum year the user can enter, e.g. if max is set 2500, the maximum date a user can enter is today's date  in the year 2500
     * CustomValidationMessage (*string*) (Set a custom validation message for when a user doesn't input a date)
-    * UpperLimitValidationMessage (*string*) (Set a custom validation message for when a user enters the year greater than 100 years from today)
+    * UpperLimitValidationMessage (*string*) (Set a custom validation message for when a user enters a date greater than today's date 100 years from now OR if a max value has been specified, the validation message when a user enters a date greater than today's date in the year stated by the max value)
     * TargetMapping (*string*)  
 
 Date Picker example:
@@ -812,12 +818,12 @@ If it is a SubmitForm behaviour we have submitslugs which will (using the enviro
                         "EqualTo": "Yes"
                     }
                 ],
-                "BehaviourType": GoToPage,
+                "BehaviourType": "GoToPage",
                 "PageSlug": "why-do-you-like-apples"
             },
             {
                 "Conditions": [],
-                "BehaviourType": SubmitForm,
+                "BehaviourType": "SubmitForm",
                 "PageSlug": "",
                 "SubmitSlugs": [
                   {
@@ -854,7 +860,7 @@ Example where dependant on their answers to certain questions the form navigates
                         "EqualTo": "Yes"
                     },
                 ],
-                "BehaviourType": GoToPage,
+                "BehaviourType": "GoToPage",
                 "PageSlug": "you-like-apples-oranges"
             },
             {
@@ -868,7 +874,7 @@ Example where dependant on their answers to certain questions the form navigates
                         "EqualTo": "No"
                     },
                 ],
-                "BehaviourType": GoToPage,
+                "BehaviourType": "GoToPage",
                 "PageSlug": "you-dont-like-apples-oranges"
             },        ]
     }
@@ -877,6 +883,7 @@ Example where dependant on their answers to certain questions the form navigates
 **Conditions**[*object*]
 * QuestionID (*string*) - The name of the Radio/Checkbox list to evaluate
 * EqualTo (*string*) - The value it must equal to for the behaviour to happen
+* CheckboxContains (*string*) - The value will be checked against the list supplied by the checkbox. If it is found it will go to the behaviour 
 
 **BehaviourType** (*enum*) __*__
 * 0 = GoToPage
@@ -891,24 +898,163 @@ The success page is a page with with the PageSlug of success it is of the form i
 
 ```json
 {
-      "Title": "Thank you for submitting your views on fruit",
-      "PageSlug": "success",
-      "Elements": [
-        {
-          "Type": "p",
-          "Properties": {
-            "Text": "The wikipedia page on fruit is at <a href=\"https://en.wikipedia.org/wiki/fruit\">Fruits</a>"
-          }
-        }]
+  "Title": "Thank you for submitting your views on fruit",
+  "PageSlug": "success",
+  "Elements": [
+    {
+      "Type": "p",
+      "Properties": {
+        "Text": "The wikipedia page on fruit is at <a href=\"https://en.wikipedia.org/wiki/fruit\">Fruits</a>"
+      }
+    }]
 }
 ```
 It will also diplay the form name and the FeedbackUrl if one is specified.
 
-## Address_Providers
+# Validators
 
-Any address service to be used needs to implement `IAddressProvider` which requires a SearchAsync method as well as a ProviderName. Within the address JSON the `AddressProvider` key is used to specifiy which provider to use.
+Comming Soon...
 
-## UI_Tests
+# Providers
+## Address Providers
+
+`IAddressProvider` is provided to enable integration with different address data sources. 
+
+The interface requires a ProviderName and a SearchAsync method which must return an `AddressSearchResult` object. 
+
+```c#
+string ProviderName { get; }
+
+Task<IEnumerable<AddressSearchResult>> SearchAsync(string streetOrPostcode);
+```
+
+You can register new/multiple address providers in startup 
+
+```c#
+services.AddSingleton<IAddressProvider, FakeAddressProvider>();
+services.AddSingleton<IAddressProvider, CRMAddressProvider>();
+services.AddSingleton<IAddressProvider, MyCustomAddressProvider>();
+```
+
+You can specify in the JSON form defenition for Address elements, which address provider you want use. To do this set `AddressProvider` to the value of the required `IAddressProvider.ProviderName`, for example to use a Provider with a ProviderName of "Fake";
+
+```json
+{
+  "Type": "Address",
+  "Properties": {
+    "QuestionId": "address",
+    "AddressProvider": "Fake",
+  }
+}
+```
+
+## Street Providers
+
+`IStreetProvider` is provided to enable integration with different street level data sources. 
+
+Implementation is almost identical to that described in the AddressProvider
+
+Register for use 
+
+```c#
+services.AddSingleton<IStreetProvider, FakeStreetProvider>();
+services.AddSingleton<IStreetProvider, CRMStreetProvider>();
+return services;
+```
+
+Specify which street provider to use.
+
+```json
+"Elements": [
+  {
+    "Type": "Street",
+    "Properties": {
+      "QuestionId": "customersstreet",
+      "StreetProvider": "Fake",
+    }
+```
+
+
+## Organisation Providers
+
+`IOrganisationProvider` is provided to enable integration with different organisation data sources. 
+
+Implementation is almost identical to that described in the AddressProvider/StreetProvider, however Organisation Providers return an `OrganisationSearchResult`
+
+Register for user
+
+```c#
+services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
+services.AddSingleton<IOrganisationProvider, CRMOrganisationProvider>();
+return services;
+```
+
+Specify which organisation provider to use.
+
+```json
+{
+  "Type": "Organisation",
+  "Properties": {
+    "QuestionId": "organisation",
+    "Label": "Enter the organisation",
+    "OrganisationProvider": "Fake",
+  }
+```
+## Payment Providers
+
+Comming Soon...
+
+## Storage Providers
+
+As users submit data and move through forms the data they are submitting is temporarily stored before submission.
+
+This function uses [IDistributedCache](https://docs.microsoft.com/en-us/aspnet/core/performance/caching/distributed?view=aspnetcore-3.1).
+
+Storage providers can be added from config and registered on app startup using.
+
+```c#
+services.AddStorageProvider(Configuration);
+```
+
+### Application
+By default setup using config currently supports "Application", Distributed In Memory Cache (which ironically isn't actually distributed!), but allows us to develop locally and deploy to single instances.
+
+This can be set up using the following config
+
+```json
+  {
+    "StorageProvider": {
+      "Type": "Application"
+    }
+  }
+```
+
+### Redis
+For a truly distributed we support Redis, this can be setup using the StorageProvider config below.
+
+```json
+{
+  "StorageProvider": {
+      "Type": "Redis",
+      "Address": "YourRedisUrlHere",
+      "Instance": "YourPreferredInstanceNameHere"
+  }
+}
+```
+
+### Running High Availability/Load Balancing
+If running in a load balanced environment you will need to be running a truly distributed cache (i.e. Redis).
+
+In this case it's worth noting that for sessions to work correctly there needs to be a shared keystore.
+
+Distributed cache and DataProtecton key storage specification is wrapped up in the ```services.AddStorageProvider(Configuration);``` service registration (we should seperate this out!) so when you set storage provider to 'Redis' it also shares the data protection keys in redis as well (as per the code below).
+
+```c#
+  var redis = ConnectionMultiplexer.Connect(storageProviderConfiguration["Address"]);
+  services.AddDataProtection().PersistKeysToStackExchangeRedis(redis, $"{storageProviderConfiguration["InstanceName"]}DataProtection-Keys");
+```
+
+# UI Tests
 
 The form builder app has UI tests to ensure that the UI is expected. Our UI Tests are written using SpecFlow
 

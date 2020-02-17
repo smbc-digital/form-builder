@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using form_builder.Exceptions;
+using form_builder.Helpers.Session;
 using form_builder.Services.PayService;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +10,12 @@ namespace form_builder.Controllers
     public class PaymentController : Controller
     {
         private readonly IPayService _payService;
+        private readonly ISessionHelper _sessionHelper;
 
-        public PaymentController(IPayService payService)
+        public PaymentController(IPayService payService, ISessionHelper sessionHelper)
         {
             _payService = payService;
+            _sessionHelper = sessionHelper;
         }
 
         [HttpGet]
@@ -39,7 +42,7 @@ namespace form_builder.Controllers
             }
             catch (PaymentDeclinedException)
             {
-                return RedirectToAction("PaymentFailure", new
+                return RedirectToAction("PaymentDeclined", new
                 {
                     form,
                     reference = callingAppTxnRef
@@ -63,16 +66,55 @@ namespace form_builder.Controllers
 
         [HttpGet]
         [Route("{form}/payment-failure")]
-        public IActionResult PaymentFailure(string form, [FromQuery] string reference)
+        public async Task<IActionResult> PaymentFailure(string form, [FromQuery] string reference)
         {
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var path = "payment";
+            var url = await _payService.ProcessPayment(form, path, reference, sessionGuid);
             var paymentFailureViewModel = new PaymentFailureViewModel
             {
                 FormName = form,
                 PageTitle = "Failure",
-                Reference = reference
+                Reference = reference,
+                PaymentUrl = url
             };
 
             return View("./Failure", paymentFailureViewModel);
+        }
+
+        [HttpGet]
+        [Route("{form}/payment-declined")]
+        public async Task<IActionResult> PaymentDeclined(string form, [FromQuery] string reference)
+        {
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var path = "payment";
+            var url = await _payService.ProcessPayment(form, path, reference, sessionGuid);
+            var paymentDeclinedViewModel = new PaymentDeclinedViewModel
+            {
+                FormName = form,
+                PageTitle = "Declined",
+                Reference = reference,
+                PaymentUrl = url.ToString()
+            };
+
+            return View("./Declined", paymentDeclinedViewModel);
+        }
+
+        [HttpGet]
+        [Route("{form}/payment-summary")]
+        public async Task<IActionResult> PaymentSummary(string form)
+        {
+            var paymentInfo = await _payService.GetFormPaymentInformation(form);
+
+            var paymentSummaryViewModel = new PaymentSummaryViewModel
+            {
+                FormName = form,
+                PageTitle = "Summary",
+                Amount = paymentInfo.Settings.Amount, 
+                Description = paymentInfo.Settings.Description 
+            };
+
+            return View("./Summary", paymentSummaryViewModel);
         }
     }
 }
