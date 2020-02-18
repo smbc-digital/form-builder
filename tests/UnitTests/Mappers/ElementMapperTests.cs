@@ -1,15 +1,30 @@
 ﻿using form_builder.Mappers;
 using form_builder.Models;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Logging;
+using Moq;
 using StockportGovUK.NetStandard.Models.Addresses;
 using System;
 using System.Collections.Generic;
 using Xunit;
+using form_builder.Providers.StorageProvider;
+using form_builder.Enum;
+using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.Models.FileManagement;
 
 namespace form_builder_tests.UnitTests.Mappers
 {
     public class ElementMapperTests
     {
+        private readonly ElementMapper _elementMapper;
+        private readonly Mock<ILogger<ElementMapper>> _logger = new Mock<ILogger<ElementMapper>>();
+        private readonly Mock<IDistributedCacheWrapper> _wrapper = new Mock<IDistributedCacheWrapper>();
+
+        public ElementMapperTests()
+        {
+            _elementMapper = new ElementMapper(_logger.Object, _wrapper.Object);
+        }
+
         [Fact]
         public void GetAnswerValue_ShouldReturnIntWhenNumericIsTrue()
         {
@@ -33,8 +48,7 @@ namespace form_builder_tests.UnitTests.Mappers
                     }
                 }
             };
-
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             Assert.IsType<int>(result);
         }
@@ -43,7 +57,7 @@ namespace form_builder_tests.UnitTests.Mappers
         public void GetAnswerValue_ShouldReturnSingleDateWhenElementIsDatePicker()
         {
             var element = new ElementBuilder()
-            .WithType(form_builder.Enum.EElementType.DatePicker)
+            .WithType(EElementType.DatePicker)
             .WithQuestionId("testDate")
             .Build();
 
@@ -63,7 +77,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
             };
 
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             Assert.IsType<DateTime>(result);
         }
@@ -72,7 +86,7 @@ namespace form_builder_tests.UnitTests.Mappers
         public void GetAnswerValue_ShouldReturnNullWhenResponseIsEmpty_WhenElementIsDatePicker()
         {
             var element = new ElementBuilder()
-            .WithType(form_builder.Enum.EElementType.DatePicker)
+            .WithType(EElementType.DatePicker)
             .WithQuestionId("testNumber")
             .Build();
 
@@ -91,7 +105,7 @@ namespace form_builder_tests.UnitTests.Mappers
                     }
             };
 
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             Assert.Null(result);
         }
@@ -119,7 +133,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
             };
 
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             Assert.Null(result);
         }
@@ -129,7 +143,7 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             var element = new ElementBuilder()
            .WithQuestionId("testCheckbox")
-           .WithType(form_builder.Enum.EElementType.Checkbox)
+           .WithType(EElementType.Checkbox)
            .Build();
 
             var formAnswers = new FormAnswers
@@ -148,7 +162,7 @@ namespace form_builder_tests.UnitTests.Mappers
                     }
             };
 
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             var type = Assert.IsType<List<string>>(result);
             Assert.Equal("option1", type[0]);
@@ -162,7 +176,7 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             var element = new ElementBuilder()
             .WithQuestionId("testCheckbox")
-            .WithType(form_builder.Enum.EElementType.Checkbox)
+            .WithType(EElementType.Checkbox)
             .Build();
 
             var formAnswers = new FormAnswers
@@ -180,7 +194,7 @@ namespace form_builder_tests.UnitTests.Mappers
                     }
             };
 
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             var type = Assert.IsType<List<string>>(result);
             Assert.Empty(type);
@@ -191,7 +205,7 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             var element = new ElementBuilder()
             .WithQuestionId("testDate")
-            .WithType(form_builder.Enum.EElementType.DateInput)
+            .WithType(EElementType.DateInput)
             .Build();
 
             var dayKey = "testDate-day";
@@ -223,7 +237,7 @@ namespace form_builder_tests.UnitTests.Mappers
                         }
                 }
             };
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
             Assert.IsType<DateTime>(result);
         }
         [Fact]
@@ -231,7 +245,7 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             var element = new ElementBuilder()
             .WithQuestionId("testDate")
-            .WithType(form_builder.Enum.EElementType.DateInput)
+            .WithType(EElementType.DateInput)
             .Build();
 
             var dayKey = "testDate-day";
@@ -263,7 +277,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
                     
             };
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
             Assert.Null(result);
         }
 
@@ -272,7 +286,7 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             var element = new ElementBuilder()
                    .WithQuestionId("testTime")
-                   .WithType(form_builder.Enum.EElementType.TimeInput)
+                   .WithType(EElementType.TimeInput)
                    .Build();
 
             var timeMinutesKey = "testTime-minutes";
@@ -304,7 +318,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
 
             };
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
             Assert.Null(result);
         }
 
@@ -313,7 +327,7 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             var element = new ElementBuilder()
                   .WithQuestionId("testTime")
-                  .WithType(form_builder.Enum.EElementType.TimeInput)
+                  .WithType(EElementType.TimeInput)
                   .Build();
 
             var timeMinutesKey = "testTime-minutes";
@@ -346,7 +360,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
 
             };
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
             Assert.IsType<TimeSpan>(result);
         }
         [Fact]
@@ -354,7 +368,7 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             var element = new ElementBuilder()
                   .WithQuestionId("testAddress")
-                  .WithType(form_builder.Enum.EElementType.Address)
+                  .WithType(EElementType.Address)
                   .Build();
 
             var uprn = "testAddress-address";
@@ -375,7 +389,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
 
             };
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             var type = Assert.IsType<Address>(result);
             Assert.Equal("1001254222", type.PlaceRef);
@@ -385,7 +399,7 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             var element = new ElementBuilder()
                   .WithQuestionId("testAddress")
-                  .WithType(form_builder.Enum.EElementType.Address)
+                  .WithType(EElementType.Address)
                   .Build();
 
             var manualAddressLineOne = "testAddress-AddressManualAddressLine1";
@@ -424,7 +438,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
 
             };
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
             var type = Assert.IsType<Address>(result);
 
             Assert.Equal("line1", type.AddressLine1);
@@ -438,7 +452,7 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             var element = new ElementBuilder()
                   .WithQuestionId("testStreetAddress")
-                  .WithType(form_builder.Enum.EElementType.Street)
+                  .WithType(EElementType.Street)
                   .Build();
 
             var streetUspr = "testStreetAddress-streetaddress";
@@ -465,7 +479,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
 
             };
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
             var type = Assert.IsType<Address>(result);
 
             Assert.Equal("0101010101", type.PlaceRef);
@@ -476,7 +490,7 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             var element = new ElementBuilder()
                   .WithQuestionId("testOrganisation")
-                  .WithType(form_builder.Enum.EElementType.Organisation)
+                  .WithType(EElementType.Organisation)
                   .Build();
 
             var organisationKey = "testOrganisation-organisation";
@@ -503,7 +517,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
 
             };
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
             var type = Assert.IsType<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>(result);
 
             Assert.Equal("0101010101", type.Reference);
@@ -530,10 +544,105 @@ namespace form_builder_tests.UnitTests.Mappers
                         }
                     }
                 }
-
             };
-            var result = ElementMapper.GetAnswerValue(element, formAnswers);
+
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
             Assert.IsType<string>(result);
+        }
+
+        [Fact]
+        public void GetAnswerValue_ShouldCall_DistributedCache_ToGetFileUploadContent()
+        {
+            var key = "fileUploadTestKey";
+            _wrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns("testfile");
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers
+                            {
+                                QuestionId = "fileUploadTestKey",
+                                Response = JsonConvert.SerializeObject(new FileUploadModel{ FileName = key })
+                            }
+                        }
+                    }
+                }
+            };
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId(key)
+                .Build();
+
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+
+            _wrapper.Verify(_ => _.GetString(It.Is<string>(x => x == $"file-{key}")), Times.Once);
+
+            var model = Assert.IsType<File>(result);
+            Assert.Equal(key, model.FileName);
+        }
+
+        [Fact]
+        public void GetAnswerValue_ShouldCall_ThrowExceptionWhenDistrbutedCacheThrows()
+        {
+            var key = "fileUploadTestKey";
+            _wrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(() => null);
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers
+                            {
+                                QuestionId = "fileUploadTestKey",
+                                Response = JsonConvert.SerializeObject(new FileUploadModel())
+                            }
+                        }
+                    }
+                }
+            };
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId(key)
+                .Build();
+
+            var result = Assert.Throws<Exception>(() => _elementMapper.GetAnswerValue(element, formAnswers));
+
+            Assert.Equal($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {key} from the distrbuted cache", result.Message);
+        }
+
+        [Fact]
+        public void GetAnswerValue_ShouldNotCall_DistributedCache_WhenNoFileWithinAnswers()
+        {
+            var key = "fileUploadTestKey";
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers>()
+                    }
+                }
+            };
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId(key)
+                .Build();
+
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+
+            Assert.IsType<File>(result);
+            _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
         }
     }
 }

@@ -21,11 +21,14 @@ namespace form_builder.Services.MappingService
     {
         private readonly ISchemaProvider _schemaProvider;
         private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IElementMapper _elementMapper;
 
-        public MappingService(ISchemaProvider schemaProvider, IDistributedCacheWrapper distributedCache)
+        public MappingService(ISchemaProvider schemaProvider, IDistributedCacheWrapper distributedCache,
+            IElementMapper elementMapper)
         {
             _schemaProvider = schemaProvider;
             _distributedCache = distributedCache;
+            _elementMapper = elementMapper;
         }
 
         public async Task<MappingEntity> Map(string sessionGuid, string form)
@@ -63,13 +66,13 @@ namespace form_builder.Services.MappingService
                 object objectValue;
                 if (obj.TryGetValue(splitTargets[0], out objectValue))
                 {
-                    var combinedValue = $"{objectValue} {ElementMapper.GetAnswerValue(element, formAnswers)}";
+                    var combinedValue = $"{objectValue} {_elementMapper.GetAnswerValue(element, formAnswers)}";
                     obj.Remove(splitTargets[0]);
                     obj.Add(splitTargets[0], combinedValue);
                     return obj;
                 }
 
-                obj.Add(splitTargets[0], ElementMapper.GetAnswerValue(element, formAnswers));
+                obj.Add(splitTargets[0], _elementMapper.GetAnswerValue(element, formAnswers));
                 return obj;
             }
 

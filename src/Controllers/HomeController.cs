@@ -16,12 +16,14 @@ namespace form_builder.Controllers
         private readonly IPageService _pageService;
         private readonly ISubmitWorkflow _submitWorkflow;
         private readonly IPaymentWorkflow _paymentWorkflow;
+        private readonly IFileHelper _fileHelper;
 
-        public HomeController(IPageService pageService, ISubmitWorkflow submitWorkflow, IPaymentWorkflow paymentWorkflow)
+        public HomeController(IPageService pageService, ISubmitWorkflow submitWorkflow, IPaymentWorkflow paymentWorkflow, IFileHelper fileHelper)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
             _paymentWorkflow = paymentWorkflow;
+            _fileHelper = fileHelper;
         }
 
         [HttpGet]
@@ -65,11 +67,13 @@ namespace form_builder.Controllers
         public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData, IFormFile fileUpload)
         {
             var viewModel = formData.ToNormaliseDictionary();
+            
             if(fileUpload != null)
             {
-                viewModel.Add("fileUpload",FileHelper.ConvertFileToBase64StringWithFileName(fileUpload));
+                viewModel.Add(fileUpload.Name, _fileHelper.ConvertFileToBase64StringWithFileName(fileUpload));
             }
-            var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel);
+
+            var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload);
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
             {
@@ -105,7 +109,7 @@ namespace form_builder.Controllers
         public async Task<IActionResult> AddressManual(string form, string path, Dictionary<string, string[]> formData)
         {
             var viewModel = formData.ToNormaliseDictionary();
-            var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, true);
+            var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, null, true);
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
             {

@@ -13,9 +13,11 @@ using form_builder.Services.PageService.Entities;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 using System;
@@ -63,7 +65,8 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheExpirationConfiguration
             {
                 UserData = 30,
-                PaymentConfiguration = 5
+                PaymentConfiguration = 5,
+                FileUpload = 60
             });
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
@@ -374,7 +377,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
 
-            _pageHelper.SaveAnswers(viewModel, guid.ToString(), "formName");
+            _pageHelper.SaveAnswers(viewModel, guid.ToString(), "formName", null);
 
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())));
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == guid.ToString()), It.IsAny<string>(), It.IsAny<CancellationToken>()));
@@ -417,7 +420,7 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add("Item1", item1Data);
             viewModel.Add("Item2", item2Data);
 
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName");
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null);
 
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
@@ -444,7 +447,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("Path", "path");
 
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName");
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null);
 
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
@@ -470,7 +473,7 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add("Item1", item1Data);
             viewModel.Add("Item2", item2Data);
 
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName");
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null);
 
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
@@ -479,6 +482,114 @@ namespace form_builder_tests.UnitTests.Helpers
 
             Assert.Equal("Item2", callbackModel.Pages[0].Answers[1].QuestionId);
             Assert.Equal(item2Data, callbackModel.Pages[0].Answers[1].Response);
+        }
+
+        [Fact]
+        public void SaveAnswers_ShouldSaveFileUpload_WithinDistrbutedCache_OnSeperateKey()
+        {
+            var questionId = "testFileQuestionId";
+            var fileContent = "abc";
+
+            var fileMock = new Mock<IFormFile>();
+            fileMock.Setup(_ => _.Name).Returns(questionId);
+
+            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(mockData);
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("Path", "path");
+            viewModel.Add(questionId, new DocumentModel { Content = fileContent, FileName = "file.txt" });
+
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", fileMock.Object);
+
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"file-{questionId}"), It.Is<string>(x => x == fileContent), It.Is<int>(x => x == 60), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public void SaveAnswers_ShouldSaveFilUploadReference_WithinFormAnswers_InDistrbutedCache()
+        {
+            var callbackCacheProvider = string.Empty;
+            var questionId = "testFileQuestionId";
+            var fileContent = "abc";
+
+            var fileMock = new Mock<IFormFile>();
+            fileMock.Setup(_ => _.Name).Returns(questionId);
+
+            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(mockData);
+
+            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("Path", "path");
+            viewModel.Add(questionId, new DocumentModel { Content = fileContent, FileName = "file.txt" });
+
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", fileMock.Object);
+
+            var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
+
+            Assert.Equal(questionId, callbackModel.Pages[0].Answers[0].QuestionId);
+            var fileUploadModel = JsonConvert.DeserializeObject<FileUploadModel>(callbackModel.Pages[0].Answers[0].Response.ToString());
+            Assert.Equal($"file-{questionId}", fileUploadModel.Key);
+        }
+
+        [Fact]
+        public void SaveAnswers_ShouldReplaceFilUploadReference_WithinFormAnswers_IfAnswerAlreadyExists_InDistrbutedCache()
+        {
+            var callbackCacheProvider = string.Empty;
+            var questionId = "testFileQuestionId";
+            var fileName = "new-filename";
+            var fileContent = "abc";
+
+            var fileMock = new Mock<IFormFile>();
+            fileMock.Setup(_ => _.FileName).Returns(fileName);
+            fileMock.Setup(_ => _.Name).Returns(questionId);
+
+            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers> { new PageAnswers {PageSlug = "page-one" , Answers = new List<Answers> { new Answers { QuestionId = questionId, Response = new FileUploadModel { FileName = "replace-me.txt" } } } } } });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(mockData);
+
+            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("Path", "page-one");
+            viewModel.Add(questionId, new DocumentModel { Content = fileContent, FileName = "file.txt" });
+
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", fileMock.Object);
+
+            var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
+
+            Assert.Equal(questionId, callbackModel.Pages[0].Answers[0].QuestionId);
+            var fileUploadModel = JsonConvert.DeserializeObject<FileUploadModel>(callbackModel.Pages[0].Answers[0].Response.ToString());
+            Assert.Equal(fileName, fileUploadModel.FileName);
+        }
+
+        [Fact]
+        public void SaveAnswers_ShouldNotCallDistrbutedCache_ForFileUpload_WhenNoFile()
+        {
+            var fileMock = new Mock<IFormFile>();
+
+            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(mockData);
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("Path", "path");
+
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null);
+
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]

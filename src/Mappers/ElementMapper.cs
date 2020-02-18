@@ -5,13 +5,26 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using form_builder.Providers.StorageProvider;
+using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.Models.FileManagement;
+using Microsoft.Extensions.Logging;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
 
 namespace form_builder.Mappers
 {
-    public static class ElementMapper
+    public class ElementMapper : IElementMapper
     {
-        public static object GetAnswerValue(IElement element, FormAnswers formAnswers)
+        private readonly IDistributedCacheWrapper _distributedCacheWrapper;
+        private readonly ILogger<ElementMapper> _logger;
+        
+        public ElementMapper(ILogger<ElementMapper> logger,IDistributedCacheWrapper distributedCacheWrapper)
+        {
+            _distributedCacheWrapper = distributedCacheWrapper;
+            _logger = logger;
+        }
+
+        public object GetAnswerValue(IElement element, FormAnswers formAnswers)
         {
             var key = element.Properties.QuestionId;
 
@@ -22,7 +35,7 @@ namespace form_builder.Mappers
                 case EElementType.DatePicker:
                     return GetDatePickerElementValue(key, formAnswers);
                 case EElementType.Checkbox:
-                    return GetCheckboxElementValue(key, formAnswers); 
+                    return GetCheckboxElementValue(key, formAnswers);
                 case EElementType.TimeInput:
                     return GetTimeElementValue(key, formAnswers);
                 case EElementType.Address:
@@ -31,6 +44,8 @@ namespace form_builder.Mappers
                     return GetStreetElementValue(key, formAnswers);
                 case EElementType.Organisation:
                     return GetOrganisationElementValue(key, formAnswers);
+                case EElementType.FileUpload:
+                    return GetFileUploadElementValue(key, formAnswers);
                 default:
                     if (element.Properties.Numeric)
                     {
@@ -44,7 +59,34 @@ namespace form_builder.Mappers
                     return value?.Response ?? "";
             }
         }
-        private static Address GetAddressElementValue(string key, FormAnswers formAnswers)
+
+        private object GetFileUploadElementValue(string key, FormAnswers formAnswers)
+        {
+            var model = new File();
+            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+                .Where(_ => _.QuestionId == key)
+                .ToList();
+
+            if (value.Count > 0)
+            {
+                FileUploadModel uploadModel = JsonConvert.DeserializeObject<FileUploadModel>(value.First().Response.ToString());
+
+                var fileData = _distributedCacheWrapper.GetString($"file-{key}");
+
+                if (fileData == null)
+                {
+                    throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {key} from the distrbuted cache");
+                };
+
+                model.Content = fileData;
+                model.FileName = uploadModel.FileName;
+
+                return model;
+            }
+            return model;
+        }
+
+        private Address GetAddressElementValue(string key, FormAnswers formAnswers)
         {
             var addressObject = new Address();
 
@@ -69,12 +111,12 @@ namespace form_builder.Mappers
             return addressObject;
 
         }
-        private static Address GetStreetElementValue(string key, FormAnswers formAnswers)
+        private Address GetStreetElementValue(string key, FormAnswers formAnswers)
         {
             var addressObject = new Address();
 
             var uspnKey = $"{key}-streetaddress";
-            var streetDescription= $"{key}-streetaddress-description";
+            var streetDescription = $"{key}-streetaddress-description";
 
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == uspnKey || _.QuestionId == streetDescription)
@@ -85,7 +127,7 @@ namespace form_builder.Mappers
 
             return addressObject;
         }
-        private static DateTime? GetDateInputElementValue(string key, FormAnswers formAnswers)
+        private DateTime? GetDateInputElementValue(string key, FormAnswers formAnswers)
         {
             dynamic dateObject = new ExpandoObject();
             var dateDayKey = $"{key}-day";
@@ -108,7 +150,7 @@ namespace form_builder.Mappers
 
             return null;
         }
-        private static TimeSpan? GetTimeElementValue(string key, FormAnswers formAnswers)
+        private TimeSpan? GetTimeElementValue(string key, FormAnswers formAnswers)
         {
             dynamic dateObject = new ExpandoObject();
             var timeMinutesKey = $"{key}-minutes";
@@ -132,7 +174,7 @@ namespace form_builder.Mappers
 
             return null;
         }
-        private static StockportGovUK.NetStandard.Models.Models.Verint.Organisation GetOrganisationElementValue(string key, FormAnswers formAnswers)
+        private StockportGovUK.NetStandard.Models.Models.Verint.Organisation GetOrganisationElementValue(string key, FormAnswers formAnswers)
         {
             var dateObject = new StockportGovUK.NetStandard.Models.Models.Verint.Organisation();
             var organisationKey = $"{key}-organisation";
@@ -147,7 +189,7 @@ namespace form_builder.Mappers
 
             return dateObject;
         }
-        private static int? GetNumericElementValue(string key, FormAnswers formAnswers)
+        private int? GetNumericElementValue(string key, FormAnswers formAnswers)
         {
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == key)
@@ -159,10 +201,10 @@ namespace form_builder.Mappers
             }
             return int.Parse(value.Response);
         }
-        private static DateTime? GetDatePickerElementValue(string key, FormAnswers formAnswers)
+        private DateTime? GetDatePickerElementValue(string key, FormAnswers formAnswers)
         {
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
-                .Where(_ => _.QuestionId == key) 
+                .Where(_ => _.QuestionId == key)
                 .FirstOrDefault();
 
             if (value == null || string.IsNullOrEmpty(value.Response))
@@ -172,7 +214,7 @@ namespace form_builder.Mappers
 
             return DateTime.Parse(value.Response);
         }
-        private static List<string> GetCheckboxElementValue(string key, FormAnswers formAnswers)
+        private List<string> GetCheckboxElementValue(string key, FormAnswers formAnswers)
         {
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == key)

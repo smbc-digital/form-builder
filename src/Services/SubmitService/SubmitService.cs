@@ -15,6 +15,7 @@ using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
 using form_builder.Extensions;
 using System.Linq;
+using form_builder.Enum;
 
 namespace form_builder.Services.SubmtiService
 {
@@ -30,8 +31,6 @@ namespace form_builder.Services.SubmtiService
 
         private readonly IGateway _gateway;
 
-        private readonly IComplimentsComplaintsServiceGateway _complimentsComplaintsServiceGateway;
-
         private readonly IPageHelper _pageHelper;
 
         private readonly ISessionHelper _sessionHelper;
@@ -41,12 +40,10 @@ namespace form_builder.Services.SubmtiService
         private readonly IHostingEnvironment _environment;
 
 
-
-        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IComplimentsComplaintsServiceGateway complimentsComplaintsServiceGateway, IPageHelper pageHelper, ISessionHelper sessionHelper, IHostingEnvironment environment)
+        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper, IHostingEnvironment environment)
         {
             _distributedCache = distributedCache;
             _gateway = gateway;
-            _complimentsComplaintsServiceGateway = complimentsComplaintsServiceGateway;
             _pageHelper = pageHelper;
             _sessionHelper = sessionHelper;
             _logger = logger;
@@ -64,35 +61,30 @@ namespace form_builder.Services.SubmtiService
                 throw new ApplicationException($"The AuthToken or URL is empty for this form: { form }");
             }
 
-            if (form == "give-a-compliment" || form == "give-feedback" || form == "make-a-formal-complaint")
+            _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
+            var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
+
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                var response = await _complimentsComplaintsServiceGateway.SubmitForm(submitSlug.URL, mappingEntity.Data);
-
-                if (response.StatusCode != HttpStatusCode.OK)
-                {
-                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
-                }
-
-                if (response.ResponseContent != null)
-                {
-                    reference = JsonConvert.DeserializeObject<string>(response.ResponseContent);
-                }
+                throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             }
-            else
+
+            if (response.Content != null)
             {
-                _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
-                var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
+                var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
+                reference = JsonConvert.DeserializeObject<string>(content);
+            }
 
-                if (response.StatusCode != HttpStatusCode.OK)
-                {
-                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
-                }
+            var formFileUploadElements = mappingEntity.BaseForm.Pages.SelectMany(_ => _.Elements)
+                .Where(_ => _.Type == EElementType.FileUpload)
+                .ToList();
 
-                if (response.Content != null)
+            if (formFileUploadElements.Count > 0)
+            {
+                formFileUploadElements.ForEach(_ =>
                 {
-                    var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
-                    reference = JsonConvert.DeserializeObject<string>(content);
-                }
+                    _distributedCache.Remove($"file-{_.Properties.QuestionId}");
+                });
             }
 
             _distributedCache.Remove(sessionGuid);
@@ -130,8 +122,6 @@ namespace form_builder.Services.SubmtiService
 
         public async Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
-            var reference = string.Empty;
-
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
 
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());

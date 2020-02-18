@@ -17,13 +17,14 @@ using form_builder.ViewModels;
 using form_builder.Providers.StorageProvider;
 using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
+using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Services.PageService
 {
     public interface IPageService
     {
         Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false);
-        Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, bool processManual = false);
+        Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IFormFile file, bool processManual = false);
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid);
         Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
     }
@@ -150,7 +151,7 @@ namespace form_builder.Services.PageService
             };
         }
 
-        public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, bool processManual)
+        public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IFormFile file, bool processManual)
         {
             var baseForm = await _schemaProvider.Get<FormSchema>(form);
             var currentPage = baseForm.GetPage(path);
@@ -192,7 +193,7 @@ namespace form_builder.Services.PageService
                 return await _organisationService.ProcesssOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
             }
 
-            _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL);
+            _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, file);
 
             if (!currentPage.IsValid)
             {

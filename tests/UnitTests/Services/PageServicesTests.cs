@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 using Newtonsoft.Json;
-using form_builder.Providers.Organisation;
 using form_builder.Services.OrganisationService;
 using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 
@@ -92,7 +91,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcessRequest("form", "page-one", viewModel, false);
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null, false);
 
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Once);
             _schemaProvider.Verify(_ => _.Get<FormSchema>(It.IsAny<string>()), Times.Once);
@@ -132,7 +131,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcessRequest("form", "page-one", viewModel, false);
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null, false);
 
             _addressService.Verify(_ => _.ProcesssAddress(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
@@ -170,7 +169,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcessRequest("form", "page-one", viewModel, false);
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null, false);
 
             _streetService.Verify(_ => _.ProcessStreet(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
@@ -209,7 +208,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, false));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null, false));
 
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Once);
         }
@@ -242,7 +241,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessRequest("form", "page-one", viewModel, false));
+            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessRequest("form", "page-one", viewModel, null, false));
             Assert.Equal("Session guid null.", result.Message);
         }
 
@@ -283,7 +282,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.ProcessPage("form", "page-one", false);
 
             // Assert
-            var entityResult= Assert.IsType<ProcessPageEntity>(result);
+            var entityResult = Assert.IsType<ProcessPageEntity>(result);
             Assert.Equal("../Address/Index", entityResult.ViewName);
         }
 
@@ -500,7 +499,7 @@ namespace form_builder_tests.UnitTests.Services
         public void GetBehaviour_ShouldCallSession_And_DistributedCache()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("12345");
-            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers {  Pages = new List<PageAnswers>() }));
+            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.GoToPage)
@@ -549,7 +548,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-organisation-searchterm", "orgName" },
             };
 
-            var result = await _service.ProcessRequest("form", "page-one", viewModel, false);
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null, false);
 
             _organisationService.Verify(_ => _.ProcesssOrganisation(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);

@@ -6,6 +6,7 @@ using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
+using form_builder.Mappers;
 using form_builder.Providers.Address;
 using form_builder.Providers.Organisation;
 using form_builder.Providers.PaymentProvider;
@@ -79,6 +80,8 @@ namespace form_builder.Extensions
         {
             services.AddSingleton<IPageHelper, PageHelper>();
             services.AddSingleton<IElementHelper, ElementHelper>();
+            services.AddSingleton<IElementMapper, ElementMapper>();
+            services.AddSingleton<IFileHelper, FileHelper>();
 
             services.AddScoped<IViewRender, ViewRender>();
             services.AddHttpContextAccessor();

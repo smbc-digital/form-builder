@@ -67,7 +67,7 @@ namespace form_builder.Services.OrganisationService
 
                 if (currentPage.IsValid && organisationElement.Properties.Optional && emptySearchTerm)
                 {
-                    _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL);
+                    _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null);
                     return new ProcessRequestEntity
                     {
                         Page = currentPage
@@ -76,7 +76,7 @@ namespace form_builder.Services.OrganisationService
 
                 if (currentPage.IsValid && organisationElement.Properties.Optional && emptyOrganisation && !emptySearchTerm && journey == "Select")
                 {
-                    _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL);
+                    _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null);
                     return new ProcessRequestEntity
                     {
                         Page = currentPage
@@ -109,7 +109,7 @@ namespace form_builder.Services.OrganisationService
                 };
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL);
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null);
             return await _pageHelper.ProcessOrganisationJourney(journey, currentPage, viewModel, baseForm, guid, organisationResults);
         }
     }
