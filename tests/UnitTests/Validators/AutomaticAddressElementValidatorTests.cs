@@ -18,7 +18,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithType(EElementType.Address)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             //Assert
             var result = _automaticAddressElementValidator.Validate(element, viewModel);
@@ -34,7 +34,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithType(EElementType.Address)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("testaddress-address", "234567434567");
 
             //Assert
@@ -51,7 +51,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithType(EElementType.Address)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("testaddress-address", "566");
 
             //Assert

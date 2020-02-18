@@ -15,7 +15,7 @@ namespace form_builder.Services.StreetService
 {
     public interface IStreetService
     {
-        Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path);
+        Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path);
     }
 
     public class StreetService : IStreetService
@@ -31,9 +31,9 @@ namespace form_builder.Services.StreetService
             _streetProviders = streetProviders;
         }
 
-        public async Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
+        public async Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
-            var journey = viewModel["StreetStatus"];
+            var journey = (string)viewModel["StreetStatus"];
             var streetResults = new List<AddressSearchResult>();
 
             var cachedAnswers = _distributedCache.GetString(guid);
@@ -42,8 +42,8 @@ namespace form_builder.Services.StreetService
                         ? new FormAnswers { Pages = new List<PageAnswers>() }
                         : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
             var street = journey == "Select"
-                ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}-street").Response
-                : viewModel[$"{streetElement.Properties.QuestionId}-street"];
+                ? (string) convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}-street").Response
+                : (string) viewModel[$"{streetElement.Properties.QuestionId}-street"];
 
             if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
             {

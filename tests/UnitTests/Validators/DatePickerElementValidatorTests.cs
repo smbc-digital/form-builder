@@ -33,7 +33,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("test-date")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-date", "2222aaaa");
 
             //Assert
@@ -51,7 +51,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("test-date")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-date", "2019-08-02");
 
             //Assert
@@ -68,7 +68,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("test-date")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-date", "2230-01-01");
 
             //Assert
@@ -89,7 +89,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithUpperLimitValidationMessage(upperLimitMessage)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-date", "2050-01-01");
 
             //Assert

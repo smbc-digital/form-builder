@@ -19,8 +19,8 @@ namespace form_builder.Models.Elements
             EElementType Type { get; set; }
             BaseProperty Properties { get; set; }
             bool IsValid { get; }
-            void Validate(Dictionary<string, string> viewModel, IEnumerable<IElementValidator> form_builder);
-            Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationSearchResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment);
-            Dictionary<string, object> GenerateElementProperties();
+            void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder);
+            Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationSearchResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment);
+            Dictionary<string, dynamic> GenerateElementProperties();
     }
 }

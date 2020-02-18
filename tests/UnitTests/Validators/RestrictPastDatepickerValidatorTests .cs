@@ -34,7 +34,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithOptional(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             //Assert
             var result = _restrictPastDatepickerValidator.Validate(element, viewModel);
@@ -52,7 +52,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithLabel("Date")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-date", string.Empty);
 
             //Assert
@@ -71,7 +71,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithRestrictPastDate(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             var yesterday = DateTime.Today.AddDays(-1);
             
             viewModel.Add("test-date", yesterday.ToString("yyyy-MM-dd"));
@@ -92,7 +92,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithRestrictPastDate(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             var tomorrow = DateTime.Today.AddDays(1);
 
             viewModel.Add("test-date", tomorrow.ToString("yyyy-MM-dd"));

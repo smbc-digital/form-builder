@@ -18,7 +18,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithType(EElementType.Address)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             //Assert
             var result = _addressPostcodeValidator.Validate(element, viewModel);
@@ -35,7 +35,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithType(EElementType.Address)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("testaddress-postcode", "SK4 1AA");
 
             //Assert
@@ -52,7 +52,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithType(EElementType.Address)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("testaddress-postcode", "Elephant");
 
             //Assert

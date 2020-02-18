@@ -7,7 +7,7 @@ namespace form_builder.Validators
 {
     public class AddressPostcodeValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
             if (element.Type != Enum.EElementType.Address)
             {

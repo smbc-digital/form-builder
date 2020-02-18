@@ -17,9 +17,9 @@ namespace form_builder.Models.Elements
             Type = EElementType.Button;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            var viewData = new Dictionary<string, object> { { "displayAnchor", !CheckForStartPageSlug(formSchema, page) }, { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) } };
+            var viewData = new Dictionary<string, dynamic> { { "displayAnchor", !CheckForStartPageSlug(formSchema, page) }, { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) } };
 
             return viewRender.RenderAsync("Button", this, viewData);
         }
@@ -34,7 +34,7 @@ namespace form_builder.Models.Elements
             return behaviour.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay);
         }
 
-        private bool CheckForStreetAddress(List<IElement> element, Dictionary<string, string> viewModel)
+        private bool CheckForStreetAddress(List<IElement> element, Dictionary<string, dynamic> viewModel)
         {
             bool isStreetAddress = element.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.Street);
 
@@ -46,7 +46,7 @@ namespace form_builder.Models.Elements
             return isStreetAddress;
         }
 
-        private bool ShowSpinner(List<Behaviour> behaviour, List<IElement> element, Dictionary<string, string> viewModel)
+        private bool ShowSpinner(List<Behaviour> behaviour, List<IElement> element, Dictionary<string, dynamic> viewModel)
         {
             if (CheckForBehaviour(behaviour) || CheckForStreetAddress(element, viewModel))
             {

@@ -16,7 +16,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.Checkbox;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);

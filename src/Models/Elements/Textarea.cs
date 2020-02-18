@@ -16,7 +16,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.Textarea;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);
@@ -25,9 +25,9 @@ namespace form_builder.Models.Elements
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
-        public override Dictionary<string, object> GenerateElementProperties()
+        public override Dictionary<string, dynamic> GenerateElementProperties()
         {
-            var properties = new Dictionary<string, object>()
+            var properties = new Dictionary<string, dynamic>()
             {
                 { "name", Properties.QuestionId },
                 { "id", Properties.QuestionId },

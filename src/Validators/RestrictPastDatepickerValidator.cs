@@ -8,7 +8,7 @@ namespace form_builder.Validators
 {
     public class RestrictPastDatepickerValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
             if (!element.Properties.RestrictPastDate
                 || element.Type != EElementType.DatePicker 
@@ -22,8 +22,9 @@ namespace form_builder.Validators
 
             var value = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId] : null;
 
+            var outDate = DateTime.Now;
 
-            var isValidDate = DateTime.TryParse(value, out _);
+            var isValidDate = DateTime.TryParse(value, out outDate);
 
             if (!isValidDate)
             {

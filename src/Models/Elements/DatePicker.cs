@@ -18,7 +18,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.DatePicker;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             Properties.Date = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
             elementHelper.CheckForQuestionId(this);
@@ -27,7 +27,7 @@ namespace form_builder.Models.Elements
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
-        public override Dictionary<string, object> GenerateElementProperties()
+        public override Dictionary<string, dynamic> GenerateElementProperties()
         {
             var todaysDate = DateTime.Now;
             var maxDate = Properties.RestrictFutureDate ?
@@ -38,7 +38,7 @@ namespace form_builder.Models.Elements
                 (Properties.RestrictCurrentDate ? DateTime.Today.AddDays(1).ToString("yyyy-MM-dd") : DateTime.Today.ToString("yyyy-MM-dd"))
                 : string.Empty;
 
-            var properties = new Dictionary<string, object>()
+            var properties = new Dictionary<string, dynamic>()
             {
                 { "type", "date" },
                 { "id", Properties.QuestionId },

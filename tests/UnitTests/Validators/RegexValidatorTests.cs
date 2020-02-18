@@ -22,7 +22,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithRegex("^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$")                
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("ni", "");
 
             //Assert
@@ -42,7 +42,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithRegex("^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("ni", "BV123456E");
 
             //Assert
@@ -61,7 +61,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithRegex("^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("ni", "notAnNiNumber");
 
             //Assert
@@ -80,7 +80,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithRegex("^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             //Assert
             var result = _requiredElementValidator.Validate(element, viewModel);
@@ -100,7 +100,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithRegex("^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("ni", "");
 
             //Assert

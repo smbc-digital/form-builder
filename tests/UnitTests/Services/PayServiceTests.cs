@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Hosting;
 using Xunit;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Models;
+using form_builder_tests.Builders;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -57,39 +58,36 @@ namespace form_builder_tests.UnitTests.Services
                 PaymentConfiguration = 5
             });
 
-            var mappingEntity = new MappingEntity
+            var submitSlug = new SubmitSlug
             {
-                BaseForm = new FormSchema
-                {
-                    Pages = new List<Page>
-                    {
-                        new Page
-                        {
-                            Behaviours = new List<Behaviour>
-                            {
-                                new Behaviour
-                                {
-                                    BehaviourType = EBehaviourType.SubmitAndPay,
-                                    SubmitSlugs = new List<SubmitSlug>
-                                    {
-                                        new SubmitSlug
-                                        {
-                                            AuthToken = "testToken",
-                                            Environment = "local",
-                                            URL = "customer-pay"
-                                        }
-                                    }
-                                }
-                            },
-                            PageSlug = "customer-pay"
-                        }
-                    }
-                },
-                FormAnswers = new FormAnswers
-                {
-                    Path = "customer-pay"
-                }
+                AuthToken = "testToken",
+                Environment = "local",
+                URL = "customer-pay"
             };
+
+            var formAnswers = new FormAnswers
+            {
+                Path = "customer-pay"
+            };
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .WithSubmitSlug(submitSlug)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("customer-pay")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            var mappingEntity = new MappingEntityBuilder()
+                .WithBaseForm(formSchema)
+                .WithFormAnswers(formAnswers)
+                .Build();
 
             var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
             _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());

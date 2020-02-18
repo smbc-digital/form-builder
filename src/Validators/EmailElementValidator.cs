@@ -6,7 +6,7 @@ namespace form_builder.Validators
 {
     public class EmailElementValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
             if(element.Properties.Email != true)
             {

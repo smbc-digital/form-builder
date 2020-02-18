@@ -18,7 +18,7 @@ namespace form_builder.Models.Elements
         {
             Type = EElementType.Street;
         }
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
@@ -30,18 +30,18 @@ namespace form_builder.Models.Elements
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
                 if (string.IsNullOrEmpty(Properties.Value))
                 {
-                    if (viewModel["StreetStatus"] == "Select")
+                    if ((string)viewModel["StreetStatus"] == "Select")
                     {
                         var streetaddress = $"{Properties.QuestionId}-streetaddress";
-                        Properties.Value = viewModel[streetaddress];
+                        Properties.Value = (string)viewModel[streetaddress];
                         if(string.IsNullOrEmpty(Properties.Value))
                         {
-                            Properties.Value = viewModel[streetKey];
+                            Properties.Value = (string)viewModel[streetKey];
                         }
                     }
                     else
                     {
-                        Properties.Value = viewModel[streetKey];
+                        Properties.Value = (string)viewModel[streetKey];
                     }
 
                 }
@@ -60,9 +60,9 @@ namespace form_builder.Models.Elements
             return await viewRender.RenderAsync("StreetSearch", this);
         }
 
-        public override Dictionary<string, object> GenerateElementProperties()
+        public override Dictionary<string, dynamic> GenerateElementProperties()
         {
-            var properties = new Dictionary<string, object>()
+            var properties = new Dictionary<string, dynamic>()
             {
                 { "id", $"{Properties.QuestionId}-street" },
                 { "maxlength", Properties.MaxLength }

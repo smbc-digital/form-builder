@@ -32,7 +32,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithNumeric(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("tets-id", "123");
 
             var result = _validator.Validate(element, viewModel);
@@ -51,7 +51,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithLabel(label)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("tets-id", "a123");
 
             var result = _validator.Validate(element, viewModel);
@@ -71,7 +71,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithMax("20")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("tets-id", "123");
 
             var result = _validator.Validate(element, viewModel);
@@ -91,7 +91,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithMin("20")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("tets-id", "12");
 
             var result = _validator.Validate(element, viewModel);
@@ -112,7 +112,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithMin("10")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("tets-id", "7");
 
             var result = _validator.Validate(element, viewModel);
@@ -132,7 +132,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithMaxLength(7)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-id", "12345678");
 
             var result = _validator.Validate(element, viewModel);

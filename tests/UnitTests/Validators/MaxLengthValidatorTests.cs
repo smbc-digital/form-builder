@@ -21,7 +21,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
 
-            var viewModel = new Dictionary<string, string>() { { "test-id", "123456789012345678901234567890" } };
+            var viewModel = new Dictionary<string, dynamic>() { { "test-id", "123456789012345678901234567890" } };
 
             var result = _validator.Validate(element, viewModel);
             Assert.False(result.IsValid);
@@ -41,7 +41,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
 
-            var viewModel = new Dictionary<string, string>() { { "test-id", "1234567" } };
+            var viewModel = new Dictionary<string, dynamic>() { { "test-id", "1234567" } };
 
             var result = _validator.Validate(element, viewModel);
             Assert.True(result.IsValid);

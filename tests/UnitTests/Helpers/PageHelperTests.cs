@@ -80,7 +80,7 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             var page = new PageBuilder()
                 .Build();
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .Build();
@@ -117,7 +117,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithElement(element)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .Build();
@@ -142,7 +142,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithElement(element)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("AddressStatus", "Select");
 
             var schema = new FormSchemaBuilder()
@@ -177,7 +177,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithPageSlug(pageSlug)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("AddressStatus", "Select");
 
             var schema = new FormSchemaBuilder()
@@ -202,7 +202,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithElement(addressElement)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("AddressStatus", "Search");
 
             var schema = new FormSchemaBuilder()
@@ -226,7 +226,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithElement(element)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("StreetStatus", "Select");
             viewModel.Add("street-streetaddress", string.Empty);
             viewModel.Add("street-street", "street");
@@ -255,7 +255,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithElement(element)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("StreetStatus", "Search");
 
             var schema = new FormSchemaBuilder()
@@ -290,7 +290,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithPageSlug(pageSlug)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("StreetStatus", "Select");
             viewModel.Add("-streetaddress", string.Empty);
             viewModel.Add("-street", "street");
@@ -324,7 +324,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithElement(element)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .Build();
@@ -350,7 +350,7 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithElement(element)
                .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .Build();
@@ -366,7 +366,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void SaveAnswers_ShouldCallCacheProvider()
         {
             var guid = Guid.NewGuid();
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("Path", "path");
 
             var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
@@ -412,7 +412,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("Path", "path");
             viewModel.Add("Item1", item1Data);
             viewModel.Add("Item2", item2Data);
@@ -441,7 +441,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("Path", "path");
 
             _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName");
@@ -465,7 +465,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("Path", "path");
             viewModel.Add("Item1", item1Data);
             viewModel.Add("Item2", item2Data);
@@ -562,7 +562,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task ProcessOrganisationJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
         {
-            var result = await _pageHelper.ProcessOrganisationJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
+            var result = await _pageHelper.ProcessOrganisationJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
 
             var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
             Assert.Equal("../Organisation/Index", journeyResult.ViewName);
@@ -572,7 +572,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task ProcessOrganisationJourney_ShouldGenerteCorrectHtml_WhenSelectJourney()
         {
-            var result = await _pageHelper.ProcessOrganisationJourney("Select", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
+            var result = await _pageHelper.ProcessOrganisationJourney("Select", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
 
             Assert.IsType<ProcessRequestEntity>(result);
         }
@@ -580,14 +580,14 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task ProcessOrganisationJourney_ShouldThrowException_WhenUnknownJourneyType()
         {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessOrganisationJourney("UnknownType", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>()));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessOrganisationJourney("UnknownType", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>()));
             Assert.Equal($"PageHelper.ProcessOrganisationJourney: Unknown journey type", result.Message);
         }
 
         [Fact]
         public async Task ProcessAddressJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
         {
-            var result = await _pageHelper.ProcessAddressJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.ProcessAddressJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
 
             var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
             Assert.Equal("../Address/Index", journeyResult.ViewName);
@@ -597,7 +597,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task ProcessAddressJourney_ShouldGenerteCorrectHtml_WhenSelectJourney()
         {
-            var result = await _pageHelper.ProcessAddressJourney("Select", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.ProcessAddressJourney("Select", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
 
             Assert.IsType<ProcessRequestEntity>(result);
         }
@@ -605,14 +605,14 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task ProcessAddressJourney_ShouldThrowException_WhenUnknownJourneyType()
         {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessAddressJourney("UnknownType", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>()));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessAddressJourney("UnknownType", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>()));
             Assert.Equal($"PageHelper.ProcessAddressJourney: Unknown journey type", result.Message);
         }
 
         [Fact]
         public async Task ProcessStreetJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
         {
-            var result = await _pageHelper.ProcessStreetJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.ProcessStreetJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
 
             var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
             Assert.Equal("../Street/Index", journeyResult.ViewName);
@@ -622,7 +622,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task ProcessStreetJourney_ShouldGenerteCorrectHtml_WhenSelectJourney()
         {
-            var result = await _pageHelper.ProcessStreetJourney("Select", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.ProcessStreetJourney("Select", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
 
             Assert.IsType<ProcessRequestEntity>(result);
         }
@@ -630,7 +630,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task ProcessStreetJourney_ShouldThrowException_WhenUnknownJourneyType()
         {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessStreetJourney("UnknownType", new Page(), new Dictionary<string, string>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>()));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessStreetJourney("UnknownType", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>()));
             Assert.Equal($"PageHelper.ProcessStreetJourney: Unknown journey type", result.Message);
         }
 

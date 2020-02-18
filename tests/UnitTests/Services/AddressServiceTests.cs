@@ -78,7 +78,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "AddressStatus", journey },
@@ -135,7 +135,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "AddressStatus", journey },
@@ -166,10 +166,10 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "AddressStatus", "Search" },
@@ -179,7 +179,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.ProcesssAddress(viewModel, page, schema, "", "page-one");
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.ProcessAddressJourney("Search", It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
+            _pageHelper.Verify(_ => _.ProcessAddressJourney("Search", It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
         }
 
         [Fact]
@@ -203,7 +203,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "AddressStatus", "Search" },
@@ -239,7 +239,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "AddressStatus", "Search" },
@@ -249,7 +249,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssAddress(viewModel, page, schema, "", "page-one"));
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Never);
             Assert.StartsWith($"AddressController: An exception has occured while attempting to perform postcode lookup, Exception: ", result.Message);
         }
     }

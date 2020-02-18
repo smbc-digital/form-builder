@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithElement(element)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("AddressStatus", "Search");
 
             var schema = new FormSchemaBuilder()
@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithElement(element)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("AddressStatus", "Select");
 
             var schema = new FormSchemaBuilder()
@@ -100,7 +100,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithPageSlug(pageSlug)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("AddressStatus", "Select");
 
             var schema = new FormSchemaBuilder()

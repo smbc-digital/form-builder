@@ -33,7 +33,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithValue("this is the value")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-id", "this is the value");
 
             // Act
@@ -54,7 +54,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithValue("this is the value")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-id2", "this is the value");
 
             // Act
@@ -79,7 +79,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithValue("this is the value")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _elementHelper.CurrentValue(element, viewModel, "", "");
@@ -116,7 +116,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithValue("this is the value")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _elementHelper.CurrentValue(element, viewModel, "test-slug", "");
@@ -148,7 +148,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithValue("this is the value")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _elementHelper.CurrentValue(element, viewModel, "test-slug", "");
@@ -169,7 +169,7 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithLabel("test-text")
                .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _elementHelper.CheckForLabel(element);
@@ -189,7 +189,7 @@ namespace form_builder_tests.UnitTests.Helpers
               .WithQuestionId("test-id")
               .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
@@ -272,7 +272,7 @@ namespace form_builder_tests.UnitTests.Helpers
               .WithLabel(string.Empty)
               .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
@@ -288,7 +288,7 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithMaxLength(2000)
                .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _elementHelper.CheckForMaxLength(element);
@@ -307,7 +307,7 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithMaxLength(1)
                .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _elementHelper.CheckForMaxLength(element);
@@ -326,7 +326,7 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithMaxLength(0)
                .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element));
@@ -342,7 +342,7 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithPropertyText("Test")
                .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _elementHelper.CheckIfLabelAndTextEmpty(element);
@@ -359,7 +359,7 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithType(EElementType.InlineAlert)
                .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckIfLabelAndTextEmpty(element));
@@ -390,7 +390,7 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithOptions(new List<Option>())
                .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             //Assert
             var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
@@ -551,7 +551,7 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2"} })
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Assert
             var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
@@ -574,7 +574,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithYearValue("2010")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add(dayId, "14");
             viewModel.Add(monthId, "09");
             viewModel.Add(yearId, "2010");
@@ -601,7 +601,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithYearValue("2010")
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var dayResult = _elementHelper.CurrentValue(element, viewModel,"","", "-day");
@@ -627,7 +627,7 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2"} })
                 .Build();
 
-            //      var viewModel = new Dictionary<string, string>();
+            //      var viewModel = new Dictionary<string, dynamic>();
             //      viewModel.Add("questionId", "option1");
             // Act
             _elementHelper.ReSelectPreviousSelectedOptions(element);
@@ -651,7 +651,7 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2"} })
                 .Build();
 
-            //      var viewModel = new Dictionary<string, string>();
+            //      var viewModel = new Dictionary<string, dynamic>();
             //      viewModel.Add("questionId", "option1");
             // Act
             _elementHelper.ReCheckPreviousRadioOptions(element);

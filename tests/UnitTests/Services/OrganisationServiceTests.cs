@@ -78,7 +78,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "OrganisationStatus", "Search" },
@@ -134,7 +134,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                { "Guid", Guid.NewGuid().ToString() },
                 { "OrganisationStatus", "Search" },
@@ -165,10 +165,10 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "OrganisationStatus", "Search" },
@@ -178,7 +178,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one");
 
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.ProcessOrganisationJourney("Search", It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Once);
+            _pageHelper.Verify(_ => _.ProcessOrganisationJourney("Search", It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Once);
         }
 
         [Fact]
@@ -202,7 +202,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "OrganisationStatus", "Search" },
@@ -238,7 +238,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "OrganisationStatus", "Search" },
@@ -248,7 +248,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one"));
 
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Never);
             Assert.StartsWith($"OrganisationService.ProcesssOrganisation:: An exception has occured while attempting to perform organisation lookup, Exception: ", result.Message);
         }
     }

@@ -16,7 +16,7 @@ namespace form_builder_tests.UnitTests.Models
 
         public ElementTests()
         {
-            _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, string>>()))
+            _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>()))
                 .Returns(new ValidationResult { IsValid = false });
 
             var elementValidatorItems = new List<IElementValidator> { _testValidator.Object };
@@ -184,7 +184,7 @@ namespace form_builder_tests.UnitTests.Models
                             .WithQuestionId(questionId)
                             .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add(questionId, "test");
 
             element.Validate(viewModel, _validators.Object);
@@ -204,7 +204,7 @@ namespace form_builder_tests.UnitTests.Models
                             .WithQuestionId(questionId)
                             .WithHint("hint")
                             .Build();
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add(questionId, "test");
 
             element.Validate(viewModel, _validators.Object);

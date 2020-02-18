@@ -8,7 +8,7 @@ namespace form_builder.Validators
 {
     public class RestrictFutureDatepickerValidator :IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string,dynamic> viewModel)
         {
             if (!element.Properties.RestrictFutureDate || element.Type != EElementType.DatePicker || element.Properties.Optional)
             {
@@ -19,9 +19,10 @@ namespace form_builder.Validators
             }
 
             var value = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId]:null;
-            
 
-            var isValidDate = DateTime.TryParse(value, out _);
+            var outDate = DateTime.Now;
+
+            var isValidDate = DateTime.TryParse(value, out outDate);
 
             if (!isValidDate)
             {

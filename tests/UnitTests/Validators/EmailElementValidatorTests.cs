@@ -22,7 +22,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithEmail(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("email", "notanemail");
 
             //Assert
@@ -42,7 +42,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithEmail(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("email", "isanemail@stockport.gov.uk");
 
             //Assert
@@ -61,7 +61,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithEmail(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
 
             //Assert
             var result = _requiredElementValidator.Validate(element, viewModel);
@@ -81,7 +81,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithOptional(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, string>();
+            var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("email", "");
 
             //Assert

@@ -48,7 +48,7 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public void Validate(Dictionary<string, string> viewModel, IEnumerable<IElementValidator> form_builder)
+        public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
         {
             foreach (var validator in form_builder)
             {
@@ -62,17 +62,17 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public virtual Dictionary<string, object> GenerateElementProperties()
+        public virtual Dictionary<string, dynamic> GenerateElementProperties()
         {
-            return new Dictionary<string, object>();
+            return new Dictionary<string, dynamic>();
         }
 
-        public Dictionary<string, object> GenerateElementProperties(int index)
+        public Dictionary<string, dynamic> GenerateElementProperties(int index)
         {
             switch (Type)
             {
                 case EElementType.Radio:
-                    var properties = new Dictionary<string, object>()
+                    var properties = new Dictionary<string, dynamic>()
                     {
                         {"name", Properties.QuestionId },
                         { "id", $"{Properties.QuestionId}-{index}" },
@@ -90,12 +90,12 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public Dictionary<string, object> GenerateElementProperties(string errorMessage, string errorId)
+        public Dictionary<string, dynamic> GenerateElementProperties(string errorMessage, string errorId)
         {
             switch (Type)
             {
                 case EElementType.AddressManual:
-                    var properties = new Dictionary<string, object>();
+                    var properties = new Dictionary<string, dynamic>();
                     if(!IsValid && !string.IsNullOrEmpty(errorMessage))
                     {
                         properties.Add("aria-describedby", errorId);
@@ -144,7 +144,7 @@ namespace form_builder.Models.Elements
             return null;
         }
 
-        public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, string> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             return viewRender.RenderAsync(Type.ToString(), this, null);
         }

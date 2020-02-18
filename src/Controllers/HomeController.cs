@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using form_builder.Enum;
 using System.Threading.Tasks;
 using System;
 using form_builder.Services.PageService;
 using form_builder.Extensions;
+using form_builder.Helpers;
 using form_builder.Workflows;
 
 namespace form_builder.Controllers
@@ -60,9 +62,13 @@ namespace form_builder.Controllers
         [HttpPost]
         [Route("{form}")]
         [Route("{form}/{path}")]
-        public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData)
+        public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData, IFormFile fileUpload)
         {
             var viewModel = formData.ToNormaliseDictionary();
+            if(fileUpload != null)
+            {
+                viewModel.Add("fileUpload",FileHelper.ConvertFileToBase64StringWithFileName(fileUpload));
+            }
             var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel);
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)

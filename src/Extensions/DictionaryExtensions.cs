@@ -4,9 +4,9 @@ namespace form_builder.Extensions
 {
     public static class DictionaryExtensions
     {
-        public static Dictionary<string, string> ToNormaliseDictionary(this Dictionary<string, string[]> formData)
+        public static Dictionary<string,object> ToNormaliseDictionary(this Dictionary<string, string[]> formData)
         {
-            var normalisedFormData = new Dictionary<string, string>();
+            var normalisedFormData = new Dictionary<string, dynamic>();
             foreach (var item in formData)
             {
                 if (item.Value.Length == 1)

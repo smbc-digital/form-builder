@@ -110,7 +110,7 @@ namespace form_builder.Services.SubmtiService
                 };
             }
 
-            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, string>(), mappingEntity.BaseForm, sessionGuid);
+            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), mappingEntity.BaseForm, sessionGuid);
             var success = new Success
             {
                 FormName = mappingEntity.BaseForm.FormName,

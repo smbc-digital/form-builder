@@ -8,7 +8,7 @@ namespace form_builder.Validators
 {
     public class DatePickerElementValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, string> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
             if (element.Type != EElementType.DatePicker || !viewModel.ContainsKey(element.Properties.QuestionId))
             {

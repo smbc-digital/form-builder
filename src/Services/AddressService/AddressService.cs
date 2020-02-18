@@ -15,7 +15,7 @@ namespace form_builder.Services.AddressService
 {
     public interface IAddressService
     {
-        Task<ProcessRequestEntity> ProcesssAddress(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path);
+        Task<ProcessRequestEntity> ProcesssAddress(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path);
     }
 
     public class AddressService : IAddressService
@@ -31,9 +31,9 @@ namespace form_builder.Services.AddressService
             _addressProviders = addressProviders;
         }
 
-        public async Task<ProcessRequestEntity> ProcesssAddress(Dictionary<string, string> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
+        public async Task<ProcessRequestEntity> ProcesssAddress(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
-            var journey = viewModel["AddressStatus"];
+            var journey = (string)viewModel["AddressStatus"];
             var addressResults = new List<AddressSearchResult>();
 
             if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
@@ -54,12 +54,12 @@ namespace form_builder.Services.AddressService
                 }
 
                 var postcode = journey == "Select"
-                    ? convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
-                    : viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
+                    ? (string) convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
+                    : (string) viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
 
                 var address = journey != "Select"
                     ? string.Empty
-                    : viewModel[$"{addressElement.Properties.QuestionId}-address"];
+                    : (string)viewModel[$"{addressElement.Properties.QuestionId}-address"];
 
                 var emptyPostcode = string.IsNullOrEmpty(postcode);
                 var emptyAddress = string.IsNullOrEmpty(address);

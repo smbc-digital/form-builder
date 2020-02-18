@@ -51,15 +51,17 @@ namespace form_builder.Models
                                                                element.Type == EElementType.TimeInput ||
                                                                element.Type == EElementType.DatePicker ||
                                                                element.Type == EElementType.Street ||
-                                                               element.Type == EElementType.Organisation);
+                                                               element.Type == EElementType.Organisation ||
+                                                               element.Type == EElementType.FileUpload
+        );
 
-        public void Validate(Dictionary<string, string> viewModel, IEnumerable<IElementValidator> form_builder)
+        public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
         {
             ValidatableElements.ToList().ForEach(element => element.Validate(viewModel, form_builder));
             IsValidated = true;
         }
 
-        public Behaviour GetNextPage(Dictionary<string, string> viewModel)
+        public Behaviour GetNextPage(Dictionary<string, dynamic> viewModel)
         {
             if (Behaviours.Count == 1)
             {
@@ -90,7 +92,6 @@ namespace form_builder.Models
             throw new Exception("Behaviour issues");
         }
 
-
         public SubmitSlug GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)
         {
             var submitBehaviour = new SubmitSlug();
@@ -106,7 +107,7 @@ namespace form_builder.Models
                 var previousPage = formAnswers.Pages
                     .FirstOrDefault(_ => _.PageSlug == formAnswers.Path);
 
-                var viewModel = new Dictionary<string, string>();
+                var viewModel = new Dictionary<string, dynamic>();
                 previousPage.Answers.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
                 submitBehaviour.URL = GetNextPage(viewModel).PageSlug;
             }
