@@ -1,4 +1,5 @@
-﻿using form_builder.Enum;
+﻿using System;
+using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +7,7 @@ using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace form_builder.Models.Elements
 {
@@ -22,7 +24,8 @@ namespace form_builder.Models.Elements
             {
                 { "name", Properties.QuestionId },
                 { "id", Properties.QuestionId },
-                {"type", "file" }
+                { "type", "file" },
+                { "accept", Properties.AllowedFileTypes.Join(",") }
             };
 
             if (DisplayAriaDescribedby)
