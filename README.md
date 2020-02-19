@@ -187,6 +187,7 @@ The target mapping above would produce this object
     * [Time](#Time)
     * [DatePicker](#DatePicker)
     * [Organisation](#Organisation)
+    * [FileUpload](#FileUpload)
     
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)
@@ -799,6 +800,26 @@ Time example
             "CustomValidationMessage": "This field is required",
             "ValidationMessageInvalidTime": "Enter a valid time",
             "CustomValidationMessageAmPm": "You must choose AM or PM"
+          }
+
+```
+
+#
+* <a name="Time">**FileUpload**</a>
+  * QuestionId (*string*) __*__
+  * Label (*string*) __*__
+  * TargetMapping (*string*)
+  
+
+FileUpload example
+
+```json
+{
+          "Type": "FileUpload",
+          "Properties": {
+            "QuestionId": "fileUpload",
+            "Label": "Upload",
+            "TargetMapping": "customer.file",
           }
 
 ```
