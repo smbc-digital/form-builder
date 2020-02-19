@@ -275,8 +275,8 @@ namespace form_builder_tests.UnitTests.Mappers
                         }
                     }
                 }
-                    
             };
+
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
             Assert.Null(result);
         }
@@ -643,6 +643,100 @@ namespace form_builder_tests.UnitTests.Mappers
 
             Assert.IsType<File>(result);
             _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public void GetAnswerValue_ShouldReturnDateTime_WithValidTime()
+        {
+            var elementHours = "03";
+            var elementMinutes = "30";
+            var elementAmPm = "am";
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.TimeInput)
+                .WithQuestionId("timeInput")
+                .WithTargetMapping("customer.textboxtime")
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers
+                            {
+                                QuestionId = "timeInput-minutes",
+                                Response = elementMinutes
+                            },
+                            new Answers
+                            {
+                                QuestionId = "timeInput-hours",
+                                Response = elementHours
+                            },
+                            new Answers
+                            {
+                                QuestionId = "timeInput-ampm",
+                                Response = elementAmPm
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Act
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+
+            // Assert
+            var resultData = Assert.IsType<TimeSpan>(result);
+            Assert.Equal("3", resultData.Hours.ToString());
+            Assert.Equal(elementMinutes, resultData.Minutes.ToString());
+        }
+
+        [Fact]
+        public void Map_ShouldReturnExpandoObject_WhenFormContains_MultipleValidatableElementsWithTargetMapping_WithValues()
+        {
+            var elementOneAnswer = "01/01/2000";
+            
+            var element3 = new ElementBuilder()
+                .WithType(EElementType.DatePicker)
+                .WithQuestionId("test")
+                .WithTargetMapping("customer.datepicker.date")
+                .Build();
+
+
+            var page = new PageBuilder()
+                .WithElement(element3)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers
+                            {
+                                QuestionId = "test",
+                                Response = elementOneAnswer
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Act
+            var result = _elementMapper.GetAnswerValue(element3, formAnswers);
+
+            // Assert
+            var resultData = Assert.IsType<DateTime>(result);
+            Assert.Equal($"{elementOneAnswer} 00:00:00", resultData.ToString());
         }
     }
 }

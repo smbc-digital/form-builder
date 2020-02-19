@@ -1,6 +1,7 @@
 ﻿using form_builder.Enum;
 using form_builder.Mappers;
 using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService;
@@ -113,7 +114,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Empty(resultData as IDictionary<string, object>);
         }
 
-        [Fact(Skip = "cause")]
+        [Fact]
         public async Task Map_ShouldReturnExpandoObject_WhenFormContains_SingleValidatableElement()
         {
             var element = new ElementBuilder()
@@ -141,6 +142,9 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns(new { });
+
             // Act
             var result = await _service.Map("form", "guid");
 
@@ -151,7 +155,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.NotNull(castResultsData.text);
         }
 
-        [Fact(Skip ="cause")]
+        [Fact]
         public async Task Map_ShouldReturnExpandoObject_WhenFormContains_MultipleValidatableElementsWithTargetMapping()
         {
             var element = new ElementBuilder()
@@ -179,6 +183,9 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPageSlug("page-one")
                 .Build();
 
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns(new { });
+
             var schema = new FormSchemaBuilder()
                 .WithPage(page)
                 .Build();
@@ -199,170 +206,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.NotNull(customerObject.datepicker);
         }
 
-        [Fact(Skip = "cause")]
-        public async Task Map_ShouldReturnExpandoObject_WhenFormContains_MultipleValidatableElementsWithTargetMapping_WithValues()
-        {
-            var elementOneAnswer = "text answer";
-            var elementTwoAnswer = "01/01/2000";
-
-            var element = new ElementBuilder()
-                 .WithType(EElementType.H1)
-                 .WithQuestionId("test-question")
-                 .Build();
-
-            var element2 = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithQuestionId("text")
-                .Build();
-
-            var element3 = new ElementBuilder()
-                .WithType(EElementType.DatePicker)
-                .WithQuestionId("test")
-                .WithTargetMapping("customer.datepicker.date")
-                .Build();
-
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithElement(element2)
-                .WithElement(element3)
-                .WithValidatedModel(true)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns(JsonConvert.SerializeObject(new FormAnswers
-                {
-                    Pages = new List<PageAnswers>
-                    {
-                        new PageAnswers
-                        {
-                            Answers = new List<Answers>
-                            {
-                                new Answers
-                                {
-                                    QuestionId = "text",
-                                    Response = elementOneAnswer
-                                },
-                                new Answers
-                                {
-                                    QuestionId = "test",
-                                    Response = elementTwoAnswer
-                                }
-                            }
-                        }
-                    }
-                }));
-
-            // Act
-            var result = await _service.Map("form", "guid");
-
-            // Assert
-            var resultData = Assert.IsType<ExpandoObject>(result.Data);
-            dynamic castResultsData = resultData;
-            var customerObject = castResultsData.customer;
-            var datepickerObject = customerObject.datepicker;
-
-            Assert.NotNull(castResultsData.customer);
-            Assert.NotNull(customerObject.datepicker);
-
-            Assert.Equal(elementOneAnswer, (string)castResultsData.text);
-            Assert.Equal($"{elementTwoAnswer} 00:00:00", ((DateTime)datepickerObject.date).ToString());
-        }
-
-        [Fact(Skip = "cause")]
-        public async Task Map_ShouldReturnExpandoObject_WhenFormContains_MultipleValidatableElementsWithSameTargetMapping()
-        {
-            var elementOneAnswer = "text answer";
-            var elementTwoHours = "03";
-            var elementTwoMinutes = "30";
-            var elementTwoAmPm = "am";
-
-            var hourId = "test-hours";
-            var minuteId = "test-minutes";
-            var amPmId = "test-ampm";
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithQuestionId("text")
-                .WithTargetMapping("customer.textboxtime")
-                .Build();
-
-            var element2 = new ElementBuilder()
-                .WithType(EElementType.TimeInput)
-                .WithQuestionId("test")
-                .WithTargetMapping("customer.textboxtime")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithElement(element2)
-                .WithValidatedModel(true)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns(JsonConvert.SerializeObject(new FormAnswers
-                {
-                    Pages = new List<PageAnswers>
-                    {
-                        new PageAnswers
-                        {
-                            Answers = new List<Answers>
-                            {
-                                new Answers
-                                {
-                                    QuestionId = "text",
-                                    Response = elementOneAnswer
-                                },
-                                new Answers
-                                {
-                                    QuestionId = hourId,
-                                    Response = elementTwoHours
-                                },
-                                new Answers
-                                {
-                                    QuestionId = minuteId,
-                                    Response = elementTwoMinutes
-                                },
-                                new Answers
-                                {
-                                    QuestionId = amPmId,
-                                    Response = elementTwoAmPm
-                                }
-                            }
-                        }
-                    }
-                }));
-
-            // Act
-            var result = await _service.Map("form", "guid");
-
-            // Assert
-            var resultData = Assert.IsType<ExpandoObject>(result.Data);
-            dynamic castResultsData = resultData;
-            var customerObject = castResultsData.customer;
-
-            Assert.NotNull(customerObject.textboxtime);
-
-            Assert.Equal($"{elementOneAnswer} {elementTwoHours}:{elementTwoMinutes}:00", (string)customerObject.textboxtime);
-        }
-
-        [Fact(Skip = "cause")]
+        [Fact]
         public async Task Map_ShouldReturnExpandoObject_WhenFormContains_ValidatableElementWithComplexTargetMapping()
         {
             var element = new ElementBuilder()
@@ -380,6 +224,9 @@ namespace form_builder_tests.UnitTests.Services
             var schema = new FormSchemaBuilder()
                 .WithPage(page)
                 .Build();
+
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns(new { });
 
             _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
@@ -410,7 +257,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.NotNull(fiveObject.six);
         }
 
-        [Fact(Skip = "cause")]
+        [Fact]
         public async Task Map_ShouldReturnExpandoObject_WhenFormContains_MutipleValidatableElementsWithComplexTargetMapping()
         {
             var element = new ElementBuilder()
@@ -444,6 +291,9 @@ namespace form_builder_tests.UnitTests.Services
                {
                    Pages = new List<PageAnswers>()
                }));
+
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns(new { });
 
             // Act
             var result = await _service.Map("form", "guid");
