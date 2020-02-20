@@ -69,7 +69,6 @@ namespace form_builder.Services.PayService
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
             string url = "Verint/paymentstatusupdate";
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
-
             try
             {
                 paymentProvider.VerifyPaymentResponse(responseCode);
