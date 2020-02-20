@@ -1,8 +1,9 @@
 ﻿
-@model form_builder.Models.Elements.Element
+@model form_builder.Models.Elements.FileUpload
 @{
     var hintId = $"{Model.Properties.QuestionId}-hint";
     var errorId = $"{Model.Properties.QuestionId}-error";
+    var allowed = string.Join(",", Model.Properties.AllowedFileTypes);
 }
 
 <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
@@ -16,6 +17,7 @@
 {
     <p class="description" id=@hintId>@Model.Properties.Hint</p>
 }
+@*<input type="file" id="@Model.Properties.QuestionId" name="@Model.Properties.Value", accept="@allowed"/>*@
 @Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())
 @if (!Model.IsValid)
 {

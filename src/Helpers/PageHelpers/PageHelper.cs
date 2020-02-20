@@ -118,7 +118,7 @@ namespace form_builder.Helpers.PageHelpers
                 var fileKey = $"file-{file.Name}";
                 _distributedCache.SetStringAsync(fileKey, viewModel[file.Name].Content, _distrbutedCacheExpirationConfiguration.FileUpload);
 
-                var model = new FileUploadModel 
+                var model = new FileUploadModel
                 {
                     FileName = file.FileName,
                     FileSize = file.Length,
