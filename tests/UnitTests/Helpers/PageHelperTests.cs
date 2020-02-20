@@ -545,14 +545,13 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             var callbackCacheProvider = string.Empty;
             var questionId = "testFileQuestionId";
-            var fileName = "new-filename";
+            var fileName = "replace-me.txt";
             var fileContent = "abc";
 
             var fileMock = new Mock<IFormFile>();
-            fileMock.Setup(_ => _.FileName).Returns(fileName);
             fileMock.Setup(_ => _.Name).Returns(questionId);
 
-            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers> { new PageAnswers {PageSlug = "page-one" , Answers = new List<Answers> { new Answers { QuestionId = questionId, Response = new FileUploadModel { FileName = "replace-me.txt" } } } } } });
+            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers> { new PageAnswers {PageSlug = "page-one" , Answers = new List<Answers> { new Answers { QuestionId = questionId, Response = new FileUploadModel {  } } } } } });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
@@ -562,7 +561,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("Path", "page-one");
-            viewModel.Add(questionId, new DocumentModel { Content = fileContent, FileName = "file.txt" });
+            viewModel.Add(questionId, new DocumentModel { Content = fileContent, FileName = "replace-me.txt" });
 
             _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", fileMock.Object);
 
