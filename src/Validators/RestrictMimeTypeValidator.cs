@@ -28,13 +28,22 @@ namespace form_builder.Validators
 
             DocumentModel documentModel = viewModel[element.Properties.QuestionId];
 
-            var converedtBase64File = Convert.FromBase64String(documentModel.Content);
-            var fileType = converedtBase64File.GetFileType();
-            var allowedFileTypes = element.Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
-
-            if (allowedFileTypes.Contains($".{fileType.Extension}"))
+            if (documentModel == null)
             {
                 return new ValidationResult { IsValid = true };
+            }
+
+            var converedtBase64File = Convert.FromBase64String(documentModel.Content);
+            var fileType = converedtBase64File.GetFileType();
+
+            if (fileType != null)
+            {
+                var allowedFileTypes = element.Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
+
+                if (allowedFileTypes.Contains($".{fileType.Extension}"))
+                {
+                    return new ValidationResult { IsValid = true };
+                }
             }
 
             return new ValidationResult { IsValid = false, Message = "This file type is not allowed" };

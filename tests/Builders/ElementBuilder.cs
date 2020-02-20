@@ -210,5 +210,14 @@ namespace form_builder_tests.Builders
             _property.UpperLimitValidationMessage = message;
             return this;
         }
+
+        public ElementBuilder WithAcceptedMimeType(string type)
+        {
+            if (_property.AllowedFileTypes == null)
+                _property.AllowedFileTypes = new List<string>();
+
+            _property.AllowedFileTypes.Add(type);
+            return this;
+        }
     }
 }
