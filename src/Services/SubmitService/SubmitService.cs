@@ -56,15 +56,19 @@ namespace form_builder.Services.SubmtiService
 
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
-            if (string.IsNullOrEmpty(submitSlug.AuthToken) || string.IsNullOrEmpty(submitSlug.URL))
+
+            if (string.IsNullOrEmpty(submitSlug.URL))
             {
-                throw new ApplicationException($"The AuthToken or URL is empty for this form: { form }");
+                throw new ApplicationException($"SubmitService::ProcessSubmission, No submission URL has been provided for FORM: { form }, ENVIRONMENT: { _environment.EnvironmentName }");
             }
 
-            _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
-            var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
+            if (!string.IsNullOrEmpty(submitSlug.AuthToken))
+            {
+                _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
+            }
 
-            if (response.StatusCode != HttpStatusCode.OK)
+            var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
+            if (!response.IsSuccessStatusCode)
             {
                 throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attemping to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             }
@@ -125,24 +129,29 @@ namespace form_builder.Services.SubmtiService
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
 
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
-            if (string.IsNullOrEmpty(postUrl.AuthToken) || string.IsNullOrEmpty(postUrl.URL))
+
+            if (string.IsNullOrEmpty(postUrl.URL))
             {
-                throw new ApplicationException($"The AuthToken or URL is empty for this form: { form }");
+                throw new ApplicationException($"SubmitService::PaymentSubmission, No submission URL has been provided for FORM: { form }, ENVIRONMENT: { _environment.EnvironmentName }");
             }
-            _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
+
+            if (!string.IsNullOrEmpty(postUrl.AuthToken))
+            {
+                _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
+            }
 
             var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
-
-            if (response.StatusCode != HttpStatusCode.OK)
+            if (!response.IsSuccessStatusCode)
             {
-                throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured while attemping to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured while attemping to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             }
 
             if (response.Content != null)
             {
                 var content = await response.Content.ReadAsStringAsync();
 
-                if(string.IsNullOrWhiteSpace(content)){
+                if (string.IsNullOrWhiteSpace(content))
+                {
                     throw new ApplicationException($"SubmitService::PaymentSubmission, Gateway {postUrl} responsed with empty reference");
                 }
 
