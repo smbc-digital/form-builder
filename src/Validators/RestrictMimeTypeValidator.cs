@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System.Text;
 using form_builder.Constants;
 using System;
+using System.Linq;
 
 namespace form_builder.Validators
 {
@@ -16,7 +17,7 @@ namespace form_builder.Validators
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
 
-            if(element.Type != EElementType.FileUpload)
+            if (element.Type != EElementType.FileUpload)
             {
                 return new ValidationResult { IsValid = true };
             }
@@ -35,10 +36,10 @@ namespace form_builder.Validators
 
             var converedtBase64File = Convert.FromBase64String(documentModel.Content);
             var fileType = converedtBase64File.GetFileType();
+            var allowedFileTypes = element.Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
 
             if (fileType != null)
             {
-                var allowedFileTypes = element.Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
 
                 if (allowedFileTypes.Contains($".{fileType.Extension}"))
                 {
@@ -46,7 +47,11 @@ namespace form_builder.Validators
                 }
             }
 
-            return new ValidationResult { IsValid = false, Message = "This file type is not allowed" };
+            var fileTypesErrorMessage = allowedFileTypes.Count > 1 
+                ? string.Join(", ", allowedFileTypes.Take(allowedFileTypes.Count - 1)).ToUpper() + $" or {allowedFileTypes.Last().ToUpper()}" 
+                : allowedFileTypes.First().ToUpper();
+
+            return new ValidationResult { IsValid = false, Message = $"The selected file must be a {fileTypesErrorMessage.Replace(".", string.Empty)}." };
         }
     }
 }
