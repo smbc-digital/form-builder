@@ -809,6 +809,7 @@ Time example
   * QuestionId (*string*) __*__
   * Label (*string*) __*__
   * TargetMapping (*string*)
+  * AllowedFileTypes (*Array[string]*) (Default: .png", .jpg", .jpeg, .pdf, .docx, .doc, .odt)
   
 
 FileUpload example
@@ -820,6 +821,7 @@ FileUpload example
             "QuestionId": "fileUpload",
             "Label": "Upload",
             "TargetMapping": "customer.file",
+            "AllowedFileTypes": [ ".jpg", ".png" ]
           }
 
 ```
