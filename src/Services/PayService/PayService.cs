@@ -79,16 +79,16 @@ namespace form_builder.Services.PayService
             catch (PaymentDeclinedException)
             {
                 var response = await _gateway.PostAsync(url, new { CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString() });
-                throw new PaymentDeclinedException("CivicaPayProvider::Declined payment");
+                throw new PaymentDeclinedException("PayService::ProcessPaymentResponse: Declined payment");
             }
             catch (PaymentFailureException)
             {
                 var response = await _gateway.PostAsync(url, new { CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString() });
-                throw new PaymentFailureException("CivicaPayProvider::Failed payment");
+                throw new PaymentFailureException("PayService::ProcessPaymentResponse: Failed payment");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "The payment callback failed");
+                _logger.LogError(e, "PayService::ProcessPaymentResponse: An error has occured while attempting verify payment response");
                 throw e;
             }
         }
