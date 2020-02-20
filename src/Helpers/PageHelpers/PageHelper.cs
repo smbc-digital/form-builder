@@ -121,7 +121,6 @@ namespace form_builder.Helpers.PageHelpers
                 var model = new FileUploadModel
                 {
                     FileName = file.FileName,
-                    FileSize = file.Length,
                     Key = fileKey
                 };
 
@@ -249,18 +248,19 @@ namespace form_builder.Helpers.PageHelpers
             {
                 foreach (var element in page.Elements)
                 {
-                    if (
-                        element.Type == EElementType.Address
-                        || element.Type == EElementType.Textbox
-                        || element.Type == EElementType.Textarea
-                        || element.Type == EElementType.Select
-                        || element.Type == EElementType.Radio
-                        || element.Type == EElementType.Street
-                        || element.Type == EElementType.Checkbox
-                        || element.Type == EElementType.DateInput
-                        || element.Type == EElementType.DatePicker
-                        || element.Type == EElementType.TimeInput
-                        || element.Type == EElementType.Organisation
+                    if (element.Type != EElementType.H1
+                        && element.Type != EElementType.H2
+                        && element.Type != EElementType.H3
+                        && element.Type != EElementType.H4
+                        && element.Type != EElementType.H5
+                        && element.Type != EElementType.H6
+                        && element.Type != EElementType.Img
+                        && element.Type != EElementType.InlineAlert
+                        && element.Type != EElementType.P
+                        && element.Type != EElementType.Span
+                        && element.Type != EElementType.UL
+                        && element.Type != EElementType.OL
+                        && element.Type != EElementType.Button
                         )
                     {
                         qIds.Add(element.Properties.QuestionId);
