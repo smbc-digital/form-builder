@@ -3,7 +3,6 @@ using form_builder.Models;
 using form_builder.Validators;
 using System.Threading.Tasks;
 using form_builder.Helpers.PageHelpers;
-using form_builder.Providers.SchemaProvider;
 using Microsoft.Extensions.Logging;
 using form_builder.Helpers.Session;
 using System;
@@ -18,6 +17,9 @@ using form_builder.Providers.StorageProvider;
 using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
 using Microsoft.AspNetCore.Http;
+using form_builder.Cache;
+using form_builder.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace form_builder.Services.PageService
 {
@@ -33,18 +35,18 @@ namespace form_builder.Services.PageService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IEnumerable<IElementValidator> _validators;
-        private readonly ISchemaProvider _schemaProvider;
         private readonly IPageHelper _pageHelper;
         private readonly ISessionHelper _sessionHelper;
         private readonly ILogger<PageService> _logger;
         private readonly IStreetService _streetService;
         private readonly IAddressService _addressService;
         private readonly IOrganisationService _organisationService;
+        private readonly ICache _cache;
+        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
 
-        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, ISchemaProvider schemaProvider, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache)
+        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
         {
             _validators = validators;
-            _schemaProvider = schemaProvider;
             _pageHelper = pageHelper;
             _sessionHelper = sessionHelper;
             _logger = logger;
@@ -52,6 +54,8 @@ namespace form_builder.Services.PageService
             _addressService = addressService;
             _organisationService = organisationService;
             _distributedCache = distributedCache;
+            _cache = cache;
+            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
         }
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false)
         {
@@ -68,7 +72,7 @@ namespace form_builder.Services.PageService
                 _sessionHelper.SetSessionGuid(sessionGuid);
             }
 
-            var baseForm = await _schemaProvider.Get<FormSchema>(form);
+            var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
 
             var formData = _distributedCache.GetString(sessionGuid);
 
@@ -153,7 +157,7 @@ namespace form_builder.Services.PageService
 
         public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IFormFile file, bool processManual)
         {
-            var baseForm = await _schemaProvider.Get<FormSchema>(form);
+            var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
             var currentPage = baseForm.GetPage(path);
 
             var sessionGuid = _sessionHelper.GetSessionGuid();

@@ -37,7 +37,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _mockDisallowedKeysOptions = new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
-        private readonly Mock<IOptions<DistrbutedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings = new Mock<IOptions<DistrbutedCacheExpirationConfiguration>>();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
         private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider = new Mock<IEnumerable<IPaymentProvider>>();
         private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
 
@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.Helpers
                         PaymentProvider = "invalidProvider"
                     } });
 
-            _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheExpirationConfiguration
+            _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
             {
                 UserData = 30,
                 PaymentConfiguration = 5,

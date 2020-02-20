@@ -166,7 +166,7 @@ namespace form_builder.Extensions
         {
             services.Configure<DisallowedAnswerKeysConfiguration>(configuration.GetSection("FormConfig"));
             services.Configure<CivicaPaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
-            services.Configure<DistrbutedCacheExpirationConfiguration>(configuration.GetSection("DistrbutedCacheExpiration"));
+            services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection("DistrbutedCacheExpiration"));
             services.Configure<DistrbutedCacheConfiguration>(cacheOptions => cacheOptions.UseDistrbutedCache = configuration.GetValue<bool>("UseDistrbutedCache"));
 
             return services;

@@ -22,6 +22,9 @@ using Xunit;
 using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
 using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
+using form_builder.Cache;
+using form_builder.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -38,6 +41,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IAddressService> _addressService = new Mock<IAddressService>();
         private readonly Mock<IOrganisationService> _organisationService = new Mock<IOrganisationService>();
         private readonly Mock<IDistributedCacheWrapper> _distributedCache = new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<ICache> _cache = new Mock<ICache>();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _distrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
 
         public PageServicesTests()
         {
@@ -56,7 +61,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            _service = new PageService(_logger.Object, _validators.Object, _schemaProvider.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object);
+            _service = new PageService(_logger.Object, _validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object, _cache.Object, _distrbutedCacheExpirationConfiguration.Object);
         }
 
         [Fact]

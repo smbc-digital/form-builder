@@ -1,4 +1,6 @@
-﻿using form_builder.Enum;
+﻿using form_builder.Cache;
+using form_builder.Configuration;
+using form_builder.Enum;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -6,9 +8,9 @@ using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
@@ -22,6 +24,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISchemaProvider> _mockSchemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistrubutedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
+        private readonly Mock<ICache> _mockCache = new Mock<ICache>();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
 
         public MappingServiceTests()
         {
@@ -49,7 +53,14 @@ namespace form_builder_tests.UnitTests.Services
                     Pages = new List<PageAnswers>()
                 }));
 
-            _service = new MappingService(_mockSchemaProvider.Object, _mockDistrubutedCache.Object, _mockElementMapper.Object);
+            //_mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()).Result
+            //    .ReturnsAsync(schema)
+
+            _mockDistrbutedCacheExpirationConfiguration.Setup(_ => _.Value.ToString())
+                .Returns("form-json");
+
+
+            _service = new MappingService( _mockDistrubutedCache.Object, _mockElementMapper.Object, _mockCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object);
         }
 
         [Fact]

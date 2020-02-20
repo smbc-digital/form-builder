@@ -45,11 +45,11 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
         private readonly IHostingEnvironment _enviroment;
-        private readonly DistrbutedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly ICache _cache;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
 
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache, IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IEnumerable<IPaymentProvider> paymentProviders)
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IEnumerable<IPaymentProvider> paymentProviders)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
