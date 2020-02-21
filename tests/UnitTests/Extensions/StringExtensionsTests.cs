@@ -14,7 +14,7 @@ namespace form_builder_tests.UnitTests.Extensions
         [InlineData("local", "local")]
         [InlineData("int", "Int")]
         [InlineData("qa", "QA")]
-        [InlineData("stage", "Staging")]
+        [InlineData("stage", "Stage")]
         [InlineData("prod", "Prod")]
         public void ToS3EnvPrefix_ShouldReturnCorrectValueForEnv(string env, string expectedResult)
         {

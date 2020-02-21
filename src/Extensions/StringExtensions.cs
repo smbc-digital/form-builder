@@ -16,7 +16,7 @@ namespace form_builder.Extensions
                 case "qa":
                     return "QA";
                 case "stage":
-                    return "Staging";
+                    return "Stage";
                 case "prod":
                     return "Prod";
                 default:
@@ -31,11 +31,10 @@ namespace form_builder.Extensions
                 case "uitest":
                 case "local":
                 case "prod":
-                    return string.Empty;
                 case "int":
                 case "qa":
                 case "stage":
-                    return "/formbuilder";
+                    return string.Empty;
                 default:
                     throw new Exception("Unknown environment name");
 
