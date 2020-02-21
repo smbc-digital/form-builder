@@ -1,6 +1,6 @@
 namespace form_builder.Configuration
 {
-    public class DistrbutedCacheExpirationConfiguration
+    public class DistributedCacheExpirationConfiguration
     {
         public int UserData { get; set; }
         public int PaymentConfiguration { get; set; }

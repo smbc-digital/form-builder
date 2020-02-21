@@ -26,7 +26,7 @@ namespace form_builder.Helpers.PageHelpers
 {
     public interface IPageHelper
     {
-        void hasDuplicateQuestionIDs(List<Page> pages, string formName);
+        void HasDuplicateQuestionIDs(List<Page> pages, string formName);
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null);
         void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IFormFile file);
         Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults);
@@ -36,6 +36,7 @@ namespace form_builder.Helpers.PageHelpers
         Task CheckForPaymentConfiguration(List<Page> pages, string formName);
         void CheckForEmptyBehaviourSlugs(List<Page> pages, string formName);
         void CheckForCurrentEnvironmentSubmitSlugs(List<Page> pages, string formName);
+        void CheckForAcceptedFileUploadFileTypes(List<Page> pages, string formName);
     }
 
     public class PageHelper : IPageHelper
@@ -45,11 +46,11 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
         private readonly IHostingEnvironment _enviroment;
-        private readonly DistrbutedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly ICache _cache;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
 
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache, IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IEnumerable<IPaymentProvider> paymentProviders)
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IEnumerable<IPaymentProvider> paymentProviders)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -241,7 +242,7 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
-        public void hasDuplicateQuestionIDs(List<Page> pages, string formName)
+        public void HasDuplicateQuestionIDs(List<Page> pages, string formName)
         {
             List<string> qIds = new List<string>();
             foreach (var page in pages)
@@ -388,6 +389,27 @@ namespace form_builder.Helpers.PageHelpers
                         }
                     }
                 }
+            }
+        }
+
+        public void CheckForAcceptedFileUploadFileTypes(List<Page> pages, string formName)
+        {
+            var documentUploadElements = pages.Where(_ => _.Elements != null)
+                .SelectMany(_ => _.ValidatableElements)
+                .Where(_ => _.Type == EElementType.FileUpload)
+                .Where(_ => _.Properties.AllowedFileTypes != null)
+                .ToList();
+
+            if (documentUploadElements != null)
+            {
+                documentUploadElements.ForEach(_ =>
+                {
+                    _.Properties.AllowedFileTypes.ForEach(x =>
+                    {
+                        if (!x.StartsWith("."))
+                            throw new ApplicationException($"PageHelper::CheckForAcceptedFileUploadFileTypes, Allowed file type in FileUpload element {_.Properties.QuestionId} must have a valid extension which begins with a ., e.g. .png");
+                    });
+                });
             }
         }
     }

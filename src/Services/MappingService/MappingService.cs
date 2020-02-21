@@ -1,9 +1,12 @@
-﻿using form_builder.Mappers;
+﻿using form_builder.Cache;
+using form_builder.Configuration;
+using form_builder.Enum;
+using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -19,21 +22,24 @@ namespace form_builder.Services.MappingService
 
     public class MappingService : IMappingService
     {
-        private readonly ISchemaProvider _schemaProvider;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IElementMapper _elementMapper;
+        private readonly ICache _cache;
+        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
-        public MappingService(ISchemaProvider schemaProvider, IDistributedCacheWrapper distributedCache,
-            IElementMapper elementMapper)
+        public MappingService(IDistributedCacheWrapper distributedCache,
+            IElementMapper elementMapper, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
-            _schemaProvider = schemaProvider;
             _distributedCache = distributedCache;
             _elementMapper = elementMapper;
+            _cache = cache;
+            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
         public async Task<MappingEntity> Map(string sessionGuid, string form)
         {
-            var baseForm = await _schemaProvider.Get<FormSchema>(form);
+            var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distributedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
+
             var formData = _distributedCache.GetString(sessionGuid);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
             convertedAnswers.FormName = form;

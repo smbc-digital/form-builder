@@ -30,14 +30,14 @@ namespace form_builder.Services.PayService
         private readonly ILogger<PayService> _logger;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly ICache _cache;
-        private readonly DistrbutedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly ISessionHelper _sessionHelper;
         private readonly IMappingService _mappingService;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger,
             IGateway gateway, ICache cache,
-            IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
+            IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
             ISessionHelper sessionHelper, IMappingService mappingService, IHostingEnvironment hostingEnvironment)
         {
             _gateway = gateway;
@@ -72,23 +72,31 @@ namespace form_builder.Services.PayService
             try
             {
                 paymentProvider.VerifyPaymentResponse(responseCode);
-                var response = await _gateway.PostAsync(url, new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString() });
+                var response = await _gateway.PostAsync(url,
+                    new {CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString()});
                 return reference;
             }
             catch (PaymentDeclinedException)
             {
-                var response = await _gateway.PostAsync(url, new { CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString() });
+                var response = await _gateway.PostAsync(url,
+                    new {CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString()});
                 throw new PaymentDeclinedException("CivicaPayProvider::Declined payment");
             }
             catch (PaymentFailureException)
             {
-                var response = await _gateway.PostAsync(url, new { CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString() });
+                var response = await _gateway.PostAsync(url,
+                    new {CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString()});
                 throw new PaymentFailureException("CivicaPayProvider::Failed payment");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "The payment callback failed");
                 throw e;
+            }
+            finally
+            {
+                // clear out the payment session
+                _sessionHelper.RemoveSessionGuid();
             }
         }
 

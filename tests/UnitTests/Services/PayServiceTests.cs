@@ -14,7 +14,6 @@ using form_builder.Helpers.Session;
 using form_builder.Services.MappingService;
 using Microsoft.AspNetCore.Hosting;
 using Xunit;
-using form_builder.Services.MappingService.Entities;
 using form_builder.Models;
 using form_builder_tests.Builders;
 
@@ -28,7 +27,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider = new Mock<IEnumerable<IPaymentProvider>>();
         private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
-        private readonly Mock<IOptions<DistrbutedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings = new Mock<IOptions<DistrbutedCacheExpirationConfiguration>>();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
         private readonly Mock<IHostingEnvironment> _mockHostingEnvironment = new Mock<IHostingEnvironment>();
@@ -52,7 +51,7 @@ namespace form_builder_tests.UnitTests.Services
                 }
             });
 
-            _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheExpirationConfiguration
+            _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
             {
                 UserData = 30,
                 PaymentConfiguration = 5

@@ -143,7 +143,7 @@ namespace form_builder.Services.SubmtiService
             var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
             if (!response.IsSuccessStatusCode)
             {
-                throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured while attemping to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             }
 
             if (response.Content != null)
@@ -152,7 +152,7 @@ namespace form_builder.Services.SubmtiService
 
                 if (string.IsNullOrWhiteSpace(content))
                 {
-                    throw new ApplicationException($"SubmitService::PaymentSubmission, Gateway {postUrl} responsed with empty reference");
+                    throw new ApplicationException($"SubmitService::PaymentSubmission, Gateway {postUrl} responded with empty reference");
                 }
 
                 return JsonConvert.DeserializeObject<string>(content);

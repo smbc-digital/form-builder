@@ -2,6 +2,7 @@ using form_builder.Enum;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties;
 using form_builder.Validators;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,8 +27,9 @@ namespace form_builder.Models
 
         public bool IsValidated { get; set; }
 
+        [JsonIgnore]
         public bool IsValid => !InvalidElements.Any();
-
+        [JsonIgnore]
         public IEnumerable<BaseProperty> InvalidElements
         {
             get
@@ -40,6 +42,7 @@ namespace form_builder.Models
                 throw new System.Exception("Model is not validated, please call Validate()");
             }
         }
+       
         public IEnumerable<IElement> ValidatableElements => Elements.Where(element => element.Type == EElementType.Radio ||
                                                                element.Type == EElementType.Textarea ||
                                                                element.Type == EElementType.Select ||
