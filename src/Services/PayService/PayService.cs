@@ -72,23 +72,31 @@ namespace form_builder.Services.PayService
             try
             {
                 paymentProvider.VerifyPaymentResponse(responseCode);
-                var response = await _gateway.PostAsync(url, new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString() });
+                var response = await _gateway.PostAsync(url,
+                    new {CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString()});
                 return reference;
             }
             catch (PaymentDeclinedException)
             {
-                var response = await _gateway.PostAsync(url, new { CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString() });
+                var response = await _gateway.PostAsync(url,
+                    new {CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString()});
                 throw new PaymentDeclinedException("CivicaPayProvider::Declined payment");
             }
             catch (PaymentFailureException)
             {
-                var response = await _gateway.PostAsync(url, new { CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString() });
+                var response = await _gateway.PostAsync(url,
+                    new {CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString()});
                 throw new PaymentFailureException("CivicaPayProvider::Failed payment");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "The payment callback failed");
                 throw e;
+            }
+            finally
+            {
+                // clear out the payment session
+                _sessionHelper.RemoveSessionGuid();
             }
         }
 
