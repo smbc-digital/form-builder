@@ -185,7 +185,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcesssOrganisation_Application_ShouldThrowApplicationException_WhenNoMatchingOrganisationProvider()
         {
             var organisationProvider = "NON-EXIST-PROVIDER";
-            var searchResultsCallback = new List<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>();
+            var searchResultsCallback = new List<StockportGovUK.NetStandard.Models.Verint.Organisation>();
             var element = new ElementBuilder()
                .WithType(EElementType.Organisation)
                .WithOrganisationProvider(organisationProvider)

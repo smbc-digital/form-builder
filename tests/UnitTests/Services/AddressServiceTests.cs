@@ -10,6 +10,7 @@ using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
+using StockportGovUK.NetStandard.Gateways.AddressService;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly AddressService _service;
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IEnumerable<IAddressProvider>> _mockAddressProvider = new Mock<IEnumerable<IAddressProvider>>();
+        private readonly Mock<IEnumerable<IAddressServiceGateway>> _mockAddressServiceGateway = new Mock<IEnumerable<IAddressServiceGateway>>();
         private readonly Mock<IAddressProvider> _addressProvider = new Mock<IAddressProvider>();
 
         public AddressServiceTests()
@@ -30,7 +31,7 @@ namespace form_builder_tests.UnitTests.Services
             _addressProvider.Setup(_ => _.ProviderName).Returns("testAddressProvider");
 
             var addressProviderItems = new List<IAddressProvider> { _addressProvider.Object };
-            _mockAddressProvider.Setup(m => m.GetEnumerator()).Returns(() => addressProviderItems.GetEnumerator());
+            _mockAddressServiceGateway.Setup(m => m.GetEnumerator()).Returns(() => addressProviderItems.GetEnumerator());
 
             _service = new AddressService(_mockDistributedCache.Object, _mockAddressProvider.Object, _pageHelper.Object);
         }
