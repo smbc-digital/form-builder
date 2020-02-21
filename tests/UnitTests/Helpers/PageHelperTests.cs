@@ -627,7 +627,7 @@ namespace form_builder_tests.UnitTests.Helpers
             pages.Add(page2);
 
             // Act
-            Assert.Throws<ApplicationException>(() => _pageHelper.hasDuplicateQuestionIDs(pages, "form"));
+            Assert.Throws<ApplicationException>(() => _pageHelper.HasDuplicateQuestionIDs(pages, "form"));
         }
 
         [Fact]
@@ -666,7 +666,7 @@ namespace form_builder_tests.UnitTests.Helpers
             pages.Add(page2);
 
             // Act
-            _pageHelper.hasDuplicateQuestionIDs(pages, "form");
+            _pageHelper.HasDuplicateQuestionIDs(pages, "form");
         }
 
         [Fact]
@@ -969,6 +969,111 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForCurrentEnvironmentSubmitSlugs(pages, "end-point"));
             Assert.Equal($"No SubmitSlug found for end-point form for local", result.Message);
+        }
+
+        [Fact]
+        public void CheckForAcceptedFileUploadFileTypes_ShouldThrowAnException_WhenAcceptedFleTypes_HasInvalidExtensionName()
+        {
+            var pages = new List<Page>();
+            var invalidElementQuestionId = "fileUpload2";
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId("fileUpload")
+                .WithAcceptedMimeType(".png")
+                .Build();
+
+            var elementWithInvalidMimeType = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId(invalidElementQuestionId)
+                .WithAcceptedMimeType("png")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithElement(elementWithInvalidMimeType)
+                .Build();
+
+            pages.Add(page);
+
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForAcceptedFileUploadFileTypes(pages, "end-point"));
+            Assert.Equal($"PageHelper::CheckForAcceptedFileUploadFileTypes, Allowed file type in FileUpload element {invalidElementQuestionId} must have a valid extension which begins with a ., e.g. .png", result.Message);
+        }
+
+        [Fact]
+        public void CheckForAcceptedFileUploadFileTypes_ShouldNotThrowException_WhenAllFileTypesAreValid()
+        {
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithAcceptedMimeType(".png")
+                .WithAcceptedMimeType(".pdf")
+                .WithAcceptedMimeType(".jpg")
+                .WithQuestionId("fileUpload")
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithAcceptedMimeType(".png")
+                .WithAcceptedMimeType(".jpg")
+                .WithAcceptedMimeType(".jpge")
+                .WithQuestionId("fileUpload1")
+                .Build();
+
+            var element3 = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithAcceptedMimeType(".docx")
+                .WithQuestionId("fileUpload3")
+                .Build();
+
+            var element4 = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithAcceptedMimeType(".docx")
+                .WithAcceptedMimeType(".doc")
+                .WithQuestionId("fileUpload4")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithElement(element2)
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithElement(element3)
+                .WithElement(element4)
+                .Build();
+
+            pages.Add(page);
+            pages.Add(page2);
+
+            _pageHelper.CheckForAcceptedFileUploadFileTypes(pages, "end-point");
+        }
+
+
+        [Fact]
+        public void CheckForAcceptedFileUploadFileTypes_ShouldNotThrowException_WhenNoFileUploadElementsExists()
+        {
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("textBox")
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.Textarea)
+                .WithQuestionId("textArea")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithElement(element2)
+                .Build();
+
+            pages.Add(page);
+
+            _pageHelper.CheckForAcceptedFileUploadFileTypes(pages, "end-point");
         }
     }
 }
