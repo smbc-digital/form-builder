@@ -39,7 +39,7 @@ namespace form_builder.Providers.SchemaProvider
             }
             catch (AmazonS3Exception e)
             {
-                var ex = new Exception($"S3FileSchemaProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}", e);
+                var ex = new Exception($"S3FileSchemaProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_enviroment.EnvironmentName.ToS3EnvPrefix()} {schemaName} ", e);
                 throw ex;
             }
             catch (Exception e)
