@@ -22,6 +22,9 @@ using Xunit;
 using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
 using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
+using form_builder.Cache;
+using form_builder.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -38,6 +41,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IAddressService> _addressService = new Mock<IAddressService>();
         private readonly Mock<IOrganisationService> _organisationService = new Mock<IOrganisationService>();
         private readonly Mock<IDistributedCacheWrapper> _distributedCache = new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<ICache> _mockCache = new Mock<ICache>();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
 
         public PageServicesTests()
         {
@@ -56,7 +61,12 @@ namespace form_builder_tests.UnitTests.Services
 
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            _service = new PageService(_logger.Object, _validators.Object, _schemaProvider.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object);
+            _mockDistrbutedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
+            {
+                FormJson = 1
+            });
+
+            _service = new PageService(_logger.Object, _validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object, _mockCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object);
         }
 
         [Fact]
@@ -81,7 +91,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(schema);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -94,7 +104,8 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.ProcessRequest("form", "page-one", viewModel, null, false);
 
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Once);
-            _schemaProvider.Verify(_ => _.Get<FormSchema>(It.IsAny<string>()), Times.Once);
+            _mockCache.Verify(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>
+                (It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()), Times.Once);
             _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
         }
@@ -121,7 +132,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(schema);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -159,7 +170,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(schema);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -198,7 +209,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(schema);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -231,7 +242,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(schema);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -246,13 +257,14 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ShouldCallSchemaProvider_ToGetFormSchema()
+        public async Task ProcessPage_ShouldCallCache_ToGetFormSchema()
         {
             // Act
             await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessPage("form", "page-one", false));
 
             // Assert
-            _schemaProvider.Verify(_ => _.Get<FormSchema>(It.Is<string>(x => x == "form")));
+            _mockCache.Verify(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>
+                (It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()), Times.Once);
         }
 
         [Fact]
@@ -272,11 +284,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(schema);
-
-            //.Setup(_ => _.GetViewModel(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
-            //   .ReturnsAsync(new FormBuilderViewModel());
 
             // Act
             var result = await _service.ProcessPage("form", "page-one", false);
@@ -308,7 +317,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(schema);
 
             // Act
@@ -342,8 +351,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(schema);
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                 .ReturnsAsync(schema);
 
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPage("form", requestPath));
@@ -367,7 +376,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(schema);
 
             var result = await _service.ProcessPage("form", "page-one");
@@ -395,7 +404,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(schema);
 
             var result = await _service.ProcessPage("form", "page-one");
@@ -423,7 +432,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(schema);
 
             var result = await _service.ProcessPage("form", "page-one");
@@ -457,7 +466,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithBaseUrl("new-form")
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(schema);
 
             var result = await _service.ProcessPage("new-form", "page-one");
@@ -487,7 +496,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithBaseUrl("new-form")
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(schema);
 
             var result = await _service.ProcessPage("new-form", "page-one");
@@ -538,7 +547,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
                 .ReturnsAsync(schema);
 
             var viewModel = new Dictionary<string, dynamic>

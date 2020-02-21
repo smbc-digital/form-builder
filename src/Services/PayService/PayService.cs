@@ -30,14 +30,14 @@ namespace form_builder.Services.PayService
         private readonly ILogger<PayService> _logger;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly ICache _cache;
-        private readonly DistrbutedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly ISessionHelper _sessionHelper;
         private readonly IMappingService _mappingService;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger,
             IGateway gateway, ICache cache,
-            IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
+            IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
             ISessionHelper sessionHelper, IMappingService mappingService, IHostingEnvironment hostingEnvironment)
         {
             _gateway = gateway;

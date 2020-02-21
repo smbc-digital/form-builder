@@ -34,11 +34,12 @@ namespace form_builder.Models
             if (path != StartPageSlug)
                 return;
 
-            pageHelper.hasDuplicateQuestionIDs(Pages, form);
+            pageHelper.HasDuplicateQuestionIDs(Pages, form);
             pageHelper.CheckForEmptyBehaviourSlugs(Pages, form);
             pageHelper.CheckForInvalidQuestionOrTargetMappingValue(Pages, form);
             pageHelper.CheckForCurrentEnvironmentSubmitSlugs(Pages, form);
             await pageHelper.CheckForPaymentConfiguration(Pages, form);
+            pageHelper.CheckForAcceptedFileUploadFileTypes(Pages, form);
         }
     }
 }

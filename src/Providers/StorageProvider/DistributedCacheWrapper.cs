@@ -15,9 +15,9 @@ namespace form_builder.Providers.StorageProvider
     public class DistributedCacheWrapper : IDistributedCacheWrapper
     {
         private readonly IDistributedCache _distributedCache;
-        private readonly DistrbutedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
 
-        public DistributedCacheWrapper(IDistributedCache distributedCache, IOptions<DistrbutedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
+        public DistributedCacheWrapper(IDistributedCache distributedCache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
         {
             _distributedCache = distributedCache;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
