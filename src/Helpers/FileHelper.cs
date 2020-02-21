@@ -18,7 +18,7 @@ namespace form_builder.Helpers
                 documentFile = new DocumentModel
                 {
                     Content = fileBaseEncoded,
-                    FileName = file.FileName,
+                    FileName = $"Formbuilder-{Guid.NewGuid().ToString()}{Path.GetExtension(file.FileName)}",
                     FileSize = file.Length
                 };
             }

@@ -8,6 +8,7 @@ using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Internal;
+using form_builder.Constants;
 
 namespace form_builder.Models.Elements
 {
@@ -20,12 +21,14 @@ namespace form_builder.Models.Elements
 
         public override Dictionary<string, dynamic> GenerateElementProperties()
         {
+            var allowedFileType = Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
+
             var properties = new Dictionary<string, dynamic>()
             {
                 { "name", Properties.QuestionId },
                 { "id", Properties.QuestionId },
-                { "type", "file" },
-                { "accept", Properties.AllowedFileTypes.Join(",") }
+                { "type", "file" },               
+                { "accept", allowedFileType.Join(",") }
             };
 
             if (DisplayAriaDescribedby)
