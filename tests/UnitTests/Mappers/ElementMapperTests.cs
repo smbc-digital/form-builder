@@ -10,7 +10,7 @@ using Xunit;
 using form_builder.Providers.StorageProvider;
 using form_builder.Enum;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Models.FileManagement;
+using StockportGovUK.NetStandard.Models.FileManagement;
 
 namespace form_builder_tests.UnitTests.Mappers
 {
@@ -518,7 +518,7 @@ namespace form_builder_tests.UnitTests.Mappers
 
             };
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
-            var type = Assert.IsType<StockportGovUK.NetStandard.Models.Models.Verint.Organisation>(result);
+            var type = Assert.IsType<StockportGovUK.NetStandard.Models.Verint.Organisation>(result);
 
             Assert.Equal("0101010101", type.Reference);
             Assert.Equal("im an organisation", type.Name);

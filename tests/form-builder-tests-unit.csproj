@@ -17,7 +17,7 @@
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="79.0.3945.3600-beta" />
     <PackageReference Include="Serilog" Version="2.8.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
-    <PackageReference Include="StockportGovUK.NetStandard.Gateways" Version="1.0.11-prerelease118" />
+    <PackageReference Include="StockportGovUK.NetStandard.Gateways" Version="1.0.11-prerelease122" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
   </ItemGroup>

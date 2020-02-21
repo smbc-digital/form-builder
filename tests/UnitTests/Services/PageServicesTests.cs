@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
-using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
+using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using form_builder.Cache;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;

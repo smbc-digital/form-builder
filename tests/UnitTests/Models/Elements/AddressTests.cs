@@ -5,7 +5,7 @@ using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
 using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Models.Verint.Lookup;
+using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

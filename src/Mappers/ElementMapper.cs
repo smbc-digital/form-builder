@@ -7,7 +7,7 @@ using System.Dynamic;
 using System.Linq;
 using form_builder.Providers.StorageProvider;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Models.FileManagement;
+using StockportGovUK.NetStandard.Models.FileManagement;
 using Microsoft.Extensions.Logging;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
 
@@ -174,9 +174,9 @@ namespace form_builder.Mappers
 
             return null;
         }
-        private StockportGovUK.NetStandard.Models.Models.Verint.Organisation GetOrganisationElementValue(string key, FormAnswers formAnswers)
+        private StockportGovUK.NetStandard.Models.Verint.Organisation GetOrganisationElementValue(string key, FormAnswers formAnswers)
         {
-            var dateObject = new StockportGovUK.NetStandard.Models.Models.Verint.Organisation();
+            var dateObject = new StockportGovUK.NetStandard.Models.Verint.Organisation();
             var organisationKey = $"{key}-organisation";
             var organisationDescriptionKey = $"{key}-organisation-description";
 

@@ -5,7 +5,9 @@ using form_builder.Providers.Address;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Gateways.AddressService;
 using StockportGovUK.NetStandard.Models.Addresses;
+using StockportGovUk.NetStandard.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,12 +25,13 @@ namespace form_builder.Services.AddressService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IPageHelper _pageHelper;
         private readonly IEnumerable<IAddressProvider> _addressProviders;
+        private readonly IAddressServiceGateway _addressServiceGateway;
 
-        public AddressService(IDistributedCacheWrapper distributedCache, IEnumerable<IAddressProvider> addressProviders, IPageHelper pageHelper)
+        public AddressService(IDistributedCacheWrapper distributedCache, IAddressServiceGateway addressServiceGateway, IPageHelper pageHelper)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
-            _addressProviders = addressProviders;
+            _addressServiceGateway = addressServiceGateway;
         }
 
         public async Task<ProcessRequestEntity> ProcesssAddress(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -44,14 +47,6 @@ namespace form_builder.Services.AddressService
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
                 var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
-                var provider = _addressProviders.ToList()
-                    .Where(_ => _.ProviderName == addressElement.Properties.AddressProvider)
-                    .FirstOrDefault();
-
-                if (provider == null)
-                {
-                    throw new ApplicationException($"No address provider configure for {addressElement.Properties.AddressProvider}");
-                }
 
                 var postcode = journey == "Select"
                     ? (string) convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
@@ -85,8 +80,8 @@ namespace form_builder.Services.AddressService
 
                 try
                 {
-                    var result = await provider.SearchAsync(postcode);
-                    addressResults = result.ToList();
+                    var result = await _addressServiceGateway.SearchAsync(new AddressSearch { AddressProvider = (StockportGovUK.NetStandard.Models.Enums.EAddressProvider)System.Enum.Parse(typeof(StockportGovUK.NetStandard.Models.Enums.EAddressProvider), addressElement.Properties.AddressProvider), SearchTerm = postcode });
+                    addressResults = result.ResponseContent.ToList();
                 }
                 catch (Exception e)
                 {
