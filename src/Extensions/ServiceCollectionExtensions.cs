@@ -101,6 +101,12 @@ namespace form_builder.Extensions
 
             return services;
         }
+        public static IServiceCollection ConfigureAddressProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IAddressProvider, FakeAddressProvider>();
+            services.AddSingleton<IAddressProvider, CRMAddressProvider>();
+            return services;
+        }
 
         public static IServiceCollection ConfigureStreetProviders(this IServiceCollection services)
         {
