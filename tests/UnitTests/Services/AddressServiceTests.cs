@@ -1,6 +1,7 @@
 ﻿using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Providers.Address;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
 using form_builder.ViewModels;
@@ -23,11 +24,16 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
         private readonly Mock<IAddressServiceGateway> _addressServiceGateway = new Mock<IAddressServiceGateway>();
+        private readonly Mock<IAddressProvider> _addressProvider = new Mock<IAddressProvider>();
+
         public AddressServiceTests()
         {
+            _addressProvider.Setup(_ => _.ProviderName).Returns("testAddressProvider");
+
+            var addressProviderItems = new List<IAddressProvider> { _addressProvider.Object };
+
             _service = new AddressService(_mockDistributedCache.Object, _addressServiceGateway.Object, _pageHelper.Object);
         }
-
         [Theory(Skip = "WIP")]
         [InlineData(true, "Search")]
         public async Task ProcesssAddress_ShouldCallAddressProvider_WhenCorrectJourney(bool isValid, string journey)
@@ -80,7 +86,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcesssAddress(viewModel, page, schema, "", "page-one");
 
-            _addressServiceGateway.Verify(_ => _.SearchAsync(It.IsAny<AddressSearch>()), Times.Once);
+            _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
         }
 
 
@@ -137,7 +143,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcesssAddress(viewModel, page, schema, "", "page-one");
 
-            _addressServiceGateway.Verify(_ => _.SearchAsync(It.IsAny<AddressSearch>()), Times.Never);
+            _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact(Skip = "WIP")]
@@ -171,7 +177,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcesssAddress(viewModel, page, schema, "", "page-one");
 
-            _addressServiceGateway.Verify(_ => _.SearchAsync(It.IsAny<AddressSearch>()), Times.Once);
+            _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.ProcessAddressJourney("Search", It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
         }
 
@@ -204,7 +210,7 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssAddress(viewModel, page, schema, "", "page-one"));
-            _addressServiceGateway.Verify(_ => _.SearchAsync(It.IsAny<AddressSearch>()), Times.Never);
+            _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
             Assert.Equal($"No address provider configure for {addressProvider}", result.Message);
         }
 
@@ -212,7 +218,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcesssAddress_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
         {
 
-            _addressServiceGateway.Setup(_ => _.SearchAsync(It.IsAny<AddressSearch>()))
+            _addressProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
                 .Throws<Exception>();
 
             var searchResultsCallback = new List<AddressSearchResult>();
