@@ -5,6 +5,7 @@
     <AspNetCoreHostingModelV2>InProcess</AspNetCoreHostingModelV2>
     <RootNamespace>form_builder</RootNamespace>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 
   <ItemGroup>
