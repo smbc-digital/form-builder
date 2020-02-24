@@ -1,17 +1,16 @@
 ﻿using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
-using form_builder.Providers.Address;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.AddressService;
 using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUk.NetStandard.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using StockportGovUK.NetStandard.Models.Enums;
 
 namespace form_builder.Services.AddressService
 {
@@ -24,7 +23,6 @@ namespace form_builder.Services.AddressService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IPageHelper _pageHelper;
-        private readonly IEnumerable<IAddressProvider> _addressProviders;
         private readonly IAddressServiceGateway _addressServiceGateway;
 
         public AddressService(IDistributedCacheWrapper distributedCache, IAddressServiceGateway addressServiceGateway, IPageHelper pageHelper)
@@ -80,7 +78,7 @@ namespace form_builder.Services.AddressService
 
                 try
                 {
-                    var result = await _addressServiceGateway.SearchAsync(new AddressSearch { AddressProvider = (StockportGovUK.NetStandard.Models.Enums.EAddressProvider)System.Enum.Parse(typeof(StockportGovUK.NetStandard.Models.Enums.EAddressProvider), addressElement.Properties.AddressProvider), SearchTerm = postcode });
+                    var result = await _addressServiceGateway.SearchAsync(new AddressSearch { AddressProvider = (EAddressProvider)System.Enum.Parse(typeof(EAddressProvider), addressElement.Properties.AddressProvider), SearchTerm = postcode });
                     addressResults = result.ResponseContent.ToList();
                 }
                 catch (Exception e)
