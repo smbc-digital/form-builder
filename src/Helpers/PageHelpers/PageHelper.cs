@@ -36,6 +36,7 @@ namespace form_builder.Helpers.PageHelpers
         Task CheckForPaymentConfiguration(List<Page> pages, string formName);
         void CheckForEmptyBehaviourSlugs(List<Page> pages, string formName);
         void CheckForCurrentEnvironmentSubmitSlugs(List<Page> pages, string formName);
+        void CheckSubmitSlugsHaveAllProperties(List<Page> pages, string formName);
         void CheckForAcceptedFileUploadFileTypes(List<Page> pages, string formName);
     }
 
@@ -390,6 +391,46 @@ namespace form_builder.Helpers.PageHelpers
                     }
                 }
             }
+        }
+
+        public void CheckSubmitSlugsHaveAllProperties(List<Page> pages, string formName)
+        {
+            List<Behaviour> behaviours = new List<Behaviour>();
+
+            foreach (var page in pages)
+            {
+                if (page.Behaviours != null)
+                {
+                    foreach (var behaviour in page.Behaviours)
+                    {
+                        behaviours.Add(behaviour);
+                    }
+                }
+            }
+
+            foreach (var item in behaviours)
+            {
+                if (item.BehaviourType == EBehaviourType.SubmitForm || item.BehaviourType == EBehaviourType.SubmitAndPay)
+                {
+                    if (item.SubmitSlugs.Count > 0)
+                    {
+                        foreach (var subItem in item.SubmitSlugs)
+                        {
+                            if (string.IsNullOrEmpty(subItem.URL))
+
+                            {
+                                throw new ApplicationException($"No URL found in the SubmitSlug for {formName} form");
+                            }
+
+                            if (string.IsNullOrEmpty(subItem.AuthToken))
+                            {
+                                throw new ApplicationException($"No Auth Token found in the SubmitSlug for {formName} form");
+                            }
+                        }
+                    }
+                }
+            }
+
         }
 
         public void CheckForAcceptedFileUploadFileTypes(List<Page> pages, string formName)
