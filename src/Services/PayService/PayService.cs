@@ -95,8 +95,11 @@ namespace form_builder.Services.PayService
             }
             finally
             {
-                // clear out the payment session
-                _sessionHelper.RemoveSessionGuid();
+                if (_sessionHelper != null)
+                {
+                    // clear out the payment session
+                    _sessionHelper.RemoveSessionGuid();
+                }
             }
         }
 
