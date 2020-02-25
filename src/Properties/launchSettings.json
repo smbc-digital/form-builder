@@ -2,6 +2,10 @@
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost/form-builder",
+      "sslPort": 0
+    },
     "iisExpress": {
       "applicationUrl": "http://localhost:4877",
       "sslPort": 44360
@@ -10,7 +14,7 @@
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
     "IIS Express": {
-      "commandName": "IISExpress",
+      "commandName": "IIS",
       "launchBrowser": true,
       "launchUrl": "fileuploadwithdefault",
       "environmentVariables": {
@@ -18,7 +22,7 @@
       }
     },
     "form_builder": {
-      "commandName": "Project",
+      "commandName": "IIS",
       "launchBrowser": true,
       "launchUrl": "customer-pay",
       "environmentVariables": {

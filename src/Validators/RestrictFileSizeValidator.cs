@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -29,7 +30,7 @@ namespace form_builder.Validators
                 return new ValidationResult { IsValid = true };
             }
 
-            var maxFileSize = element.Properties.MaxFileSize > 0 ? element.Properties.MaxFileSize*1024000 : 5220000;
+            var maxFileSize = element.Properties.MaxFileSize > 0 ? element.Properties.MaxFileSize*1024000 : SystemConstants.DefaultMaxFileSize;
 
             if (documentModel.FileSize <= maxFileSize)
             {
