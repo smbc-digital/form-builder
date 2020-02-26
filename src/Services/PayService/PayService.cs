@@ -105,7 +105,7 @@ namespace form_builder.Services.PayService
 
         public async Task<PaymentInformation> GetFormPaymentInformation(string form)
         {
-            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>("paymentconfiguration", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
+            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_hostingEnvironment.EnvironmentName}", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
 
             var paymentInfo = paymentInformation.Select(x => x)
                .Where(c => c.FormName == form)
