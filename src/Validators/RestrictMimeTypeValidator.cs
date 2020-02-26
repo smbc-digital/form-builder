@@ -16,8 +16,6 @@ namespace form_builder.Validators
 
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            return new ValidationResult { IsValid = true };
-
             if (element.Type != EElementType.FileUpload)
             {
                 return new ValidationResult { IsValid = true };
