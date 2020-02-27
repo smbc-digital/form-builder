@@ -205,6 +205,7 @@ namespace form_builder.Services.PageService
                 formModel.Path = currentPage.PageSlug;
                 formModel.FormName = baseForm.FormName;
                 formModel.PageTitle = currentPage.Title;
+
                 return new ProcessRequestEntity
                 {
                     Page = currentPage,
