@@ -33,7 +33,8 @@ namespace form_builder.Models.Elements
                 { "id", Properties.QuestionId },
                 { "type", "file" },
                 { "accept", allowedFileType.Join(",") },
-                { "max-file-size", maxFileSize }
+                { "max-file-size", maxFileSize },
+                { "onchange", "ValidateSize(this)" }
             };
 
             if (DisplayAriaDescribedby)
