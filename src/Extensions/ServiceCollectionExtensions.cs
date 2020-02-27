@@ -58,8 +58,8 @@ namespace form_builder.Extensions
             services.AddTransient<IElementValidator, TimeInputValidator>();
             services.AddTransient<IElementValidator, MaxLengthValidator>();
             services.AddTransient<IElementValidator, AddressPostcodeValidator>();
-            services.AddTransient<IElementValidator, RestrictMimeTypeValidator>();
             services.AddTransient<IElementValidator, RestrictFileSizeValidator>();
+            services.AddTransient<IElementValidator, RestrictMimeTypeValidator>();
 
             return services;
         }
