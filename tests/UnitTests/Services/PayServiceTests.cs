@@ -70,6 +70,7 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             var behaviour = new BehaviourBuilder()
+                .WithCallbackUrl("Verint/paymentstatusupdate")
                 .WithBehaviourType(EBehaviourType.SubmitAndPay)
                 .WithSubmitSlug(submitSlug)
                 .Build();

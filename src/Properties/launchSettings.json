@@ -2,6 +2,10 @@
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost/form-builder",
+      "sslPort": 0
+    },
     "iisExpress": {
       "applicationUrl": "http://localhost:4877",
       "sslPort": 44360
@@ -18,7 +22,7 @@
       }
     },
     "form_builder": {
-      "commandName": "Project",
+      "commandName": "IIS",
       "launchBrowser": true,
       "launchUrl": "customer-pay",
       "environmentVariables": {

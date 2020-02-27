@@ -10,6 +10,7 @@ namespace form_builder_tests.Builders
         private EBehaviourType _behaviourType = EBehaviourType.GoToExternalPage;
         private string _PageSlug;
         private List<SubmitSlug> _submitSlugs = new List<SubmitSlug>();
+        private string _callbackUrl;
 
 
 
@@ -20,7 +21,8 @@ namespace form_builder_tests.Builders
                 BehaviourType = _behaviourType,
                 PageSlug = _PageSlug,
                 Conditions = _conditions,
-                SubmitSlugs = _submitSlugs
+                SubmitSlugs = _submitSlugs,
+                CallbackUrl = _callbackUrl
             };
         }
 
@@ -51,6 +53,12 @@ namespace form_builder_tests.Builders
         public BehaviourBuilder WithCondition(Condition condition)
         {
             _conditions.Add(condition);
+            return this;
+        }
+
+        public BehaviourBuilder WithCallbackUrl(string url)
+        {
+            _callbackUrl = url;
             return this;
         }
     }

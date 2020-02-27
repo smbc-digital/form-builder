@@ -67,7 +67,7 @@ namespace form_builder.Controllers
         public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData, IFormFile fileUpload)
         {
             var viewModel = formData.ToNormaliseDictionary();
-            
+
             if(fileUpload != null)
             {
                 viewModel.Add(fileUpload.Name, _fileHelper.ConvertFileToBase64StringWithFileName(fileUpload));

@@ -82,6 +82,7 @@ namespace form_builder.Services.StreetService
                 formModel.Path = currentPage.PageSlug;
                 formModel.StreetStatus = journey;
                 formModel.FormName = baseForm.FormName;
+                formModel.PageTitle = currentPage.Title;
 
                 return new ProcessRequestEntity
                 {

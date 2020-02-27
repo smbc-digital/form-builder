@@ -16,7 +16,6 @@ namespace form_builder.Validators
 
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-
             if (element.Type != EElementType.FileUpload)
             {
                 return new ValidationResult { IsValid = true };
@@ -47,8 +46,8 @@ namespace form_builder.Validators
                 }
             }
 
-            var fileTypesErrorMessage = allowedFileTypes.Count > 1 
-                ? string.Join(", ", allowedFileTypes.Take(allowedFileTypes.Count - 1)).ToUpper() + $" or {allowedFileTypes.Last().ToUpper()}" 
+            var fileTypesErrorMessage = allowedFileTypes.Count > 1
+                ? string.Join(", ", allowedFileTypes.Take(allowedFileTypes.Count - 1)).ToUpper() + $" or {allowedFileTypes.Last().ToUpper()}"
                 : allowedFileTypes.First().ToUpper();
 
             return new ValidationResult { IsValid = false, Message = $"The selected file must be a {fileTypesErrorMessage.Replace(".", string.Empty)}." };

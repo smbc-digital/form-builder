@@ -11,7 +11,7 @@ namespace form_builder.Validators
         {
 
             if (element.Type == EElementType.DateInput || element.Type == EElementType.TimeInput ||
-                element.Type == EElementType.AddressManual || element.Type == EElementType.DatePicker || 
+                element.Type == EElementType.AddressManual || element.Type == EElementType.DatePicker ||
                 element.Properties.Optional)
             {
                 return new ValidationResult
@@ -70,8 +70,6 @@ namespace form_builder.Validators
                     validationMessage = "Check the " + element.Properties.Label.ToLower() + " and try again";
                 }
             }
-
-            
 
             var isValid = true;
 
