@@ -66,12 +66,19 @@ namespace form_builder.Services.PayService
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
 
-            // Need access to the callback url here.
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
-            var url = currentPage.Behaviours.Find(behaviour => string.IsNullOrEmpty(behaviour.CallbackUrl))
-                .CallbackUrl;
-            //string url = "Verint/paymentstatusupdate";
+            string url;
+            try
+            {
+                url = currentPage.Behaviours.Find(behaviour => !string.IsNullOrEmpty(behaviour.CallbackUrl))
+                    .CallbackUrl;
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException("Callback url has not been specified", e.InnerException);
+            }
+
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
             try
             {
