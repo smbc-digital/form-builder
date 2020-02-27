@@ -811,18 +811,20 @@ Time example
   * Label (*string*) __*__
   * TargetMapping (*string*)
   * AllowedFileTypes (*Array[string]*) (Default: .png", .jpg", .jpeg, .pdf, .docx, .doc, .odt)
+  * MaxFileSize (*string*) in Mb
   
 
 FileUpload example
 
 ```json
-{
+        {
           "Type": "FileUpload",
           "Properties": {
             "QuestionId": "fileUpload",
             "Label": "Upload",
             "TargetMapping": "customer.file",
-            "AllowedFileTypes": [ ".jpg", ".png" ]
+            "AllowedFileTypes": [ ".jpg", ".png" ],
+            "MaxFileSize": "50"
           }
 
 ```
@@ -847,6 +849,7 @@ If it is a SubmitForm behaviour we have submitslugs which will (using the enviro
             },
             {
                 "Conditions": [],
+                "callbackUrl": "<url>",
                 "BehaviourType": "SubmitForm",
                 "PageSlug": "",
                 "SubmitSlugs": [
@@ -867,6 +870,10 @@ If it is a SubmitForm behaviour we have submitslugs which will (using the enviro
         ]
     }
 ```
+**callbackUrl**
+
+The callbackUrl property is used when third party systems are involved and logic has be performed on the receipt of a response from the third party system.
+In the current code base this is used when a call is made to invoke Civica Pay and the result outcome specifies whether the payment was successful or not. In this scenario we need the form to behave accordingly.
 
 
 Example where dependant on their answers to certain questions the form navigates to different pages (the questions don't need to have been answered on that page but can have been answered earlier in the form:
