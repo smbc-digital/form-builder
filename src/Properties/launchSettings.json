@@ -22,7 +22,7 @@
       }
     },
     "form_builder": {
-      "commandName": "IIS",
+      "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "customer-pay",
       "environmentVariables": {

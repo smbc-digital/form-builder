@@ -55,6 +55,7 @@ namespace form_builder.Services.SubmtiService
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
+            _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
             var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
             if (!response.IsSuccessStatusCode)
             {
