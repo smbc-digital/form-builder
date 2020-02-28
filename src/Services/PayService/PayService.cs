@@ -65,9 +65,20 @@ namespace form_builder.Services.PayService
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
+
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
-            string url = "Verint/paymentstatusupdate";
+            string url;
+            try
+            {
+                url = currentPage.Behaviours.Find(behaviour => !string.IsNullOrEmpty(behaviour.CallbackUrl))
+                    .CallbackUrl;
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException("Callback url has not been specified", e.InnerException);
+            }
+
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
             try
             {
@@ -95,14 +106,17 @@ namespace form_builder.Services.PayService
             }
             finally
             {
-                // clear out the payment session
-                _sessionHelper.RemoveSessionGuid();
+                if (_sessionHelper != null)
+                {
+                    // clear out the payment session
+                    _sessionHelper.RemoveSessionGuid();
+                }
             }
         }
 
         public async Task<PaymentInformation> GetFormPaymentInformation(string form)
         {
-            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>("paymentconfiguration", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
+            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_hostingEnvironment.EnvironmentName}", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
 
             var paymentInfo = paymentInformation.Select(x => x)
                .Where(c => c.FormName == form)

@@ -1050,7 +1050,6 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.CheckForAcceptedFileUploadFileTypes(pages, "end-point");
         }
 
-
         [Fact]
         public void CheckForAcceptedFileUploadFileTypes_ShouldNotThrowException_WhenNoFileUploadElementsExists()
         {
@@ -1074,6 +1073,136 @@ namespace form_builder_tests.UnitTests.Helpers
             pages.Add(page);
 
             _pageHelper.CheckForAcceptedFileUploadFileTypes(pages, "end-point");
+        }
+
+        [Fact]
+        public void CheckSubmitSlugsHaveAllProperties_ShouldThrowException_WhenAuthTokenIsNullOrEmptyAndBehaviourTypeIsNotSubmitPowerAutomate()
+        {
+            var pages = new List<Page>();
+
+            var submitSlugs = new SubmitSlug
+            {
+                URL = "test"
+            };
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlugs)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            pages.Add(page);
+
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckSubmitSlugsHaveAllProperties(pages, "test-form"));
+
+            Assert.Equal("No Auth Token found in the SubmitSlug for test-form form", result.Message);
+        }
+
+        [Fact]
+        public void CheckSubmitSlugsHaveAllProperties_ShouldNotThrowException_WhenAuthTokenIsNullOrEmptyAndBehaviourTypeIsSubmitPowerAutomate()
+        {
+            var pages = new List<Page>();
+
+            var submitSlugs = new SubmitSlug
+            {
+                URL = "test"
+            };
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitPowerAutomate)
+                .WithSubmitSlug(submitSlugs)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            pages.Add(page);
+
+            _pageHelper.CheckSubmitSlugsHaveAllProperties(pages, "test-form");
+        }
+
+        [Fact]
+        public void CheckSubmitSlugsHaveAllProperties_ShouldThrowException_WhenUrlIsNull()
+        {
+            var pages = new List<Page>();
+
+            var submitSlugs = new SubmitSlug
+            {
+                AuthToken = "this is auth token"
+            };
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlugs)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            pages.Add(page);
+
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckSubmitSlugsHaveAllProperties(pages, "test-form"));
+
+            Assert.Equal("No URL found in the SubmitSlug for test-form form", result.Message);
+        }
+
+        [Fact]
+        public void CheckSubmitSlugsHaveAllProperties_ShouldThrowException_WhenUrlIsEmpty()
+        {
+            var pages = new List<Page>();
+
+            var submitSlugs = new SubmitSlug
+            {
+                AuthToken = "this is auth token",
+                URL = ""
+            };
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlugs)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            pages.Add(page);
+
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckSubmitSlugsHaveAllProperties(pages, "test-form"));
+
+            Assert.Equal("No URL found in the SubmitSlug for test-form form", result.Message);
+        }
+
+        [Fact]
+        public void CheckSubmitSlugsHaveAllProperties_ShouldNotThrowException_WhenAuthTokenAndUrlAreNotNullOrEmpty()
+        {
+            {
+                var pages = new List<Page>();
+
+                var submitSlugs = new SubmitSlug
+                {
+                    AuthToken = "this is auth token",
+                    URL = "test"
+                };
+
+                var behaviour = new BehaviourBuilder()
+                    .WithBehaviourType(EBehaviourType.SubmitForm)
+                    .WithSubmitSlug(submitSlugs)
+                    .Build();
+
+                var page = new PageBuilder()
+                    .WithBehaviour(behaviour)
+                    .Build();
+
+                pages.Add(page);
+
+                _pageHelper.CheckSubmitSlugsHaveAllProperties(pages, "test-form");
+            }
         }
     }
 }

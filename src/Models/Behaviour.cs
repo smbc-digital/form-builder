@@ -9,6 +9,8 @@ namespace form_builder.Models
     {
         public List<Condition> Conditions { get; set; }
 
+        public string CallbackUrl { get; set; }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public EBehaviourType BehaviourType { get; set; }
 

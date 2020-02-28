@@ -22,13 +22,19 @@ namespace form_builder.Models.Elements
         public override Dictionary<string, dynamic> GenerateElementProperties()
         {
             var allowedFileType = Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
+            var maxFileSize = Properties.MaxFileSize > 0 ? Properties.MaxFileSize*1024000 : SystemConstants.DefaultMaxFileSize;
+            maxFileSize = maxFileSize > SystemConstants.DefaultMaxFileSize
+                ? SystemConstants.DefaultMaxFileSize
+                : Properties.MaxFileSize * 1024000;
 
             var properties = new Dictionary<string, dynamic>()
             {
                 { "name", Properties.QuestionId },
                 { "id", Properties.QuestionId },
-                { "type", "file" },               
-                { "accept", allowedFileType.Join(",") }
+                { "type", "file" },
+                { "accept", allowedFileType.Join(",") },
+                { "max-file-size", maxFileSize },
+                { "onchange", "ValidateSize(this)" }
             };
 
             if (DisplayAriaDescribedby)

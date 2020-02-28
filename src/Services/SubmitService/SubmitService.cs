@@ -8,9 +8,7 @@ using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
-using StockportGovUK.NetStandard.Gateways.ComplimentsComplaintsServiceGateway;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
 using form_builder.Extensions;
@@ -56,16 +54,6 @@ namespace form_builder.Services.SubmtiService
 
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
-
-            if (string.IsNullOrEmpty(submitSlug.URL))
-            {
-                throw new ApplicationException($"SubmitService::ProcessSubmission, No submission URL has been provided for FORM: { form }, ENVIRONMENT: { _environment.EnvironmentName }");
-            }
-
-            if (!string.IsNullOrEmpty(submitSlug.AuthToken))
-            {
-                _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
-            }
 
             var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
             if (!response.IsSuccessStatusCode)

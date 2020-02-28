@@ -100,6 +100,7 @@ namespace form_builder.Services.OrganisationService
                 formModel.Path = currentPage.PageSlug;
                 formModel.OrganisationStatus = journey;
                 formModel.FormName = baseForm.FormName;
+                formModel.PageTitle = currentPage.Title;
 
                 return new ProcessRequestEntity
                 {

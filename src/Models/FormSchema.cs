@@ -38,6 +38,7 @@ namespace form_builder.Models
             pageHelper.CheckForEmptyBehaviourSlugs(Pages, form);
             pageHelper.CheckForInvalidQuestionOrTargetMappingValue(Pages, form);
             pageHelper.CheckForCurrentEnvironmentSubmitSlugs(Pages, form);
+            pageHelper.CheckSubmitSlugsHaveAllProperties(Pages, form);
             await pageHelper.CheckForPaymentConfiguration(Pages, form);
             pageHelper.CheckForAcceptedFileUploadFileTypes(Pages, form);
         }

@@ -48,7 +48,8 @@ namespace form_builder
             services.AddTransient<ICache, form_builder.Cache.Cache>();
 
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()))
+                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
         }
 
