@@ -371,11 +371,11 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var item in behaviours)
             {
-                if (item.BehaviourType == EBehaviourType.SubmitForm || item.BehaviourType == EBehaviourType.SubmitAndPay)
+                if (item.BehaviourType == EBehaviourType.SubmitForm || item.BehaviourType == EBehaviourType.SubmitAndPay || item.BehaviourType == EBehaviourType.SubmitPowerAutomate)
                 {
                     if (item.SubmitSlugs.Count > 0)
                     {
-                        var foundEnviromentSubmitSlug = false;
+                       var foundEnviromentSubmitSlug = false;
                         foreach (var subItem in item.SubmitSlugs)
                         {
                             if (subItem.Environment.ToLower() == _enviroment.EnvironmentName.ToS3EnvPrefix().ToLower())
@@ -426,8 +426,7 @@ namespace form_builder.Helpers.PageHelpers
                             {
                                 if (string.IsNullOrEmpty(subItem.AuthToken))
                                 {
-                                    throw new ApplicationException(
-                                        $"No Auth Token found in the SubmitSlug for {formName} form");
+                                    throw new ApplicationException($"No Auth Token found in the SubmitSlug for {formName} form");
                                 }
                             }
                         }
