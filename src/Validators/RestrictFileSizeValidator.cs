@@ -38,7 +38,7 @@ namespace form_builder.Validators
             }
 
             return new ValidationResult
-                    {IsValid = false, Message = $"The selected file must less than {maxFileSize / 1024000} Mb"};
+                    {IsValid = false, Message = $"The selected file must smaller than {maxFileSize / 1024000} MB"};
         }
     }
 }
