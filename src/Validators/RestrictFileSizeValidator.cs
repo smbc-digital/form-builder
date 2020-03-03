@@ -30,7 +30,7 @@ namespace form_builder.Validators
                 return new ValidationResult { IsValid = true };
             }
 
-            var maxFileSize = element.Properties.MaxFileSize > 0 ? element.Properties.MaxFileSize*1024000 : SystemConstants.DefaultMaxFileSize;
+            var maxFileSize = element.Properties.MaxFileSize > 0 ? element.Properties.MaxFileSize * 1024000 : SystemConstants.DefaultMaxFileSize;
 
             if (documentModel.FileSize <= maxFileSize)
             {

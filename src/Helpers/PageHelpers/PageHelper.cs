@@ -417,7 +417,6 @@ namespace form_builder.Helpers.PageHelpers
                         foreach (var subItem in item.SubmitSlugs)
                         {
                             if (string.IsNullOrEmpty(subItem.URL))
-
                             {
                                 throw new ApplicationException($"No URL found in the SubmitSlug for {formName} form");
                             }
