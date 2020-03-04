@@ -849,21 +849,23 @@ If it is a SubmitForm behaviour we have submitslugs which will (using the enviro
             },
             {
                 "Conditions": [],
-                "callbackUrl": "<url>",
                 "BehaviourType": "SubmitForm",
                 "PageSlug": "",
                 "SubmitSlugs": [
                   {
                       "Location": "local",
-                      "URL": "https://localhost:44359/api/v1/home"
+                      "URL": "https://localhost:44359/api/v1/home",
+                      "callbackUrl": "<url>",
                   },
                   {
                        "Location": "Int",
-                       "URL": "http://scninthub-int1.stockport.gov.uk/formbuilderservice/api/v1/home"
+                       "URL": "http://scninthub-int1.stockport.gov.uk/formbuilderservice/api/v1/home",
+                       "callbackUrl": "<url>",
                    },
                    {
                         "Location": "QA",
-                        "URL": "http://scninthub-qa1.stockport.gov.uk/formbuilderservice/api/v1/home"
+                        "URL": "http://scninthub-qa1.stockport.gov.uk/formbuilderservice/api/v1/home",
+                        "callbackUrl": "<url>",
                     }
                     ]
             }
