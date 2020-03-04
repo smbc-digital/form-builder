@@ -2,7 +2,6 @@
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
-using form_builder.Providers.Street;
 using form_builder.Services.PageService.Entities;
 using form_builder.Services.StreetService;
 using form_builder_tests.Builders;
@@ -11,6 +10,9 @@ using StockportGovUK.NetStandard.Models.Addresses;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using StockportGovUK.NetStandard.Gateways.Response;
+using StockportGovUK.NetStandard.Gateways.StreetServiceGateway;
+using StockportGovUK.NetStandard.Models.Street;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
@@ -20,26 +22,22 @@ namespace form_builder_tests.UnitTests.Services
         private readonly StreetService _service;
         private readonly Mock<IDistributedCacheWrapper> _distributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IEnumerable<IStreetProvider>> _streetProviders = new Mock<IEnumerable<IStreetProvider>>();
-        private readonly Mock<IStreetProvider> _streetProvider = new Mock<IStreetProvider>();
+        private readonly Mock<IStreetServiceGateway> _streetServiceGateway = new Mock<IStreetServiceGateway>();
 
         private const string SearchResultsUniqueId = "123456";
         private const string SearchResultsReference = "Test street";
 
         public StreetServiceTests()
         {
-            _streetProvider.Setup(_ => _.ProviderName).Returns("testStreetProvider");
-
-            var addressProviderItems = new List<IStreetProvider> { _streetProvider.Object };
-            _streetProviders.Setup(m => m.GetEnumerator()).Returns(() => addressProviderItems.GetEnumerator());
-
-            _service = new StreetService(_distributedCache.Object, _streetProviders.Object, _pageHelper.Object);
+            _service = new StreetService(_distributedCache.Object, _streetServiceGateway.Object, _pageHelper.Object);
         }
 
         [Theory]
         [InlineData(true, "Search")]
         public async Task ProcessStreet_ShouldCallStreetProvider_WhenCorrectJourney(bool isValid, string journey)
         {
+            _streetServiceGateway.Setup(_ => _.SearchAsync(It.IsAny<StreetSearch>())).ReturnsAsync(new HttpResponse<IEnumerable<AddressSearchResult>> { ResponseContent = new List<AddressSearchResult> { new AddressSearchResult { UniqueId = SearchResultsUniqueId, Name = SearchResultsReference } } });
+
             var questionId = "test-street";
 
             var cacheData = new FormAnswers
@@ -67,7 +65,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                .WithType(EElementType.Street)
                .WithQuestionId(questionId)
-               .WithStreetProvider("testStreetProvider")
+               .WithStreetProvider("CRM")
                .Build();
 
             var page = new PageBuilder()
@@ -89,7 +87,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
 
-            _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _streetServiceGateway.Verify(_ => _.SearchAsync(It.IsAny<StreetSearch>()), Times.Once);
         }
 
         [Fact]
@@ -117,13 +115,13 @@ namespace form_builder_tests.UnitTests.Services
             };
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(Newtonsoft.Json.JsonConvert.SerializeObject(cacheData));
 
-            _streetProvider.Setup(_ => _.SearchAsync(It.IsAny<string>())).ReturnsAsync(new List<AddressSearchResult> { new AddressSearchResult { UniqueId = SearchResultsUniqueId, Name = SearchResultsReference } });
+            _streetServiceGateway.Setup(_ => _.SearchAsync(It.IsAny<StreetSearch>())).ReturnsAsync(new HttpResponse<IEnumerable<AddressSearchResult>>{ResponseContent = new List<AddressSearchResult> { new AddressSearchResult { UniqueId = SearchResultsUniqueId, Name = SearchResultsReference }} });
 
             var searchResultsCallback = new List<AddressSearchResult>();
             var element = new ElementBuilder()
                .WithType(EElementType.Street)
                .WithQuestionId(questionId)
-               .WithStreetProvider("testStreetProvider")
+               .WithStreetProvider("CRM")
                .Build();
 
             var page = new PageBuilder()
@@ -149,7 +147,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
 
-            _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _streetServiceGateway.Verify(_ => _.SearchAsync(It.IsAny<StreetSearch>()), Times.Once);
             _pageHelper.Verify(_ => _.ProcessStreetJourney(It.Is<string>(x => x == "Search"), It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
             Assert.NotNull(searchResultsCallback);
             Assert.Single(searchResultsCallback);
