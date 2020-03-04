@@ -726,7 +726,7 @@ Address example:
 #
   * <a name="Street">**Street**</a>
     * QuestionId (*string*) __*__
-    * StreetProvider (*string*) __*__ (FAKEStreet or CRMStreet)
+    * StreetProvider (*string*) __*__ (Fake or CRM)
     * StreetLabel (*string*) (Default: Search for a street)
     * Hint (*string*) (Hint message when a user is searching for a street)
     * SelectLabel (*string*) (Default: Street)
@@ -743,7 +743,7 @@ Street example:
             "StreetLabel": "Search for a street by name",
             "Hint": "e.g. 'Hibbert' or 'Hibbert Lane'",
             "SelectLabel": "Street",
-            "StreetProvider": "CRMStreet",
+            "StreetProvider": "CRM",
             "MaxLength": "20"
           }
     }
