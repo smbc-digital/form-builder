@@ -68,34 +68,28 @@ namespace form_builder.Services.PayService
 
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
-            string url;
-            try
+            if (String.IsNullOrWhiteSpace(postUrl.CallbackUrl))
             {
-                url = currentPage.Behaviours.Find(behaviour => !string.IsNullOrEmpty(behaviour.CallbackUrl))
-                    .CallbackUrl;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException("Callback url has not been specified", e.InnerException);
+                throw new ArgumentException("Callback url has not been specified");
             }
 
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
             try
             {
                 paymentProvider.VerifyPaymentResponse(responseCode);
-                var response = await _gateway.PostAsync(url,
+                var response = await _gateway.PostAsync(postUrl.CallbackUrl,
                     new {CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString()});
                 return reference;
             }
             catch (PaymentDeclinedException)
             {
-                var response = await _gateway.PostAsync(url,
+                var response = await _gateway.PostAsync(postUrl.CallbackUrl,
                     new {CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString()});
                 throw new PaymentDeclinedException("CivicaPayProvider::Declined payment");
             }
             catch (PaymentFailureException)
             {
-                var response = await _gateway.PostAsync(url,
+                var response = await _gateway.PostAsync(postUrl.CallbackUrl,
                     new {CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString()});
                 throw new PaymentFailureException("CivicaPayProvider::Failed payment");
             }
