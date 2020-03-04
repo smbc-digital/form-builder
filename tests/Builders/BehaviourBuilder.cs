@@ -21,8 +21,7 @@ namespace form_builder_tests.Builders
                 BehaviourType = _behaviourType,
                 PageSlug = _PageSlug,
                 Conditions = _conditions,
-                SubmitSlugs = _submitSlugs,
-                CallbackUrl = _callbackUrl
+                SubmitSlugs = _submitSlugs
             };
         }
 
@@ -53,12 +52,6 @@ namespace form_builder_tests.Builders
         public BehaviourBuilder WithCondition(Condition condition)
         {
             _conditions.Add(condition);
-            return this;
-        }
-
-        public BehaviourBuilder WithCallbackUrl(string url)
-        {
-            _callbackUrl = url;
             return this;
         }
     }

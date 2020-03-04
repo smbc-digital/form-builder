@@ -61,7 +61,8 @@ namespace form_builder_tests.UnitTests.Services
             {
                 AuthToken = "testToken",
                 Environment = "local",
-                URL = "customer-pay"
+                URL = "customer-pay",
+                CallbackUrl = "ddjshfkfjhk"
             };
 
             var formAnswers = new FormAnswers
@@ -70,7 +71,6 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             var behaviour = new BehaviourBuilder()
-                .WithCallbackUrl("Verint/paymentstatusupdate")
                 .WithBehaviourType(EBehaviourType.SubmitAndPay)
                 .WithSubmitSlug(submitSlug)
                 .Build();
