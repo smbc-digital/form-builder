@@ -5,7 +5,10 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Gateways.StreetServiceGateway;
 using StockportGovUK.NetStandard.Models.Addresses;
+using StockportGovUK.NetStandard.Models.Enums;
+using StockportGovUK.NetStandard.Models.Street;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,13 +25,13 @@ namespace form_builder.Services.StreetService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IPageHelper _pageHelper;
-        private readonly IEnumerable<IStreetProvider> _streetProviders;
+        private readonly IStreetServiceGateway _streetServiceGateway;
 
-        public StreetService(IDistributedCacheWrapper distributedCache, IEnumerable<IStreetProvider> streetProviders, IPageHelper pageHelper)
+        public StreetService(IDistributedCacheWrapper distributedCache, IStreetServiceGateway streetServiceGateway, IPageHelper pageHelper)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
-            _streetProviders = streetProviders;
+            _streetServiceGateway = streetServiceGateway;
         }
 
         public async Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -56,19 +59,21 @@ namespace form_builder.Services.StreetService
 
             if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
             {
-                var provider = _streetProviders.ToList()
-                    .Where(_ => _.ProviderName == streetElement.Properties.StreetProvider)
-                    .FirstOrDefault();
+                var provider = EStreetProvider.Unknown;
 
-                if (provider == null)
+                try
                 {
-                    throw new ApplicationException($"No street provider configure for {streetElement.Properties.AddressProvider}");
+                    provider = (EStreetProvider)System.Enum.Parse(typeof(EStreetProvider), streetElement.Properties.StreetProvider, true);
+                }
+                catch (Exception e)
+                {
+                    throw new ApplicationException($"No street provider configure for {streetElement.Properties.StreetProvider}");
                 }
 
                 try
                 {
-                    var result = await provider.SearchAsync(street);
-                    streetResults = result.ToList();
+                    var result = await _streetServiceGateway.SearchAsync(new StreetSearch { SearchTerm = street, StreetProvider = provider });
+                    streetResults = result.ResponseContent.ToList();
                 }
                 catch (Exception e)
                 {

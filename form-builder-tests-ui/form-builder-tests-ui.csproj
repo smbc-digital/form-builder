@@ -27,7 +27,7 @@
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="79.0.3945.3600-beta" />
     <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.0.225" />
     <PackageReference Include="SpecRun.SpecFlow" Version="3.0.391" />
-    <PackageReference Include="StockportGovUK.AspNetCore.Gateways" Version="0.9.9-prerelease97" />
+    <PackageReference Include="StockportGovUK.NetStandard.Gateways" Version="1.1.1-prerelease132" />
     <PackageReference Include="WireMock.Net" Version="1.0.36" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
