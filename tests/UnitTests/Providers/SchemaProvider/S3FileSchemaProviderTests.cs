@@ -3,6 +3,7 @@ using Amazon.S3.Model;
 using form_builder.Gateways;
 using form_builder.Providers.SchemaProvider;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -17,13 +18,15 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
         private readonly Mock<IS3Gateway> _mockS3gateway = new Mock<IS3Gateway>();
         private readonly Mock<ILogger<S3FileSchemaProvider>> _mockLogger = new Mock<ILogger<S3FileSchemaProvider>>();
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
+
+        private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
         private readonly Mock<StreamResponse> _mockStreamResponse = new Mock<StreamResponse>();
 
         public S3FileSchemaProviderTests()
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("uitest");
-
-            _s3Schema = new S3FileSchemaProvider(_mockS3gateway.Object, _mockLogger.Object, _mockHostingEnv.Object);
+            _mockConfiguration.Setup(_ => _["S3BucketKey"]).Returns("forms-storage");
+            _s3Schema = new S3FileSchemaProvider(_mockS3gateway.Object, _mockLogger.Object, _mockHostingEnv.Object, _mockConfiguration.Object);
         }
 
         [Fact]
