@@ -14,10 +14,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Gateways.Response;
-using StockportGovUK.NetStandard.Gateways.StreetServiceGateway;
 using StockportGovUK.NetStandard.Models.Enums;
-using StockportGovUK.NetStandard.Models.Street;
 using Xunit;
+using StockportGovUK.NetStandard.Models.Organisation;
+using StockportGovUK.NetStandard.Gateways.OrganisationServiceGateway;
 
 namespace form_builder_tests.UnitTests.Services
 {

@@ -9,9 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using StockportGovUK.NetStandard.Gateways.StreetServiceGateway;
 using StockportGovUK.NetStandard.Models.Enums;
-using StockportGovUK.NetStandard.Models.Street;
+using StockportGovUK.NetStandard.Gateways.OrganisationServiceGateway;
+using StockportGovUK.NetStandard.Models.Organisation;
 
 namespace form_builder.Services.OrganisationService
 {
@@ -91,7 +91,7 @@ namespace form_builder.Services.OrganisationService
                 {
                     var result = await _organisationServiceGateway.SearchAsync(new OrganisationSearch
                         {OrganisationProvider = provider, SearchTerm = searchTerm});
-                    organisationResults = result.ResponseContent.ToList();
+                    organisationResults = result.ResponseContent == null ? new List<OrganisationSearchResult>() : result.ResponseContent.ToList();
                 }
                 catch (Exception e)
                 {
