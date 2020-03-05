@@ -8,11 +8,9 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Mappers;
 using form_builder.Providers.Address;
-using form_builder.Providers.Organisation;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
-using form_builder.Providers.Street;
 using form_builder.Services.AddressService;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
@@ -109,23 +107,9 @@ namespace form_builder.Extensions
             return services;
         }
 
-        public static IServiceCollection ConfigureStreetProviders(this IServiceCollection services)
-        {
-            services.AddSingleton<IStreetProvider, FakeStreetProvider>();
-            services.AddSingleton<IStreetProvider, CRMStreetProvider>();
-            return services;
-        }
-
         public static IServiceCollection ConfigurePaymentProviders(this IServiceCollection services)
         {
             services.AddSingleton<IPaymentProvider, CivicaPayProvider>();
-            return services;
-        }
-
-        public static IServiceCollection ConfigureOrganisationProviders(this IServiceCollection services)
-        {
-            services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
-            services.AddSingleton<IOrganisationProvider, CRMOrganisationProvider>();
             return services;
         }
 

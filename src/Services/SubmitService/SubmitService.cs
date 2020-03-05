@@ -55,6 +55,15 @@ namespace form_builder.Services.SubmtiService
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
+            if (string.IsNullOrWhiteSpace(submitSlug.AuthToken))
+            {
+                _gateway.ChangeAuthenticationHeader(string.Empty);
+            }
+            else
+            {
+                _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
+            }
+
             var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
             if (!response.IsSuccessStatusCode)
             {
@@ -123,7 +132,11 @@ namespace form_builder.Services.SubmtiService
                 throw new ApplicationException($"SubmitService::PaymentSubmission, No submission URL has been provided for FORM: { form }, ENVIRONMENT: { _environment.EnvironmentName }");
             }
 
-            if (!string.IsNullOrEmpty(postUrl.AuthToken))
+            if (string.IsNullOrWhiteSpace(postUrl.AuthToken))
+            {
+                _gateway.ChangeAuthenticationHeader(string.Empty);
+            }
+            else
             {
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
             }

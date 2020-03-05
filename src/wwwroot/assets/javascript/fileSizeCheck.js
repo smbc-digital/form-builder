@@ -9,11 +9,11 @@
         if (validation !== null) {
             validation.remove();
         }
-        sizeValidation.style.visibility = "visible";
+        sizeValidation.style.display = "block";
         next.disabled = true;
         input.setAttribute("aria-describedby", "fileSizeError");
     } else {
-        sizeValidation.style.visibility = "hidden";
+        sizeValidation.style.display = "none";
         next.disabled = false;
         input.removeAttribute("aria-describedby");
     }

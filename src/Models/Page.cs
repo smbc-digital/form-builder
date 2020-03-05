@@ -42,7 +42,7 @@ namespace form_builder.Models
                 throw new System.Exception("Model is not validated, please call Validate()");
             }
         }
-       
+
         public IEnumerable<IElement> ValidatableElements => Elements.Where(element => element.Type == EElementType.Radio ||
                                                                element.Type == EElementType.Textarea ||
                                                                element.Type == EElementType.Select ||
@@ -130,8 +130,8 @@ namespace form_builder.Models
                     {
                         throw new NullReferenceException("HomeController, Submit: No Url supplied for submit form");
                     }
-                    submitBehaviour.URL = behaviour.URL;
-                    submitBehaviour.AuthToken = behaviour.AuthToken;
+
+                    submitBehaviour = behaviour;
                 }
             }
 

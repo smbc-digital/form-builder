@@ -726,7 +726,7 @@ Address example:
 #
   * <a name="Street">**Street**</a>
     * QuestionId (*string*) __*__
-    * StreetProvider (*string*) __*__ (FAKEStreet or CRMStreet)
+    * StreetProvider (*string*) __*__ (Fake or CRM)
     * StreetLabel (*string*) (Default: Search for a street)
     * Hint (*string*) (Hint message when a user is searching for a street)
     * SelectLabel (*string*) (Default: Street)
@@ -743,7 +743,7 @@ Street example:
             "StreetLabel": "Search for a street by name",
             "Hint": "e.g. 'Hibbert' or 'Hibbert Lane'",
             "SelectLabel": "Street",
-            "StreetProvider": "CRMStreet",
+            "StreetProvider": "CRM",
             "MaxLength": "20"
           }
     }
@@ -849,21 +849,23 @@ If it is a SubmitForm behaviour we have submitslugs which will (using the enviro
             },
             {
                 "Conditions": [],
-                "callbackUrl": "<url>",
                 "BehaviourType": "SubmitForm",
                 "PageSlug": "",
                 "SubmitSlugs": [
                   {
                       "Location": "local",
-                      "URL": "https://localhost:44359/api/v1/home"
+                      "URL": "https://localhost:44359/api/v1/home",
+                      "callbackUrl": "<url>",
                   },
                   {
                        "Location": "Int",
-                       "URL": "http://scninthub-int1.stockport.gov.uk/formbuilderservice/api/v1/home"
+                       "URL": "http://scninthub-int1.stockport.gov.uk/formbuilderservice/api/v1/home",
+                       "callbackUrl": "<url>",
                    },
                    {
                         "Location": "QA",
-                        "URL": "http://scninthub-qa1.stockport.gov.uk/formbuilderservice/api/v1/home"
+                        "URL": "http://scninthub-qa1.stockport.gov.uk/formbuilderservice/api/v1/home",
+                        "callbackUrl": "<url>",
                     }
                     ]
             }
