@@ -8,7 +8,6 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Mappers;
 using form_builder.Providers.Address;
-using form_builder.Providers.Organisation;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
@@ -111,13 +110,6 @@ namespace form_builder.Extensions
         public static IServiceCollection ConfigurePaymentProviders(this IServiceCollection services)
         {
             services.AddSingleton<IPaymentProvider, CivicaPayProvider>();
-            return services;
-        }
-
-        public static IServiceCollection ConfigureOrganisationProviders(this IServiceCollection services)
-        {
-            services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
-            services.AddSingleton<IOrganisationProvider, CRMOrganisationProvider>();
             return services;
         }
 

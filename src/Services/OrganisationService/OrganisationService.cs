@@ -1,16 +1,17 @@
 ﻿using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
-using form_builder.Providers.Organisation;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Verint;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using StockportGovUK.NetStandard.Gateways.StreetServiceGateway;
+using StockportGovUK.NetStandard.Models.Enums;
+using StockportGovUK.NetStandard.Models.Street;
 
 namespace form_builder.Services.OrganisationService
 {
@@ -23,13 +24,12 @@ namespace form_builder.Services.OrganisationService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IPageHelper _pageHelper;
-        private readonly IEnumerable<IOrganisationProvider> _organisationProviders;
-
-        public OrganisationService(IDistributedCacheWrapper distributedCache, IEnumerable<IOrganisationProvider> organisationProviders, IPageHelper pageHelper)
+        private readonly IOrganisationServiceGateway _organisationServiceGateway;
+        public OrganisationService(IDistributedCacheWrapper distributedCache, IOrganisationServiceGateway organisationServiceGateway, IPageHelper pageHelper)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
-            _organisationProviders = organisationProviders;
+            _organisationServiceGateway = organisationServiceGateway;
         }
 
         public async Task<ProcessRequestEntity> ProcesssOrganisation(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -45,14 +45,6 @@ namespace form_builder.Services.OrganisationService
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
                 var organisationElement = currentPage.Elements.Where(_ => _.Type == EElementType.Organisation).FirstOrDefault();
-                var provider = _organisationProviders.ToList()
-                    .Where(_ => _.ProviderName == organisationElement.Properties.OrganisationProvider)
-                    .FirstOrDefault();
-
-                if (provider == null)
-                {
-                    throw new ApplicationException($"OrganisationService.ProcesssOrganisation:: No address provider configure for {organisationElement.Properties.OrganisationProvider}");
-                }
 
                 var searchTerm = journey == "Select"
                     ? (string)convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{organisationElement.Properties.QuestionId}-organisation-searchterm").Response
@@ -83,10 +75,23 @@ namespace form_builder.Services.OrganisationService
                     };
                 }
 
+                var provider = EOrganisationProvider.Unknown;
+
                 try
                 {
-                    var result = await provider.SearchAsync(searchTerm);
-                    organisationResults = result.ToList();
+                    provider = (EOrganisationProvider) System.Enum.Parse(typeof(EOrganisationProvider),
+                        organisationElement.Properties.OrganisationProvider, true);
+                }
+                catch (Exception e)
+                {
+                    throw new ApplicationException($"No organisation provider configured for {organisationElement.Properties.OrganisationProvider}");
+                }
+
+                try
+                {
+                    var result = await _organisationServiceGateway.SearchAsync(new OrganisationSearch
+                        {OrganisationProvider = provider, SearchTerm = searchTerm});
+                    organisationResults = result.ResponseContent.ToList();
                 }
                 catch (Exception e)
                 {

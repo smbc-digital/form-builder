@@ -1,7 +1,6 @@
 ﻿using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
-using form_builder.Providers.Organisation;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.OrganisationService;
 using form_builder.ViewModels;
@@ -12,7 +11,12 @@ using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using StockportGovUK.NetStandard.Gateways.Response;
+using StockportGovUK.NetStandard.Gateways.StreetServiceGateway;
+using StockportGovUK.NetStandard.Models.Enums;
+using StockportGovUK.NetStandard.Models.Street;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
@@ -20,24 +24,27 @@ namespace form_builder_tests.UnitTests.Services
     public class OrganisationServiceTests
     {
         private readonly OrganisationService _service;
+        private OrganisationSearch _searchModel;
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IEnumerable<IOrganisationProvider>> _mockOrganisationProvider = new Mock<IEnumerable<IOrganisationProvider>>();
-        private readonly Mock<IOrganisationProvider> _organisationProvider = new Mock<IOrganisationProvider>();
+        private readonly Mock<IOrganisationServiceGateway> _organisationServiceGateway = new Mock<IOrganisationServiceGateway>();
 
         public OrganisationServiceTests()
         {
-            _organisationProvider.Setup(_ => _.ProviderName).Returns("testOrgProvider");
+            _service = new OrganisationService(_mockDistributedCache.Object, _organisationServiceGateway.Object, _pageHelper.Object);
 
-            var organisationProviderItems = new List<IOrganisationProvider> { _organisationProvider.Object };
-            _mockOrganisationProvider.Setup(m => m.GetEnumerator()).Returns(() => organisationProviderItems.GetEnumerator());
-
-            _service = new OrganisationService(_mockDistributedCache.Object, _mockOrganisationProvider.Object, _pageHelper.Object);
+            _searchModel = new OrganisationSearch
+            {
+                SearchTerm = "test",
+                OrganisationProvider = EOrganisationProvider.Fake
+            };
         }
 
         [Fact]
         public async Task ProcesssOrganisation_ShouldCallOrganisationProvider_WhenCorrectJourney()
         {
+            _organisationServiceGateway.Setup(_ => _.SearchAsync(It.IsAny<OrganisationSearch>())).ReturnsAsync(new HttpResponse<IEnumerable<OrganisationSearchResult>>{ResponseContent = new List<OrganisationSearchResult>{new OrganisationSearchResult{Reference = "test", Address = "test", Name = "test"}}});
+
             var questionId = "test-org";
 
             var cacheData = new FormAnswers
@@ -65,7 +72,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                .WithType(EElementType.Organisation)
                .WithQuestionId(questionId)
-               .WithOrganisationProvider("testOrgProvider")
+               .WithOrganisationProvider(EOrganisationProvider.Fake.ToString())
                .Build();
 
             var page = new PageBuilder()
@@ -87,7 +94,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one");
 
-            _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _organisationServiceGateway.Verify(_ => _.SearchAsync(It.IsAny<OrganisationSearch>()), Times.Once);
         }
 
         [Fact]
@@ -143,16 +150,18 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one");
 
-            _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
+            _organisationServiceGateway.Verify(_ => _.SearchAsync(_searchModel), Times.Never);
         }
 
         [Fact]
         public async Task ProcesssOrganisation_ShouldCall_PageHelper_ToProcessSearchResults()
         {
+            _organisationServiceGateway.Setup(_ => _.SearchAsync(It.IsAny<OrganisationSearch>())).ReturnsAsync(new HttpResponse<IEnumerable<OrganisationSearchResult>>{ResponseContent = new List<OrganisationSearchResult>{new OrganisationSearchResult{Reference = "test", Address = "test", Name = "test"}}});
+
             var element = new ElementBuilder()
                .WithType(EElementType.Organisation)
                .WithQuestionId("test-org")
-               .WithOrganisationProvider("testOrgProvider")
+               .WithOrganisationProvider(EOrganisationProvider.Fake.ToString())
                .Build();
 
             var page = new PageBuilder()
@@ -177,54 +186,18 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one");
 
-            _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _organisationServiceGateway.Verify(_ => _.SearchAsync(It.IsAny<OrganisationSearch>()), Times.Once);
             _pageHelper.Verify(_ => _.ProcessOrganisationJourney("Search", It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Once);
         }
 
         [Fact]
-        public async Task ProcesssOrganisation_Application_ShouldThrowApplicationException_WhenNoMatchingOrganisationProvider()
+        public async Task ProcesssOrganisation_Application_ShouldThrowApplicationException_WhenOrganisationProvider_ThrowsException()
         {
-            var organisationProvider = "NON-EXIST-PROVIDER";
-            var searchResultsCallback = new List<StockportGovUK.NetStandard.Models.Verint.Organisation>();
+            _organisationServiceGateway.Setup(gateway => gateway.SearchAsync(It.IsAny<OrganisationSearch>())).Throws<Exception>();
+
             var element = new ElementBuilder()
                .WithType(EElementType.Organisation)
-               .WithOrganisationProvider(organisationProvider)
-               .WithQuestionId("test-org")
-               .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .WithValidatedModel(true)
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                { "Guid", Guid.NewGuid().ToString() },
-                { "OrganisationStatus", "Search" },
-                { $"{element.Properties.QuestionId}-organisation-searchterm", "searchTerm" },
-            };
-
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one"));
-            _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            Assert.Equal($"OrganisationService.ProcesssOrganisation:: No address provider configure for {organisationProvider}", result.Message);
-        }
-
-        [Fact]
-        public async Task ProcesssOrganisation_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
-        {
-
-            _organisationProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
-                .Throws<Exception>();
-
-            var searchResultsCallback = new List<AddressSearchResult>();
-            var element = new ElementBuilder()
-               .WithType(EElementType.Organisation)
-               .WithOrganisationProvider("testOrgProvider")
+               .WithOrganisationProvider(EOrganisationProvider.Fake.ToString())
                .WithQuestionId("test-address")
                .Build();
 
@@ -242,12 +215,11 @@ namespace form_builder_tests.UnitTests.Services
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "OrganisationStatus", "Search" },
-                { $"{element.Properties.QuestionId}-organisation-searchterm", "searchTerm" },
+                { $"{element.Properties.QuestionId}-organisation-searchterm", _searchModel.SearchTerm },
             };
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one"));
-
-            _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _organisationServiceGateway.Verify(_ => _.SearchAsync(It.IsAny<OrganisationSearch>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Never);
             Assert.StartsWith($"OrganisationService.ProcesssOrganisation:: An exception has occured while attempting to perform organisation lookup, Exception: ", result.Message);
         }
