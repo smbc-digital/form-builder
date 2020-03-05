@@ -21,6 +21,8 @@ namespace form_builder.Models.Elements
 
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
+            
+
             var postcodeKey = $"{Properties.QuestionId}-postcode";
             
             var viewElement = new ElementViewModel
@@ -38,7 +40,7 @@ namespace form_builder.Models.Elements
            
             if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
             {
-                Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
+                Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
 
                 viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
                 viewElement.ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";

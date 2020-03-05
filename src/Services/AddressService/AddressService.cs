@@ -36,6 +36,7 @@ namespace form_builder.Services.AddressService
         {
             var journey = (string)viewModel["AddressStatus"];
             var addressResults = new List<AddressSearchResult>();
+            var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
 
             if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
             {
@@ -44,8 +45,7 @@ namespace form_builder.Services.AddressService
                     ? new FormAnswers { Pages = new List<PageAnswers>() }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-                var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
-
+               
                 var postcode = journey == "Select"
                     ? (string) convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
                     : (string) viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
@@ -56,7 +56,6 @@ namespace form_builder.Services.AddressService
 
                 var emptyPostcode = string.IsNullOrEmpty(postcode);
                 var emptyAddress = string.IsNullOrEmpty(address);
-                var truthstatement = emptyPostcode ^ emptyAddress;
 
                 if (currentPage.IsValid && addressElement.Properties.Optional && emptyPostcode)
                 {
@@ -104,6 +103,7 @@ namespace form_builder.Services.AddressService
             }
 
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null);
+            _pageHelper.SaveFormData($"{addressElement.Properties.QuestionId}-srcount", addressResults.Count, guid);
             return await _pageHelper.ProcessAddressJourney(journey, currentPage, viewModel, baseForm, guid, addressResults);
         }
     }

@@ -21,6 +21,13 @@
             Address details
         </label>
     </legend>
+    
+    @Model.Element.Properties.DisplayNoResults
+    
+    <div class="user-search-term">
+        <p><strong>Postcode: </strong>@Model.Element.Properties.Value </p>
+        <a class="back-button" href="@Model.ManualAddressURL">Change</a>
+    </div>
 
     @if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
     {
@@ -52,5 +59,4 @@
         <p class="input-error-content" id="@postcodeErrorId">@errorMessages[2]</p>
     }
 
-    <p><a href="@Model.ManualAddressURL">Search by postcode</a></p>
 </fieldset>
