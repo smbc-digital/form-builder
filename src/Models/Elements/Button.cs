@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
+using form_builder.Constants;
 
 namespace form_builder.Models.Elements
 {
@@ -19,7 +20,7 @@ namespace form_builder.Models.Elements
 
         public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            var viewData = new Dictionary<string, dynamic> { { "displayAnchor", !CheckForStartPageSlug(formSchema, page) }, { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) } };
+            var viewData = new Dictionary<string, dynamic> { { "displayAnchor", !CheckForStartPageSlug(formSchema, page) }, { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) }, { "buttonText", GetButtonText(page.Elements, viewModel, page) } };
 
             return viewRender.RenderAsync("Button", this, viewData);
         }
@@ -36,7 +37,7 @@ namespace form_builder.Models.Elements
 
         private bool CheckForStreetAddress(List<IElement> element, Dictionary<string, dynamic> viewModel)
         {
-            bool isStreetAddress = element.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.Street);
+            var isStreetAddress = element.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.Street);
 
             if (isStreetAddress && (viewModel.ContainsKey("AddressStatus") || viewModel.ContainsKey("StreetStatus")))
             {
@@ -54,6 +55,19 @@ namespace form_builder.Models.Elements
             }
 
             return false;
+        }
+
+        private string GetButtonText(List<IElement> element, Dictionary<string, dynamic> viewModel, Page page)
+        {
+            var containsAddressElement = element.Any(_ => _.Type == EElementType.Address);
+
+            if (containsAddressElement && 
+                (!viewModel.ContainsKey("AddressStatus") || !page.IsValid && viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Search"))
+            {
+                return SystemConstants.AddressSearchButtonText;
+            }
+
+            return string.IsNullOrEmpty(Properties.Text) ? SystemConstants.NextStepButtonText : Properties.Text;
         }
     }
 }

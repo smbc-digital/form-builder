@@ -61,6 +61,10 @@ fieldset.input-memorable-date, fieldset.input-time {
     flex-grow: 0.2;
 }
 
+.user-search-term > p > strong {
+    padding-right: 5px;
+}
+
 @media only screen and (max-width: 767px) {
     ol .indented-list {
         margin-left: 25px;

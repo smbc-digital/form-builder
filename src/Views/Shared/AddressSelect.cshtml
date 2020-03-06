@@ -9,22 +9,24 @@
 }
 
 @await Html.BeginFieldSet(Model.Item1.Element, "-address")
+
+<legend>
+</legend>
+
 <div class="user-search-term">
     <p><strong>Postcode: </strong>@Model.Item1.Element.Properties.Value </p>
     <a class="back-button" href="@Model.Item1.ReturnURL">Change</a>
 </div>
 
-<legend>
-    <label @Model.Item1.Element.WriteOptional() for="@questionId">@Model.Item1.Element.Properties.AddressLabel</label>
-    @if (Model.Item1.Element.Properties.Optional)
-    {
-        <span class="optional">(optional)</span>
-    }
-</legend>
-
 @if (!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectHint))
 {
     <p id=@hintId>@Html.Raw(Model.Item1.Element.Properties.SelectHint)</p>
+}
+
+<label @Model.Item1.Element.WriteOptional() for="@questionId">@Model.Item1.Element.Properties.AddressLabel</label>
+@if (Model.Item1.Element.Properties.Optional)
+{
+    <span class="optional">(optional)</span>
 }
 
 <select id="@questionId" name="@questionId">

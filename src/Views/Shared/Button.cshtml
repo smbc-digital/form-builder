@@ -2,7 +2,7 @@
 @{
     var showSpinner = (bool)ViewData["showSpinner"];
     var displayAnchor = (bool)ViewData["displayAnchor"];
-    var text = string.IsNullOrEmpty(Model.Properties.Text) ? "Next step" : Model.Properties.Text;
+    var text = (string)ViewData["buttonText"];
     var className = string.IsNullOrEmpty(Model.Properties.ClassName) ? "button-primary" : Model.Properties.ClassName;
     var spinnerButton = showSpinner ? $"onclick=spinnerButton('{@Model.Properties.ButtonId}');" : null;
 }

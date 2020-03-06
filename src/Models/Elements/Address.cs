@@ -21,8 +21,6 @@ namespace form_builder.Models.Elements
 
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            
-
             var postcodeKey = $"{Properties.QuestionId}-postcode";
             
             var viewElement = new ElementViewModel

@@ -32,6 +32,14 @@ namespace form_builder.Models.Elements
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             SetAddressProperties(viewModel);
+
+            if (viewModel.ContainsKey("AddressStatus"))
+            {
+                viewModel.Remove("AddressStatus");
+            };
+
+            viewModel.Add("AddressStatus", "Manual");
+
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
             var searchResultsCount =  elementHelper.GetFormDataValue(guid, $"{Properties.QuestionId}-srcount");
 
@@ -40,7 +48,7 @@ namespace form_builder.Models.Elements
             if (isValid && output == 0)
             {
 
-                Properties.DisplayNoResults = true;
+                Properties.DisplayNoResultsIAG = true;
             }
 
             var viewElement = new ElementViewModel
