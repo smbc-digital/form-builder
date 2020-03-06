@@ -3,7 +3,7 @@
 @pagecontent
 Scenario: Render information on the page correctly
 	Given I navigate to "/pagecontent/page1"
-	Then I should see a "h1" element with "Page content" text
+	Then I should see a "h1" element with "page1" text
 	And I should see a "h2" element with "This is a H2" text
 	And I should see a "h3" element with "This is a H3" text
 	And I should see a "h4" element with "This is a H4" text
