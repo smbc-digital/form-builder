@@ -3,12 +3,8 @@ Feature: AddressManual
 	In order to collect address information I have to navigate to Page1
 
 Scenario: Address Manual element standard use
-	Given I navigate to "/address/page1"
+	Given I navigate to "/address/page1/manual"
 	Then I should see the header
-	And I should see the "customersaddress-postcode" input
-	And I should see the "manual" link
-	And I should see the "nextStep" button
-	Then  I click the manual link
 	Then I should see the "customersaddress-AddressManualAddressLine1" input
 	Then I should see the "customersaddress-AddressManualAddressLine2" input
 	Then I should see the "customersaddress-AddressManualAddressTown" input
