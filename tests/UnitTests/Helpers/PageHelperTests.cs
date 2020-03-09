@@ -82,6 +82,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public async Task GenerateHtml_ShouldRenderH1Element_WithBaseformName()
         {
             var page = new PageBuilder()
+                .WithPageTitle("Page title")
                 .Build();
             var viewModel = new Dictionary<string, dynamic>();
             var schema = new FormSchemaBuilder()
@@ -90,7 +91,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "H1"), It.Is<Element>(x => x.Properties.Text == "form-name"), It.IsAny<Dictionary<string, object>>()));
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "H1"), It.Is<Element>(x => x.Properties.Text == "Page title"), It.IsAny<Dictionary<string, object>>()));
         }
 
         [Theory]
