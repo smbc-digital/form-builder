@@ -16,7 +16,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "addressdesign",
+      "launchUrl": "fileupload",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       }
