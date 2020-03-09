@@ -14,5 +14,6 @@ namespace form_builder.Models
         public string Path { get; set; }
         public string CaseReference {get;set;}
         public List<PageAnswers> Pages { get; set; }
+        public Dictionary<string, object> FormData { get; set; } = new Dictionary<string, object>();
     }
 }

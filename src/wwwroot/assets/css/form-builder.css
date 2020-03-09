@@ -53,9 +53,20 @@ fieldset.input-memorable-date, fieldset.input-time {
     position: relative;
 }
 
-@media only screen and (max-width: 767px) {
+.user-search-term {
+    display: flex; 
+}
 
-    ol.indented-list {
+.user-search-term > p {
+    flex-grow: 0.2;
+}
+
+.user-search-term > p > strong {
+    padding-right: 5px;
+}
+
+@media only screen and (max-width: 767px) {
+    ol .indented-list {
         margin-left: 25px;
     }
 
@@ -66,6 +77,10 @@ fieldset.input-memorable-date, fieldset.input-time {
 
     .ampm {
         width:100%;
+    }
+
+    .user-search-term > p{
+        flex-grow: 0.5;
     }
 }
 
