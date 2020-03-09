@@ -19,6 +19,8 @@ namespace form_builder.Models.Elements
             Type = EElementType.AddressManual;
         }
 
+      
+
         protected void SetAddressProperties(Dictionary<string, dynamic> viewModel)
         {
             Properties.AddressManualAddressLine1 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine1")).Value;
@@ -30,11 +32,30 @@ namespace form_builder.Models.Elements
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             SetAddressProperties(viewModel);
+
+            if (viewModel.ContainsKey("AddressStatus"))
+            {
+                viewModel.Remove("AddressStatus");
+            };
+
+            viewModel.Add("AddressStatus", "Manual");
+
+            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
+            var searchResultsCount =  elementHelper.GetFormDataValue(guid, $"{Properties.QuestionId}-srcount");
+
+            var isValid = int.TryParse(searchResultsCount.ToString(), out int output);
+
+            if (isValid && output == 0)
+            {
+
+                Properties.DisplayNoResultsIAG = true;
+            }
+
             var viewElement = new ElementViewModel
             {
                 Element = this,
                 ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
-            };
+        };
 
             return await viewRender.RenderAsync(Type.ToString(), viewElement);
         }

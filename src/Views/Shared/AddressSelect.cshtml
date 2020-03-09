@@ -10,19 +10,23 @@
 
 @await Html.BeginFieldSet(Model.Item1.Element, "-address")
 
-<p><a class="back-button" href="@Model.Item1.ReturnURL">Change</a></p>
-
 <legend>
-    <label @Model.Item1.Element.WriteOptional() for="@questionId">@Model.Item1.Element.Properties.AddressLabel</label>
-    @if (Model.Item1.Element.Properties.Optional)
-    {
-        <span class="optional">(optional)</span>
-    }
 </legend>
+
+<div class="user-search-term">
+    <p><strong>Postcode: </strong>@Model.Item1.Element.Properties.Value </p>
+    <a class="back-button" href="@Model.Item1.ReturnURL">Change</a>
+</div>
 
 @if (!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectHint))
 {
     <p id=@hintId>@Html.Raw(Model.Item1.Element.Properties.SelectHint)</p>
+}
+
+<label @Model.Item1.Element.WriteOptional() for="@questionId">@Model.Item1.Element.Properties.AddressLabel</label>
+@if (Model.Item1.Element.Properties.Optional)
+{
+    <span class="optional">(optional)</span>
 }
 
 <select id="@questionId" name="@questionId">
@@ -40,5 +44,5 @@
         <p class="input-error-content" id="@errorId">@validationMessage</p>
     }
 }
-<p><a href="@Model.Item1.ManualAddressURL">Enter the address manually</a></p>
+<p><a href="@Model.Item1.ManualAddressURL">I cannot find my address in the list</a></p>
 @await Html.EndFieldSet()

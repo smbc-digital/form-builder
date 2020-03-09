@@ -4,6 +4,7 @@ using form_builder.Providers.StorageProvider;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace form_builder.Helpers.ElementHelpers
 {
@@ -21,6 +22,7 @@ namespace form_builder.Helpers.ElementHelpers
         void ReSelectPreviousSelectedOptions(Element element);
         void ReCheckPreviousRadioOptions(Element element);
         bool CheckForProvider(Element element);
+        object GetFormDataValue(string guid, string key);
     }
 
     public class ElementHelper : IElementHelper
@@ -171,6 +173,20 @@ namespace form_builder.Helpers.ElementHelpers
             }
 
             return true;
+        }
+
+        public object GetFormDataValue(string guid, string key)
+        {
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+
+            if (!string.IsNullOrEmpty(formData))
+            {
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+            }
+
+            return convertedAnswers.FormData.ContainsKey(key) ? convertedAnswers.FormData.GetValueOrDefault(key) : string.Empty;
         }
     }
 }
