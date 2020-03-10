@@ -9,7 +9,7 @@ namespace form_builder.Services.FileUploadService
 {
     public interface IFileUploadService
     {
-        Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IFormFileCollection fileUpload);
+        Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IFormFileCollection fileUpload, string form, string path);
         FormAnswers CollectAnswers(FormAnswers currentPageAnswers, IFormFileCollection files,
             Dictionary<string, dynamic> viewModel);
     }

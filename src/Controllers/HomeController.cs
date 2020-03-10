@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using form_builder.Enum;
 using System.Threading.Tasks;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using form_builder.Services.PageService;
 using form_builder.Extensions;
@@ -36,7 +38,7 @@ namespace form_builder.Controllers
         [Route("{form}/{path}")]
         public async Task<IActionResult> Index(string form, string path)
         {
-            
+
             var response = await _pageService.ProcessPage(form, path);
             if (response.ShouldRedirect)
             {
@@ -78,7 +80,7 @@ namespace form_builder.Controllers
             {
                 if (fileUpload.Any())
                 {
-                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
+                    viewModel = _fileUploadService.AddFiles(viewModel, fileUpload, form, path);
                 }
             }
 
