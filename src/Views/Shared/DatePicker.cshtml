@@ -8,7 +8,7 @@
 
 @await Html.BeginFieldSet(Model, classes)
 <legend>
-    <label @Model.WriteOptional()>@Model.Properties.Label</label>
+    <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
     @if (Model.Properties.Optional)
     {
         <span class="optional">(optional)</span>
@@ -16,9 +16,6 @@
 </legend>
 <p id="@hintId">@Model.Properties.Hint</p>
 <div>
-    <label for="@Model.Properties.QuestionId">
-        Date
-    </label>
      @Html.TextBox(Model.Properties.QuestionId, Model.Properties.Date, Model.GenerateElementProperties())
 </div>
 

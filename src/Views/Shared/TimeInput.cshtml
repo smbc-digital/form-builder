@@ -28,7 +28,7 @@
         Hours
     </label>
 
-    @Html.TextBox(hoursid, Model.Properties.Hours, new { maxLength = "2", type = "number", pattern="[0-9]*", min = "1", max = "12" })
+    @Html.TextBox(hoursid, Model.Properties.Hours, new { maxLength = "2", type = "number", pattern="[0-9]*", min = "1", max = "12", style = "width:3em"})
 </div>
 <div class="colon-divider">:</div>
 <div>
@@ -36,7 +36,7 @@
         Minutes
     </label>
 
-    @Html.TextBox(minutesid, Model.Properties.Minutes, new { maxLength = "2", type = "number", pattern="[0-9]*", min = "0", max = "59"})
+    @Html.TextBox(minutesid, Model.Properties.Minutes, new { maxLength = "2", type = "number", pattern="[0-9]*", min = "0", max = "59", style = "width:3em"})
 </div>
 <div class="ampm">
     <div class="input-radio-container horizontal">
@@ -48,7 +48,7 @@
         {
             <input type="radio" name="@amPmName" id="@amid" value="am" />
         }
-        <label for="@amid">AM</label>
+        <label for="@amid">am</label>
     </div>
     <div class="input-radio-container horizontal">
         @if (Model.Properties.AmPm.ToLower() == "pm")
@@ -60,7 +60,7 @@
             <input type="radio" name="@amPmName" id="@pmid" value="pm" />
         }
 
-        <label for="@pmid">PM</label>
+        <label for="@pmid">pm</label>
     </div>
 </div>
 @if (!Model.IsValid)
