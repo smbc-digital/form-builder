@@ -36,6 +36,7 @@ namespace form_builder.Controllers
         [Route("{form}/{path}")]
         public async Task<IActionResult> Index(string form, string path)
         {
+            
             var response = await _pageService.ProcessPage(form, path);
             if (response.ShouldRedirect)
             {

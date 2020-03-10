@@ -536,7 +536,11 @@ namespace form_builder_tests.UnitTests.Helpers
                         {
                             new Answers
                             {
-                                QuestionId = questionId
+                                QuestionId = questionId,
+                                Response = new FileUploadModel
+                                {
+                                    
+                                }
                             }
                         }
                     }

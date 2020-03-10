@@ -5,6 +5,7 @@ using form_builder.Helpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace form_builder.Services.FileUploadService
 {
@@ -14,19 +15,19 @@ namespace form_builder.Services.FileUploadService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
-        public FileUploadService(IFileHelper fileHelper, IDistributedCacheWrapper distributedCache, 
-            DistributedCacheExpirationConfiguration distributedCacheExpirationConfiguration)
+        public FileUploadService(IFileHelper fileHelper, IDistributedCacheWrapper distributedCache,
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
             _fileHelper = fileHelper;
             _distributedCache = distributedCache;
-            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration;
+            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
         public Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IFormFileCollection fileUpload)
         {
-            for (int i = 0; i < fileUpload.Count; i++)
+            for (int files = 0; files < fileUpload.Count; files++)
             {
-                viewModel.Add(fileUpload[i].Name + $"_{i}", _fileHelper.ConvertFileToBase64StringWithFileName(fileUpload[i]));
+                viewModel.Add(fileUpload[files].Name + $"_{files}", _fileHelper.ConvertFileToBase64StringWithFileName(fileUpload[files]));
             }
             return viewModel;
         }
