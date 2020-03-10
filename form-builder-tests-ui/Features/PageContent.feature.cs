@@ -78,7 +78,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 5
  testRunner.Given("I navigate to \"/pagecontent/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 6
- testRunner.Then("I should see a \"h1\" element with \"Page content\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see a \"h1\" element with \"page1\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 7
  testRunner.And("I should see a \"h2\" element with \"This is a H2\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 8

@@ -68,10 +68,12 @@ namespace form_builder.Helpers.PageHelpers
         public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
+            
             if (page.PageSlug.ToLower() != "success")
             {
-                formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = baseForm.FormName } });
+                formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
             }
+
             formModel.FeedbackForm = baseForm.FeedbackForm;
 
             foreach (var element in page.Elements)
