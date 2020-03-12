@@ -106,7 +106,3 @@ fieldset.input-memorable-date, fieldset.input-time {
 ::-webkit-clear-button {
     display: none;
 }
-
-.input-date-picker .SingleDatePicker .SingleDatePickerInput__withBorder input, .input-memorable-date div input[type=number], input, textarea {
-    display: inline;
-}
