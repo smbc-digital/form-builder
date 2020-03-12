@@ -76,11 +76,12 @@ namespace form_builder.Mappers
 
                 if (fileData == null)
                 {
-                    throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {key} from the distrbuted cache");
+                    throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {key} from the distributed cache");
                 };
 
                 model.Content = fileData;
                 model.FileName = uploadModel.FileName;
+                model.OriginalFileName = uploadModel.OriginalFileName;
 
                 return model;
             }

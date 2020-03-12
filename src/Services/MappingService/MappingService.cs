@@ -13,7 +13,6 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Models.FileManagement;
-using StockportGovUK.NetStandard.Models.Models.FileManagement;
 
 namespace form_builder.Services.MappingService
 {
@@ -65,7 +64,7 @@ namespace form_builder.Services.MappingService
             FilePack pack = new FilePack
             {
                 Files = data,
-                Name = formSchema.FormName
+                Name = formSchema.FormName,
             };
 
             return pack;

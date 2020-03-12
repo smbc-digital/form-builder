@@ -59,7 +59,8 @@ namespace form_builder.Services.FileUploadService
                     FileUploadModel model = new FileUploadModel
                     {
                         FileName = viewModel[fileName].FileName,
-                        Key = fileKey
+                        Key = fileKey,
+                        OriginalFileName = files[fileCount].FileName
                     };
 
                     if (finalAnswers.Answers.Exists(_ => _.QuestionId == fileName))
