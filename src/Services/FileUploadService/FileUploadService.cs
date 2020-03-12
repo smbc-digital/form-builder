@@ -46,32 +46,27 @@ namespace form_builder.Services.FileUploadService
 
         public FormAnswers CollectAnswers(FormAnswers currentPageAnswers, IFormFileCollection files, Dictionary<string,dynamic> viewModel)
         {
-            if (files.Any())
+            for (int fileCount = 0; fileCount < files.Count(); fileCount++)
             {
-                for (int fileCount = 0; fileCount < files.Count(); fileCount++)
+                var finalAnswers = currentPageAnswers.Pages
+                    .FirstOrDefault(_ => _.PageSlug == viewModel["Path"].ToLower());
+                if (finalAnswers != null)
                 {
-                    var finalAnswers = currentPageAnswers.Pages
-                        .FirstOrDefault(_ => _.PageSlug == viewModel["Path"].ToLower());
+                    var fileName = $"{finalAnswers.Answers[fileCount].QuestionId}"; // this is needed to get the filename
+                    var fileKey = $"file-{fileName}"; // this is the key for storing in the cache
 
-                    var file = files[fileCount];
-                    if (finalAnswers != null)
+                    _distributedCache.SetStringAsync(fileKey, viewModel[fileName].Content, _distributedCacheExpirationConfiguration.FileUpload);
+                    FileUploadModel model = new FileUploadModel
                     {
-                        var fileName = $"{finalAnswers.Answers[fileCount].QuestionId}"; // this is needed to get the filename
-                        var fileKey = $"file-{fileName}"; // this is the key for storing in the cache
+                        FileName = viewModel[fileName].FileName,
+                        Key = fileKey
+                    };
 
-                        _distributedCache.SetStringAsync(fileKey, viewModel[fileName].Content, _distributedCacheExpirationConfiguration.FileUpload);
-                        FileUploadModel model = new FileUploadModel
-                        {
-                            FileName = viewModel[fileName].FileName,
-                            Key = fileKey
-                        };
-
-                        if (finalAnswers.Answers.Exists(_ => _.QuestionId == fileName))
-                        {
-                            var fileUploadQuestion = finalAnswers.Answers.First(_ => _.QuestionId == fileName);
-                            finalAnswers.Answers.Remove(fileUploadQuestion);
-                        }
-                        finalAnswers.Answers.Add(new Answers { QuestionId = fileName, Response = model });
+                    if (finalAnswers.Answers.Exists(_ => _.QuestionId == fileName))
+                    {
+                        var fileUploadAnswer = finalAnswers.Answers.FirstOrDefault(_ => _.QuestionId == fileName);
+                        if (fileUploadAnswer != null)
+                            fileUploadAnswer.Response = model;
                     }
                 }
             }

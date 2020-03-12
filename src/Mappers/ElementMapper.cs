@@ -17,7 +17,7 @@ namespace form_builder.Mappers
     {
         private readonly IDistributedCacheWrapper _distributedCacheWrapper;
         private readonly ILogger<ElementMapper> _logger;
-        
+
         public ElementMapper(ILogger<ElementMapper> logger,IDistributedCacheWrapper distributedCacheWrapper)
         {
             _distributedCacheWrapper = distributedCacheWrapper;
@@ -62,6 +62,7 @@ namespace form_builder.Mappers
 
         private object GetFileUploadElementValue(string key, FormAnswers formAnswers)
         {
+            key = $"fileUpload_{key}";
             var model = new File();
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == key)

@@ -54,9 +54,9 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly IFileUploadService _fileUploadService;
 
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, 
-            IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache, 
-            IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, 
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
+            IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache,
+            IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
             IEnumerable<IPaymentProvider> paymentProviders, IFileUploadService fileUploadService)
         {
             _viewRender = viewRender;
@@ -121,7 +121,9 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.Path = viewModel["Path"];
             convertedAnswers.FormName = form;
 
-            convertedAnswers = _fileUploadService.CollectAnswers(convertedAnswers, file, viewModel);
+            if (file.Any())
+                convertedAnswers = _fileUploadService.CollectAnswers(convertedAnswers, file, viewModel);
+
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
