@@ -72,29 +72,9 @@ namespace form_builder.Services.MappingService
 
         private IDictionary<string, dynamic> RecursiveCheckAndCreate(string targetMapping, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
         {
-            if(element.Type == EElementType.FileUpload)
-            {
-                var target = element.Properties.TargetMapping;
-                object objectValue;
-                if (obj.TryGetValue(target, out objectValue))
-                {
-                    var files = (List<File>)objectValue;
-                    obj.Remove(target);
-                    var value = _elementMapper.GetAnswerValue(element, formAnswers);
-                    files.Add((File)value);
-                    obj.Add(target, files);
-
-                }
-                else
-                {
-                    var files = new List<File>();
-                    files.Add((File)_elementMapper.GetAnswerValue(element, formAnswers));
-                    obj.Add(target, files);
-                }
-
-                return obj;
-
-            }
+            var recursiveCheckAndCreate = CheckAndCreateForFileUpload(element, formAnswers, obj);
+            if (recursiveCheckAndCreate != null)
+                return recursiveCheckAndCreate;
 
             var splitTargets = targetMapping.Split(".");
 
@@ -121,6 +101,31 @@ namespace form_builder.Services.MappingService
 
             obj.Remove(splitTargets[0]);
             obj.Add(splitTargets[0], subObject);
+
+            return obj;
+        }
+
+        private IDictionary<string, dynamic> CheckAndCreateForFileUpload(IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
+        {
+            if (element.Type == EElementType.FileUpload)
+            {
+                var target = element.Properties.TargetMapping;
+                object objectValue;
+                if (obj.TryGetValue(target, out objectValue))
+                {
+                    var files = (List<File>) objectValue;
+                    obj.Remove(target);
+                    var value = _elementMapper.GetAnswerValue(element, formAnswers);
+                    files.Add((File) value);
+                    obj.Add(target, files);
+                }
+                else
+                {
+                    var files = new List<File>();
+                    files.Add((File) _elementMapper.GetAnswerValue(element, formAnswers));
+                    obj.Add(target, files);
+                }
+            }
 
             return obj;
         }

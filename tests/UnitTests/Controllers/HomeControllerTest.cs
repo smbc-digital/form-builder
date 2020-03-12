@@ -4,6 +4,7 @@ using Xunit;
 using Moq;
 using System.Threading.Tasks;
 using System;
+using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using form_builder.Enum;
 using form_builder_tests.Builders;
@@ -483,18 +484,17 @@ namespace form_builder_tests.UnitTests.Controllers
             _paymentWorkflow.Setup(_ => _.Submit(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync("https://www.return.url");
 
-            var fileCollection = new Dictionary<string, dynamic>();
-            var file = new Mock<FormFile>();
-            file.Setup(_ => _.Name).Returns("fileName");
-            fileCollection.Add("fileName", file.Object);
+            var collection = new FormFileCollection();
+            var file = new FormFile(Stream.Null, 0, 0, "fileName", "fileName");
+            collection.Add(file);
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
                 .Build();
 
-            await _homeController.Index("form", "page-one", viewModel, (IFormFileCollection)fileCollection);
+            await _homeController.Index("form", "page-one", viewModel, collection);
 
-            _mockFileHelper.Verify(_ => _.ConvertFileToBase64StringWithFileName(It.IsAny<IFormFile>()), Times.Once);
+            _pageService.Verify(service => service.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, object>>(), collection, false), Times.AtLeastOnce);
         }
     }
 }
