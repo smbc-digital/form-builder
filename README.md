@@ -26,6 +26,7 @@
         "FormName": "",
         "BaseURL": "",
         "StartPageSlug": "",
+        "HideTitle": ,
         "FeedbackForm": "https://stockportcouncil.typeform.com/to/yzIJEe",
         "Pages": [
           {
@@ -48,6 +49,7 @@
 **Pages**[*object*]:
 
 * **PageSlug** (*string*) - The slug for a page after the BaseURL e.g. stockport.gov.uk/{BaseURL}/{PageSlug}
+* **HideTitle** (*bool*) - This will hide the page title when set to true
 * **Title** (*string*) - The Title is used within the browser tab along with the form name e.g. Page 1 - Contact us - Stockport Council
 * **Elements**[*object*]- List of HTML elements to display on page
 * [Behaviours[*object*]](#pagebehaviours) - List of conditionals & page redirects for the page
