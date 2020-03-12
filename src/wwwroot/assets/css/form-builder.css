@@ -106,3 +106,8 @@ fieldset.input-memorable-date, fieldset.input-time {
 ::-webkit-clear-button {
     display: none;
 }
+
+#timeinput {
+    display: inline;
+}
+
