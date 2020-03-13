@@ -42,11 +42,11 @@
     <div class="input-radio-container horizontal">
         @if (Model.Properties.AmPm.ToLower() == "am")
         {
-            <input accesskeytype="radio" name="@amPmName" id="@amid" value="am" checked />
+            <input type="radio" name="@amPmName" id="@amid" value="am" checked />
         }
         else
         {
-            <input class="radiotime" type="radio" name="@amPmName" id="@amid" value="am" />
+            <input type="radio" name="@amPmName" id="@amid" value="am" />
         }
         <label for="@amid">am</label>
     </div>
