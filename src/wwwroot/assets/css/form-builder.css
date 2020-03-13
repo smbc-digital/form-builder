@@ -107,7 +107,7 @@ fieldset.input-memorable-date, fieldset.input-time {
     display: none;
 }
 
-#timeinput {
+.timeinput {
     display: inline;
 }
 
