@@ -64,10 +64,12 @@ namespace form_builder.Services.SubmtiService
                 _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
             }
 
+            var data = JsonConvert.SerializeObject(mappingEntity.Data);
+
             var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
             if (!response.IsSuccessStatusCode)
             {
-                throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occured while attempting to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occurred while attempting to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             }
 
             if (response.Content != null)

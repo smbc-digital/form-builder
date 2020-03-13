@@ -490,7 +490,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public void SaveAnswers_ShouldSaveFileUpload_WithinDistrbutedCache_OnSeperateKey()
         {
-            var questionId = "testFileQuestionId";
+            var questionId = "fileUpload_testFileQuestionId";
             var fileContent = "abc";
 
             var collection = new FormFileCollection();
@@ -498,7 +498,11 @@ namespace form_builder_tests.UnitTests.Helpers
             fileMock.Setup(_ => _.Name).Returns(questionId);
             collection.Add(fileMock.Object);
 
-            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+            var allTheAnswers = new FormAnswers {Path = "page-one", Pages = new List<PageAnswers>()};
+            var mockData = JsonConvert.SerializeObject(allTheAnswers);
+
+            _mockFileUploadService.Setup(service => service.CollectAnswers(It.IsAny<FormAnswers>(),
+                It.IsAny<IFormFileCollection>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(allTheAnswers);
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
@@ -509,16 +513,14 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection);
 
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"file-{questionId}"), It.Is<string>(x => x == fileContent), It.Is<int>(x => x == 60), It.IsAny<CancellationToken>()), Times.Once);
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), CancellationToken.None), Times.Once);
         }
 
         [Fact]
         public void SaveAnswers_ShouldSaveFilUploadReference_WithinFormAnswers_InDistributedCache()
         {
             var callbackCacheProvider = string.Empty;
-            var questionId = "testFileQuestionId";
+            var questionId = "fileUpload_testFileQuestionId";
             var fileContent = "abc";
 
             var collection = new FormFileCollection();
@@ -539,7 +541,9 @@ namespace form_builder_tests.UnitTests.Helpers
                                 QuestionId = questionId,
                                 Response = new FileUploadModel
                                 {
-                                    
+                                    Key = questionId,
+                                    FileName = $"file-{questionId}",
+                                    OriginalFileName = "file.txt"
                                 }
                             }
                         }
@@ -568,14 +572,14 @@ namespace form_builder_tests.UnitTests.Helpers
 
             Assert.Equal(questionId, callbackModel.Pages[0].Answers[0].QuestionId);
             var fileUploadModel = JsonConvert.DeserializeObject<FileUploadModel>(callbackModel.Pages[0].Answers[0].Response.ToString());
-            Assert.Equal($"file-{questionId}", fileUploadModel.Key);
+            Assert.Equal(questionId, fileUploadModel.Key);
         }
 
         [Fact]
         public void SaveAnswers_ShouldReplaceFilUploadReference_WithinFormAnswers_IfAnswerAlreadyExists_InDistributedCache()
         {
             var callbackCacheProvider = string.Empty;
-            var questionId = "testFileQuestionId";
+            var questionId = "fileUpload_testFileQuestionId";
             var fileName = "replace-me.txt";
             var fileContent = "abc";
 
@@ -584,13 +588,33 @@ namespace form_builder_tests.UnitTests.Helpers
             fileMock.Setup(_ => _.Name).Returns(questionId);
             collection.Add(fileMock.Object);
 
-            var mockData = JsonConvert.SerializeObject(new FormAnswers
+            var allTheAnswers = new FormAnswers
             {
                 Path = "page-one",
                 Pages = new List<PageAnswers>
-                { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers>
-                    { new Answers { QuestionId = questionId, Response = new FileUploadModel { } } } } }
-            });
+                {
+                    new PageAnswers
+                    {
+                        PageSlug = "page-one", Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                QuestionId = questionId, Response = new FileUploadModel
+                                {
+                                    Key = questionId,
+                                    FileName = $"file-{questionId}",
+                                    OriginalFileName = fileName
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var mockData = JsonConvert.SerializeObject(allTheAnswers);
+
+            _mockFileUploadService.Setup(service => service.CollectAnswers(It.IsAny<FormAnswers>(),
+                It.IsAny<FormFileCollection>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(allTheAnswers);
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
@@ -607,8 +631,8 @@ namespace form_builder_tests.UnitTests.Helpers
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
             Assert.Equal(questionId, callbackModel.Pages[0].Answers[0].QuestionId);
-            var fileUploadModel = JsonConvert.DeserializeObject<FileUploadModel>(callbackModel.Pages[0].Answers[0].Response.ToString());
-            Assert.Equal(fileName, fileUploadModel.FileName);
+            FileUploadModel fileUploadModel = JsonConvert.DeserializeObject<FileUploadModel>(callbackModel.Pages[0].Answers[0].Response.ToString());
+            Assert.Equal(fileName, fileUploadModel.OriginalFileName);
         }
 
         [Fact]

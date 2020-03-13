@@ -49,7 +49,7 @@ namespace form_builder.Services.MappingService
             {
                 Data = CreatePostData(convertedAnswers, baseForm),
                 BaseForm = baseForm,
-                FormAnswers = convertedAnswers
+                FormAnswers = convertedAnswers,
             };
         }
 
@@ -61,20 +61,13 @@ namespace form_builder.Services.MappingService
                 .ToList()
                 .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
 
-            FilePack pack = new FilePack
-            {
-                Files = data,
-                Name = formSchema.FormName,
-            };
-
-            return pack;
+            return data;
         }
 
         private IDictionary<string, dynamic> RecursiveCheckAndCreate(string targetMapping, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
         {
-            var recursiveCheckAndCreate = CheckAndCreateForFileUpload(element, formAnswers, obj);
-            if (recursiveCheckAndCreate != null)
-                return recursiveCheckAndCreate;
+            if (element.Type == EElementType.FileUpload)
+                return CheckAndCreateForFileUpload(element, formAnswers, obj);
 
             var splitTargets = targetMapping.Split(".");
 

@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Services.FileUploadService;
 
@@ -121,10 +122,11 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.Path = viewModel["Path"];
             convertedAnswers.FormName = form;
 
-            if (file.Any())
-                convertedAnswers = _fileUploadService.CollectAnswers(convertedAnswers, file, viewModel);
+            if (file != null)
+                if (file.Any())
+                    convertedAnswers = _fileUploadService.CollectAnswers(convertedAnswers, file, viewModel);
 
-            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
         }
 
         public async Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
