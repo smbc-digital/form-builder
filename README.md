@@ -699,13 +699,14 @@ Date Picker example:
     * AddressProvider (*string*) __*__
     * PostcodeLabel (*string*) __*__
     * AddressLabel (*string*) __*__
+    * AddressManualLabel (*string*) __*__
     * Hint (*string*) (hint which appears above the postcode input)
     * SelectHint (*string*) (hint which appears above the select input)
     * MaxLength (*string*)
     * Optional (*boolean*)
     * CustomValidationMessage (*string*) (Set a custom validation message for when user does not enter a postode) There is automatic validation there is not a valid postcode.
     * SelectCustomValidationMessage (*string*) (Set a custom validation message for when user does not select an address from the             dropdown)
-    * TargetMapping (*string*)  
+    * TargetMapping (*string*)
 
 Address example:
 ```json
