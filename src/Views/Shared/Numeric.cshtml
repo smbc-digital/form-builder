@@ -13,23 +13,17 @@
 }
 
 @await Html.BeginFieldSet(Model, classes)
-<legend>
-    <label @Model.WriteOptional()>@Model.Properties.Label</label>
-    @if (Model.Properties.Optional)
-    {
-        <span class="optional">(optional)</span>
-    }
-</legend>
-<p id="@hintId">@Model.Properties.Hint</p>
-<div>
-    <label for="@Model.Properties.QuestionId">
-        Number
-    </label>
-    <input type="number" id="@id" name="@id" max="@max" min="@min" value="@Model.Properties.Value" />
-</div>
+    <partial name="Legend" model="@Model">
+    <p id="@hintId">@Model.Properties.Hint</p>
+    <div>
+        <label for="@Model.Properties.QuestionId">
+            Number
+        </label>
+        <input type="number" id="@id" name="@id" max="@max" min="@min" value="@Model.Properties.Value" />
+    </div>
 
-@if (!Model.IsValid)
-{
-    <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
-}
+    @if (!Model.IsValid)
+    {
+        <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
+    }
 @await Html.EndFieldSet()

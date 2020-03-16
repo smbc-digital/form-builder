@@ -6,9 +6,10 @@
     var max = Model.Properties.Max ?? string.Empty;
     var min = Model.Properties.Min ?? string.Empty;
     var id = Model.Properties.QuestionId;
+    var tag = Model.Properties.LegendAsH1 ? "h1" : "label";
 }
 
-<label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+<@Html.Raw(tag) @Model.WriteHtmlForAndClassAttribute()>@Model.Properties.Label</@Html.Raw(tag)>
 
 @if (Model.Properties.Optional)
 {
@@ -21,7 +22,7 @@
 }
 @if (Model.Properties.Numeric)
 {
-    <input type="number" id="@id" name="@id" max="@max" min="@min" value="@Model.Properties.Value" maxlength="@Model.Properties.MaxLength.ToString()"/>
+    <input type="number" id="@id" name="@id" max="@max" min="@min" value="@Model.Properties.Value" maxlength="@Model.Properties.MaxLength.ToString()" />
 }
 else
 {

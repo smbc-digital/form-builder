@@ -3,9 +3,10 @@
     var questionId = $"{Model.Element.Properties.QuestionId}-organisation-searchterm";
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
+    var tag = Model.Element.Properties.LegendAsH1 ? "h1" : "label";
 }
 
-<label @Model.Element.WriteOptional() for="@questionId">@Model.Element.Properties.Label</label>
+<@Html.Raw(tag) @Model.Element.WriteHtmlForAndClassAttribute("-organisation-searchterm")>@Model.Element.Properties.Label</@Html.Raw(tag)>
 
 @if (Model.Element.Properties.Optional)
 {

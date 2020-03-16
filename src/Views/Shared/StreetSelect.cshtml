@@ -8,6 +8,8 @@
     var errorId = $"{questionId}-error";
     var streetSearchCount = $"{Model.Item2.Count} streets found";
     var streetSelectLabel = string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectLabel) ? "Street" : Model.Item1.Element.Properties.SelectLabel;
+    var legendViewData = new ViewDataDictionary(this.ViewData) { { "Label", streetSelectLabel }, { "QuestionIdPrefix", "-streetaddress" } };
+
 }
 
 @await Html.BeginFieldSet(Model.Item1.Element, "-streetaddress")
@@ -15,30 +17,24 @@
 <p>Search term: <strong id="street-fragment">@Model.Item1.Element.Properties.Value</strong> <a class="back-button" href="@Model.Item1.ReturnURL">Change</a></p>
 @Html.Hidden(hiddenId,@Model.Item1.Element.Properties.Value)
 
-<legend>
-    <label @Model.Item1.Element.WriteOptional() for="@questionId">@streetSelectLabel</label>
-    @if (Model.Item1.Element.Properties.Optional)
-    {
-        <span class="optional">(optional)</span>
-    }
-</legend>
+    <partial name="Legend" model="@Model.Item1.Element" view-data="legendViewData">
 
-<p id=@hintId>Choose a street</p>
+    <p id=@hintId>Choose a street</p>
 
-<select id="@questionId" name="@questionId">
-    <option value="">@streetSearchCount</option>
-    @for (var i = 0; i < Model.Item2.Count; i++)
-    {
-        <option value="@Model.Item2[i].UniqueId|@Model.Item2[i].Name">@Model.Item2[i].Name</option>
-    }
-</select>
+    <select id="@questionId" name="@questionId">
+        <option value="">@streetSearchCount</option>
+        @for (var i = 0; i < Model.Item2.Count; i++)
+        {
+            <option value="@Model.Item2[i].UniqueId|@Model.Item2[i].Name">@Model.Item2[i].Name</option>
+        }
+    </select>
 
-@if (!Model.Item1.Element.IsValid)
-{
+    @if (!Model.Item1.Element.IsValid)
     {
-        var validationMessage = string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectCustomValidationMessage) ? Model.Item1.Element.ValidationMessage : Model.Item1.Element.Properties.SelectCustomValidationMessage;
-        <p class="input-error-content" id="@errorId">@validationMessage</p>
+        {
+            var validationMessage = string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectCustomValidationMessage) ? Model.Item1.Element.ValidationMessage : Model.Item1.Element.Properties.SelectCustomValidationMessage;
+            <p class="input-error-content" id="@errorId">@validationMessage</p>
+        }
     }
-}
 
 @await Html.EndFieldSet()

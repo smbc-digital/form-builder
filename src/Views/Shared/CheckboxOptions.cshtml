@@ -25,7 +25,7 @@
         {
             <input type="checkbox" value="@item.Value" name="@itemName" id="@itemId" aria-describedby="@itemHint"/>
         }
-        <label @Model.WriteOptional() for="@itemId">@item.Text</label>
+        <label @Model.WriteHtmlForAndClassAttribute()>@item.Text</label>
         @if (!string.IsNullOrWhiteSpace(item.Hint))
         {
             <span class="radio-sub-label" id="@itemHint">@item.Hint</span>

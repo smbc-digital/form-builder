@@ -6,7 +6,7 @@
     var streetLabel = string.IsNullOrEmpty(Model.Properties.StreetLabel) ? "Search for a street" : Model.Properties.StreetLabel;
 }
 
-<label @Model.WriteOptional() for="@questionId">@streetLabel</label>
+<label @Model.WriteHtmlForAndClassAttribute("-street")>@streetLabel</label>
 
 @if (Model.Properties.Optional)
 {
