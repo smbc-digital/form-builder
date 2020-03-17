@@ -152,6 +152,17 @@ namespace form_builder.Models.Elements
             return data;
         }
 
+        public string WriteOptional(string prefix = "")
+        {
+            if (DisplayOptional)
+            {
+                return "class = optional";
+
+            }
+
+            return null;
+        }
+
         public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             return viewRender.RenderAsync(Type.ToString(), this, null);

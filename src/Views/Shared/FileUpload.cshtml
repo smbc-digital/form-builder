@@ -2,10 +2,15 @@
 @{
     var hintId = $"{Model.Properties.QuestionId}-hint";
     var errorId = $"{Model.Properties.QuestionId}-error";
-    var tag = Model.Properties.LegendAsH1 ? "h1" : "label";
 }
 
-<@Html.Raw(tag) @Model.WriteHtmlForAndClassAttribute()>@Model.Properties.Label</@Html.Raw(tag)>
+@if(Model.Properties.LabelAsH1) {
+    <h1>
+        <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+    </h1>
+} else {
+    <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+}
 
 @if (Model.Properties.Optional)
 {
