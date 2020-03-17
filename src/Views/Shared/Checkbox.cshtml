@@ -5,9 +5,15 @@
     var errorId = $"{Model.Properties.QuestionId}-error";
 }
 
-
 @await Html.BeginFieldSet(Model)
-    <partial name="Legend" model="@Model">
+
+    @if(Model.Properties.LegendAsH1) {
+        <h1>
+            <label @Model.WriteOptional()>@Model.Properties.Label</label>
+        </h1>
+    } else {
+        <label @Model.WriteOptional()>@Model.Properties.Label</label>
+    }
 
     @if (!string.IsNullOrEmpty(Model.Properties.Hint))
     {
