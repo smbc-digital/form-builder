@@ -6,12 +6,16 @@
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
     var addresSearchCount = $"{Model.Item2.Count} addresses found";
-    var legendViewData = new ViewDataDictionary(this.ViewData) { { "Label", @Model.Item1.Element.Properties.AddressLabel }, { "QuestionIdPrefix", "-address" } };
 }
 
 @await Html.BeginFieldSet(Model.Item1.Element, "-address")
-
-    <partial name="Legend" model="@Model.Item1.Element" view-data="legendViewData">
+     @if(Model.Item1.Element.Properties.LegendAsH1) {
+        <h1>
+            <label>@Model.Item1.Element.Properties.AddressLabel</label>
+        </h1>
+    } else {
+        <label class="h2">@Model.Item1.Element.Properties.AddressLabel</label>
+    }
 
     <div class="user-search-term">
         <p><strong>Postcode: </strong>@Model.Item1.Element.Properties.Value </p>
@@ -23,7 +27,7 @@
         <p id=@hintId>@Html.Raw(Model.Item1.Element.Properties.SelectHint)</p>
     }
 
-    <label @Model.Item1.Element.WriteHtmlForAndClassAttribute()>@Model.Item1.Element.Properties.AddressLabel</label>
+    <label @Model.Item1.Element.WriteHtmlForAndClassAttribute("-address")>@Model.Item1.Element.Properties.SelectLabel</label>
     @if (Model.Item1.Element.Properties.Optional)
     {
         <span class="optional">(optional)</span>

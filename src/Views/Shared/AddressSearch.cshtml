@@ -3,10 +3,17 @@
     var questionId = $"{Model.Element.Properties.QuestionId}-postcode";
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
-    var tag = Model.Element.Properties.LegendAsH1 ? "h1" : "label";
 }
 
-    <@Html.Raw(tag) @Model.Element.WriteHtmlForAndClassAttribute("-postcode")>@Model.Element.Properties.PostcodeLabel</@Html.Raw(tag)>
+    @if(Model.Element.Properties.LegendAsH1) {
+        <h1>
+            <label>@Model.Element.Properties.AddressLabel</label>
+        </h1>
+    } else {
+        <label class="h2">@Model.Element.Properties.AddressLabel</label>
+    }
+
+    <label @Model.Element.WriteOptional() for="@questionId">@Model.Element.Properties.PostcodeLabel</label>
 
     @if (Model.Element.Properties.Optional)
     {
