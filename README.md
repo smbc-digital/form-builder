@@ -175,7 +175,7 @@ The target mapping above would produce this object
     Sets the heading level of the legend to H1
     ```json
     {
-    "Type": "p",
+    "Type": "Radio",
         "Properties": {
             "LegendAsH1": true
         }
