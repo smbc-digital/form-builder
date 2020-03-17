@@ -13,13 +13,11 @@
     {
         errorMessages = new string[]{string.Empty,string.Empty, string.Empty };
     }
+    var legendViewData = new ViewDataDictionary(this.ViewData) { { "Label", @Model.Element.Properties.AddressManualLabel } };
 }
 
     <fieldset aria-describedby=@hintId>
-        <legend>
-            <label>
-            </label>
-        </legend>
+        <partial name="Legend" model="@Model.Element" view-data="legendViewData">
 
         <div class="user-search-term">
             <p><strong>Postcode: </strong>@Model.Element.Properties.Value </p>
@@ -66,4 +64,4 @@
             <p class="input-error-content" id="@postcodeErrorId">@errorMessages[2]</p>
         }
 
-    </fieldset>
+</fieldset>

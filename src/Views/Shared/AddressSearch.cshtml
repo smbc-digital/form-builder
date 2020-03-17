@@ -3,26 +3,27 @@
     var questionId = $"{Model.Element.Properties.QuestionId}-postcode";
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
+    var tag = Model.Element.Properties.LegendAsH1 ? "h1" : "label";
 }
 
-<label @Model.Element.WriteOptional() for="@questionId">@Model.Element.Properties.PostcodeLabel</label>
+    <@Html.Raw(tag) @Model.Element.WriteHtmlForAndClassAttribute("-postcode")>@Model.Element.Properties.PostcodeLabel</@Html.Raw(tag)>
 
-@if (Model.Element.Properties.Optional)
-{
-    <span class="optional">(optional)</span>
-}
+    @if (Model.Element.Properties.Optional)
+    {
+        <span class="optional">(optional)</span>
+    }
 
-@if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
-{
-    <p class="description" id=@hintId>@Model.Element.Properties.Hint</p>
-}
+    @if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
+    {
+        <p class="description" id=@hintId>@Model.Element.Properties.Hint</p>
+    }
 
-@Html.TextBox(questionId, Model.Element.Properties.Value, Model.Element.GenerateElementProperties())
+    @Html.TextBox(questionId, Model.Element.Properties.Value, Model.Element.GenerateElementProperties())
 
-@if (!Model.Element.IsValid)
-{
-    var validationMessage = string.IsNullOrEmpty(Model.Element.Properties.CustomValidationMessage) ? Model.Element.ValidationMessage : Model.Element.Properties.CustomValidationMessage;
-    <p class="input-error-content" id="@errorId">@validationMessage</p>
-}
+    @if (!Model.Element.IsValid)
+    {
+        var validationMessage = string.IsNullOrEmpty(Model.Element.Properties.CustomValidationMessage) ? Model.Element.ValidationMessage : Model.Element.Properties.CustomValidationMessage;
+        <p class="input-error-content" id="@errorId">@validationMessage</p>
+    }
 
 

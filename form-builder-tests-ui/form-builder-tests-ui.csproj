@@ -12,6 +12,7 @@
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Button - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\ComplexPath - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Email - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\HideTitle - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\PageContent - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Postcode - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\RadioButton - Copy.feature.cs" />
@@ -75,6 +76,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\LegendHideShow.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\Organisation.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

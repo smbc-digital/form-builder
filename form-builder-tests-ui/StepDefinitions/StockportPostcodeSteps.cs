@@ -9,13 +9,13 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then(@"I fill in page1 with wrong postcode")]
         public void ThenIFillInPage1WithWrongPostcode()
         {
-            BrowserSession.FillIn("postcode").With("lu1 1ln");
+            BrowserSession.FillIn("stockportpostcode").With("lu1 1ln");
         }
 
         [Then(@"I fill in page1 with good postcode")]
         public void ThenIFillInPage1WithGoodPostcode()
         {
-            BrowserSession.FillIn("postcode").With("sk7 4nu");
+            BrowserSession.FillIn("stockportpostcode").With("sk7 4nu");
         }
     }
 }

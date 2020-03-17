@@ -6,43 +6,43 @@
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
     var addresSearchCount = $"{Model.Item2.Count} addresses found";
+    var legendViewData = new ViewDataDictionary(this.ViewData) { { "Label", @Model.Item1.Element.Properties.AddressLabel }, { "QuestionIdPrefix", "-address" } };
 }
 
 @await Html.BeginFieldSet(Model.Item1.Element, "-address")
 
-<legend>
-</legend>
+    <partial name="Legend" model="@Model.Item1.Element" view-data="legendViewData">
 
-<div class="user-search-term">
-    <p><strong>Postcode: </strong>@Model.Item1.Element.Properties.Value </p>
-    <a class="back-button" href="@Model.Item1.ReturnURL">Change</a>
-</div>
+    <div class="user-search-term">
+        <p><strong>Postcode: </strong>@Model.Item1.Element.Properties.Value </p>
+        <a class="back-button" href="@Model.Item1.ReturnURL">Change</a>
+    </div>
 
-@if (!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectHint))
-{
-    <p id=@hintId>@Html.Raw(Model.Item1.Element.Properties.SelectHint)</p>
-}
-
-<label @Model.Item1.Element.WriteOptional() for="@questionId">@Model.Item1.Element.Properties.AddressLabel</label>
-@if (Model.Item1.Element.Properties.Optional)
-{
-    <span class="optional">(optional)</span>
-}
-
-<select id="@questionId" name="@questionId">
-    <option value="">@addresSearchCount</option>
-    @for (var i = 0; i < Model.Item2.Count; i++)
+    @if (!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectHint))
     {
-        <option value="@Model.Item2[i].UniqueId|@Model.Item2[i].Name">@Model.Item2[i].Name</option>
+        <p id=@hintId>@Html.Raw(Model.Item1.Element.Properties.SelectHint)</p>
     }
-</select>
 
-@if (!Model.Item1.Element.IsValid)
-{
+    <label @Model.Item1.Element.WriteHtmlForAndClassAttribute()>@Model.Item1.Element.Properties.AddressLabel</label>
+    @if (Model.Item1.Element.Properties.Optional)
     {
-        var validationMessage = string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectCustomValidationMessage) ? Model.Item1.Element.ValidationMessage : Model.Item1.Element.Properties.SelectCustomValidationMessage;
-        <p class="input-error-content" id="@errorId">@validationMessage</p>
+        <span class="optional">(optional)</span>
     }
-}
-<p><a href="@Model.Item1.ManualAddressURL">I cannot find my address in the list</a></p>
-@await Html.EndFieldSet()
+
+    <select id="@questionId" name="@questionId">
+        <option value="">@addresSearchCount</option>
+        @for (var i = 0; i < Model.Item2.Count; i++)
+        {
+            <option value="@Model.Item2[i].UniqueId|@Model.Item2[i].Name">@Model.Item2[i].Name</option>
+        }
+    </select>
+
+    @if (!Model.Item1.Element.IsValid)
+    {
+        {
+            var validationMessage = string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectCustomValidationMessage) ? Model.Item1.Element.ValidationMessage : Model.Item1.Element.Properties.SelectCustomValidationMessage;
+            <p class="input-error-content" id="@errorId">@validationMessage</p>
+        }
+    }
+    <p><a href="@Model.Item1.ManualAddressURL">I cannot find my address in the list</a></p>
+    @await Html.EndFieldSet()

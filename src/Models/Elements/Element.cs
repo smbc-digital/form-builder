@@ -134,14 +134,22 @@ namespace form_builder.Models.Elements
             return describedByValue.Trim();
         }
 
-        public string WriteOptional()
+        public string WriteHtmlForAndClassAttribute(string prefix = "")
         {
+            var data = string.Empty;
+
             if (DisplayOptional)
             {
-                return "class = optional";
+                data = "class = optional";
+
             }
 
-            return null;
+            if (!Properties.LegendAsH1)
+            {
+                return $"{data} for = {Properties.QuestionId}{prefix}";
+            }
+
+            return data;
         }
 
         public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)

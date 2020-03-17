@@ -13,5 +13,6 @@
         public bool? Postcode { get; set; }
         public bool? StockportPostcode { get; set; }
         public bool DisplayNoResultsIAG { get; set; } = false;
+        public string AddressManualLabel { get; set; } = "Enter your address";
     }
 }
