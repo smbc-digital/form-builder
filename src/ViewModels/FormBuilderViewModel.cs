@@ -1,4 +1,3 @@
-using System;
 
 namespace form_builder.ViewModels
 {
@@ -17,6 +16,10 @@ namespace form_builder.ViewModels
         public string OrganisationStatus { get; set; }
 
         public string FormName { get; set; }
+
+        public string BaseURL { get; set; }
+
+        public string StartPageSlug { get; set; }
 
         public string PageTitle { get; set; }
     }

@@ -205,6 +205,8 @@ namespace form_builder.Services.PageService
                 formModel.Path = currentPage.PageSlug;
                 formModel.FormName = baseForm.FormName;
                 formModel.PageTitle = currentPage.Title;
+                formModel.BaseURL = baseForm.BaseURL;
+                formModel.StartPageSlug = baseForm.StartPageSlug;
 
                 return new ProcessRequestEntity
                 {
@@ -225,6 +227,8 @@ namespace form_builder.Services.PageService
             viewModel.FormName = baseForm.FormName;
             viewModel.PageTitle = page.Title;
             viewModel.Path = path;
+            viewModel.BaseURL = baseForm.BaseURL;
+            viewModel.StartPageSlug = baseForm.StartPageSlug;
 
             return viewModel;
         }
