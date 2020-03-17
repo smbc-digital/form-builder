@@ -165,6 +165,24 @@ The target mapping above would produce this object
     }
 ```
 
+* **Generic Options** (Options which apply to all)
+    * [LegendAsH1](#LegendAsH1) (Set legend to a h1 heading)
+
+
+* <a name="LegendAsH1">**LegendAsH1**</a>
+    * LegendAsH1 (*boolean*) (defaults to false)
+
+    Sets the heading level of the legend to H1
+    ```json
+    {
+    "Type": "p",
+        "Properties": {
+            "LegendAsH1": true
+        }
+    }
+    ```
+#
+
 * **Type** (*string*) (HTML element)
     * [H2-H6](#headingprops) (Heading levels)
     * [P](#ptextprops) (Paragraph text)
