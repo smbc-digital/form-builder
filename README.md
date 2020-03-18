@@ -164,12 +164,24 @@ The target mapping above would produce this object
     }
 ```
 
-* **Generic Options** (Options which apply to all)
+* **Generic Options**
     * [LegendAsH1](#LegendAsH1) (Set legend to a h1 heading)
+    * [LabelAsH1](#LabelAsH1) (Set label to a h1 heading)
 
 
 * <a name="LegendAsH1">**LegendAsH1**</a>
     * LegendAsH1 (*boolean*) (defaults to false)
+
+      This is only valid for the elements listed below:    
+      * **Select**
+      * **DateInput**
+      * **DatePicker**
+      * **Address**
+      * **Organisation**
+      * **Street**
+      * **Radio**
+      * **Checkbox**
+      * **Time**
 
     Sets the heading level of the legend to H1
     ```json
@@ -177,6 +189,25 @@ The target mapping above would produce this object
     "Type": "Radio",
         "Properties": {
             "LegendAsH1": true
+        }
+    }
+    ```
+
+* <a name="LabelAsH1">**LabelAsH1**</a>
+    * LabelAsH1 (*boolean*) (defaults to false)
+
+      This is only valid for the elements listed below:    
+      * **Textbox**
+      * **Textarea**
+      * **FileUpload**
+      * **Numeric**
+
+    Sets the heading level of the legend to H1
+    ```json
+    {
+    "Type": "Textbox",
+        "Properties": {
+            "LabelAsH1": true
         }
     }
     ```
