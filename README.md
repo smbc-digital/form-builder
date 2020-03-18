@@ -1208,4 +1208,4 @@ The example below shows the policy we manually created and applied to a test use
 ## FormBuilder Bucket Config
 The S3 bucket used during testing was cofigured to 'Block all public access' to 'On'.
 
-The bucket will be created using a Cloudformation template with the folder structure created by the template. 
+The bucket will be created using a Cloudformation template with the folder structure created by the template.
