@@ -6,7 +6,6 @@
 </div>
 
 
-
 ## Table of Contents
 - [Requirements & Prereqs](#requirements-&-prereqs)
 - [Base JSON Structure](#base-json-structure)
