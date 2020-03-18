@@ -698,11 +698,22 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task ProcessAddressJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
         {
-            var result = await _pageHelper.ProcessAddressJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.ProcessAddressJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>{ new AddressSearchResult()});
 
             var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
             Assert.Equal("../Address/Index", journeyResult.ViewName);
             Assert.True(journeyResult.UseGeneratedViewModel);
+        }
+
+        [Fact]
+        public async Task ProcessAddressJourney_ShouldGenerteCorrectHtml_WhenNoSearchResults_AndOnSearchJourney()
+        {
+            var result = await _pageHelper.ProcessAddressJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>{});
+
+            var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
+            Assert.Equal("AddressManual", journeyResult.RedirectAction);
+            Assert.True(journeyResult.RedirectToAction);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Never);
         }
 
         [Fact]
