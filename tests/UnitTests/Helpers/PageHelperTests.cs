@@ -706,7 +706,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public async Task ProcessAddressJourney_ShouldGenerteCorrectHtml_WhenNoSearchResults_AndOnSearchJourney()
+        public async Task ProcessAddressJourney_ReturnRedirectAction_True_WhenNoSearchResults_AndOnSearchJourney()
         {
             var result = await _pageHelper.ProcessAddressJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>{});
 

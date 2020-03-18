@@ -202,6 +202,41 @@ namespace form_builder_tests.UnitTests.Controllers
             Assert.Equal("Search", viewResult.ViewName);
         }
 
+                [Fact]
+        public async Task Index_Post_ShouldRedirectWhen_RedirectToAction_IsReturnedFrom_ProcessRequest()
+        {
+            var actionName = "AddressManual";
+
+            var element = new ElementBuilder()
+               .WithType(EElementType.Address)
+               .WithAddressProvider("testAddressProvider")
+               .WithQuestionId("test-address")
+               .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithValidatedModel(true)
+                .Build();
+
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IFormFile>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessRequestEntity { RedirectAction = actionName, RedirectToAction = true });
+
+            var viewModel = new ViewModelBuilder()
+                .WithEntry("Guid", Guid.NewGuid().ToString())
+                .WithEntry("AddressStatus", "Search")
+                .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
+                .Build();
+
+            var result = await _homeController.Index("testform", "page-one", viewModel, null);
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.True(redirectResult.RouteValues.ContainsKey("form"));
+            Assert.True(redirectResult.RouteValues.ContainsKey("path"));
+            Assert.Contains("testform",redirectResult.RouteValues.Values);
+            Assert.Contains("page-one",redirectResult.RouteValues.Values);
+            Assert.Equal(actionName, redirectResult.ActionName);
+        }
+
         [Theory]
         [InlineData("Submit", EBehaviourType.SubmitForm)]
         [InlineData("Index", EBehaviourType.GoToPage)]
