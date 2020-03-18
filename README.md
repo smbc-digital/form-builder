@@ -5,7 +5,6 @@
   <a href="https://www.stockport.gov.uk">Stockport Council</a>
 </div>
 
-
 ## Table of Contents
 - [Requirements & Prereqs](#requirements-&-prereqs)
 - [Base JSON Structure](#base-json-structure)
