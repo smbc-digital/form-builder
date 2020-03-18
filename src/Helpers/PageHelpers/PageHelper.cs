@@ -186,6 +186,13 @@ namespace form_builder.Helpers.PageHelpers
                 case "Search":
                     try
                     {
+                        if(!addressResults.Any()){
+                            return new ProcessRequestEntity {
+                                RedirectToAction = true,
+                                RedirectAction = "AddressManual"
+                            };
+                        }
+
                         var adddressViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, null);
                         adddressViewModel.AddressStatus = "Select";
                         adddressViewModel.FormName = baseForm.FormName;

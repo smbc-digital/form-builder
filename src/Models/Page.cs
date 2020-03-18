@@ -147,8 +147,6 @@ namespace form_builder.Models
 
         private List<Behaviour> GetBehavioursByType(EBehaviourType type) => Behaviours.Where(_ => _.BehaviourType == type).ToList();
 
-
-
         public string GetPageTitle()
         {
            

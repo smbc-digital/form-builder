@@ -75,6 +75,14 @@ namespace form_builder.Controllers
 
             var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload);
 
+            if(currentPageResult.RedirectToAction && !string.IsNullOrWhiteSpace(currentPageResult.RedirectAction)){
+                return RedirectToAction(currentPageResult.RedirectAction, new
+                    {
+                        form,
+                        path
+                    });
+            }
+
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
             {
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);

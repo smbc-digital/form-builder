@@ -20,5 +20,9 @@ namespace form_builder.Services.PageService.Entities
     public class ProcessRequestEntity : PageEntity
     {
         public bool UseGeneratedViewModel { get; set; } = false;
+
+        public bool RedirectToAction { get; set; } = false;
+
+        public string RedirectAction { get; set; } = string.Empty;
     }
 }

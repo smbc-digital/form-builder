@@ -19,19 +19,24 @@ namespace form_builder.Models.Elements
             Type = EElementType.AddressManual;
         }
 
-      
-
-        protected void SetAddressProperties(Dictionary<string, dynamic> viewModel)
+        public override string GenerateFieldsetProperties(){
+            if(!string.IsNullOrWhiteSpace(Properties.AddressManualHint)){
+                return $"aria-describedby = {Properties.QuestionId}-hint";
+            }
+            
+            return string.Empty;
+        }
+        
+        protected void SetAddressProperties(Dictionary<string, dynamic> viewModel, string searchTerm)
         {
             Properties.AddressManualAddressLine1 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine1")).Value;
             Properties.AddressManualAddressLine2 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine2")).Value;
             Properties.AddressManualAddressTown = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressTown")).Value;
-            Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressPostcode")).Value;           
+            Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressPostcode")).Value ?? searchTerm;           
         }
 
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            SetAddressProperties(viewModel);
 
             if (viewModel.ContainsKey("AddressStatus"))
             {
@@ -39,8 +44,10 @@ namespace form_builder.Models.Elements
             };
 
             viewModel.Add("AddressStatus", "Manual");
-
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
+            
+            SetAddressProperties(viewModel, Properties.Value);
+
             var searchResultsCount =  elementHelper.GetFormDataValue(guid, $"{Properties.QuestionId}-srcount");
 
             var isValid = int.TryParse(searchResultsCount.ToString(), out int output);

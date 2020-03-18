@@ -67,6 +67,11 @@ namespace form_builder.Models.Elements
             return new Dictionary<string, dynamic>();
         }
 
+        public virtual string GenerateFieldsetProperties()
+        {
+            return string.Empty;
+        }
+
         public Dictionary<string, dynamic> GenerateElementProperties(int index)
         {
             switch (Type)

@@ -1,6 +1,7 @@
 ﻿@model form_builder.ViewModels.ElementViewModel
 @{
     var hintId = $"{Model.Element.Properties.QuestionId}-hint";
+    var searchQuestionId = $"{Model.Element.Properties.QuestionId}-postcode";
     var line1ErrorId = $"{Model.Element.Properties.QuestionId}-addressline1-error";
     var townErrorId = $"{Model.Element.Properties.QuestionId}-town-error";
     var postcodeErrorId = $"{Model.Element.Properties.QuestionId}-postcode-error";
@@ -15,7 +16,9 @@
     }
 }
 
-<fieldset aria-describedby=@hintId>
+@Html.Hidden(@searchQuestionId, Model.Element.Properties.Value)
+
+<fieldset @Model.Element.GenerateFieldsetProperties()>
     @if(Model.Element.Properties.LegendAsH1) {
         <h1>
             <label>@Model.Element.Properties.AddressManualLabel</label>
@@ -39,9 +42,9 @@
         </div>
     }
 
-    @if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
+    @if (!string.IsNullOrEmpty(Model.Element.Properties.AddressManualHint.Trim()))
     {
-        <p id=@hintId>@Model.Element.Properties.Hint</p>
+        <p id=@hintId>@Model.Element.Properties.AddressManualHint</p>
     }
 
     <label for="@line1id">Address line 1</label>
