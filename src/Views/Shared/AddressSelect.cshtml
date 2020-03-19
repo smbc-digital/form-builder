@@ -27,7 +27,7 @@
         <p id=@hintId>@Html.Raw(Model.Item1.Element.Properties.SelectHint)</p>
     }
 
-    <label @Model.Item1.Element.WriteHtmlForAndClassAttribute("-address")>@Model.Item1.Element.Properties.SelectLabel</label>
+    <label for="@questionId" @Model.Item1.Element.WriteOptional()>@Model.Item1.Element.Properties.SelectLabel</label>
     @if (Model.Item1.Element.Properties.Optional)
     {
         <span class="optional">(optional)</span>
