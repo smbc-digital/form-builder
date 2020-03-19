@@ -24,11 +24,11 @@
         "FormName": "",
         "BaseURL": "",
         "StartPageSlug": "",
-        "HideTitle": ,
         "FeedbackForm": "https://stockportcouncil.typeform.com/to/yzIJEe",
         "Pages": [
           {
             "Title": "",
+            "HideTitle": ,
             "PageSlug": "",
             "Elements": [],
             "Behaviours": []
