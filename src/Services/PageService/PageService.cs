@@ -26,7 +26,7 @@ namespace form_builder.Services.PageService
     public interface IPageService
     {
         Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false);
-        Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IFormFile file, bool processManual = false);
+        Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IFormFileCollection file, bool processManual = false);
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid);
         Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
     }
@@ -101,6 +101,7 @@ namespace form_builder.Services.PageService
                     _distributedCache.Remove(sessionGuid);
             }
 
+            
             var page = baseForm.GetPage(path);
             if (page == null)
             {
@@ -155,7 +156,7 @@ namespace form_builder.Services.PageService
             };
         }
 
-        public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IFormFile file, bool processManual)
+        public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IFormFileCollection file, bool processManual)
         {
             var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
             var currentPage = baseForm.GetPage(path);

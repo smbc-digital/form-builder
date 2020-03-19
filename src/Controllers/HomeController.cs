@@ -4,10 +4,15 @@ using Microsoft.AspNetCore.Http;
 using form_builder.Enum;
 using System.Threading.Tasks;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 using form_builder.Services.PageService;
 using form_builder.Extensions;
 using form_builder.Helpers;
+using form_builder.Services.FileUploadService;
 using form_builder.Workflows;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace form_builder.Controllers
 {
@@ -17,13 +22,15 @@ namespace form_builder.Controllers
         private readonly ISubmitWorkflow _submitWorkflow;
         private readonly IPaymentWorkflow _paymentWorkflow;
         private readonly IFileHelper _fileHelper;
+        private readonly IFileUploadService _fileUploadService;
 
-        public HomeController(IPageService pageService, ISubmitWorkflow submitWorkflow, IPaymentWorkflow paymentWorkflow, IFileHelper fileHelper)
+        public HomeController(IPageService pageService, ISubmitWorkflow submitWorkflow, IPaymentWorkflow paymentWorkflow, IFileHelper fileHelper, IFileUploadService fileUploadService)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
             _paymentWorkflow = paymentWorkflow;
             _fileHelper = fileHelper;
+            _fileUploadService = fileUploadService;
         }
 
         [HttpGet]
@@ -31,6 +38,7 @@ namespace form_builder.Controllers
         [Route("{form}/{path}")]
         public async Task<IActionResult> Index(string form, string path)
         {
+
             var response = await _pageService.ProcessPage(form, path);
             if (response.ShouldRedirect)
             {
@@ -64,13 +72,16 @@ namespace form_builder.Controllers
         [HttpPost]
         [Route("{form}")]
         [Route("{form}/{path}")]
-        public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData, IFormFile fileUpload)
+        public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData, IFormFileCollection fileUpload)
         {
             var viewModel = formData.ToNormaliseDictionary();
 
             if(fileUpload != null)
             {
-                viewModel.Add(fileUpload.Name, _fileHelper.ConvertFileToBase64StringWithFileName(fileUpload));
+                if (fileUpload.Any())
+                {
+                    viewModel = _fileUploadService.AddFiles(viewModel, fileUpload, form, path);
+                }
             }
 
             var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload);
