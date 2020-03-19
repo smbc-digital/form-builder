@@ -7,23 +7,14 @@
 }
 
 @await Html.BeginFieldSet(Model, classes)
-<legend>
-    <label @Model.WriteOptional()>@Model.Properties.Label</label>
-    @if (Model.Properties.Optional)
-    {
-        <span class="optional">(optional)</span>
-    }
-</legend>
-<p id="@hintId">@Model.Properties.Hint</p>
-<div>
-    <label for="@Model.Properties.QuestionId">
-        Date
-    </label>
-     @Html.TextBox(Model.Properties.QuestionId, Model.Properties.Date, Model.GenerateElementProperties())
-</div>
+    <partial name="Legend" model="@Model">
+    <p id="@hintId">@Model.Properties.Hint</p>
+    <div>
+        @Html.TextBox(Model.Properties.QuestionId, Model.Properties.Date, Model.GenerateElementProperties())
+    </div>
 
-@if (!Model.IsValid)
-{
-    <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
-}
+    @if (!Model.IsValid)
+    {
+        <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
+    }
 @await Html.EndFieldSet()

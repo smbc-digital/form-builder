@@ -20,9 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
-using form_builder.Services.FileUploadService;
 
 namespace form_builder.Helpers.PageHelpers
 {
@@ -30,7 +28,7 @@ namespace form_builder.Helpers.PageHelpers
     {
         void HasDuplicateQuestionIDs(List<Page> pages, string formName);
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null);
-        void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IFormFileCollection file);
+        void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IFormFile file);
         Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults);
         Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
         Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
@@ -41,6 +39,7 @@ namespace form_builder.Helpers.PageHelpers
         void CheckSubmitSlugsHaveAllProperties(List<Page> pages, string formName);
         void CheckForAcceptedFileUploadFileTypes(List<Page> pages, string formName);
         void SaveFormData(string key, object value, string guid);
+
     }
 
     public class PageHelper : IPageHelper
@@ -53,12 +52,8 @@ namespace form_builder.Helpers.PageHelpers
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly ICache _cache;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
-        private readonly IFileUploadService _fileUploadService;
 
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
-            IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache,
-            IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
-            IEnumerable<IPaymentProvider> paymentProviders, IFileUploadService fileUploadService)
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache, IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IEnumerable<IPaymentProvider> paymentProviders)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -68,16 +63,17 @@ namespace form_builder.Helpers.PageHelpers
             _cache = cache;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
             _paymentProviders = paymentProviders;
-            _fileUploadService = fileUploadService;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
+            
             if (page.PageSlug.ToLower() != "success")
             {
-                formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = baseForm.FormName } });
+                formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
             }
+
             formModel.FeedbackForm = baseForm.FeedbackForm;
 
             foreach (var element in page.Elements)
@@ -88,7 +84,7 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IFormFileCollection file)
+        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IFormFile file)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -122,11 +118,31 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.Path = viewModel["Path"];
             convertedAnswers.FormName = form;
 
-            if (file != null)
-                if (file.Any())
-                    convertedAnswers = _fileUploadService.CollectAnswers(convertedAnswers, file, viewModel);
 
-            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
+            if(file != null)
+            {
+                var fileKey = $"file-{file.Name}";
+                _distributedCache.SetStringAsync(fileKey, viewModel[file.Name].Content, _distrbutedCacheExpirationConfiguration.FileUpload);
+
+                FileUploadModel model = new FileUploadModel
+                {
+                    FileName = viewModel[file.Name].FileName,
+                    Key = fileKey
+                };
+
+                var currentPageAnswers = convertedAnswers.Pages.Where(_ => _.PageSlug == viewModel["Path"].ToLower())
+                    .FirstOrDefault();
+
+                if (currentPageAnswers.Answers.Exists(_ => _.QuestionId == file.Name))
+                {
+                    var fileUploadQuestion = currentPageAnswers.Answers.First(_ => _.QuestionId == file.Name);
+                    currentPageAnswers.Answers.Remove(fileUploadQuestion);
+                }
+
+                currentPageAnswers.Answers.Add(new Answers { QuestionId = file.Name, Response = model });
+            }
+
+            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
         public async Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
@@ -170,6 +186,13 @@ namespace form_builder.Helpers.PageHelpers
                 case "Search":
                     try
                     {
+                        if(!addressResults.Any()){
+                            return new ProcessRequestEntity {
+                                RedirectToAction = true,
+                                RedirectAction = "AddressManual"
+                            };
+                        }
+
                         var adddressViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, null);
                         adddressViewModel.AddressStatus = "Select";
                         adddressViewModel.FormName = baseForm.FormName;

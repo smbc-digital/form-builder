@@ -6,31 +6,24 @@
 }
 
 @await Html.BeginFieldSet(Model)
-<legend>
-    <label @Model.WriteOptional()>@Model.Properties.Label</label>
+    <partial name="Legend" model="@Model">
 
-    @if (Model.Properties.Optional)
+    @if (!string.IsNullOrEmpty(Model.Properties.Hint))
     {
-        <span class="optional">(optional)</span>
+        <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
     }
-</legend>
 
-@if (!string.IsNullOrEmpty(Model.Properties.Hint))
-{
-    <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
-}
+    <div>
+        <partial name="RadioOptions"/>
 
-<div>
-    <partial name="RadioOptions" />
-
-    @if (!Model.IsValid)
-    {
+        @if (!Model.IsValid)
         {
-            var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+            {
+                var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
 
-            <p class="input-error-content" id="@errorId">@validationMessage</p>
+                <p class="input-error-content" id="@errorId">@validationMessage</p>
+            }
         }
-    }
-</div>
+    </div>
 
 @await Html.EndFieldSet()

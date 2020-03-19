@@ -565,7 +565,7 @@ namespace form_builder_tests.UnitTests.Mappers
                         Answers = new List<Answers> {
                             new Answers
                             {
-                                QuestionId = "fileUpload_fileUploadTestKey",
+                                QuestionId = "fileUploadTestKey",
                                 Response = JsonConvert.SerializeObject(new FileUploadModel{ FileName = key })
                             }
                         }
@@ -580,14 +580,14 @@ namespace form_builder_tests.UnitTests.Mappers
 
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
-            _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+            _wrapper.Verify(_ => _.GetString(It.Is<string>(x => x == $"file-{key}")), Times.Once);
 
             var model = Assert.IsType<File>(result);
             Assert.Equal(key, model.FileName);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldCall_ThrowExceptionWhenDistributedCacheThrows()
+        public void GetAnswerValue_ShouldCall_ThrowExceptionWhenDistrbutedCacheThrows()
         {
             var key = "fileUploadTestKey";
             _wrapper.Setup(_ => _.GetString(It.IsAny<string>()))
@@ -601,7 +601,7 @@ namespace form_builder_tests.UnitTests.Mappers
                         Answers = new List<Answers> {
                             new Answers
                             {
-                                QuestionId = "fileUpload_fileUploadTestKey",
+                                QuestionId = "fileUploadTestKey",
                                 Response = JsonConvert.SerializeObject(new FileUploadModel())
                             }
                         }
@@ -616,7 +616,7 @@ namespace form_builder_tests.UnitTests.Mappers
 
             var result = Assert.Throws<Exception>(() => _elementMapper.GetAnswerValue(element, formAnswers));
 
-            Assert.Equal($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: fileUpload_{key} from the distributed cache", result.Message);
+            Assert.Equal($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {key} from the distrbuted cache", result.Message);
         }
 
         [Fact]
@@ -697,7 +697,7 @@ namespace form_builder_tests.UnitTests.Mappers
         public void Map_ShouldReturnExpandoObject_WhenFormContains_MultipleValidatableElementsWithTargetMapping_WithValues()
         {
             var elementOneAnswer = "01/01/2000";
-
+            
             var element3 = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
                 .WithQuestionId("test")

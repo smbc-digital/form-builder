@@ -67,6 +67,11 @@ namespace form_builder.Models.Elements
             return new Dictionary<string, dynamic>();
         }
 
+        public virtual string GenerateFieldsetProperties()
+        {
+            return string.Empty;
+        }
+
         public Dictionary<string, dynamic> GenerateElementProperties(int index)
         {
             switch (Type)
@@ -134,11 +139,30 @@ namespace form_builder.Models.Elements
             return describedByValue.Trim();
         }
 
-        public string WriteOptional()
+        public string WriteHtmlForAndClassAttribute(string prefix = "")
+        {
+            var data = string.Empty;
+
+            if (DisplayOptional)
+            {
+                data = "class = optional";
+
+            }
+
+            if (!Properties.LegendAsH1)
+            {
+                return $"{data} for = {Properties.QuestionId}{prefix}";
+            }
+
+            return data;
+        }
+
+        public string WriteOptional(string prefix = "")
         {
             if (DisplayOptional)
             {
                 return "class = optional";
+
             }
 
             return null;

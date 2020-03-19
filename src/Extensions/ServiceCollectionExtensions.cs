@@ -28,7 +28,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 using System.Diagnostics.CodeAnalysis;
-using form_builder.Services.FileUploadService;
 
 namespace form_builder.Extensions
 {
@@ -123,7 +122,6 @@ namespace form_builder.Extensions
             services.AddSingleton<IPayService, PayService>();
             services.AddSingleton<IOrganisationService, OrganisationService>();
             services.AddSingleton<IMappingService, MappingService>();
-            services.AddSingleton<IFileUploadService, FileUploadService>();
 
             return services;
         }

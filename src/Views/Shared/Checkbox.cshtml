@@ -5,31 +5,32 @@
     var errorId = $"{Model.Properties.QuestionId}-error";
 }
 
-
 @await Html.BeginFieldSet(Model)
-<legend>
-    <label @Model.WriteOptional()>@Model.Properties.Label</label>
-    @if (Model.Properties.Optional)
+
+    <legend>
+        @if(Model.Properties.LegendAsH1) {
+            <h1>
+                <label @Model.WriteOptional()>@Model.Properties.Label</label>
+            </h1>
+        } else {
+            <label @Model.WriteOptional()>@Model.Properties.Label</label>
+        }
+    </legend>
+
+    @if (!string.IsNullOrEmpty(Model.Properties.Hint))
     {
-        <span class="optional">(optional)</span>
+        <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
     }
-</legend>
-
-
-@if (!string.IsNullOrEmpty(Model.Properties.Hint))
-{
-    <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
-}
 
     <partial name="CheckboxOptions" />
 
-@if (!Model.IsValid)
-{
+    @if (!Model.IsValid)
     {
-        var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+        {
+            var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
 
-        <p class="input-error-content" id="@errorId">@validationMessage</p>
+            <p class="input-error-content" id="@errorId">@validationMessage</p>
+        }
     }
-}
 
 @await Html.EndFieldSet()

@@ -5,7 +5,6 @@
   <a href="https://www.stockport.gov.uk">Stockport Council</a>
 </div>
 
-
 ## Table of Contents
 - [Requirements & Prereqs](#requirements-&-prereqs)
 - [Base JSON Structure](#base-json-structure)
@@ -19,13 +18,13 @@
 # Requirements & Prereqs
 - dotnet core 2.2
 
-
 # Base JSON Structure
 ```json
     {
         "FormName": "",
         "BaseURL": "",
         "StartPageSlug": "",
+        "HideTitle": ,
         "FeedbackForm": "https://stockportcouncil.typeform.com/to/yzIJEe",
         "Pages": [
           {
@@ -48,6 +47,7 @@
 **Pages**[*object*]:
 
 * **PageSlug** (*string*) - The slug for a page after the BaseURL e.g. stockport.gov.uk/{BaseURL}/{PageSlug}
+* **HideTitle** (*bool*) - This will hide the page title when set to true
 * **Title** (*string*) - The Title is used within the browser tab along with the form name e.g. Page 1 - Contact us - Stockport Council
 * **Elements**[*object*]- List of HTML elements to display on page
 * [Behaviours[*object*]](#pagebehaviours) - List of conditionals & page redirects for the page
@@ -162,6 +162,55 @@ The target mapping above would produce this object
         }
     }
 ```
+
+* **Generic Options**
+    * [LegendAsH1](#LegendAsH1) (Set legend to a h1 heading)
+    * [LabelAsH1](#LabelAsH1) (Set label to a h1 heading)
+
+
+* <a name="LegendAsH1">**LegendAsH1**</a>
+    * LegendAsH1 (*boolean*) (defaults to false)
+
+      This is only valid for the elements listed below:    
+      * **Select**
+      * **DateInput**
+      * **DatePicker**
+      * **Address**
+      * **Organisation**
+      * **Street**
+      * **Radio**
+      * **Checkbox**
+      * **Time**
+
+    Sets the heading level of the legend to H1
+    ```json
+    {
+    "Type": "Radio",
+        "Properties": {
+            "LegendAsH1": true
+        }
+    }
+    ```
+
+* <a name="LabelAsH1">**LabelAsH1**</a>
+    * LabelAsH1 (*boolean*) (defaults to false)
+
+      This is only valid for the elements listed below:    
+      * **Textbox**
+      * **Textarea**
+      * **FileUpload**
+      * **Numeric**
+
+    Sets the heading level of the legend to H1
+    ```json
+    {
+    "Type": "Textbox",
+        "Properties": {
+            "LabelAsH1": true
+        }
+    }
+    ```
+#
 
 * **Type** (*string*) (HTML element)
     * [H2-H6](#headingprops) (Heading levels)
@@ -697,13 +746,14 @@ Date Picker example:
     * AddressProvider (*string*) __*__
     * PostcodeLabel (*string*) __*__
     * AddressLabel (*string*) __*__
+    * AddressManualLabel (*string*) __*__
     * Hint (*string*) (hint which appears above the postcode input)
     * SelectHint (*string*) (hint which appears above the select input)
     * MaxLength (*string*)
     * Optional (*boolean*)
     * CustomValidationMessage (*string*) (Set a custom validation message for when user does not enter a postode) There is automatic validation there is not a valid postcode.
     * SelectCustomValidationMessage (*string*) (Set a custom validation message for when user does not select an address from the             dropdown)
-    * TargetMapping (*string*)  
+    * TargetMapping (*string*)
 
 Address example:
 ```json
@@ -748,6 +798,7 @@ Street example:
           }
     }
 ```
+
 
 #
   * <a name="Organisation">**Organisation**</a>
@@ -1156,4 +1207,4 @@ The example below shows the policy we manually created and applied to a test use
 ## FormBuilder Bucket Config
 The S3 bucket used during testing was cofigured to 'Block all public access' to 'On'.
 
-The bucket will be created using a Cloudformation template with the folder structure created by the template. 
+The bucket will be created using a Cloudformation template with the folder structure created by the template.

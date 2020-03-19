@@ -22,11 +22,6 @@ namespace form_builder.Validators
 
             var key = element.Properties.QuestionId;
 
-            if (element.Type == EElementType.FileUpload)
-            {
-                key = $"fileUpload_{element.Properties.QuestionId}";
-            }
-
             var validationMessage = string.Empty;
 
             if (element.Type != EElementType.Address && element.Type != EElementType.Street && element.Type != EElementType.Organisation)
@@ -80,11 +75,13 @@ namespace form_builder.Validators
 
             if (element.Type == EElementType.FileUpload)
             {
+
                 DocumentModel value = viewModel.ContainsKey(key)
                 ? viewModel[key]
                 : null;
 
                 isValid = !(value is null);
+
             }
             else
             {

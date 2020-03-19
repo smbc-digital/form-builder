@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace form_builder.Models.Properties
@@ -26,5 +25,7 @@ namespace form_builder.Models.Properties
         public string Min { get; set; } = string.Empty;
         public string TargetMapping { get; set; }
         public string UpperLimitValidationMessage { get; set; } = string.Empty;
+        public bool LegendAsH1 { get; set; }
+        public bool LabelAsH1 { get; set; }
     }
 }

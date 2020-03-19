@@ -24,5 +24,6 @@ namespace form_builder.Models.Elements
             void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder);
             Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationSearchResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment);
             Dictionary<string, dynamic> GenerateElementProperties();
+            string GenerateFieldsetProperties();
     }
 }

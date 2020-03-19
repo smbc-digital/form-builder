@@ -27,6 +27,8 @@ namespace form_builder.Models
 
         public bool IsValidated { get; set; }
 
+        public bool HideTitle { get; set; }
+
         [JsonIgnore]
         public bool IsValid => !InvalidElements.Any();
         [JsonIgnore]
@@ -144,5 +146,16 @@ namespace form_builder.Models
         }
 
         private List<Behaviour> GetBehavioursByType(EBehaviourType type) => Behaviours.Where(_ => _.BehaviourType == type).ToList();
+
+        public string GetPageTitle()
+        {
+           
+            if (Elements.Any() && HideTitle)
+            {
+                return Elements.First().Properties.Label;
+            }
+
+            return Title;
+        }
     }
 }
