@@ -119,21 +119,35 @@ namespace form_builder_tests.UnitTests.Models
         public void GenerateElementProperties_ShouldReturnCorrectPropertiesFor_Address()
         {
             var questionId = "test--address-question-id";
-            var length = 5;
 
             var element = new ElementBuilder()
                             .WithType(EElementType.Address)
                             .WithQuestionId(questionId)
-                            .WithMaxLength(length)
                             .Build();
 
             var result = element.GenerateElementProperties();
 
             Assert.NotEmpty(result);
             Assert.True(result.ContainsKey("id"));
-            Assert.True(result.ContainsKey("maxlength"));
             Assert.True(result.ContainsValue($"{questionId}-postcode"));
-            Assert.True(result.ContainsValue(length));
+        }
+        
+        [Fact]
+        public void GenerateElementProperties_ShouldReturnCorrectPropertiesFor_AddressSelect()
+        {
+            var questionId = "test--address-question-id";
+
+            var element = new ElementBuilder()
+                            .WithType(EElementType.Address)
+                            .WithQuestionId(questionId)
+                            .Build();
+
+            var result = element.GenerateElementProperties("Select");
+
+            Assert.NotEmpty(result);
+            Assert.True(result.ContainsKey("id"));
+            Assert.True(result.ContainsKey("name"));
+            Assert.True(result.ContainsValue($"{questionId}-address"));
         }
 
         [Fact]

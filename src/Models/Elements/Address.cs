@@ -41,7 +41,7 @@ namespace form_builder.Models.Elements
             {
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
 
-                viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
+                 
                 viewElement.ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
                 var optionsList = new List<SelectListItem>{ new SelectListItem($"{addressSearchResults.Count} addresses found", string.Empty)};
@@ -100,6 +100,11 @@ namespace form_builder.Models.Elements
 
                     return properties;
                 }
+        }
+
+        public Task RenderAsync(IViewRender object1, IElementHelper object2, string v, List<SelectListItem> list1, List<OrganisationSearchResult> list2, Dictionary<string, dynamic> viewModel, Page page, FormSchema schema, IHostingEnvironment object3)
+        {
+            throw new NotImplementedException();
         }
     }
 }

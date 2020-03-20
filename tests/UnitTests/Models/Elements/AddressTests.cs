@@ -3,6 +3,7 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Moq;
 using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
@@ -73,7 +74,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"),It.IsAny<Tuple<ElementViewModel, List<AddressSearchResult>>>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"),It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
@@ -81,11 +82,11 @@ namespace form_builder_tests.UnitTests.Models.Elements
         {
             //Arrange
             var elementView = new ElementViewModel();
-            var addressList = new List<AddressSearchResult>();
-            var callback = new Tuple<ElementViewModel, List<AddressSearchResult>>(elementView, addressList);
+            var addressList = new List<SelectListItem>();
+            var callback = new Tuple<ElementViewModel, List<SelectListItem>>(elementView, addressList);
 
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Tuple<ElementViewModel, List<AddressSearchResult>>>(), null))
-                .Callback<string, Tuple<ElementViewModel, List<AddressSearchResult>>, Dictionary<string, object>>((x, y, z) => callback = y);
+            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), null))
+                .Callback<string, Tuple<ElementViewModel, List<SelectListItem>>, Dictionary<string, object>>((x, y, z) => callback = y);
 
             var pageSlug = "page-one";
             var baseUrl = "test";

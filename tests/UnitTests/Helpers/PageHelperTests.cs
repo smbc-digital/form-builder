@@ -27,6 +27,7 @@ using System.Threading.Tasks;
 using form_builder.Services.FileUploadService;
 using Microsoft.AspNetCore.Http.Internal;
 using Xunit;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace form_builder_tests.UnitTests.Helpers
 {
@@ -157,10 +158,10 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<Tuple<ElementViewModel, List<AddressSearchResult>>>(), null), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), null), Times.Once);
         }
 
         [Fact]
@@ -168,11 +169,11 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             //Arrange
             var elementView = new ElementViewModel();
-            var addressList = new List<AddressSearchResult>();
-            var callback = new Tuple<ElementViewModel, List<AddressSearchResult>>(elementView, addressList);
+            var addressList = new List<SelectListItem>();
+            var callback = new Tuple<ElementViewModel, List<SelectListItem>>(elementView, addressList);
 
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Tuple<ElementViewModel, List<AddressSearchResult>>>(), null))
-                .Callback<string, Tuple<ElementViewModel, List<AddressSearchResult>>, Dictionary<string, object>>((x, y, z) => callback = y);
+            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), null))
+                .Callback<string, Tuple<ElementViewModel, List<SelectListItem>>, Dictionary<string, object>>((x, y, z) => callback = y);
 
             var pageSlug = "page-one";
             var baseUrl = "test";
@@ -193,7 +194,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
 
             //Assert
             Assert.Equal($"/{baseUrl}/{pageSlug}", callback.Item1.ReturnURL);
