@@ -22,7 +22,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
 
         [Fact]
-        public async Task GenerateHtml_ShouldUseAddressSearchText_ForButton_WhenAddressSearch()
+        public async Task RenderAsync_ShouldUseAddressSearchText_ForButton_WhenAddressSearch()
         {
             var callback = new Dictionary<string, dynamic>();
             _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Button>(), It.IsAny<Dictionary<string, dynamic>>()))
@@ -59,7 +59,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         }
 
         [Fact]
-        public async Task GenerateHtml_ShouldUseDefaultButtonText()
+        public async Task RenderAsync_ShouldUseDefaultButtonText()
         {
             var callback = new Dictionary<string, dynamic>();
             _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Button>(), It.IsAny<Dictionary<string, dynamic>>()))
@@ -96,7 +96,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
 
         [Fact]
-        public async Task GenerateHtml_ShouldUse_SuppliedButtonText_DefaultButtonText()
+        public async Task RenderAsync_ShouldUse_SuppliedButtonText_DefaultButtonText()
         {
             var callback = new Dictionary<string, dynamic>();
             _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Button>(), It.IsAny<Dictionary<string, dynamic>>()))

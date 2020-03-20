@@ -819,7 +819,7 @@ Street example:
             "QuestionId": "organisation",
             "OrganisationProvider": "Fake",
             "Label": "Enter the organisation",
-            "SelectLabel": "Selecte the organisation",
+            "SelectLabel": "Select the organisation",
             "Hint": "This is an additional hint",
             "SelectHint": "Select the organisation below",
             "MaxLength": 60
