@@ -213,6 +213,9 @@ namespace form_builder.Services.PageService
                 formModel.BaseURL = baseForm.BaseURL;
                 formModel.StartPageSlug = baseForm.StartPageSlug;
 
+                var startFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{formModel.BaseURL}/{formModel.StartPageSlug}";
+                formModel.StartFormUrl = startFormUrl;
+
                 return new ProcessRequestEntity
                 {
                     Page = currentPage,

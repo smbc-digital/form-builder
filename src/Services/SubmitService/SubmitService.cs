@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 using form_builder.Extensions;
 using System.Linq;
 using form_builder.Enum;
+using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Services.SubmtiService
 {
@@ -37,8 +38,10 @@ namespace form_builder.Services.SubmtiService
 
         private readonly IHostingEnvironment _environment;
 
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper, IHostingEnvironment environment)
+
+        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper, IHostingEnvironment environment, IHttpContextAccessor httpContextAccessor)
         {
             _distributedCache = distributedCache;
             _gateway = gateway;
@@ -46,6 +49,7 @@ namespace form_builder.Services.SubmtiService
             _sessionHelper = sessionHelper;
             _logger = logger;
             _environment = environment;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<SubmitServiceEntity> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
@@ -104,13 +108,20 @@ namespace form_builder.Services.SubmtiService
             }
 
             var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), mappingEntity.BaseForm, sessionGuid);
+            viewModel.BaseURL = mappingEntity.BaseForm.BaseURL;
+            viewModel.StartPageSlug = mappingEntity.BaseForm.StartPageSlug;
+
+            var startFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{viewModel.BaseURL}/{viewModel.StartPageSlug}";
+            viewModel.StartFormUrl = startFormUrl;
+
             var success = new Success
             {
                 FormName = mappingEntity.BaseForm.FormName,
                 Reference = reference,
                 FormAnswers = mappingEntity.FormAnswers,
                 PageContent = viewModel.RawHTML,
-                SecondaryHeader = page.Title
+                SecondaryHeader = page.Title,
+                StartFormUrl = viewModel.StartFormUrl
             };
 
             return new SubmitServiceEntity
