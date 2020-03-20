@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using Coypu;
+﻿using Coypu;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 using Xunit;
@@ -22,6 +19,13 @@ namespace form_builder_tests_ui.StepDefinitions
         {
             var webDriver = BrowserSession.Native as IWebDriver;
             Assert.True(webDriver.FindElement(By.XPath($"//{elementType}[text() = '{elementText}']")).Displayed);
+        }
+
+        [Then(@"I should see a ""(.*)"" element containing ""(.*)"" text")]
+        public void ThenIShouldSeeAElementContaining(string elementType, string elementText)
+        {
+            var webDriver = BrowserSession.Native as IWebDriver;
+            Assert.True(webDriver.FindElement(By.XPath($"//{elementType}[contains(text(), '{elementText}')]")).Displayed);
         }
     }
 }

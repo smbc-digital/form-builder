@@ -16,7 +16,8 @@ Scenario: Street lookup standard use
 	Then I should see "3 streets found" is selected in "customersstreet-streetaddress" dropdown with the value ""
 	When I click the "nextStep" button
 	Then I should see a ".input-error-content" html element
-	Then I should see a "p" element with "<strong>Search term: </strong>Green" text
+	Then I should see a "p" element containing "Green" text
+	Then I should see a "strong" element containing "Search term:" text
 	Then I select "Green lane" in "customersstreet-streetaddress" dropdown
 	Then I should see "Green lane" is selected in "customersstreet-streetaddress" dropdown with the value "123456789012|Green lane"
 	When I click the "nextStep" button
