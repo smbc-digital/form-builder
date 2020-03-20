@@ -24,7 +24,7 @@ namespace form_builder.Models.Elements
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
-        public override Dictionary<string, dynamic> GenerateElementProperties()
+        public override Dictionary<string, dynamic> GenerateElementProperties(string type)
         {
             var properties = new Dictionary<string, dynamic>()
             {

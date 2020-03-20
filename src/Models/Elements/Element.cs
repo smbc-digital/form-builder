@@ -62,7 +62,7 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public virtual Dictionary<string, dynamic> GenerateElementProperties()
+        public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             return new Dictionary<string, dynamic>();
         }

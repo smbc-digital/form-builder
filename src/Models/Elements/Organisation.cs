@@ -57,7 +57,7 @@ namespace form_builder.Models.Elements
             return await viewRender.RenderAsync("OrganisationSearch", viewElement);
         }
 
-        public override Dictionary<string, dynamic> GenerateElementProperties()
+        public override Dictionary<string, dynamic> GenerateElementProperties(string type)
         {
             var properties = new Dictionary<string, dynamic>()
             {

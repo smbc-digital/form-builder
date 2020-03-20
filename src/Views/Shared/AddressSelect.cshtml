@@ -1,15 +1,11 @@
-﻿@using form_builder.Helpers
-@using StockportGovUK.NetStandard.Models.Addresses;
-@model Tuple<form_builder.ViewModels.ElementViewModel, List<AddressSearchResult>>
+﻿@model Tuple<form_builder.ViewModels.ElementViewModel, List<SelectListItem>>
 @{
     var questionId = $"{Model.Item1.Element.Properties.QuestionId}-address";
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
-    var addresSearchCount = $"{Model.Item2.Count} addresses found";
 }
 
-@await Html.BeginFieldSet(Model.Item1.Element, "-address")
-     @if(Model.Item1.Element.Properties.LegendAsH1) {
+    @if(Model.Item1.Element.Properties.LegendAsH1) {
         <h1>@Model.Item1.Element.Properties.AddressLabel</h1>
     } else {
         <label class="h2">@Model.Item1.Element.Properties.AddressLabel</label>
@@ -31,13 +27,7 @@
         <span class="optional">(optional)</span>
     }
 
-    <select id="@questionId" name="@questionId">
-        <option value="">@addresSearchCount</option>
-        @for (var i = 0; i < Model.Item2.Count; i++)
-        {
-            <option value="@Model.Item2[i].UniqueId|@Model.Item2[i].Name">@Model.Item2[i].Name</option>
-        }
-    </select>
+    @Html.DropDownList(@questionId, @Model.Item2, @Model.Item1.Element.GenerateElementProperties("Select"))
 
     @if (!Model.Item1.Element.IsValid)
     {
@@ -47,4 +37,3 @@
         }
     }
     <p><a href="@Model.Item1.ManualAddressURL">I cannot find my address in the list</a></p>
-    @await Html.EndFieldSet()
