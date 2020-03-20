@@ -1,10 +1,6 @@
-﻿@using Microsoft.AspNetCore.Http
-@inject IHttpContextAccessor httpContextAccessor
-
-@{
+﻿@{
     var isForm = (bool?)ViewData["Form"] ?? false;
     var headerClass = string.Empty;
-    var url = Context.
 }
 <div class="center-wrapper" id="header-wrapper">
     <div id="header-logo-width">
@@ -13,6 +9,6 @@
         </div>
     </div>
     <div id="formTitle">
-        <a href='@string.Format("https://{0}/{1}/{2}", @httpContextAccessor.HttpContext.Request.Host, @Model.BaseURL, @Model.StartPageSlug)'><p><strong>@Model.FormName</strong></p></a>
+      <a href="@Model.StartFormUrl">@Model.FormName</strong></p></a>
     </div>
 </div>

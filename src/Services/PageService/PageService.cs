@@ -43,8 +43,9 @@ namespace form_builder.Services.PageService
         private readonly IOrganisationService _organisationService;
         private readonly ICache _cache;
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
-
-        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        
+        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IHttpContextAccessor httpContextAccessor)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -55,7 +56,9 @@ namespace form_builder.Services.PageService
             _organisationService = organisationService;
             _distributedCache = distributedCache;
             _cache = cache;
-            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;         
+            _httpContextAccessor = httpContextAccessor;
+
         }
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false)
         {
@@ -118,6 +121,8 @@ namespace form_builder.Services.PageService
             }
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid);
+            var startFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{viewModel.BaseURL}/{viewModel.StartPageSlug}";
+            viewModel.StartFormUrl = startFormUrl;
 
             if (page.Elements.Any(_ => _.Type == EElementType.Street))
             {

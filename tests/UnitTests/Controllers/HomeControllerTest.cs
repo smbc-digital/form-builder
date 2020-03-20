@@ -24,10 +24,11 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<ISubmitWorkflow> _submitWorkflow = new Mock<ISubmitWorkflow>();
         private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new Mock<IPaymentWorkflow>();
         private readonly Mock<IFileHelper> _mockFileHelper = new Mock<IFileHelper>();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
         public HomeControllerTest()
         {
-            _homeController = new HomeController(_pageService.Object, _submitWorkflow.Object, _paymentWorkflow.Object, _mockFileHelper.Object);
+            _homeController = new HomeController(_pageService.Object, _submitWorkflow.Object, _paymentWorkflow.Object, _mockFileHelper.Object, _mockHttpContextAccessor.Object);
         }
 
         [Fact]
@@ -286,7 +287,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(new ProcessPageEntity());
 
             //Act
-            var result = await _homeController.Index("form", "path");
+            var result = await _homeController.Index("form", "path", It.IsAny<FormSchema>(), It.IsAny<Page>(), "");
 
 
             //Assert
@@ -301,7 +302,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(new ProcessPageEntity());
 
             //Act
-            var result = await _homeController.Index("form", "path");
+            var result = await _homeController.Index("form", "path", It.IsAny<FormSchema>(), It.IsAny<Page>(), "");
 
             //Assert
             Assert.IsType<ViewResult>(result);
@@ -315,7 +316,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(new ProcessPageEntity {  ShouldRedirect = true });
 
             //Act
-            var result = await _homeController.Index("form", "path");
+            var result = await _homeController.Index("form", "path", It.IsAny<FormSchema>(), It.IsAny<Page>(), "");
 
             //Assert
             Assert.IsType<RedirectToActionResult>(result);
