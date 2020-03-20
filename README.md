@@ -748,6 +748,7 @@ Date Picker example:
     * AddressManualLabel (*string*) __*__
     * Hint (*string*) (hint which appears above the postcode input)
     * SelectHint (*string*) (hint which appears above the select input)
+    * AddressManualHint (*string*) (hint which appears above the manual address inputs)
     * MaxLength (*string*)
     * Optional (*boolean*)
     * CustomValidationMessage (*string*) (Set a custom validation message for when user does not enter a postode) There is automatic validation there is not a valid postcode.
@@ -777,8 +778,9 @@ Address example:
     * QuestionId (*string*) __*__
     * StreetProvider (*string*) __*__ (Fake or CRM)
     * StreetLabel (*string*) (Default: Search for a street)
-    * Hint (*string*) (Hint message when a user is searching for a street)
     * SelectLabel (*string*) (Default: Street)
+    * Hint (*string*) (Hint message when a user is searching for a street)
+    * SelectHint (*string*) (Hint which appear above the select)
     * MaxLength (*string*) (Default: 200)
     * Optional (*boolean*) (Default: false)
     * TargetMapping (*string*)  
@@ -811,7 +813,7 @@ Street example:
     * Optional (*boolean*) (Default: false)
     * TargetMapping (*string*)  
 
-Street example:
+Organisation example:
 ```json
     {
           "Type": "Organisation",
