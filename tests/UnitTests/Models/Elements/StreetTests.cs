@@ -1,6 +1,5 @@
 ﻿using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
-using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties;
 using form_builder.ViewModels;
@@ -13,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace form_builder_tests.UnitTests.Models.Elements
 {
@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             //Act
             var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<Tuple<ElementViewModel, List<AddressSearchResult>>>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]

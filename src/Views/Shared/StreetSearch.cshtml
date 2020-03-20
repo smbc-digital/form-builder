@@ -7,11 +7,9 @@
 }
 
 @if(Model.Properties.LegendAsH1) {
-    <h1>
-        <label @Model.WriteOptional() for="@questionId">@streetLabel</label>
-    </h1>
+    <h1>@streetLabel</h1>
 } else {
-    <label @Model.WriteOptional() for="@questionId">@streetLabel</label>
+    <label class="h2">@streetLabel</label>
 }
 
 @if (Model.Properties.Optional)

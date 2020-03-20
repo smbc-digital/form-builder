@@ -9,6 +9,7 @@ using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace form_builder.Models.Elements
 {
@@ -18,6 +19,7 @@ namespace form_builder.Models.Elements
         {
             Type = EElementType.Street;
         }
+
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             elementHelper.CheckForQuestionId(this);
@@ -53,27 +55,62 @@ namespace form_builder.Models.Elements
                     ReturnURL = url
                 };
 
-                return await viewRender.RenderAsync("StreetSelect", new Tuple<ElementViewModel, List<AddressSearchResult>>(viewElement, addressSearchResults));
+                var optionsList = new List<SelectListItem>{ new SelectListItem($"{addressSearchResults.Count} streets found", string.Empty)};
+                addressSearchResults.ForEach((searchResult) => {
+                    optionsList.Add(new SelectListItem(searchResult.Name, $"{searchResult.UniqueId}|{searchResult.Name}"));
+                });
+
+                return await viewRender.RenderAsync("StreetSelect", new Tuple<ElementViewModel, List<SelectListItem>>(viewElement, optionsList));
             }
 
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-street");
             return await viewRender.RenderAsync("StreetSearch", this);
         }
 
-        public override Dictionary<string, dynamic> GenerateElementProperties(string type)
-        {
-            var properties = new Dictionary<string, dynamic>()
-            {
-                { "id", $"{Properties.QuestionId}-street" },
-                { "maxlength", Properties.MaxLength }
-            };
+        private string StreetSelectDescribeByValue(){
+            var describedByValue = string.Empty;
 
-            if (DisplayAriaDescribedby)
+            if (!string.IsNullOrEmpty(Properties.SelectHint))
             {
-                properties.Add("aria-describedby", DescribedByValue("-street"));
+                describedByValue += $"{Properties.QuestionId}-streetaddress-hint ";
             }
 
-            return properties;
+            if (!IsValid)
+            {
+                describedByValue += $"{Properties.QuestionId}-streetaddress-error";
+            }
+
+            return describedByValue.Trim();
+        }
+
+
+        public override Dictionary<string, dynamic> GenerateElementProperties(string type)
+        {
+            var properties = new Dictionary<string, dynamic>();
+
+            switch(type){
+                case "Select":
+                    properties.Add("id", $"{Properties.QuestionId}-streetaddress");
+                    properties.Add("name", $"{Properties.QuestionId}-streetaddress");
+
+                    if (!string.IsNullOrWhiteSpace(Properties.SelectHint) || !IsValid)
+                    {
+                        properties.Add("aria-describedby", StreetSelectDescribeByValue());
+                    }
+
+                    return properties;
+
+                default:
+                    properties.Add("id", $"{Properties.QuestionId}-street");
+                    properties.Add("maxlength", Properties.MaxLength);
+
+                    if (DisplayAriaDescribedby)
+                    {
+                        properties.Add("aria-describedby", DescribedByValue("-street"));
+                    }
+
+                    return properties;
+            }
         }
     }
 }
