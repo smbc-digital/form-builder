@@ -10,9 +10,7 @@
 
 @await Html.BeginFieldSet(Model.Item1.Element, "-address")
      @if(Model.Item1.Element.Properties.LegendAsH1) {
-        <h1>
-            <label>@Model.Item1.Element.Properties.AddressLabel</label>
-        </h1>
+        <h1>@Model.Item1.Element.Properties.AddressLabel</h1>
     } else {
         <label class="h2">@Model.Item1.Element.Properties.AddressLabel</label>
     }

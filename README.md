@@ -52,7 +52,6 @@
 * **Elements**[*object*]- List of HTML elements to display on page
 * [Behaviours[*object*]](#pagebehaviours) - List of conditionals & page redirects for the page
 
-
 ## Element Types & Properties
 **Elements[*object*]**:
 

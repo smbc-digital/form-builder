@@ -21,9 +21,13 @@
 {
     <p class="description" id=@hintId>@Model.Properties.Hint</p>
 }
-@Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())
+@*@Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())*@
+<input type="file" allowed="@Model.Properties.AllowedFileTypes" id="@Model.Properties.QuestionId" name="fileUpload" value="@Model.Properties.Value" />
+
 @if (!Model.IsValid)
 {
     <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
 }
 <p class="input-error-content" id="fileSizeError" style="display: none">The selected file must be smaller than 23MB</p>
+
+

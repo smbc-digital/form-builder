@@ -20,9 +20,7 @@
 
 <fieldset @Model.Element.GenerateFieldsetProperties()>
     @if(Model.Element.Properties.LegendAsH1) {
-        <h1>
-            <label>@Model.Element.Properties.AddressManualLabel</label>
-        </h1>
+        <h1>@Model.Element.Properties.AddressManualLabel</h1>
     } else {
         <label class="h2">@Model.Element.Properties.AddressManualLabel</label>
     }
