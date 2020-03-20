@@ -31,8 +31,6 @@ namespace form_builder.Models.Elements
 
             if(!IsValid && viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Search")
             {
-                viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
-
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
                 return await viewRender.RenderAsync("AddressSearch", viewElement);
             }
@@ -40,20 +38,17 @@ namespace form_builder.Models.Elements
             if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
             {
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
-
                  
                 viewElement.ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
+                viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
                 var optionsList = new List<SelectListItem>{ new SelectListItem($"{addressSearchResults.Count} addresses found", string.Empty)};
                 addressSearchResults.ForEach((searchResult) => {
                     optionsList.Add(new SelectListItem(searchResult.Name, $"{searchResult.UniqueId}|{searchResult.Name}"));
                 });
-
+                
                 return await viewRender.RenderAsync("AddressSelect", new Tuple<ElementViewModel, List<SelectListItem>>(viewElement, optionsList));
             }
-                                   
-            
-            viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
             return await viewRender.RenderAsync("AddressSearch", viewElement);
