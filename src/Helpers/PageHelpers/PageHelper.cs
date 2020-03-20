@@ -69,7 +69,7 @@ namespace form_builder.Helpers.PageHelpers
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
             
-            if (page.PageSlug.ToLower() != "success")
+            if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
             {
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
             }
