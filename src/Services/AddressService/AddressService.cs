@@ -77,9 +77,8 @@ namespace form_builder.Services.AddressService
 
                 try
                 {
-                    //var result = await _addressServiceGateway.SearchAsync(new AddressSearch { AddressProvider = (EAddressProvider)System.Enum.Parse(typeof(EAddressProvider), addressElement.Properties.AddressProvider), SearchTerm = postcode });
-                    //addressResults = result.ResponseContent.ToList();
-                    addressResults = new List<AddressSearchResult>{new AddressSearchResult{ Name = "address 1", UniqueId = "123456765432" }, new AddressSearchResult{ Name = "address 2", UniqueId = "654545454545" }};
+                    var result = await _addressServiceGateway.SearchAsync(new AddressSearch { AddressProvider = (EAddressProvider)System.Enum.Parse(typeof(EAddressProvider), addressElement.Properties.AddressProvider), SearchTerm = postcode });
+                    addressResults = result.ResponseContent.ToList();
                 }
                 catch (Exception e)
                 {
