@@ -2,9 +2,10 @@
 @{
     var hintId = $"{Model.Properties.QuestionId}-hint";
     var errorId = $"{Model.Properties.QuestionId}-error";
+    var sizeValidationError = $"{Model.Properties.QuestionId}-fileSizeError";
 }
 
-@if(Model.Properties.LabelAsH1) {
+@if (Model.Properties.LabelAsH1) {
     <h1>
         <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
     </h1>
@@ -21,13 +22,12 @@
 {
     <p class="description" id=@hintId>@Model.Properties.Hint</p>
 }
-@*@Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())*@
-<input type="file" allowed="@Model.Properties.AllowedFileTypes" id="@Model.Properties.QuestionId" name="fileUpload" value="@Model.Properties.Value" />
+@Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())
 
 @if (!Model.IsValid)
 {
     <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
 }
-<p class="input-error-content" id="fileSizeError" style="display: none">The selected file must be smaller than 23MB</p>
+<p class="input-error-content" id="@sizeValidationError" style="display: none">The selected file must be smaller than 23MB</p>
 
 

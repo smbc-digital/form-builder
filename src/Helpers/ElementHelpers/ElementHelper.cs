@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using form_builder.Enum;
 
 namespace form_builder.Helpers.ElementHelpers
 {
@@ -35,12 +36,18 @@ namespace form_builder.Helpers.ElementHelpers
 
         public string CurrentValue(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "")
             {
+
+            if (element.Type == EElementType.FileUpload)
+            {
+                return string.Empty;
+            };
+
             var currentValue = viewModel.ContainsKey($"{element.Properties.QuestionId}{suffix}");
             var cacheData = _distributedCache.GetString(guid);
 
             if (!currentValue && cacheData != null)
             {
-                var mappedCacheData = Newtonsoft.Json.JsonConvert.DeserializeObject<FormAnswers>(cacheData);
+                var mappedCacheData = JsonConvert.DeserializeObject<FormAnswers>(cacheData);
                 var storedValue = mappedCacheData.Pages.FirstOrDefault(_ => _.PageSlug == pageSlug);
 
                 if (storedValue != null)

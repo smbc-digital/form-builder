@@ -62,26 +62,25 @@ namespace form_builder.Mappers
 
         private object GetFileUploadElementValue(string key, FormAnswers formAnswers)
         {
-            key = $"fileUpload_{key}";
             var model = new File();
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == key)
-                .ToList();
+                .ToList()
+                .FirstOrDefault();
 
-            if (value.Count > 0)
+            if (value != null)
             {
-                FileUploadModel uploadModel = JsonConvert.DeserializeObject<FileUploadModel>(value.First().Response.ToString());
+                FileUploadModel uploadModel = JsonConvert.DeserializeObject<FileUploadModel>(value.Response.ToString());
 
-                var fileData = _distributedCacheWrapper.GetString($"file-{key}");
+                var fileData = _distributedCacheWrapper.GetString(uploadModel.Key);
 
                 if (fileData == null)
                 {
-                    throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {key} from the distributed cache");
+                    throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {uploadModel.Key} from the distributed cache");
                 };
 
                 model.Content = fileData;
-                model.FileName = uploadModel.FileName;
-                model.OriginalFileName = uploadModel.OriginalFileName;
+                model.FileName = uploadModel.TrustedOriginalFileName;
 
                 return model;
             }

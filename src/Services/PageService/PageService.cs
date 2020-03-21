@@ -16,7 +16,6 @@ using form_builder.ViewModels;
 using form_builder.Providers.StorageProvider;
 using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
-using Microsoft.AspNetCore.Http;
 using form_builder.Cache;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
@@ -26,7 +25,7 @@ namespace form_builder.Services.PageService
     public interface IPageService
     {
         Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false);
-        Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IFormFileCollection file, bool processManual = false);
+        Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> file, bool processManual = false);
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid);
         Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
     }
@@ -156,7 +155,7 @@ namespace form_builder.Services.PageService
             };
         }
 
-        public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IFormFileCollection file, bool processManual)
+        public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> file, bool processManual)
         {
             var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
             var currentPage = baseForm.GetPage(path);

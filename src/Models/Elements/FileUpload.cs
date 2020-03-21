@@ -19,7 +19,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.FileUpload;
         }
 
-        public override Dictionary<string, dynamic> GenerateElementProperties(string type)
+        public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var allowedFileType = Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
             var maxFileSize = Properties.MaxFileSize > 0 ? Properties.MaxFileSize*1024000 : SystemConstants.DefaultMaxFileSize;
