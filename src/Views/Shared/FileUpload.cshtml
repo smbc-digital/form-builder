@@ -1,16 +1,17 @@
 ﻿@model form_builder.Models.Elements.FileUpload
 @{
-    var hintId = $"{Model.Properties.QuestionId}-hint";
-    var errorId = $"{Model.Properties.QuestionId}-error";
-    var sizeValidationError = $"{Model.Properties.QuestionId}-fileSizeError";
+    var questionId = $"{Model.Properties.QuestionId}-fileupload";
+    var hintId = $"{questionId}-hint";
+    var errorId = $"{questionId}-error";
+    var sizeValidationError = $"{questionId}-fileSizeError";
 }
 
 @if (Model.Properties.LabelAsH1) {
     <h1>
-        <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+        <label @Model.WriteOptional() for="@questionId">@Model.Properties.Label</label>
     </h1>
 } else {
-    <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+    <label @Model.WriteOptional() for="@questionId">@Model.Properties.Label</label>
 }
 
 @if (Model.Properties.Optional)
@@ -22,7 +23,7 @@
 {
     <p class="description" id=@hintId>@Model.Properties.Hint</p>
 }
-@Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, Model.GenerateElementProperties())
+@Html.TextBox(questionId, Model.Properties.Value, Model.GenerateElementProperties())
 
 @if (!Model.IsValid)
 {

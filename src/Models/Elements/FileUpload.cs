@@ -29,8 +29,8 @@ namespace form_builder.Models.Elements
 
             var properties = new Dictionary<string, dynamic>()
             {
-                { "name", Properties.QuestionId },
-                { "id", Properties.QuestionId },
+                { "name", $"{Properties.QuestionId}-fileupload" },
+                { "id", $"{Properties.QuestionId}-fileupload" },
                 { "type", "file" },
                 { "accept", allowedFileType.Join(",") },
                 { "max-file-size", maxFileSize },
@@ -39,7 +39,7 @@ namespace form_builder.Models.Elements
 
             if (DisplayAriaDescribedby)
             {
-                properties.Add("aria-describedby", DescribedByValue());
+                properties.Add("aria-describedby", DescribedByValue("-fileupload"));
             }
 
             return properties;

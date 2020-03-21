@@ -155,7 +155,7 @@ namespace form_builder.Services.PageService
             };
         }
 
-        public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> file, bool processManual)
+        public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> files, bool processManual)
         {
             var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
             var currentPage = baseForm.GetPage(path);
@@ -197,7 +197,7 @@ namespace form_builder.Services.PageService
                 return await _organisationService.ProcesssOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
             }
 
-            _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, file);
+            _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
             if (!currentPage.IsValid)
             {

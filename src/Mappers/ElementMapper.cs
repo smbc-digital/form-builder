@@ -62,6 +62,7 @@ namespace form_builder.Mappers
 
         private object GetFileUploadElementValue(string key, FormAnswers formAnswers)
         {
+            key = $"{key}-fileupload";
             var model = new File();
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == key)

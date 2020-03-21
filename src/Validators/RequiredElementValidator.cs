@@ -29,6 +29,11 @@ namespace form_builder.Validators
                 validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
             }
 
+            if (element.Type == EElementType.FileUpload)
+            {
+                key = $"{element.Properties.QuestionId}-fileupload";
+            }
+
             if (element.Type == EElementType.Address)
             {
                 if (viewModel.ContainsKey("AddressStatus") &&viewModel["AddressStatus"] == "Select")

@@ -107,10 +107,14 @@ namespace form_builder.Services.MappingService
                 if (obj.TryGetValue(target, out objectValue))
                 {
                     var files = (List<File>) objectValue;
-                    obj.Remove(target);
                     var value = _elementMapper.GetAnswerValue(element, formAnswers);
-                    files.Add((File) value);
-                    obj.Add(target, files);
+
+                    if (!element.Properties.Optional || value != null)
+                    {
+                        obj.Remove(target);
+                        files.Add((File) value);
+                        obj.Add(target, files);
+                    }
                 }
                 else
                 {
