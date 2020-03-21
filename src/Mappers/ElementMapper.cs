@@ -68,7 +68,7 @@ namespace form_builder.Mappers
                 .ToList()
                 .FirstOrDefault();
 
-            if (value != null)
+            if (value != null && value.Response != null)
             {
                 FileUploadModel uploadModel = JsonConvert.DeserializeObject<FileUploadModel>(value.Response.ToString());
 
@@ -84,7 +84,7 @@ namespace form_builder.Mappers
 
                 return model;
             }
-            return model;
+            return null;
         }
 
         private Address GetAddressElementValue(string key, FormAnswers formAnswers)
