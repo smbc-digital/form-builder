@@ -10,10 +10,10 @@
     <legend>
         @if(Model.Properties.LegendAsH1) {
             <h1>
-                <label @Model.WriteOptional()>@Model.Properties.Label</label>
+                @Model.Properties.Label
             </h1>
         } else {
-            <label @Model.WriteOptional()>@Model.Properties.Label</label>
+            @Model.Properties.Label
         }
     </legend>
 
