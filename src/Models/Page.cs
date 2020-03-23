@@ -27,12 +27,14 @@ namespace form_builder.Models
 
         public List<EnvironmentAvailability> EnvironmentAvailabilities { get; set; }
 
+
         public bool IsValidated { get; set; }
 
         public bool HideTitle { get; set; }
 
         [JsonIgnore]
         public bool IsValid => !InvalidElements.Any();
+        
         [JsonIgnore]
         public IEnumerable<BaseProperty> InvalidElements
         {
@@ -48,18 +50,18 @@ namespace form_builder.Models
         }
 
         public IEnumerable<IElement> ValidatableElements => Elements.Where(element => element.Type == EElementType.Radio ||
-                                                               element.Type == EElementType.Textarea ||
-                                                               element.Type == EElementType.Select ||
-                                                               element.Type == EElementType.Textbox ||
-                                                               element.Type == EElementType.Checkbox ||
-                                                               element.Type == EElementType.Address ||
-                                                               element.Type == EElementType.AddressManual ||
-                                                               element.Type == EElementType.DateInput ||
-                                                               element.Type == EElementType.TimeInput ||
-                                                               element.Type == EElementType.DatePicker ||
-                                                               element.Type == EElementType.Street ||
-                                                               element.Type == EElementType.Organisation ||
-                                                               element.Type == EElementType.FileUpload
+                                                                element.Type == EElementType.Textarea ||
+                                                                element.Type == EElementType.Select ||
+                                                                element.Type == EElementType.Textbox ||
+                                                                element.Type == EElementType.Checkbox ||
+                                                                element.Type == EElementType.Address ||
+                                                                element.Type == EElementType.AddressManual ||
+                                                                element.Type == EElementType.DateInput ||
+                                                                element.Type == EElementType.TimeInput ||
+                                                                element.Type == EElementType.DatePicker ||
+                                                                element.Type == EElementType.Street ||
+                                                                element.Type == EElementType.Organisation ||
+                                                                element.Type == EElementType.FileUpload
         );
 
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
@@ -90,8 +92,8 @@ namespace form_builder.Models
                         //if (condition.CheckboxContains != null)
                         {
                             return Behaviours
-                               .OrderByDescending(_ => _.Conditions.Count)
-                               .FirstOrDefault(_ => _.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains)));
+                                .OrderByDescending(_ => _.Conditions.Count)
+                                .FirstOrDefault(_ => _.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains)));
                         }
                     }
                 }
@@ -151,13 +153,23 @@ namespace form_builder.Models
 
         public string GetPageTitle()
         {
-           
             if (Elements.Any() && HideTitle)
             {
                 return Elements.First().Properties.Label;
             }
 
             return Title;
+        }
+
+        public bool IsAvailable(string environment)
+        {
+            var environmentAvailability = EnvironmentAvailabilities.SingleOrDefault(_ => _.Environment.Equals(environment));
+            if (environmentAvailability == null)
+            {
+                return true;
+            }
+
+            return environmentAvailability.IsAvailable;
         }
     }
 }
