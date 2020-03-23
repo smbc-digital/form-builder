@@ -107,6 +107,8 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("I should see an image element within a p tag", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 20
  testRunner.And("I should see a link element within a p tag", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 21
+ testRunner.And("I should see the form title in the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }
