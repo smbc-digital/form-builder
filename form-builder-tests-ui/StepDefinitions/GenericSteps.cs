@@ -37,8 +37,7 @@ namespace form_builder_tests_ui.StepDefinitions
 
         [Then("I should see the header")]
         public void ThenIShouldSeeTheHeaderSection()
-        {
-            ThenIShouldSeeTheLink("myaccount.stockport.gov.uk");
+        { 
             Assert.True(BrowserSession.FindAllCss("a[href*='https://www.stockport.gov.uk']").Any());
         }
 
