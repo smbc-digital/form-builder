@@ -25,9 +25,6 @@ namespace form_builder.Models
 
         public List<Behaviour> Behaviours { get; set; }
 
-        public List<EnvironmentAvailability> EnvironmentAvailabilities { get; set; }
-
-
         public bool IsValidated { get; set; }
 
         public bool HideTitle { get; set; }
@@ -159,17 +156,6 @@ namespace form_builder.Models
             }
 
             return Title;
-        }
-
-        public bool IsAvailable(string environment)
-        {
-            var environmentAvailability = EnvironmentAvailabilities.SingleOrDefault(_ => _.Environment.Equals(environment));
-            if (environmentAvailability == null)
-            {
-                return true;
-            }
-
-            return environmentAvailability.IsAvailable;
         }
     }
 }
