@@ -16,5 +16,7 @@ namespace form_builder.Models
         public string Reference { get; set; }
 
         public string PageContent { get; set; }
+
+        public string StartFormUrl { get; set; }
     }
 }

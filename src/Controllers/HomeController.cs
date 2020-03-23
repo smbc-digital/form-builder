@@ -28,7 +28,7 @@ namespace form_builder.Controllers
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
-            _paymentWorkflow = paymentWorkflow;
+            _paymentWorkflow = paymentWorkflow; 
             _fileHelper = fileHelper;
             _fileUploadService = fileUploadService;
         }
