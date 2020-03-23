@@ -98,6 +98,7 @@ namespace form_builder.Services.SubmtiService
             _sessionHelper.RemoveSessionGuid();
 
             var page = mappingEntity.BaseForm.GetPage("success");
+            var startFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{mappingEntity.BaseForm.BaseURL}/{mappingEntity.BaseForm.StartPageSlug}";
 
             if (page == null)
             {
@@ -109,11 +110,7 @@ namespace form_builder.Services.SubmtiService
                 };
             }
 
-            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), mappingEntity.BaseForm, sessionGuid);
-            viewModel.BaseURL = mappingEntity.BaseForm.BaseURL;
-            viewModel.StartPageSlug = mappingEntity.BaseForm.StartPageSlug;
-
-            var startFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{viewModel.BaseURL}/{viewModel.StartPageSlug}";
+            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), mappingEntity.BaseForm, sessionGuid);           
             viewModel.StartFormUrl = startFormUrl;
 
             var success = new Success
