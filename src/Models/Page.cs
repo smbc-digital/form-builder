@@ -25,6 +25,8 @@ namespace form_builder.Models
 
         public List<Behaviour> Behaviours { get; set; }
 
+        public List<EnvironmentAvailability> EnvironmentAvailabilities { get; set; }
+
         public bool IsValidated { get; set; }
 
         public bool HideTitle { get; set; }
