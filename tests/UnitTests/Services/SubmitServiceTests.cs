@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using StockportGovUK.NetStandard.Gateways.ComplimentsComplaintsServiceGateway;
 using Xunit;
 using System.Dynamic;
 using form_builder.Services.MappingService.Entities;
@@ -60,6 +59,9 @@ namespace form_builder_tests.UnitTests.Services
                 }
             };
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(Newtonsoft.Json.JsonConvert.SerializeObject(cacheData));
+
+            _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
+                .Returns(new HostString("www.test.com"));
 
             _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockGateway.Object, _pageHelper.Object, _sessionHelper.Object, _mockEnvironment.Object, _mockHttpContextAccessor.Object);
         }
