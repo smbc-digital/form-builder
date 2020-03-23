@@ -52,6 +52,31 @@
 * **Elements**[*object*]- List of HTML elements to display on page
 * [Behaviours[*object*]](#pagebehaviours) - List of conditionals & page redirects for the page
 
+## Controlling Form Availaiblity ##
+
+Form availability can be controlled per Environment by setting a boolean availability value against the ```ASPNETCORE_ENVIRONMENT``` value for the specified environment. 
+
+For example:
+
+ ```json
+ {
+  "FormName": "My test form",
+  "BaseURL": "my-test-form",
+  "EnvironmentAvailabilities":[
+    {
+      "Environment": "Local",
+      "IsAvailable": true
+    },
+    {
+      "Environment": "Int",
+      "IsAvailable": false
+    }
+  ],
+  ...
+ ```
+
+If the availabilities block is not present or the availability for the requested environment is not specified **forms will be assumed to be available**.
+
 ## Element Types & Properties
 **Elements[*object*]**:
 
