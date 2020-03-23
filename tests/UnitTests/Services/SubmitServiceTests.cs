@@ -20,6 +20,7 @@ using Xunit;
 using System.Dynamic;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -32,6 +33,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
         private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IHostingEnvironment> _mockEnvironment = new Mock<IHostingEnvironment>();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
         public SubmitServiceTests()
         {
@@ -59,7 +61,7 @@ namespace form_builder_tests.UnitTests.Services
             };
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(Newtonsoft.Json.JsonConvert.SerializeObject(cacheData));
 
-            _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockGateway.Object, _pageHelper.Object, _sessionHelper.Object, _mockEnvironment.Object);
+            _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockGateway.Object, _pageHelper.Object, _sessionHelper.Object, _mockEnvironment.Object, _mockHttpContextAccessor.Object);
         }
 
         [Fact]

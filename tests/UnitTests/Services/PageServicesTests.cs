@@ -25,6 +25,7 @@ using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using form_builder.Cache;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -43,6 +44,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDistributedCacheWrapper> _distributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
         public PageServicesTests()
         {
@@ -66,7 +68,10 @@ namespace form_builder_tests.UnitTests.Services
                 FormJson = 1
             });
 
-            _service = new PageService(_logger.Object, _validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object, _mockCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object);
+            _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
+                .Returns(new HostString("www.test.com"));
+
+            _service = new PageService(_logger.Object, _validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object, _mockCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockHttpContextAccessor.Object);
         }
 
         [Fact]
