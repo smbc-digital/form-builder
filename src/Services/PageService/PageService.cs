@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
 using form_builder.Cache;
 using form_builder.Configuration;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace form_builder.Services.PageService
@@ -43,7 +44,7 @@ namespace form_builder.Services.PageService
         private readonly ICache _cache;
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        
+
         public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IHttpContextAccessor httpContextAccessor)
         {
             _validators = validators;
@@ -55,7 +56,7 @@ namespace form_builder.Services.PageService
             _organisationService = organisationService;
             _distributedCache = distributedCache;
             _cache = cache;
-            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;         
+            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
             _httpContextAccessor = httpContextAccessor;
 
         }
@@ -80,7 +81,7 @@ namespace form_builder.Services.PageService
 
             if (formData == null && path != baseForm.StartPageSlug)
             {
-                return new ProcessPageEntity 
+                return new ProcessPageEntity
                 {
                     ShouldRedirect = true,
                     TargetPage = baseForm.StartPageSlug
@@ -89,7 +90,7 @@ namespace form_builder.Services.PageService
 
             if (string.IsNullOrEmpty(path))
             {
-                return new ProcessPageEntity 
+                return new ProcessPageEntity
                 {
                     ShouldRedirect = true,
                     TargetPage = baseForm.StartPageSlug
@@ -103,7 +104,7 @@ namespace form_builder.Services.PageService
                     _distributedCache.Remove(sessionGuid);
             }
 
-            
+
             var page = baseForm.GetPage(path);
             if (page == null)
             {
