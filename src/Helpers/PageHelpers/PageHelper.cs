@@ -11,7 +11,6 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
@@ -30,7 +29,7 @@ namespace form_builder.Helpers.PageHelpers
     {
         void HasDuplicateQuestionIDs(List<Page> pages, string formName);
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null);
-        void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IFormFileCollection file);
+        void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid);
         Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults);
         Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
         Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
@@ -90,7 +89,7 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IFormFileCollection file)
+        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -115,6 +114,9 @@ namespace form_builder.Helpers.PageHelpers
                 }
             }
 
+            if (files != null && files.Any() && isPageValid)
+                answers = _fileUploadService.SaveFormFileAnswers(answers, files);
+
             convertedAnswers.Pages.Add(new PageAnswers
             {
                 PageSlug = viewModel["Path"].ToLower(),
@@ -123,10 +125,6 @@ namespace form_builder.Helpers.PageHelpers
 
             convertedAnswers.Path = viewModel["Path"];
             convertedAnswers.FormName = form;
-
-            if (file != null)
-                if (file.Any())
-                    convertedAnswers = _fileUploadService.CollectAnswers(convertedAnswers, file, viewModel);
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
         }

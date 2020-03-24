@@ -21,12 +21,14 @@ namespace form_builder.Validators
                 return new ValidationResult { IsValid = true };
             }
 
-            if (!viewModel.ContainsKey(element.Properties.QuestionId))
+            var key = $"{element.Properties.QuestionId}-fileupload";
+
+            if (!viewModel.ContainsKey(key))
             {
                 return new ValidationResult { IsValid = true };
             }
 
-            DocumentModel documentModel = viewModel[element.Properties.QuestionId];
+            DocumentModel documentModel = viewModel[key];
 
             if (documentModel == null)
             {
@@ -39,7 +41,6 @@ namespace form_builder.Validators
 
             if (fileType != null)
             {
-
                 if (allowedFileTypes.Contains($".{fileType.Extension}"))
                 {
                     return new ValidationResult { IsValid = true };

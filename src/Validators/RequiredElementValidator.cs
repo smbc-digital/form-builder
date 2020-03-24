@@ -22,16 +22,16 @@ namespace form_builder.Validators
 
             var key = element.Properties.QuestionId;
 
-            if (element.Type == EElementType.FileUpload)
-            {
-                key = $"fileUpload_{element.Properties.QuestionId}";
-            }
-
             var validationMessage = string.Empty;
 
             if (element.Type != EElementType.Address && element.Type != EElementType.Street && element.Type != EElementType.Organisation)
             {
                 validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
+            }
+
+            if (element.Type == EElementType.FileUpload)
+            {
+                key = $"{element.Properties.QuestionId}-fileupload";
             }
 
             if (element.Type == EElementType.Address)
@@ -76,13 +76,13 @@ namespace form_builder.Validators
                 }
             }
 
-            var isValid = true;
+            var isValid = false;
 
             if (element.Type == EElementType.FileUpload)
             {
                 DocumentModel value = viewModel.ContainsKey(key)
-                ? viewModel[key]
-                : null;
+                    ? viewModel[key]
+                    : null;
 
                 isValid = !(value is null);
             }

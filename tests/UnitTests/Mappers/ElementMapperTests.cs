@@ -553,7 +553,7 @@ namespace form_builder_tests.UnitTests.Mappers
         [Fact]
         public void GetAnswerValue_ShouldCall_DistributedCache_ToGetFileUploadContent()
         {
-            var key = "fileUploadTestKey";
+            var key = "fileUpload_fileUploadTestKey";
             _wrapper.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns("testfile");
 
@@ -565,8 +565,8 @@ namespace form_builder_tests.UnitTests.Mappers
                         Answers = new List<Answers> {
                             new Answers
                             {
-                                QuestionId = "fileUpload_fileUploadTestKey",
-                                Response = JsonConvert.SerializeObject(new FileUploadModel{ FileName = key })
+                                QuestionId = "fileUpload_fileUploadTestKey-fileupload",
+                                Response = JsonConvert.SerializeObject(new FileUploadModel{ UntrustedOriginalFileName = key })
                             }
                         }
                     }
@@ -583,7 +583,7 @@ namespace form_builder_tests.UnitTests.Mappers
             _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
 
             var model = Assert.IsType<File>(result);
-            Assert.Equal(key, model.FileName);
+            Assert.Equal("testfile", model.Content);
         }
 
         [Fact]
@@ -601,8 +601,11 @@ namespace form_builder_tests.UnitTests.Mappers
                         Answers = new List<Answers> {
                             new Answers
                             {
-                                QuestionId = "fileUpload_fileUploadTestKey",
-                                Response = JsonConvert.SerializeObject(new FileUploadModel())
+                                QuestionId = $"{key}-fileupload",
+                                Response = JsonConvert.SerializeObject(new FileUploadModel
+                                {
+                                    Key = key
+                                })
                             }
                         }
                     }
@@ -616,7 +619,7 @@ namespace form_builder_tests.UnitTests.Mappers
 
             var result = Assert.Throws<Exception>(() => _elementMapper.GetAnswerValue(element, formAnswers));
 
-            Assert.Equal($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: fileUpload_{key} from the distributed cache", result.Message);
+            Assert.Equal($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {key} from the distributed cache", result.Message);
         }
 
         [Fact]
@@ -641,7 +644,6 @@ namespace form_builder_tests.UnitTests.Mappers
 
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
-            Assert.IsType<File>(result);
             _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
         }
 

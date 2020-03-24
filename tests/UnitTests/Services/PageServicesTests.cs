@@ -26,6 +26,7 @@ using form_builder.Cache;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -46,6 +47,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
+        private readonly Mock<IHostingEnvironment> _mockEnvironment = new Mock<IHostingEnvironment>();
+
         public PageServicesTests()
         {
             _validator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>()))
@@ -55,6 +58,9 @@ namespace form_builder_tests.UnitTests.Services
 
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
                         .ReturnsAsync(new FormBuilderViewModel());
+
+            _mockEnvironment.Setup(_ => _.EnvironmentName)
+                .Returns("local");
 
             var cacheData = new FormAnswers
             {
@@ -71,7 +77,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
                 .Returns(new HostString("www.test.com"));
 
-            _service = new PageService(_logger.Object, _validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object, _mockCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockHttpContextAccessor.Object);
+            _service = new PageService(_logger.Object, _validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object, _mockCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockHttpContextAccessor.Object, _mockEnvironment.Object);
         }
 
         [Fact]
@@ -82,9 +88,9 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var element = new ElementBuilder()
-               .WithType(EElementType.Textarea)
-               .WithQuestionId("test-question")
-               .Build();
+                .WithType(EElementType.Textarea)
+                .WithQuestionId("test-question")
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -116,6 +122,36 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task ProcessPage_ShouldThrowException_IfFormIsNotAvailable()
+        {
+            var schema = new FormSchemaBuilder()
+                .WithEnvironmentAvailability("local", false)
+                .Build();
+
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(schema);
+
+            await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPage("form", "page-one"));
+        }
+
+        [Fact]
+        public async Task ProcessRequest_ShouldThrowException_IfFormIsNotAvailable()
+        {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+
+            var schema = new FormSchemaBuilder()
+                .WithEnvironmentAvailability("local", false)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(schema);
+
+            await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null, false));
+        }
+
+        [Fact]
         public async Task ProcessRequest_ShouldCallAddressService_WhenAddressElement()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
@@ -123,9 +159,9 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new ProcessRequestEntity());
 
             var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithQuestionId("test-address-question")
-               .Build();
+                .WithType(EElementType.Address)
+                .WithQuestionId("test-address-question")
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -161,9 +197,9 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new ProcessRequestEntity());
 
             var element = new ElementBuilder()
-               .WithType(EElementType.Street)
-               .WithQuestionId("test-street-question")
-               .Build();
+                .WithType(EElementType.Street)
+                .WithQuestionId("test-street-question")
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -200,9 +236,9 @@ namespace form_builder_tests.UnitTests.Services
                 .Throws<ApplicationException>();
 
             var element = new ElementBuilder()
-               .WithType(EElementType.Textarea)
-               .WithQuestionId("test-question")
-               .Build();
+                .WithType(EElementType.Textarea)
+                .WithQuestionId("test-question")
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -233,9 +269,9 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessRequest_ApplicationShould_ThrowNullException_WhenNoSessionGUid()
         {
             var element = new ElementBuilder()
-               .WithType(EElementType.Textarea)
-               .WithQuestionId("test-question")
-               .Build();
+                .WithType(EElementType.Textarea)
+                .WithQuestionId("test-question")
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -276,9 +312,9 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessPage_ShouldReturnAddressView_WhenTypeContainsAddress()
         {
             var element = new ElementBuilder()
-                 .WithType(EElementType.Address)
-                 .WithQuestionId("address-test")
-                 .Build();
+                    .WithType(EElementType.Address)
+                    .WithQuestionId("address-test")
+                    .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -357,7 +393,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
-                 .ReturnsAsync(schema);
+                    .ReturnsAsync(schema);
 
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPage("form", requestPath));
@@ -368,9 +404,9 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessPage_Get_ShouldSetAddressStatusToSearch()
         {
             var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithQuestionId("test-address")
-               .Build();
+                .WithType(EElementType.Address)
+                .WithQuestionId("test-address")
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -396,9 +432,9 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessPage_AddressManual_Should_Return_index()
         {
             var element = new ElementBuilder()
-                   .WithType(EElementType.Address)
-                   .WithQuestionId("test-address")
-                   .Build();
+                    .WithType(EElementType.Address)
+                    .WithQuestionId("test-address")
+                    .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -413,7 +449,6 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             var result = await _service.ProcessPage("form", "page-one");
-
             var viewResult = Assert.IsType<ProcessPageEntity>(result);
             var viewModel = Assert.IsType<FormBuilderViewModel>(viewResult.ViewModel);
 
@@ -424,9 +459,9 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessPage_Get_ShouldSetStreetStatusToSearch()
         {
             var element = new ElementBuilder()
-               .WithType(EElementType.Street)
-               .WithQuestionId("test-street")
-               .Build();
+                .WithType(EElementType.Street)
+                .WithQuestionId("test-street")
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -456,9 +491,9 @@ namespace form_builder_tests.UnitTests.Services
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { FormName = "other-form" }));
 
             var element = new ElementBuilder()
-                          .WithType(EElementType.Street)
-                          .WithQuestionId("test-street")
-                          .Build();
+                        .WithType(EElementType.Street)
+                        .WithQuestionId("test-street")
+                        .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -486,9 +521,9 @@ namespace form_builder_tests.UnitTests.Services
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { FormName = "new-form" }));
 
             var element = new ElementBuilder()
-                          .WithType(EElementType.Street)
-                          .WithQuestionId("test-street")
-                          .Build();
+                        .WithType(EElementType.Street)
+                        .WithQuestionId("test-street")
+                        .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -538,9 +573,9 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new ProcessRequestEntity());
 
             var element = new ElementBuilder()
-               .WithType(EElementType.Organisation)
-               .WithQuestionId("test-org-question")
-               .Build();
+                .WithType(EElementType.Organisation)
+                .WithQuestionId("test-org-question")
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
