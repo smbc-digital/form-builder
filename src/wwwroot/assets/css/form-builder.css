@@ -111,3 +111,32 @@ fieldset.input-memorable-date, fieldset.input-time {
     display: inline;
 }
 
+#formTitle {
+    color: white;
+    font-size: 1.2em;
+    width: 66.66%;
+    float: left;
+    margin-top: 27px;
+    padding-left: 15px;
+}
+
+#formTitle:hover {
+    text-decoration: underline;
+}
+
+#header-wrapper {
+    display: flex;
+}
+
+body > header #header-logo-width {
+    width: 33.33%;
+    float: left;
+    padding-right: 15px;
+}
+
+#formTitle > a{
+    color: white;
+    text-decoration: none;
+}
+
+form h1 label { font-size : 1em; }

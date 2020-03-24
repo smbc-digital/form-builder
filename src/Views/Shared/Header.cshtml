@@ -1,12 +1,16 @@
 ﻿@{
-    var isForm = (bool?)ViewData["Form"] ?? false;
-    var headerClass = string.Empty;
+    var displayHeading = (string)ViewData["Title"] != "Error";
 }
-    <div class="center-wrapper">
+<div class="center-wrapper" id="header-wrapper">
+    <div id="header-logo-width">
         <div id="header-logo">
             <a href="https://www.stockport.gov.uk">Stockport Metropolitan Borough Council Homepage</a>
         </div>
-        <div class="form-header" id="header-my-account">
-            <a id="form-myaccount-link" href="https://myaccount.stockport.gov.uk" onClick="ga('send','event','Form','Click My Account')"><span class="fa fa-user" aria-hidden="true"></span><span>My Account</span></a>
-        </div>
     </div>
+    @if (displayHeading)
+    {
+        <div id="formTitle">
+            <a href="@Model.StartFormUrl"><strong>@Model.FormName</strong></a>
+        </div>
+    }
+</div>

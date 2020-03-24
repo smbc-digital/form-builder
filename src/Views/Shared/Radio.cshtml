@@ -6,7 +6,15 @@
 }
 
 @await Html.BeginFieldSet(Model)
-    <partial name="Legend" model="@Model">
+    <legend>
+        @if(Model.Properties.LegendAsH1) {
+            <h1>
+                @Model.Properties.Label
+            </h1>
+        } else {
+            @Model.Properties.Label
+        }
+    </legend>
 
     @if (!string.IsNullOrEmpty(Model.Properties.Hint))
     {

@@ -18,3 +18,6 @@ Scenario: Render information on the page correctly
 	And I should see a strong element within a p tag
 	And I should see an image element within a p tag
 	And I should see a link element within a p tag
+	And I should see the form title in the header
+
+	

@@ -37,8 +37,7 @@ namespace form_builder_tests_ui.StepDefinitions
 
         [Then("I should see the header")]
         public void ThenIShouldSeeTheHeaderSection()
-        {
-            ThenIShouldSeeTheLink("myaccount.stockport.gov.uk");
+        { 
             Assert.True(BrowserSession.FindAllCss("a[href*='https://www.stockport.gov.uk']").Any());
         }
 
@@ -46,6 +45,12 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenIShouldSeeBreadcrumbs()
         {
             Assert.True(BrowserSession.FindCss(".breadcrumb-container").Exists());
+        }
+
+        [Then("I should see the form title in the header")]
+        public void ThenIShouldSeeFormTitle()
+        {
+            Assert.True(BrowserSession.FindCss("#formTitle").Exists());
         }
 
         [Then(@"I should find an element with class ""(.*)""")]
