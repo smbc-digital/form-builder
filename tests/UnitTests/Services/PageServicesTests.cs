@@ -674,7 +674,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns("guid");
 
             //Act
-            var result = await _service.ProcessRequest("form", "first-page", It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IFormFileCollection>(), It.IsAny<bool>());
+            var result = await _service.ProcessRequest("form", "first-page", It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>());
 
             //Assert 
             Assert.Equal(viewModel.StartFormUrl, result.ViewModel.StartFormUrl);
