@@ -39,6 +39,7 @@ namespace form_builder
                 .AddIOptionsConfiguration(Configuration)
                 .ConfigureAddressProviders()
                 .ConfigurePaymentProviders()
+                .ConfigureDocumentCreationProviders()
                 .AddHelpers()
                 .AddServices()
                 .AddWorkflows()
