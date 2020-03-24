@@ -82,7 +82,6 @@ namespace form_builder.Extensions
             services.AddSingleton<IPageHelper, PageHelper>();
             services.AddSingleton<IElementHelper, ElementHelper>();
             services.AddSingleton<IElementMapper, ElementMapper>();
-            services.AddSingleton<IFileHelper, FileHelper>();
 
             services.AddScoped<IViewRender, ViewRender>();
             services.AddHttpContextAccessor();

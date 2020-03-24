@@ -9,6 +9,9 @@ namespace form_builder.Extensions
             var normalisedFormData = new Dictionary<string, dynamic>();
             foreach (var item in formData)
             {
+                if (item.Key.EndsWith("-fileupload"))
+                    continue;
+
                 if (item.Value.Length == 1)
                 {
                     if (item.Key.EndsWith("-address") && !string.IsNullOrEmpty(item.Value[0]))

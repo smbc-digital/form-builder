@@ -59,7 +59,7 @@ namespace form_builder.Services.AddressService
 
                 if (currentPage.IsValid && addressElement.Properties.Optional && emptyPostcode)
                 {
-                    _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null);
+                    _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
                     return new ProcessRequestEntity
                     {
                         Page = currentPage
@@ -68,7 +68,7 @@ namespace form_builder.Services.AddressService
 
                 if (currentPage.IsValid && addressElement.Properties.Optional && emptyAddress && !emptyPostcode && journey == "Select")
                 {
-                    _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null);
+                    _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
                     return new ProcessRequestEntity
                     {
                         Page = currentPage
@@ -102,7 +102,7 @@ namespace form_builder.Services.AddressService
                 };
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null);
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
             _pageHelper.SaveFormData($"{addressElement.Properties.QuestionId}-srcount", addressResults.Count, guid);
             return await _pageHelper.ProcessAddressJourney(journey, currentPage, viewModel, baseForm, guid, addressResults);
         }

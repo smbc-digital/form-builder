@@ -9,10 +9,21 @@ namespace form_builder.Models
     public class FormSchema
     {
         public string FormName { get; set; }
+        
         public string BaseURL { get; set; }
+        
         public string StartPageSlug { get; set; }
+        
         public string FeedbackForm { get; set; }
+        
         public List<Page> Pages { get; set; }
+        
+        public List<EnvironmentAvailability> EnvironmentAvailabilities { get; set; }
+
+        public FormSchema()
+        {
+            EnvironmentAvailabilities = new List<EnvironmentAvailability>();
+        }
 
         public Page GetPage(string path)
         {
@@ -41,6 +52,17 @@ namespace form_builder.Models
             pageHelper.CheckSubmitSlugsHaveAllProperties(Pages, form);
             await pageHelper.CheckForPaymentConfiguration(Pages, form);
             pageHelper.CheckForAcceptedFileUploadFileTypes(Pages, form);
+        }
+
+        public bool IsAvailable(string environment)
+        {
+            var environmentAvailability = EnvironmentAvailabilities.SingleOrDefault(_ => _.Environment.Equals(environment));
+            if (environmentAvailability == null)
+            {
+                return true;
+            }
+
+            return environmentAvailability.IsAvailable;
         }
     }
 }

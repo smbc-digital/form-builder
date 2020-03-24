@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using form_builder.Models;
-using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Services.FileUploadService
 {
     public interface IFileUploadService
     {
-        Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IFormFileCollection fileUpload, string form, string path);
-        FormAnswers CollectAnswers(FormAnswers currentPageAnswers, IFormFileCollection files,
-            Dictionary<string, dynamic> viewModel);
+        Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload);
+        List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files);
     }
 }
