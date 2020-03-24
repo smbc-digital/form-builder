@@ -1,7 +1,4 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-using form_builder_tests.Builders;
-using System;
+﻿using form_builder.Models;
 using System.Collections.Generic;
 using Xunit;
 
@@ -15,7 +12,7 @@ namespace form_builder_tests.UnitTests.Models
         {
             var formSchema = new FormSchema();
 
-            var result = formSchema.IsAvailabile("Int");
+            var result = formSchema.IsAvailable("Int");
 
             Assert.True(result);
         }
@@ -27,13 +24,13 @@ namespace form_builder_tests.UnitTests.Models
                 EnvironmentAvailabilities = new List<EnvironmentAvailability>
                 {
                     new EnvironmentAvailability {
-                        Environment: "Prod",
-                        IsAvailabile: false
-                    };
-                };
+                        Environment = "Prod",
+                        IsAvailable = false
+                    }
+                }
             };
 
-            var result = formSchema.IsAvailabile("Int");
+            var result = formSchema.IsAvailable("Int");
 
             Assert.True(result);
         }
@@ -44,14 +41,14 @@ namespace form_builder_tests.UnitTests.Models
             var formSchema = new FormSchema{
                 EnvironmentAvailabilities = new List<EnvironmentAvailability>
                 {
-                    new EnvironmentAvailability {
-                        Environment: "Int",
-                        IsAvailabile: true
-                    };
-                };
+                    new EnvironmentAvailability(){
+                        Environment = "Int",
+                        IsAvailable = true
+                    }
+                }
             };
 
-            var result = formSchema.IsAvailabile("Int");
+            var result = formSchema.IsAvailable("Int");
 
             Assert.True(result);
         }
@@ -64,13 +61,13 @@ namespace form_builder_tests.UnitTests.Models
                 EnvironmentAvailabilities = new List<EnvironmentAvailability>
                 {
                     new EnvironmentAvailability {
-                        Environment: "Int",
-                        IsAvailabile: false
-                    };
-                };
+                        Environment = "Int",
+                        IsAvailable = false
+                    }
+                }
             };
 
-            var result = formSchema.IsAvailabile("Int");
+            var result = formSchema.IsAvailable("Int");
 
             Assert.False(result);
         }

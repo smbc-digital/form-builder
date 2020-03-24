@@ -14,9 +14,11 @@ using form_builder.Services.StreetService;
 using form_builder.Models.Elements;
 using form_builder.ViewModels;
 using form_builder.Providers.StorageProvider;
+using form_builder.Extensions;
 using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 using form_builder.Cache;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
@@ -82,7 +84,7 @@ namespace form_builder.Services.PageService
 
             if(!baseForm.IsAvailable(_environment.EnvironmentName.ToS3EnvPrefix()))
             {
-                throw new Exception($"Form: {form} is not available in this Environment: {}");
+                throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
             }
 
             var formData = _distributedCache.GetString(sessionGuid);
@@ -175,7 +177,7 @@ namespace form_builder.Services.PageService
             
             if(!baseForm.IsAvailable(_environment.EnvironmentName.ToS3EnvPrefix()))
             {
-                throw new Exception($"Form: {form} is not available in this Environment: {}");
+                throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
             }
 
             var currentPage = baseForm.GetPage(path);
