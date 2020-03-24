@@ -14,8 +14,11 @@ using form_builder.Services.StreetService;
 using form_builder.Models.Elements;
 using form_builder.ViewModels;
 using form_builder.Providers.StorageProvider;
+using form_builder.Extensions;
 using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 using form_builder.Cache;
 using form_builder.Configuration;
 using Microsoft.AspNetCore.Http;
@@ -44,8 +47,10 @@ namespace form_builder.Services.PageService
         private readonly ICache _cache;
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHostingEnvironment _environment;
 
-        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IHttpContextAccessor httpContextAccessor)
+        
+        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IHttpContextAccessor httpContextAccessor,  IHostingEnvironment environment)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -58,6 +63,7 @@ namespace form_builder.Services.PageService
             _cache = cache;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
             _httpContextAccessor = httpContextAccessor;
+            _environment = environment;
 
         }
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false)
@@ -76,6 +82,11 @@ namespace form_builder.Services.PageService
             }
 
             var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
+
+            if(!baseForm.IsAvailable(_environment.EnvironmentName.ToS3EnvPrefix()))
+            {
+                throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
+            }
 
             var formData = _distributedCache.GetString(sessionGuid);
 
@@ -164,6 +175,12 @@ namespace form_builder.Services.PageService
         public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> files, bool processManual)
         {
             var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
+            
+            if(!baseForm.IsAvailable(_environment.EnvironmentName.ToS3EnvPrefix()))
+            {
+                throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
+            }
+
             var currentPage = baseForm.GetPage(path);
 
             var sessionGuid = _sessionHelper.GetSessionGuid();

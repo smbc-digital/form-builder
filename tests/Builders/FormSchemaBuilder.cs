@@ -11,6 +11,8 @@ namespace form_builder_tests.Builders
         private List<Page> _pages = new List<Page>();
         private string _startPageSlug = "page-one";
 
+        private List<EnvironmentAvailability> _environmentAvailability = new List<EnvironmentAvailability>();
+
         public FormSchema Build()
         {
             return new FormSchema
@@ -19,7 +21,8 @@ namespace form_builder_tests.Builders
                 FeedbackForm = _feedbackForm,
                 FormName = _formName,
                 Pages = _pages,
-                StartPageSlug = _startPageSlug
+                StartPageSlug = _startPageSlug,
+                EnvironmentAvailabilities = _environmentAvailability
             };
         }
 
@@ -44,6 +47,15 @@ namespace form_builder_tests.Builders
         public FormSchemaBuilder WithStartPageSlug(string slug)
         {
             _startPageSlug = slug;
+            return this;
+        }
+
+        public FormSchemaBuilder WithEnvironmentAvailability(string environment, bool isAvailable)
+        {
+            _environmentAvailability.Add(new EnvironmentAvailability{
+                Environment = environment,
+                IsAvailable = isAvailable
+            });
             return this;
         }
     }
