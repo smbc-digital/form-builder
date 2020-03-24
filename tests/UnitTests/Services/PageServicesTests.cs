@@ -567,5 +567,82 @@ namespace form_builder_tests.UnitTests.Services
             _organisationService.Verify(_ => _.ProcesssOrganisation(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
         }
+
+        [Fact]
+        public async Task ProcessPage_ShouldGetTheRighStartFormUrl()
+        {
+            //Arrange 
+            var element = new ElementBuilder()
+               .WithType(EElementType.Textbox)
+               .WithQuestionId("test-textbox")
+               .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithBaseUrl("textbox")
+                .WithStartPageSlug("page-one")
+                .Build();
+
+            var viewModel = new FormBuilderViewModel
+            {
+                BaseURL = schema.BaseURL,
+                StartPageSlug = schema.StartPageSlug,
+                StartFormUrl = "https://www.test.com/textbox/page-one"
+            };
+
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(schema);
+
+            //Act
+            var result = await _service.ProcessPage("form", "page-one");
+
+            //Assert 
+            Assert.Equal(viewModel.StartFormUrl, result.ViewModel.StartFormUrl);
+        }
+
+        [Fact]
+        public async Task ProcessRequest_ShouldGetTheRighStartFormUrl()
+        {
+            //Arrange 
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textarea)
+                .WithQuestionId("test-textarea")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("first-page")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithBaseUrl("textarea")
+                .WithStartPageSlug("first-page")
+                .Build();
+
+            var viewModel = new FormBuilderViewModel
+            {
+                BaseURL = schema.BaseURL,
+                StartPageSlug = schema.StartPageSlug,
+                StartFormUrl = "https://www.test.com/textarea/first-page"
+            };
+
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+              .ReturnsAsync(schema);
+
+            _sessionHelper.Setup(_ => _.GetSessionGuid())
+                .Returns("guid");
+
+            //Act
+            var result = await _service.ProcessRequest("form", "first-page", It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IFormFileCollection>(), It.IsAny<bool>());
+
+            //Assert 
+            Assert.Equal(viewModel.StartFormUrl, result.ViewModel.StartFormUrl);
+        }
     }
 }
