@@ -6,6 +6,7 @@ using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
+using form_builder.Services.DocumentService.Entities;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -13,7 +14,7 @@ namespace form_builder.Services.DocumentService
 {
     public interface IDocumentWorkflow
     {
-        Task GenerateDocument(EDocumentContentType documentContentType, EDocumentType documentType, Guid id);
+        Task<byte[]> GenerateDocument(EDocumentContentType documentContentType, EDocumentType documentType, Guid id);
     }
 
     public class DocumentWorkflow : IDocumentWorkflow
@@ -31,19 +32,18 @@ namespace form_builder.Services.DocumentService
             _cache = cache;
         }
 
-        public async Task GenerateDocument(EDocumentContentType documentContentType, EDocumentType documentType, Guid id)
+        public async Task<byte[]> GenerateDocument(EDocumentContentType documentContentType, EDocumentType documentType, Guid id)
         {
             switch (documentContentType)
             {
                 case EDocumentContentType.Summary:
-                    await GenerateSummaryDocumentAsync(documentType, id);
-                    break;
+                    return await GenerateSummaryDocumentAsync(documentType, id);
                 default:
                     throw new Exception("Unknown EDocumentContentType");
             }
         }
 
-        private async Task GenerateSummaryDocumentAsync(EDocumentType documentType, Guid id)
+        private async Task<byte[]> GenerateSummaryDocumentAsync(EDocumentType documentType, Guid id)
         {
             var formData = _distributedCache.GetString($"document-{id.ToString()}");
 
@@ -55,7 +55,7 @@ namespace form_builder.Services.DocumentService
             
             var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(previousAnswers.FormName, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
 
-            _documentSummaryService.GenerateDocument(documentType, previousAnswers, baseForm);
+            return _documentSummaryService.GenerateDocument(new DocumentSummaryEntity{ DocumentType = documentType, PreviousAnswers = previousAnswers, FormSchema = baseForm });
         }
     }
 }

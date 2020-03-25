@@ -86,7 +86,6 @@ namespace form_builder.Services.SubmtiService
                 reference = JsonConvert.DeserializeObject<string>(content);
             }
 
-
             var formFileUploadElements = mappingEntity.BaseForm.Pages.SelectMany(_ => _.Elements)
                 .Where(_ => _.Type == EElementType.FileUpload)
                 .ToList();

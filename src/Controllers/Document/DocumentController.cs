@@ -1,5 +1,6 @@
 using form_builder.Enum;
 using form_builder.Exceptions;
+using form_builder.Extensions;
 using form_builder.Services.DocumentService;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -24,12 +25,11 @@ namespace form_builder.Controllers.Document
                 return RedirectToAction("Index", "Error");
             
             try {
-                await _documentWorkflow.GenerateDocument(EDocumentContentType.Summary, documentType, id);
+                var result = await _documentWorkflow.GenerateDocument(EDocumentContentType.Summary, documentType, id);
+                return File(result, documentType.ToContentType(), "summary.txt");
             } catch(DocumentExpiredException){
                 return RedirectToAction("Expired");
             }
-
-            return Ok();
         }
         
         [HttpGet]
