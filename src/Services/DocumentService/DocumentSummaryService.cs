@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using form_builder.Enum;
+using form_builder.Models;
 using form_builder.Providers.DocumentCreation;
 
 namespace form_builder.Services.DocumentService
 {
     public interface IDocumentSummaryService
     {
-        void GenerateDocument();
+        void GenerateDocument(EDocumentType documentType, FormAnswers previousAnswers);
     }
 
     public class DocumentSummaryService : IDocumentSummaryService
@@ -19,7 +20,7 @@ namespace form_builder.Services.DocumentService
             _textfileProviders = providers.Where(_ => _.DocumentType == EDocumentType.Txt);
         }
 
-        public void GenerateDocument()
+        public void GenerateDocument(EDocumentType documentType, FormAnswers previousAnswers)
         {
             //Generate Document Summary Data
             //Call required provider

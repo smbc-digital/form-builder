@@ -1,4 +1,5 @@
 using form_builder.Enum;
+using form_builder.Exceptions;
 using form_builder.Services.DocumentService;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -17,7 +18,15 @@ namespace form_builder.Controllers.Document
         [Route("Summary/{documentType}/{id}")]
         public IActionResult Summary(EDocumentType documentType, Guid id)
         {
-            _documentWorkflow.GenerateSummaryDocument();
+            if(id == Guid.Empty)
+                return RedirectToAction("Index", "Error");
+            
+            try {
+                _documentWorkflow.GenerateDocument(EDocumentContentType.Summary, documentType, id);
+            } catch(DocumentExpiredException){
+                return RedirectToAction("Expired");
+            }
+
             return Ok();
         }
         
