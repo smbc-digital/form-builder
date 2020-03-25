@@ -83,6 +83,7 @@ namespace form_builder.Services.SubmtiService
             if (response.Content != null)
             {
                 var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
+                reference = JsonConvert.DeserializeObject<string>(content);
             }
 
 
