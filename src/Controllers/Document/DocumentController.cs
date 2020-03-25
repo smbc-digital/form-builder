@@ -3,6 +3,8 @@ using form_builder.Exceptions;
 using form_builder.Services.DocumentService;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading.Tasks;
+
 namespace form_builder.Controllers.Document
 {
     [Route("document")]
@@ -16,13 +18,13 @@ namespace form_builder.Controllers.Document
 
         [HttpGet]
         [Route("Summary/{documentType}/{id}")]
-        public IActionResult Summary(EDocumentType documentType, Guid id)
+        public async Task<IActionResult> Summary(EDocumentType documentType, Guid id)
         {
             if(id == Guid.Empty)
                 return RedirectToAction("Index", "Error");
             
             try {
-                _documentWorkflow.GenerateDocument(EDocumentContentType.Summary, documentType, id);
+                await _documentWorkflow.GenerateDocument(EDocumentContentType.Summary, documentType, id);
             } catch(DocumentExpiredException){
                 return RedirectToAction("Expired");
             }

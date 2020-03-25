@@ -50,7 +50,7 @@ namespace form_builder.Providers.StorageProvider
 
         public Task RemoveAsync(string key, CancellationToken token = default)
         {
-            return _distributedCache.RefreshAsync(key, token);
+            return _distributedCache.RemoveAsync(key, token);
         }
 
         public void Set(string key, byte[] value, DistributedCacheEntryOptions options)

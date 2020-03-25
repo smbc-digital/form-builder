@@ -152,8 +152,8 @@ namespace form_builder.Controllers
         public async Task<IActionResult> Submit(string form)
         {
             var result = await _submitWorkflow.Submit(form);
-
             ViewData["BannerTypeformUrl"] = result.FeedbackFormUrl;
+
             return View(result.ViewName, result.ViewModel);
         }
     }

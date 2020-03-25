@@ -15,7 +15,6 @@ using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -1117,6 +1116,70 @@ namespace form_builder_tests.UnitTests.Helpers
             pages.Add(page2);
 
             _pageHelper.CheckForAcceptedFileUploadFileTypes(pages, "end-point");
+        }
+
+        [Fact]
+        public void CheckForDocumentDownload_ShouldThrowApplicationException_WhenFormSchemaContains_NoDocumentTypes_WhenDocumentDownload_True()
+        {
+            var pages = new List<Page>();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithDocumentDownload(true)
+                .Build();
+
+                
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForDocumentDownload(formSchema));
+
+            Assert.Equal("PageHelper::CheckForDocumentDownload, No document download type configured", result.Message);
+        }
+
+        [Fact]
+        public void CheckForDocumentDownload_ShouldThrowApplicationException_WhenFormSchemaContains_UnknownDocumentType_WhenDocumentDownload_True()
+        {
+            var pages = new List<Page>();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithDocumentDownload(true)
+                .WithDocumentType(EDocumentType.Unknown)
+                .Build();
+
+                
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForDocumentDownload(formSchema));
+
+            Assert.Equal("PageHelper::CheckForDocumentDownload, Unknown document download type configured", result.Message);
+        }
+
+        [Fact]
+        public void CheckForDocumentDownload_ShouldThrowApplicationException_WhenFormSchemaContains_UnknownDocumentType_InList_WhenDocumentDownload_True()
+        {
+            var pages = new List<Page>();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithDocumentDownload(true)
+                .WithDocumentType(EDocumentType.Txt)
+                .WithDocumentType(EDocumentType.Unknown)
+                .Build();
+
+                
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForDocumentDownload(formSchema));
+
+            Assert.Equal("PageHelper::CheckForDocumentDownload, Unknown document download type configured", result.Message);
+        }
+
+        [Fact]
+        public void CheckForDocumentDownload_ShouldNotThrowApplicationException_WhenValidFormSchema_ForDocumentDownload()
+        {
+            var pages = new List<Page>();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithDocumentDownload(true)
+                .WithDocumentType(EDocumentType.Txt)
+                .WithDocumentType(EDocumentType.Txt)
+                .WithDocumentType(EDocumentType.Txt)
+                .Build();
+
+                
+            _pageHelper.CheckForDocumentDownload(formSchema);
         }
 
         [Fact]

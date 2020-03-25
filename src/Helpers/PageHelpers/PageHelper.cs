@@ -35,6 +35,7 @@ namespace form_builder.Helpers.PageHelpers
         Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
         void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName);
         Task CheckForPaymentConfiguration(List<Page> pages, string formName);
+        void CheckForDocumentDownload(FormSchema formSchema);
         void CheckForEmptyBehaviourSlugs(List<Page> pages, string formName);
         void CheckForCurrentEnvironmentSubmitSlugs(List<Page> pages, string formName);
         void CheckSubmitSlugsHaveAllProperties(List<Page> pages, string formName);
@@ -467,6 +468,18 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.FormData.Add(key, value);
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
 
+        }
+
+        public void CheckForDocumentDownload(FormSchema formSchema)
+        {
+            if(formSchema.DocumentDownload){
+                if(formSchema.DocumentType.Any()){
+                    if(formSchema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
+                        throw new ApplicationException($"PageHelper::CheckForDocumentDownload, Unknown document download type configured");
+                } else {
+                     throw new ApplicationException($"PageHelper::CheckForDocumentDownload, No document download type configured");
+                }
+            }
         }
     }
 }
