@@ -30,8 +30,7 @@ namespace form_builder.Helpers.DocumentCreation
                 var questionInFormSchema = formSchemaAnswers.Where(_ => _.Properties.QuestionId == answer.QuestionId)
                                                             .FirstOrDefault();
                                                             
-                var addOptionalText = questionInFormSchema.Properties.Optional ? "(optional)" : string.Empty;
-                data.Add($"{questionInFormSchema.Properties.Label}{addOptionalText}:", answer.Response);
+                data.Add(GetLabelText(questionInFormSchema), answer.Response);
             });
 
             return data;
@@ -39,13 +38,20 @@ namespace form_builder.Helpers.DocumentCreation
 
         private string GetLabelText(IElement element)
         {
-            //TODO: Add correct question labels for each type.
+            var optionalLabelText = string.Empty;
+            if(element.Properties.Optional){
+                optionalLabelText = " (optional)";
+            }
+
             switch (element.Type)
             {
-                case EElementType.Organisation:
-                    return "";
+                case EElementType.Street:
+                    return string.IsNullOrEmpty(element.Properties.StreetLabel) ? $"Search for a street{optionalLabelText}:" 
+                                                                                : $"{element.Properties.StreetLabel}{optionalLabelText}";
+                case EElementType.Address:
+                    return $"{element.Properties.AddressLabel}{optionalLabelText}:";
                 default:
-                    return element.Properties.Label;
+                    return $"{element.Properties.Label}{optionalLabelText}:";
             }
         }
     }

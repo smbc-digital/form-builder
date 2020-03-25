@@ -27,7 +27,6 @@ namespace form_builder.Services.DocumentService
 
         public byte[] GenerateDocument(DocumentSummaryEntity entity)
         {
-            //return document bytes
             switch (entity.DocumentType)
             {
                 case EDocumentType.Txt:
