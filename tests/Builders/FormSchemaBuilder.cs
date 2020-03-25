@@ -1,4 +1,5 @@
-﻿using form_builder.Models;
+﻿using form_builder.Enum;
+using form_builder.Models;
 using System.Collections.Generic;
 
 namespace form_builder_tests.Builders
@@ -10,6 +11,8 @@ namespace form_builder_tests.Builders
         private string _formName = "formname";
         private List<Page> _pages = new List<Page>();
         private string _startPageSlug = "page-one";
+        private bool _documentDownload;
+        private List<EDocumentType> _documentType = new List<EDocumentType>();
 
         private List<EnvironmentAvailability> _environmentAvailability = new List<EnvironmentAvailability>();
 
@@ -22,7 +25,9 @@ namespace form_builder_tests.Builders
                 FormName = _formName,
                 Pages = _pages,
                 StartPageSlug = _startPageSlug,
-                EnvironmentAvailabilities = _environmentAvailability
+                EnvironmentAvailabilities = _environmentAvailability,
+                DocumentDownload = _documentDownload,
+                DocumentType = _documentType
             };
         }
 
@@ -47,6 +52,18 @@ namespace form_builder_tests.Builders
         public FormSchemaBuilder WithStartPageSlug(string slug)
         {
             _startPageSlug = slug;
+            return this;
+        }
+
+        public FormSchemaBuilder WithDocumentDownload(bool value)
+        {
+            _documentDownload = value;
+            return this;
+        }
+
+        public FormSchemaBuilder WithDocumentType(EDocumentType documentType)
+        {
+            _documentType.Add(documentType);
             return this;
         }
 

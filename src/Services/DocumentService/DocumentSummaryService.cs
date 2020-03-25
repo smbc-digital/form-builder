@@ -8,7 +8,7 @@ namespace form_builder.Services.DocumentService
 {
     public interface IDocumentSummaryService
     {
-        void GenerateDocument(EDocumentType documentType, FormAnswers previousAnswers);
+        void GenerateDocument(EDocumentType documentType, FormAnswers previousAnswers, FormSchema formSchema);
     }
 
     public class DocumentSummaryService : IDocumentSummaryService
@@ -20,7 +20,7 @@ namespace form_builder.Services.DocumentService
             _textfileProviders = providers.Where(_ => _.DocumentType == EDocumentType.Txt);
         }
 
-        public void GenerateDocument(EDocumentType documentType, FormAnswers previousAnswers)
+        public void GenerateDocument(EDocumentType documentType, FormAnswers previousAnswers, FormSchema formSchema)
         {
             //Generate Document Summary Data
             //Call required provider
