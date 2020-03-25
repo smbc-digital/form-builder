@@ -33,6 +33,7 @@ using form_builder.Providers.DocumentCreation;
 using form_builder.Providers.DocumentCreation.Generic;
 using form_builder.Providers.DocumentCreation.Smbc;
 using form_builder.Services.DocumentService;
+using form_builder.Helpers.DocumentCreation;
 
 namespace form_builder.Extensions
 {
@@ -86,9 +87,10 @@ namespace form_builder.Extensions
             services.AddSingleton<IPageHelper, PageHelper>();
             services.AddSingleton<IElementHelper, ElementHelper>();
             services.AddSingleton<IElementMapper, ElementMapper>();
+            services.AddSingleton<IDocumentCreationHelper, DocumentCreationHelper>();
 
-            services.AddScoped<IViewRender, ViewRender>();
             services.AddHttpContextAccessor();
+            services.AddScoped<IViewRender, ViewRender>();
             services.AddSingleton<ISessionHelper, SessionHelper>();
 
             return services;
@@ -120,7 +122,7 @@ namespace form_builder.Extensions
         public static IServiceCollection ConfigureDocumentCreationProviders(this IServiceCollection services)
         {
             services.AddSingleton<IDocumentCreation, TextfileDocumentCreator>();
-            services.AddSingleton<IDocumentCreation, SmbcTextfileDocumentCreator>();
+            //services.AddSingleton<IDocumentCreation, SmbcTextfileDocumentCreator>();
             return services;
         }
 

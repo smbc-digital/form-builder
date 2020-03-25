@@ -6,5 +6,6 @@ namespace form_builder.Configuration
         public int PaymentConfiguration { get; set; }
         public int FormJson { get; set; }
         public int FileUpload { get; set; }
+        public int Document { get; set; }
     }
 }

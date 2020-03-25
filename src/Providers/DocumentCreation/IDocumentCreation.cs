@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using form_builder.Enum;
 
 namespace form_builder.Providers.DocumentCreation
@@ -6,6 +7,6 @@ namespace form_builder.Providers.DocumentCreation
     {
         EDocumentType DocumentType { get; }
         
-        void CreateDocument();
+        byte[] CreateDocument(Dictionary<string, string> fileContent);
     }
 }

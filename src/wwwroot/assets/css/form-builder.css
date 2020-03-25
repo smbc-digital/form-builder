@@ -84,59 +84,77 @@ fieldset.input-memorable-date, fieldset.input-time {
     }
 }
 
-.colon-divider {
-    text-align: left;
-    font-weight: 500;
-}
 
-.horizontal > label {
-    -webkit-user-select: none;
-    user-select: none;
-    cursor: pointer;
-    font-size: 19px;
-    line-height: 28px;
-    display: inline-block;
-    font-family: Noto Sans, Arial, sans-serif;
-    font-weight: 400;
-    margin: 0;
-    padding: 12px 18px 4px 45px;
-    position: relative;
-}
+    .colon-divider {
+        text-align: left;
+        font-weight: 500;
+    }
 
-::-webkit-clear-button {
-    display: none;
-}
+    .horizontal > label {
+        -webkit-user-select: none;
+        user-select: none;
+        cursor: pointer;
+        font-size: 19px;
+        line-height: 28px;
+        display: inline-block;
+        font-family: Noto Sans, Arial, sans-serif;
+        font-weight: 400;
+        margin: 0;
+        padding: 12px 18px 4px 45px;
+        position: relative;
+    }
 
-.timeinput {
-    display: inline;
-}
+    ::-webkit-clear-button {
+        display: none;
+    }
 
-#formTitle {
-    color: white;
-    font-size: 1.2em;
-    width: 66.66%;
-    float: left;
-    margin-top: 27px;
-    padding-left: 15px;
-}
+    .timeinput {
+        display: inline;
+    }
 
-#formTitle:hover {
-    text-decoration: underline;
-}
+    #formTitle {
+        color: white;
+        font-size: 1.5em;
+        width: 66.66%;
+        float: left;
+        margin-top: 14px;
+        padding-left: 15px;
+    }
 
-#header-wrapper {
-    display: flex;
-}
+        #formTitle:hover {
+            text-decoration: underline;
+        }
 
-body > header #header-logo-width {
-    width: 33.33%;
-    float: left;
-    padding-right: 15px;
-}
+        #formTitle > a {
+            color: white;
+            text-decoration: none;
+        }
 
-#formTitle > a{
-    color: white;
-    text-decoration: none;
-}
+    #header-wrapper {
+        display: flex;
+    }
 
-form h1 label { font-size : 1em; }
+    body > header #header-logo-width {
+        width: 33.33%;
+        float: left;
+        padding-right: 15px;
+    }
+
+    form h1 label {
+        font-size: 1em;
+    }
+
+@media only screen and (max-width: 415px) {
+
+    #formTitle {
+        width: 100%;
+        margin-top: 50px;
+        padding-left: 0px;
+        font-size: 1.3em;
+    }
+
+    body > header #header-logo-width {
+        width: 0%;
+        padding-right: 0px;
+    }
+}

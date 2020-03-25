@@ -29,6 +29,7 @@
         DatePicker,
         Organisation,
         Numeric,
-        FileUpload
+        FileUpload,
+        DocumentDownload
     }
 }

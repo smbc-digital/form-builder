@@ -1,30 +1,49 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using form_builder.Enum;
+using form_builder.Helpers.DocumentCreation;
+using form_builder.Models;
 using form_builder.Providers.DocumentCreation;
+using form_builder.Services.DocumentService.Entities;
 
 namespace form_builder.Services.DocumentService
 {
     public interface IDocumentSummaryService
     {
-        void GenerateDocument();
+        byte[] GenerateDocument(DocumentSummaryEntity entity);
     }
 
     public class DocumentSummaryService : IDocumentSummaryService
     {
         private IEnumerable<IDocumentCreation> _textfileProviders;
+        private IDocumentCreationHelper _documentCreationHelper;
 
-        public DocumentSummaryService(IEnumerable<IDocumentCreation> providers)
+        public DocumentSummaryService(IDocumentCreationHelper documentCreationHelper, IEnumerable<IDocumentCreation> providers)
         {
             _textfileProviders = providers.Where(_ => _.DocumentType == EDocumentType.Txt);
+            _documentCreationHelper = documentCreationHelper;
         }
 
-        public void GenerateDocument()
+        public byte[] GenerateDocument(DocumentSummaryEntity entity)
         {
-            //Generate Document Summary Data
+            //return document bytes
+            switch (entity.DocumentType)
+            {
+                case EDocumentType.Txt:
+                    return GenerateTextFile(entity.PreviousAnswers, entity.FormSchema);
+                default:
+                    throw new Exception("DocumentSummaryService::GenerateDocument, Unknown Document type request for Summary");
+            }
+        }
+
+        private byte[] GenerateTextFile(FormAnswers formAnswers, FormSchema formSchema) 
+        {
+            var data = _documentCreationHelper.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
+
             //Call required provider
-            //return document
-            throw new System.NotImplementedException(); 
+            //How to handle multiple providers of same type
+            return _textfileProviders.FirstOrDefault().CreateDocument(data);
         }
     }
 }

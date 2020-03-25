@@ -1,4 +1,5 @@
 ﻿using form_builder.Helpers.Session;
+using form_builder.Models;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.SubmtiService;
@@ -38,6 +39,8 @@ namespace form_builder_tests.UnitTests.Workflows
         public async Task Submit_ShouldCallMapping_And_SubmitService()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
+
+            _mappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new MappingEntity{ BaseForm = new FormSchema() });
 
             // Act
             var result = await _workflow.Submit("form");

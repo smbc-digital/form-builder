@@ -1,4 +1,7 @@
-﻿using form_builder.Helpers.PageHelpers;
+﻿using form_builder.Enum;
+using form_builder.Helpers.PageHelpers;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +22,10 @@ namespace form_builder.Models
         public List<Page> Pages { get; set; }
         
         public List<EnvironmentAvailability> EnvironmentAvailabilities { get; set; }
+
+        public bool DocumentDownload { get; set; }
+        
+        public List<EDocumentType> DocumentType { get; set; }
 
         public FormSchema()
         {
@@ -52,6 +59,7 @@ namespace form_builder.Models
             pageHelper.CheckSubmitSlugsHaveAllProperties(Pages, form);
             await pageHelper.CheckForPaymentConfiguration(Pages, form);
             pageHelper.CheckForAcceptedFileUploadFileTypes(Pages, form);
+            pageHelper.CheckForDocumentDownload(this);
         }
 
         public bool IsAvailable(string environment)

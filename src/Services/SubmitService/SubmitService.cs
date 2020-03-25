@@ -15,6 +15,8 @@ using form_builder.Extensions;
 using System.Linq;
 using form_builder.Enum;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using form_builder.Configuration;
 
 namespace form_builder.Services.SubmtiService
 {
@@ -39,9 +41,10 @@ namespace form_builder.Services.SubmtiService
         private readonly IHostingEnvironment _environment;
 
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
 
 
-        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper, IHostingEnvironment environment, IHttpContextAccessor httpContextAccessor)
+        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper, IHostingEnvironment environment, IHttpContextAccessor httpContextAccessor, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
         {
             _distributedCache = distributedCache;
             _gateway = gateway;
@@ -50,6 +53,7 @@ namespace form_builder.Services.SubmtiService
             _logger = logger;
             _environment = environment;
             _httpContextAccessor = httpContextAccessor;
+            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
         }
 
         public async Task<SubmitServiceEntity> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
@@ -93,6 +97,9 @@ namespace form_builder.Services.SubmtiService
                     _distributedCache.Remove($"file-fileUpload_{_.Properties.QuestionId}");
                 });
             }
+
+            if(mappingEntity.BaseForm.DocumentDownload)
+                await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(mappingEntity.FormAnswers), _distrbutedCacheExpirationConfiguration.Document);
 
             _distributedCache.Remove(sessionGuid);
             _sessionHelper.RemoveSessionGuid();

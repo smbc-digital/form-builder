@@ -54,11 +54,12 @@ namespace form_builder.Controllers
         [Route("{form}/payment-success")]
         public IActionResult PaymentSuccess(string form, [FromQuery] string reference)
         {
-            var paymentSuccessViewModel = new PaymentSuccessViewModel
+            var paymentSuccessViewModel = new PaymentViewModel
             {
                 Reference = reference,
                 FormName = form,
-                PageTitle = "Success"
+                PageTitle = "Success",
+                StartFormUrl = $"https://{Request.Host}/{form}"
             };
 
             return View("./Index", paymentSuccessViewModel);
@@ -76,7 +77,8 @@ namespace form_builder.Controllers
                 FormName = form,
                 PageTitle = "Failure",
                 Reference = reference,
-                PaymentUrl = url
+                PaymentUrl = url,
+                StartFormUrl = $"https://{Request.Host}/{form}"
             };
 
             return View("./Failure", paymentFailureViewModel);
@@ -89,12 +91,13 @@ namespace form_builder.Controllers
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var path = "payment";
             var url = await _payService.ProcessPayment(form, path, reference, sessionGuid);
-            var paymentDeclinedViewModel = new PaymentDeclinedViewModel
+            var paymentDeclinedViewModel = new PaymentFailureViewModel
             {
                 FormName = form,
                 PageTitle = "Declined",
                 Reference = reference,
-                PaymentUrl = url.ToString()
+                PaymentUrl = url.ToString(),
+                StartFormUrl = $"https://{Request.Host}/{form}"
             };
 
             return View("./Declined", paymentDeclinedViewModel);
@@ -111,7 +114,8 @@ namespace form_builder.Controllers
                 FormName = form,
                 PageTitle = "Summary",
                 Amount = paymentInfo.Settings.Amount, 
-                Description = paymentInfo.Settings.Description 
+                Description = paymentInfo.Settings.Description,
+                StartFormUrl = $"https://{Request.Host}/{form}"
             };
 
             return View("./Summary", paymentSummaryViewModel);

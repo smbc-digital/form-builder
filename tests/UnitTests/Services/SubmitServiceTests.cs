@@ -23,6 +23,8 @@ using Microsoft.AspNetCore.Http;
 using form_builder.ViewModels;
 using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
+using Microsoft.Extensions.Options;
+using form_builder.Configuration;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -37,6 +39,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IHostingEnvironment> _mockEnvironment = new Mock<IHostingEnvironment>();
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
         public SubmitServiceTests()
         {
             _mockEnvironment.Setup(_ => _.EnvironmentName)
@@ -61,12 +64,18 @@ namespace form_builder_tests.UnitTests.Services
                     }
                 }
             };
+
+            _mockDistrbutedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
+            {
+                Document = 1
+            });
+
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(Newtonsoft.Json.JsonConvert.SerializeObject(cacheData));
 
             _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
                 .Returns(new HostString("www.test.com"));
 
-            _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockGateway.Object, _pageHelper.Object, _sessionHelper.Object, _mockEnvironment.Object, _mockHttpContextAccessor.Object);
+            _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockGateway.Object, _pageHelper.Object, _sessionHelper.Object, _mockEnvironment.Object, _mockHttpContextAccessor.Object, _mockDistrbutedCacheExpirationConfiguration.Object);
         }
 
         [Fact]
@@ -213,7 +222,7 @@ namespace form_builder_tests.UnitTests.Services
                  .WithPropertyText("test-text")
                  .Build();
 
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+            var submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)

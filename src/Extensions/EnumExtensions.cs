@@ -17,5 +17,16 @@ namespace form_builder.Extensions
                     throw new Exception("Unknown schema type");
             }
         }
+
+        public static string ToContentType(this EDocumentType value)
+        {
+            switch (value)
+            {
+                case EDocumentType.Txt:
+                    return "text/plain";
+                default:
+                    throw new Exception("Unknown document type");
+            }
+        }
     }
 }

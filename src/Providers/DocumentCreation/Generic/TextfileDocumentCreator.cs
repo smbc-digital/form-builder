@@ -1,4 +1,7 @@
+using System.IO;
 using form_builder.Enum;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace form_builder.Providers.DocumentCreation.Generic
 {
@@ -6,9 +9,18 @@ namespace form_builder.Providers.DocumentCreation.Generic
     {
         public EDocumentType DocumentType => EDocumentType.Txt;
 
-        public void CreateDocument()
+        public byte[] CreateDocument(Dictionary<string, string> fileContent)
         {
-            throw new System.NotImplementedException();
+            using (var stream = new MemoryStream())
+            {
+                var objstreamwriter = new StreamWriter(stream);
+                fileContent.ToList().ForEach((line) => {
+                    objstreamwriter.WriteLine($"{line.Key} {line.Value}");
+                });
+                objstreamwriter.Flush();
+                objstreamwriter.Close(); 
+                return stream.ToArray();
+            }
         }
     }
 }
