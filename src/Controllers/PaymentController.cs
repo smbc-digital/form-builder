@@ -54,7 +54,7 @@ namespace form_builder.Controllers
         [Route("{form}/payment-success")]
         public IActionResult PaymentSuccess(string form, [FromQuery] string reference)
         {
-            var paymentSuccessViewModel = new PaymentSuccessViewModel
+            var paymentSuccessViewModel = new PaymentViewModel
             {
                 Reference = reference,
                 FormName = form,
@@ -89,7 +89,7 @@ namespace form_builder.Controllers
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var path = "payment";
             var url = await _payService.ProcessPayment(form, path, reference, sessionGuid);
-            var paymentDeclinedViewModel = new PaymentDeclinedViewModel
+            var paymentDeclinedViewModel = new PaymentFailureViewModel
             {
                 FormName = form,
                 PageTitle = "Declined",
