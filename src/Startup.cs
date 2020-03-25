@@ -10,6 +10,7 @@ using form_builder.Configuration;
 using StockportGovUK.AspNetCore.Middleware.App;
 using StockportGovUK.NetStandard.Gateways;
 using form_builder.Cache;
+using form_builder.ModelBinders.Providers;
 
 namespace form_builder
 {
@@ -38,16 +39,22 @@ namespace form_builder
                 .AddIOptionsConfiguration(Configuration)
                 .ConfigureAddressProviders()
                 .ConfigurePaymentProviders()
+                .ConfigureDocumentCreationProviders()
                 .AddHelpers()
                 .AddServices()
                 .AddWorkflows()
                 .AddSession(_ => _.IdleTimeout = TimeSpan.FromMinutes(30));
 
-            services.AddTransient<ICache, form_builder.Cache.Cache>();
+            services.AddTransient<ICache, Cache.Cache>();
 
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
-            services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()))
-                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc()
+                .AddMvcOptions(options => {
+                    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+                    options.ModelBinderProviders.Insert(0, new CustomFormFileModelBinderProvider());
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
             services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
         }
 

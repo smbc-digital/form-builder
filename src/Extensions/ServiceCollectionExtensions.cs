@@ -29,6 +29,10 @@ using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 using System.Diagnostics.CodeAnalysis;
 using form_builder.Services.FileUploadService;
+using form_builder.Providers.DocumentCreation;
+using form_builder.Providers.DocumentCreation.Generic;
+using form_builder.Providers.DocumentCreation.Smbc;
+using form_builder.Services.DocumentService;
 
 namespace form_builder.Extensions
 {
@@ -82,7 +86,6 @@ namespace form_builder.Extensions
             services.AddSingleton<IPageHelper, PageHelper>();
             services.AddSingleton<IElementHelper, ElementHelper>();
             services.AddSingleton<IElementMapper, ElementMapper>();
-            services.AddSingleton<IFileHelper, FileHelper>();
 
             services.AddScoped<IViewRender, ViewRender>();
             services.AddHttpContextAccessor();
@@ -114,6 +117,13 @@ namespace form_builder.Extensions
             return services;
         }
 
+        public static IServiceCollection ConfigureDocumentCreationProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IDocumentCreation, TextfileDocumentCreator>();
+            services.AddSingleton<IDocumentCreation, SmbcTextfileDocumentCreator>();
+            return services;
+        }
+
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddSingleton<IAddressService, AddressService>();
@@ -124,6 +134,7 @@ namespace form_builder.Extensions
             services.AddSingleton<IOrganisationService, OrganisationService>();
             services.AddSingleton<IMappingService, MappingService>();
             services.AddSingleton<IFileUploadService, FileUploadService>();
+            services.AddSingleton<IDocumentSummaryService, DocumentSummaryService>();
 
             return services;
         }
@@ -132,6 +143,7 @@ namespace form_builder.Extensions
         {
             services.AddSingleton<ISubmitWorkflow, SubmitWorkflow>();
             services.AddSingleton<IPaymentWorkflow, PaymentWorkflow>();
+            services.AddSingleton<IDocumentWorkflow, DocumentWorkflow>();
 
             return services;
         }

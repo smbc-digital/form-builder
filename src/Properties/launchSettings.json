@@ -16,7 +16,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "legend-test",
+      "launchUrl": "fileuploadwithdefault",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       }
@@ -24,7 +24,7 @@
     "form_builder": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "legend-test",
+      "launchUrl": "fileuploadwithdefault",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       },

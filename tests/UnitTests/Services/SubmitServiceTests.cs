@@ -20,6 +20,9 @@ using System.Dynamic;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using form_builder.ViewModels;
+using StockportGovUK.NetStandard.Models.Addresses;
+using StockportGovUK.NetStandard.Models.Verint.Lookup;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -94,7 +97,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             // Act
-            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one"} }, "form", ""));
+            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
             // Assert
             Assert.Equal("HomeController, Submit: No postUrl supplied for submit form", result.Message);
@@ -435,6 +438,61 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             Assert.StartsWith($"SubmitService::PaymentSubmission, Gateway", result.Message);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessSubmission_ShouldGetTheRighStartFormUrl()
+        {
+            var submitSlug = new SubmitSlug { Environment = "local", URL = "test" };
+
+            var element = new ElementBuilder()
+                 .WithType(EElementType.Textarea)
+                 .WithQuestionId("test-textarea")
+                 .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlug)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success") 
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithBaseUrl("textarea")
+                .WithStartPageSlug("first-page")
+                .WithPage(page)   
+                .Build();
+
+            var mappingEntity = new MappingEntity
+            {
+                BaseForm = schema,
+                FormAnswers = new FormAnswers
+                {
+                    StartFormUrl = "https://www.test.com/textarea/first-page",
+                    Path = "success"  
+                },
+                Data = new ExpandoObject()            
+            };
+
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("")
+                });
+
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), 
+                It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
+                        .ReturnsAsync(new FormBuilderViewModel());
+
+            var result = await _service.ProcessSubmission(mappingEntity, "form", "guid");
+
+            var submitEntity = Assert.IsType<Success>(result.ViewModel);
+            Assert.Equal(mappingEntity.FormAnswers.StartFormUrl, submitEntity.StartFormUrl);
         }
     }
 }

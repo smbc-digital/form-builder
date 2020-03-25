@@ -111,7 +111,6 @@ namespace form_builder.Services.SubmtiService
             }
 
             var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), mappingEntity.BaseForm, sessionGuid);           
-            viewModel.StartFormUrl = startFormUrl;
 
             var success = new Success
             {
@@ -120,7 +119,7 @@ namespace form_builder.Services.SubmtiService
                 FormAnswers = mappingEntity.FormAnswers,
                 PageContent = viewModel.RawHTML,
                 SecondaryHeader = page.Title,
-                StartFormUrl = viewModel.StartFormUrl
+                StartFormUrl = startFormUrl
             };
 
             return new SubmitServiceEntity

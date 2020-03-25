@@ -9,7 +9,5 @@ namespace form_builder.Services.MappingService.Entities
         public FormSchema BaseForm { get; set; }
 
         public FormAnswers FormAnswers { get; set; }
-
-        public object Files { get; set; }
     }
 }
