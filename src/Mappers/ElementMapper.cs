@@ -81,8 +81,8 @@ namespace form_builder.Mappers
                 };
 
                 model.Content = fileData;
-                model.FileName = uploadModel.TrustedOriginalFileName;
-
+                model.TrustedOriginalFileName = uploadModel.TrustedOriginalFileName;
+                model.UntrustedOriginalFileName = uploadModel.UntrustedOriginalFileName;
                 return model;
             }
             return null;
