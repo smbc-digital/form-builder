@@ -94,7 +94,7 @@ namespace form_builder.Services.SubmtiService
             {
                 formFileUploadElements.ForEach(_ =>
                 {
-                    _distributedCache.Remove($"file-fileUpload_{_.Properties.QuestionId}");
+                    _distributedCache.Remove($"{_.Properties.QuestionId}-fileupload");
                 });
             }
 
