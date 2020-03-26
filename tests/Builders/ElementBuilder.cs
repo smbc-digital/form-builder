@@ -56,6 +56,19 @@ namespace form_builder_tests.Builders
             return this;
         }
 
+        public ElementBuilder WithStreetLabel(string label)
+        {
+            _property.StreetLabel = label;
+            return this;
+        }
+
+
+        public ElementBuilder WithAddressLabel(string label)
+        {
+            _property.AddressLabel = label;
+            return this;
+        }
+
         public ElementBuilder WithValue(string value)
         {
             _property.Value = value;

@@ -17,7 +17,10 @@ namespace form_builder_tests.UnitTests.Helpers
 
         [Theory]
         [InlineData(EElementType.Textbox, "question label", "test")]
-        [InlineData(EElementType.Textarea, "What is your ", "textAreaValue")]
+        [InlineData(EElementType.Textarea, "What is your", "textAreaValue")]
+        [InlineData(EElementType.Checkbox, "Checkbox label", "yes")]
+        [InlineData(EElementType.DatePicker, "Enter the date", "01/01/2000")]
+        [InlineData(EElementType.Radio, "Radio radio", "no")]
         public void GenerateQuestionAndAnswersDictionary_ShouldReturnCorrectLabelText_ForElements(EElementType type, string labelText, string value)
         {
             var questionId = "test-questionID";
@@ -43,20 +46,60 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal($"{labelText}: {value}", result[0]);
         }
 
-        // [Fact]
-        // public void GenerateQuestionAndAnswersDictionary_ShouldReturnCorrectLabelText_ForStreetElement()
-        // {
+        [Fact]
+        public void GenerateQuestionAndAnswersDictionary_ShouldReturnCorrectLabelText_ForStreetElement()
+        {
+            var questionId = "test-questionID";
+            var labelText = "Enter the Street";
+            var value = "street, city, postcode, uk";
+            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-streetaddress-description", Response = value } } }}};
 
+            var element = new ElementBuilder()
+                            .WithType(EElementType.Street)
+                            .WithQuestionId(questionId)
+                            .WithStreetLabel(labelText)
+                            .Build();
 
-        //     var result = _documentCreation.GenerateQuestionAndAnswersDictionary();
-        // }
+            var page = new PageBuilder()
+                        .WithElement(element)
+                        .Build();
 
-        // [Fact]
-        // public void GenerateQuestionAndAnswersDictionary_ShouldReturnCorrectLabelText_ForAddressElement()
-        // {
-            
+            var formSchema = new FormSchemaBuilder()
+                            .WithPage(page)
+                            .Build();
 
-        //     var result = _documentCreation.GenerateQuestionAndAnswersDictionary();
-        // }
+            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
+
+            Assert.Single(result);
+            Assert.Equal($"{labelText}: {value}", result[0]);
+        }
+
+        [Fact]
+        public void GenerateQuestionAndAnswersDictionary_ShouldReturnCorrectLabelText_ForAddressElement()
+        {
+            var questionId = "test-questionID";
+            var labelText = "Whats your Address";
+            var value = "11 road, city, postcode, uk";
+            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-address-description", Response = value } } }}};
+
+            var element = new ElementBuilder()
+                            .WithType(EElementType.Address)
+                            .WithQuestionId(questionId)
+                            .WithAddressLabel(labelText)
+                            .Build();
+
+            var page = new PageBuilder()
+                        .WithElement(element)
+                        .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                            .WithPage(page)
+                            .Build();
+
+            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
+
+            Assert.Single(result);
+            Assert.Equal($"{labelText}: {value}", result[0]);
+        }
     }
 }
