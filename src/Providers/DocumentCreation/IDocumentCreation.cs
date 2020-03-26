@@ -7,6 +7,6 @@ namespace form_builder.Providers.DocumentCreation
     {
         EDocumentType DocumentType { get; }
         
-        byte[] CreateDocument(Dictionary<string, string> fileContent);
+        byte[] CreateDocument(List<string> fileContent);
     }
 }

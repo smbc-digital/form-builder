@@ -1,6 +1,5 @@
 using System.IO;
 using form_builder.Enum;
-using System.Linq;
 using System.Collections.Generic;
 
 namespace form_builder.Providers.DocumentCreation.Generic
@@ -9,13 +8,13 @@ namespace form_builder.Providers.DocumentCreation.Generic
     {
         public EDocumentType DocumentType => EDocumentType.Txt;
 
-        public byte[] CreateDocument(Dictionary<string, string> fileContent)
+        public byte[] CreateDocument(List<string> fileContent)
         {
             using (var stream = new MemoryStream())
             {
                 var objstreamwriter = new StreamWriter(stream);
-                fileContent.ToList().ForEach((line) => {
-                    objstreamwriter.WriteLine($"{line.Key} {line.Value}");
+                fileContent.ForEach((line) => {
+                    objstreamwriter.WriteLine(line);
                 });
                 objstreamwriter.Flush();
                 objstreamwriter.Close(); 

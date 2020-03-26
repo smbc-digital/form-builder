@@ -7,7 +7,7 @@ namespace form_builder.Providers.DocumentCreation.Smbc
     {
         public EDocumentType DocumentType => EDocumentType.Txt;
 
-        public byte[] CreateDocument(Dictionary<string, string> fileContent)
+        public byte[] CreateDocument(List<string> fileContent)
         {
             throw new System.NotImplementedException();
         }

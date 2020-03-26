@@ -36,7 +36,7 @@ namespace form_builder.Services.DocumentService
             }
         }
 
-        private byte[] GenerateTextFile(FormAnswers formAnswers, FormSchema formSchema) 
+        private byte[] GenerateTextFile(FormAnswers formAnswers, FormSchema formSchema)
         {
             var data = _documentCreationHelper.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
 

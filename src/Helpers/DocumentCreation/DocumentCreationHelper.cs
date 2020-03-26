@@ -6,34 +6,67 @@ using System.Linq;
 
 namespace form_builder.Helpers.DocumentCreation
 {
-    public interface IDocumentCreationHelper 
+    public interface IDocumentCreationHelper
     {
-        Dictionary<string, string> GenerateQuestionAndAnswersDictionary(FormAnswers formAnswers, FormSchema formSchema);
+        List<string> GenerateQuestionAndAnswersDictionary(FormAnswers formAnswers, FormSchema formSchema);
     }
 
     public class DocumentCreationHelper : IDocumentCreationHelper
     {
-        public Dictionary<string, string> GenerateQuestionAndAnswersDictionary(FormAnswers formAnswers, FormSchema formSchema)
+        public List<string> GenerateQuestionAndAnswersDictionary(FormAnswers formAnswers, FormSchema formSchema)
         {
-            var data = new Dictionary<string, string>();
+            var data = new List<string>();
+            var filesData = new List<string>();
 
-            var formSchemaAnswers = formSchema.Pages.ToList()
-                .SelectMany(_ => _.Elements)
+            var formSchemaQuestions = formSchema.Pages.ToList()
+                .Where(_ => _.Elements != null)
+                .SelectMany(_ => _.ValidatableElements)
                 .ToList();
 
             var answers = formAnswers.Pages.ToList()
                 .SelectMany(_ => _.Answers)
                 .ToList();
 
-            //TODO: Replace with GetLabelText and GetValue.
-            answers.ForEach((answer) => {
-                var questionInFormSchema = formSchemaAnswers.Where(_ => _.Properties.QuestionId == answer.QuestionId)
-                                                            .FirstOrDefault();
-                                                            
-                data.Add(GetLabelText(questionInFormSchema), answer.Response);
+            formSchemaQuestions.ForEach((question) => {
+                var answer = GetValueForQuestion(question, answers);
+
+                if(!string.IsNullOrWhiteSpace(answer)){
+                    if(question.Type == EElementType.FileUpload){
+                        filesData.Add($"{GetLabelText(question)} {answer}");
+                    } else {
+                        data.Add($"{GetLabelText(question)} {answer}");
+                    }
+                }
             });
+            
+            if(filesData.Any()){
+                data.Add(string.Empty);
+                data.Add("Files:");
+                data.AddRange(filesData);
+            }
 
             return data;
+        }
+
+        private string GetValueForQuestion(IElement question, List<Answers> answers){
+            switch (question.Type)
+            {
+                case EElementType.TimeInput:
+                    var min = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-hours"))?.Response;
+                    var hour = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-minutes"))?.Response;
+                    var amorpm = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-ampm"))?.Response;
+                    return min == null && hour == null && amorpm == null ? string.Empty : $"{min}:{hour}{amorpm}";
+                case EElementType.DateInput:
+                    var day = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-day"))?.Response;
+                    var month = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-month"))?.Response;
+                    var year = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-year"))?.Response;
+                    return day == null && month == null && year == null ? string.Empty : $"{day}/{month}/{year}";
+                case EElementType.FileUpload:
+                    var fileInput = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question,"-fileupload"));
+                    return fileInput == null ? string.Empty : Newtonsoft.Json.JsonConvert.DeserializeObject<FileUploadModel>(fileInput.Response.ToString()).TrustedOriginalFileName;
+                default:
+                    return answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question))?.Response;
+            }
         }
 
         private string GetLabelText(IElement element)
@@ -47,11 +80,30 @@ namespace form_builder.Helpers.DocumentCreation
             {
                 case EElementType.Street:
                     return string.IsNullOrEmpty(element.Properties.StreetLabel) ? $"Search for a street{optionalLabelText}:" 
-                                                                                : $"{element.Properties.StreetLabel}{optionalLabelText}";
+                                                                                : $"{element.Properties.StreetLabel}{optionalLabelText}:";
                 case EElementType.Address:
                     return $"{element.Properties.AddressLabel}{optionalLabelText}:";
                 default:
                     return $"{element.Properties.Label}{optionalLabelText}:";
+            }
+        }
+
+        private string GetQuestionId(IElement element, string prefix = ""){
+
+            switch (element.Type)
+            {
+                case EElementType.DateInput:
+                case EElementType.TimeInput:
+                case EElementType.FileUpload:
+                    return $"{element.Properties.QuestionId}{prefix}";
+                case EElementType.Address:
+                    return $"{element.Properties.QuestionId}-address-description";
+                case EElementType.Organisation:
+                    return $"{element.Properties.QuestionId}-organisation-description";
+                case EElementType.Street:
+                    return $"{element.Properties.QuestionId}-streetaddress-description";
+                default:
+                    return element.Properties.QuestionId;
             }
         }
     }
