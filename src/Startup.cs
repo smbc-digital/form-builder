@@ -11,6 +11,7 @@ using StockportGovUK.AspNetCore.Middleware.App;
 using StockportGovUK.NetStandard.Gateways;
 using form_builder.Cache;
 using form_builder.ModelBinders.Providers;
+using form_builder.ContentFactory;
 
 namespace form_builder
 {
@@ -46,6 +47,7 @@ namespace form_builder
                 .AddSession(_ => _.IdleTimeout = TimeSpan.FromMinutes(30));
 
             services.AddTransient<ICache, Cache.Cache>();
+            services.AddTransient<SuccessPageContentFactory>();
 
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
             services.AddMvc()

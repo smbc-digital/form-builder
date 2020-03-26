@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Hosting;
 using form_builder.Cache;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
+using form_builder.ContentFactory;
 
 namespace form_builder.Services.PageService
 {
@@ -31,6 +32,7 @@ namespace form_builder.Services.PageService
         Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> file, bool processManual = false);
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid);
         Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
+        Task<SuccessPageEntity> FinalisePageJoueny(string form);
     }
 
     public class PageService : IPageService
@@ -47,9 +49,9 @@ namespace form_builder.Services.PageService
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _environment;
+        private readonly SuccessPageContentFactory _successPageContentFactory;
 
-
-        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IHttpContextAccessor httpContextAccessor,  IHostingEnvironment environment)
+        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IHttpContextAccessor httpContextAccessor,  IHostingEnvironment environment, SuccessPageContentFactory successPageContentFactory)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -63,7 +65,7 @@ namespace form_builder.Services.PageService
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
             _httpContextAccessor = httpContextAccessor;
             _environment = environment;
-
+            _successPageContentFactory = successPageContentFactory;
         }
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false)
         {
@@ -271,6 +273,41 @@ namespace form_builder.Services.PageService
                 .ForEach(x => answers.Add(x.QuestionId, x.Response));
 
             return currentPageResult.Page.GetNextPage(answers);
+        }
+
+        public async Task<SuccessPageEntity> FinalisePageJoueny(string form)
+        {
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+
+            if (string.IsNullOrEmpty(sessionGuid))
+            {
+                throw new Exception("PageService::FinalisePageJoueny: Session has expired");
+            }
+
+            var formData = _distributedCache.GetString(sessionGuid);
+            var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+            var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
+
+            var formFileUploadElements = baseForm.Pages.SelectMany(_ => _.Elements)
+                .Where(_ => _.Type == EElementType.FileUpload)
+                .ToList();
+
+            if (formFileUploadElements.Count > 0)
+            {
+                formFileUploadElements.ForEach(_ =>
+                {
+                    _distributedCache.Remove($"{_.Properties.QuestionId}-fileupload");
+                });
+            }
+
+            if(baseForm.DocumentDownload)
+                await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(formAnswers), _distrbutedCacheExpirationConfiguration.Document);
+
+            _distributedCache.Remove(sessionGuid);
+            _sessionHelper.RemoveSessionGuid();
+
+            return await _successPageContentFactory.Build(form, baseForm, sessionGuid, formAnswers);
         }
 
     }
