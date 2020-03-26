@@ -66,13 +66,12 @@ namespace form_builder.Services.MappingService
 
         private IDictionary<string, dynamic> RecursiveCheckAndCreate(string targetMapping, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
         {
-
             var splitTargets = targetMapping.Split(".");
 
             if (splitTargets.Length == 1)
             {
                 if (element.Type == EElementType.FileUpload)
-                    return CheckAndCreateForFileUpload(element, formAnswers, obj);
+                    return CheckAndCreateForFileUpload(splitTargets[0], element, formAnswers, obj);
 
                 object objectValue;
                 if (obj.TryGetValue(splitTargets[0], out objectValue))
@@ -99,9 +98,8 @@ namespace form_builder.Services.MappingService
             return obj;
         }
 
-        private IDictionary<string, dynamic> CheckAndCreateForFileUpload(IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
+        private IDictionary<string, dynamic> CheckAndCreateForFileUpload(string target, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
         {
-            var target = element.Properties.TargetMapping;
             object objectValue;
             if (obj.TryGetValue(target, out objectValue))
             {
