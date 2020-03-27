@@ -5,7 +5,12 @@ using form_builder.Models;
 
 namespace form_builder.ContentFactory
 {
-    public class PageContentFactory
+    public interface IPageContentFactory
+    {
+        Task<string> Build(Page page, FormSchema baseForm, string sessionGuid);
+    }
+    
+    public class PageContentFactory : IPageContentFactory
     {
         private readonly IPageHelper _pageHelper;
 
@@ -16,7 +21,7 @@ namespace form_builder.ContentFactory
 
         public async Task<string> Build(Page page, FormSchema baseForm, string sessionGuid)
         {
-            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid);           
+            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid);         
 
             return viewModel.RawHTML;
         }

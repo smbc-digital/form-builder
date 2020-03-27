@@ -13,13 +13,18 @@ using Microsoft.AspNetCore.Http;
 
 namespace form_builder.ContentFactory
 {
-    public class SuccessPageContentFactory
+    public interface ISuccessPageContentFactory
+    {
+        Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType);
+    }
+
+    public class SuccessPageContentFactory : ISuccessPageContentFactory
     {
         private readonly IPageHelper _pageHelper;
         private readonly IHostingEnvironment _enviroment;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly PageContentFactory _pageContentFactory;
-        public SuccessPageContentFactory(IHttpContextAccessor httpContextAccessor, IHostingEnvironment enviroment, IPageHelper pageHelper, PageContentFactory pageContentFactory)
+        private readonly IPageContentFactory _pageContentFactory;
+        public SuccessPageContentFactory(IHttpContextAccessor httpContextAccessor, IHostingEnvironment enviroment, IPageHelper pageHelper, IPageContentFactory pageContentFactory)
         {
             _pageHelper = pageHelper;
             _enviroment = enviroment;

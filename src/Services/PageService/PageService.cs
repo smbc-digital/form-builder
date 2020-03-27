@@ -49,9 +49,9 @@ namespace form_builder.Services.PageService
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _environment;
-        private readonly SuccessPageContentFactory _successPageContentFactory;
+        private readonly ISuccessPageContentFactory _successPageContentFactory;
 
-        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IHttpContextAccessor httpContextAccessor,  IHostingEnvironment environment, SuccessPageContentFactory successPageContentFactory)
+        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IHttpContextAccessor httpContextAccessor,  IHostingEnvironment environment, ISuccessPageContentFactory successPageContentFactory)
         {
             _validators = validators;
             _pageHelper = pageHelper;
