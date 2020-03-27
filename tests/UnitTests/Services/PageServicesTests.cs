@@ -27,6 +27,8 @@ using form_builder.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
+using form_builder.Builders;
+using form_builder.ContentFactory;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -46,8 +48,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-
         private readonly Mock<IHostingEnvironment> _mockEnvironment = new Mock<IHostingEnvironment>();
+        private readonly Mock<SuccessPageContentFactory> _mockSuccessPageContentFactory = new Mock<SuccessPageContentFactory>();
 
         public PageServicesTests()
         {
@@ -77,7 +79,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
                 .Returns(new HostString("www.test.com"));
 
-            _service = new PageService(_logger.Object, _validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object, _mockCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockHttpContextAccessor.Object, _mockEnvironment.Object);
+            _service = new PageService(_logger.Object, _validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object, _mockCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockHttpContextAccessor.Object, _mockEnvironment.Object, _mockSuccessPageContentFactory.Object);
         }
 
         [Fact]

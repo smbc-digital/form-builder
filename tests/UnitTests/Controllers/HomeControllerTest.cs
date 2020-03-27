@@ -4,8 +4,6 @@ using Xunit;
 using Moq;
 using System.Threading.Tasks;
 using System;
-using System.IO;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using form_builder.Enum;
 using form_builder_tests.Builders;
@@ -14,12 +12,9 @@ using form_builder.Services.PageService.Entities;
 using form_builder.Services.SubmitService.Entities;
 using form_builder.Models;
 using form_builder.Workflows;
-using Microsoft.AspNetCore.Http;
-using form_builder.Helpers;
 using form_builder.Services.FileUploadService;
-using Microsoft.AspNetCore.Http.Internal;
-using Microsoft.Extensions.Primitives;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+using form_builder.Builders;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -411,7 +406,7 @@ namespace form_builder_tests.UnitTests.Controllers
         public async Task Submit_ShouldReturnView_OnSuccessfull()
         {
             // Arrange
-            _submitWorkflow.Setup(_ => _.Submit(It.IsAny<string>())).ReturnsAsync(new SubmitServiceEntity { ViewName = "Success" });
+            _submitWorkflow.Setup(_ => _.Submit(It.IsAny<string>())).ReturnsAsync(string.Empty);
 
             // Act
             var result = await _homeController.Submit("form");

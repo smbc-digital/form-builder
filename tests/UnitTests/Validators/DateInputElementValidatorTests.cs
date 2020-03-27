@@ -1,6 +1,6 @@
-﻿using form_builder.Enum;
+﻿using form_builder.Builders;
+using form_builder.Enum;
 using form_builder.Validators;
-using form_builder_tests.Builders;
 using System;
 using System.Collections.Generic;
 using Xunit;

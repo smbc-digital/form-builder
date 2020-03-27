@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using form_builder.Builders;
 
 namespace form_builder_tests.UnitTests.Services
 {

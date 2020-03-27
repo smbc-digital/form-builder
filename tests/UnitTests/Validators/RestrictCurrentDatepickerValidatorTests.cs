@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using form_builder.Validators;
 using Xunit;
 using System;
+using form_builder.Builders;
 
 namespace form_builder_tests.UnitTests.Validators
 {

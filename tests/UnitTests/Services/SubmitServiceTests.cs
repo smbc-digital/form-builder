@@ -25,6 +25,7 @@ using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using Microsoft.Extensions.Options;
 using form_builder.Configuration;
+using form_builder.Builders;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -491,7 +492,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent("")
+                    Content = new StringContent("123")
                 });
 
             _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), 
@@ -500,8 +501,9 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcessSubmission(mappingEntity, "form", "guid");
 
-            var submitEntity = Assert.IsType<Success>(result.ViewModel);
-            Assert.Equal(mappingEntity.FormAnswers.StartFormUrl, submitEntity.StartFormUrl);
+            Assert.Equal("123", result);
+            //var submitEntity = Assert.IsType<Succes>(result.ViewModel);
+            //Assert.Equal(mappingEntity.FormAnswers.StartFormUrl, submitEntity.StartFormUrl);
         }
     }
 }
