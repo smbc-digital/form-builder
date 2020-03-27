@@ -1,19 +1,14 @@
 ﻿using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
-using form_builder.Models;
 using form_builder.Providers.StorageProvider;
-using form_builder.Services.SubmitService.Entities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
 using form_builder.Extensions;
-using System.Linq;
-using form_builder.Enum;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using form_builder.Configuration;
@@ -22,7 +17,7 @@ namespace form_builder.Services.SubmtiService
 {
     public interface ISubmitService
     {
-        Task<SubmitServiceEntity> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
+        Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
         Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
 
     }
@@ -56,7 +51,7 @@ namespace form_builder.Services.SubmtiService
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
         }
 
-        public async Task<SubmitServiceEntity> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
+        public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
             var reference = string.Empty;
 
@@ -86,55 +81,7 @@ namespace form_builder.Services.SubmtiService
                 reference = JsonConvert.DeserializeObject<string>(content);
             }
 
-            var formFileUploadElements = mappingEntity.BaseForm.Pages.SelectMany(_ => _.Elements)
-                .Where(_ => _.Type == EElementType.FileUpload)
-                .ToList();
-
-            if (formFileUploadElements.Count > 0)
-            {
-                formFileUploadElements.ForEach(_ =>
-                {
-                    _distributedCache.Remove($"{_.Properties.QuestionId}-fileupload");
-                });
-            }
-
-            if(mappingEntity.BaseForm.DocumentDownload)
-                await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(mappingEntity.FormAnswers), _distrbutedCacheExpirationConfiguration.Document);
-
-            _distributedCache.Remove(sessionGuid);
-            _sessionHelper.RemoveSessionGuid();
-
-            var page = mappingEntity.BaseForm.GetPage("success");
-            var startFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{mappingEntity.BaseForm.BaseURL}/{mappingEntity.BaseForm.StartPageSlug}";
-
-            if (page == null)
-            {
-                return new SubmitServiceEntity
-                {
-                    ViewName = "Submit",
-                    ViewModel = mappingEntity.FormAnswers,
-                    FeedbackFormUrl = mappingEntity.BaseForm.FeedbackForm
-                };
-            }
-
-            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), mappingEntity.BaseForm, sessionGuid);           
-
-            var success = new Success
-            {
-                FormName = mappingEntity.BaseForm.FormName,
-                Reference = reference,
-                FormAnswers = mappingEntity.FormAnswers,
-                PageContent = viewModel.RawHTML,
-                SecondaryHeader = page.Title,
-                StartFormUrl = startFormUrl
-            };
-
-            return new SubmitServiceEntity
-            {
-                ViewName = "Success",
-                ViewModel = success,
-                FeedbackFormUrl = mappingEntity.BaseForm.FeedbackForm
-            };
+            return reference;
         }
 
         public async Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid)

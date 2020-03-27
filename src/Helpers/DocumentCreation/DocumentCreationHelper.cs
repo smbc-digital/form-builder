@@ -51,6 +51,17 @@ namespace form_builder.Helpers.DocumentCreation
         private string GetValueForQuestion(IElement question, List<Answers> answers){
             switch (question.Type)
             {
+                case EElementType.Address:
+                    var autoAddress = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-address-description"))?.Response;
+                    if(!string.IsNullOrEmpty(autoAddress)){
+                        return autoAddress;
+                    }
+                    var manualLine1 = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-AddressManualAddressLine1"))?.Response;
+                    var manualLine2 = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-AddressManualAddressLine2"))?.Response;
+                    var town = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-AddressManualAddressTown"))?.Response;
+                    var postcode = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-AddressManualAddressPostcode"))?.Response;
+                    var manualLine2Text = string.IsNullOrEmpty(manualLine2) ? string.Empty : $",{manualLine2}";
+                    return manualLine1 == null && town == null && postcode == null ? string.Empty : $"{manualLine1}{manualLine2Text},{town},{postcode}";
                 case EElementType.TimeInput:
                     var min = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-hours"))?.Response;
                     var hour = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-minutes"))?.Response;
@@ -95,9 +106,8 @@ namespace form_builder.Helpers.DocumentCreation
                 case EElementType.DateInput:
                 case EElementType.TimeInput:
                 case EElementType.FileUpload:
-                    return $"{element.Properties.QuestionId}{prefix}";
                 case EElementType.Address:
-                    return $"{element.Properties.QuestionId}-address-description";
+                    return $"{element.Properties.QuestionId}{prefix}";
                 case EElementType.Organisation:
                     return $"{element.Properties.QuestionId}-organisation-description";
                 case EElementType.Street:

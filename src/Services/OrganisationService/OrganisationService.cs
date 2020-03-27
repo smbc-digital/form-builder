@@ -89,9 +89,8 @@ namespace form_builder.Services.OrganisationService
 
                 try
                 {
-                    var result = await _organisationServiceGateway.SearchAsync(new OrganisationSearch
-                        {OrganisationProvider = provider, SearchTerm = searchTerm});
-                    organisationResults = result.ResponseContent == null ? new List<OrganisationSearchResult>() : result.ResponseContent.ToList();
+                    var result = await _organisationServiceGateway.SearchAsync(new OrganisationSearch {OrganisationProvider = provider, SearchTerm = searchTerm});
+                    organisationResults = result.ResponseContent.ToList();
                 }
                 catch (Exception e)
                 {

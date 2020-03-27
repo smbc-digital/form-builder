@@ -84,6 +84,7 @@ namespace form_builder.Mappers
                 model.TrustedOriginalFileName = uploadModel.UntrustedOriginalFileName;
                 model.UntrustedOriginalFileName = uploadModel.TrustedOriginalFileName;
                 model.KeyName = key;
+                
                 return model;
             }
             return null;

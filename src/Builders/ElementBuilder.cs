@@ -1,4 +1,4 @@
-﻿using form_builder.Enum;
+using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace form_builder_tests.Builders
+namespace form_builder.Builders
 {
     public class ElementBuilder
     {

@@ -152,9 +152,30 @@ namespace form_builder.Controllers
         public async Task<IActionResult> Submit(string form)
         {
             var result = await _submitWorkflow.Submit(form);
-            ViewData["BannerTypeformUrl"] = result.FeedbackFormUrl;
 
-            return View(result.ViewName, result.ViewModel);
+            TempData["reference"] = result;
+            return RedirectToAction("Success", new
+            {
+                form
+            });
+        }
+
+        [HttpGet]
+        [Route("{form}/success")]
+        public async Task<IActionResult> Success(string form)
+        {
+            var result = await _pageService.FinalisePageJoueny(form, EBehaviourType.SubmitForm);
+            
+            var success = new SuccessViewModel {
+                Reference = (string)TempData["reference"],
+                PageContent = result.HtmlContent,
+                FormAnswers = result.FormAnswers,
+                FormName = result.FormName,
+                StartFormUrl = result.StartFormUrl,
+                SecondaryHeader = "Success"
+            };
+
+            return View(result.ViewName, success);
         }
     }
 }

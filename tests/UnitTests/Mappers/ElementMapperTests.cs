@@ -11,6 +11,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Enum;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
+using form_builder.Builders;
 
 namespace form_builder_tests.UnitTests.Mappers
 {

@@ -98,14 +98,7 @@ namespace form_builder.Services.PayService
                 _logger.LogError(e, "The payment callback failed");
                 throw e;
             }
-            finally
-            {
-                if (_sessionHelper != null)
-                {
-                    // clear out the payment session
-                    _sessionHelper.RemoveSessionGuid();
-                }
-            }
+            
         }
 
         public async Task<PaymentInformation> GetFormPaymentInformation(string form)

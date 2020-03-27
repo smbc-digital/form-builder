@@ -25,6 +25,7 @@ using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using Microsoft.Extensions.Options;
 using form_builder.Configuration;
+using form_builder.Builders;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -261,46 +262,6 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessSubmission_ShouldReturnModel_OnSuccessfulGatewayCall_And_DeleteCacheEntry()
-        {
-            // Arrange
-            var guid = Guid.NewGuid();
-
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
-
-            var formData = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithSubmitSlug(submitSlug)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithBehaviour(formData)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
-               .ReturnsAsync(new HttpResponseMessage
-               {
-                   StatusCode = HttpStatusCode.OK,
-                   Content = new StringContent("\"1234456\"")
-               });
-
-            // Act
-            var result = await _service.ProcessSubmission((new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }), "form", guid.ToString());
-
-            // Assert
-            var viewResult = Assert.IsType<SubmitServiceEntity>(result);
-
-            _sessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
-            _mockDistrubutedCache.Verify(_ => _.Remove(It.Is<string>(x => x == guid.ToString())), Times.Once);
-            Assert.Equal("Submit", viewResult.ViewName);
-        }
-
-        [Fact]
         public async Task PaymentSubmission_ShouldCallGateway_AndReturn_Reference()
         {
             // Arrange
@@ -449,59 +410,5 @@ namespace form_builder_tests.UnitTests.Services
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 
-        [Fact]
-        public async Task ProcessSubmission_ShouldGetTheRighStartFormUrl()
-        {
-            var submitSlug = new SubmitSlug { Environment = "local", URL = "test" };
-
-            var element = new ElementBuilder()
-                 .WithType(EElementType.Textarea)
-                 .WithQuestionId("test-textarea")
-                 .Build();
-
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithSubmitSlug(submitSlug)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithBehaviour(behaviour)
-                .WithPageSlug("success") 
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithBaseUrl("textarea")
-                .WithStartPageSlug("first-page")
-                .WithPage(page)   
-                .Build();
-
-            var mappingEntity = new MappingEntity
-            {
-                BaseForm = schema,
-                FormAnswers = new FormAnswers
-                {
-                    StartFormUrl = "https://www.test.com/textarea/first-page",
-                    Path = "success"  
-                },
-                Data = new ExpandoObject()            
-            };
-
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent("")
-                });
-
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), 
-                It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
-                        .ReturnsAsync(new FormBuilderViewModel());
-
-            var result = await _service.ProcessSubmission(mappingEntity, "form", "guid");
-
-            var submitEntity = Assert.IsType<Success>(result.ViewModel);
-            Assert.Equal(mappingEntity.FormAnswers.StartFormUrl, submitEntity.StartFormUrl);
-        }
     }
 }
