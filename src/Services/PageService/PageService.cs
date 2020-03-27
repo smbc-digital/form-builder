@@ -32,7 +32,7 @@ namespace form_builder.Services.PageService
         Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> file, bool processManual = false);
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid);
         Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
-        Task<SuccessPageEntity> FinalisePageJoueny(string form);
+        Task<SuccessPageEntity> FinalisePageJoueny(string form, EBehaviourType behaviourType);
     }
 
     public class PageService : IPageService
@@ -172,7 +172,6 @@ namespace form_builder.Services.PageService
                 ViewModel = viewModel
             };
         }
-
         public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> files, bool processManual)
         {
             var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
@@ -247,7 +246,6 @@ namespace form_builder.Services.PageService
                 Page = currentPage
             };
         }
-
         public async Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid)
         {
             var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid);
@@ -274,8 +272,7 @@ namespace form_builder.Services.PageService
 
             return currentPageResult.Page.GetNextPage(answers);
         }
-
-        public async Task<SuccessPageEntity> FinalisePageJoueny(string form)
+        public async Task<SuccessPageEntity> FinalisePageJoueny(string form, EBehaviourType behaviourType)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
@@ -307,8 +304,7 @@ namespace form_builder.Services.PageService
             _distributedCache.Remove(sessionGuid);
             _sessionHelper.RemoveSessionGuid();
 
-            return await _successPageContentFactory.Build(form, baseForm, sessionGuid, formAnswers);
+            return await _successPageContentFactory.Build(form, baseForm, sessionGuid, formAnswers, behaviourType);
         }
-
     }
 }

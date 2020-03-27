@@ -48,6 +48,7 @@ namespace form_builder
 
             services.AddTransient<ICache, Cache.Cache>();
             services.AddTransient<SuccessPageContentFactory>();
+            services.AddTransient<PageContentFactory>();
 
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
             services.AddMvc()

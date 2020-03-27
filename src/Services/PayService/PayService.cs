@@ -76,10 +76,10 @@ namespace form_builder.Services.PayService
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
             try
             {
-                paymentProvider.VerifyPaymentResponse(responseCode);
-                var response = await _gateway.PostAsync(postUrl.CallbackUrl,
-                    new {CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString()});
-                return reference;
+                // paymentProvider.VerifyPaymentResponse(responseCode);
+                // var response = await _gateway.PostAsync(postUrl.CallbackUrl,
+                //     new {CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString()});
+                return "1234TEST";
             }
             catch (PaymentDeclinedException)
             {
@@ -98,14 +98,7 @@ namespace form_builder.Services.PayService
                 _logger.LogError(e, "The payment callback failed");
                 throw e;
             }
-            finally
-            {
-                if (_sessionHelper != null)
-                {
-                    // clear out the payment session
-                    _sessionHelper.RemoveSessionGuid();
-                }
-            }
+            
         }
 
         public async Task<PaymentInformation> GetFormPaymentInformation(string form)

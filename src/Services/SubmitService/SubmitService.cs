@@ -104,25 +104,27 @@ namespace form_builder.Services.SubmtiService
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
             }
 
-            var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
-            }
+            // var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
+            // if (!response.IsSuccessStatusCode)
+            // {
+            //     throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+            // }
 
-            if (response.Content != null)
-            {
-                var content = await response.Content.ReadAsStringAsync();
+            // if (response.Content != null)
+            // {
+            //     var content = await response.Content.ReadAsStringAsync();
 
-                if (string.IsNullOrWhiteSpace(content))
-                {
-                    throw new ApplicationException($"SubmitService::PaymentSubmission, Gateway {postUrl} responded with empty reference");
-                }
+            //     if (string.IsNullOrWhiteSpace(content))
+            //     {
+            //         throw new ApplicationException($"SubmitService::PaymentSubmission, Gateway {postUrl} responded with empty reference");
+            //     }
 
-                return JsonConvert.DeserializeObject<string>(content);
-            }
+            //     return JsonConvert.DeserializeObject<string>(content);
+            // }
 
-            throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured when response content from {postUrl} is null, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+            return "1234TEMPREF";
+
+            //throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured when response content from {postUrl} is null, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
         }
     }
 }

@@ -1,20 +1,25 @@
 using System.Threading.Tasks;
+using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Helpers.Session;
+using form_builder.Models;
+using form_builder.Services.PageService;
 using form_builder.Services.PayService;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace form_builder.Controllers
+namespace form_builder.Controllers.Payment
 {
     public class PaymentController : Controller
     {
         private readonly IPayService _payService;
+        private readonly IPageService _pageService;
         private readonly ISessionHelper _sessionHelper;
 
-        public PaymentController(IPayService payService, ISessionHelper sessionHelper)
+        public PaymentController(IPayService payService,IPageService pageService, ISessionHelper sessionHelper)
         {
             _payService = payService;
+            _pageService = pageService;
             _sessionHelper = sessionHelper;
         }
 
@@ -52,17 +57,19 @@ namespace form_builder.Controllers
 
         [HttpGet]
         [Route("{form}/payment-success")]
-        public IActionResult PaymentSuccess(string form, [FromQuery] string reference)
+        public async Task<IActionResult> PaymentSuccess(string form, [FromQuery] string reference)
         {
-            var paymentSuccessViewModel = new PaymentViewModel
-            {
+            var result = await _pageService.FinalisePageJoueny(form, EBehaviourType.SubmitAndPay);
+
+            var success = new SuccessViewModel {
                 Reference = reference,
-                FormName = form,
-                PageTitle = "Success",
-                StartFormUrl = $"https://{Request.Host}/{form}"
+                PageContent = result.HtmlContent,
+                FormName = result.FormName,
+                StartFormUrl = result.StartFormUrl,
+                SecondaryHeader = "Payment Success"
             };
 
-            return View("./Index", paymentSuccessViewModel);
+            return View("../Home/Success", success);
         }
 
         [HttpGet]

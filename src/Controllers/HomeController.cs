@@ -164,7 +164,7 @@ namespace form_builder.Controllers
         [Route("{form}/success")]
         public async Task<IActionResult> Success(string form)
         {
-            var result = await _pageService.FinalisePageJoueny(form);
+            var result = await _pageService.FinalisePageJoueny(form, EBehaviourType.SubmitForm);
             
             var success = new SuccessViewModel {
                 Reference = (string)TempData["reference"],
