@@ -76,10 +76,10 @@ namespace form_builder.Services.PayService
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
             try
             {
-                // paymentProvider.VerifyPaymentResponse(responseCode);
-                // var response = await _gateway.PostAsync(postUrl.CallbackUrl,
-                //     new {CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString()});
-                return "1234TEST";
+                paymentProvider.VerifyPaymentResponse(responseCode);
+                var response = await _gateway.PostAsync(postUrl.CallbackUrl,
+                    new {CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString()});
+                return reference;
             }
             catch (PaymentDeclinedException)
             {
