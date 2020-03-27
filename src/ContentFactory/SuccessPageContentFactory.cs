@@ -32,7 +32,8 @@ namespace form_builder.ContentFactory
             var page = baseForm.GetPage("success");
             var startFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{baseForm.BaseURL}/{baseForm.StartPageSlug}";
             
-            if(page == null && behaviourType == EBehaviourType.SubmitAndPay){
+            if(page == null && behaviourType == EBehaviourType.SubmitAndPay)
+            {
                 page = GenerateGenericPaymentPage();
                 baseForm.Pages.Add(page);
             }   
