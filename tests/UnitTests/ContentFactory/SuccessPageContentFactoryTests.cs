@@ -149,5 +149,36 @@ namespace form_builder_tests.UnitTests.ContentFactory
             Assert.Equal(EElementType.DocumentDownload, callBack.Elements[1].Type);
             Assert.Equal($"Download {EDocumentType.Txt.ToString()} Document", callBack.Elements[1].Properties.Label);
         }
+
+        
+        [Fact]
+        public async Task Build_ShouldReuturn_Correct_StartFormUrl()
+        {
+            var element = new ElementBuilder()
+                .WithType(EElementType.H2)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithStartPageSlug("page-one")
+                .WithBaseUrl("base-test")
+                .WithPage(page)
+                .Build();
+
+            _mockHttpContext.Setup(_ => _.HttpContext.Request.Host).Returns(new HostString("test"));
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
+            _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>()))
+                .ReturnsAsync("123");
+
+            // Act 
+            var result = await _factory.Build(string.Empty, formSchema, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm);
+
+            // Assert
+            Assert.Equal($"https://test/{formSchema.BaseURL}/{formSchema.StartPageSlug}", result.StartFormUrl);
+        }
     }
 }

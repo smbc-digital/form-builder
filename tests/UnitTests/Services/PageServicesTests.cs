@@ -49,7 +49,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
         private readonly Mock<IHostingEnvironment> _mockEnvironment = new Mock<IHostingEnvironment>();
-        private readonly Mock<SuccessPageContentFactory> _mockSuccessPageContentFactory = new Mock<SuccessPageContentFactory>();
+        private readonly Mock<ISuccessPageContentFactory> _mockSuccessPageContentFactory = new Mock<ISuccessPageContentFactory>();
 
         public PageServicesTests()
         {
@@ -680,6 +680,33 @@ namespace form_builder_tests.UnitTests.Services
 
             //Assert 
             Assert.Equal(viewModel.StartFormUrl, result.ViewModel.StartFormUrl);
+        }
+
+        
+        [Fact]
+        public async Task FinalisePageJoueny_ShouldDeleteCacheEntry()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+
+            var page = new PageBuilder()
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(schema);
+
+            // Act
+            var result = await _service.FinalisePageJoueny("form", EBehaviourType.SubmitAndPay);
+
+            // Assert
+            _sessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == guid.ToString())), Times.Once);
         }
     }
 }
