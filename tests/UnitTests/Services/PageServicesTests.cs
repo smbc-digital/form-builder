@@ -29,6 +29,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using form_builder.Builders;
 using form_builder.ContentFactory;
+using System.Threading;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -681,7 +682,6 @@ namespace form_builder_tests.UnitTests.Services
             //Assert 
             Assert.Equal(viewModel.StartFormUrl, result.ViewModel.StartFormUrl);
         }
-
         
         [Fact]
         public async Task FinalisePageJoueny_ShouldDeleteCacheEntry()
@@ -707,6 +707,86 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             _sessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
             _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == guid.ToString())), Times.Once);
+        }
+
+        [Fact]
+        public async Task FinalisePageJoueny_ShouldDeleteFileUpload_CacheEntries()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+            var questionIDOne = "fileUploadone";
+            var questionIDTwo = "fileUploadtwo";
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId(questionIDOne)
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId(questionIDTwo)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithPageSlug("page-one")
+                .WithElement(element)
+                .WithElement(element2)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(schema);
+
+            // Act
+            var result = await _service.FinalisePageJoueny("form", EBehaviourType.SubmitAndPay);
+
+            // Assert
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"{questionIDOne}-fileupload")), Times.Once);
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"{questionIDTwo}-fileupload")), Times.Once);
+        }
+
+        [Fact]
+        public async Task FinalisePageJoueny_Should_SetCache_WhenDocumentDownload_True()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+            var questionIDOne = "fileUploadone";
+            var questionIDTwo = "fileUploadtwo";
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId(questionIDOne)
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId(questionIDTwo)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithPageSlug("page-one")
+                .WithElement(element)
+                .WithElement(element2)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithDocumentDownload(true)
+                .Build();
+
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(schema);
+
+            // Act
+            var result = await _service.FinalisePageJoueny("form", EBehaviourType.SubmitAndPay);
+
+            // Assert
+            _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"document-{guid.ToString()}"), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }
