@@ -4,31 +4,39 @@
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
     var sizeValidationError = $"{questionId}-fileSizeError";
+    var elements =  Model.GenerateElementProperties();
+    elements.Add("class", "govuk-file-upload");
 }
 
-@if (Model.Properties.LabelAsH1) {
-    <h1>
-        <label @Model.WriteOptional() for="@questionId">@Model.Properties.Label</label>
-    </h1>
-} else {
-    <label @Model.WriteOptional() for="@questionId">@Model.Properties.Label</label>
-}
+<div class="govuk-form-group">
+    @if (Model.Properties.LabelAsH1) {
+        <h1 class="govuk-label-wrapper">
+            <label class="govuk-label govuk-label--xl" @Model.WriteOptional() for="@questionId">@Model.Properties.Label
+                @if (Model.Properties.Optional)
+                {
+                    <span>(optional)</span>
+                }
+            </label>
+        </h1>
+    } else {
+        <label class="govuk-label" @Model.WriteOptional() for="@questionId">@Model.Properties.Label
+            @if (Model.Properties.Optional)
+            {
+                <span>(optional)</span>
+            }
+        </label>
+    }
 
-@if (Model.Properties.Optional)
-{
-    <span class="optional">(optional)</span>
-}
+    @if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
+    {
+        <span class="govuk-hint" id=@hintId>@Model.Properties.Hint</span>
+    }
 
-@if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
-{
-    <p class="description" id=@hintId>@Model.Properties.Hint</p>
-}
-@Html.TextBox(questionId, Model.Properties.Value, Model.GenerateElementProperties())
+    @Html.TextBox(questionId, Model.Properties.Value, elements)
 
-@if (!Model.IsValid)
-{
-    <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
-}
-<p class="input-error-content" id="@sizeValidationError" style="display: none">The selected file must be smaller than 23MB</p>
-
-
+    @if (!Model.IsValid)
+    {
+        <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
+    }
+    <p class="input-error-content" id="@sizeValidationError" style="display: none">The selected file must be smaller than 23MB</p>
+</div>
