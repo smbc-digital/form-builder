@@ -6,7 +6,6 @@ namespace form_builder.Providers.DocumentCreation.Smbc
     public class SmbcTextfileDocumentCreator : IDocumentCreation
     {
         public EDocumentType DocumentType => EDocumentType.Txt;
-
         public byte[] CreateDocument(List<string> fileContent)
         {
             throw new System.NotImplementedException();

@@ -7,7 +7,6 @@ namespace form_builder.Providers.DocumentCreation.Generic
     public class TextfileDocumentCreator : IDocumentCreation
     {
         public EDocumentType DocumentType => EDocumentType.Txt;
-
         public byte[] CreateDocument(List<string> fileContent)
         {
             using (var stream = new MemoryStream())

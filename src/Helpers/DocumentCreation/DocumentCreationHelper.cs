@@ -75,6 +75,12 @@ namespace form_builder.Helpers.DocumentCreation
                 case EElementType.FileUpload:
                     var fileInput = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question,"-fileupload"));
                     return fileInput == null ? string.Empty : Newtonsoft.Json.JsonConvert.DeserializeObject<FileUploadModel>(fileInput.Response.ToString()).TrustedOriginalFileName;
+                case EElementType.Select:
+                case EElementType.Checkbox:
+                case EElementType.Radio:
+                    var answer = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question));
+                    var value = answer != null ? question.Properties.Options.FirstOrDefault(_ => _.Value == answer.Response) : null;
+                    return value?.Text ?? string.Empty;
                 default:
                     return answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question))?.Response;
             }
