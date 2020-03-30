@@ -86,6 +86,8 @@ namespace form_builder.Services.StreetService
                 formModel.Path = currentPage.PageSlug;
                 formModel.StreetStatus = journey;
                 formModel.FormName = baseForm.FormName;
+                formModel.HideBackButton = currentPage.HideBackButton;
+
                 formModel.PageTitle = currentPage.Title;
 
                 return new ProcessRequestEntity

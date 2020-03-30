@@ -141,6 +141,7 @@ namespace form_builder.Helpers.PageHelpers
                         streetViewModel.StreetStatus = "Select";
                         streetViewModel.FormName = baseForm.FormName;
                         streetViewModel.PageTitle = currentPage.Title;
+                        streetViewModel.HideBackButton = currentPage.HideBackButton;
 
                         return new ProcessRequestEntity
                         {
@@ -178,15 +179,16 @@ namespace form_builder.Helpers.PageHelpers
                             };
                         }
 
-                        var adddressViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, null);
-                        adddressViewModel.AddressStatus = "Select";
-                        adddressViewModel.FormName = baseForm.FormName;
-                        adddressViewModel.PageTitle = currentPage.Title;
+                        var addressViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, null);
+                        addressViewModel.AddressStatus = "Select";
+                        addressViewModel.FormName = baseForm.FormName;
+                        addressViewModel.PageTitle = currentPage.Title;
+                        addressViewModel.HideBackButton = currentPage.HideBackButton;
 
                         return new ProcessRequestEntity
                         {
                             Page = currentPage,
-                            ViewModel = adddressViewModel,
+                            ViewModel = addressViewModel,
                             UseGeneratedViewModel = true,
                             ViewName = "../Address/Index"
                         };
@@ -216,6 +218,7 @@ namespace form_builder.Helpers.PageHelpers
                         organisationViewModel.OrganisationStatus = "Select";
                         organisationViewModel.FormName = baseForm.FormName;
                         organisationViewModel.PageTitle = currentPage.Title;
+                        organisationViewModel.HideBackButton = currentPage.HideBackButton;
 
                         return new ProcessRequestEntity
                         {

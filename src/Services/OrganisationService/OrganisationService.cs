@@ -105,6 +105,7 @@ namespace form_builder.Services.OrganisationService
                 formModel.OrganisationStatus = journey;
                 formModel.FormName = baseForm.FormName;
                 formModel.PageTitle = currentPage.Title;
+                formModel.HideBackButton = currentPage.HideBackButton;
 
                 return new ProcessRequestEntity
                 {

@@ -228,6 +228,7 @@ namespace form_builder.Services.PageService
                 formModel.Path = currentPage.PageSlug;
                 formModel.FormName = baseForm.FormName;
                 formModel.PageTitle = currentPage.Title;
+                formModel.HideBackButton = currentPage.HideBackButton;
                 formModel.BaseURL = baseForm.BaseURL;
                 formModel.StartPageSlug = baseForm.StartPageSlug;
 
@@ -251,6 +252,7 @@ namespace form_builder.Services.PageService
             var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid);
             viewModel.FormName = baseForm.FormName;
             viewModel.PageTitle = page.Title;
+            viewModel.HideBackButton = page.HideBackButton;
             viewModel.Path = path;
             viewModel.BaseURL = baseForm.BaseURL;
             viewModel.StartPageSlug = baseForm.StartPageSlug;

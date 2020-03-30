@@ -93,6 +93,7 @@ namespace form_builder.Services.AddressService
                 formModel.AddressStatus = journey;
                 formModel.FormName = baseForm.FormName;
                 formModel.PageTitle = currentPage.Title;
+                formModel.HideBackButton = currentPage.HideBackButton;
 
                 return new ProcessRequestEntity
                 {
