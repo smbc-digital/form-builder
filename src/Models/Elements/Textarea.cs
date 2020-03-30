@@ -38,7 +38,7 @@ namespace form_builder.Models.Elements
 
             if (Properties.MaxLength <= 200 || Properties.MaxLength > 500)
             {
-                properties.Add("class", Properties.MaxLength > 500 ? "large" : "small");
+                properties.Add("rows", Properties.MaxLength > 500 ? "15" : "5");
             }
 
             if (DisplayAriaDescribedby)
