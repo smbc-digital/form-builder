@@ -70,7 +70,7 @@ namespace form_builder.Services.PayService
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
             if (String.IsNullOrWhiteSpace(postUrl.CallbackUrl))
             {
-                throw new ArgumentException("Callback url has not been specified");
+                throw new ArgumentException("PayService::ProcessPaymentResponse, Callback url has not been specified");
             }
 
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
@@ -85,20 +85,19 @@ namespace form_builder.Services.PayService
             {
                 var response = await _gateway.PostAsync(postUrl.CallbackUrl,
                     new {CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString()});
-                throw new PaymentDeclinedException("CivicaPayProvider::Declined payment");
+                throw new PaymentDeclinedException("PayService::ProcessPaymentResponse, PaymentProvider declined payment");
             }
             catch (PaymentFailureException)
             {
                 var response = await _gateway.PostAsync(postUrl.CallbackUrl,
                     new {CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString()});
-                throw new PaymentFailureException("CivicaPayProvider::Failed payment");
+                throw new PaymentFailureException("PayService::ProcessPaymentResponse, PaymentProvider failed payment");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "The payment callback failed");
                 throw e;
             }
-            
         }
 
         public async Task<PaymentInformation> GetFormPaymentInformation(string form)
