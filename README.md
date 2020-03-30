@@ -25,6 +25,10 @@
         "BaseURL": "",
         "StartPageSlug": "",
         "FeedbackForm": "https://stockportcouncil.typeform.com/to/yzIJEe",
+        "DocumentDownload": true,
+        "DocumentType": [
+          "Txt“
+        ],
         "Pages": [
           {
             "Title": "",
@@ -42,7 +46,14 @@
 
 **StartPageSlug** (*string*) - The first PageSlug users will visit
 
-**FeedbackForm** (*string*) - If present this will be used at the top of the form to link them to, commonly, a TypeForm form that will be created to capture feedback on the new form.
+**FeedbackForm** (*string*) - If present this will be used at the top of the form to link them to, commonly, a TypeForm form that will be created to capture feedback on the new form
+
+**DocumentDownload** (*bool*) - Enable Document download (optional)
+
+**DocumentType** (*Array[string]*) - If Document download is enabled what document type is required.
+
+Allowed Values:
+* **Txt**
 
 **Pages**[*object*]:
 
