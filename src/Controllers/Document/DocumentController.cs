@@ -3,6 +3,7 @@ using form_builder.Exceptions;
 using form_builder.Extensions;
 using form_builder.Services.DocumentService;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -12,9 +13,12 @@ namespace form_builder.Controllers.Document
     public class DocumentController : Controller
     {
         private IDocumentWorkflow _documentWorkflow;
-        public DocumentController(IDocumentWorkflow documentWorkflow)
+        private ILogger<DocumentController> _logger;
+
+        public DocumentController(IDocumentWorkflow documentWorkflow, ILogger<DocumentController> logger)
         {
             _documentWorkflow = documentWorkflow;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -27,7 +31,8 @@ namespace form_builder.Controllers.Document
             try {
                 var result = await _documentWorkflow.GenerateDocument(EDocumentContentType.Summary, documentType, id);
                 return File(result, documentType.ToContentType(), "summary.txt");
-            } catch(DocumentExpiredException){
+            } catch(DocumentExpiredException ex){
+                _logger.LogWarning(ex.Message);
                 return RedirectToAction("Expired");
             }
         }
