@@ -19,9 +19,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Theory]
         [InlineData(EElementType.Textbox, "question label", "test")]
         [InlineData(EElementType.Textarea, "What is your", "textAreaValue")]
-        [InlineData(EElementType.Checkbox, "Checkbox label", "yes")]
         [InlineData(EElementType.DatePicker, "Enter the date", "01/01/2000")]
-        [InlineData(EElementType.Radio, "Radio radio", "no")]
         public void GenerateQuestionAndAnswersDictionary_ShouldReturnCorrectLabelText_AndValue_ForElements(EElementType type, string labelText, string value)
         {
             var questionId = "test-questionID";
@@ -45,6 +43,35 @@ namespace form_builder_tests.UnitTests.Helpers
 
             Assert.Single(result);
             Assert.Equal($"{labelText}: {value}", result[0]);
+        }
+
+        [Theory]
+        [InlineData(EElementType.Checkbox, "Checkbox label", "yes", "Yes Text")]
+        [InlineData(EElementType.Radio, "Radio radio", "no", "No Text")]
+        public void GenerateQuestionAndAnswersDictionary_ShouldReturnCorrectLabelText_AndValue_ForOptionsElements(EElementType type, string labelText, string value, string labelValue)
+        {
+            var questionId = "test-questionID";
+            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = questionId, Response = value } } }}};
+
+            var element = new ElementBuilder()
+                            .WithType(type)
+                            .WithQuestionId(questionId)
+                            .WithLabel(labelText)
+                            .WithOptions(new List<Option>{ new Option{ Text = "Yes Text", Value = "yes" }, new Option{ Text = "No Text", Value = "no" }})
+                            .Build();
+
+            var page = new PageBuilder()
+                        .WithElement(element)
+                        .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                            .WithPage(page)
+                            .Build();
+
+            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
+
+            Assert.Single(result);
+            Assert.Equal($"{labelText}: {labelValue}", result[0]);
         }
 
         [Fact]
