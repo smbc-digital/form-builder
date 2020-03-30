@@ -8,32 +8,38 @@
     var id = Model.Properties.QuestionId;
 }
 
-@if(Model.Properties.LabelAsH1) {
-    <h1>
-        <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
-    </h1>
-} else {
-    <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
-}
+<div class="govuk-form-group">
+    @if(Model.Properties.LabelAsH1) {
+        <h1 class="govuk-fieldset__heading">
+            <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+        </h1>
+    } else {
+        <label class="govuk-label" @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label
+        @if (Model.Properties.Optional)
+        {
+            <span>(optional)</span>
+        }    
+        </label>
+    }
 
-@if (Model.Properties.Optional)
-{
-    <span class="optional">(optional)</span>
-}
-
-@if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
-{
-    <p class="description" id=@hintId>@Model.Properties.Hint</p>
-}
-@if (Model.Properties.Numeric)
-{
-    <input type="number" id="@id" name="@id" max="@max" min="@min" value="@Model.Properties.Value" maxlength="@Model.Properties.MaxLength.ToString()" />
-}
-else
-{
-    @Html.TextBox(id, Model.Properties.Value, Model.GenerateElementProperties())
-}
-@if (!Model.IsValid)
-{
-    <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
-}
+    @if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
+    {
+        <span class="govuk-hint" id=@hintId>@Model.Properties.Hint</span>
+    }
+    @if (Model.Properties.Numeric)
+    {
+        <input type="number" id="@id" name="@id" max="@max" min="@min" value="@Model.Properties.Value" maxlength="@Model.Properties.MaxLength.ToString()" class="govuk-input" />
+    }
+    else
+    {
+        @* TODO: This feels like a hack, but I didn't want to add this in the .cs file *@
+        var elements = Model.GenerateElementProperties();
+        elements.Add("class", "govuk-input");
+        
+        @Html.TextBox(id, Model.Properties.Value, elements)
+    }
+    @if (!Model.IsValid)
+    {
+        <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
+    }
+</div>

@@ -3,11 +3,12 @@
     var showSpinner = (bool)ViewData["showSpinner"];
     var displayAnchor = (bool)ViewData["displayAnchor"];
     var text = (string)ViewData["buttonText"];
-    var className = string.IsNullOrEmpty(Model.Properties.ClassName) ? "button-primary" : Model.Properties.ClassName;
+    var className = string.IsNullOrEmpty(Model.Properties.ClassName) ? string.Empty : Model.Properties.ClassName;
+    var disabled = string.IsNullOrEmpty(Model.Properties.Disabled) ? string.Empty : "disabled='disabled'";
     var spinnerButton = showSpinner ? $"onclick=spinnerButton('{@Model.Properties.ButtonId}');" : null;
 }
 
-<button class="govuk-button @className" @spinnerButton type="submit" id="@Model.Properties.ButtonId">@text</button>
+<button data-prevent-double-click="true" class="govuk-button @Model.Properties.ClassName" @disabled @spinnerButton type="submit" id="@Model.Properties.ButtonId">@text</button>
 
 @if (@displayAnchor)
 {
