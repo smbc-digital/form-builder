@@ -95,6 +95,7 @@ namespace form_builder.Mappers
             var addressObject = new Address();
 
             var urpnKey = $"{key}-address";
+            var addressDescription = $"{key}-address-description";
             var manualAddressLineOne = $"{key}-AddressManualAddressLine1";
             var manualAddressLineTwo = $"{key}-AddressManualAddressLine2";
             var manualAddressLineTown = $"{key}-AddressManualAddressTown";
@@ -103,7 +104,7 @@ namespace form_builder.Mappers
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == manualAddressLineOne || _.QuestionId == manualAddressLineTwo ||
                             _.QuestionId == manualAddressLineTown || _.QuestionId == manualAddressLinePostcode ||
-                            _.QuestionId == urpnKey)
+                            _.QuestionId == urpnKey || _.QuestionId == addressDescription)
                 .ToList();
 
             addressObject.AddressLine1 = value.FirstOrDefault(_ => _.QuestionId == manualAddressLineOne)?.Response ?? string.Empty;
@@ -111,6 +112,7 @@ namespace form_builder.Mappers
             addressObject.Town = value.FirstOrDefault(_ => _.QuestionId == manualAddressLineTown)?.Response ?? string.Empty;
             addressObject.Postcode = value.FirstOrDefault(_ => _.QuestionId == manualAddressLinePostcode)?.Response ?? string.Empty;
             addressObject.PlaceRef = value.FirstOrDefault(_ => _.QuestionId == urpnKey)?.Response ?? string.Empty;
+            addressObject.SelectedAddress = value.FirstOrDefault(_ => _.QuestionId == addressDescription)?.Response ?? string.Empty;
 
             return addressObject;
 
@@ -154,6 +156,7 @@ namespace form_builder.Mappers
 
             return null;
         }
+        
         private TimeSpan? GetTimeElementValue(string key, FormAnswers formAnswers)
         {
             dynamic dateObject = new ExpandoObject();
@@ -178,9 +181,10 @@ namespace form_builder.Mappers
 
             return null;
         }
+
         private StockportGovUK.NetStandard.Models.Verint.Organisation GetOrganisationElementValue(string key, FormAnswers formAnswers)
         {
-            var dateObject = new StockportGovUK.NetStandard.Models.Verint.Organisation();
+            var orgObject = new StockportGovUK.NetStandard.Models.Verint.Organisation();
             var organisationKey = $"{key}-organisation";
             var organisationDescriptionKey = $"{key}-organisation-description";
 
@@ -188,10 +192,10 @@ namespace form_builder.Mappers
                 .Where(_ => _.QuestionId == organisationKey || _.QuestionId == organisationDescriptionKey)
                 .ToList();
 
-            dateObject.Reference = value.FirstOrDefault(_ => _.QuestionId == organisationKey)?.Response ?? string.Empty;
-            dateObject.Name = value.FirstOrDefault(_ => _.QuestionId == organisationDescriptionKey)?.Response ?? string.Empty;
+            orgObject.Reference = value.FirstOrDefault(_ => _.QuestionId == organisationKey)?.Response ?? string.Empty;
+            orgObject.Name = value.FirstOrDefault(_ => _.QuestionId == organisationDescriptionKey)?.Response ?? string.Empty;
 
-            return dateObject;
+            return orgObject;
         }
         private int? GetNumericElementValue(string key, FormAnswers formAnswers)
         {
