@@ -29,6 +29,8 @@ namespace form_builder.Models
 
         public bool HideTitle { get; set; }
 
+        public string HideBackButton { get; set; }
+
         [JsonIgnore]
         public bool IsValid => !InvalidElements.Any();
         
