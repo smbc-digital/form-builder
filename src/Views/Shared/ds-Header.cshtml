@@ -1,0 +1,20 @@
+﻿@{
+    var displayHeading = (string)ViewData["Title"] != "Error";
+}
+
+    <header class="smbc-header " role="banner" data-module="govuk-header">
+        <div class="smbc-header__container govuk-width-container">
+            <div class="govuk-header__logo">
+                <a href="https://www.stockport.gov.uk/" class="govuk-header__link smbc-header__logo"></a>
+            </div>
+            <div class="govuk-header__content">
+            @if (displayHeading)
+            {
+
+                <a href="#" class="govuk-header__link govuk-header__link--service-name">
+                    @Model.FormName
+                </a>
+            }
+            </div>
+        </div>
+    </header>

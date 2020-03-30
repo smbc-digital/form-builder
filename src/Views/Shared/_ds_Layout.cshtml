@@ -1,0 +1,58 @@
+@{
+    var bannerTypeformUrl = ViewData["BannerTypeformUrl"];
+}
+
+<!doctype html>
+<html lang="en" class="govuk-template flexbox no-flexboxtweener">
+
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["PageTitle"] - @ViewData["Title"] - Stockport Council</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://stockportgov-design-system.s3-eu-west-1.amazonaws.com/int/1.0.0/smbc-frontend.min.css"
+        rel="stylesheet" />
+    <script type="text/javascript" src="~/assets/javascript/fileSizeCheck.js"></script>
+    <script src="/javascripts/vendor/modernizr.js"></script>
+    <partial name="TagManagerHead" />
+</head>
+
+<body class="govuk-template__body  js-enabled">
+    <partial name="TagManagerBody" />
+
+    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+    
+    <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
+
+    <partial name="ds-Header" />
+
+    <div class="govuk-width-container">
+        <div class="govuk-phase-banner">
+            <p class="govuk-phase-banner__content">
+                <strong class="smbc-tag govuk-phase-banner__content__tag">
+                    alpha
+                </strong>
+                <span class="govuk-phase-banner__text">
+                    This is a new service - your <a class="govuk-link" href="#">feedback</a> will help us to improve it.
+                </span>
+            </p>
+        </div>
+
+        <a href="#" class="govuk-back-link">Back</a>
+
+        <main class="govuk-main-wrapper " id="main-content" role="main">
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                  @RenderBody()  
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <partial name="ds-footer" />
+
+    <script src="/javascripts/vendor/iframeResizer.contentWindow.js"></script>
+    <script src="/javascripts/govuk-frontend-d78f5b9df409c37471b91ddb1952fee4.js"></script>
+    <script src="/javascripts/example-149b2c1c72d42e5afd271c8a89fed638.js"></script>
+</body>
+
+</html>
