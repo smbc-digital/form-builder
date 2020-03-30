@@ -1,34 +1,37 @@
 ﻿@model form_builder.Models.Elements.Element
-@for (var i = 0; i < Model.Properties.Options.Count; i++)
-{
-    var item = Model.Properties.Options[i];
-    string itemHint = null;
-    var itemId = $"{Model.Properties.QuestionId}-{i}";
-    var itemName = $"{Model.Properties.QuestionId}";
-
-    if(!string.IsNullOrWhiteSpace(item.Hint))
+<p class="govuk-checkboxes">
+    @for (var i = 0; i < Model.Properties.Options.Count; i++)
     {
-         itemHint = $"{Model.Properties.QuestionId}-{i}-hint";
-    }
+        var item = Model.Properties.Options[i];
+        string itemHint = null;
+        var itemId = $"{Model.Properties.QuestionId}-{i}";
+        var itemName = $"{Model.Properties.QuestionId}";
 
-    <div class="input-checkbox-container">
+        if(!string.IsNullOrWhiteSpace(item.Hint))
+        {
+            itemHint = $"{Model.Properties.QuestionId}-{i}-hint";
+        }
+
+        <div class="govuk-checkboxes__item">
         @if (Model.Properties.Checked)
         {
-            <input type="checkbox" value="@item.Value" name="@itemName" id="@itemId" aria-describedby="@itemHint" checked />
+            <input class="govuk-checkboxes__input" type="checkbox" value="@item.Value" name="@itemName" id="@itemId" aria-describedby="@itemHint" checked />
         }
         else if (Model.Properties.Value.Contains(item.Value))
 
         {
-            <input type="checkbox" value="@item.Value" name="@itemName" id="@itemId" aria-describedby="@itemHint" checked />
+            <input class="govuk-checkboxes__input" type="checkbox" value="@item.Value" name="@itemName" id="@itemId" aria-describedby="@itemHint" checked />
         }
         else
         {
-            <input type="checkbox" value="@item.Value" name="@itemName" id="@itemId" aria-describedby="@itemHint"/>
+            <input class="govuk-checkboxes__input" type="checkbox" value="@item.Value" name="@itemName" id="@itemId" aria-describedby="@itemHint"/>
         }
-        <label for="@itemId" @Model.WriteOptional()>@item.Text</label>
+
+        <label class="govuk-label govuk-checkboxes__label" for="@itemId" @Model.WriteOptional()>@item.Text</label>
         @if (!string.IsNullOrWhiteSpace(item.Hint))
         {
-            <span class="radio-sub-label" id="@itemHint">@item.Hint</span>
+            <div class="govuk-hint govuk-checkboxes__hint" id="@itemHint">@item.Hint</div>
         }
-    </div>
-}
+        </div>
+    }
+</p>

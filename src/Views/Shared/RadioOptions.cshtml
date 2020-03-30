@@ -1,18 +1,21 @@
 ﻿@model form_builder.Models.Elements.Element
+<p class="govuk-radios">
+    @for (var i = 0; i < Model.Properties.Options.Count; i++)
+    {
+        var item = Model.Properties.Options[i];
+        var itemHint = $"{Model.Properties.QuestionId}-{i}-hint";
+        var itemId = $"{Model.Properties.QuestionId}-{i}";
+        var itemName = $"{Model.Properties.QuestionId}";
 
-@for (var i = 0; i < Model.Properties.Options.Count; i++)
-{
-    var item = Model.Properties.Options[i];
-    var itemHint = $"{Model.Properties.QuestionId}-{i}-hint";
-    var itemId = $"{Model.Properties.QuestionId}-{i}";
+        <div class="govuk-radios__item">
+            @* @Html.RadioButton(Model.Properties.QuestionId, Model.Properties.Options[i].Value, Model.Properties.Options[i].Checked, @Model.GenerateElementProperties(i)) *@
+            <input class="govuk-radios__input" type="radio" value="@item.Value" name="@itemName" id="@itemId" aria-describedby="@itemHint" checked />
+            <label class="govuk-label govuk-radios__label" for="@itemId">@item.Text</label>
 
-    <div class="input-radio-container">
-        @Html.RadioButton(Model.Properties.QuestionId, Model.Properties.Options[i].Value, Model.Properties.Options[i].Checked, @Model.GenerateElementProperties(i))
-        <label for="@itemId">@item.Text</label>
-
-        @if (!string.IsNullOrEmpty(item.Hint))
-        {
-            <p><span class="radio-sub-label" id=@itemHint>@Html.Raw(item.Hint)</span></p>
-        }
-    </div>
-}
+            @if (!string.IsNullOrEmpty(item.Hint))
+            {
+                <div class="govuk-hint govuk-radios__hint" id=@itemHint>@Html.Raw(item.Hint)</div>
+            }
+        </div>
+    }
+</p>

@@ -4,33 +4,35 @@
     var hintId = $"{Model.Properties.QuestionId}-hint";
     var errorId = $"{Model.Properties.QuestionId}-error";
 }
-
-@await Html.BeginFieldSet(Model)
-
-    <legend>
+<div class="govuk-form-group">
+    @await Html.BeginFieldSet(Model, new string[] {"govuk-fieldset"})
         @if(Model.Properties.LegendAsH1) {
-            <h1>
-                @Model.Properties.Label
-            </h1>
-        } else {
-            @Model.Properties.Label
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                <h1 class="govuk-fieldset__heading">
+                    @Model.Properties.Label
+                </h1>
+            </legend>
         }
-    </legend>
+        else {
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                    @Model.Properties.Label
+            </legend>
+        }
 
-    @if (!string.IsNullOrEmpty(Model.Properties.Hint))
-    {
-        <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
-    }
-
-    <partial name="CheckboxOptions" />
-
-    @if (!Model.IsValid)
-    {
+        @if (!string.IsNullOrEmpty(Model.Properties.Hint))
         {
-            var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
-
-            <p class="input-error-content" id="@errorId">@validationMessage</p>
+            <p class="govuk-hint" id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
         }
-    }
 
-@await Html.EndFieldSet()
+        <partial name="CheckboxOptions" />
+
+        @if (!Model.IsValid)
+        {
+            {
+                var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+                <p class="input-error-content" id="@errorId">@validationMessage</p>
+            }
+        }
+
+    @await Html.EndFieldSet()
+</div>

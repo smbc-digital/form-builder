@@ -7,7 +7,7 @@
     var spinnerButton = showSpinner ? $"onclick=spinnerButton('{@Model.Properties.ButtonId}');" : null;
 }
 
-<button class="@className" @spinnerButton type="submit" id="@Model.Properties.ButtonId">@text</button>
+<button class="govuk-button @className" @spinnerButton type="submit" id="@Model.Properties.ButtonId">@text</button>
 
 @if (@displayAnchor)
 {
