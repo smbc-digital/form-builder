@@ -4,15 +4,31 @@
     var hintId = $"{Model.Properties.QuestionId}-hint";
     var errorId = $"{Model.Properties.QuestionId}-error";
 }
-@await Html.BeginFieldSet(Model)
-    <partial name="Legend" model="@Model">
+<div class="govuk-form-group">
+    @if(Model.Properties.LabelAsH1) {
+        <h1 class="govuk-label-wrapper">
+            <label class="govuk-label govuk-label--xl" @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label
+                @if (Model.Properties.Optional)
+                {
+                    <span>(optional)</span>
+                }
+            </label>
+        </h1>
+    } else {
+        <label class="govuk-label" @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label
+        @if (Model.Properties.Optional)
+        {
+            <span>(optional)</span>
+        }    
+        </label>
+    }
 
     @if (!string.IsNullOrEmpty(Model.Properties.Hint))
     {
-        <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
+        <div class="govuk-hint" id=@hintId>@Html.Raw(Model.Properties.Hint)</div>
     }
 
-    <select id="@Model.Properties.QuestionId" name="@Model.Properties.QuestionId">
+    <select class="govuk-select" id="@Model.Properties.QuestionId" name="@Model.Properties.QuestionId">
         <partial name="SelectOptions" />
     </select>
 
@@ -23,4 +39,4 @@
             <p class="input-error-content" id="@errorId">@validationMessage</p>
         }
     }
-@await Html.EndFieldSet()
+</div>
