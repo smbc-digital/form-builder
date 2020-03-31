@@ -34,6 +34,7 @@ using form_builder.Providers.DocumentCreation.Generic;
 using form_builder.Providers.DocumentCreation.Smbc;
 using form_builder.Services.DocumentService;
 using form_builder.Helpers.DocumentCreation;
+using form_builder.ContentFactory;
 
 namespace form_builder.Extensions
 {
@@ -146,6 +147,14 @@ namespace form_builder.Extensions
             services.AddSingleton<ISubmitWorkflow, SubmitWorkflow>();
             services.AddSingleton<IPaymentWorkflow, PaymentWorkflow>();
             services.AddSingleton<IDocumentWorkflow, DocumentWorkflow>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddFactories(this IServiceCollection services)
+        {
+            services.AddTransient<ISuccessPageContentFactory, SuccessPageContentFactory>();
+            services.AddTransient<IPageContentFactory, PageContentFactory>();
 
             return services;
         }
