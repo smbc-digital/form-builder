@@ -25,6 +25,13 @@
         "BaseURL": "",
         "StartPageSlug": "",
         "FeedbackForm": "https://stockportcouncil.typeform.com/to/yzIJEe",
+        "EnvironmentAvailabilities": [
+          {
+            "Environment": "local",
+            "IsAvailable": true
+          }
+          ...
+        ],
         "Pages": [
           {
             "Title": "",
@@ -33,24 +40,29 @@
             "Elements": [],
             "Behaviours": []
           }
+          ...
         ],
     }
 ```
-**FormName** (*string*) - Name of the form - Will display in browser tab name
+## Form Settings
 
-**BaseURL** (*string*) - "test-form" would create stockport.gov.uk/test-form/
+### **FormName** (*string*)
+The name of the form this will display in the browser tab/window title
 
-**StartPageSlug** (*string*) - The first PageSlug users will visit
+### **BaseURL** (*string*)
+The path of this form, this will come after the domain e.g. `test-form` would create `forms.yourdomain.gov.uk/test-form/`
 
-**FeedbackForm** (*string*) - If present this will be used at the top of the form to link them to, commonly, a TypeForm form that will be created to capture feedback on the new form.
+### **StartPageSlug** (*string*) 
+The first PageSlug users will visit
 
-**Pages**[*object*]:
+### **FeedbackForm** (*string*) 
+If present this will be used at the top of the form to link them to, commonly, a TypeForm form that will be created to capture feedback on the new form.
 
-* **PageSlug** (*string*) - The slug for a page after the BaseURL e.g. stockport.gov.uk/{BaseURL}/{PageSlug}
-* **HideTitle** (*bool*) - This will hide the page title when set to true
-* **Title** (*string*) - The Title is used within the browser tab along with the form name e.g. Page 1 - Contact us - Stockport Council
-* **Elements**[*object*]- List of HTML elements to display on page
-* [Behaviours[*object*]](#pagebehaviours) - List of conditionals & page redirects for the page
+### [**EnvironmentAvailabilities** [*object*]](Controlling-Form-Availability)
+List of environments and the current availability status
+
+### [**Pages** [*object*]](Creating-Pages)
+List of the pages in this form
 
 ## Controlling Form Availaiblity ##
 
@@ -76,6 +88,34 @@ For example:
  ```
 
 If the availabilities block is not present or the availability for the requested environment is not specified **forms will be assumed to be available**.
+
+## Creating Pages
+
+### **PageSlug** (*string*) 
+The slug (path) of a page after the domain and BaseURL e.g. `contact-details` would create a URL of `forms.yourdomain.uk/{BaseURL}/contact-details`
+
+### **HideTitle** (*bool*) 
+Hides the default page title when set to true, this can be used if there is only a single control on the page, use the legend/label as the page title if appropriate.
+
+### **HideBackButton** (*bool*) 
+Hide the in page back button when set to true
+
+### **Title** (*string*)
+The Title is used within the browser tab along with the form name e.g. Page 1 - Contact us - Stockport Council
+
+### **Elements** [*object*]
+List of HTML elements to display on page
+* [Behaviours[*object*]](#pagebehaviours) - List of conditionals & page redirects for the page
+
+
+```json
+      "Title": "page1",
+      "PageSlug": "page-one",
+      "HideTitle": false,
+      "HideBackButton": true,
+      "Elements": [ ... ] ,
+      "Behaviours": [ ... ]
+```
 
 ## Element Types & Properties
 **Elements[*object*]**:
@@ -196,7 +236,6 @@ The target mapping above would produce this object
     * LegendAsH1 (*boolean*) (defaults to false)
 
       This is only valid for the elements listed below:    
-      * **Select**
       * **DateInput**
       * **DatePicker**
       * **Address**
@@ -220,6 +259,7 @@ The target mapping above would produce this object
     * LabelAsH1 (*boolean*) (defaults to false)
 
       This is only valid for the elements listed below:    
+      * **Select**
       * **Textbox**
       * **Textarea**
       * **FileUpload**
