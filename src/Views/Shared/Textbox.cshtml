@@ -3,12 +3,18 @@
     var hintId = $"{Model.Properties.QuestionId}-hint";
     var errorId = $"{Model.Properties.QuestionId}-error";
 
-    var max = Model.Properties.Max ?? string.Empty;
-    var min = Model.Properties.Min ?? string.Empty;
     var id = Model.Properties.QuestionId;
+    var elements = Model.GenerateElementProperties();
+    if(!Model.IsValid)
+    {
+        elements.Add("class", "govuk-input govuk-input--error");
+    }
+    else{
+        elements.Add("class", "govuk-input");
+    }
 }
 
-<div class="govuk-form-group">
+<div class="govuk-form-group @(!Model.IsValid ? " govuk-form-group--error" : string.Empty)">
     @if(Model.Properties.LabelAsH1) {
         <h1 class="govuk-label-wrapper">
             <label class="govuk-label govuk-label--xl" @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label
@@ -31,20 +37,13 @@
     {
         <span class="govuk-hint" id=@hintId>@Model.Properties.Hint</span>
     }
-    @if (Model.Properties.Numeric)
-    {
-        <input type="number" id="@id" name="@id" max="@max" min="@min" value="@Model.Properties.Value" maxlength="@Model.Properties.MaxLength.ToString()" class="govuk-input" />
-    }
-    else
-    {
-        @* TODO: This feels like a hack, but I didn't want to add this in the .cs file *@
-        var elements = Model.GenerateElementProperties();
-        elements.Add("class", "govuk-input");
-        
-        @Html.TextBox(id, Model.Properties.Value, elements)
-    }
+    
     @if (!Model.IsValid)
     {
-        <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
+        <span id="passport-issued-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> @Model.ValidationMessage
+        </span>
     }
+
+    @Html.TextBox(id, Model.Properties.Value, elements)
 </div>
