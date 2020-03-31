@@ -900,6 +900,7 @@ Time example
   * TargetMapping (*string*)
   * AllowedFileTypes (*Array[string]*) (Default: .png", .jpg", .jpeg, .pdf, .docx, .doc, .odt)
   * MaxFileSize (*string*) in Mb
+  * Optional (*boolean*) defaults to false
   
 
 FileUpload example
