@@ -1,9 +1,9 @@
 ﻿@model form_builder.Models.Elements.Element
 
-<section class="alert-inline">
+<section class="govuk-inset-text">
     @if (!string.IsNullOrEmpty(Model.Properties.Label))
     {
-        <h2>@Model.Properties.Label</h2>
+        <h2 class="govuk-heading-l">@Model.Properties.Label</h2>
     }
 
     @if (!string.IsNullOrEmpty(Model.Properties.Text))
