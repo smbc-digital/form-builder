@@ -61,14 +61,12 @@ namespace form_builder.ContentFactory
             if(baseForm.DocumentDownload && page != null)
             {
                     baseForm.DocumentType.ForEach((docType) => {
-                        var element = new DocumentDownload
-                        {
-                            Properties = new BaseProperty {
-                                Label = $"Download {docType} Document",
-                                DocumentType = docType,
-                                Source = $"/document/Summary/{docType}/{sessionGuid}"
-                            }
-                        };
+                        var element = new ElementBuilder()
+                            .WithType(EElementType.DocumentDownload)
+                            .WithLabel($"Download {docType} document")
+                            .WithSource($"/document/Summary/{docType}/{sessionGuid}")
+                            .WithDocumentType(docType)
+                            .Build();
 
                         page.Elements.Add(element);
                     });

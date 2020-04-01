@@ -4,13 +4,13 @@ using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways.AddressService;
 using StockportGovUK.NetStandard.Models.Addresses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using StockportGovUK.NetStandard.Models.Enums;
+using form_builder.Providers.Address;
+using form_builder.Extensions;
 
 namespace form_builder.Services.AddressService
 {
@@ -23,13 +23,15 @@ namespace form_builder.Services.AddressService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IPageHelper _pageHelper;
-        private readonly IAddressServiceGateway _addressServiceGateway;
+        
 
-        public AddressService(IDistributedCacheWrapper distributedCache, IAddressServiceGateway addressServiceGateway, IPageHelper pageHelper)
+        private readonly IEnumerable<IAddressProvider> _addressProviders;
+
+        public AddressService(IDistributedCacheWrapper distributedCache, IPageHelper pageHelper, IEnumerable<IAddressProvider> addressProviders)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
-            _addressServiceGateway = addressServiceGateway;
+            _addressProviders = addressProviders;
         }
 
         public async Task<ProcessRequestEntity> ProcesssAddress(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -45,7 +47,6 @@ namespace form_builder.Services.AddressService
                     ? new FormAnswers { Pages = new List<PageAnswers>() }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-               
                 var postcode = journey == "Select"
                     ? (string) convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
                     : (string) viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
@@ -77,12 +78,12 @@ namespace form_builder.Services.AddressService
 
                 try
                 {
-                    var result = await _addressServiceGateway.SearchAsync(new AddressSearch { AddressProvider = (EAddressProvider)System.Enum.Parse(typeof(EAddressProvider), addressElement.Properties.AddressProvider), SearchTerm = postcode });
-                    addressResults = result.ResponseContent.ToList();
+                    var searchResult = await _addressProviders.Get(addressElement.Properties.AddressProvider).SearchAsync(postcode);
+                    addressResults = searchResult.ToList();
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException($"AddressController: An exception has occured while attempting to perform postcode lookup, Exception: {e.Message}");
+                    throw new ApplicationException($"AddressController: An exception has occured while attempting to perform postcode lookup", e);
                 }
             }
 

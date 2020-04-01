@@ -8,7 +8,11 @@
 
 @await Html.BeginFieldSet(Model, classes)
     <partial name="Legend" model="@Model">
-    <p id="@hintId">@Model.Properties.Hint</p>
+
+    @if(!string.IsNullOrEmpty(Model.Properties.Hint)){
+        <p id="@hintId">@Model.Properties.Hint</p>
+    }
+
     <div>
         @Html.TextBox(Model.Properties.QuestionId, Model.Properties.Date, Model.GenerateElementProperties())
     </div>

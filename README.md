@@ -25,12 +25,18 @@
         "BaseURL": "",
         "StartPageSlug": "",
         "FeedbackForm": "https://stockportcouncil.typeform.com/to/yzIJEe",
+<<<<<<< HEAD
         "EnvironmentAvailabilities": [
           {
             "Environment": "local",
             "IsAvailable": true
           }
           ...
+=======
+        "DocumentDownload": true,
+        "DocumentType": [
+          "Txt“
+>>>>>>> master
         ],
         "Pages": [
           {
@@ -52,8 +58,19 @@ The name of the form this will display in the browser tab/window title
 ### **BaseURL** (*string*)
 The path of this form, this will come after the domain e.g. `test-form` would create `forms.yourdomain.gov.uk/test-form/`
 
+<<<<<<< HEAD
 ### **StartPageSlug** (*string*) 
 The first PageSlug users will visit
+=======
+**FeedbackForm** (*string*) - If present this will be used at the top of the form to link them to, commonly, a TypeForm form that will be created to capture feedback on the new form
+
+**DocumentDownload** (*bool*) - Enable Document download (optional)
+
+**DocumentType** (*Array[string]*) - If Document download is enabled what document type is required.
+
+Allowed Values:
+* **Txt**
+>>>>>>> master
 
 ### **FeedbackForm** (*string*) 
 If present this will be used at the top of the form to link them to, commonly, a TypeForm form that will be created to capture feedback on the new form.
@@ -929,6 +946,7 @@ Time example
   * TargetMapping (*string*)
   * AllowedFileTypes (*Array[string]*) (Default: .png", .jpg", .jpeg, .pdf, .docx, .doc, .odt)
   * MaxFileSize (*string*) in Mb
+  * Optional (*boolean*) defaults to false
   
 
 FileUpload example

@@ -1,6 +1,8 @@
 using form_builder.Enum;
+using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,6 +15,12 @@ namespace form_builder.Helpers.DocumentCreation
 
     public class DocumentCreationHelper : IDocumentCreationHelper
     {
+        private readonly IElementMapper _elementMapper;
+        public DocumentCreationHelper(IElementMapper elementMapper)
+        {
+            _elementMapper = elementMapper;
+        }
+        
         public List<string> GenerateQuestionAndAnswersDictionary(FormAnswers formAnswers, FormSchema formSchema)
         {
             var data = new List<string>();
@@ -28,7 +36,7 @@ namespace form_builder.Helpers.DocumentCreation
                 .ToList();
 
             formSchemaQuestions.ForEach((question) => {
-                var answer = GetValueForQuestion(question, answers);
+                var answer = GetValueForQuestion(question, formAnswers, answers);
 
                 if(!string.IsNullOrWhiteSpace(answer)){
                     if(question.Type == EElementType.FileUpload){
@@ -48,35 +56,55 @@ namespace form_builder.Helpers.DocumentCreation
             return data;
         }
 
-        private string GetValueForQuestion(IElement question, List<Answers> answers){
+        private string GetValueForQuestion(IElement question, FormAnswers formAnswers, List<Answers> answers)
+        {
+            object value = null;
+
+            if(question.Type != EElementType.FileUpload){
+             value = _elementMapper.GetAnswerValue(question, formAnswers);
+            }
+
             switch (question.Type)
             {
-                case EElementType.Address:
-                    var autoAddress = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-address-description"))?.Response;
-                    if(!string.IsNullOrEmpty(autoAddress)){
-                        return autoAddress;
-                    }
-                    var manualLine1 = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-AddressManualAddressLine1"))?.Response;
-                    var manualLine2 = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-AddressManualAddressLine2"))?.Response;
-                    var town = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-AddressManualAddressTown"))?.Response;
-                    var postcode = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-AddressManualAddressPostcode"))?.Response;
-                    var manualLine2Text = string.IsNullOrEmpty(manualLine2) ? string.Empty : $",{manualLine2}";
-                    return manualLine1 == null && town == null && postcode == null ? string.Empty : $"{manualLine1}{manualLine2Text},{town},{postcode}";
-                case EElementType.TimeInput:
-                    var min = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-hours"))?.Response;
-                    var hour = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-minutes"))?.Response;
-                    var amorpm = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-ampm"))?.Response;
-                    return min == null && hour == null && amorpm == null ? string.Empty : $"{min}:{hour}{amorpm}";
                 case EElementType.DateInput:
-                    var day = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-day"))?.Response;
-                    var month = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-month"))?.Response;
-                    var year = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question, "-year"))?.Response;
-                    return day == null && month == null && year == null ? string.Empty : $"{day}/{month}/{year}";
+                    var convertDateTime = new DateTime();
+                    if(value != null){
+                        convertDateTime = (DateTime)value;
+                    }
+                    return value != null ? convertDateTime.Date.ToShortDateString() : string.Empty;
+                case EElementType.Select:
+                case EElementType.Radio:
+                    var selectValue = value != null ? question.Properties.Options.FirstOrDefault(_ => _.Value == value.ToString()) : null;
+                    return selectValue?.Text ?? string.Empty;
+                case EElementType.Checkbox:
+                    var answerCheckbox = string.Empty;
+                    var list = (List<string>)value;
+                    list.ForEach((answersCheckbox) =>
+                    {
+                        answerCheckbox += $" {question.Properties.Options.FirstOrDefault(_ => _.Value == answersCheckbox)?.Text ?? string.Empty},";
+                    });
+                    return answerCheckbox.EndsWith(",") ? answerCheckbox.Remove(answerCheckbox.Length - 1).Trim() :answerCheckbox.Trim();
+                case EElementType.Organisation:
+                    var orgValue = (StockportGovUK.NetStandard.Models.Verint.Organisation)value;
+                    return !string.IsNullOrEmpty(orgValue.Name) ? orgValue.Name : string.Empty;
+                case EElementType.Address:
+                    var addressValue = (StockportGovUK.NetStandard.Models.Addresses.Address)value;
+                    if(!string.IsNullOrEmpty(addressValue.SelectedAddress)){
+                        return addressValue.SelectedAddress;
+                    }
+                    var manualLine2Text = string.IsNullOrWhiteSpace(addressValue.AddressLine2) ? string.Empty : $",{addressValue.AddressLine2}";
+                    return string.IsNullOrWhiteSpace(addressValue.AddressLine1) ? string.Empty : $"{addressValue.AddressLine1}{manualLine2Text},{addressValue.Town},{addressValue.Postcode}";
+                case EElementType.Street:
+                    var streetValue = (StockportGovUK.NetStandard.Models.Addresses.Address)value;
+                    if(string.IsNullOrEmpty(streetValue.PlaceRef) && string.IsNullOrEmpty(streetValue.SelectedAddress)){
+                        return string.Empty;
+                    }
+                    return streetValue.SelectedAddress;
                 case EElementType.FileUpload:
-                    var fileInput = answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question,"-fileupload"));
-                    return fileInput == null ? string.Empty : Newtonsoft.Json.JsonConvert.DeserializeObject<FileUploadModel>(fileInput.Response.ToString()).TrustedOriginalFileName;
+                    var fileInput = answers.FirstOrDefault(_ => _.QuestionId == $"{question.Properties.QuestionId}-fileupload")?.Response;
+                    return fileInput == null ? string.Empty : Newtonsoft.Json.JsonConvert.DeserializeObject<FileUploadModel>(fileInput.ToString()).TrustedOriginalFileName;
                 default:
-                    return answers.FirstOrDefault(_ => _.QuestionId == GetQuestionId(question))?.Response;
+                    return value != null ? value.ToString() : string.Empty;
             }
         }
 
@@ -96,24 +124,6 @@ namespace form_builder.Helpers.DocumentCreation
                     return $"{element.Properties.AddressLabel}{optionalLabelText}:";
                 default:
                     return $"{element.Properties.Label}{optionalLabelText}:";
-            }
-        }
-
-        private string GetQuestionId(IElement element, string prefix = ""){
-
-            switch (element.Type)
-            {
-                case EElementType.DateInput:
-                case EElementType.TimeInput:
-                case EElementType.FileUpload:
-                case EElementType.Address:
-                    return $"{element.Properties.QuestionId}{prefix}";
-                case EElementType.Organisation:
-                    return $"{element.Properties.QuestionId}-organisation-description";
-                case EElementType.Street:
-                    return $"{element.Properties.QuestionId}-streetaddress-description";
-                default:
-                    return element.Properties.QuestionId;
             }
         }
     }

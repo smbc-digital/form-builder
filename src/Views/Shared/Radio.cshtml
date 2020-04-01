@@ -11,12 +11,20 @@
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
                 <h1 class="govuk-fieldset__heading">
                     @Model.Properties.Label
+                    @if (Model.Properties.Optional)
+                    {
+                        <span>(optional)</span>
+                    }
                 </h1>
             </legend>
         }
         else {
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                     @Model.Properties.Label
+                    @if (Model.Properties.Optional)
+                    {
+                        <span>(optional)</span>
+                    }
             </legend>
         }
 

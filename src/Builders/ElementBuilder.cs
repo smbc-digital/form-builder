@@ -232,5 +232,11 @@ namespace form_builder.Builders
             _property.AllowedFileTypes.Add(type);
             return this;
         }
+
+        public ElementBuilder WithDocumentType(EDocumentType docType)
+        {
+            _property.DocumentType = docType;
+            return this;
+        }
     }
 }
