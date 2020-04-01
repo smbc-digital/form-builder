@@ -9,28 +9,23 @@
 
 <div class="govuk-form-group">
     @if(Model.Element.Properties.LegendAsH1) {
-        <h1 class="class="govuk-label-wrapper"">
-            <label class="govuk-label govuk-label--xl">@Model.Element.Properties.AddressLabel
-                @if (Model.Element.Properties.Optional)
-                {
-                    <span>(optional)</span>
-                }
-            </label>
+        <h1 class="govuk-label-wrapper">
+            <label class="govuk-label govuk-label--xl">@Model.Element.Properties.AddressLabel</label>
         </h1>
     } else {
-        <label class="govuk-label govuk-label--xl">@Model.Element.Properties.AddressLabel
-            @if (Model.Element.Properties.Optional)
-            {
-                <span>(optional)</span>
-            }
-        </label>
+        <label class="govuk-label govuk-label--xl">@Model.Element.Properties.AddressLabel</label>
     }
 
-    <label class="govuk-label govuk-label--m" @Model.Element.WriteOptional() for="@questionId">@Model.Element.Properties.PostcodeLabel</label>
+    <label class="govuk-label govuk-label--m" @Model.Element.WriteOptional() for="@questionId">@Model.Element.Properties.PostcodeLabel
+        @if (Model.Element.Properties.Optional)
+        {
+            <span>(optional)</span>
+        }
+    </label>
 
     @if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
     {
-        <p class="govuk-hint" id=@hintId>@Model.Element.Properties.Hint</p>
+        <div class="govuk-hint" id=@hintId>@Model.Element.Properties.Hint</div>
     }
 
     @Html.TextBox(questionId, Model.Element.Properties.Value, elements)
