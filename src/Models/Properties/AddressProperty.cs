@@ -8,8 +8,8 @@
         public string AddressManualAddressPostcode { get; set; } = string.Empty;
         public string AddressManualHint { get; set; } = string.Empty;
         public string AddressLabel { get; set; } = string.Empty;
-        public string PostcodeLabel { get; set; } = "Enter your postcode";
-        public string AddressManualLabel { get; set; } = "Enter your address";
+        public string PostcodeLabel { get; set; } = "Postcode";
+        public string AddressManualLabel { get; set; } = "Select an address";
         public string AddressProvider { get; set; }
         public bool? Postcode { get; set; }
         public bool? StockportPostcode { get; set; }

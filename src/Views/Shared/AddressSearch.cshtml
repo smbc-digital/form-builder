@@ -3,32 +3,42 @@
     var questionId = $"{Model.Element.Properties.QuestionId}-postcode";
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
+    var elements = Model.Element.GenerateElementProperties();
+    elements.Add("class", "govuk-input govuk-input--width-10");
 }
 
+<div class="govuk-form-group">
     @if(Model.Element.Properties.LegendAsH1) {
-        <h1>@Model.Element.Properties.AddressLabel</h1>
+        <h1 class="class="govuk-label-wrapper"">
+            <label class="govuk-label govuk-label--xl">@Model.Element.Properties.AddressLabel
+                @if (Model.Element.Properties.Optional)
+                {
+                    <span>(optional)</span>
+                }
+            </label>
+        </h1>
     } else {
-        <label class="h2">@Model.Element.Properties.AddressLabel</label>
+        <label class="govuk-label govuk-label--xl">@Model.Element.Properties.AddressLabel
+            @if (Model.Element.Properties.Optional)
+            {
+                <span>(optional)</span>
+            }
+        </label>
     }
 
-    <label @Model.Element.WriteOptional() for="@questionId">@Model.Element.Properties.PostcodeLabel</label>
-
-    @if (Model.Element.Properties.Optional)
-    {
-        <span class="optional">(optional)</span>
-    }
+    <label class="govuk-label govuk-label--m" @Model.Element.WriteOptional() for="@questionId">@Model.Element.Properties.PostcodeLabel</label>
 
     @if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
     {
-        <p class="description" id=@hintId>@Model.Element.Properties.Hint</p>
+        <p class="govuk-hint" id=@hintId>@Model.Element.Properties.Hint</p>
     }
 
-    @Html.TextBox(questionId, Model.Element.Properties.Value, Model.Element.GenerateElementProperties())
+    @Html.TextBox(questionId, Model.Element.Properties.Value, elements)
 
     @if (!Model.Element.IsValid)
     {
         var validationMessage = string.IsNullOrEmpty(Model.Element.Properties.CustomValidationMessage) ? Model.Element.ValidationMessage : Model.Element.Properties.CustomValidationMessage;
         <p class="input-error-content" id="@errorId">@validationMessage</p>
     }
-
+</div>
 

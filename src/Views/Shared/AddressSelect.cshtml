@@ -3,6 +3,8 @@
     var questionId = $"{Model.Item1.Element.Properties.QuestionId}-address";
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
+    var elements = Model.Item1.Element.GenerateElementProperties("Select");
+    elements.Add("class", "govuk-select");
 }
 
 @if(Model.Item1.Element.Properties.LegendAsH1) {
@@ -11,23 +13,24 @@
     <label class="h2">@Model.Item1.Element.Properties.AddressLabel</label>
 }
 
-<div class="user-search-term">
+<div class="govuk-body">
     <p><strong>Postcode: </strong>@Model.Item1.Element.Properties.Value </p>
-    <a class="back-button" href="@Model.Item1.ReturnURL">Change</a>
+    <a href="@Model.Item1.ReturnURL">Change</a>
 </div>
+
+<label class="govuk-label govuk-label--m" for="@questionId" @Model.Item1.Element.WriteOptional()>@Model.Item1.Element.Properties.SelectLabel
+    @if (Model.Item1.Element.Properties.Optional)
+    {
+        <span>(optional)</span>
+    }
+</label>
 
 @if (!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectHint))
 {
-    <p id=@hintId>@Html.Raw(Model.Item1.Element.Properties.SelectHint)</p>
+    <div class="govuk-hint" id=@hintId>@Html.Raw(Model.Item1.Element.Properties.SelectHint)</div>
 }
 
-<label for="@questionId" @Model.Item1.Element.WriteOptional()>@Model.Item1.Element.Properties.SelectLabel</label>
-@if (Model.Item1.Element.Properties.Optional)
-{
-    <span class="optional">(optional)</span>
-}
-
-@Html.DropDownList(@questionId, @Model.Item2, @Model.Item1.Element.GenerateElementProperties("Select"))
+@Html.DropDownList(@questionId, @Model.Item2, elements)
 
 @if (!Model.Item1.Element.IsValid)
 {
@@ -36,4 +39,4 @@
         <p class="input-error-content" id="@errorId">@validationMessage</p>
     }
 }
-<p><a href="@Model.Item1.ManualAddressURL">I cannot find my address in the list</a></p>
+<div class="govuk-body"><a href="@Model.Item1.ManualAddressURL">I cannot find my address in the list</a></div>

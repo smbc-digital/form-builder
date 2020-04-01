@@ -19,7 +19,7 @@
 
 <div class="govuk-form-group @(!Model.IsValid ? " govuk-form-group--error" : string.Empty)">
     @if(Model.Properties.LabelAsH1) {
-        <h1 class="govuk-label-wrapper">
+        <h1 class="govuk-label-heading">
             <label class="govuk-label govuk-label--xl" @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label
                 @if (Model.Properties.Optional)
                 {
