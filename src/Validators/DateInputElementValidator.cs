@@ -2,6 +2,7 @@
 using form_builder.Models.Elements;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace form_builder.Validators
 {
@@ -50,7 +51,7 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out DateTime date);
+            var isValidDate = DateTime.TryParseExact($"{valueDay}/{valueMonth}/{valueYear}","dd/MM/yyyy",new CultureInfo("en-GB"), DateTimeStyles.None, out DateTime date);
 
             if (isValidDate)
             {
