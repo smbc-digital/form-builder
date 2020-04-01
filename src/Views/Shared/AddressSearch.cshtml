@@ -8,13 +8,9 @@
 }
 
 <div class="govuk-form-group">
-    @if(Model.Element.Properties.LegendAsH1) {
-        <h1 class="govuk-label-wrapper">
-            <label class="govuk-label govuk-label--xl">@Model.Element.Properties.AddressLabel</label>
-        </h1>
-    } else {
-        <label class="govuk-label govuk-label--xl">@Model.Element.Properties.AddressLabel</label>
-    }
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
+        @Model.Element.Properties.AddressLabel
+    </h1>
 
     <label class="govuk-label govuk-label--m" @Model.Element.WriteOptional() for="@questionId">@Model.Element.Properties.PostcodeLabel
         @if (Model.Element.Properties.Optional)
