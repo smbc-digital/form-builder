@@ -5,7 +5,6 @@
         Unknown,
         GoToPage,
         SubmitForm,
-        SubmitPowerAutomate,
         GoToExternalPage,
         SubmitAndPay
     }

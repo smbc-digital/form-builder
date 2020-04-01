@@ -1234,30 +1234,6 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CheckSubmitSlugsHaveAllProperties_ShouldNotThrowException_WhenAuthTokenIsNullOrEmptyAndBehaviourTypeIsSubmitPowerAutomate()
-        {
-            var pages = new List<Page>();
-
-            var submitSlugs = new SubmitSlug
-            {
-                URL = "test"
-            };
-
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitPowerAutomate)
-                .WithSubmitSlug(submitSlugs)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithBehaviour(behaviour)
-                .Build();
-
-            pages.Add(page);
-
-            _pageHelper.CheckSubmitSlugsHaveAllProperties(pages, "test-form");
-        }
-
-        [Fact]
         public void CheckSubmitSlugsHaveAllProperties_ShouldThrowException_WhenUrlIsNull()
         {
             var pages = new List<Page>();
