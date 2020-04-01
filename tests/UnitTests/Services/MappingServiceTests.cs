@@ -12,6 +12,7 @@ using form_builder_tests.Builders;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.FileManagement;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
@@ -329,6 +330,160 @@ namespace form_builder_tests.UnitTests.Services
             Assert.NotNull(fourObject.value);
             Assert.NotNull(fiveObject);
             Assert.NotNull(fiveObject.six);
+        }
+
+        
+        [Fact]
+        public async Task Map_ShouldReturnEmptyExpandoObject_WhenNullResponse_ForFile()
+        {
+            var element = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId("file")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(schema);
+
+            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+               .Returns(JsonConvert.SerializeObject(new FormAnswers
+               {
+                   Pages = new List<PageAnswers>()
+               }));
+
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns(null);
+
+            // Act
+            var result = await _service.Map("form", "guid");
+
+            // Assert
+            var resultData = Assert.IsType<ExpandoObject>(result.Data);
+            dynamic castResultsData = resultData;
+
+            Assert.Empty(castResultsData);
+        }
+
+                
+        [Fact]
+        public async Task Map_ShouldReturnExpandoObject_WithSingleFile()
+        {
+            var element = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId("file")
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId("filetwo")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(schema);
+
+            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+               .Returns(JsonConvert.SerializeObject(new FormAnswers
+               {
+                   Pages = new List<PageAnswers>()
+               }));
+
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "file"), It.IsAny<FormAnswers>()))
+                .Returns(null);
+
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns(new File());
+
+            // Act
+            var result = await _service.Map("form", "guid");
+
+            // Assert
+            var resultData = Assert.IsType<ExpandoObject>(result.Data);
+            dynamic castResultsData = resultData;
+
+            Assert.Single(castResultsData.file);
+            Assert.NotNull(castResultsData);
+        }
+
+        [Fact]
+        public async Task Map_ShouldReturnExpandoObject_WithTwoFiles_WithSameMapping()
+        {
+            var element = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId("file")
+                .WithTargetMapping("file")
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId("filetwo")
+                .WithTargetMapping("file")
+                .Build();
+
+            var element3 = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId("filethree")
+                .WithTargetMapping("file")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithElement(element2)
+                .WithElement(element3)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(schema);
+
+            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+               .Returns(JsonConvert.SerializeObject(new FormAnswers
+               {
+                   Pages = new List<PageAnswers>()
+               }));
+
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "file"), It.IsAny<FormAnswers>()))
+                .Returns(new File());
+
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filetwo"), It.IsAny<FormAnswers>()))
+                .Returns(null);
+
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filethree"), It.IsAny<FormAnswers>()))
+                .Returns(new File());
+
+            // Act
+            var result = await _service.Map("form", "guid");
+
+            // Assert
+            var resultData = Assert.IsType<ExpandoObject>(result.Data);
+            dynamic castResultsData = resultData;
+
+            Assert.Equal(2,castResultsData.file.Count);
+            Assert.NotNull(castResultsData);
+            Assert.NotNull(castResultsData.file);
         }
     }
 }

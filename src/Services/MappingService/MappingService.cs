@@ -101,12 +101,13 @@ namespace form_builder.Services.MappingService
         private IDictionary<string, dynamic> CheckAndCreateForFileUpload(string target, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
         {
             object objectValue;
+            var value = _elementMapper.GetAnswerValue(element, formAnswers);
+
             if (obj.TryGetValue(target, out objectValue))
             {
                 var files = (List<File>) objectValue;
-                var value = _elementMapper.GetAnswerValue(element, formAnswers);
 
-                if (!element.Properties.Optional || value != null)
+                if (value != null)
                 {
                     obj.Remove(target);
                     files.Add((File) value);
@@ -117,8 +118,11 @@ namespace form_builder.Services.MappingService
             else
             {
                 var files = new List<File>();
-                files.Add((File) _elementMapper.GetAnswerValue(element, formAnswers));
-                obj.Add(target, files);
+                if (value != null)
+                {
+                    files.Add((File) value);
+                    obj.Add(target, files);
+                }
             }
 
             return obj;
