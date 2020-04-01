@@ -26,16 +26,20 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
         private readonly Mock<IAddressServiceGateway> _addressServiceGateway = new Mock<IAddressServiceGateway>();
         private readonly Mock<IAddressProvider> _addressProvider = new Mock<IAddressProvider>();
+        private IEnumerable<IAddressProvider> _addressProviders;
 
         public AddressServiceTests()
         {
             _addressProvider.Setup(_ => _.ProviderName).Returns("testAddressProvider");
+            _addressProviders = new List<IAddressProvider>
+            {
+                _addressProvider.Object
+            };
 
-            var addressProviderItems = new List<IAddressProvider> { _addressProvider.Object };
 
-            _service = new AddressService(_mockDistributedCache.Object, _addressServiceGateway.Object, _pageHelper.Object);
+            _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders);
         }
-        [Theory(Skip = "WIP")]
+        
         [InlineData(true, "Search")]
         public async Task ProcesssAddress_ShouldCallAddressProvider_WhenCorrectJourney(bool isValid, string journey)
         {
@@ -63,10 +67,10 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
             var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithQuestionId(questionId)
-               .WithAddressProvider("testAddressProvider")               
-               .Build();
+                .WithType(EElementType.Address)
+                .WithQuestionId(questionId)
+                .WithAddressProvider("testAddressProvider")               
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -119,11 +123,11 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
             var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithQuestionId(questionId)
-               .WithAddressProvider("testAddressProvider")
-               .WithOptional(true)
-               .Build();
+                .WithType(EElementType.Address)
+                .WithQuestionId(questionId)
+                .WithAddressProvider("testAddressProvider")
+                .WithOptional(true)
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -147,14 +151,13 @@ namespace form_builder_tests.UnitTests.Services
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
         }
 
-        [Fact(Skip = "WIP")]
         public async Task ProcesssAddress_ShouldCall_PageHelper_ToProcessSearchResults()
         {
             var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithQuestionId("test-address")
-               .WithAddressProvider("testAddressProvider")
-               .Build();
+                .WithType(EElementType.Address)
+                .WithQuestionId("test-address")
+                .WithAddressProvider("testAddressProvider")
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -182,16 +185,15 @@ namespace form_builder_tests.UnitTests.Services
             _pageHelper.Verify(_ => _.ProcessAddressJourney("Search", It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
         }
 
-        [Fact(Skip = "WIP")]
         public async Task ProcesssAddress_Application_ShouldThrowApplicationException_WhenNoMatchingAddressProvider()
         {
             var addressProvider = "NON-EXIST-PROVIDER";
             var searchResultsCallback = new List<AddressSearchResult>();
             var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithAddressProvider(addressProvider)
-               .WithQuestionId("test-address")
-               .Build();
+                .WithType(EElementType.Address)
+                .WithAddressProvider(addressProvider)
+                .WithQuestionId("test-address")
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -215,7 +217,6 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal($"No address provider configure for {addressProvider}", result.Message);
         }
 
-        [Fact (Skip="WIP")]
         public async Task ProcesssAddress_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
         {
 
@@ -224,10 +225,10 @@ namespace form_builder_tests.UnitTests.Services
 
             var searchResultsCallback = new List<AddressSearchResult>();
             var element = new ElementBuilder()
-               .WithType(EElementType.Address)
-               .WithAddressProvider("testAddressProvider")
-               .WithQuestionId("test-address")
-               .Build();
+                .WithType(EElementType.Address)
+                .WithAddressProvider("testAddressProvider")
+                .WithQuestionId("test-address")
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -248,7 +249,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssAddress(viewModel, page, schema, "", "page-one"));
 
-            _addressServiceGateway.Verify(_ => _.SearchAsync(It.IsAny<AddressSearch>()), Times.Once);
+            //_addressServiceGateway.Verify(_ => _.SearchAsync(It.IsAny<AddressSearch>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Never);
             Assert.StartsWith($"AddressController: An exception has occured while attempting to perform postcode lookup, Exception: ", result.Message);
         }

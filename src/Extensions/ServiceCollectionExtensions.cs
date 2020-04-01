@@ -110,7 +110,7 @@ namespace form_builder.Extensions
         public static IServiceCollection ConfigureAddressProviders(this IServiceCollection services)
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
-            services.AddSingleton<IAddressProvider, CRMAddressProvider>();
+            services.AddSingleton<IAddressProvider, ServiceAddressProvider>();
             return services;
         }
 
