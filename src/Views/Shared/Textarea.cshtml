@@ -2,11 +2,17 @@
 @{
     var hintId = $"{Model.Properties.QuestionId}-hint";
     var errorId = $"{Model.Properties.QuestionId}-error";
-    var elementProperties = Model.GenerateElementProperties();
-    elementProperties.Add("class", "govuk-textarea");
+    var elements = Model.GenerateElementProperties();
+    if(!Model.IsValid)
+    {
+        elements.Add("class", "govuk-textarea govuk-textarea--error");
+    }
+    else{
+        elements.Add("class", "govuk-textarea");
+    }
 }
 
-<div class="govuk-form-group">
+<div class="govuk-form-group @(!Model.IsValid ? " govuk-form-group--error" : string.Empty)"
     @if(Model.Properties.LabelAsH1) {
         <h1 class="govuk-label-wrapper">
             <label class="govuk-label govuk-label--xl" @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label
@@ -32,11 +38,12 @@
     }
     <p class="govuk-hint">Your description can be up to @Model.Properties.MaxLength characters</p>
     
-    @Html.TextArea(Model.Properties.QuestionId, Model.Properties.Value, elementProperties)
-
     @if (!Model.IsValid)
     {
-        var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
-        <p class="input-error-content text-area-validation" id="@errorId">@validationMessage</p>
+        <span class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> @Model.ValidationMessage
+        </span>
     }
+    
+    @Html.TextArea(Model.Properties.QuestionId, Model.Properties.Value, elements)    
 </div>
