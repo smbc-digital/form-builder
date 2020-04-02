@@ -28,6 +28,13 @@ namespace form_builder.Controllers
         }
 
         [HttpGet]
+        [Route("/")]
+        public IActionResult Home()
+        {
+            return Redirect("https://www.stockport.gov.uk");
+        }
+
+        [HttpGet]
         [Route("{form}")]
         [Route("{form}/{path}")]
         public async Task<IActionResult> Index(string form, string path)

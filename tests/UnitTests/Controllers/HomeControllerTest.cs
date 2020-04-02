@@ -39,6 +39,16 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
+        public void Home_ShouldRedirectTo_www_When_RouteRequested()
+        {
+            var result = _homeController.Home();
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectResult>(result);
+            Assert.Equal("https://www.stockport.gov.uk", redirectResult.Url);
+        }
+
+        [Fact]
         public async Task Index_ShouldRunBehaviourForRedirect_GoToExternalPage()
         {
             // Arrange
