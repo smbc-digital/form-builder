@@ -84,7 +84,7 @@ namespace form_builder.Services.PageService
 
             var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
 
-            if(!baseForm.IsAvailable(_environment.EnvironmentName.ToS3EnvPrefix()))
+            if(!baseForm.IsAvailable(_environment.EnvironmentName))
             {
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
             }
@@ -176,7 +176,7 @@ namespace form_builder.Services.PageService
         {
             var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
 
-            if(!baseForm.IsAvailable(_environment.EnvironmentName.ToS3EnvPrefix()))
+            if(!baseForm.IsAvailable(_environment.EnvironmentName))
             {
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
             }
