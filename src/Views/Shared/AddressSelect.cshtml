@@ -13,9 +13,9 @@
     </h1>
 
     <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Postcode</h2>
-    <p class="govuk-body"><strong class="govuk-!-margin-right-2">@Model.Item1.Element.Properties.Value.ToUpper()</strong><a class="govuk-link" href="@Model.Item1.ReturnURL">Change</a></p>
+    <p class="govuk-body"><strong class="govuk-!-margin-right-3">@Model.Item1.Element.Properties.Value.ToUpper()</strong><a class="govuk-link" href="@Model.Item1.ReturnURL">Change</a></p>
 
-    <h2 class="govuk-label-wrapper govuk-!-margin-bottom-0">
+    <h2 class="govuk-label-wrapper govuk-!-margin-bottom-1">
         <label class="govuk-label govuk-label--m" for="@questionId" @Model.Item1.Element.WriteOptional()>@Model.Item1.Element.Properties.SelectLabel
             @if (Model.Item1.Element.Properties.Optional)
             {
@@ -38,5 +38,5 @@
             <p class="input-error-content" id="@errorId">@validationMessage</p>
         }
     }
-    <p class="govuk-body govuk-link govuk-!-margin-top-4"><a class="govuk-link" href="@Model.Item1.ManualAddressURL">I can't find my address in the list</a></p>
+    <p class="govuk-body govuk-link govuk-!-margin-top-5"><a class="govuk-link" href="@Model.Item1.ManualAddressURL">I can't find my address in the list</a></p>
 </div>
