@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using form_builder.Builders;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -25,27 +26,38 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<IPageService> _pageService = new Mock<IPageService>();
         private readonly Mock<ISubmitWorkflow> _submitWorkflow = new Mock<ISubmitWorkflow>();
         private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new Mock<IPaymentWorkflow>();
-        private readonly Mock<IFileHelper> _mockFileHelper = new Mock<IFileHelper>();
         private readonly Mock<IFileUploadService> _mockFileUploadService = new Mock<IFileUploadService>();
-
+        private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
 
         public HomeControllerTest()
         {
             var httpContext = new DefaultHttpContext();
             var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
 
-            _homeController = new HomeController(_pageService.Object, _submitWorkflow.Object, _paymentWorkflow.Object, _mockFileUploadService.Object);
+            _homeController = new HomeController(_pageService.Object, _submitWorkflow.Object, _paymentWorkflow.Object, _mockFileUploadService.Object, _mockHostingEnv.Object);
             _homeController.TempData = tempData;
         }
 
         [Fact]
-        public void Home_ShouldRedirectTo_www_When_RouteRequested()
+        public void Home_ShouldRedirectTo_www_When_Prod_Env_ForHomeRoute()
         {
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("prod");
             var result = _homeController.Home();
 
             // Assert
             var redirectResult = Assert.IsType<RedirectResult>(result);
             Assert.Equal("https://www.stockport.gov.uk", redirectResult.Url);
+        }
+
+        [Fact]
+        public void Home_ShouldReturnErrorView_WhenNonProdEnv_ForHomeRoute()
+        {
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
+            var result = _homeController.Home();
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Equal("../Error/Index", viewResult.ViewName);
         }
 
         [Fact]
