@@ -15,6 +15,12 @@ namespace form_builder.Models.Elements
         {
             Type = EElementType.Textbox;
         }
+        
+        public bool DisplayHint { get =>  !string.IsNullOrEmpty(Properties.Hint.Trim());}
+
+        public string HintId { get => $"{Properties.QuestionId}-hint"; }
+
+        public string ErrorId {get => $"{Properties.QuestionId}-error"; }
 
         public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
@@ -24,7 +30,7 @@ namespace form_builder.Models.Elements
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
-        public override Dictionary<string, dynamic> GenerateElementProperties(string type)
+        public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var properties = new Dictionary<string, dynamic>()
             {
@@ -32,12 +38,31 @@ namespace form_builder.Models.Elements
                 { "id", Properties.QuestionId },
                 { "maxlength", Properties.MaxLength },
                 { "value", Properties.Value},
-                { "autocomplete", "on" }
             };
-
-            if (DisplayAriaDescribedby)
+            
+            if (Properties.Numeric)
             {
-                properties.Add("aria-describedby", DescribedByValue());
+                properties.Add("type", "number");
+                properties.Add("max", Properties.Max);
+                properties.Add("min", Properties.Min);
+            }
+
+            if (DisplayAriaDescribedby && !IsValid)
+            {
+                properties.Add("aria-describedby", $"{HintId} {ErrorId}");
+            }
+            else if(DisplayAriaDescribedby)
+            {
+                properties.Add("aria-describedby", $"{HintId}");
+            }
+            else if(!IsValid)
+            {
+                properties.Add("aria-describedby", $"{ErrorId}");
+            }
+
+            if (!string.IsNullOrEmpty(Properties.Purpose))
+            {
+                properties.Add("autocomplete", Properties.Purpose);
             }
 
             return properties;
