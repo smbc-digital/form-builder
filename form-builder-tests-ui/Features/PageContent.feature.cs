@@ -246,4 +246,7 @@ this.ScenarioInitialize(scenarioInfo);
 }
 #pragma warning restore
 #endregion
+<<<<<<< HEAD
 >>>>>>> 72cff9d... Modified ui-tests
+=======
+>>>>>>> 86c2b7d... fixed merge conflict
