@@ -42,17 +42,9 @@ namespace form_builder.Models.Elements
                 properties.Add("spellcheck", Properties.Spellcheck.ToString());
             }
 
-            if (DisplayAriaDescribedby && !IsValid)
+            if (DisplayAriaDescribedby)
             {
-                properties.Add("aria-describedby", $"{HintId} {ErrorId}");
-            }
-            else if(DisplayAriaDescribedby)
-            {
-                properties.Add("aria-describedby", $"{HintId}");
-            }
-            else if(!IsValid)
-            {
-                properties.Add("aria-describedby", $"{ErrorId}");
+                properties.Add("aria-describedby", DescribedByValue());
             }
 
             if (!string.IsNullOrEmpty(Properties.Purpose))

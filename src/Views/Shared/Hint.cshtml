@@ -1,4 +1,4 @@
     @if (Model.DisplayHint)
     {
-        <span class="govuk-hint" id=@Model.HintId>@Model.Properties.Hint</span>
+        <span class="govuk-hint" id=@Model.HintId>@Html.Raw(Model.Properties.Hint)</span>
     }

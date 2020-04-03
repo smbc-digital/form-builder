@@ -24,24 +24,23 @@ namespace form_builder.Models.Elements
 
         public BaseProperty Properties { get; set; }
 
-        public bool DisplayHint { get =>  !string.IsNullOrEmpty(Properties.Hint.Trim());}
+        public bool DisplayHint => !string.IsNullOrEmpty(Properties.Hint.Trim());
 
-        public string HintId { get => $"{Properties.QuestionId}-hint"; }
+        public string HintId => $"{Properties.QuestionId}-hint"; 
 
-        public string ErrorId {get => $"{Properties.QuestionId}-error"; }
+        public string ErrorId => $"{Properties.QuestionId}-error"; 
 
-        public bool DisplayAriaDescribedby { get => Properties.Hint != string.Empty || !IsValid; }
+        public bool DisplayAriaDescribedby => DisplayHint || !IsValid; 
 
-        public bool IsValid { get => validationResult.IsValid; }
+        public bool IsValid => validationResult.IsValid; 
 
-        public string ValidationMessage { get => validationResult.Message; } 
+        public string ValidationMessage => string.IsNullOrEmpty(Properties.CustomValidationMessage) ? validationResult.Message : Properties.CustomValidationMessage; 
 
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
         {
             foreach (var validator in form_builder)
             {
                 var result = validator.Validate(this, viewModel);
-
                 if (!result.IsValid)
                 {
                     validationResult = result;
@@ -100,6 +99,16 @@ namespace form_builder.Models.Elements
             
         }
 
+        public string GetListItemId(int index)
+        {
+            return $"{Properties.QuestionId}-{index}";
+        }
+
+        public string GetListItemHintId(int index)
+        {
+            return $"{GetListItemId(index)}-hint";
+        }
+
         public string DescribedByValue()
         {
             return DescribeValue($"{Properties.QuestionId}");
@@ -112,19 +121,18 @@ namespace form_builder.Models.Elements
 
         private string DescribeValue(string key)
         {
-            var describedByValue = string.Empty;
-
-            if (!string.IsNullOrEmpty(Properties.Hint))
+            var describedBy = new List<string>();
+            if (DisplayHint)
             {
-                describedByValue += $"{key}-hint ";
+                describedBy.Add(HintId);
             }
 
             if (!IsValid)
             {
-                describedByValue += $"{key}-error";
+                describedBy.Add(ErrorId);
             }
 
-            return describedByValue.Trim();
+            return string.Join(" ", describedBy);
         }
 
         public string WriteHtmlForAndClassAttribute(string prefix = "")

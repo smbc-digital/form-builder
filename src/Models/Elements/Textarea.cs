@@ -41,17 +41,9 @@ namespace form_builder.Models.Elements
                 properties.Add("rows", Properties.MaxLength > 500 ? "15" : "5");
             }
 
-            if (DisplayAriaDescribedby && !IsValid)
+            if (DisplayAriaDescribedby)
             {
-                properties.Add("aria-describedby", $"{HintId} {ErrorId}");
-            }
-            else if(DisplayAriaDescribedby)
-            {
-                properties.Add("aria-describedby", $"{HintId}");
-            }
-            else if(!IsValid)
-            {
-                properties.Add("aria-describedby", $"{ErrorId}");
+                properties.Add("aria-describedby", DescribedByValue());
             }
 
             return properties;
