@@ -15,12 +15,6 @@ namespace form_builder.Models.Elements
         {
             Type = EElementType.Textbox;
         }
-        
-        public bool DisplayHint { get =>  !string.IsNullOrEmpty(Properties.Hint.Trim());}
-
-        public string HintId { get => $"{Properties.QuestionId}-hint"; }
-
-        public string ErrorId {get => $"{Properties.QuestionId}-error"; }
 
         public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
@@ -45,6 +39,7 @@ namespace form_builder.Models.Elements
                 properties.Add("type", "number");
                 properties.Add("max", Properties.Max);
                 properties.Add("min", Properties.Min);
+                properties.Add("spellcheck", Properties.Spellcheck.ToString());
             }
 
             if (DisplayAriaDescribedby && !IsValid)

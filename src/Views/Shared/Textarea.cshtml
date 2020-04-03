@@ -13,37 +13,12 @@
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? " govuk-form-group--error" : string.Empty)"
-    @if(Model.Properties.LabelAsH1) {
-        <h1 class="govuk-label-wrapper">
-            <label class="govuk-label govuk-label--xl" @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label
-                @if (Model.Properties.Optional)
-                {
-                    <span>(optional)</span>
-                }
-            </label>
-        </h1>
-    } else {
-        <label class="govuk-label" @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label
-        @if (Model.Properties.Optional)
-        {
-            <span>(optional)</span>
-        }
-        </label>
-    }
+    <partial name="LabelH1" />
 
-    @if (!string.IsNullOrEmpty(Model.Properties.Hint))
-    {
-        <span class="govuk-hint" id=@hintId>@Html.Raw(Model.Properties.Hint)</span>
-        
-    }
+    <partial name="Hint" />
     <p class="govuk-hint">Your description can be up to @Model.Properties.MaxLength characters</p>
     
-    @if (!Model.IsValid)
-    {
-        <span class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> @Model.ValidationMessage
-        </span>
-    }
+    <partial name="Error" />
     
     @Html.TextArea(Model.Properties.QuestionId, Model.Properties.Value, elements)    
 </div>

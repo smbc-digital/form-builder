@@ -33,7 +33,7 @@ namespace form_builder.Models.Elements
                 { "id", Properties.QuestionId },
                 { "maxlength", Properties.MaxLength },
                 { "value", Properties.Value},
-                { "autocomplete", "on" }
+                { "spellcheck", Properties.Spellcheck.ToString().ToLower() }
             };
 
             if (Properties.MaxLength <= 200 || Properties.MaxLength > 500)
@@ -41,9 +41,17 @@ namespace form_builder.Models.Elements
                 properties.Add("rows", Properties.MaxLength > 500 ? "15" : "5");
             }
 
-            if (DisplayAriaDescribedby)
+            if (DisplayAriaDescribedby && !IsValid)
             {
-                properties.Add("aria-describedby", DescribedByValue());
+                properties.Add("aria-describedby", $"{HintId} {ErrorId}");
+            }
+            else if(DisplayAriaDescribedby)
+            {
+                properties.Add("aria-describedby", $"{HintId}");
+            }
+            else if(!IsValid)
+            {
+                properties.Add("aria-describedby", $"{ErrorId}");
             }
 
             return properties;

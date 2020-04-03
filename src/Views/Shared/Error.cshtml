@@ -1,0 +1,6 @@
+    @if (!Model.IsValid)
+    {
+        <span class="govuk-error-message" id="@Model.ErrorId">
+            <span class="govuk-visually-hidden">Error:</span> @Model.ValidationMessage
+        </span>
+    }

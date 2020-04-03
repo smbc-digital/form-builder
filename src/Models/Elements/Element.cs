@@ -24,29 +24,17 @@ namespace form_builder.Models.Elements
 
         public BaseProperty Properties { get; set; }
 
-        public bool DisplayAriaDescribedby
-        {
-            get
-            {
-                return Properties.Hint != string.Empty || !IsValid;
-            }
-        }
+        public bool DisplayHint { get =>  !string.IsNullOrEmpty(Properties.Hint.Trim());}
 
-        public bool IsValid
-        {
-            get
-            {
-                return validationResult.IsValid;
-            }
-        }
+        public string HintId { get => $"{Properties.QuestionId}-hint"; }
 
-        public string ValidationMessage
-        {
-            get
-            {
-                return validationResult.Message;
-            }
-        }
+        public string ErrorId {get => $"{Properties.QuestionId}-error"; }
+
+        public bool DisplayAriaDescribedby { get => Properties.Hint != string.Empty || !IsValid; }
+
+        public bool IsValid { get => validationResult.IsValid; }
+
+        public string ValidationMessage { get => validationResult.Message; } 
 
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
         {

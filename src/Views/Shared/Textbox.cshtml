@@ -1,4 +1,4 @@
-﻿@model form_builder.Models.Elements.Textbox
+﻿@model form_builder.Models.Elements.Element
 @{
     var elements = Model.GenerateElementProperties();
     if(!Model.IsValid)
@@ -12,36 +12,12 @@
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-    @if(Model.Properties.LabelAsH1)
-    {
-        <h1 class="govuk-label-heading">
-            <label class="govuk-label govuk-label--xl" for="@Model.Properties.QuestionId">
-                @Model.Properties.Label
-                @if (Model.Properties.Optional) { <span>(optional)</span> }
-            </label>
-        </h1>
-    } 
-    else 
-    {
-        <label class="govuk-label" for="@Model.Properties.QuestionId">@Model.Properties.Label
-        @if (Model.Properties.Optional)
-        {
-            <span>(optional)</span>
-        }    
-        </label>
-    }
 
-    @if (Model.DisplayHint)
-    {
-        <span class="govuk-hint" id=@Model.HintId>@Model.Properties.Hint</span>
-    }
-    
-    @if (!Model.IsValid)
-    {
-        <span class="govuk-error-message" id="@Model.ErrorId">
-            <span class="govuk-visually-hidden">Error:</span> @Model.ValidationMessage
-        </span>
-    }
+    <partial name="LabelH1" />
+
+    <partial name="Hint" />
+
+    <partial name="Error" />
     
     @Html.TextBox(Model.Properties.QuestionId, Model.Properties.Value, elements)
 </div>
