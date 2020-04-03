@@ -35,6 +35,7 @@ using form_builder.Providers.DocumentCreation.Smbc;
 using form_builder.Services.DocumentService;
 using form_builder.Helpers.DocumentCreation;
 using form_builder.ContentFactory;
+using form_builder.Providers.Organisation;
 
 namespace form_builder.Extensions
 {
@@ -111,6 +112,14 @@ namespace form_builder.Extensions
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
             services.AddSingleton<IAddressProvider, ServiceAddressProvider>();
+            return services;
+        }
+
+        public static IServiceCollection ConfigureOrganisationProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
+            services.AddSingleton<IOrganisationProvider, ServiceOrganisationProvider>();
+            
             return services;
         }
 
