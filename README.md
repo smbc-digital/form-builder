@@ -335,15 +335,18 @@ Paragraph text JSON example:
 ```
 #
    * <a name="textboxprops">**Textbox**</a>
-        * Label (*string*) __*__
-        * QuestionId (*string*) __*__
-        * CustomValidationMessage (*string*)
-        * Hint (*string*)
-        * MaxLength (*int*) (defaulted to 200)
-        * Optional (*boolean*) (defaults to false)
-        * Regex (*string*) - The regex pattern to use
-        * RegexValidationMessage (*string*) -  The validation message that appears if the input does not match the Regex pattern         (Default: Check the {Label} and try again)
-        * TargetMapping (*string*)  
+        * **Label** (*string*) __*__
+        * **LabelAsH1** (*string*) __*__
+        * **QuestionId** (*string*) __*__
+        * **CustomValidationMessage** (*string*)
+        * **MaxLength** (*int*) (defaulted to 200)
+        * **Hint** (*string*)
+        * **Purpose** (*string*) - The purpose of the textbox is used by the autocomplete attribute, valid values can be found in the [WCAG input purposes specification](https://www.w3.org/TR/WCAG21/#input-purposes)
+        * **Optional** (*boolean*) (defaults to false)
+        * Regex** (*string*) - The regex pattern to use
+        * **Spellcheck** (*boolean*) (defaults to true) - Sets the value of he spellcheck attribute, this should be set to false for fields where spellcheck isn't relevant e.g. Names, Reference Numnbers etc.
+        * **TargetMapping** (*string*)  
+        * **RegexValidationMessage** (*string*) -  The validation message that appears if the input does not match the Regex pattern         (Default: Check the {Label} and try again)
         
 ### Textbox JSON example (has to be a valid UK National Insurance Number):
 ```json
@@ -357,7 +360,9 @@ Paragraph text JSON example:
       "MaxLength": 9,
       "Regex": "^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$",
       "RegexValidationMessage": "Enter a valid NI Number",
-      "TargetMapping": "customer.ninumber"
+      "TargetMapping": "customer.ninumber",
+      "Purpose": "given-name",
+      "Spellcheck": false
     }
   }
 ```
@@ -491,13 +496,16 @@ Textbox JSON example:
 ```
 #
    * <a name="textareaprops">**Textarea**</a>
-        * Label (*string*) __*__
-        * QuestionId (*string*) __*__
-        * CustomValidationMessage (*string*)
-        * Hint (*string*)
-        * MaxLength (*int*) (defaults to 200)
-        * Optional (*boolean*) (defaults to false)
-        * TargetMapping (*string*)  
+        * **Label** (*string*) __*__
+        * **QuestionId** (*string*) __*__
+        * **CustomValidationMessage** (*string*)
+        * **Hint** (*string*)
+        * **MaxLength** (*int*) (defaults to 200)
+        * **Optional** (*boolean*) (defaults to false)
+        * **Purpose** (*string*) - The purpose of the textbox is used by the autocomplete attribute, valid values can be found in the [WCAG input purposes specification](https://www.w3.org/TR/WCAG21/#input-purposes)
+        * **Spellcheck** (*boolean*) (defaults to true) - Sets the value of he spellcheck attribute, this should be set to false for fields where spellcheck isn't relevant e.g. Names, Reference Numnbers etc.
+        * **TargetMapping** (*string*)  
+        
 
 Textarea (Email) JSON example:
 ```json
@@ -509,7 +517,8 @@ Textarea (Email) JSON example:
       "CustomValidationMessage": "Custom validation message",
       "Hint": "Hint text",
       "MaxLength": "2000",
-      "Optional": false
+      "Optional": false,
+      "Spellcheck": true
     }
   }
 ```
