@@ -142,7 +142,6 @@ namespace form_builder.Models.Elements
             if (DisplayOptional)
             {
                 data = "class = optional";
-
             }
 
             if (!Properties.LegendAsH1)
@@ -159,7 +158,6 @@ namespace form_builder.Models.Elements
             if (DisplayOptional)
             {
                 return "class = optional";
-
             }
 
             return null;

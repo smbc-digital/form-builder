@@ -12,7 +12,9 @@
                 aria-describedby="@Model.GetListItemHintId(i)" 
                 @(Model.Properties.Checked ||  Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty) />
 
-            <label class="govuk-label govuk-checkboxes__label" for="@Model.GetListItemId(i)">@Model.Properties.Options[i].Text</label>
+            <label class="govuk-label govuk-checkboxes__label" 
+                for="@Model.GetListItemId(i)"
+                id="@Model.GetListItemHintId(i)">@Model.Properties.Options[i].Text</label>
 
             @if (!string.IsNullOrWhiteSpace(Model.Properties.Options[i].Hint))
             {

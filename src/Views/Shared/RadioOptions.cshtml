@@ -2,19 +2,23 @@
 <p class="govuk-radios">
     @for (var i = 0; i < Model.Properties.Options.Count; i++)
     {
-        var item = Model.Properties.Options[i];
-        var itemHint = $"{Model.Properties.QuestionId}-{i}-hint";
-        var itemId = $"{Model.Properties.QuestionId}-{i}";
-        var itemName = $"{Model.Properties.QuestionId}";
-
         <div class="govuk-radios__item">
-            @* @Html.RadioButton(Model.Properties.QuestionId, Model.Properties.Options[i].Value, Model.Properties.Options[i].Checked, @Model.GenerateElementProperties(i)) *@
-            <input class="govuk-radios__input" type="radio" value="@item.Value" name="@itemName" id="@itemId" aria-describedby="@itemHint" checked />
-            <label class="govuk-label govuk-radios__label" for="@itemId">@item.Text</label>
+            @* TODO: Should this use @Html.Radio? *@
+            <input class="govuk-radios__input" 
+                type="radio" 
+                value="@Model.Properties.Options[i].Value" 
+                name="@Model.Properties.QuestionId" 
+                id="@Model.GetListItemId(i)" 
+                aria-describedby="@Model.GetListItemHintId(i)" 
+                @(Model.Properties.Checked ||  Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty) />
+            
+            <label class="govuk-label govuk-radios__label" 
+                for="@Model.GetListItemId(i)"
+                id="@Model.GetListItemHintId(i)">@Model.Properties.Options[i].Text</label>
 
-            @if (!string.IsNullOrEmpty(item.Hint))
+            @if (!string.IsNullOrWhiteSpace(Model.Properties.Options[i].Hint))
             {
-                <div class="govuk-hint govuk-radios__hint" id=@itemHint>@Html.Raw(item.Hint)</div>
+                <div class="govuk-hint govuk-radios__hint" id="@Model.GetListItemHintId(i)">@Html.Raw(Model.Properties.Options[i].Hint)</div>
             }
         </div>
     }
