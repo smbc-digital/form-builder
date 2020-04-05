@@ -1,7 +1,11 @@
 ﻿@model form_builder.Models.Elements.Element
 
-<option value="">Select an option...</option>
-@for (var i = 0; i < Model.Properties.Options.Count; i++)
-{
-    <option value="@Model.Properties.Options[i].Value" selected="@Model.Properties.Options[i].Selected">@Model.Properties.Options[i].Text</option>
-}
+<select class="govuk-select" id="@Model.Properties.QuestionId " name="@Model.Properties.QuestionId" @Html.Raw(Model.DescribedByAttribute())>
+    <option value="">Select an option...</option>
+    @for (var i = 0; i < Model.Properties.Options.Count; i++)
+    {
+    <option value="@Model.Properties.Options[i].Value" 
+            selected="@Model.Properties.Options[i].Selected"
+            id="@Model.GetListItemId(i)">@Model.Properties.Options[i].Text</option>
+    }
+</select>

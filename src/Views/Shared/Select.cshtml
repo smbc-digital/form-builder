@@ -1,43 +1,12 @@
-﻿@using form_builder.Helpers
-@model form_builder.Models.Elements.Element
-@{
-    var hintId = $"{Model.Properties.QuestionId}-hint";
-    var errorId = $"{Model.Properties.QuestionId}-error";
-}
+﻿@model form_builder.Models.Elements.Element
 
-<div class="govuk-form-group">
-    @if(Model.Properties.LabelAsH1) {
-        <h1 class="govuk-label-wrapper">
-            <label class="govuk-label govuk-label--xl" @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label
-                @if (Model.Properties.Optional)
-                {
-                    <span>(optional)</span>
-                }
-            </label>
-        </h1>
-    } else {
-        <label class="govuk-label" @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label
-        @if (Model.Properties.Optional)
-        {
-            <span>(optional)</span>
-        }    
-        </label>
-    }
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
 
-    @if (!string.IsNullOrEmpty(Model.Properties.Hint))
-    {
-        <div class="govuk-hint" id=@hintId>@Html.Raw(Model.Properties.Hint)</div>
-    }
+    <partial name="LabelH1" />
+    
+    <partial name="Hint" />
 
-    <select class="govuk-select" id="@Model.Properties.QuestionId" name="@Model.Properties.QuestionId">
-        <partial name="SelectOptions" />
-    </select>
+    <partial name="Error" />
 
-    @if (!Model.IsValid)
-    {
-        {
-            var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
-            <p class="input-error-content" id="@errorId">@validationMessage</p>
-        }
-    }
+    <partial name="SelectOptions" />
 </div>

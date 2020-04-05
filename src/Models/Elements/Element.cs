@@ -114,6 +114,11 @@ namespace form_builder.Models.Elements
             return DescribeValue($"{Properties.QuestionId}");
         }
 
+        public string DescribedByAttribute()
+        {
+            return DisplayAriaDescribedby ? $"aria-describedby=\"{DescribedByValue()}\"" : string.Empty;
+        }
+
         public string DescribedByValue(string prefix)
         {
             return DescribeValue($"{Properties.QuestionId}{prefix}");
