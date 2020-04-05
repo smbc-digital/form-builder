@@ -16,7 +16,7 @@
                 for="@Model.GetListItemId(i)"
                 id="@Model.GetListItemHintId(i)">@Model.Properties.Options[i].Text</label>
 
-            @if (!string.IsNullOrWhiteSpace(Model.Properties.Options[i].Hint))
+            @if (Model.Properties.Options[i].HasHint)
             {
                 <div class="govuk-hint govuk-checkboxes__hint" id="@Model.GetListItemHintId(i)">@Model.Properties.Options[i].Hint</div>
             }

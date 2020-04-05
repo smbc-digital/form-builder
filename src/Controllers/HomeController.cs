@@ -105,19 +105,23 @@ namespace form_builder.Controllers
             {
                 case EBehaviourType.GoToExternalPage:
                     return Redirect(behaviour.PageSlug);
+
                 case EBehaviourType.GoToPage:
                     return RedirectToAction("Index", new
                     {
                         path = behaviour.PageSlug
                     });
+
                 case EBehaviourType.SubmitForm:
                     return RedirectToAction("Submit", new
                     {
                         form
                     });
+
                 case EBehaviourType.SubmitAndPay:
                     var result = await _paymentWorkflow.Submit(form, path);
                     return Redirect(result);
+                    
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
             }
@@ -135,27 +139,37 @@ namespace form_builder.Controllers
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
             }
 
+            /*
+             * TODO : Should there be abstraction here? 
+             * Should we be able to return behaviour.GetResult():
+             * So as to more easily be able to add new behaviour types
+             * Also this duplicates the code above so should at least be moved in to a shared method
+             */
             var behaviour = _pageService.GetBehaviour(currentPageResult);
 
             switch (behaviour.BehaviourType)
             {
                 case EBehaviourType.GoToExternalPage:
                     return Redirect(behaviour.PageSlug);
+
                 case EBehaviourType.GoToPage:
                     return RedirectToAction("Index", new
                     {
                         path = behaviour.PageSlug,
                         form
                     });
+
                 case EBehaviourType.SubmitForm:
                     return RedirectToAction("Submit", new
                     {
                         form,
                         path
                     });
+
                 case EBehaviourType.SubmitAndPay:
                     var result = await _paymentWorkflow.Submit(form, path);
                     return Redirect(result);
+
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
             }
@@ -178,7 +192,7 @@ namespace form_builder.Controllers
         [Route("{form}/success")]
         public async Task<IActionResult> Success(string form)
         {
-            var result = await _pageService.FinalisePageJoueny(form, EBehaviourType.SubmitForm);
+            var result = await _pageService.FinalisePageJourney(form, EBehaviourType.SubmitForm);
             
             var success = new SuccessViewModel {
                 Reference = (string)TempData["reference"],

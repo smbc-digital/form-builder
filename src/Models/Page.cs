@@ -75,28 +75,30 @@ namespace form_builder.Models
             {
                 return Behaviours.FirstOrDefault();
             }
-            else
+
+            foreach (var behaviour in Behaviours)
             {
-                foreach (var behaviour in Behaviours)
+                /* 
+                 * TODO : Should this be abstracted away into some for of ICondition interface for MatchesAnswerCondition?
+                 * ICondition would then have and interface IsMatching() that would then allow for other condition types to be easily added?
+                 */
+                foreach (var condition in behaviour.Conditions)
                 {
-                    foreach (var condition in behaviour.Conditions)
+                    if (condition.EqualTo != null)
                     {
-                        if (condition.EqualTo != null)
-                        {
-                            return Behaviours
+                        return Behaviours
                             .OrderByDescending(_ => _.Conditions.Count)
                             .FirstOrDefault(_ => _.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]));
-                        }
-                        else
-                        //if (condition.CheckboxContains != null)
-                        {
-                            return Behaviours
-                                .OrderByDescending(_ => _.Conditions.Count)
-                                .FirstOrDefault(_ => _.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains)));
-                        }
+                    }
+                    else
+                    {
+                        return Behaviours
+                            .OrderByDescending(_ => _.Conditions.Count)
+                            .FirstOrDefault(_ => _.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains)));
                     }
                 }
             }
+
             throw new Exception("Behaviour issues");
         }
 

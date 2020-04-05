@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using form_builder.Helpers.PageHelpers;
 using Microsoft.Extensions.Logging;
 using form_builder.Helpers.Session;
-using System; 
-using form_builder.Services.PageService.Entities; 
+using System;
+using form_builder.Services.PageService.Entities;
 using System.Linq;
 using form_builder.Enum;
 using form_builder.Services.AddressService;
 using form_builder.Services.StreetService;
-using form_builder.Models.Elements;    
+using form_builder.Models.Elements;
 using form_builder.ViewModels;
 using form_builder.Providers.StorageProvider;
 using form_builder.Extensions;
@@ -26,14 +26,6 @@ using form_builder.ContentFactory;
 
 namespace form_builder.Services.PageService
 {
-    public interface IPageService
-    {
-        Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false);
-        Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> file, bool processManual = false);
-        Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid);
-        Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
-        Task<SuccessPageEntity> FinalisePageJoueny(string form, EBehaviourType behaviourType);
-    }
 
     public class PageService : IPageService
     {
@@ -274,7 +266,7 @@ namespace form_builder.Services.PageService
 
             return currentPageResult.Page.GetNextPage(answers);
         }
-        public async Task<SuccessPageEntity> FinalisePageJoueny(string form, EBehaviourType behaviourType)
+        public async Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
