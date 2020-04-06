@@ -21,21 +21,20 @@ namespace form_builder.Models.Elements
         }
 
         public EElementType Type { get; set; }
-
         public BaseProperty Properties { get; set; }
-
         public bool DisplayHint => !string.IsNullOrEmpty(Properties.Hint.Trim());
-
+        public bool HadCustomClasses => !string.IsNullOrEmpty(Properties.ClassName);
         public string HintId => $"{Properties.QuestionId}-hint"; 
-
         public string ErrorId => $"{Properties.QuestionId}-error"; 
-
         public bool DisplayAriaDescribedby => DisplayHint || !IsValid; 
-
         public bool IsValid => validationResult.IsValid; 
-
         public string ValidationMessage => string.IsNullOrEmpty(Properties.CustomValidationMessage) ? validationResult.Message : Properties.CustomValidationMessage; 
-
+        
+        public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        {
+            return viewRender.RenderAsync(Type.ToString(), this, null);
+        }
+        
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
         {
             foreach (var validator in form_builder)
@@ -54,6 +53,7 @@ namespace form_builder.Models.Elements
             return new Dictionary<string, dynamic>();
         }
 
+        // TODO: What is the point in this?
         public virtual string GenerateFieldsetProperties()
         {
             return string.Empty;
@@ -103,28 +103,27 @@ namespace form_builder.Models.Elements
         {
             return $"{Properties.QuestionId}-{index}";
         }
-
         public string GetListItemHintId(int index)
         {
             return $"{GetListItemId(index)}-hint";
         }
 
-        public string DescribedByValue()
-        {
-            return DescribeValue($"{Properties.QuestionId}");
-        }
-
         public string DescribedByAttribute()
         {
-            return DisplayAriaDescribedby ? $"aria-describedby=\"{DescribedByValue()}\"" : string.Empty;
+            return DisplayAriaDescribedby ? $"aria-describedby=\"{GetDescribedByAttributeValue()}\"" : string.Empty;
         }
 
-        public string DescribedByValue(string prefix)
+        public string GetDescribedByAttributeValue()
         {
-            return DescribeValue($"{Properties.QuestionId}{prefix}");
+            return CreateDescribedByAttributeValue($"{Properties.QuestionId}");
         }
 
-        private string DescribeValue(string key)
+        public string GetDescribedByAttributeValue(string prefix)
+        {
+            return CreateDescribedByAttributeValue($"{Properties.QuestionId}{prefix}");
+        }
+
+        private string CreateDescribedByAttributeValue(string key)
         {
             var describedBy = new List<string>();
             if (DisplayHint)
@@ -166,11 +165,6 @@ namespace form_builder.Models.Elements
             }
 
             return null;
-        }
-
-        public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
-        {
-            return viewRender.RenderAsync(Type.ToString(), this, null);
         }
 
         private bool DisplayOptional

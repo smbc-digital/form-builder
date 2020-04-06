@@ -106,7 +106,7 @@ namespace form_builder.Models.Elements
 
                     if (DisplayAriaDescribedby)
                     {
-                        properties.Add("aria-describedby", DescribedByValue("-street"));
+                        properties.Add("aria-describedby", GetDescribedByAttributeValue("-street"));
                     }
 
                     return properties;

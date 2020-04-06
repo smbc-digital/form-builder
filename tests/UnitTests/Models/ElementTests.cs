@@ -181,7 +181,7 @@ namespace form_builder_tests.UnitTests.Models
                             .WithHint("hint")
                             .Build();
 
-            var result = element.DescribedByValue();
+            var result = element.GetDescribedByAttributeValue();
 
             Assert.NotNull(result);
             Assert.Equal($"{questionId}-hint", result);
@@ -201,7 +201,7 @@ namespace form_builder_tests.UnitTests.Models
             viewModel.Add(questionId, "test");
 
             element.Validate(viewModel, _validators.Object);
-            var result = element.DescribedByValue();
+            var result = element.GetDescribedByAttributeValue();
 
             Assert.NotNull(result);
             Assert.Equal($"{questionId}-error", result);
@@ -221,7 +221,7 @@ namespace form_builder_tests.UnitTests.Models
             viewModel.Add(questionId, "test");
 
             element.Validate(viewModel, _validators.Object);
-            var result = element.DescribedByValue();
+            var result = element.GetDescribedByAttributeValue();
 
             Assert.NotNull(result);
             Assert.Contains($"{questionId}-hint", result);

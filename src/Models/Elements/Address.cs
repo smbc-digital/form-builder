@@ -34,11 +34,10 @@ namespace form_builder.Models.Elements
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
                 return await viewRender.RenderAsync("AddressSearch", viewElement);
             }
-           
+
             if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
             {
-                Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
-                 
+                Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");                 
                 viewElement.ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
                 viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
@@ -90,7 +89,7 @@ namespace form_builder.Models.Elements
 
                     if (DisplayAriaDescribedby)
                     {
-                        properties.Add("aria-describedby", DescribedByValue("-postcode"));
+                        properties.Add("aria-describedby", GetDescribedByAttributeValue("-postcode"));
                     }
 
                     return properties;

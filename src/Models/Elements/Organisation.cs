@@ -101,7 +101,7 @@ namespace form_builder.Models.Elements
 
                     if (DisplayAriaDescribedby)
                     {
-                        properties.Add("aria-describedby", DescribedByValue("-organisation-searchterm"));
+                        properties.Add("aria-describedby", GetDescribedByAttributeValue("-organisation-searchterm"));
                     }
 
                 return properties;

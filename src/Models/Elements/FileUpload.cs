@@ -39,7 +39,7 @@ namespace form_builder.Models.Elements
 
             if (DisplayAriaDescribedby)
             {
-                properties.Add("aria-describedby", DescribedByValue("-fileupload"));
+                properties.Add("aria-describedby", GetDescribedByAttributeValue("-fileupload"));
             }
 
             return properties;

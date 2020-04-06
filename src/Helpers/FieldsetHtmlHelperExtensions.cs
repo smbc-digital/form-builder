@@ -13,7 +13,7 @@ namespace form_builder.Helpers
 
             if (element.DisplayAriaDescribedby)
             {
-                fieldsetBuilder.Attributes.Add("aria-describedby", element.DescribedByValue());
+                fieldsetBuilder.Attributes.Add("aria-describedby", element.GetDescribedByAttributeValue());
             }
             fieldsetBuilder.AddCssClass("form-section question-section");
 
@@ -26,7 +26,7 @@ namespace form_builder.Helpers
 
             if (element.DisplayAriaDescribedby)
             {
-                fieldsetBuilder.Attributes.Add("aria-describedby", element.DescribedByValue());
+                fieldsetBuilder.Attributes.Add("aria-describedby", element.GetDescribedByAttributeValue());
             }
 
             foreach (var className in classNames)
@@ -45,7 +45,7 @@ namespace form_builder.Helpers
 
             if (element.DisplayAriaDescribedby)
             {
-                fieldsetBuilder.Attributes.Add("aria-describedby", element.DescribedByValue(prefix));
+                fieldsetBuilder.Attributes.Add("aria-describedby", element.GetDescribedByAttributeValue(prefix));
             }
             
             fieldsetBuilder.AddCssClass("form-section question-section");

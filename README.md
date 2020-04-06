@@ -529,7 +529,10 @@ Textarea (Email) JSON example:
         * Options[*object*] __*__
             * Text (*string*) __*__
             * Value (*string*) __*__
-            * Hint (*string*)
+            * Hint (*string*) <br />
+            Custom hint text for this option
+            * Divider (*string *) <br />
+            If one or more of your radio options is different from the others, it can help users if you separate them using a text divider. The text is usually the word ‘or’ but can be customised here.
         * CustomValidationMessage (*string*)
         * Hint (*string*)
         * Optional (*boolean*)
@@ -548,7 +551,8 @@ Textarea (Email) JSON example:
         {
           "Text": "Yes",
           "Value": "yes",
-          "Hint": "<strong>This</strong> is an affirmative response."
+          "Hint": "<strong>This</strong> is an affirmative response.",
+          "Divider": "or"
         },
         {
           "Text": "No",
