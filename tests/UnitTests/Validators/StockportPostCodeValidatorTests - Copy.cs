@@ -15,10 +15,12 @@ namespace form_builder_tests.UnitTests.Validators
         {
             //Arrange
             var element = new ElementBuilder()
+                .WithQuestionId("postcode")
                 .WithType(EElementType.Textbox)
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("postcode", "OL16 0AE");
 
             //Assert
             var result = _stockportPostcodeValidator.Validate(element, viewModel);
@@ -31,12 +33,13 @@ namespace form_builder_tests.UnitTests.Validators
         {
             //Arrange
             var element = new ElementBuilder()
-                .WithQuestionId("testaddress")
+                .WithQuestionId("postcode")
                 .WithType(EElementType.Textbox)
+                .WithStockportPostcode(true)                 
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("testaddress-postcode", "SK4 1AA");
+            viewModel.Add("postcode", "SK4 1AA");
 
             //Assert
             var result = _stockportPostcodeValidator.Validate(element, viewModel);
