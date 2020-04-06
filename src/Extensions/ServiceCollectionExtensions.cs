@@ -35,6 +35,8 @@ using form_builder.Providers.DocumentCreation.Smbc;
 using form_builder.Services.DocumentService;
 using form_builder.Helpers.DocumentCreation;
 using form_builder.ContentFactory;
+using form_builder.Providers.Organisation;
+using form_builder.Providers.Street;
 
 namespace form_builder.Extensions
 {
@@ -111,6 +113,22 @@ namespace form_builder.Extensions
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
             services.AddSingleton<IAddressProvider, ServiceAddressProvider>();
+            return services;
+        }
+
+        public static IServiceCollection ConfigureOrganisationProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
+            services.AddSingleton<IOrganisationProvider, ServiceOrganisationProvider>();
+            
+            return services;
+        }
+
+        public static IServiceCollection ConfigureStreetProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IStreetProvider, FakeStreetProvider>();
+            services.AddSingleton<IStreetProvider, ServiceStreetProvider>();
+            
             return services;
         }
 
