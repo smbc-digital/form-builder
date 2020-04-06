@@ -77,7 +77,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
 
             Assert.Single(result);
-            Assert.Equal($"{labelText}: {value}", result[0]);
+            Assert.Equal($"{labelText}: {value.ToString("dd/MM/yyyy")}", result[0]);
         }
 
         [Fact]
@@ -411,18 +411,19 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal($"{labelText}: {valueDay}/{valueMonth}/{valueYear}", result[0]);
         }
 
-        [Fact]
-        public void GenerateQuestionAndAnswersDictionary_ShouldGenerateCorrectValue_ForTimeInput()
+        [Theory]
+        [InlineData("03", "10", "PM")]
+        [InlineData("12", "54", "PM")]
+        [InlineData("12", "11", "AM")]
+        [InlineData("05", "23", "AM")]
+        public void GenerateQuestionAndAnswersDictionary_ShouldGenerateCorrectValue_ForTimeInput(string hour, string min, string amPm)
         {
-            var valueHour = "3";
-            var valueMin = "10";
-            var valueAmPm = "pm";
-            var dateTime = DateTime.Parse($"{valueHour}:{valueMin} {valueAmPm}");
-            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(dateTime.TimeOfDay.ToString());
+            var dateTime = DateTime.Parse($"{hour}:{min} {amPm}");
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(dateTime.TimeOfDay);
 
             var questionId = "test-questionID";
             var labelText = "What Time do you like";
-            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-hours", Response = valueMin }, new Answers { QuestionId = $"{questionId}-minutes", Response = valueHour }, new Answers { QuestionId = $"{questionId}-ampm", Response = valueAmPm } } }}};
+            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-hours", Response = min }, new Answers { QuestionId = $"{questionId}-minutes", Response = hour }, new Answers { QuestionId = $"{questionId}-ampm", Response = amPm } } }}};
 
             var element = new ElementBuilder()
                 .WithType(EElementType.TimeInput)
@@ -441,7 +442,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
 
             Assert.Single(result);
-            Assert.Equal($"{labelText}: 15:{valueMin}:00", result[0]);
+            Assert.Equal($"{labelText}: {hour}:{min} {amPm}", result[0]);
         }
     }
 }

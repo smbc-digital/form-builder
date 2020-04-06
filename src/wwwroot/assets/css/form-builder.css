@@ -121,14 +121,14 @@ fieldset.input-memorable-date, fieldset.input-time {
         padding-left: 15px;
     }
 
-        #formTitle:hover {
-            text-decoration: underline;
-        }
+    #formTitle > a:hover {
+        text-decoration: underline;
+    }
 
-        #formTitle > a {
-            color: white;
-            text-decoration: none;
-        }
+    #formTitle > a {
+        color: white;
+        text-decoration: none;
+    }
 
     #header-wrapper {
         display: flex;

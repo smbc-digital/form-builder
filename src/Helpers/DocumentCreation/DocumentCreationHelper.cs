@@ -4,6 +4,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace form_builder.Helpers.DocumentCreation
@@ -61,20 +62,26 @@ namespace form_builder.Helpers.DocumentCreation
             object value = null;
 
             if(question.Type != EElementType.FileUpload){
-             value = _elementMapper.GetAnswerValue(question, formAnswers);
+                value = _elementMapper.GetAnswerValue(question, formAnswers);
+            }
+
+            if(value == null && question.Type != EElementType.FileUpload){
+                return string.Empty;
             }
 
             switch (question.Type)
             {
+                case EElementType.TimeInput:
+                    var convertTime = (TimeSpan)value;
+                    var date = DateTime.Today.Add(convertTime);
+                    return date.ToString("hh:mm tt");
+                case EElementType.DatePicker:
                 case EElementType.DateInput:
-                    var convertDateTime = new DateTime();
-                    if(value != null){
-                        convertDateTime = (DateTime)value;
-                    }
-                    return value != null ? convertDateTime.Date.ToShortDateString() : string.Empty;
+                    var convertDateTime = (DateTime)value;
+                    return convertDateTime.Date.ToString("dd/MM/yyyy");
                 case EElementType.Select:
                 case EElementType.Radio:
-                    var selectValue = value != null ? question.Properties.Options.FirstOrDefault(_ => _.Value == value.ToString()) : null;
+                    var selectValue = question.Properties.Options.FirstOrDefault(_ => _.Value == value.ToString());
                     return selectValue?.Text ?? string.Empty;
                 case EElementType.Checkbox:
                     var answerCheckbox = string.Empty;
@@ -104,7 +111,7 @@ namespace form_builder.Helpers.DocumentCreation
                     var fileInput = answers.FirstOrDefault(_ => _.QuestionId == $"{question.Properties.QuestionId}-fileupload")?.Response;
                     return fileInput == null ? string.Empty : Newtonsoft.Json.JsonConvert.DeserializeObject<FileUploadModel>(fileInput.ToString()).TrustedOriginalFileName;
                 default:
-                    return value != null ? value.ToString() : string.Empty;
+                    return value.ToString();
             }
         }
 

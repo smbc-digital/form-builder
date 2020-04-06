@@ -38,6 +38,8 @@ namespace form_builder
                 .AddGateways()
                 .AddIOptionsConfiguration(Configuration)
                 .ConfigureAddressProviders()
+                .ConfigureOrganisationProviders()
+                .ConfigureStreetProviders()
                 .ConfigurePaymentProviders()
                 .ConfigureDocumentCreationProviders()
                 .AddHelpers()
