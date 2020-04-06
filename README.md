@@ -787,6 +787,7 @@ Date Picker example:
     * AddressManualHint (*string*) (hint which appears above the manual address inputs)
     * MaxLength (*string*)
     * Optional (*boolean*)
+    * StockportPoscodde (*boolean*)
     * CustomValidationMessage (*string*) (Set a custom validation message for when user does not enter a postode) There is automatic validation there is not a valid postcode.
     * SelectCustomValidationMessage (*string*) (Set a custom validation message for when user does not select an address from the             dropdown)
     * TargetMapping (*string*)
@@ -805,7 +806,8 @@ Address example:
                 "MaxLength": "10",
                 "Optional": false,
                 "CustomValidationMessage": "This is postcode custom validation message",
-                "SelectCustomValidationMessage": "This is select address custom validation message"
+                "SelectCustomValidationMessage": "This is select address custom validation message",
+                "StockportPostcode": true
             }
     }
 ```
