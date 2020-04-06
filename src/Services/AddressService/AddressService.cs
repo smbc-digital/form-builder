@@ -79,6 +79,9 @@ namespace form_builder.Services.AddressService
                 {
                     var result = await _addressServiceGateway.SearchAsync(new AddressSearch { AddressProvider = (EAddressProvider)System.Enum.Parse(typeof(EAddressProvider), addressElement.Properties.AddressProvider), SearchTerm = postcode });
                     addressResults = result.ResponseContent.ToList();
+                    // use below when running local
+                    //addressResults = new List<AddressSearchResult> { new AddressSearchResult { Name = "asdddrezs 1", UniqueId = "321654321" }, new AddressSearchResult { Name = "asdddrezs 1", UniqueId = "321654321" } };
+
                 }
                 catch (Exception e)
                 {
