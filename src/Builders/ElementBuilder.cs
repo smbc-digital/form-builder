@@ -238,5 +238,12 @@ namespace form_builder.Builders
             _property.DocumentType = docType;
             return this;
         }
+
+        public ElementBuilder WithStockportPostcode(bool isStockportPostCode)
+        {
+            _property.StockportPostcode = isStockportPostCode;
+            return this;
+
+        }
     }
 }
