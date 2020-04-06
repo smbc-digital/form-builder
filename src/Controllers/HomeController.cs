@@ -9,6 +9,7 @@ using form_builder.Services.FileUploadService;
 using form_builder.Workflows;
 using Microsoft.EntityFrameworkCore.Internal;
 using form_builder.Models;
+using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Controllers
 {
@@ -18,13 +19,26 @@ namespace form_builder.Controllers
         private readonly ISubmitWorkflow _submitWorkflow;
         private readonly IPaymentWorkflow _paymentWorkflow;
         private readonly IFileUploadService _fileUploadService;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public HomeController(IPageService pageService, ISubmitWorkflow submitWorkflow, IPaymentWorkflow paymentWorkflow, IFileUploadService fileUploadService)
+        public HomeController(IPageService pageService, ISubmitWorkflow submitWorkflow, IPaymentWorkflow paymentWorkflow, IFileUploadService fileUploadService, IHostingEnvironment hostingEnvironment)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
             _paymentWorkflow = paymentWorkflow;
             _fileUploadService = fileUploadService;
+            _hostingEnvironment = hostingEnvironment;
+        }
+
+        [HttpGet]
+        [Route("/")]
+        public IActionResult Home()
+        {
+            if(_hostingEnvironment.EnvironmentName.ToLower() == "prod"){
+                return Redirect("https://www.stockport.gov.uk");
+            }
+
+            return View("../Error/Index");
         }
 
         [HttpGet]
