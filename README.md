@@ -785,6 +785,7 @@ Date Picker example:
     * Hint (*string*) (hint which appears above the postcode input)
     * SelectHint (*string*) (hint which appears above the select input)
     * AddressManualHint (*string*) (hint which appears above the manual address inputs)
+    * AddressManualLinkText(*string*) (Default: 'I cannot find my address in the list')
     * MaxLength (*string*)
     * Optional (*boolean*)
     * StockportPoscodde (*boolean*)
