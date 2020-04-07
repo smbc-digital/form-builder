@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using form_builder.Models.Elements;
 using form_builder.Enum;
 
@@ -8,6 +9,8 @@ namespace form_builder.Validators
 {
     public class RestrictCurrentDatepickerValidator : IElementValidator
     {
+        private readonly CultureInfo _culture_info = new CultureInfo("en-gb");
+
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
             if (!element.Properties.RestrictCurrentDate || element.Type != EElementType.DatePicker || element.Properties.Optional)
@@ -22,7 +25,7 @@ namespace form_builder.Validators
 
             var outDate = DateTime.Now;
 
-            var isValidDate = DateTime.TryParse(value, out outDate);
+            var isValidDate = DateTime.TryParse(value,out outDate); ;
 
             if (!isValidDate)
             {

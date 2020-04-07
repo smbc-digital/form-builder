@@ -14,5 +14,6 @@
         public bool? Postcode { get; set; }
         public bool? StockportPostcode { get; set; }
         public bool DisplayNoResultsIAG { get; set; } = false;
+        public string AddressManualLinkText { get; set; } = "I cannot find my address in the list";
     }
 }

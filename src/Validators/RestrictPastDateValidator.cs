@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using form_builder.Models.Elements;
 using form_builder.Enum;
 
@@ -37,7 +38,7 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out _);
+            var isValidDate = DateTime.TryParseExact($"{valueDay}/{valueMonth}/{valueYear}", "dd/MM/yyyy", new CultureInfo("en-GB"), DateTimeStyles.None, out DateTime dateOutput);
 
             if (!isValidDate)
             {
@@ -50,8 +51,7 @@ namespace form_builder.Validators
 
             var date = DateTime.Today;
 
-            var dateOutput = DateTime.Parse($"{valueDay}/{valueMonth}/{valueYear}");
-
+          
             if (dateOutput < date)
             {
                 return new ValidationResult
