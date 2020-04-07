@@ -9,8 +9,6 @@ namespace form_builder.Validators
 {
     public class RestrictCurrentDatepickerValidator : IElementValidator
     {
-        private readonly CultureInfo _culture_info = new CultureInfo("en-gb");
-
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
             if (!element.Properties.RestrictCurrentDate || element.Type != EElementType.DatePicker || element.Properties.Optional)

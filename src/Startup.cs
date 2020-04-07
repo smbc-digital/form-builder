@@ -11,6 +11,7 @@ using StockportGovUK.AspNetCore.Middleware.App;
 using StockportGovUK.NetStandard.Gateways;
 using form_builder.Cache;
 using form_builder.ModelBinders.Providers;
+using System.Globalization;
 
 namespace form_builder
 {
@@ -29,6 +30,7 @@ namespace form_builder
 
         public void ConfigureServices(IServiceCollection services)
         {
+            CultureInfo.CurrentCulture = new CultureInfo("en-GB");
             services
                 .ConfigureCookiePolicy()
                 .AddValidators()

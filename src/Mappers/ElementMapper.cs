@@ -18,7 +18,6 @@ namespace form_builder.Mappers
     {
         private readonly IDistributedCacheWrapper _distributedCacheWrapper;
         private readonly ILogger<ElementMapper> _logger;
-        private readonly CultureInfo _culture_info = new CultureInfo("en-gb");
 
         public ElementMapper(ILogger<ElementMapper> logger,IDistributedCacheWrapper distributedCacheWrapper)
         {
@@ -153,7 +152,7 @@ namespace form_builder.Mappers
 
             if (!string.IsNullOrEmpty(day) && !string.IsNullOrEmpty(month) && !string.IsNullOrEmpty(year))
             {
-                return DateTime.Parse($"{day}/{month}/{year}", _culture_info);
+                return DateTime.Parse($"{day}/{month}/{year}");
             }
 
             return null;
@@ -222,7 +221,7 @@ namespace form_builder.Mappers
                 return null;
             }
 
-            return DateTime.Parse(value.Response, _culture_info);
+            return DateTime.Parse(value.Response);
         }
         private List<string> GetCheckboxElementValue(string key, FormAnswers formAnswers)
         {
