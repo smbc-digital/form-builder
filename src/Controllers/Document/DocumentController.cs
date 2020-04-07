@@ -25,14 +25,14 @@ namespace form_builder.Controllers.Document
         [Route("Summary/{documentType}/{id}")]
         public async Task<IActionResult> Summary(EDocumentType documentType, Guid id)
         {
-            if(id == Guid.Empty)
+            if(id.Equals(Guid.Empty))
                 return RedirectToAction("Index", "Error");
             
             try {
-                var result = await _documentWorkflow.GenerateDocument(EDocumentContentType.Summary, documentType, id);
+                var result = await _documentWorkflow.GenerateSummaryDocumentAsync(documentType, id);
                 return File(result, documentType.ToContentType(), "summary.txt");
-            } catch(DocumentExpiredException ex){
-                _logger.LogWarning(ex.Message);
+            } catch(DocumentExpiredException ex) {
+                _logger.LogWarning(ex, ex.Message);
                 return RedirectToAction("Expired");
             }
         }
