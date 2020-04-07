@@ -1,4 +1,9 @@
-﻿ul {
+﻿/*
+** IE and Edge css for legend width.
+*/
+_:-ms-lang(x), legend { width: 100%; }
+
+ul {
     margin: 0 0 20px 15px;
 }
 
@@ -158,8 +163,3 @@ fieldset.input-memorable-date, fieldset.input-time {
         padding-right: 0px;
     }
 }
-
-/*
-** IE and Edge css for legend width.
-*/
-_:-ms-lang(x), legend { width: 100%; }
