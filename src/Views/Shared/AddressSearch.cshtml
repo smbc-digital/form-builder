@@ -1,35 +1,24 @@
 ﻿@model form_builder.ViewModels.ElementViewModel
 @{
-    var questionId = $"{Model.Element.Properties.QuestionId}-postcode";
-    var hintId = $"{questionId}-hint";
-    var errorId = $"{questionId}-error";
-    var elements = Model.Element.GenerateElementProperties();
-    elements.Add("class", "govuk-input govuk-input--width-10");
+    var elementProperties = Model.Element.GenerateElementProperties();
+    elementProperties.Add("class", "govuk-input govuk-input--width-10");
 }
 
-<div class="govuk-form-group">
+<div class="govuk-form-group @(!Model.Element.IsValid ? "govuk-form-group--error" : string.Empty)">
     <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
         @Model.Element.Properties.AddressLabel
     </h1>
 
-    <label class="govuk-label govuk-label--m" @Model.Element.WriteOptional() for="@questionId">@Model.Element.Properties.PostcodeLabel
+    <label class="govuk-label govuk-label--m" for=@Model.Element.GetCustomItemId("postcode")>@Model.Element.Properties.PostcodeLabel
         @if (Model.Element.Properties.Optional)
         {
             <span>(optional)</span>
         }
     </label>
 
-    @if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
-    {
-        <div class="govuk-hint" id=@hintId>@Model.Element.Properties.Hint</div>
-    }
+    <partial name="Hint" model=@Model.Element />
 
-    @Html.TextBox(questionId, Model.Element.Properties.Value, elements)
+    <partial name="Error" model=@Model.Element />
 
-    @if (!Model.Element.IsValid)
-    {
-        var validationMessage = string.IsNullOrEmpty(Model.Element.Properties.CustomValidationMessage) ? Model.Element.ValidationMessage : Model.Element.Properties.CustomValidationMessage;
-        <p class="input-error-content" id="@errorId">@validationMessage</p>
-    }
+    @Html.TextBox(Model.Element.GetCustomItemId("postcode"), Model.Element.Properties.Value, elementProperties)
 </div>
-

@@ -103,6 +103,22 @@ namespace form_builder.Models.Elements
         {
             return $"{Properties.QuestionId}-{index}";
         }
+
+        public string GetCustomItemId(string key)
+        {
+            return $"{Properties.QuestionId}-{key}";
+        }
+
+        public string GetCustomHintId(string key)
+        {
+            return $"{Properties.QuestionId}-{key}-hint";
+        }
+
+        public string GetCustomErrorId(string key)
+        {
+            return $"{Properties.QuestionId}-{key}-error";
+        }
+
         public string GetListItemHintId(int index)
         {
             return $"{GetListItemId(index)}-hint";

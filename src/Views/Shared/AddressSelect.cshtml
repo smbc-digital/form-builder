@@ -1,22 +1,23 @@
 ﻿@model Tuple<form_builder.ViewModels.ElementViewModel, List<SelectListItem>>
 @{
-    var questionId = $"{Model.Item1.Element.Properties.QuestionId}-address";
-    var hintId = $"{questionId}-hint";
-    var errorId = $"{questionId}-error";
-    var elements = Model.Item1.Element.GenerateElementProperties("Select");
-    elements.Add("class", "govuk-select");
+    var elementProperties = Model.Item1.Element.GenerateElementProperties("Select");
+    elementProperties.Add("class", "govuk-select");
 }
 
-<div class="govuk-form-group">
+<div class="govuk-form-group @(!Model.Item1.Element.IsValid ? "govuk-form-group--error" : string.Empty)">
     <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
         @Model.Item1.Element.Properties.AddressLabel
     </h1>
 
     <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Postcode</h2>
-    <p class="govuk-body"><strong class="govuk-!-margin-right-3">@Model.Item1.Element.Properties.Value.ToUpper()</strong><a class="govuk-link" href="@Model.Item1.ReturnURL">Change</a></p>
+    
+    <p class="govuk-body">
+        <strong class="govuk-!-margin-right-3">@Model.Item1.Element.Properties.Value.ToUpper()</strong>
+        <a class="govuk-link" href="@Model.Item1.ReturnURL">Change</a>
+    </p>
 
     <h2 class="govuk-label-wrapper govuk-!-margin-bottom-1">
-        <label class="govuk-label govuk-label--m" for="@questionId" @Model.Item1.Element.WriteOptional()>@Model.Item1.Element.Properties.SelectLabel
+        <label class="govuk-label govuk-label--m" for= @Model.Item1.Element.GetCustomItemId("address")>@Model.Item1.Element.Properties.SelectLabel
             @if (Model.Item1.Element.Properties.Optional)
             {
                 <span>(optional)</span>
@@ -26,17 +27,22 @@
 
     @if (!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectHint))
     {
-        <p class="govuk-hint" id=@hintId>@Html.Raw(Model.Item1.Element.Properties.SelectHint)</p>
+        <p class="govuk-hint" id=@Model.Item1.Element.GetCustomHintId("address")>
+            @Html.Raw(Model.Item1.Element.Properties.SelectHint)
+        </p>
     }
-
-    @Html.DropDownList(@questionId, @Model.Item2, elements)
 
     @if (!Model.Item1.Element.IsValid)
     {
-        {
-            var validationMessage = string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectCustomValidationMessage) ? Model.Item1.Element.ValidationMessage : Model.Item1.Element.Properties.SelectCustomValidationMessage;
-            <p class="input-error-content" id="@errorId">@validationMessage</p>
-        }
+        <span class="govuk-error-message" id=@Model.Item1.Element.GetCustomErrorId("address")>
+            <span class="govuk-visually-hidden">Error:</span> @(string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectCustomValidationMessage) 
+                                                                    ? Model.Item1.Element.ValidationMessage 
+                                                                    : Model.Item1.Element.Properties.SelectCustomValidationMessage)
+        </span>
     }
-    <p class="govuk-body govuk-link govuk-!-margin-top-5"><a class="govuk-link" href="@Model.Item1.ManualAddressURL">I can't find my address in the list</a></p>
+
+    @Html.DropDownList(@Model.Item1.Element.GetCustomItemId("address"), @Model.Item2, elementProperties)
+    <p class="govuk-body govuk-link govuk-!-margin-top-5">
+        <a class="govuk-link" href="@Model.Item1.ManualAddressURL">I can't find my address in the list</a>
+    </p>
 </div>

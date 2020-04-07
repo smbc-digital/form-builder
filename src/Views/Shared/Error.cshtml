@@ -1,6 +1,10 @@
     @if (!Model.IsValid)
     {
+        var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) 
+            ? Model.ValidationMessage 
+            : Model.Properties.CustomValidationMessage;
+
         <span class="govuk-error-message" id="@Model.ErrorId">
-            <span class="govuk-visually-hidden">Error:</span> @Model.ValidationMessage
+            <span class="govuk-visually-hidden">Error:</span> @validationMessage
         </span>
     }
