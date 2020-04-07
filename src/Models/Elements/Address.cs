@@ -101,5 +101,11 @@ namespace form_builder.Models.Elements
         {
             throw new NotImplementedException();
         }
+        
+        public override string GetLabelText(){
+            var optionalLabelText = Properties.Optional ? " (optional)" : string.Empty;
+            
+            return $"{Properties.AddressLabel}{optionalLabelText}";
+        }
     }
 }

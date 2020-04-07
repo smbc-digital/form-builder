@@ -6,6 +6,7 @@ namespace form_builder.Providers.DocumentCreation.Generic
 {
     public class TextfileDocumentCreator : IDocumentCreation
     {
+        public EProviderPriority Priority => EProviderPriority.High;
         public EDocumentType DocumentType => EDocumentType.Txt;
         public byte[] CreateDocument(List<string> fileContent)
         {

@@ -180,5 +180,11 @@ namespace form_builder.Models.Elements
                 return Properties.Optional;
             }
         }
+
+        public virtual string GetLabelText(){
+            var optionalLabelText = Properties.Optional ? " (optional)" : string.Empty;
+
+            return $"{Properties.Label}{optionalLabelText}";
+        }
     }
 }
