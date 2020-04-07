@@ -12,4 +12,44 @@ Scenario: Postcode validation standard use
 	And I should see a "p" element with "Stockport postcode must be a valid postcode" text
 	Then I fill in page1 with good postcode
 	Then I click the "nextStep" button
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	And I should see a "h2" element with "You are on the second page" text
