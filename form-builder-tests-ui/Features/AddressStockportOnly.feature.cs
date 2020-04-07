@@ -84,7 +84,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 10
  testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 11
- testRunner.Then("I should see a validation message for \"customersaddress-postcode-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see a validation message for \"stockportaddressOne-postcode-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
