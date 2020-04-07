@@ -38,7 +38,7 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValidDate = DateTime.TryParseExact($"{valueDay}/{valueMonth}/{valueYear}", "dd/MM/yyyy", new CultureInfo("en-GB"), DateTimeStyles.None, out DateTime dateOutput);
+            var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out _);
 
             if (!isValidDate)
             {
@@ -50,6 +50,7 @@ namespace form_builder.Validators
             }
 
             var date = DateTime.Today;
+            var dateOutput = DateTime.Parse($"{valueDay}/{valueMonth}/{valueYear}");
 
             if (element.Properties.RestrictCurrentDate && dateOutput == date)
             {
