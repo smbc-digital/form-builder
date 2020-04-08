@@ -12,8 +12,11 @@
         public string AddressManualLabel { get; set; } = "Enter your address";
         public string AddressProvider { get; set; }
         public bool? Postcode { get; set; }
+        public string AddressIAG { get; set; } = "You must live in Stockport.";
         public bool? StockportPostcode { get; set; }
         public bool DisplayNoResultsIAG { get; set; } = false;
         public string AddressManualLinkText { get; set; } = "I cannot find my address in the list";
+
+        
     }
 }
