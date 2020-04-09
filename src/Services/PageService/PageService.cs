@@ -294,8 +294,7 @@ namespace form_builder.Services.PageService
             {
                 formFileUploadElements.ForEach(_ =>
                 {
-                    _distributedCache.Remove($"{_.Properties.QuestionId}-fileupload");
-                    _distributedCache.Remove($"file-{_.Properties.QuestionId}-{_sessionHelper.GetSessionGuid()}");
+                    _distributedCache.Remove($"file-{_.Properties.QuestionId}-fileupload-{sessionGuid}");
                 });
             }
 
