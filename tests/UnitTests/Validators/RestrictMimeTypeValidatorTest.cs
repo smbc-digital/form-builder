@@ -107,7 +107,7 @@ namespace form_builder_tests.UnitTests.Validators
             //Assert
             var result = _restrictMimeTypeValidator.Validate(element, viewModel);
             Assert.False(result.IsValid);
-            Assert.StartsWith("The selected file must be a PNG", result.Message);
+            Assert.StartsWith("The selected file must be a png", result.Message);
         }
     }
 }

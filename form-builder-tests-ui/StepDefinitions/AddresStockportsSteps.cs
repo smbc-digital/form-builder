@@ -19,7 +19,7 @@ namespace form_builder_tests_ui.StepDefinitions
         [When(@"I fill in page1 with invalid postcode")]
         public void ThenIFillInPage1WithInvalidPostcode()
         {
-            BrowserSession.FillIn("customersaddress-postcode").With("B74 4OE");
+            BrowserSession.FillIn("stockportaddressOne-postcode").With("B74 4OE");
         }
 
         [Then(@"I should see a validation message for ""(.*)"" input")]

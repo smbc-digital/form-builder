@@ -48,8 +48,8 @@ namespace form_builder.Validators
             }
 
             var fileTypesErrorMessage = allowedFileTypes.Count > 1
-                ? string.Join(", ", allowedFileTypes.Take(allowedFileTypes.Count - 1)).ToUpper() + $" or {allowedFileTypes.Last().ToUpper()}"
-                : allowedFileTypes.First().ToUpper();
+                ? string.Join(", ", allowedFileTypes.Take(allowedFileTypes.Count - 1)).ToString() + $" or {allowedFileTypes.Last().ToString()}"
+                : allowedFileTypes.First().ToString();
 
             return new ValidationResult { IsValid = false, Message = $"The selected file must be a {fileTypesErrorMessage.Replace(".", string.Empty)}." };
         }

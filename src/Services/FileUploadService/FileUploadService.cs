@@ -5,6 +5,7 @@ using System.Net;
 using form_builder.Configuration;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
+using form_builder.Helpers.Session;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -14,12 +15,15 @@ namespace form_builder.Services.FileUploadService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
+        private readonly ISessionHelper _sessionHelper;
 
         public FileUploadService(IDistributedCacheWrapper distributedCache,
-            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
+            ISessionHelper sessionHelper)
         {
             _distributedCache = distributedCache;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
+            _sessionHelper = sessionHelper;
         }
 
         public Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload)
@@ -38,7 +42,7 @@ namespace form_builder.Services.FileUploadService
         {
             files.ToList().ForEach((file) =>
             {
-                var key = Guid.NewGuid().ToString();
+                var key = $"{ file.QuestionId}-{_sessionHelper.GetSessionGuid()}";
                 _distributedCache.SetStringAsync($"file-{key}", file.Base64EncodedContent, _distributedCacheExpirationConfiguration.FileUpload);
                 FileUploadModel model = new FileUploadModel
                 {
