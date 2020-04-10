@@ -839,12 +839,14 @@ Date Picker example:
     * Hint (*string*) (hint which appears above the postcode input)
     * SelectHint (*string*) (hint which appears above the select input)
     * AddressManualHint (*string*) (hint which appears above the manual address inputs)
+    * AddressManualLinkText(*string*) (Default: 'I cannot find my address in the list')
     * MaxLength (*string*)
     * Optional (*boolean*)
+    * StockportPoscodde (*boolean*)
     * CustomValidationMessage (*string*) (Set a custom validation message for when user does not enter a postode) There is automatic validation there is not a valid postcode.
     * SelectCustomValidationMessage (*string*) (Set a custom validation message for when user does not select an address from the             dropdown)
     * TargetMapping (*string*)
-
+    * AdressIAG (*string*)
 Address example:
 ```json
     {
@@ -859,7 +861,9 @@ Address example:
                 "MaxLength": "10",
                 "Optional": false,
                 "CustomValidationMessage": "This is postcode custom validation message",
-                "SelectCustomValidationMessage": "This is select address custom validation message"
+                "SelectCustomValidationMessage": "This is select address custom validation message",
+                "StockportPostcode": true,
+                "AddressIAG": "Address Information and Guidance"
             }
     }
 ```

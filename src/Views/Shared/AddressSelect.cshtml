@@ -43,6 +43,6 @@
 
     @Html.DropDownList(@Model.Item1.Element.GetCustomItemId("address"), @Model.Item2, elementProperties)
     <p class="govuk-body govuk-link govuk-!-margin-top-5">
-        <a class="govuk-link" href="@Model.Item1.ManualAddressURL">I can't find my address in the list</a>
+        <a class="govuk-link" href="@Model.Item1.ManualAddressURL">@Model.Item1.Element.Properties.AddressManualLinkText</a>
     </p>
 </div>

@@ -13,6 +13,5 @@ Scenario: Success page standard use
 	Then I click the "submit" button
 	Then I should see a ".success-page" html element
 	Then I should see a "p.h2" html element
-	Then I should see a "p" element with "Thank you for submitting your views on fruit" text
 	Then I should see a "p" element with "The wikipedia page on fruit is at Fruits" text
 

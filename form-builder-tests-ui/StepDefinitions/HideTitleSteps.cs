@@ -23,9 +23,9 @@ namespace form_builder_tests_ui.StepDefinitions
         {
             var webDriver = BrowserSession.Native as IWebDriver;
 
-            var theTitle= webDriver.FindElements(By.TagName("H1"))[0].Text;
+            var h1Count = webDriver.FindElements(By.TagName("h1")).Count;
             
-            Assert.NotEqual("Page title page 2", theTitle);
+            Assert.Equal(0,h1Count);
         }
     }
 }

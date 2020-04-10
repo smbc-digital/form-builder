@@ -1,8 +1,6 @@
-using form_builder.Enum;
 using form_builder.Mappers;
 using form_builder.Models;
-using form_builder.Models.Elements;
-using System;
+using form_builder.Builders.Document;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,7 +8,7 @@ namespace form_builder.Helpers.DocumentCreation
 {
     public interface IDocumentCreationHelper
     {
-        List<string> GenerateQuestionAndAnswersDictionary(FormAnswers formAnswers, FormSchema formSchema);
+        List<string> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema);
     }
 
     public class DocumentCreationHelper : IDocumentCreationHelper
@@ -21,110 +19,22 @@ namespace form_builder.Helpers.DocumentCreation
             _elementMapper = elementMapper;
         }
         
-        public List<string> GenerateQuestionAndAnswersDictionary(FormAnswers formAnswers, FormSchema formSchema)
+        public List<string> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema)
         {
-            var data = new List<string>();
-            var filesData = new List<string>();
+            var summaryBuilder = new SummaryAnswerBuilder();
 
             var formSchemaQuestions = formSchema.Pages.ToList()
                 .Where(_ => _.Elements != null)
                 .SelectMany(_ => _.ValidatableElements)
                 .ToList();
 
-            var answers = formAnswers.Pages.ToList()
-                .SelectMany(_ => _.Answers)
-                .ToList();
-
             formSchemaQuestions.ForEach((question) => {
-                var answer = GetValueForQuestion(question, formAnswers, answers);
+                var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
 
-                if(!string.IsNullOrWhiteSpace(answer)){
-                    if(question.Type == EElementType.FileUpload){
-                        filesData.Add($"{GetLabelText(question)} {answer}");
-                    } else {
-                        data.Add($"{GetLabelText(question)} {answer}");
-                    }
-                }
+                summaryBuilder.Add(question.GetLabelText(), answer, question.Type);
             });
-            
-            if(filesData.Any()){
-                data.Add(string.Empty);
-                data.Add("Files:");
-                data.AddRange(filesData);
-            }
 
-            return data;
-        }
-
-        private string GetValueForQuestion(IElement question, FormAnswers formAnswers, List<Answers> answers)
-        {
-            object value = null;
-
-            if(question.Type != EElementType.FileUpload){
-             value = _elementMapper.GetAnswerValue(question, formAnswers);
-            }
-
-            switch (question.Type)
-            {
-                case EElementType.DateInput:
-                    var convertDateTime = new DateTime();
-                    if(value != null){
-                        convertDateTime = (DateTime)value;
-                    }
-                    return value != null ? convertDateTime.Date.ToShortDateString() : string.Empty;
-                case EElementType.Select:
-                case EElementType.Radio:
-                    var selectValue = value != null ? question.Properties.Options.FirstOrDefault(_ => _.Value == value.ToString()) : null;
-                    return selectValue?.Text ?? string.Empty;
-                case EElementType.Checkbox:
-                    var answerCheckbox = string.Empty;
-                    var list = (List<string>)value;
-                    list.ForEach((answersCheckbox) =>
-                    {
-                        answerCheckbox += $" {question.Properties.Options.FirstOrDefault(_ => _.Value == answersCheckbox)?.Text ?? string.Empty},";
-                    });
-                    return answerCheckbox.EndsWith(",") ? answerCheckbox.Remove(answerCheckbox.Length - 1).Trim() :answerCheckbox.Trim();
-                case EElementType.Organisation:
-                    var orgValue = (StockportGovUK.NetStandard.Models.Verint.Organisation)value;
-                    return !string.IsNullOrEmpty(orgValue.Name) ? orgValue.Name : string.Empty;
-                case EElementType.Address:
-                    var addressValue = (StockportGovUK.NetStandard.Models.Addresses.Address)value;
-                    if(!string.IsNullOrEmpty(addressValue.SelectedAddress)){
-                        return addressValue.SelectedAddress;
-                    }
-                    var manualLine2Text = string.IsNullOrWhiteSpace(addressValue.AddressLine2) ? string.Empty : $",{addressValue.AddressLine2}";
-                    return string.IsNullOrWhiteSpace(addressValue.AddressLine1) ? string.Empty : $"{addressValue.AddressLine1}{manualLine2Text},{addressValue.Town},{addressValue.Postcode}";
-                case EElementType.Street:
-                    var streetValue = (StockportGovUK.NetStandard.Models.Addresses.Address)value;
-                    if(string.IsNullOrEmpty(streetValue.PlaceRef) && string.IsNullOrEmpty(streetValue.SelectedAddress)){
-                        return string.Empty;
-                    }
-                    return streetValue.SelectedAddress;
-                case EElementType.FileUpload:
-                    var fileInput = answers.FirstOrDefault(_ => _.QuestionId == $"{question.Properties.QuestionId}-fileupload")?.Response;
-                    return fileInput == null ? string.Empty : Newtonsoft.Json.JsonConvert.DeserializeObject<FileUploadModel>(fileInput.ToString()).TrustedOriginalFileName;
-                default:
-                    return value != null ? value.ToString() : string.Empty;
-            }
-        }
-
-        private string GetLabelText(IElement element)
-        {
-            var optionalLabelText = string.Empty;
-            if(element.Properties.Optional){
-                optionalLabelText = " (optional)";
-            }
-
-            switch (element.Type)
-            {
-                case EElementType.Street:
-                    return string.IsNullOrEmpty(element.Properties.StreetLabel) ? $"Search for a street{optionalLabelText}:" 
-                                                                                : $"{element.Properties.StreetLabel}{optionalLabelText}:";
-                case EElementType.Address:
-                    return $"{element.Properties.AddressLabel}{optionalLabelText}:";
-                default:
-                    return $"{element.Properties.Label}{optionalLabelText}:";
-            }
+            return summaryBuilder.Build();
         }
     }
 }

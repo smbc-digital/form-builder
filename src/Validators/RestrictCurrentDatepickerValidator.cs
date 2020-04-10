@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using form_builder.Models.Elements;
 using form_builder.Enum;
 
@@ -22,7 +23,7 @@ namespace form_builder.Validators
 
             var outDate = DateTime.Now;
 
-            var isValidDate = DateTime.TryParse(value, out outDate);
+            var isValidDate = DateTime.TryParse(value,out outDate); ;
 
             if (!isValidDate)
             {

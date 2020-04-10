@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Models.Enums;
 using StockportGovUK.NetStandard.Gateways.OrganisationServiceGateway;
 using StockportGovUK.NetStandard.Models.Organisation;
+using form_builder.Providers.Organisation;
+using form_builder.Extensions;
 
 namespace form_builder.Services.OrganisationService
 {
@@ -24,12 +26,13 @@ namespace form_builder.Services.OrganisationService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IPageHelper _pageHelper;
-        private readonly IOrganisationServiceGateway _organisationServiceGateway;
-        public OrganisationService(IDistributedCacheWrapper distributedCache, IOrganisationServiceGateway organisationServiceGateway, IPageHelper pageHelper)
+        private readonly IEnumerable<IOrganisationProvider> _organisationProviders;
+
+        public OrganisationService(IDistributedCacheWrapper distributedCache, IEnumerable<IOrganisationProvider> organisationProviders, IPageHelper pageHelper)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
-            _organisationServiceGateway = organisationServiceGateway;
+            _organisationProviders = organisationProviders;
         }
 
         public async Task<ProcessRequestEntity> ProcesssOrganisation(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -75,22 +78,10 @@ namespace form_builder.Services.OrganisationService
                     };
                 }
 
-                var provider = EOrganisationProvider.Unknown;
-
                 try
                 {
-                    provider = (EOrganisationProvider) System.Enum.Parse(typeof(EOrganisationProvider),
-                        organisationElement.Properties.OrganisationProvider, true);
-                }
-                catch (Exception e)
-                {
-                    throw new ApplicationException($"No organisation provider configured for {organisationElement.Properties.OrganisationProvider}");
-                }
-
-                try
-                {
-                    var result = await _organisationServiceGateway.SearchAsync(new OrganisationSearch {OrganisationProvider = provider, SearchTerm = searchTerm});
-                    organisationResults = result.ResponseContent.ToList();
+                    var result = await _organisationProviders.Get(organisationElement.Properties.OrganisationProvider).SearchAsync(searchTerm);
+                    organisationResults = result.ToList();
                 }
                 catch (Exception e)
                 {

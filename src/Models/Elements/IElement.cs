@@ -25,5 +25,6 @@ namespace form_builder.Models.Elements
             Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationSearchResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment);
             Dictionary<string, dynamic> GenerateElementProperties(string type = "");
             string GenerateFieldsetProperties();
+            string GetLabelText();
     }
 }

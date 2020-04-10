@@ -16,12 +16,16 @@ namespace form_builder.Services.DocumentService
 
     public class DocumentSummaryService : IDocumentSummaryService
     {
-        private IEnumerable<IDocumentCreation> _textfileProviders;
+        private IDocumentCreation _textfileProvider;
         private IDocumentCreationHelper _documentCreationHelper;
 
         public DocumentSummaryService(IDocumentCreationHelper documentCreationHelper, IEnumerable<IDocumentCreation> providers)
         {
-            _textfileProviders = providers.Where(_ => _.DocumentType == EDocumentType.Txt);
+            _textfileProvider = providers
+                                    .Where(_ => _.DocumentType == EDocumentType.Txt)
+                                    .OrderByDescending(_ => _.Priority)
+                                    .FirstOrDefault();
+
             _documentCreationHelper = documentCreationHelper;
         }
 
@@ -38,11 +42,9 @@ namespace form_builder.Services.DocumentService
 
         private byte[] GenerateTextFile(FormAnswers formAnswers, FormSchema formSchema)
         {
-            var data = _documentCreationHelper.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
+            var data = _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
-            //Call required provider
-            //How to handle multiple providers of same type
-            return _textfileProviders.FirstOrDefault().CreateDocument(data);
+            return _textfileProvider.CreateDocument(data);
         }
     }
 }

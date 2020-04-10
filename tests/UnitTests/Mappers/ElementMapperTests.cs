@@ -373,6 +373,8 @@ namespace form_builder_tests.UnitTests.Mappers
                   .Build();
 
             var uprn = "testAddress-address";
+            var addressDescription = "testAddress-address-description";
+            var description = "line1,line2,town,sk11aa";
 
             var formAnswers = new FormAnswers
             {
@@ -384,16 +386,21 @@ namespace form_builder_tests.UnitTests.Mappers
                             {
                                 QuestionId = uprn,
                                 Response = "1001254222"
+                            },
+                            new Answers
+                            {
+                                QuestionId = addressDescription,
+                                Response = description
                             }
                         }
                     }
                 }
-
             };
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             var type = Assert.IsType<Address>(result);
             Assert.Equal("1001254222", type.PlaceRef);
+            Assert.Equal(description, type.SelectedAddress);
         }
         [Fact]
         public void GetAnswerValue_ShouldReturnAddress_WhenElementIsAddress_Manual()
@@ -437,7 +444,6 @@ namespace form_builder_tests.UnitTests.Mappers
                         }
                     }
                 }
-
             };
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
             var type = Assert.IsType<Address>(result);
@@ -740,6 +746,250 @@ namespace form_builder_tests.UnitTests.Mappers
             // Assert
             var resultData = Assert.IsType<DateTime>(result);
             Assert.Equal($"{elementOneAnswer} 00:00:00", resultData.ToString());
+        }
+        
+        
+        [Theory]
+        [InlineData(EElementType.Textbox, "test")]
+        [InlineData(EElementType.Textarea, "textAreaValue")]
+        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForElements(EElementType type, string value)
+        {
+            var questionId = "test-questionID";
+            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = questionId, Response = value } } } }};
+
+            var element = new ElementBuilder()
+                            .WithType(type)
+                            .WithQuestionId(questionId)
+                            .Build();
+
+            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+
+            Assert.Equal(value, result);
+        }
+
+        [Fact]
+        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForDatePickerElement()
+        {
+            var questionId = "test-questionID";
+            var labelText = "Enter the date";
+            var value = new DateTime(2000, 01, 01);
+            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = questionId, Response = value.ToString() } } } }};
+
+            var element = new ElementBuilder()
+                            .WithType(EElementType.DatePicker)
+                            .WithQuestionId(questionId)
+                            .WithLabel(labelText)
+                            .Build();
+
+            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+
+            Assert.Equal(value.ToString("dd/MM/yyyy"), result);
+        }
+
+        [Fact]
+        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForCheckboxElement()
+        {
+            var questionId = "test-questionID";
+            var labelText = "Checkbox label";
+            var labelValue =  "Yes Text";
+            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = questionId, Response = "yes" } } } }};
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Checkbox)
+                .WithQuestionId(questionId)
+                .WithLabel(labelText)
+                .WithOptions(new List<Option>{ new Option{ Text = labelValue, Value = "yes" }, new Option{ Text = "No Text", Value = "n" }})
+                .Build();
+
+            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+
+            Assert.Equal(labelValue, result);
+        }
+
+        [Fact]
+        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForRadioElement()
+        {
+             var labelText = "Radio radio";
+             var labelValue = "No Text";
+            
+            var questionId = "test-questionID";
+            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = questionId, Response = "n" } } } }};
+
+            var element = new ElementBuilder()
+                            .WithType(EElementType.Radio)
+                            .WithQuestionId(questionId)
+                            .WithLabel(labelText)
+                            .WithOptions(new List<Option>{ new Option{ Text = "Yes Text", Value = "yes" }, new Option{ Text = labelValue, Value = "n" }})
+                            .Build();
+
+            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+
+            Assert.Equal(labelValue, result);
+        }
+
+        [Fact]
+        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForStreetElement()
+        {
+             var value = new StockportGovUK.NetStandard.Models.Addresses.Address{ SelectedAddress = "street, city, postcode, uk", PlaceRef = "1234" };
+
+            var questionId = "test-questionID";
+            var labelText = "Enter the Street";
+
+            var uspn = "test-questionID-streetaddress";
+            var addressDescription = "test-questionID-streetaddress-description";
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers
+                            {
+                                QuestionId = uspn,
+                                Response = "1001254222"
+                            },
+                            new Answers
+                            {
+                                QuestionId = addressDescription,
+                                Response = "street, city, postcode, uk"
+                            }
+                        }
+                    }
+                }
+            };
+            var element = new ElementBuilder()
+                            .WithType(EElementType.Street)
+                            .WithQuestionId(questionId)
+                            .WithStreetLabel(labelText)
+                            .Build();
+
+            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+
+            Assert.Equal("street, city, postcode, uk", result);
+        }
+
+        [Fact]
+        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForAddressElement()
+        {
+            var value = new StockportGovUK.NetStandard.Models.Addresses.Address{ SelectedAddress = "11 road, city, postcode, uk" };
+
+            var questionId = "test-questionID";
+            var labelText = "Whats your Address";
+            var uprn = "test-questionID-address";
+            var addressDescription = "test-questionID-address-description";
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers
+                            {
+                                QuestionId = uprn,
+                                Response = "1001254222"
+                            },
+                            new Answers
+                            {
+                                QuestionId = addressDescription,
+                                Response = "11 road, city, postcode, uk"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var element = new ElementBuilder()
+                            .WithType(EElementType.Address)
+                            .WithQuestionId(questionId)
+                            .WithAddressLabel(labelText)
+                            .Build();
+
+            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+
+            Assert.Equal(value.SelectedAddress, result);
+        }
+        
+        [Fact]
+        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForFileUpload()
+        {
+            var questionId = "test-questionID";
+            var labelText = "Evidence file";
+            var value = new FileUploadModel{ TrustedOriginalFileName = "your_upload_file.txt" };
+            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-fileupload", Response = Newtonsoft.Json.JsonConvert.SerializeObject(value) } } }}};
+
+            var element = new ElementBuilder()
+                            .WithType(EElementType.FileUpload)
+                            .WithQuestionId(questionId)
+                            .WithLabel(labelText)
+                            .Build();
+
+            var page = new PageBuilder()
+                        .WithElement(element)
+                        .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                            .WithPage(page)
+                            .Build();
+
+            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+
+            Assert.Equal(value.TrustedOriginalFileName, result);
+        }
+              
+           
+        [Fact]
+        public void GetAnswerStringValue_ShouldGenerateCorrectValue_ForDateInput()
+        {
+            var questionId = "test-questionID";
+            var labelText = "What Date do you like";
+            var valueDay = "01";
+            var valueMonth = "02";
+            var valueYear = "2010";
+            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-day", Response = valueDay }, new Answers { QuestionId = $"{questionId}-month", Response = valueMonth }, new Answers { QuestionId = $"{questionId}-year", Response = valueYear } } }}};
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId(questionId)
+                .WithLabel(labelText)
+                .Build();
+
+            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+
+            Assert.Equal($"{valueDay}/{valueMonth}/{valueYear}", result);
+        }
+
+        [Theory]
+        [InlineData("03", "10", "PM")]
+        [InlineData("12", "54", "PM")]
+        [InlineData("12", "11", "AM")]
+        [InlineData("05", "23", "AM")]
+        public void GetAnswerStringValue_ShouldGenerateCorrectValue_ForTimeInput(string hour, string min, string amPm)
+        {
+            var dateTime = DateTime.Parse($"{hour}:{min} {amPm}");
+
+            var questionId = "test-questionID";
+            var labelText = "What Time do you like";
+            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-hours", Response = hour }, new Answers { QuestionId = $"{questionId}-minutes", Response = min }, new Answers { QuestionId = $"{questionId}-ampm", Response = amPm } } }}};
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.TimeInput)
+                .WithQuestionId(questionId)
+                .WithLabel(labelText)
+                .Build();
+
+            var page = new PageBuilder()
+            .WithElement(element)
+            .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+
+            Assert.Equal($"{hour}:{min} {amPm}", result);
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
+using form_builder.Providers.Street;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.StreetServiceGateway;
@@ -24,13 +26,13 @@ namespace form_builder.Services.StreetService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IPageHelper _pageHelper;
-        private readonly IStreetServiceGateway _streetServiceGateway;
+        private readonly IEnumerable<IStreetProvider> _streetProviders;
 
-        public StreetService(IDistributedCacheWrapper distributedCache, IStreetServiceGateway streetServiceGateway, IPageHelper pageHelper)
+        public StreetService(IDistributedCacheWrapper distributedCache, IEnumerable<IStreetProvider> streetProviders, IPageHelper pageHelper)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
-            _streetServiceGateway = streetServiceGateway;
+            _streetProviders = streetProviders;
         }
 
         public async Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -58,25 +60,14 @@ namespace form_builder.Services.StreetService
 
             if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
             {
-                var provider = EStreetProvider.Unknown;
-
                 try
                 {
-                    provider = (EStreetProvider)System.Enum.Parse(typeof(EStreetProvider), streetElement.Properties.StreetProvider, true);
+                    var result = await _streetProviders.Get(streetElement.Properties.StreetProvider).SearchAsync(street);
+                    streetResults = result.ToList();
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException($"No street provider configure for {streetElement.Properties.StreetProvider}");
-                }
-
-                try
-                {
-                    var result = await _streetServiceGateway.SearchAsync(new StreetSearch { SearchTerm = street, StreetProvider = provider });
-                    streetResults = result.ResponseContent.ToList();
-                }
-                catch (Exception e)
-                {
-                    throw new ApplicationException($"StreetController: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
+                    throw new ApplicationException($"StreetService::ProcessStreet: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
                 }
             }
 

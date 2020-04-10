@@ -1,4 +1,4 @@
-﻿@model form_builder.ViewModels.ElementViewModel
+@model form_builder.ViewModels.ElementViewModel
 @{
     var elementProperties = Model.Element.GenerateElementProperties();
     elementProperties.Add("class", "govuk-input govuk-input--width-10");
@@ -8,6 +8,13 @@
     <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
         @Model.Element.Properties.AddressLabel
     </h1>
+
+    @if (@Model.Element.Properties.StockportPostcode == true)
+    {
+        <section class="govuk-inset-text">
+            <p>@Model.Element.Properties.AddressIAG</p>
+        </section>
+    }
 
     <label class="govuk-label govuk-label--m" for=@Model.Element.GetCustomItemId("postcode")>@Model.Element.Properties.PostcodeLabel
         @if (Model.Element.Properties.Optional)

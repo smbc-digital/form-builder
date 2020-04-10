@@ -112,5 +112,13 @@ namespace form_builder.Models.Elements
                     return properties;
             }
         }
+
+        public override string GetLabelText(){
+            var optionalLabelText = Properties.Optional ? " (optional)" : string.Empty;
+            
+            return string.IsNullOrEmpty(Properties.StreetLabel)
+            ? $"Search for a street{optionalLabelText}"
+            : $"{Properties.StreetLabel}{optionalLabelText}";
+        }
     }
 }

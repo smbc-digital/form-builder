@@ -23,8 +23,6 @@ namespace form_builder.Services.AddressService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IPageHelper _pageHelper;
-        
-
         private readonly IEnumerable<IAddressProvider> _addressProviders;
 
         public AddressService(IDistributedCacheWrapper distributedCache, IPageHelper pageHelper, IEnumerable<IAddressProvider> addressProviders)
@@ -80,6 +78,8 @@ namespace form_builder.Services.AddressService
                 {
                     var searchResult = await _addressProviders.Get(addressElement.Properties.AddressProvider).SearchAsync(postcode);
                     addressResults = searchResult.ToList();
+                    // for running local use below.
+                    //addressResults = new List<AddressSearchResult> { new AddressSearchResult { Name = "asdddrezs 1", UniqueId = "321654321" }, new AddressSearchResult { Name = "asdddrezs 1", UniqueId = "321654321" } };
                 }
                 catch (Exception e)
                 {

@@ -1,4 +1,9 @@
-﻿ul {
+﻿/*
+** IE and Edge css for legend width.
+*/
+_:-ms-lang(x), legend { width: 100%; }
+
+ul {
     margin: 0 0 20px 15px;
 }
 
@@ -121,14 +126,14 @@ fieldset.input-memorable-date, fieldset.input-time {
         padding-left: 15px;
     }
 
-        #formTitle:hover {
-            text-decoration: underline;
-        }
+    #formTitle > a:hover {
+        text-decoration: underline;
+    }
 
-        #formTitle > a {
-            color: white;
-            text-decoration: none;
-        }
+    #formTitle > a {
+        color: white;
+        text-decoration: none;
+    }
 
     #header-wrapper {
         display: flex;

@@ -22,426 +22,129 @@ namespace form_builder_tests.UnitTests.Helpers
             _documentCreation = new DocumentCreationHelper(_mockElementMapper.Object);
         }
 
-        [Theory]
-        [InlineData(EElementType.Textbox, "question label", "test")]
-        [InlineData(EElementType.Textarea, "What is your", "textAreaValue")]
-        public void GenerateQuestionAndAnswersDictionary_ShouldReturnCorrectLabelText_AndValue_ForElements(EElementType type, string labelText, string value)
+
+        [Fact]
+        public void GenerateQuestionAndAnswersList_ShouldReturn_List_Without_NonValidatable_Elements()
         {
-            var questionId = "test-questionID";
+            _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns("test value");
             var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>()};
-            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(value);
+            var labelText = "I am a label";
 
             var element = new ElementBuilder()
-                            .WithType(type)
-                            .WithQuestionId(questionId)
-                            .WithLabel(labelText)
+                            .WithType(EElementType.H1)
                             .Build();
-
-            var page = new PageBuilder()
-                        .WithElement(element)
-                        .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                            .WithPage(page)
-                            .Build();
-
-            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
-
-            Assert.Single(result);
-            Assert.Equal($"{labelText}: {value}", result[0]);
-        }
-
-        [Fact]
-        public void GenerateQuestionAndAnswersDictionary_ShouldReturnCorrectLabelText_AndValue_ForDatePickerElement()
-        {
-            var questionId = "test-questionID";
-            var labelText = "Enter the date";
-            var value = new DateTime(2000, 01, 01);
-            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>()};
-            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(value);
-
-            var element = new ElementBuilder()
-                            .WithType(EElementType.DatePicker)
-                            .WithQuestionId(questionId)
-                            .WithLabel(labelText)
-                            .Build();
-
-            var page = new PageBuilder()
-                        .WithElement(element)
-                        .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                            .WithPage(page)
-                            .Build();
-
-            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
-
-            Assert.Single(result);
-            Assert.Equal($"{labelText}: {value}", result[0]);
-        }
-
-        [Fact]
-        public void GenerateQuestionAndAnswersDictionary_ShouldReturnCorrectLabelText_AndValue_ForCheckboxElement()
-        {
-            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(new List<string>{"yes"});
-            
-            var questionId = "test-questionID";
-            var labelText = "Checkbox label";
-            var labelValue =  "Yes Text";
-            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>()};
-
-            var element = new ElementBuilder()
-                            .WithType(EElementType.Checkbox)
-                            .WithQuestionId(questionId)
-                            .WithLabel(labelText)
-                            .WithOptions(new List<Option>{ new Option{ Text = labelValue, Value = "yes" }, new Option{ Text = "No Text", Value = "n" }})
-                            .Build();
-
-            var page = new PageBuilder()
-                        .WithElement(element)
-                        .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                            .WithPage(page)
-                            .Build();
-
-            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
-
-            Assert.Single(result);
-            Assert.Equal($"{labelText}: {labelValue}", result[0]);
-        }
-
-        [Fact]
-        public void GenerateQuestionAndAnswersDictionary_ShouldReturnCorrectLabelText_AndValue_ForRadioElement()
-        {
-             var labelText = "Radio radio";
-             var labelValue = "No Text";
-            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns("n");
-            
-            var questionId = "test-questionID";
-            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>()};
-
-            var element = new ElementBuilder()
-                            .WithType(EElementType.Radio)
-                            .WithQuestionId(questionId)
-                            .WithLabel(labelText)
-                            .WithOptions(new List<Option>{ new Option{ Text = "Yes Text", Value = "yes" }, new Option{ Text = labelValue, Value = "n" }})
-                            .Build();
-
-            var page = new PageBuilder()
-                        .WithElement(element)
-                        .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                            .WithPage(page)
-                            .Build();
-
-            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
-
-            Assert.Single(result);
-            Assert.Equal($"{labelText}: {labelValue}", result[0]);
-        }
-
-        [Fact]
-        public void GenerateQuestionAndAnswersDictionary_ShouldReturnCorrectLabelText_AndValue_ForStreetElement()
-        {
-             var value = new StockportGovUK.NetStandard.Models.Addresses.Address{ SelectedAddress = "street, city, postcode, uk" };
-            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(value);
-
-            var questionId = "test-questionID";
-            var labelText = "Enter the Street";
-            var formAnswers =  new FormAnswers{ Pages = new List<PageAnswers>()};
-
-            var element = new ElementBuilder()
-                            .WithType(EElementType.Street)
-                            .WithQuestionId(questionId)
-                            .WithStreetLabel(labelText)
-                            .Build();
-
-            var page = new PageBuilder()
-                        .WithElement(element)
-                        .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                            .WithPage(page)
-                            .Build();
-
-            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
-
-            Assert.Single(result);
-            Assert.Equal($"{labelText}: {value.SelectedAddress}", result[0]);
-        }
-
-        [Fact]
-        public void GenerateQuestionAndAnswersDictionary_ShouldReturnCorrectLabelText_AndValue_ForAddressElement()
-        {
-            var value = new StockportGovUK.NetStandard.Models.Addresses.Address{ SelectedAddress = "11 road, city, postcode, uk" };
-            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(value);
-
-            var questionId = "test-questionID";
-            var labelText = "Whats your Address";
-            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>()};
-
-            var element = new ElementBuilder()
-                            .WithType(EElementType.Address)
-                            .WithQuestionId(questionId)
-                            .WithAddressLabel(labelText)
-                            .Build();
-
-            var page = new PageBuilder()
-                        .WithElement(element)
-                        .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                            .WithPage(page)
-                            .Build();
-
-            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
-
-            Assert.Single(result);
-            Assert.Equal($"{labelText}: {value.SelectedAddress}", result[0]);
-        }
-        
-        [Fact]
-        public void GenerateQuestionAndAnswersDictionary_ShouldGenerateList_With_FileUpload()
-        {
-            var questionId = "test-questionID";
-            var labelText = "Evidence file";
-            var value = new FileUploadModel{ TrustedOriginalFileName = "your_upload_file.txt" };
-            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-fileupload", Response = Newtonsoft.Json.JsonConvert.SerializeObject(value) } } }}};
-
-            var element = new ElementBuilder()
-                            .WithType(EElementType.FileUpload)
-                            .WithQuestionId(questionId)
-                            .WithLabel(labelText)
-                            .Build();
-
-            var page = new PageBuilder()
-                        .WithElement(element)
-                        .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                            .WithPage(page)
-                            .Build();
-
-            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
-
-            Assert.Equal(3, result.Count);
-            Assert.Equal(string.Empty, result[0]);
-            Assert.Equal("Files:", result[1]);
-            Assert.Equal($"{labelText}: {value.TrustedOriginalFileName}", result[2]);
-        }
-                
-
-        [Fact]
-        public void GenerateQuestionAndAnswersDictionary_ShouldGenerateList_With_NoFilesTitle_WhenNoFileUploadElements()
-        {
-            var value = "answer number one";
-            var value2 = "answer number two";
-            var value3= "answer number three";
-            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = "test-questionID", Response = value }, new Answers { QuestionId = "test-questionIDtwo", Response = value2  }, new Answers { QuestionId = "test-questionIDthree", Response = value3  } }}}};
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.Textarea)
-                .WithQuestionId("test-questionID")
-                .WithLabel("Textarea question one")
-                .Build();
-
 
             var element2 = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithQuestionId("test-questionIDtwo")
-                .WithLabel("Textbox question two")
-                .Build();
+                            .WithType(EElementType.P)
+                            .Build();
 
             var element3 = new ElementBuilder()
-                .WithType(EElementType.Textarea)
-                .WithQuestionId("test-questionIDthree")
-                .WithLabel("Textarea question three")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithElement(element2)
-                .WithElement(element3)
-                .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
-
-            Assert.DoesNotContain("Files:", result);
-        }
-
-        [Fact]
-        public void GenerateQuestionAndAnswersDictionary_ShouldGenerateList_With_AnElement_And_FileUploadElement()
-        {
-            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns("test response");
-
-            var questionId = "test-questionID";
-            var questionId2 = "test-questionIDtwo";
-            var labelText = "Evidence file";
-            var labelText2 = "FirstName";
-            var value = new FileUploadModel{ TrustedOriginalFileName = "your_upload_file.txt" };
-            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-fileupload", Response = Newtonsoft.Json.JsonConvert.SerializeObject(value) } } }}};
-
-            var element = new ElementBuilder()
-                            .WithType(EElementType.FileUpload)
-                            .WithQuestionId(questionId)
-                            .WithLabel(labelText)
-                            .Build();
-
-            var element2 = new ElementBuilder()
                             .WithType(EElementType.Textarea)
-                            .WithQuestionId(questionId2)
-                            .WithLabel(labelText2)
+                            .WithQuestionId("QuestiionId")
+                            .WithLabel("I am a label")
                             .Build();
-
 
             var page = new PageBuilder()
                         .WithElement(element)
                         .WithElement(element2)
+                        .WithElement(element3)
                         .Build();
 
             var formSchema = new FormSchemaBuilder()
                             .WithPage(page)
                             .Build();
 
-            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
+            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
-             Assert.Equal(4, result.Count);
-            Assert.Equal($"{labelText2}: test response", result[0]);
-            Assert.Equal(string.Empty, result[1]);
-            Assert.Equal("Files:", result[2]);
-            Assert.Equal($"{labelText}: {value.TrustedOriginalFileName}", result[3]);
+            Assert.Single(result);
+            Assert.Equal($"{labelText}: test value", result[0]);
+        }
+
+
+        [Theory]
+        [InlineData(EElementType.Textbox)]
+        [InlineData(EElementType.Textarea)]
+        [InlineData(EElementType.Checkbox)]
+        [InlineData(EElementType.Radio)]
+        [InlineData(EElementType.DateInput)]
+        [InlineData(EElementType.DatePicker)]
+        [InlineData(EElementType.Select)]
+        [InlineData(EElementType.TimeInput)]
+        public void GenerateQuestionAndAnswersList_ShouldReturn_ListWithSingleItem_For_ElementType(EElementType type)
+        {
+            var value = "value";
+            _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns(value);
+
+            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>()};
+            var labelText = "I am a label";
+
+            var element = new ElementBuilder()
+                            .WithType(type)
+                            .WithQuestionId("testQuestion")
+                            .WithLabel(labelText)
+                            .Build();
+
+            var page = new PageBuilder()
+                        .WithElement(element)
+                        .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                            .WithPage(page)
+                            .Build();
+
+            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+
+            Assert.Single(result);
+            Assert.Equal($"{labelText}: {value}", result[0]);
         }
 
         [Fact]
-        public void GenerateQuestionAndAnswersDictionary_ShouldGenerateList_With_OptionalLabelText()
+        public void GenerateQuestionAndAnswersList_ShouldReturn_ListOfMultipleItems()
         {
+            var value = "value";
+            _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns(value);
 
-
-            var questionId = "test-questionID";
-            var questionId2 = "test-questionIDtwo";
-            var questionId3 = "test-questionIDthree";
-            var labelText = "Textarea question one";
-            var labelText2 = "Textbox question two";
-            var labelText3 = "Textarea question three";
-            var value = "answer number one";
-            var value2 = "answer number two";
-            var value3 = "answer number three";
-            
-            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Type == EElementType.Textarea && x.Properties.QuestionId == questionId), It.IsAny<FormAnswers>())).Returns(value);
-            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Type == EElementType.Textbox), It.IsAny<FormAnswers>())).Returns(value2);
-            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Type == EElementType.Textarea && x.Properties.QuestionId == questionId3), It.IsAny<FormAnswers>())).Returns(value3);
-            
             var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>()};
+            var labelText = "I am a label";
+            var labelText2 = "second label";
+            var labelText3 = "third label";
 
             var element = new ElementBuilder()
-                .WithType(EElementType.Textarea)
-                .WithQuestionId(questionId)
-                .WithOptional(true)
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("testQuestion1")
                 .WithLabel(labelText)
                 .Build();
 
-
             var element2 = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithQuestionId(questionId2)
+                .WithType(EElementType.Textarea)
+                .WithQuestionId("testQuestion2")
                 .WithLabel(labelText2)
                 .Build();
 
             var element3 = new ElementBuilder()
-                .WithType(EElementType.Textarea)
-                .WithQuestionId(questionId3)
-                .WithOptional(true)
+                .WithType(EElementType.Select)
+                .WithQuestionId("testQuestion3")
                 .WithLabel(labelText3)
                 .Build();
 
             var page = new PageBuilder()
-                .WithElement(element)
-                .WithElement(element2)
-                .WithElement(element3)
-                .Build();
+                        .WithElement(element)
+                        .WithElement(element2)
+                        .WithElement(element3)
+                        .Build();
 
             var formSchema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
+                            .WithPage(page)
+                            .Build();
 
-            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
+            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
-            Assert.Equal($"{labelText} (optional): {value}", result[0]);
-            Assert.Equal($"{labelText2}: {value2}", result[1]);
-            Assert.Equal($"{labelText3} (optional): {value3}", result[2]);
-        }
-
-           
-        [Fact]
-        public void GenerateQuestionAndAnswersDictionary_ShouldGenerateCorrectValue_ForDateInput()
-        {
-            var questionId = "test-questionID";
-            var labelText = "What Date do you like";
-            var valueDay = "01";
-            var valueMonth = "02";
-            var valueYear = "2010";
-            var value = new DateTime(2010,02,01);
-            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>()};
-
-            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(value);
-            
-            var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
-                .WithQuestionId(questionId)
-                .WithLabel(labelText)
-                .Build();
-
-            var page = new PageBuilder()
-            .WithElement(element)
-            .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
-
-            Assert.Single(result);
-            Assert.Equal($"{labelText}: {valueDay}/{valueMonth}/{valueYear}", result[0]);
-        }
-
-        [Fact]
-        public void GenerateQuestionAndAnswersDictionary_ShouldGenerateCorrectValue_ForTimeInput()
-        {
-            var valueHour = "3";
-            var valueMin = "10";
-            var valueAmPm = "pm";
-            var dateTime = DateTime.Parse($"{valueHour}:{valueMin} {valueAmPm}");
-            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(dateTime.TimeOfDay.ToString());
-
-            var questionId = "test-questionID";
-            var labelText = "What Time do you like";
-            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-hours", Response = valueMin }, new Answers { QuestionId = $"{questionId}-minutes", Response = valueHour }, new Answers { QuestionId = $"{questionId}-ampm", Response = valueAmPm } } }}};
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.TimeInput)
-                .WithQuestionId(questionId)
-                .WithLabel(labelText)
-                .Build();
-
-            var page = new PageBuilder()
-            .WithElement(element)
-            .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            var result = _documentCreation.GenerateQuestionAndAnswersDictionary(formAnswers, formSchema);
-
-            Assert.Single(result);
-            Assert.Equal($"{labelText}: 15:{valueMin}:00", result[0]);
+            Assert.Equal(3, result.Count);
+            Assert.Equal($"{labelText}: {value}", result[0]);
+            Assert.Equal($"{labelText2}: {value}", result[1]);
+            Assert.Equal($"{labelText3}: {value}", result[2]);
         }
     }
 }

@@ -1,7 +1,5 @@
 ﻿@model form_builder.Models.Elements.Element
 @{
-    var hintId = $"{Model.Properties.QuestionId}-hint";
-    var errorId = $"{Model.Properties.QuestionId}-error";
     var elements = Model.GenerateElementProperties();
     if(!Model.IsValid)
     {

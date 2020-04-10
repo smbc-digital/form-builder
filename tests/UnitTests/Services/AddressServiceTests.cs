@@ -24,7 +24,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly AddressService _service;
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IAddressServiceGateway> _addressServiceGateway = new Mock<IAddressServiceGateway>();
         private readonly Mock<IAddressProvider> _addressProvider = new Mock<IAddressProvider>();
         private IEnumerable<IAddressProvider> _addressProviders;
 
