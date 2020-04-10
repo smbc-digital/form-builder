@@ -28,7 +28,7 @@ namespace form_builder.Models.Elements
         public string ErrorId => $"{Properties.QuestionId}-error"; 
         public bool DisplayAriaDescribedby => DisplayHint || !IsValid; 
         public bool IsValid => validationResult.IsValid; 
-        public string ValidationMessage => string.IsNullOrEmpty(Properties.CustomValidationMessage) ? validationResult.Message : Properties.CustomValidationMessage; 
+        public string ValidationMessage => validationResult.Message;
         
         public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {

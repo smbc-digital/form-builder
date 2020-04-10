@@ -29,10 +29,10 @@ namespace form_builder.Models.Elements
         
         protected void SetAddressProperties(Dictionary<string, dynamic> viewModel, string searchTerm)
         {
-            Properties.AddressManualAddressLine1 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine1")).Value;
-            Properties.AddressManualAddressLine2 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine2")).Value;
-            Properties.AddressManualAddressTown = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressTown")).Value;
-            Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressPostcode")).Value ?? searchTerm;           
+            Properties.AddressManualAddressLine1 = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.ADDRESS_LINE_1)).Value;
+            Properties.AddressManualAddressLine2 = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.ADDRESS_LINE_2)).Value;
+            Properties.AddressManualAddressTown = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.TOWN)).Value;
+            Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.POSTCODE)).Value ?? searchTerm;           
         }
 
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)

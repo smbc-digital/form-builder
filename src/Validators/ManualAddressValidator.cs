@@ -19,27 +19,21 @@ namespace form_builder.Validators
                 };
             }
 
-            var valueAddressLine1 = viewModel.ContainsKey($"{element.Properties.QuestionId}-AddressManualAddressLine1")
-                 ? viewModel[$"{element.Properties.QuestionId}-AddressManualAddressLine1"]
-                 : null;
-
+            var valueAddressLine1 = viewModel.ContainsKey(element.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1))
+                ? viewModel[element.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1)]
+                : null;
             var addressLine1Valid = !string.IsNullOrEmpty(valueAddressLine1);
-
             var addressLine1Message = addressLine1Valid ? string.Empty : "Please enter Address Line 1";
 
-
-
-            var valueAddressTown = viewModel.ContainsKey($"{element.Properties.QuestionId}-AddressManualAddressTown")
-                ? viewModel[$"{element.Properties.QuestionId}-AddressManualAddressTown"]
+            var valueAddressTown = viewModel.ContainsKey(element.GetCustomItemId(AddressManualConstants.TOWN))
+                ? viewModel[element.GetCustomItemId(AddressManualConstants.TOWN)]
                 : null;
-
             var addressTownValid = !string.IsNullOrEmpty(valueAddressTown);
             var addressTownMessage = addressTownValid ? string.Empty : "Please enter Town";
 
-            var valueAddressPostcode = viewModel.ContainsKey($"{element.Properties.QuestionId}-AddressManualAddressPostcode")
-                ? viewModel[$"{element.Properties.QuestionId}-AddressManualAddressPostcode"]
+            var valueAddressPostcode = viewModel.ContainsKey(element.GetCustomItemId(AddressManualConstants.POSTCODE))
+                ? viewModel[element.GetCustomItemId(AddressManualConstants.POSTCODE)]
                 : null;
-
             var addressPostcodeMessage = string.Empty;
             var addressPostcodeValid = true;
 
