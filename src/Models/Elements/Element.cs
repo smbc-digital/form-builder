@@ -24,8 +24,9 @@ namespace form_builder.Models.Elements
         public BaseProperty Properties { get; set; }
         public bool DisplayHint => !string.IsNullOrEmpty(Properties.Hint.Trim());
         public bool HadCustomClasses => !string.IsNullOrEmpty(Properties.ClassName);
-        public string HintId => $"{Properties.QuestionId}-hint"; 
-        public string ErrorId => $"{Properties.QuestionId}-error"; 
+        public virtual string QuestionId => Properties.QuestionId; 
+        public virtual string HintId => $"{QuestionId}-hint"; 
+        public virtual string ErrorId => $"{QuestionId}-error"; 
         public bool DisplayAriaDescribedby => DisplayHint || !IsValid; 
         public bool IsValid => validationResult.IsValid; 
         public string ValidationMessage => validationResult.Message;
@@ -48,75 +49,50 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "")
-        {
-            return new Dictionary<string, dynamic>();
-        }
-
-        // TODO: What is the point in this?
         public virtual string GenerateFieldsetProperties()
         {
             return string.Empty;
         }
 
-        public Dictionary<string, dynamic> GenerateElementProperties(int index)
+        public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
-            switch (Type)
-            {
-                case EElementType.Radio:
-                    var properties = new Dictionary<string, dynamic>()
-                    {
-                        {"name", Properties.QuestionId },
-                        { "id", $"{Properties.QuestionId}-{index}" },
-                        { "value", Properties.Value}
-                    };
-
-                    if (!string.IsNullOrEmpty(Properties.Options[index].Hint))
-                    {
-                        properties.Add("aria-describedby", $"{Properties.QuestionId}-{index}-hint");
-                    }
-
-                    return properties;
-                default:
-                    return null;
-            }
+            return new Dictionary<string, dynamic>();
         }
 
         public Dictionary<string, dynamic> GenerateElementProperties(string errorMessage, string errorId)
         {
-            switch (Type)
-            {
-                case EElementType.AddressManual:
-                    var properties = new Dictionary<string, dynamic>();
-                    if(!IsValid && !string.IsNullOrEmpty(errorMessage))
-                    {
-                        properties.Add("aria-describedby", errorId);
-                    }
-                    return properties;
-                default:
-                    return null;
+            if (Type == EElementType.AddressManual)
+            {            
+                var properties = new Dictionary<string, dynamic>();
+                if(!IsValid && !string.IsNullOrEmpty(errorMessage))
+                {
+                    properties.Add("aria-describedby", errorId);
+                }
+                
+                return properties;
             }
-            
+
+            return null;
         }
 
         public string GetListItemId(int index)
         {
-            return $"{Properties.QuestionId}-{index}";
+            return $"{QuestionId}-{index}";
         }
 
         public string GetCustomItemId(string key)
         {
-            return $"{Properties.QuestionId}-{key}";
+            return $"{QuestionId}-{key}";
         }
 
         public string GetCustomHintId(string key)
         {
-            return $"{Properties.QuestionId}-{key}-hint";
+            return $"{GetCustomItemId(key)}-hint";
         }
 
         public string GetCustomErrorId(string key)
         {
-            return $"{Properties.QuestionId}-{key}-error";
+            return $"{GetCustomItemId(key)}-error";
         }
 
         public string GetListItemHintId(int index)
@@ -131,12 +107,12 @@ namespace form_builder.Models.Elements
 
         public string GetDescribedByAttributeValue()
         {
-            return CreateDescribedByAttributeValue($"{Properties.QuestionId}");
+            return CreateDescribedByAttributeValue($"{QuestionId}");
         }
 
         public string GetDescribedByAttributeValue(string prefix)
         {
-            return CreateDescribedByAttributeValue($"{Properties.QuestionId}{prefix}");
+            return CreateDescribedByAttributeValue($"{QuestionId}{prefix}");
         }
 
         private string CreateDescribedByAttributeValue(string key)
@@ -166,7 +142,7 @@ namespace form_builder.Models.Elements
 
             if (!Properties.LegendAsH1)
             {
-                return $"{data} for = {Properties.QuestionId}{prefix}";
+                return $"{data} for = {QuestionId}{prefix}";
             }
 
             return data;

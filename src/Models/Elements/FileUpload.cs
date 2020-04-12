@@ -19,6 +19,8 @@ namespace form_builder.Models.Elements
             Type = EElementType.FileUpload;
         }
 
+        public override string QuestionId => $"{base.QuestionId}-fileupload";
+
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var allowedFileType = Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
@@ -29,8 +31,8 @@ namespace form_builder.Models.Elements
 
             var properties = new Dictionary<string, dynamic>()
             {
-                { "name", $"{Properties.QuestionId}-fileupload" },
-                { "id", $"{Properties.QuestionId}-fileupload" },
+                { "name", QuestionId },
+                { "id", QuestionId },
                 { "type", "file" },
                 { "accept", allowedFileType.Join(",") },
                 { "max-file-size", maxFileSize },
@@ -39,7 +41,7 @@ namespace form_builder.Models.Elements
 
             if (DisplayAriaDescribedby)
             {
-                properties.Add("aria-describedby", GetDescribedByAttributeValue("-fileupload"));
+                properties.Add("aria-describedby", GetDescribedByAttributeValue());
             }
 
             return properties;

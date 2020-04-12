@@ -8,13 +8,13 @@
         }
         
         <div class="govuk-radios__item">
-            @* TODO: Should this use @Html.Radio? *@
+           
             <input class="govuk-radios__input" 
                 type="radio" 
                 value="@Model.Properties.Options[i].Value" 
-                name="@Model.Properties.QuestionId" 
+                name="@Model.QuestionId" 
                 id="@Model.GetListItemId(i)" 
-                aria-describedby="@Model.GetListItemHintId(i)" 
+                @(Model.Properties.Options[i].HasHint ? $"aria-describedby={Model.GetListItemHintId(i)}" : string.Empty) 
                 @(Model.Properties.Checked ||  Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty) />
             
             <label class="govuk-label govuk-radios__label" 

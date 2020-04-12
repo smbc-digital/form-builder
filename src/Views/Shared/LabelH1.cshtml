@@ -1,7 +1,7 @@
     @if(Model.Properties.LabelAsH1)
     {
         <h1 class="govuk-label-heading">
-            <label class="govuk-label govuk-label--xl" for="@Model.Properties.QuestionId">
+            <label class="govuk-label govuk-label--xl" for="@Model.QuestionId">
                 @Model.Properties.Label
                 @if (Model.Properties.Optional) { <span>(optional)</span> }
             </label>
@@ -9,7 +9,7 @@
     } 
     else 
     {
-        <label class="govuk-label" for="@Model.Properties.QuestionId">@Model.Properties.Label
+        <label class="govuk-label" for="@Model.QuestionId">@Model.Properties.Label
         @if (Model.Properties.Optional)
         {
             <span>(optional)</span>
