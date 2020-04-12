@@ -7,8 +7,6 @@ namespace form_builder.Validators
 {
     public class ManualAddressValidator : IElementValidator
     {
-        private readonly Regex _postCode  = new Regex(@"^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})$");
-        private readonly Regex _stockportPostCode= new Regex(@"^(sK|Sk|SK|sk|M|m)[0-9][0-9A-Za-z]?\s?[0-9][A-Za-z]{2}");
 
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
@@ -21,6 +19,8 @@ namespace form_builder.Validators
                 };
             }
 
+            // TODO: Should all these validation messages be editable in the DSL?
+            
             var valueAddressLine1 = viewModel.ContainsKey(element.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1))
                 ? viewModel[element.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1)]
                 : null;
@@ -44,12 +44,12 @@ namespace form_builder.Validators
                 addressPostcodeMessage = "Please enter a Postcode";
                 addressPostcodeValid = false;
             }
-            else if (!_stockportPostCode.IsMatch(valueAddressPostcode) && element.Properties.StockportPostcode == true)
+            else if (!AddressConstants.STOCKPORT_POSTCODE_REGEX.IsMatch(valueAddressPostcode) && element.Properties.StockportPostcode == true)
             {
                 addressPostcodeMessage = "Please enter a valid Stockport Postcode";
                 addressPostcodeValid = false;
             }
-            else if(!_postCode.IsMatch(valueAddressPostcode))
+            else if(!AddressConstants.POSTCODE_REGEX.IsMatch(valueAddressPostcode))
             {
                 addressPostcodeMessage = "Please enter a valid Postcode";
                 addressPostcodeValid = false;

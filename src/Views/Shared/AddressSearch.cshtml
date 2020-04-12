@@ -1,6 +1,8 @@
+@using form_builder.Models.Elements;
 @model form_builder.ViewModels.ElementViewModel
 @{
     var elementProperties = Model.Element.GenerateElementProperties();
+    elementProperties.Add("autocomplete", "postal-code");
     elementProperties.Add("class", "govuk-input govuk-input--width-10");
 }
 
@@ -15,8 +17,8 @@
             <p>@Model.Element.Properties.AddressIAG</p>
         </section>
     }
-
-    <label class="govuk-label govuk-label--m" for=@Model.Element.GetCustomItemId("postcode")>@Model.Element.Properties.PostcodeLabel
+@* TODO: Move "postcode" reference to constants *@
+    <label class="govuk-label govuk-label--m" for=@Model.Element.GetCustomItemId(AddressConstants.POSTCODE)>@Model.Element.Properties.PostcodeLabel
         @if (Model.Element.Properties.Optional)
         {
             <span>(optional)</span>
@@ -27,5 +29,5 @@
 
     <partial name="Error" model=@Model.Element />
 
-    @Html.TextBox(Model.Element.GetCustomItemId("postcode"), Model.Element.Properties.Value, elementProperties)
+    @Html.TextBox(Model.Element.GetCustomItemId(AddressConstants.POSTCODE), Model.Element.Properties.Value, elementProperties)
 </div>

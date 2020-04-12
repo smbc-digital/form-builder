@@ -1,4 +1,5 @@
-﻿@model Tuple<form_builder.ViewModels.ElementViewModel, List<SelectListItem>>
+﻿@using form_builder.Models.Elements;
+@model Tuple<form_builder.ViewModels.ElementViewModel, List<SelectListItem>>
 @{
     var elementProperties = Model.Item1.Element.GenerateElementProperties("Select");
     elementProperties.Add("class", "govuk-select");
@@ -17,7 +18,7 @@
     </p>
 
     <h2 class="govuk-label-wrapper govuk-!-margin-bottom-1">
-        <label class="govuk-label govuk-label--m" for= @Model.Item1.Element.GetCustomItemId("address")>@Model.Item1.Element.Properties.SelectLabel
+        <label class="govuk-label govuk-label--m" for= @Model.Item1.Element.GetCustomItemId(AddressConstants.ADDRESS_SELECT)>@Model.Item1.Element.Properties.SelectLabel
             @if (Model.Item1.Element.Properties.Optional)
             {
                 <span>(optional)</span>
@@ -27,21 +28,22 @@
 
     @if (!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectHint))
     {
-        <p class="govuk-hint" id=@Model.Item1.Element.GetCustomHintId("address")>
+        <p class="govuk-hint" id=@Model.Item1.Element.GetCustomHintId(AddressConstants.ADDRESS_SELECT)>
             @Html.Raw(Model.Item1.Element.Properties.SelectHint)
         </p>
     }
 
     @if (!Model.Item1.Element.IsValid)
     {
-        <span class="govuk-error-message" id=@Model.Item1.Element.GetCustomErrorId("address")>
+        @* TODO: move addredss reference to constants *@
+        <span class="govuk-error-message" id=@Model.Item1.Element.GetCustomErrorId(AddressConstants.ADDRESS_SELECT)>
             <span class="govuk-visually-hidden">Error:</span> @(string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectCustomValidationMessage) 
                                                                     ? Model.Item1.Element.ValidationMessage 
                                                                     : Model.Item1.Element.Properties.SelectCustomValidationMessage)
         </span>
     }
 
-    @Html.DropDownList(@Model.Item1.Element.GetCustomItemId("address"), @Model.Item2, elementProperties)
+    @Html.DropDownList(@Model.Item1.Element.GetCustomItemId(AddressConstants.ADDRESS_SELECT), @Model.Item2, elementProperties)
     <p class="govuk-body govuk-link govuk-!-margin-top-5">
         <a class="govuk-link" href="@Model.Item1.ManualAddressURL">@Model.Item1.Element.Properties.AddressManualLinkText</a>
     </p>

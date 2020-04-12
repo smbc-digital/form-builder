@@ -9,6 +9,7 @@
 
     var showLine1Validation = !Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[0]);
     var line1Elements = Model.Element.GenerateElementProperties(errorMessages[0], @Model.Element.GetCustomErrorId(AddressManualConstants.ADDRESS_LINE_1));
+    line1Elements.Add("autocomplete", "address-line1");
     line1Elements.Add("class", "govuk-input");
     if(!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[0]))
     {
@@ -16,10 +17,12 @@
     }
     
     var line2Elements = Model.Element.GenerateElementProperties();
+    line2Elements.Add("autocomplete", "address-line2");
     line2Elements.Add("class", "govuk-input");
 
     var showTownValidation = !Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[1]);
     var townElements = Model.Element.GenerateElementProperties(errorMessages[1], @Model.Element.GetCustomErrorId(AddressManualConstants.TOWN));
+    townElements.Add("autocomplete", "address-level1");
     townElements.Add("class", "govuk-input");
     if(!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[1]))
     {
@@ -28,8 +31,8 @@
     
     var showPostcodeValidation = !Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[2]);
     var postcodeElements = Model.Element.GenerateElementProperties(errorMessages[2], @Model.Element.GetCustomErrorId(AddressManualConstants.POSTCODE));
+    postcodeElements.Add("autocomplete", "postal-code");
     postcodeElements.Add("class", "govuk-input--width-10 govuk-input");
-
     if(!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[2]))
     {
         postcodeElements["class"] += " govuk-input--error";
