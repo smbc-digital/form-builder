@@ -8,6 +8,8 @@ namespace form_builder_tests.Builders
     {
         private string _baseUrl = "base-url";
         private string _feedbackForm = "www.feedback.com";
+
+        private string _feedbackPhase = "";
         private string _formName = "formname";
         private List<Page> _pages = new List<Page>();
         private string _startPageSlug = "page-one";
@@ -22,6 +24,7 @@ namespace form_builder_tests.Builders
             {
                 BaseURL = _baseUrl,
                 FeedbackForm = _feedbackForm,
+                FeedbackPhase = _feedbackPhase,
                 FormName = _formName,
                 Pages = _pages,
                 StartPageSlug = _startPageSlug,
@@ -46,6 +49,13 @@ namespace form_builder_tests.Builders
         public FormSchemaBuilder WithName(string name)
         {
             _formName = name;
+            return this;
+        }
+
+        public FormSchemaBuilder WithFeedback(string phase, string feedbackFormUrl)
+        {
+            _feedbackPhase = phase;
+            _feedbackForm = feedbackFormUrl;
             return this;
         }
 

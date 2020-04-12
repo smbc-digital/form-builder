@@ -70,6 +70,9 @@ Allowed Values:
 ### **FeedbackForm** (*string*) 
 If present this will be used at the top of the form to link them to, commonly, a TypeForm form that will be created to capture feedback on the new form.
 
+### **FeedbackPhase** (*string*, usually *alpha", *beta*)
+If present this will be used to communicate to the user this form is still in a testing phase.
+
 ### [**EnvironmentAvailabilities** [*object*]](Controlling-Form-Availability)
 List of environments and the current availability status
 
@@ -86,6 +89,8 @@ For example:
  {
   "FormName": "My test form",
   "BaseURL": "my-test-form",
+  "FeedbackForm": "https://www.yourfeedbackurlhere.com",
+  "FeedbackPhase": "beta",
   "EnvironmentAvailabilities":[
     {
       "Environment": "Local",
