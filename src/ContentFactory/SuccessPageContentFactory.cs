@@ -53,6 +53,7 @@ namespace form_builder.ContentFactory
                     ViewName = "Submit",
                     FormAnswers = formAnswers,
                     FeedbackFormUrl = baseForm.FeedbackForm,
+                    FeedbackPhase = baseForm.FeedbackPhase,
                     FormName = baseForm.FormName,
                     StartFormUrl = startFormUrl
                 };

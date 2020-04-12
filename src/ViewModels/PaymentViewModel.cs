@@ -4,6 +4,8 @@
     {
         public string FeedbackForm { get; set; }
 
+        public string FeedbackPhase { get; set; }
+
         public string FormName { get; set; }
 
         public string PageTitle { get; set; }

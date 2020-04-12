@@ -1,5 +1,5 @@
 ﻿@{
-    var bannerTypeformUrl = ViewData["BannerTypeformUrl"];
+    var FeedbackUrl = ViewData["FeedbackUrl"];
 }
 
 <!DOCTYPE html>
@@ -32,11 +32,11 @@
         <partial name="Header" />
         @RenderSection("Breadcrumb", false)
 
-        @if (bannerTypeformUrl != null)
+        @if (FeedbackUrl != null)
         {
             <div class="banner-header">
                 <div class="center-wrapper">
-                    <span>NEW</span><strong>This part of our website is brand new. </strong><a href="@bannerTypeformUrl" target="_blank" data-mode="1" class="typeform-share link">Give us your feedback</a> to help us improve it.
+                    <span>NEW</span><strong>This part of our website is brand new. </strong><a href="@FeedbackUrl" target="_blank" data-mode="1" class="typeform-share link">Give us your feedback</a> to help us improve it.
                 </div>
             </div>
         }

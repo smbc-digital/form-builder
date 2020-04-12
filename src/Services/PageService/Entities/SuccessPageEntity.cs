@@ -7,6 +7,9 @@ namespace form_builder.Services.PageService.Entities
         public string ViewName { get; set; } = "Success";
         public FormAnswers FormAnswers { get; set; }
         public string FeedbackFormUrl {get;set;}
+
+        public string FeedbackPhase {get;set;}
+
         public string HtmlContent { get; set; }
         public string FormName { get; set; }
         public string SecondaryHeader { get; set; }

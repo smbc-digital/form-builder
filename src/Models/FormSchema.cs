@@ -16,6 +16,8 @@ namespace form_builder.Models
         public string StartPageSlug { get; set; }
         
         public string FeedbackForm { get; set; }
+
+        public string FeedbackPhase { get; set; }
         
         public List<Page> Pages { get; set; }
         

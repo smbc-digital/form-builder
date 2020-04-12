@@ -1,5 +1,6 @@
 @{
-    var bannerTypeformUrl = ViewData["BannerTypeformUrl"];
+    var feedbackFormUrl = (string)ViewData["FeedbackUrl"];
+    var feedbackPhase = (string)ViewData["FeedbackPhase"];
 }
 
 <!doctype html>
@@ -30,16 +31,19 @@
     <div class="govuk-width-container">
 
         @* TODO: Work out how to do the typeform feedback and phase banner *@
+        @if(!string.IsNullOrEmpty(feedbackPhase))
+        {
         <div class="govuk-phase-banner">
             <p class="govuk-phase-banner__content">
                 <strong class="smbc-tag govuk-phase-banner__content__tag">
-                    alpha
+                    @feedbackPhase
                 </strong>
                 <span class="govuk-phase-banner__text">
-                    This is a new service - your <a class="govuk-link" href="#">feedback</a> will help us to improve it.
+                    This is a new service - your <a class="govuk-link" href="@feedbackFormUrl">feedback</a> will help us to improve it.
                 </span>
             </p>
         </div>
+        }
 
         @if(!Model.HideBackButton)
         {
