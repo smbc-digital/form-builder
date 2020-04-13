@@ -47,6 +47,12 @@ namespace form_builder.Models.Elements
                 { "min", minDate }
             };
 
+            
+            if (DisplayAriaDescribedby)
+            {
+                properties.Add("aria-describedby", GetDescribedByAttributeValue());
+            }
+
             return properties;
         }
     }
