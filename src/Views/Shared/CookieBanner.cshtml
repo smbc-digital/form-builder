@@ -1,0 +1,19 @@
+<link rel="stylesheet" type="text/css" href="//wpcc.io/lib/1.0.2/cookieconsent.min.css"/>
+<script src="//wpcc.io/lib/1.0.2/cookieconsent.min.js"></script>
+<script>
+  window.addEventListener("load", function() {
+    window.wpcc.init({
+      border: "thin",
+      corners: "small",
+      colors: {
+        popup: { background: "#285e61", text: "#ffffff", border: "#234e52" },
+        button: { background: "#ffffff", text: "#234e52" }
+      },
+      content: {
+        message: "This website uses cookies to make sure you get the best experience on our website.",
+        href: "https://www.stockport.gov.uk/cookies",
+        button:"Accept cookies"
+      }
+    });
+  });
+</script>

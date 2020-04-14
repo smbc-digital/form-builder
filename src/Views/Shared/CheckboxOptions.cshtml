@@ -28,7 +28,7 @@
         <label for="@itemId" @Model.WriteOptional()>@item.Text</label>
         @if (!string.IsNullOrWhiteSpace(item.Hint))
         {
-            <span class="radio-sub-label" id="@itemHint">@item.Hint</span>
+            <span class="radio-sub-label" id="@itemHint">@Html.Raw(item.Hint)</span>
         }
     </div>
 }
