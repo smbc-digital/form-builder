@@ -20,12 +20,26 @@ namespace form_builder.Models.Elements
             Type = EElementType.Organisation;
         }
 
+        private string _organisationSearchTermId;
+
+        private string _organisationSelectId; 
+
+        private string _questionId; 
+
+        public string OrganisationSearchTermId => _organisationSearchTermId;
+
+        public string OrganisationSelectId => _organisationSelectId;
+
+        public override string QuestionId => _questionId;
+
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            var organisationKey = $"{Properties.QuestionId}-organisation-searchterm";
+            _organisationSearchTermId =  $"{Properties.QuestionId}-organisation-searchterm";
+            _organisationSelectId =  $"{Properties.QuestionId}-organisation";
 
-            if (viewModel.ContainsKey("OrganisationStatus") && viewModel["OrganisationStatus"] == "Select" || viewModel.ContainsKey(organisationKey) && !string.IsNullOrEmpty(viewModel[organisationKey]))
+            if (viewModel.ContainsKey("OrganisationStatus") && viewModel["OrganisationStatus"] == "Select" || viewModel.ContainsKey(OrganisationSearchTermId) && !string.IsNullOrEmpty(viewModel[OrganisationSearchTermId]))
             {
+                _questionId =_organisationSelectId;
                 Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
                 if (string.IsNullOrEmpty(Properties.Value))
                 {
@@ -35,12 +49,12 @@ namespace form_builder.Models.Elements
                         Properties.Value = viewModel[organisation];
                         if (string.IsNullOrEmpty(Properties.Value))
                         {
-                            Properties.Value = viewModel[organisationKey];
+                            Properties.Value = viewModel[OrganisationSearchTermId];
                         }
                     }
                     else
                     {
-                        Properties.Value = viewModel[organisationKey];
+                        Properties.Value = viewModel[OrganisationSearchTermId];
                     }
                 }
 
@@ -53,6 +67,8 @@ namespace form_builder.Models.Elements
                 return await viewRender.RenderAsync("OrganisationSelect", new Tuple<ElementViewModel, List<SelectListItem>>(new ElementViewModel{Element = this, ReturnURL = returnURL }, optionsList));
             }
 
+            _questionId =_organisationSearchTermId;
+            
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-organisation-searchterm");
 
             var viewElement = new ElementViewModel

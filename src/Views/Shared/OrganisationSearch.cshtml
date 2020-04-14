@@ -1,27 +1,23 @@
 ﻿@model form_builder.ViewModels.ElementViewModel
 @{
-    var questionId = $"{Model.Element.Properties.QuestionId}-organisation-searchterm";
-    var hintId = $"{questionId}-hint";
-    var errorId = $"{questionId}-error";
-    var tag = Model.Element.Properties.LegendAsH1 ? "h1" : "label";
+    var elementProperties = Model.Element.GenerateElementProperties();
+    if(!Model.Element.IsValid)
+    {
+        elementProperties.Add("class", "govuk-input govuk-input--error");
+    }
+    else
+    {
+        elementProperties.Add("class", "govuk-input");
+    }
 }
 
-<@Html.Raw(tag) @Model.Element.WriteHtmlForAndClassAttribute("-organisation-searchterm")>@Model.Element.Properties.Label</@Html.Raw(tag)>
+<div class="govuk-form-group @(!Model.Element.IsValid ? "govuk-form-group--error" : string.Empty)">
 
-@if (Model.Element.Properties.Optional)
-{
-    <span class="optional">(optional)</span>
-}
+    <partial name="LabelH1" model=@Model.Element />
 
-@if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
-{
-    <p class="description" id=@hintId>@Model.Element.Properties.Hint</p>
-}
+    <partial name="Hint"  model=@Model.Element />
 
-@Html.TextBox(questionId, Model.Element.Properties.Value, Model.Element.GenerateElementProperties())
+    <partial name="Error"  model=@Model.Element />
 
-@if (!Model.Element.IsValid)
-{
-    var validationMessage = string.IsNullOrEmpty(Model.Element.Properties.CustomValidationMessage) ? Model.Element.ValidationMessage : Model.Element.Properties.CustomValidationMessage;
-    <p class="input-error-content" id="@errorId">@validationMessage</p>
-}
+    @Html.TextBox(Model.Element.QuestionId, Model.Element.Properties.Value, elementProperties)
+</div>
