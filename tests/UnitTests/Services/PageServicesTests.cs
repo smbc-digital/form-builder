@@ -745,8 +745,8 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.FinalisePageJoueny("form", EBehaviourType.SubmitAndPay);
 
             // Assert
-            _distributedCache.Verify(_ => _.Remove(It.IsAny<string>()), Times.AtLeastOnce);
-            _distributedCache.Verify(_ => _.Remove(It.IsAny<string>()), Times.AtLeastOnce);
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"file-{questionIDOne}-fileupload-{guid}")), Times.Once);
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"file-{questionIDTwo}-fileupload-{guid}")), Times.Once);
         }
 
         [Fact]
