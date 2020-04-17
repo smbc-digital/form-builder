@@ -68,13 +68,14 @@ namespace form_builder.Models
         }
 
         public Behaviour GetNextPage(Dictionary<string, dynamic> viewModel)
-        {
+         {
             if (Behaviours.Count == 1)
             {
                 return Behaviours.FirstOrDefault();
             }
             else
             {
+              
                 foreach (var behaviour in Behaviours)
                 {
                     foreach (var condition in behaviour.Conditions)
@@ -85,15 +86,29 @@ namespace form_builder.Models
                             .OrderByDescending(_ => _.Conditions.Count)
                             .FirstOrDefault(_ => _.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]));
                         }
-                        else
-                        //if (condition.CheckboxContains != null)
+                        else if (condition.CheckboxContains != null)
                         {
                             return Behaviours
                                 .OrderByDescending(_ => _.Conditions.Count)
                                 .FirstOrDefault(_ => _.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains)));
                         }
+                        else if(condition.IsAfter != null)
+                        {
+                            if(DateIsAfter(condition,viewModel))
+                            {
+                                return (behaviour);
+                            }
+                        }
+                        else if (condition.IsBefore != null)
+                        {
+                            if (DateIsBefore(condition, viewModel))
+                            {
+                                return (behaviour);
+                            }
+                        }
                     }
-                }
+                }                
+                                
             }
             throw new Exception("Behaviour issues");
         }
@@ -156,6 +171,92 @@ namespace form_builder.Models
             }
 
             return Title;
+        }
+
+
+        public bool DateIsBefore(Condition condition, Dictionary<string, dynamic> viewModel)
+        {
+            var dateComparison = DateTime.Today;
+            if (condition.ComparisonDate.ToLower() != "today")
+            {
+                dateComparison = DateTime.Parse(condition.ComparisonDate);
+            }
+
+            int isBeforeInt = condition.IsBefore ?? 0;
+
+            DateTime newComparisonDate;
+            switch (condition.Unit)
+            {
+                case (EDateUnit.Year):
+                    newComparisonDate =  dateComparison.AddYears(isBeforeInt);
+                    break;
+                case (EDateUnit.Month):
+                    newComparisonDate = dateComparison.AddMonths(isBeforeInt);
+                    break;
+                case (EDateUnit.Day):
+                    newComparisonDate = dateComparison.AddDays(isBeforeInt);
+                    break;
+                default:
+                    throw new Exception("No unit specifed");
+
+            }
+
+            int years = int.Parse(viewModel[condition.QuestionId + "-year"]);
+            int months = int.Parse(viewModel[condition.QuestionId + "-month"]);
+            int days = int.Parse(viewModel[condition.QuestionId + "-day"]);
+
+            var dateValue = new DateTime(years, months, days);
+
+
+
+            if (DateTime.Compare(dateValue, newComparisonDate) <= 0)
+            {
+                 return true;
+            }
+
+            return false;
+        }
+
+        public bool DateIsAfter(Condition condition, Dictionary<string,dynamic> viewModel)
+        {
+            var dateComparison =  DateTime.Today;
+            if (condition.ComparisonDate.ToLower() != "today")
+            {
+                dateComparison = DateTime.Parse(condition.ComparisonDate);
+            }
+            
+            int isAfterInt = condition.IsAfter ?? 0;
+            DateTime newComparisonDate;
+            switch (condition.Unit)
+            {
+                case (EDateUnit.Year):
+                    newComparisonDate = dateComparison.AddYears(isAfterInt);
+                    break;
+                case (EDateUnit.Month):
+                    newComparisonDate = dateComparison.AddMonths(isAfterInt);
+                    break;
+                case (EDateUnit.Day):
+                    newComparisonDate = dateComparison.AddDays(isAfterInt);
+                    break;
+                default:
+                    throw new Exception("No unit specifed");
+
+            }
+
+            int years = int.Parse(viewModel[condition.QuestionId + "-year"]);
+            int months = int.Parse(viewModel[condition.QuestionId + "-month"]);
+            int days =int.Parse(viewModel[condition.QuestionId + "-day"]);
+
+            var dateValue = new DateTime(years, months, days);
+
+            
+
+            if (DateTime.Compare(dateValue, newComparisonDate) > 0)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
