@@ -118,7 +118,8 @@ namespace form_builder.Models
                 }
             }
 
-            throw new Exception("Behaviour issues");
+            // identify the default and return
+            return Behaviours.Find(behaviour => behaviour.Conditions.Count == 0);
         }
 
         public SubmitSlug GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)
