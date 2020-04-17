@@ -254,7 +254,6 @@ The target mapping above would produce this object
 
       This is only valid for the elements listed below:    
       * **DateInput**
-      * **DatePicker**
       * **Address**
       * **Organisation**
       * **Street**
@@ -281,6 +280,7 @@ The target mapping above would produce this object
       * **Textarea**
       * **FileUpload**
       * **Numeric**
+      * **DatePicker**
 
     Sets the heading level of the legend to H1
     ```json

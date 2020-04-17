@@ -1,6 +1,13 @@
-﻿@model Tuple<form_builder.ViewModels.ElementViewModel, List<SelectListItem>>
+﻿
+@model Tuple<form_builder.ViewModels.ElementViewModel, List<SelectListItem>>
 @{
-    @* TODO : Need to work out how to get rid of this... *@
+    @* TODO : Need to work out how to get rid of this... 
+        I think that would be possible by
+        * redefinig the Models, here which would include
+        * discarding ElementViewModel and Tuple model
+        * Model becoming reference to strong type OrganisationSelectElement - which already includes details of the reference below
+        * element Could also include Address selection list
+    *@
     var hiddenId = $"{Model.Item1.Element.Properties.QuestionId}-organisation-searchterm";
     
     var elementProperties = Model.Item1.Element.GenerateElementProperties("Select");
@@ -20,7 +27,7 @@
     </p>
 
     @* 
-    TODO:Do we really need a select hint ?
+    TODO:Do we really need a select hint?
     @if (!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectHint))
     {
         <p class="govuk-hint" id=@Model.Item1.Element.HintId>
