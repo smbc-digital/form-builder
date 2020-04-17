@@ -196,5 +196,95 @@ namespace form_builder_tests.UnitTests.Models
             Assert.Equal(PageSlugGreaterThan, result.URL);
 
         }
+        [Fact]
+        public void GetNextPage_ShouldGoToOther_WhenDateLessThan42DaysWithCalendarControl()
+        {
+            var PageSlugLessThan = "less-than";
+            var PageSlugGreaterThan = "more-than";
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("page-continue")
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug(PageSlugLessThan)
+                .WithCondition(new Condition { ComparisonDate = DateTime.Today.ToString("yyyy-MM-dd"), IsBefore = 42, Unit = EDateUnit.Day, QuestionId = "testDate" })
+                .Build();
+
+
+            var behaviour3 = new BehaviourBuilder()
+               .WithBehaviourType(EBehaviourType.GoToPage)
+               .WithPageSlug(PageSlugGreaterThan)
+               .WithCondition(new Condition { ComparisonDate = DateTime.Today.ToString("yyyy-MM-dd"), IsAfter = 43, Unit = EDateUnit.Day, QuestionId = "testDate" })
+               .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .WithBehaviour(behaviour3)
+                .Build();
+
+            var result = page.GetSubmitFormEndpoint(new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one",
+                    Answers = new List<Answers> {
+                new Answers { QuestionId = "testDate", Response = DateTime.Today.ToString() }
+            } } }
+            }, null);
+
+            Assert.Equal(PageSlugLessThan, result.URL);
+
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldGoToOther_WhenDateGreaterThan42DaysWithCalendarControl()
+        {
+            var PageSlugLessThan = "less-than";
+            var PageSlugGreaterThan = "more-than";
+
+
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("page-continue")
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug(PageSlugLessThan)
+                .WithCondition(new Condition { ComparisonDate = DateTime.Today.ToString("yyyy-MM-dd"), IsBefore = 42, Unit = EDateUnit.Day, QuestionId = "testDate" })
+                .Build();
+
+
+            var behaviour3 = new BehaviourBuilder()
+               .WithBehaviourType(EBehaviourType.GoToPage)
+               .WithPageSlug(PageSlugGreaterThan)
+               .WithCondition(new Condition { ComparisonDate = DateTime.Today.ToString("yyyy-MM-dd"), IsAfter = 43, Unit = EDateUnit.Day, QuestionId = "testDate" })
+               .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .WithBehaviour(behaviour3)
+                .Build();
+
+            var futureDate = DateTime.Today.AddDays(50);
+
+            var result = page.GetSubmitFormEndpoint(new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one",
+                    Answers = new List<Answers> {
+                new Answers { QuestionId = "testDate", Response = futureDate.ToString("yyyy-MM-dd") },
+
+            } } }
+            }, null);
+
+            Assert.Equal(PageSlugGreaterThan, result.URL);
+
+        }
     }
 }
