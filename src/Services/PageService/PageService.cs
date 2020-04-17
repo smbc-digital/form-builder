@@ -246,6 +246,7 @@ namespace form_builder.Services.PageService
                 Page = currentPage
             };
         }
+
         public async Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid)
         {
             var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid);
@@ -257,6 +258,7 @@ namespace form_builder.Services.PageService
 
             return viewModel;
         }
+
         public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
             Dictionary<string, dynamic> answers = new Dictionary<string, dynamic>();
