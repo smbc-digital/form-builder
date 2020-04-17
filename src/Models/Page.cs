@@ -31,7 +31,7 @@ namespace form_builder.Models
 
         [JsonIgnore]
         public bool IsValid => !InvalidElements.Any();
-        
+
         [JsonIgnore]
         public IEnumerable<BaseProperty> InvalidElements
         {
@@ -81,21 +81,45 @@ namespace form_builder.Models
                     {
                         if (condition.EqualTo != null)
                         {
-                            return Behaviours
-                            .OrderByDescending(_ => _.Conditions.Count)
-                            .FirstOrDefault(_ => _.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]));
+                            var list = Behaviours
+                                .OrderByDescending(_ => _.Conditions.Count);
+                            foreach (var behaviour1 in list)
+                            {
+                                if (behaviour1.Conditions.Any(nextTask => nextTask.EqualTo == viewModel[nextTask.QuestionId]))
+                                    return behaviour1;
+                            }
+
+                            return EvaluateBehaviourForCheckbox(viewModel);
+
                         }
                         else
-                        //if (condition.CheckboxContains != null)
-                        {
-                            return Behaviours
-                                .OrderByDescending(_ => _.Conditions.Count)
-                                .FirstOrDefault(_ => _.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains)));
-                        }
+                            return EvaluateBehaviourForCheckbox(viewModel);
                     }
                 }
             }
             throw new Exception("Behaviour issues");
+        }
+
+        private Behaviour EvaluateBehaviourForCheckbox(Dictionary<string, dynamic> viewModel)
+        {
+            var list = Behaviours
+                .OrderByDescending(_ => _.Conditions.Count);
+            foreach (var behaviour1 in list)
+            {
+                foreach (var nextTask in behaviour1.Conditions)
+                {
+                    if (!string.IsNullOrEmpty(nextTask.CheckboxContains))
+                    {
+                        if (viewModel[nextTask.QuestionId].Contains(nextTask.CheckboxContains))
+                            return behaviour1;
+                    }
+                    else
+                        continue;
+                }
+            }
+
+            // identify the default and return
+            return Behaviours.Find(behaviour => behaviour.Conditions.Count == 0);
         }
 
         public SubmitSlug GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)
