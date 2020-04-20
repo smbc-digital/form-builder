@@ -2,12 +2,10 @@
 using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
-using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,7 +13,6 @@ namespace form_builder.Models.Elements
 {
     public class Organisation : Element
     {
-
         public const string SEARCH_QUESTION_SUFFIX = "-organisation-searchterm";
         public List<SelectListItem> Items { get; set; }
         public string ReturnURL { get; set; }
@@ -43,16 +40,15 @@ namespace form_builder.Models.Elements
             Type = EElementType.Organisation;
         }
 
-
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> searchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             IsSelect = viewModel.ContainsKey("OrganisationStatus") && viewModel["OrganisationStatus"] == "Select" || viewModel.ContainsKey(OrganisationSearchQuestionId) && !string.IsNullOrEmpty(viewModel[OrganisationSearchQuestionId]);
+            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, SEARCH_QUESTION_SUFFIX);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
 
             if (IsSelect)
             {
-                Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
                 Items = new List<SelectListItem>{ new SelectListItem($"{organisationResults.Count} organisations found", string.Empty)};
                 organisationResults.ForEach((_) => { Items.Add(new SelectListItem(_.Name, $"{_.Reference}|{_.Name}")); });
                 ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
@@ -69,7 +65,6 @@ namespace form_builder.Models.Elements
                 return await viewRender.RenderAsync("OrganisationSelect", this);
             }
             
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-organisation-searchterm");
             return await viewRender.RenderAsync("OrganisationSearch", this);
         }
 

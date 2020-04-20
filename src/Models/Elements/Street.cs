@@ -46,10 +46,11 @@ namespace form_builder.Models.Elements
             IsSelect = viewModel.ContainsKey("StreetStatus") && viewModel["StreetStatus"] == "Select" || viewModel.ContainsKey(StreetSearchQuestionId) && !string.IsNullOrEmpty(viewModel[StreetSearchQuestionId]);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
+            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, SEARCH_QUESTION_SUFFIX);
+
 
             if (IsSelect)
             {
-                Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
                 Items = new List<SelectListItem>{ new SelectListItem($"{searchResults.Count} streets found", string.Empty)};
                 searchResults.ForEach((_) => { Items.Add(new SelectListItem(_.Name, $"{_.UniqueId}|{_.Name}")); });
                 ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
@@ -66,7 +67,6 @@ namespace form_builder.Models.Elements
                 return await viewRender.RenderAsync("StreetSelect", this);
             }
 
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, SEARCH_QUESTION_SUFFIX);
             return await viewRender.RenderAsync("StreetSearch", this);
         }
 
