@@ -4,7 +4,6 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Addresses;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Extensions;
@@ -15,95 +14,88 @@ namespace form_builder.Models.Elements
 {
     public class Address : Element
     {
+        public const string SEARCH_QUESTION_SUFFIX = "-postcode";
+        public const string SELECT_QUESTION_SUFFIX = "-address";
+        public List<SelectListItem> Items { get; set; }
+        public string ReturnURL { get; set; }
+        public string ManualAddressURL { get; set; }
+        public string AddressSearchQuestionId => $"{Properties.QuestionId}{SEARCH_QUESTION_SUFFIX}";
+        public string AddressSelectQuestionId => $"{Properties.QuestionId}{SELECT_QUESTION_SUFFIX}";
+        private bool IsSelect { get; set; } = false; 
+        public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
+        public override string  QuestionId => IsSelect ? AddressSelectQuestionId : AddressSearchQuestionId;
+        public string ChangeHeader => "Postcode";
+        public override string Label
+        {
+            get
+            {
+                if(IsSelect)
+                {
+                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Address" : Properties.SelectLabel;
+                }
+
+                return string.IsNullOrEmpty(Properties.AddressLabel) ? "Postcode " : Properties.AddressLabel;
+            }
+        }
         public Address()
         {
             Type = EElementType.Address;          
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> searchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> answers, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            var postcodeKey = $"{Properties.QuestionId}-postcode";
-            
-            var viewElement = new ElementViewModel
-            {
-                Element = this,                
-            };
+            var isSearch =  answers.ContainsKey("AddressStatus") && answers["AddressStatus"] == "Search";
+            IsSelect = answers.ContainsKey("AddressStatus") && answers["AddressStatus"] == "Select" || answers.ContainsKey(AddressSearchQuestionId) && !string.IsNullOrEmpty(answers[AddressSearchQuestionId]);
+            elementHelper.CheckForQuestionId(this);
+            elementHelper.CheckForProvider(this);
+            Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, SEARCH_QUESTION_SUFFIX);
 
-            if(!IsValid && viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Search")
+            if(isSearch && !IsValid || !IsSelect)
             {
-                Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
-                return await viewRender.RenderAsync("AddressSearch", viewElement);
+                IsSelect = false;
+                return await viewRender.RenderAsync("AddressSearch", this);
             }
 
-            if (viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Select" || viewModel.ContainsKey(postcodeKey) && !string.IsNullOrEmpty(viewModel[postcodeKey]))
+            Items = new List<SelectListItem>{ new SelectListItem($"{searchResults.Count} addresses found", string.Empty)};
+            searchResults.ForEach((_) => { Items.Add(new SelectListItem(_.Name, $"{_.UniqueId}|{_.Name}")); });
+
+            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
+            ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
+
+            if (string.IsNullOrEmpty(Properties.Value))
             {
-                Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");                 
-                viewElement.ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
-                viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
-
-                var optionsList = new List<SelectListItem>{ new SelectListItem($"{addressSearchResults.Count} addresses found", string.Empty)};
-                addressSearchResults.ForEach((searchResult) => {
-                    optionsList.Add(new SelectListItem(searchResult.Name, $"{searchResult.UniqueId}|{searchResult.Name}"));
-                });
-                
-                return await viewRender.RenderAsync("AddressSelect", new Tuple<ElementViewModel, List<SelectListItem>>(viewElement, optionsList));
-            }
-
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
-            return await viewRender.RenderAsync("AddressSearch", viewElement);
-        }
-
-        private string AddressSelectDescribeByValue(){
-            var describedByValue = string.Empty;
-
-            if (!string.IsNullOrEmpty(Properties.SelectHint))
-            {
-                describedByValue += $"{Properties.QuestionId}-address-hint ";
-            }
-
-            if (!IsValid)
-            {
-                describedByValue += $"{Properties.QuestionId}-address-error";
-            }
-
-            return describedByValue.Trim();
-        }
-
-        public override Dictionary<string, dynamic> GenerateElementProperties(string type)
-        {
-            var properties = new Dictionary<string, dynamic>();
-            switch (type)
-            {
-                case "Select":
-                    properties.Add("id", $"{Properties.QuestionId}-address");
-                    properties.Add("name", $"{Properties.QuestionId}-address");
-
-                    if (!string.IsNullOrWhiteSpace(Properties.SelectHint) || !IsValid)
-                    {
-                        properties.Add("aria-describedby", AddressSelectDescribeByValue());
-                    }
-
-                    return properties;
-                default:
-                    properties.Add("id", $"{Properties.QuestionId}-postcode");
-
-                    if (DisplayAriaDescribedby)
-                    {
-                        properties.Add("aria-describedby", GetDescribedByAttributeValue("-postcode"));
-                    }
-
-                    return properties;
+                Properties.Value = (string)answers[AddressSearchQuestionId];
+                if ((string)answers["AddressStatus"] == "Select")
+                {
+                    Properties.Value = (string)answers[QuestionId];
                 }
+            }
+
+            return await viewRender.RenderAsync("AddressSelect", this);
         }
 
-        public Task RenderAsync(IViewRender object1, IElementHelper object2, string v, List<SelectListItem> list1, List<OrganisationSearchResult> list2, Dictionary<string, dynamic> viewModel, Page page, FormSchema schema, IHostingEnvironment object3)
+        public override Dictionary<string, dynamic> GenerateElementProperties(string type="")
         {
-            throw new NotImplementedException();
+            var elemnentProperties = new Dictionary<string, dynamic>();
+            elemnentProperties.Add("id", $"{QuestionId}");
+            elemnentProperties.Add("name", $"{QuestionId}");
+
+            
+            if (DisplayAriaDescribedby)
+            {
+                elemnentProperties.Add("aria-describedby", GetDescribedByAttributeValue());
+            }
+
+            if(string.IsNullOrEmpty(type))
+            {
+                elemnentProperties.Add("maxlength", Properties.MaxLength);
+            }
+
+            return elemnentProperties;
         }
         
         public override string GetLabelText(){
             var optionalLabelText = Properties.Optional ? " (optional)" : string.Empty;
-            
             return $"{Properties.AddressLabel}{optionalLabelText}";
         }
     }

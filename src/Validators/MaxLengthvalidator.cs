@@ -23,8 +23,23 @@ namespace form_builder.Validators
                 };
             }
 
+            if(element.Type == Enum.EElementType.Street && viewModel["StreetStatus"] == "Select")
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            }
+
+            if(element.Type == Enum.EElementType.Organisation && viewModel["OrganisationStatus"] == "Select")
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            }
+
             var value = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId] : "";
-           
             
             if(!string.IsNullOrEmpty(value) && value.Length > element.Properties.MaxLength)
             {

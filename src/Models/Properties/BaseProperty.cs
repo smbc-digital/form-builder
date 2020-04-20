@@ -6,7 +6,7 @@ namespace form_builder.Models.Properties
     {
         public string Text { get; set; }
         public string QuestionId { get; set; }
-        public string Label { get; set; }
+        public virtual string Label { get; set; }
         public bool Optional { get; set; } = false;
         public bool? Email { get; set; }
         public bool Numeric { get; set; } = false;

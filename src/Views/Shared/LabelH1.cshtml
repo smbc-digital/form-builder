@@ -1,18 +1,21 @@
-    @if(Model.Properties.LabelAsH1)
+    @if(!string.IsNullOrEmpty(Model.Label))
     {
-        <h1 class="govuk-label-heading">
-            <label class="govuk-label govuk-label--xl" for="@Model.QuestionId">
-                @Model.Properties.Label
-                @if (Model.Properties.Optional) { <span>(optional)</span> }
-            </label>
-        </h1>
-    } 
-    else 
-    {
-        <label class="govuk-label" for="@Model.QuestionId">@Model.Properties.Label
-        @if (Model.Properties.Optional)
+        @if(Model.Properties.LabelAsH1)
         {
-            <span>(optional)</span>
-        }    
-        </label>
+            <h1 class="govuk-label-heading">
+                <label class="govuk-label govuk-label--xl" for="@Model.QuestionId">
+                    @Model.Label
+                    @if (Model.Properties.Optional) { <span>(optional)</span> }
+                </label>
+            </h1>
+        } 
+        else 
+        {
+            <label class="govuk-label" for="@Model.QuestionId">@Model.Label
+            @if (Model.Properties.Optional)
+            {
+                <span>(optional)</span>
+            }    
+            </label>
+        }
     }

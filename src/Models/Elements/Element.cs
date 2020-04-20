@@ -24,7 +24,9 @@ namespace form_builder.Models.Elements
         public BaseProperty Properties { get; set; }
         public bool DisplayHint => !string.IsNullOrEmpty(Properties.Hint.Trim());
         public bool HadCustomClasses => !string.IsNullOrEmpty(Properties.ClassName);
-        public virtual string QuestionId => Properties.QuestionId; 
+        public virtual string QuestionId => Properties.QuestionId;
+        public virtual string Label => Properties.Label;        
+        public virtual string Hint => Properties.Hint;
         public virtual string HintId => $"{QuestionId}-hint"; 
         public virtual string ErrorId => $"{QuestionId}-error"; 
         public bool DisplayAriaDescribedby => DisplayHint || !IsValid; 
@@ -36,9 +38,9 @@ namespace form_builder.Models.Elements
             return viewRender.RenderAsync(Type.ToString(), this, null);
         }
         
-        public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
+        public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators)
         {
-            foreach (var validator in form_builder)
+            foreach (var validator in validators)
             {
                 var result = validator.Validate(this, viewModel);
                 if (!result.IsValid)

@@ -1,7 +1,7 @@
-﻿@model form_builder.ViewModels.ElementViewModel
+﻿@model form_builder.Models.Elements.Organisation
 @{
-    var elementProperties = Model.Element.GenerateElementProperties();
-    if(!Model.Element.IsValid)
+    var elementProperties = Model.GenerateElementProperties();
+    if(!Model.IsValid)
     {
         elementProperties.Add("class", "govuk-input govuk-input--error");
     }
@@ -11,13 +11,12 @@
     }
 }
 
-<div class="govuk-form-group @(!Model.Element.IsValid ? "govuk-form-group--error" : string.Empty)">
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    <partial name="LabelH1" />
 
-    <partial name="LabelH1" model=@Model.Element />
+    <partial name="Hint" />
 
-    <partial name="Hint"  model=@Model.Element />
+    <partial name="Error" />
 
-    <partial name="Error"  model=@Model.Element />
-
-    @Html.TextBox(Model.Element.QuestionId, Model.Element.Properties.Value, elementProperties)
+    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elementProperties)
 </div>

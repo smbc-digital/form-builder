@@ -1,4 +1,4 @@
-﻿@model form_builder.Models.Elements.Element
+﻿@model form_builder.Models.Elements.Street
 @{
     var elementProperties = Model.GenerateElementProperties();
     if(!Model.IsValid)
@@ -9,26 +9,14 @@
     {
         elementProperties.Add("class", "govuk-input");
     }
-
-    var questionId = $"{Model.Properties.QuestionId}-street";
-    var hintId = $"{questionId}-hint";
-    var errorId = $"{questionId}-error";
-    var streetLabel = string.IsNullOrEmpty(Model.Properties.StreetLabel) ? "Search for a street" : Model.Properties.StreetLabel;
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-
     <partial name="LabelH1" />
 
     <partial name="Hint" />
 
     <partial name="Error" />
 
-    @Html.TextBox(Model.GetCustomItemId("street"), Model.Properties.Value, elementProperties)
+    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elementProperties)
 </div>
-
-@if(Model.Properties.LegendAsH1) {
-    <h1>@streetLabel</h1>
-} else {
-    <label class="h2">@streetLabel</label>
-}

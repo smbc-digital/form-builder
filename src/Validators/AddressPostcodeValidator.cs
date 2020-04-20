@@ -15,7 +15,9 @@ namespace form_builder.Validators
                 };
             }
 
-            if (!viewModel.ContainsKey(element.GetCustomItemId(AddressConstants.POSTCODE)))
+            var addressElement = (Address)element;
+
+            if (!viewModel.ContainsKey(addressElement.AddressSearchQuestionId))
             {
                 return new ValidationResult
                 {
@@ -23,7 +25,7 @@ namespace form_builder.Validators
                 };
             }
 
-            if (string.IsNullOrEmpty(viewModel[element.GetCustomItemId(AddressConstants.POSTCODE)]) && element.Properties.Optional)
+            if (string.IsNullOrEmpty(viewModel[addressElement.AddressSearchQuestionId]) && element.Properties.Optional)
             {
                 return new ValidationResult
                 {
@@ -31,14 +33,13 @@ namespace form_builder.Validators
                 };
             }
 
-            var value = viewModel[element.GetCustomItemId(AddressConstants.POSTCODE)];
+            var value = viewModel[addressElement.AddressSearchQuestionId];
             var isValid = true;
             if (!AddressConstants.POSTCODE_REGEX.Match(value).Success)
             {
                 isValid = false;
             }
 
-            // TODO: Should this validation message be editable in the DSL?
             return new ValidationResult
             {
                 IsValid = isValid,

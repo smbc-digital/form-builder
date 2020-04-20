@@ -1,33 +1,30 @@
-@using form_builder.Models.Elements;
-@model form_builder.ViewModels.ElementViewModel
+@model form_builder.Models.Elements.Address
 @{
-    var elementProperties = Model.Element.GenerateElementProperties();
+    var elementProperties = Model.GenerateElementProperties();
     elementProperties.Add("autocomplete", "postal-code");
-    elementProperties.Add("class", "govuk-input govuk-input--width-10");
+    if(!Model.IsValid)
+    {
+        elementProperties.Add("class", "govuk-input govuk-input--width-10 govuk-input--error");
+    }
+    else
+    {
+        elementProperties.Add("class", "govuk-input govuk-input--width-10");
+    }
 }
 
-<div class="govuk-form-group @(!Model.Element.IsValid ? "govuk-form-group--error" : string.Empty)">
-    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
-        @Model.Element.Properties.AddressLabel
-    </h1>
-
-    @if (@Model.Element.Properties.StockportPostcode == true)
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    <partial name="LabelH1" />
+    
+    @if (@Model.Properties.StockportPostcode == true)
     {
         <section class="govuk-inset-text">
-            <p>@Model.Element.Properties.AddressIAG</p>
+            <p>@Model.Properties.AddressIAG</p>
         </section>
     }
-@* TODO: Move "postcode" reference to constants *@
-    <label class="govuk-label govuk-label--m" for=@Model.Element.GetCustomItemId(AddressConstants.POSTCODE)>@Model.Element.Properties.PostcodeLabel
-        @if (Model.Element.Properties.Optional)
-        {
-            <span>(optional)</span>
-        }
-    </label>
 
-    <partial name="Hint" model=@Model.Element />
+    <partial name="Hint" />
 
-    <partial name="Error" model=@Model.Element />
+    <partial name="Error" />
 
-    @Html.TextBox(Model.Element.GetCustomItemId(AddressConstants.POSTCODE), Model.Element.Properties.Value, elementProperties)
+    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elementProperties)
 </div>

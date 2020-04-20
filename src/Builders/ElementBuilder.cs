@@ -56,13 +56,6 @@ namespace form_builder.Builders
             return this;
         }
 
-        public ElementBuilder WithStreetLabel(string label)
-        {
-            _property.StreetLabel = label;
-            return this;
-        }
-
-
         public ElementBuilder WithAddressLabel(string label)
         {
             _property.AddressLabel = label;

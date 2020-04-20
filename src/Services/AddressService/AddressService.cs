@@ -36,7 +36,7 @@ namespace form_builder.Services.AddressService
         {
             var journey = (string)viewModel["AddressStatus"];
             var addressResults = new List<AddressSearchResult>();
-            var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
+            var addressElement = (Models.Elements.Address)currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
 
             if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
             {
@@ -47,11 +47,11 @@ namespace form_builder.Services.AddressService
 
                 var postcode = journey == "Select"
                     ? (string) convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
-                    : (string) viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
+                    : (string) viewModel[addressElement.AddressSearchQuestionId];
 
                 var address = journey != "Select"
                     ? string.Empty
-                    : (string)viewModel[$"{addressElement.Properties.QuestionId}-address"];
+                    : (string)viewModel[addressElement.AddressSelectQuestionId];
 
                 var emptyPostcode = string.IsNullOrEmpty(postcode);
                 var emptyAddress = string.IsNullOrEmpty(address);

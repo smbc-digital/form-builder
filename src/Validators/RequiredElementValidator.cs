@@ -36,42 +36,47 @@ namespace form_builder.Validators
 
             if (element.Type == EElementType.Address)
             {
+                var addressElement = (Address)element;
+
                 if (viewModel.ContainsKey("AddressStatus") &&viewModel["AddressStatus"] == "Select")
                 {
-                    key = $"{element.Properties.QuestionId}-address";
-                    validationMessage = "Check the " + element.Properties.AddressLabel.ToLower() + " and try again";
+                    key = addressElement.AddressSelectQuestionId;
+                    validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
                 }
                 else
                 {
-                    key = $"{element.Properties.QuestionId}-postcode";
+                    key = addressElement.AddressSearchQuestionId;
                     validationMessage = "Check the " + element.Properties.PostcodeLabel.ToLower() + " and try again";
                 }
             }
 
             if (element.Type == EElementType.Street)
             {
+                var streetElement = (Street)element;
                 if (viewModel["StreetStatus"] == "Select")
                 {
-                    key = $"{element.Properties.QuestionId}-streetaddress";
+                    key = streetElement.StreetSelectQuestionId;
                     validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
                 }
                 else
                 {
-                    key = $"{element.Properties.QuestionId}-street";
-                    validationMessage = "Check the " + element.Properties.StreetLabel.ToLower() + " and try again";
+                    key = streetElement.StreetSearchQuestionId;
+                    // TODO: Not sure whether validation messages should be needed in the validator... these should just say valid = true/false?
+                    validationMessage = "Check the " + element.Properties.Label.ToLower() + " and try again";
                 }
             }
 
             if (element.Type == EElementType.Organisation)
             {
+                var organisationElement = (Organisation)element;
                 if (viewModel["OrganisationStatus"] == "Select")
                 {
-                    key = $"{element.Properties.QuestionId}-organisation";
+                    key = organisationElement.OrganisationSelectQuestionId;
                     validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
                 }
                 else
                 {
-                    key = $"{element.Properties.QuestionId}-organisation-searchterm";
+                    key = organisationElement.OrganisationSearchQuestionId;
                     validationMessage = "Check the " + element.Properties.Label.ToLower() + " and try again";
                 }
             }
@@ -91,8 +96,10 @@ namespace form_builder.Validators
                 var value = viewModel.ContainsKey(key)
                 ? viewModel[key]
                 : null;
+                
                 isValid = !string.IsNullOrEmpty(value);
             }
+            
             return new ValidationResult
             {
                 IsValid = isValid,
