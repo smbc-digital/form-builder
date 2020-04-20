@@ -91,9 +91,6 @@ namespace form_builder.Models
 
                     if (equalToValid && checkBoxContainsValid)
                         return behaviour;
-
-                    if (!behaviour.Conditions.Any())
-                        return behaviour;
                 }
             }
 
