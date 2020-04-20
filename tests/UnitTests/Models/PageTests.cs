@@ -99,5 +99,261 @@ namespace form_builder_tests.UnitTests.Models
 
             Assert.Equal(PageSlug, result.URL);
         }
+
+        #region GetNextPage Tests
+
+        [Theory]
+        [InlineData(EBehaviourType.GoToPage)]
+        [InlineData(EBehaviourType.GoToExternalPage)]
+        [InlineData(EBehaviourType.SubmitAndPay)]
+        [InlineData(EBehaviourType.SubmitForm)]
+        public void GetNextPage_ShouldReturn_DefaultBehaviour(EBehaviourType type)
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(type)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            var result = page.GetNextPage(new Dictionary<string, dynamic>());
+
+            Assert.Equal(type, result.BehaviourType);
+        }
+        
+        [Fact]
+        public void GetNextPage_ShouldReturn_DefaultBehaviour_WhenEqualTo_Condition_False()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToExternalPage)
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ EqualTo = "value", QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "wrongvalue");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.GoToExternalPage, result.BehaviourType);
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_Behaviour_WhenEqualTo_Condition_True()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToExternalPage)
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ EqualTo = "value", QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "value");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.GoToPage, result.BehaviourType);
+        }
+
+        
+        [Fact]
+        public void GetNextPage_ShouldReturn_Behaviour_WhenMultipleEqualTo_Condition_True()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .WithCondition(new Condition{ EqualTo = "pear", QuestionId = "test" })
+                .Build();
+
+            var behaviour3 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithCondition(new Condition{ EqualTo = "berry", QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .WithBehaviour(behaviour3)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "pear");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.SubmitAndPay, result.BehaviourType);
+        }
+        
+        [Fact]
+        public void GetNextPage_ShouldReturn_Behaviour_WhenMultipleEqualToConditions_Condition_True()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .WithCondition(new Condition{ EqualTo = "pear", QuestionId = "test" })
+                .Build();
+
+            var behaviour3 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithCondition(new Condition{ EqualTo = "berry", QuestionId = "test" })
+                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test2" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .WithBehaviour(behaviour3)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "pear");
+            viewModel.Add("test2", "apple");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.SubmitAndPay, result.BehaviourType);
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_DefaultBehaviour_WhenCheckboxContains_Condition_False()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToExternalPage)
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ CheckboxContains = "invalid", QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "wrongvalue");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.GoToExternalPage, result.BehaviourType);
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_Behaviour_WhenCheckboxContains_Condition_True()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToExternalPage)
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ CheckboxContains = "value", QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "value");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.GoToPage, result.BehaviourType);
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_Behaviour_WhenMultipleCheckboxContains_Condition_True()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ CheckboxContains = "apple", QuestionId = "test" })
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .WithCondition(new Condition{ CheckboxContains = "pear", QuestionId = "test" })
+                .Build();
+
+            var behaviour3 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithCondition(new Condition{ CheckboxContains = "berry", QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .WithBehaviour(behaviour3)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "berry");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.SubmitForm, result.BehaviourType);
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_Behaviour_WhenMultipleCheckboxContainsConditions_Condition_True()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ CheckboxContains = "apple", QuestionId = "test" })
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .WithCondition(new Condition{ CheckboxContains = "pear", QuestionId = "test", })
+                .Build();
+
+            var behaviour3 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithCondition(new Condition{ CheckboxContains = "berry", QuestionId = "test" })
+                .WithCondition(new Condition{ CheckboxContains = "apple", QuestionId = "test", })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .WithBehaviour(behaviour3)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "berry,apple");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.SubmitForm, result.BehaviourType);
+        }
+
+        #endregion
     }
 }
