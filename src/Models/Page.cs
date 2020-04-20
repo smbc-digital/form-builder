@@ -32,7 +32,7 @@ namespace form_builder.Models
 
         [JsonIgnore]
         public bool IsValid => !InvalidElements.Any();
-        
+
         [JsonIgnore]
         public IEnumerable<BaseProperty> InvalidElements
         {
@@ -69,49 +69,69 @@ namespace form_builder.Models
         }
 
         public Behaviour GetNextPage(Dictionary<string, dynamic> viewModel)
-         {
+        {
             if (Behaviours.Count == 1)
             {
                 return Behaviours.FirstOrDefault();
             }
             else
             {
-              
                 foreach (var behaviour in Behaviours)
                 {
                     foreach (var condition in behaviour.Conditions)
                     {
                         if (condition.EqualTo != null)
                         {
-                            return Behaviours
-                            .OrderByDescending(_ => _.Conditions.Count)
-                            .FirstOrDefault(_ => _.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]));
-                        }
-                        else if (condition.CheckboxContains != null)
-                        {
-                            return Behaviours
-                                .OrderByDescending(_ => _.Conditions.Count)
-                                .FirstOrDefault(_ => _.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains)));
-                        }
-                        else if(condition.IsAfter != null)
-                        {
-                            if(DateComparator.DateIsAfter(condition,viewModel))
+                            var list = Behaviours
+                                .OrderByDescending(_ => _.Conditions.Count);
+                            foreach (var behaviour1 in list)
                             {
-                                return (behaviour);
+                                if (behaviour1.Conditions.Any(nextTask => nextTask.EqualTo == viewModel[nextTask.QuestionId]))
+                                    return behaviour1;
                             }
+
+                            return EvaluateBehaviourForCondition(viewModel);
+
                         }
-                        else if (condition.IsBefore != null)
-                        {
-                            if (DateComparator.DateIsBefore(condition, viewModel))
-                            {
-                                return (behaviour);
-                            }
-                        }
+                        else
+                            return EvaluateBehaviourForCondition(viewModel);
                     }
-                }                
-                                
+                }
             }
             throw new Exception("Behaviour issues");
+        }
+
+        private Behaviour EvaluateBehaviourForCondition(Dictionary<string, dynamic> viewModel)
+        {
+            var list = Behaviours
+                .OrderByDescending(_ => _.Conditions.Count);
+            foreach (var behaviour1 in list)
+            {
+                foreach (var nextTask in behaviour1.Conditions)
+                {
+                    if (!string.IsNullOrEmpty(nextTask.CheckboxContains))
+                    {
+                        if (viewModel[nextTask.QuestionId].Contains(nextTask.CheckboxContains))
+                            return behaviour1;
+                    }
+                    else if(nextTask.IsAfter != null)
+                    {
+                        if (DateComparator.DateIsAfter(nextTask, viewModel))
+                            return behaviour1;
+                    }
+                    else if (nextTask.IsBefore != null)
+                    {
+                        if (DateComparator.DateIsBefore(nextTask, viewModel))                        
+                            return behaviour1;
+                    }
+
+                    else
+                        continue;
+                }
+            }
+
+            // identify the default and return
+            return Behaviours.Find(behaviour => behaviour.Conditions.Count == 0);
         }
 
         public SubmitSlug GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)

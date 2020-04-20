@@ -17,7 +17,7 @@ namespace form_builder.Comparators
                 dateComparison = DateTime.Parse(condition.ComparisonDate);
             }
 
-            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, condition.IsAfter);
+            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, condition.IsBefore);
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
 
 
