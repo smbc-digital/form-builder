@@ -504,6 +504,7 @@ Textbox JSON example:
         * **Label** (*string*) __*__
         * **QuestionId** (*string*) __*__
         * **CustomValidationMessage** (*string*)
+        * **DisplayCharacterCount** (*boolean*) - Determines whether a character count is displayed
         * **Hint** (*string*)
         * **MaxLength** (*int*) (defaults to 200)
         * **Optional** (*boolean*) (defaults to false)
@@ -520,6 +521,7 @@ Textarea (Email) JSON example:
       "Label": "Enter your issue",
       "QuestionId": "issueOne",
       "CustomValidationMessage": "Custom validation message",
+      "DisplayCharacterCount": true,
       "Hint": "Hint text",
       "MaxLength": "2000",
       "Optional": false,
