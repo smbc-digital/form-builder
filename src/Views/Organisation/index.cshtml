@@ -6,12 +6,10 @@
     ViewData["FeedbackPhase"] = Model.FeedbackPhase;
 }
 
-<div id="root" class="text-center">
-    @using (Html.BeginForm("Index", "Organisation", FormMethod.Post))
-    {
-        @Html.Raw(Model.RawHTML)
+@using (Html.BeginForm("Index", "Organisation", FormMethod.Post))
+{
+    @Html.Raw(Model.RawHTML)
 
-        @Html.HiddenFor(_ => _.Path)
-        <input type="hidden" id="OrganisationStatus" name="OrganisationStatus" value="@Model.OrganisationStatus">
-    }
-</div>
+    @Html.HiddenFor(_ => _.Path)
+    <input type="hidden" id="OrganisationStatus" name="OrganisationStatus" value="@Model.OrganisationStatus">
+}

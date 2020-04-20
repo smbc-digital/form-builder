@@ -2,23 +2,21 @@
 @{
     ViewData["Title"] = "Submit";
 }
-<div id="root" class="text-center">
-    <h1>Submit</h1>
-    <table>
-        <caption>Data</caption>
-        <tbody>
-            @foreach (var page in Model.FormAnswers.Pages)
+
+<h1>Submit</h1>
+<table>
+    <caption>Data</caption>
+    <tbody>
+        @foreach (var page in Model.FormAnswers.Pages)
+        {
+            @foreach (var question in page.Answers)
             {
-                @foreach (var question in page.Answers)
-                {
-                    <tr>
-                        <th>@question.QuestionId</th>
-                        <td>@question.Response</td>
+                <tr>
+                    <th>@question.QuestionId</th>
+                    <td>@question.Response</td>
 
-                    </tr>
-                }
+                </tr>
             }
-        </tbody>
-    </table>
-
-</div>
+        }
+    </tbody>
+</table>

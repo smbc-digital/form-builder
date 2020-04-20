@@ -3,18 +3,25 @@
     ViewData["Title"] = Model.FormName;
     ViewData["PageTitle"] = Model.SecondaryHeader;
 }
-<div class="success-page">
-    <section class="header-container">
-        <h1>@Model.FormName</h1>
-        <p class="h2">@Model.SecondaryHeader</p>
-    </section>
 
-    <section class="body-container">
-        @if (!string.IsNullOrWhiteSpace(Model.Reference))
-        {
-            <p><strong>Your reference number is:</strong> @Html.Raw(Model.Reference)</p>
-        }
-        @Html.Raw(Model.PageContent)
-    </section>
-</div>
+<main class="govuk-main-wrapper govuk-main-wrapper--l" id="main-content" role="main">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-panel govuk-panel--confirmation">
+                <h1 class="govuk-panel__title">
+                    @Model.FormName
+                </h1>
+                @if (!string.IsNullOrWhiteSpace(Model.Reference))
+                {
+                    <div class="govuk-panel__body">
+                        Your reference number<br><strong>@Html.Raw(Model.Reference)</strong>
+                    </div>
+                }
+            </div>
 
+            <h2 class="govuk-heading-m">@Model.SecondaryHeader</h2>
+
+            @Html.Raw(Model.PageContent)
+        </div>
+    </div>
+</main>
