@@ -14,6 +14,7 @@ using StockportGovUK.NetStandard.Gateways.OrganisationServiceGateway;
 using StockportGovUK.NetStandard.Models.Organisation;
 using form_builder.Providers.Organisation;
 using form_builder.Extensions;
+using form_builder.Models.Elements;
 
 namespace form_builder.Services.OrganisationService
 {
@@ -47,15 +48,15 @@ namespace form_builder.Services.OrganisationService
                     ? new FormAnswers { Pages = new List<PageAnswers>() }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-                var organisationElement = currentPage.Elements.Where(_ => _.Type == EElementType.Organisation).FirstOrDefault();
+                var organisationElement = (Organisation)currentPage.Elements.Where(_ => _.Type == EElementType.Organisation).FirstOrDefault();
 
                 var searchTerm = journey == "Select"
-                    ? (string)convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{organisationElement.Properties.QuestionId}-organisation-searchterm").Response
-                    : (string)viewModel[$"{organisationElement.Properties.QuestionId}-organisation-searchterm"];
+                    ? (string)convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == organisationElement.OrganisationSearchQuestionId).Response
+                    : (string)viewModel[organisationElement.OrganisationSearchQuestionId];
 
                 var organisation = journey != "Select"
                     ? string.Empty
-                    : (string)viewModel[$"{organisationElement.Properties.QuestionId}-organisation"];
+                    : (string)viewModel[organisationElement.OrganisationSelectQuestionId];
 
                 var emptySearchTerm = string.IsNullOrEmpty(searchTerm);
                 var emptyOrganisation = string.IsNullOrEmpty(organisation);
