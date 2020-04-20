@@ -18,5 +18,7 @@ namespace form_builder.Models
         public string PageContent { get; set; }
 
         public string StartFormUrl { get; set; }
+
+        public bool HideBackButton => true;
     }
 }
