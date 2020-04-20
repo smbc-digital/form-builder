@@ -67,46 +67,6 @@ namespace form_builder.Models
             IsValidated = true;
         }
 
-        public Behaviour GetSubmitBehaviour(Dictionary<string, dynamic> viewModel)
-        {
-            var behaviours = Behaviours
-                .Where(_ => _.SubmitSlugs != null)
-                .Where(_ => _.SubmitSlugs.Any())
-                .ToList();
-
-            if (behaviours.Count == 1)
-            {
-                return behaviours.FirstOrDefault();
-            }
-            else
-            {
-                foreach (var behaviour in behaviours.OrderByDescending(_ => _.Conditions.Count))
-                {
-                    foreach (var condition in behaviour.Conditions)
-                    {
-                        var found = false;
-                        if (condition.EqualTo != null)
-                        {
-                            found = behaviour.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
-                        }
-                        else
-                        {
-                            found = behaviour.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
-                        }
-
-                        if (found)
-                            return behaviour;
-                    }
-
-                    if (!behaviour.Conditions.Any())
-                    {
-                        return behaviour;
-                    }
-                }
-            }
-            throw new Exception("Behaviour issues");
-        }
-
         public Behaviour GetNextPage(Dictionary<string, dynamic> viewModel)
         {
             if (Behaviours.Count == 1)
@@ -160,7 +120,7 @@ namespace form_builder.Models
 
                 var viewModel = new Dictionary<string, dynamic>();
                 previousPage.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
-                var foundSubmitBehaviour = GetSubmitBehaviour(viewModel);
+                var foundSubmitBehaviour = GetNextPage(viewModel);
 
                 submitBehaviour = foundSubmitBehaviour.SubmitSlugs.ToList()
                             .Where(x => x.Environment.ToLower() == environment.ToLower())
