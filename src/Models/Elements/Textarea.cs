@@ -11,6 +11,7 @@ namespace form_builder.Models.Elements
 {
     public class Textarea : Element
     {
+        public bool DisplayCharacterCount => Properties.DisplayCharacterCount;
         public Textarea()
         {
             Type = EElementType.Textarea;
@@ -25,17 +26,17 @@ namespace form_builder.Models.Elements
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
-        public override Dictionary<string, dynamic> GenerateElementProperties(string type)
+        public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var properties = new Dictionary<string, dynamic>()
             {
                 { "name", Properties.QuestionId },
                 { "id", Properties.QuestionId },
-                { "maxlength", Properties.MaxLength },
                 { "value", Properties.Value},
                 { "spellcheck", Properties.Spellcheck.ToString().ToLower() }
             };
-
+            
+            properties.Add("maxlength", Properties.MaxLength);
             if (Properties.MaxLength <= 200 || Properties.MaxLength > 500)
             {
                 properties.Add("rows", Properties.MaxLength > 500 ? "15" : "5");
@@ -43,8 +44,14 @@ namespace form_builder.Models.Elements
 
             if (DisplayAriaDescribedby)
             {
-
-                properties.Add("aria-describedby", $"{GetCustomItemId("info")} {GetDescribedByAttributeValue()}");
+                if(DisplayCharacterCount)
+                {
+                    properties.Add("aria-describedby", $"{GetCustomItemId("info")} {GetDescribedByAttributeValue()}");
+                }
+                else
+                {
+                    properties.Add("aria-describedby", GetDescribedByAttributeValue());
+                }    
             }
 
             return properties;
