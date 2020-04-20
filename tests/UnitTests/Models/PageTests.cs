@@ -541,6 +541,101 @@ namespace form_builder_tests.UnitTests.Models
             Assert.Equal(EBehaviourType.SubmitForm, result.BehaviourType);
             Assert.Equal("submit-two", result.PageSlug);
         }
+        //         {
+        //   "conditions": [
+        //     {
+        //       "questionId": "foodAfford",
+        //       "EqualTo": "no"
+        //     },
+        //     {
+        //       "questionId": "helpWith",
+        //       "CheckboxContains": "medicalTransport"
+        //     }
+        //   ],
+        //   "behaviourType": "GoToPage",
+        //   "PageSlug": "medical-transport"
+        // },
+        // {
+        //   "conditions": [],
+        //   "behaviourType": "GoToPage",
+        //   "PageSlug": "name-details"
+        // }
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_Behaviour_WhenMix_OfEqualAndCheckbox_WithinSameBehaviour()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("submit-one")
+                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
+                .WithCondition(new Condition{ CheckboxContains = "berry", QuestionId = "data" })
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageSlug("submit-two")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "apple");
+            viewModel.Add("data", "berry");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.GoToPage, result.BehaviourType);
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_Behaviour_WhenMix_OfMultipleEqualAndCheckbox_WithinSameBehaviour()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("submit-one")
+                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
+                .WithCondition(new Condition{ CheckboxContains = "berry", QuestionId = "data" })
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
+            var behaviour3 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageSlug("submit-one")
+                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
+                .WithCondition(new Condition{ CheckboxContains = "pear", QuestionId = "data" })
+                .WithCondition(new Condition{ CheckboxContains = "berry", QuestionId = "data" })
+                .Build();
+
+            var behaviour4 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageSlug("submit-one")
+                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
+                .WithCondition(new Condition{ CheckboxContains = "berry", QuestionId = "data" })
+                .WithCondition(new Condition{ EqualTo = "data", QuestionId = "test2" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .WithBehaviour(behaviour3)
+                .WithBehaviour(behaviour4)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "apple");
+            viewModel.Add("test2", "fish");
+            viewModel.Add("data", "berry");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.GoToPage, result.BehaviourType);
+        }
 
         #endregion
     }
