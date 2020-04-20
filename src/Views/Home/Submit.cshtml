@@ -3,20 +3,22 @@
     ViewData["Title"] = "Submit";
 }
 
-<h1>Submit</h1>
-<table>
-    <caption>Data</caption>
-    <tbody>
-        @foreach (var page in Model.FormAnswers.Pages)
-        {
-            @foreach (var question in page.Answers)
-            {
-                <tr>
-                    <th>@question.QuestionId</th>
-                    <td>@question.Response</td>
+<h1 class="govuk-heading-l">Your answers</h1>
+    @foreach (var currentPage in Model.FormAnswers.Pages)
+    {
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+            <h2 class="govuk-heading-m">@currentPage.PageSlug</h2>
 
-                </tr>
+            @foreach (var question in currentPage.Answers)
+            {
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        @question.QuestionId
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @question.Response
+                    </dd>
+                </div>
             }
-        }
-    </tbody>
-</table>
+        </dl>
+    }
