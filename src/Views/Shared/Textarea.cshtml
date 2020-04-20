@@ -1,22 +1,26 @@
 ﻿@model form_builder.Models.Elements.Element
 @{
-    var elements = Model.GenerateElementProperties();
+    var elementProperties = Model.GenerateElementProperties();
     if(!Model.IsValid)
     {
-        elements.Add("class", "govuk-textarea govuk-textarea--error");
+        elementProperties.Add("class", "govuk-textarea govuk-js-character-count govuk-textarea--error");
     }
     else{
-        elements.Add("class", "govuk-textarea");
+        elementProperties.Add("class", "govuk-textarea govuk-js-character-count");
     }
 }
 
-<div class="govuk-form-group @(!Model.IsValid ? " govuk-form-group--error" : string.Empty)"
-    <partial name="LabelH1" />
+<div class="govuk-character-count" data-module="govuk-character-count" data-maxlength=@Model.Properties.MaxLength>
+    <div class= @(!Model.IsValid ? "govuk-form-group govuk-form-group--error" : "govuk-form-group")>
+        <partial name="LabelH1" />
 
-    <partial name="Hint" />
-    <p class="govuk-hint">Your description can be up to @Model.Properties.MaxLength characters</p>
-    
-    <partial name="Error" />
-    
-    @Html.TextArea(Model.QuestionId, Model.Properties.Value, elements)    
+        <partial name="Hint" />
+        
+        <partial name="Error" />
+        
+        @Html.TextArea(Model.QuestionId, Model.Properties.Value, elementProperties) 
+    </div>
+    <span id=@Model.GetCustomItemId("info") class="govuk-hint govuk-character-count__message" aria-live="polite">
+        You can enter up to @Model.Properties.MaxLength characters
+    </span>
 </div>

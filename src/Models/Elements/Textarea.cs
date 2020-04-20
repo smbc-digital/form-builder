@@ -43,7 +43,8 @@ namespace form_builder.Models.Elements
 
             if (DisplayAriaDescribedby)
             {
-                properties.Add("aria-describedby", GetDescribedByAttributeValue());
+
+                properties.Add("aria-describedby", $"{GetCustomItemId("info")} {GetDescribedByAttributeValue()}");
             }
 
             return properties;
