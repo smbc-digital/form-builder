@@ -541,26 +541,7 @@ namespace form_builder_tests.UnitTests.Models
             Assert.Equal(EBehaviourType.SubmitForm, result.BehaviourType);
             Assert.Equal("submit-two", result.PageSlug);
         }
-        //         {
-        //   "conditions": [
-        //     {
-        //       "questionId": "foodAfford",
-        //       "EqualTo": "no"
-        //     },
-        //     {
-        //       "questionId": "helpWith",
-        //       "CheckboxContains": "medicalTransport"
-        //     }
-        //   ],
-        //   "behaviourType": "GoToPage",
-        //   "PageSlug": "medical-transport"
-        // },
-        // {
-        //   "conditions": [],
-        //   "behaviourType": "GoToPage",
-        //   "PageSlug": "name-details"
-        // }
-
+        
         [Fact]
         public void GetNextPage_ShouldReturn_Behaviour_WhenMix_OfEqualAndCheckbox_WithinSameBehaviour()
         {
