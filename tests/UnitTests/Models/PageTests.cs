@@ -354,6 +354,194 @@ namespace form_builder_tests.UnitTests.Models
             Assert.Equal(EBehaviourType.SubmitForm, result.BehaviourType);
         }
 
+        [Fact]
+        public void GetNextPage_ShouldReturn_CorrectBehaviour_When_MixedConditions_ForChecboxContains()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .WithCondition(new Condition{ EqualTo = "berry", QuestionId = "test" })
+                .Build();
+
+            var behaviour3 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToExternalPage)
+                .WithCondition(new Condition{ CheckboxContains = "mango", QuestionId = "test" })
+                .Build();
+
+            var behaviour4 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithCondition(new Condition{ CheckboxContains = "pear", QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .WithBehaviour(behaviour3)
+                .WithBehaviour(behaviour4)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "pear");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.SubmitForm, result.BehaviourType);
+        }
+
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_CorrectBehaviour_When_MixedConditions_ForEqualTo()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ CheckboxContains = "apple", QuestionId = "test" })
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .WithCondition(new Condition{ CheckboxContains = "pear", QuestionId = "test" })
+                .Build();
+
+            var behaviour3 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToExternalPage)
+                .WithCondition(new Condition{ EqualTo = "mango", QuestionId = "test" })
+                .Build();
+
+            var behaviour4 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithCondition(new Condition{ EqualTo = "berry", QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .WithBehaviour(behaviour3)
+                .WithBehaviour(behaviour4)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "berry");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.SubmitForm, result.BehaviourType);
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_CorrectBehaviour_When_MixedConditions_Submit_And_CheckboxContains()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ CheckboxContains = "apple", QuestionId = "test" })
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "apple");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.GoToPage, result.BehaviourType);
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_CorrectBehaviour_When_MixedConditions_Submit_And_EqualTo()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "apple");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.GoToPage, result.BehaviourType);
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_SubmitBehaviour()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition{ CheckboxContains = "berry", QuestionId = "test" })
+                .Build();
+
+            var behaviour3 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .WithBehaviour(behaviour3)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "pear");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.SubmitForm, result.BehaviourType);
+        }
+
+        
+        [Fact]
+        public void GetNextPage_ShouldReturn_SubmitBehaviour_WhenMultipleSubmitForms()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageSlug("submit-one")
+                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageSlug("submit-two")
+                .WithCondition(new Condition{ CheckboxContains = "pear", QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "pear");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.SubmitForm, result.BehaviourType);
+            Assert.Equal("submit-two", result.PageSlug);
+        }
+
         #endregion
     }
 }
