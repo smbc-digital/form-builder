@@ -609,7 +609,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldGetTheRighStartFormUrl()
         {
-            //Arrange 
+            //Arrange
             var element = new ElementBuilder()
                .WithType(EElementType.Textbox)
                .WithQuestionId("test-textbox")
@@ -639,14 +639,14 @@ namespace form_builder_tests.UnitTests.Services
             //Act
             var result = await _service.ProcessPage("form", "page-one");
 
-            //Assert 
+            //Assert
             Assert.Equal(viewModel.StartFormUrl, result.ViewModel.StartFormUrl);
         }
 
         [Fact]
         public async Task ProcessRequest_ShouldGetTheRighStartFormUrl()
         {
-            //Arrange 
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textarea)
                 .WithQuestionId("test-textarea")
@@ -679,10 +679,10 @@ namespace form_builder_tests.UnitTests.Services
             //Act
             var result = await _service.ProcessRequest("form", "first-page", It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>());
 
-            //Assert 
+            //Assert
             Assert.Equal(viewModel.StartFormUrl, result.ViewModel.StartFormUrl);
         }
-        
+
         [Fact]
         public async Task FinalisePageJoueny_ShouldDeleteCacheEntry()
         {
@@ -745,8 +745,8 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.FinalisePageJoueny("form", EBehaviourType.SubmitAndPay);
 
             // Assert
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"{questionIDOne}-fileupload")), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"{questionIDTwo}-fileupload")), Times.Once);
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"file-{questionIDOne}-fileupload-{guid}")), Times.Once);
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"file-{questionIDTwo}-fileupload-{guid}")), Times.Once);
         }
 
         [Fact]

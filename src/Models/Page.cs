@@ -31,7 +31,7 @@ namespace form_builder.Models
 
         [JsonIgnore]
         public bool IsValid => !InvalidElements.Any();
-        
+
         [JsonIgnore]
         public IEnumerable<BaseProperty> InvalidElements
         {
@@ -75,23 +75,27 @@ namespace form_builder.Models
             }
             else
             {
-                foreach (var behaviour in Behaviours)
+                foreach (var behaviour in Behaviours.OrderByDescending(_ => _.Conditions.Count))
                 {
                     foreach (var condition in behaviour.Conditions)
                     {
+                        var found = false;
                         if (condition.EqualTo != null)
                         {
-                            return Behaviours
-                            .OrderByDescending(_ => _.Conditions.Count)
-                            .FirstOrDefault(_ => _.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]));
+                            found = behaviour.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
                         }
                         else
-                        //if (condition.CheckboxContains != null)
                         {
-                            return Behaviours
-                                .OrderByDescending(_ => _.Conditions.Count)
-                                .FirstOrDefault(_ => _.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains)));
+                             found = behaviour.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
                         }
+
+                        if (found)
+                            return behaviour;
+                    }
+
+                    if (!behaviour.Conditions.Any())
+                    {
+                        return behaviour;
                     }
                 }
             }
@@ -111,11 +115,16 @@ namespace form_builder.Models
             if (Behaviours.Count > 1)
             {
                 var previousPage = formAnswers.Pages
-                    .FirstOrDefault(_ => _.PageSlug == formAnswers.Path);
+                    .SelectMany(_ => _.Answers)
+                    .ToList();
 
                 var viewModel = new Dictionary<string, dynamic>();
-                previousPage.Answers.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
-                submitBehaviour.URL = GetNextPage(viewModel).PageSlug;
+                previousPage.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
+                var foundSubmitBehaviour = GetNextPage(viewModel);
+
+                submitBehaviour = foundSubmitBehaviour.SubmitSlugs.ToList()
+                            .Where(x => x.Environment.ToLower() == environment.ToLower())
+                            .FirstOrDefault();
             }
             else
             {

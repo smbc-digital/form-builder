@@ -12,6 +12,7 @@ using StockportGovUK.NetStandard.Gateways;
 using form_builder.Cache;
 using form_builder.ModelBinders.Providers;
 using System.Globalization;
+using form_builder.Middleware;
 
 namespace form_builder
 {
@@ -72,12 +73,11 @@ namespace form_builder
             else
             {
                 app.UseMiddleware<AppExceptionHandling>();
-
                 app.UseHsts();
             }
 
+            app.UseMiddleware<HeaderConfiguration>();
             app.UseSession();
-
             app.UseHttpsRedirection();
             app.UseMvc(routes =>
             {

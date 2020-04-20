@@ -246,6 +246,7 @@ namespace form_builder.Services.PageService
                 Page = currentPage
             };
         }
+
         public async Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid)
         {
             var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid);
@@ -257,6 +258,7 @@ namespace form_builder.Services.PageService
 
             return viewModel;
         }
+
         public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
             Dictionary<string, dynamic> answers = new Dictionary<string, dynamic>();
@@ -294,8 +296,7 @@ namespace form_builder.Services.PageService
             {
                 formFileUploadElements.ForEach(_ =>
                 {
-                    _distributedCache.Remove($"{_.Properties.QuestionId}-fileupload");
-                    _distributedCache.Remove($"file-{_.Properties.QuestionId}-{_sessionHelper.GetSessionGuid()}");
+                    _distributedCache.Remove($"file-{_.Properties.QuestionId}-fileupload-{sessionGuid}");
                 });
             }
 
