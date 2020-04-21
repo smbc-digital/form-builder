@@ -78,36 +78,33 @@ namespace form_builder.Models
             {
                 foreach (var behaviour in Behaviours.OrderByDescending(_ => _.Conditions.Count))
                 {
-                    foreach (var condition in behaviour.Conditions)
-                    {
-                        var found = false;
-                        if (condition.EqualTo != null)
-                        {
-                            found = behaviour.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
-                        }
-                        else if(condition.IsBefore != null)
-                        {
-                            found = behaviour.Conditions.All(x => DateComparator.DateIsBefore(x, viewModel));
-                        }
-                        else if(condition.IsAfter != null)
-                        {
-                            found = behaviour.Conditions.All(x => DateComparator.DateIsAfter(x, viewModel));                           
-                        }
-                        else
-                        {
-                             found = behaviour.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
-                        }
+                    var equalToConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.EqualTo));
+                    var checkBoxContainsConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.CheckboxContains));
+                    var dateIsBeforeConditions = behaviour.Conditions.Where(x => x.IsBefore != null);
+                    var dateIsAfterConditions = behaviour.Conditions.Where(x => x.IsAfter != null);
 
-                        if (found)
-                            return behaviour;
-                    }
+                    var equalToValid = !equalToConditions.Any();
+                    var checkBoxContainsValid = !checkBoxContainsConditions.Any();
+                    var dateIsBeforeValid = !dateIsBeforeConditions.Any();
+                    var dateIsAfterValid = !dateIsAfterConditions.Any();
 
-                    if (!behaviour.Conditions.Any())
-                    {
+                    if(equalToConditions.Any())
+                        equalToValid = equalToConditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
+
+                    if(checkBoxContainsConditions.Any())
+                        checkBoxContainsValid = checkBoxContainsConditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
+                        
+                    if(dateIsBeforeConditions.Any())
+                        dateIsBeforeValid = dateIsBeforeConditions.All(x => DateComparator.DateIsBefore(x, viewModel));
+                        
+                    if(dateIsAfterConditions.Any())
+                        dateIsAfterValid = dateIsAfterConditions.All(x => DateComparator.DateIsAfter(x, viewModel));  
+
+                    if (equalToValid && checkBoxContainsValid && dateIsBeforeValid && dateIsAfterValid)
                         return behaviour;
-                    }
                 }
             }
+
             throw new Exception("Behaviour issues");
         }
 
