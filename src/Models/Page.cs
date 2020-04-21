@@ -76,62 +76,39 @@ namespace form_builder.Models
             }
             else
             {
-                foreach (var behaviour in Behaviours)
+                foreach (var behaviour in Behaviours.OrderByDescending(_ => _.Conditions.Count))
                 {
                     foreach (var condition in behaviour.Conditions)
                     {
+                        var found = false;
                         if (condition.EqualTo != null)
                         {
-                            var list = Behaviours
-                                .OrderByDescending(_ => _.Conditions.Count);
-                            foreach (var behaviour1 in list)
-                            {
-                                if (behaviour1.Conditions.Any(nextTask => nextTask.EqualTo == viewModel[nextTask.QuestionId]))
-                                    return behaviour1;
-                            }
-
-                            return EvaluateBehaviourForCondition(viewModel);
-
+                            found = behaviour.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
+                        }
+                        else if(condition.IsBefore != null)
+                        {
+                            found = behaviour.Conditions.All(x => DateComparator.DateIsBefore(x, viewModel));
+                        }
+                        else if(condition.IsAfter != null)
+                        {
+                            found = behaviour.Conditions.All(x => DateComparator.DateIsAfter(x, viewModel));                           
                         }
                         else
-                            return EvaluateBehaviourForCondition(viewModel);
+                        {
+                             found = behaviour.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
+                        }
+
+                        if (found)
+                            return behaviour;
+                    }
+
+                    if (!behaviour.Conditions.Any())
+                    {
+                        return behaviour;
                     }
                 }
             }
             throw new Exception("Behaviour issues");
-        }
-
-        private Behaviour EvaluateBehaviourForCondition(Dictionary<string, dynamic> viewModel)
-        {
-            var list = Behaviours
-                .OrderByDescending(_ => _.Conditions.Count);
-            foreach (var behaviour1 in list)
-            {
-                foreach (var nextTask in behaviour1.Conditions)
-                {
-                    if (!string.IsNullOrEmpty(nextTask.CheckboxContains))
-                    {
-                        if (viewModel[nextTask.QuestionId].Contains(nextTask.CheckboxContains))
-                            return behaviour1;
-                    }
-                    else if(nextTask.IsAfter != null)
-                    {
-                        if (DateComparator.DateIsAfter(nextTask, viewModel))
-                            return behaviour1;
-                    }
-                    else if (nextTask.IsBefore != null)
-                    {
-                        if (DateComparator.DateIsBefore(nextTask, viewModel))                        
-                            return behaviour1;
-                    }
-
-                    else
-                        continue;
-                }
-            }
-
-            // identify the default and return
-            return Behaviours.Find(behaviour => behaviour.Conditions.Count == 0);
         }
 
         public SubmitSlug GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)
@@ -147,11 +124,16 @@ namespace form_builder.Models
             if (Behaviours.Count > 1)
             {
                 var previousPage = formAnswers.Pages
-                    .FirstOrDefault(_ => _.PageSlug == formAnswers.Path);
+                    .SelectMany(_ => _.Answers)
+                    .ToList();
 
                 var viewModel = new Dictionary<string, dynamic>();
-                previousPage.Answers.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
-                submitBehaviour.URL = GetNextPage(viewModel).PageSlug;
+                previousPage.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
+                var foundSubmitBehaviour = GetNextPage(viewModel);
+
+                submitBehaviour = foundSubmitBehaviour.SubmitSlugs.ToList()
+                            .Where(x => x.Environment.ToLower() == environment.ToLower())
+                            .FirstOrDefault();
             }
             else
             {
