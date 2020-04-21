@@ -53,7 +53,7 @@ namespace form_builder.Models.Elements
 
         public string PostcodeValdationMessage => ErrorMessages[2];
 
-        public string Label => Properties.AddressManualLabel;
+        public override string Label => Properties.AddressManualLabel;
 
         public ErrorViewModel PostcodeValidationModel => new ErrorViewModel {
         Id = GetCustomItemId(AddressManualConstants.POSTCODE),
@@ -85,7 +85,6 @@ namespace form_builder.Models.Elements
 
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-
             if (viewModel.ContainsKey("AddressStatus"))
             {
                 viewModel.Remove("AddressStatus");
@@ -93,11 +92,8 @@ namespace form_builder.Models.Elements
 
             viewModel.Add("AddressStatus", "Manual");
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
-            
             SetAddressProperties(viewModel, Properties.Value);
-
             var searchResultsCount =  elementHelper.GetFormDataValue(guid, $"{Properties.QuestionId}-srcount");
-
             var isValid = int.TryParse(searchResultsCount.ToString(), out int output);
 
             if (isValid && output == 0)
@@ -106,13 +102,6 @@ namespace form_builder.Models.Elements
             }
             
             ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
-            
-            // var viewElement = new ElementViewModel
-            // {
-            //     Element = this,
-            //     ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
-            // };
-
             return await viewRender.RenderAsync(Type.ToString(), this);
         }
     }
