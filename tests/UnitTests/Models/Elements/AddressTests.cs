@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<ElementViewModel>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<form_builder.Models.Elements.Address>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
@@ -56,8 +56,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
         {
             //Arrange
             var element = new AddressBuilder()
-               .WithPropertyText("test")
-               .Build();
+                .WithPropertyText("test")
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -65,6 +65,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("AddressStatus", "Select");
+            viewModel.Add(element.AddressSearchQuestionId, "SK1 3XE");
+
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -74,7 +76,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"),It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"),It.IsAny<form_builder.Models.Elements.Address>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
@@ -83,15 +85,15 @@ namespace form_builder_tests.UnitTests.Models.Elements
             //Arrange
             var elementView = new ElementViewModel();
             var addressList = new List<SelectListItem>();
-            var callback = new Tuple<ElementViewModel, List<SelectListItem>>(elementView, addressList);
+            var callback = new form_builder.Models.Elements.Address();
 
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), null))
-                .Callback<string, Tuple<ElementViewModel, List<SelectListItem>>, Dictionary<string, object>>((x, y, z) => callback = y);
+            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Address>(), null))
+                .Callback<string, form_builder.Models.Elements.Address, Dictionary<string, object>>((x, y, z) => callback = y);
 
             var pageSlug = "page-one";
             var baseUrl = "test";
 
-            var element = new AddressBuilder()
+            var element = (form_builder.Models.Elements.Address)new AddressBuilder()
                 .WithPropertyText("test")
                 .WithQuestionId("address-test")
                 .Build();
@@ -103,6 +105,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("AddressStatus", "Select");
+            viewModel.Add(element.AddressSearchQuestionId, "sk1 3xe");
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -113,7 +116,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
-            Assert.Equal($"/{baseUrl}/{pageSlug}", callback.Item1.ReturnURL);
+            Assert.Equal($"/{baseUrl}/{pageSlug}", callback.ReturnURL);
         }
     }
 }

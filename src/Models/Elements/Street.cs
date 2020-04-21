@@ -41,13 +41,12 @@ namespace form_builder.Models.Elements
             Type = EElementType.Street;
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> searchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> searchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> answers, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            IsSelect = viewModel.ContainsKey("StreetStatus") && viewModel["StreetStatus"] == "Select" || viewModel.ContainsKey(StreetSearchQuestionId) && !string.IsNullOrEmpty(viewModel[StreetSearchQuestionId]);
+            IsSelect = answers.ContainsKey("StreetStatus") && answers["StreetStatus"] == "Select" || answers.ContainsKey(StreetSearchQuestionId) && !string.IsNullOrEmpty(answers[StreetSearchQuestionId]);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, SEARCH_QUESTION_SUFFIX);
-
+            Properties.Value = answers.ContainsKey(StreetSearchQuestionId) ? answers[StreetSearchQuestionId] : string.Empty;
 
             if (IsSelect)
             {
@@ -57,10 +56,10 @@ namespace form_builder.Models.Elements
 
                 if (string.IsNullOrEmpty(Properties.Value))
                 {
-                    Properties.Value = (string)viewModel[StreetSearchQuestionId];
-                    if ((string)viewModel["StreetStatus"] == "Select")
+                    Properties.Value = (string)answers[StreetSearchQuestionId];
+                    if ((string)answers["StreetStatus"] == "Select")
                     {
-                        Properties.Value = (string)viewModel[QuestionId];
+                        Properties.Value = (string)answers[QuestionId];
                     }
                 }
 

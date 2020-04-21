@@ -35,8 +35,7 @@ namespace form_builder.Helpers.ElementHelpers
         }
 
         public string CurrentValue(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "")
-            {
-
+        {
             if (element.Type == EElementType.FileUpload)
             {
                 return string.Empty;

@@ -77,7 +77,6 @@ namespace form_builder_tests.UnitTests.Helpers
             _paymentProvider.Setup(_ => _.ProviderName).Returns("testProvider");
             var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
             _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
-
             _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object, _mockCache.Object, _mockDistrbutedCacheExpirationSettings.Object, _mockPaymentProvider.Object, _mockFileUploadService.Object);
         }
 
@@ -140,9 +139,10 @@ namespace form_builder_tests.UnitTests.Helpers
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenAddressSelect()
         {
             //Arrange
-            var element = new ElementBuilder()
+            var element = (form_builder.Models.Elements.Address)new ElementBuilder()
                 .WithType(EElementType.Address)
                 .WithPropertyText("text")
+                .WithValue("SK1 3XE")
                 .Build();
 
             var page = new PageBuilder()
@@ -151,6 +151,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("AddressStatus", "Select");
+            viewModel.Add(element.AddressSearchQuestionId, "SK1 3XE");
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -160,7 +161,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), null), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<form_builder.Models.Elements.Address>(), null), Times.Once);
         }
 
         [Fact]
@@ -169,10 +170,10 @@ namespace form_builder_tests.UnitTests.Helpers
             //Arrange
             var elementView = new ElementViewModel();
             var addressList = new List<SelectListItem>();
-            var callback = new Tuple<ElementViewModel, List<SelectListItem>>(elementView, addressList);
+            var callback = new form_builder.Models.Elements.Address();
 
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), null))
-                .Callback<string, Tuple<ElementViewModel, List<SelectListItem>>, Dictionary<string, object>>((x, y, z) => callback = y);
+            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Address>(), null))
+                .Callback<string, form_builder.Models.Elements.Address, Dictionary<string, object>>((x, y, z) => callback = y);
 
             var pageSlug = "page-one";
             var baseUrl = "test";
@@ -186,6 +187,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("AddressStatus", "Select");
+            viewModel.Add(addressElement.AddressSearchQuestionId, "SK1");
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -196,7 +198,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
 
             //Assert
-            Assert.Equal($"/{baseUrl}/{pageSlug}", callback.Item1.ReturnURL);
+            Assert.Equal($"/{baseUrl}/{pageSlug}", callback.ReturnURL);
         }
 
         [Fact]
@@ -220,7 +222,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<ElementViewModel>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<form_builder.Models.Elements.Address>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
@@ -235,8 +237,9 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("StreetStatus", "Select");
-            viewModel.Add("street-streetaddress", string.Empty);
-            viewModel.Add("street-street", "street");
+            viewModel.Add(element.StreetSelectQuestionId, string.Empty);
+            viewModel.Add(element.StreetSearchQuestionId, "street");
+
 
             var schema = new FormSchemaBuilder()
                 .WithName("Street name")
@@ -246,7 +249,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), null), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<form_builder.Models.Elements.Street>(), null), Times.Once);
         }
 
         [Fact]
@@ -283,10 +286,10 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var elementView = new ElementViewModel();
             var streetList = new List<SelectListItem>();
-            var callback = new Tuple<ElementViewModel, List<SelectListItem>>(elementView, streetList);
+            var callback = new form_builder.Models.Elements.Street();
 
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), null))
-                .Callback<string, Tuple<ElementViewModel, List<SelectListItem>>, Dictionary<string, object>>((x, y, z) => callback = y);
+            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Street>(), null))
+                .Callback<string, form_builder.Models.Elements.Street, Dictionary<string, object>>((x, y, z) => callback = y);
 
             var pageSlug = "page-one";
             var baseUrl = "test";
@@ -299,8 +302,8 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("StreetStatus", "Select");
-            viewModel.Add("-streetaddress", string.Empty);
-            viewModel.Add("-street", "street");
+            viewModel.Add(element.StreetSelectQuestionId, string.Empty);
+            viewModel.Add(element.StreetSearchQuestionId, "street");
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -311,7 +314,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
 
             //Assert
-            Assert.Equal($"/{baseUrl}/{pageSlug}", callback.Item1.ReturnURL);
+            Assert.Equal($"/{baseUrl}/{pageSlug}", callback.ReturnURL);
         }
 
         [Theory]

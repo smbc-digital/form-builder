@@ -40,10 +40,10 @@ namespace form_builder.Models.Elements
             Type = EElementType.Organisation;
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> searchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> searchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> answers, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            IsSelect = viewModel.ContainsKey("OrganisationStatus") && viewModel["OrganisationStatus"] == "Select" || viewModel.ContainsKey(OrganisationSearchQuestionId) && !string.IsNullOrEmpty(viewModel[OrganisationSearchQuestionId]);
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, SEARCH_QUESTION_SUFFIX);
+            IsSelect = answers.ContainsKey("OrganisationStatus") && answers["OrganisationStatus"] == "Select" || answers.ContainsKey(OrganisationSearchQuestionId) && !string.IsNullOrEmpty(answers[OrganisationSearchQuestionId]);
+            Properties.Value = answers.ContainsKey(OrganisationSearchQuestionId) ? answers[OrganisationSearchQuestionId] : string.Empty;
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
 
@@ -55,10 +55,10 @@ namespace form_builder.Models.Elements
                 
                 if (string.IsNullOrEmpty(Properties.Value))
                 {
-                    Properties.Value = (string)viewModel[OrganisationSearchQuestionId];
-                    if ((string)viewModel["OrganisationStatus"] == "Select")
+                    Properties.Value = (string)answers[OrganisationSearchQuestionId];
+                    if ((string)answers["OrganisationStatus"] == "Select")
                     {
-                        Properties.Value = (string)viewModel[QuestionId];
+                        Properties.Value = (string)answers[QuestionId];
                     }
                 }
 

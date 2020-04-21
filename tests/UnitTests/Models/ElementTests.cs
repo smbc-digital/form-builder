@@ -72,11 +72,11 @@ namespace form_builder_tests.UnitTests.Models
         }
 
         [Theory]
-        [InlineData(50, "small")]
-        [InlineData(199, "small")]
-        [InlineData(501, "large")]
-        [InlineData(2000, "large")]
-        public void GenerateElementProperties_ShouldReturnCorrectClassValue_When_MaxLengthSupllied(int length, string expectedClassname)
+        [InlineData(50, "5")]
+        [InlineData(199, "5")]
+        [InlineData(501, "15")]
+        [InlineData(2000, "15")]
+        public void GenerateElementProperties_ShouldReturnCorrectRowsSize_When_MaxLengthSupllied(int length, string expectedValue)
         {
             var questionId = "test-question-id";
             var value = "test-value";
@@ -91,12 +91,12 @@ namespace form_builder_tests.UnitTests.Models
             var result = element.GenerateElementProperties();
 
             Assert.NotEmpty(result);
-            Assert.True(result.ContainsKey("class"));
-            Assert.True(result.ContainsValue(expectedClassname));
+            Assert.True(result.ContainsKey("rows"));
+            Assert.True(result.ContainsValue(expectedValue));
         }
 
         [Fact]
-        public void GenerateElementProperties_ShouldReturnCorrectClassValue_When_UsingDefaultMaxLength()
+        public void GenerateElementProperties_ShouldReturnCorrectRowsSize_When_UsingDefaultMaxLength()
         {
             var questionId = "test-question-id";
             var value = "test-value";
@@ -110,8 +110,8 @@ namespace form_builder_tests.UnitTests.Models
             var result = element.GenerateElementProperties();
 
             Assert.NotEmpty(result);
-            Assert.True(result.ContainsKey("class"));
-            Assert.True(result.ContainsValue("small"));
+            Assert.True(result.ContainsKey("rows"));
+            Assert.True(result.ContainsValue("5"));
         }
 
         [Fact]
@@ -136,7 +136,7 @@ namespace form_builder_tests.UnitTests.Models
         {
             var questionId = "test--address-question-id";
 
-            var element = new ElementBuilder()
+            var element = (form_builder.Models.Elements.Address)new ElementBuilder()
                             .WithType(EElementType.Address)
                             .WithQuestionId(questionId)
                             .Build();
@@ -146,7 +146,7 @@ namespace form_builder_tests.UnitTests.Models
             Assert.NotEmpty(result);
             Assert.True(result.ContainsKey("id"));
             Assert.True(result.ContainsKey("name"));
-            Assert.True(result.ContainsValue($"{questionId}-address"));
+            Assert.True(result.ContainsValue(element.AddressSearchQuestionId));
         }
 
         [Fact]
@@ -155,7 +155,7 @@ namespace form_builder_tests.UnitTests.Models
             var questionId = "test-street-question-id";
             var length = 5;
 
-            var element = new ElementBuilder()
+            var element = (form_builder.Models.Elements.Street) new ElementBuilder()
                             .WithType(EElementType.Street)
                             .WithQuestionId(questionId)
                             .WithMaxLength(length)
@@ -166,7 +166,7 @@ namespace form_builder_tests.UnitTests.Models
             Assert.NotEmpty(result);
             Assert.True(result.ContainsKey("id"));
             Assert.True(result.ContainsKey("maxlength"));
-            Assert.True(result.ContainsValue($"{questionId}-street"));
+            Assert.True(result.ContainsValue(element.StreetSearchQuestionId));
             Assert.True(result.ContainsValue(length));
         }
 
@@ -184,7 +184,7 @@ namespace form_builder_tests.UnitTests.Models
             var result = element.GetDescribedByAttributeValue();
 
             Assert.NotNull(result);
-            Assert.Equal($"{questionId}-hint", result);
+            Assert.Equal(element.HintId, result);
         }
 
         [Fact]
@@ -204,7 +204,7 @@ namespace form_builder_tests.UnitTests.Models
             var result = element.GetDescribedByAttributeValue();
 
             Assert.NotNull(result);
-            Assert.Equal($"{questionId}-error", result);
+            Assert.Equal(element.ErrorId, result);
         }
 
         [Fact]
@@ -217,6 +217,7 @@ namespace form_builder_tests.UnitTests.Models
                             .WithQuestionId(questionId)
                             .WithHint("hint")
                             .Build();
+                            
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add(questionId, "test");
 
@@ -224,8 +225,8 @@ namespace form_builder_tests.UnitTests.Models
             var result = element.GetDescribedByAttributeValue();
 
             Assert.NotNull(result);
-            Assert.Contains($"{questionId}-hint", result);
-            Assert.Contains($"{questionId}-error", result);
+            Assert.Contains(element.HintId, result);
+            Assert.Contains(element.QuestionId, result);
         }
     }
 }
