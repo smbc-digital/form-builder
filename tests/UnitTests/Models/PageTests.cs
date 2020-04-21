@@ -74,6 +74,32 @@ namespace form_builder_tests.UnitTests.Models
             Assert.Equal(PageSlug, result.URL);
         }
 
+        [Fact(Skip="WIP, test mmight not be valid as its GoToPage within Submit, will verify")]
+        public void GetNextPage_ShouldGoToOther_WhenCheckboxContainsOther()
+        {
+            var PageSlug = "page-other";
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("page-continue")
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug(PageSlug)
+                .WithCondition(new Condition { CheckboxContains = "other", QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var result = page.GetSubmitFormEndpoint(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "test", Response = "test,other" } } } } }, null);
+
+            Assert.Equal(PageSlug, result.URL);
+        }
+
         #region GetNextPage Tests
 
         [Theory]
@@ -516,110 +542,175 @@ namespace form_builder_tests.UnitTests.Models
             Assert.Equal("submit-two", result.PageSlug);
         }
 
+        #endregion
+
         [Fact]
-        public void GetNextPage_ShouldReturn_Behaviour_WhenMix_OfEqualAndCheckbox_WithinSameBehaviour()
+        public void GetNextPage_ShouldGoToOther_WhenDateLessThan42Days()
         {
+            var PageSlugLessThan = "less-than";
+            var PageSlugGreaterThan = "more-than";
+
+
+
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithPageSlug("submit-one")
-                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
-                .WithCondition(new Condition{ CheckboxContains = "berry", QuestionId = "data" })
+                .WithPageSlug("page-continue")
                 .Build();
 
             var behaviour2 = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageSlug("submit-two")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithBehaviour(behaviour)
-                .WithBehaviour(behaviour2)
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("test", "apple");
-            viewModel.Add("data", "berry");
-
-            var result = page.GetNextPage(viewModel);
-
-            Assert.Equal(EBehaviourType.GoToPage, result.BehaviourType);
-        }
-
-        [Fact]
-        public void GetNextPage_ShouldReturn_Behaviour_WhenMix_OfMultipleEqualAndCheckbox_WithinSameBehaviour()
-        {
-            var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithPageSlug("submit-one")
-                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
-                .WithCondition(new Condition{ CheckboxContains = "berry", QuestionId = "data" })
+                .WithPageSlug(PageSlugLessThan)
+                .WithCondition(new Condition { ComparisonDate = DateTime.Today.ToString("yyyy-MM-dd"), IsBefore = 42, Unit = EDateUnit.Day, QuestionId = "testDate" })
                 .Build();
 
-            var behaviour2 = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitForm)
-                .Build();
 
             var behaviour3 = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageSlug("submit-one")
-                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
-                .WithCondition(new Condition{ CheckboxContains = "pear", QuestionId = "data" })
-                .WithCondition(new Condition{ CheckboxContains = "berry", QuestionId = "data" })
-                .Build();
-
-            var behaviour4 = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitForm)
-                .WithPageSlug("submit-one")
-                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
-                .WithCondition(new Condition{ CheckboxContains = "berry", QuestionId = "data" })
-                .WithCondition(new Condition{ EqualTo = "data", QuestionId = "test2" })
-                .Build();
+               .WithBehaviourType(EBehaviourType.GoToPage)
+               .WithPageSlug(PageSlugGreaterThan)
+               .WithCondition(new Condition { ComparisonDate = DateTime.Today.ToString("yyyy-MM-dd"), IsAfter = 43, Unit = EDateUnit.Day, QuestionId = "testDate" })
+               .Build();
 
             var page = new PageBuilder()
                 .WithBehaviour(behaviour)
                 .WithBehaviour(behaviour2)
                 .WithBehaviour(behaviour3)
-                .WithBehaviour(behaviour4)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("test", "apple");
-            viewModel.Add("test2", "fish");
-            viewModel.Add("data", "berry");
+            
+            var result = page.GetNextPage(new Dictionary<string, dynamic>()
+            { { "testDate-year",DateTime.Today.Year.ToString() },
+                { "testDate-month", DateTime.Today.Month.ToString() },
+                { "testDate-day", DateTime.Today.Day.ToString() } }
 
-            var result = page.GetNextPage(viewModel);
+           );
 
-            Assert.Equal(EBehaviourType.GoToPage, result.BehaviourType);
+            Assert.Equal(PageSlugLessThan, result.PageSlug);
+
         }
 
         [Fact]
-        public void GetNextPage_ShouldReturn_BehaviourSubmit_WhenMix_OfMultipleEqualAndCheckbox_WithinSameBehaviour()
+        public void GetNextPage_ShouldGoToOther_WhenDateGreaterThan42Days()
         {
+            var PageSlugLessThan = "less-than";
+            var PageSlugGreaterThan = "more-than";
+
+
+
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithCondition(new Condition{ EqualTo = "apple", QuestionId = "test" })
-                .WithCondition(new Condition{ CheckboxContains = "berry", QuestionId = "data" })
+                .WithPageSlug("page-continue")
                 .Build();
 
             var behaviour2 = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug(PageSlugLessThan)
+                .WithCondition(new Condition { ComparisonDate = DateTime.Today.ToString("yyyy-MM-dd"), IsBefore = 42, Unit = EDateUnit.Day, QuestionId = "testDate" })
                 .Build();
+
+
+            var behaviour3 = new BehaviourBuilder()
+               .WithBehaviourType(EBehaviourType.GoToPage)
+               .WithPageSlug(PageSlugGreaterThan)
+               .WithCondition(new Condition { ComparisonDate = DateTime.Today.ToString("yyyy-MM-dd"), IsAfter = 43, Unit = EDateUnit.Day, QuestionId = "testDate" })
+               .Build();
 
             var page = new PageBuilder()
                 .WithBehaviour(behaviour)
                 .WithBehaviour(behaviour2)
+                .WithBehaviour(behaviour3)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("test", "pear");
-            viewModel.Add("data", "berry");
+            var futureDate = DateTime.Today.AddDays(50);
 
-            var result = page.GetNextPage(viewModel);
+            var result = page.GetNextPage(new Dictionary<string, dynamic>()
+            { { "testDate-year", futureDate.Year.ToString() },
+                { "testDate-month", futureDate.Month.ToString() },
+                { "testDate-day", futureDate.Day.ToString() } }
 
-            Assert.Equal(EBehaviourType.SubmitForm, result.BehaviourType);
+          );
+
+            Assert.Equal(PageSlugGreaterThan, result.PageSlug);
+
+        }
+        [Fact]
+        public void GetNextPage_ShouldGoToOther_WhenDateLessThan42DaysWithHtml5Control()
+        {
+            var PageSlugLessThan = "less-than";
+            var PageSlugGreaterThan = "more-than";
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("page-continue")
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug(PageSlugLessThan)
+                .WithCondition(new Condition { ComparisonDate = DateTime.Today.ToString("yyyy-MM-dd"), IsBefore = 42, Unit = EDateUnit.Day, QuestionId = "testDate" })
+                .Build();
+
+
+            var behaviour3 = new BehaviourBuilder()
+               .WithBehaviourType(EBehaviourType.GoToPage)
+               .WithPageSlug(PageSlugGreaterThan)
+               .WithCondition(new Condition { ComparisonDate = DateTime.Today.ToString("yyyy-MM-dd"), IsAfter = 43, Unit = EDateUnit.Day, QuestionId = "testDate" })
+               .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .WithBehaviour(behaviour3)
+                .Build();
+
+          
+
+
+            var result = page.GetNextPage(
+             new Dictionary<string, dynamic>() { { "testDate", DateTime.Today.ToString() } });
+
+            Assert.Equal(PageSlugLessThan, result.PageSlug);
+
         }
 
+        [Fact]
+        public void GetNextPage_ShouldGoToOther_WhenDateGreaterThan42DaysWithHTML5Control()
+        {
+            var PageSlugLessThan = "less-than";
+            var PageSlugGreaterThan = "more-than";
 
-        #endregion
+
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("page-continue")
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug(PageSlugLessThan)
+                .WithCondition(new Condition { ComparisonDate = DateTime.Today.ToString("yyyy-MM-dd"), IsBefore = 42, Unit = EDateUnit.Day, QuestionId = "testDate" })
+                .Build();
+
+
+            var behaviour3 = new BehaviourBuilder()
+               .WithBehaviourType(EBehaviourType.GoToPage)
+               .WithPageSlug(PageSlugGreaterThan)
+               .WithCondition(new Condition { ComparisonDate = DateTime.Today.ToString("yyyy-MM-dd"), IsAfter = 43, Unit = EDateUnit.Day, QuestionId = "testDate" })
+               .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .WithBehaviour(behaviour3)
+                .Build();
+
+            var futureDate = DateTime.Today.AddDays(50);
+
+            var result = page.GetNextPage(
+           new Dictionary<string, dynamic>() { { "testDate", futureDate.ToString() } });
+
+           Assert.Equal(PageSlugGreaterThan, result.PageSlug);
+
+        }
     }
 }

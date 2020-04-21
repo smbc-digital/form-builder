@@ -1,3 +1,4 @@
+using form_builder.Comparators;
 using form_builder.Enum;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties;
@@ -77,23 +78,36 @@ namespace form_builder.Models
             {
                 foreach (var behaviour in Behaviours.OrderByDescending(_ => _.Conditions.Count))
                 {
-                    var equalToConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.EqualTo));
-                    var checkBoxContainsConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.CheckboxContains));
+                    foreach (var condition in behaviour.Conditions)
+                    {
+                        var found = false;
+                        if (condition.EqualTo != null)
+                        {
+                            found = behaviour.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
+                        }
+                        else if(condition.IsBefore != null)
+                        {
+                            found = behaviour.Conditions.All(x => DateComparator.DateIsBefore(x, viewModel));
+                        }
+                        else if(condition.IsAfter != null)
+                        {
+                            found = behaviour.Conditions.All(x => DateComparator.DateIsAfter(x, viewModel));                           
+                        }
+                        else
+                        {
+                             found = behaviour.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
+                        }
 
-                    var equalToValid = !equalToConditions.Any();
-                    var checkBoxContainsValid = !checkBoxContainsConditions.Any();
+                        if (found)
+                            return behaviour;
+                    }
 
-                    if(equalToConditions.Any())
-                        equalToValid = equalToConditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
-
-                    if(checkBoxContainsConditions.Any())
-                        checkBoxContainsValid = checkBoxContainsConditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
-
-                    if (equalToValid && checkBoxContainsValid)
+                    if (!behaviour.Conditions.Any())
+                    {
                         return behaviour;
+                    }
                 }
             }
-
             throw new Exception("Behaviour issues");
         }
 
