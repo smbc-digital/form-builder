@@ -861,7 +861,7 @@ namespace form_builder_tests.UnitTests.Mappers
             var element = new ElementBuilder()
                             .WithType(EElementType.Street)
                             .WithQuestionId(questionId)
-                            .WithStreetLabel(labelText)
+                            .WithLabel(labelText)
                             .Build();
 
             var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
