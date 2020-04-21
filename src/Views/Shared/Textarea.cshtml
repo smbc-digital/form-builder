@@ -9,10 +9,11 @@
         elementProperties.Add("class", "govuk-textarea govuk-js-character-count");
     }
 }
+
 @if(Model.DisplayCharacterCount)
 {
     <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength=@Model.Properties.MaxLength>
-        <div class= @(!Model.IsValid ? "govuk-form-group govuk-form-group--error" : "govuk-form-group")>
+        <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
             <partial name="LabelH1" />
 
             <partial name="Hint" />
@@ -29,13 +30,13 @@
 }
 else
 {
-        <div class= @(!Model.IsValid ? "govuk-form-group govuk-form-group--error" : "govuk-form-group")>
-            <partial name="LabelH1" />
+    <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+        <partial name="LabelH1" />
 
-            <partial name="Hint" />
-            
-            <partial name="Error" />
-            
-            @Html.TextArea(Model.QuestionId, Model.Properties.Value, elementProperties) 
-        </div>
+        <partial name="Hint" />
+        
+        <partial name="Error" />
+        
+        @Html.TextArea(Model.QuestionId, Model.Properties.Value, elementProperties) 
+    </div>
 }

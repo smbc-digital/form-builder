@@ -14,6 +14,54 @@ namespace form_builder.Models.Elements
 {
     public class AddressManual : Element
     {
+        private string[] ErrorMessages
+        {
+            get{
+                var messages = ValidationMessage.Split(", ");
+                if(messages.Length < 3)
+                {
+                    return new string[]{string.Empty,string.Empty, string.Empty };
+                }
+
+                return messages;
+            }
+        }
+
+        public string ChangeHeader => "Postcode";
+
+        public bool IsLine1Valid => IsValid && string.IsNullOrEmpty(Line1ValdationMessage);
+
+        public ErrorViewModel Line1ValidationModel => new ErrorViewModel {
+                Id = GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1),
+                IsValid = IsLine1Valid,
+                Message = Line1ValdationMessage
+            } ;
+
+        public string Line1ValdationMessage => ErrorMessages[0];
+
+        public bool IsTownValid => IsValid && string.IsNullOrEmpty(TownValdationMessage);
+
+        public ErrorViewModel TownValidationModel => new ErrorViewModel {
+        Id = GetCustomItemId(AddressManualConstants.TOWN),
+                IsValid = IsTownValid,
+                Message = TownValdationMessage
+            } ;
+
+        public string TownValdationMessage => ErrorMessages[1];
+    
+        public bool IsPostcodeValid => IsValid && string.IsNullOrEmpty(TownValdationMessage);
+
+        public string PostcodeValdationMessage => ErrorMessages[2];
+
+        public string Label => Properties.AddressManualLabel;
+
+        public ErrorViewModel PostcodeValidationModel => new ErrorViewModel {
+        Id = GetCustomItemId(AddressManualConstants.POSTCODE),
+                IsValid = IsPostcodeValid,
+                Message = PostcodeValdationMessage
+            } ;
+
+        public string ReturnURL { get; set; }
         public AddressManual()
         {
             Type = EElementType.AddressManual;
@@ -54,17 +102,18 @@ namespace form_builder.Models.Elements
 
             if (isValid && output == 0)
             {
-
                 Properties.DisplayNoResultsIAG = true;
             }
+            
+            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
+            
+            // var viewElement = new ElementViewModel
+            // {
+            //     Element = this,
+            //     ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
+            // };
 
-            var viewElement = new ElementViewModel
-            {
-                Element = this,
-                ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
-        };
-
-            return await viewRender.RenderAsync(Type.ToString(), viewElement);
+            return await viewRender.RenderAsync(Type.ToString(), this);
         }
     }
 }

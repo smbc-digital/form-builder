@@ -1,10 +1,11 @@
     @if (!Model.IsValid)
-    {
-        var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) 
-            ? Model.ValidationMessage 
-            : Model.Properties.CustomValidationMessage;
+    {        
+        var viewModel = new form_builder.ViewModels.ErrorViewModel
+        {
+            IsValid = Model.IsValid,
+            Message =  string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage,
+            Id = Model.ErrorId
+        };
 
-        <span class="govuk-error-message" id="@Model.ErrorId">
-            <span class="govuk-visually-hidden">Error:</span> @validationMessage
-        </span>
+        <partial model=viewModel name="ErrorBase" />
     }
