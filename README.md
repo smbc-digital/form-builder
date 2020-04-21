@@ -1005,11 +1005,65 @@ Example where dependant on their answers to certain questions the form navigates
             },        ]
     }
 ```
+***Date After and DateBefore Example
+
+```json
+ "Behaviours": [
+        {
+          "Conditions": [
+            {
+              // If Today is before 43 days before the testDate then...
+              "QuestionID": "testDate",
+              "IsBefore": 43,
+              "ComparisonDate": "Today",
+              "Unit": "day"
+            }
+          ],
+          "BehaviourType": "GoToPage",
+          "PageSlug": "page-is-before"
+        },
+        {
+          "Conditions": [
+            {
+              // If testDate is before 43 days from today the  then...
+              "QuestionID": "testDate",
+              "IsAfter": 1,
+              "ComparisonDate": "Today",
+              "Unit": "year"
+            }
+          ],
+          "BehaviourType": "GoToPage",
+          "PageSlug": "page-is-after"
+        },
+        {
+          "Conditions": [
+            {
+              // If date is after one year from today
+              "QuestionID": "testDate",
+              "IsAfter": 1,
+              "ComparisonDate": "Today",
+              "Unit": "year"
+            }
+          ],
+          "BehaviourType": "GoToPage",
+          "PageSlug": "page-is-after"
+        },
+        {
+          "conditions": [],
+          "behaviourType": "GoToPage",
+          "PageSlug": "page-two"
+        }
+      ]
+    }
+
+```
 
 **Conditions**[*object*]
 * QuestionID (*string*) - The name of the Radio/Checkbox list to evaluate
 * EqualTo (*string*) - The value it must equal to for the behaviour to happen
-* CheckboxContains (*string*) - The value will be checked against the list supplied by the checkbox. If it is found it will go to the behaviour 
+* CheckboxContains (*string*) - The value will be checked against the list supplied by the checkbox. If it is found it will go to the behaviour
+* DateBefore (*int*) - The value will be checked against the dateBefore if the date is less than comparison date it will got to the behavior. Units are either year,month day. 
+* DateAfter (*int*) - The value will be checked against the dateAfter if te date is less than camparison date it will got to the behavior. Units are either year,month day. 
 
 **BehaviourType** (*enum*) __*__
 * 0 = GoToPage
