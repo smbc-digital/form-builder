@@ -10,7 +10,6 @@ namespace form_builder_tests.Builders
         private EBehaviourType _behaviourType = EBehaviourType.GoToExternalPage;
         private string _PageSlug;
         private List<SubmitSlug> _submitSlugs = new List<SubmitSlug>();
-        private string _callbackUrl;
 
 
 

@@ -1,3 +1,4 @@
+using form_builder.Comparators;
 using form_builder.Enum;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties;
@@ -79,17 +80,27 @@ namespace form_builder.Models
                 {
                     var equalToConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.EqualTo));
                     var checkBoxContainsConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.CheckboxContains));
+                    var dateIsBeforeConditions = behaviour.Conditions.Where(x => x.IsBefore != null);
+                    var dateIsAfterConditions = behaviour.Conditions.Where(x => x.IsAfter != null);
 
                     var equalToValid = !equalToConditions.Any();
                     var checkBoxContainsValid = !checkBoxContainsConditions.Any();
+                    var dateIsBeforeValid = !dateIsBeforeConditions.Any();
+                    var dateIsAfterValid = !dateIsAfterConditions.Any();
 
                     if(equalToConditions.Any())
                         equalToValid = equalToConditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
 
                     if(checkBoxContainsConditions.Any())
                         checkBoxContainsValid = checkBoxContainsConditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
+                        
+                    if(dateIsBeforeConditions.Any())
+                        dateIsBeforeValid = dateIsBeforeConditions.All(x => DateComparator.DateIsBefore(x, viewModel));
+                        
+                    if(dateIsAfterConditions.Any())
+                        dateIsAfterValid = dateIsAfterConditions.All(x => DateComparator.DateIsAfter(x, viewModel));  
 
-                    if (equalToValid && checkBoxContainsValid)
+                    if (equalToValid && checkBoxContainsValid && dateIsBeforeValid && dateIsAfterValid)
                         return behaviour;
                 }
             }
