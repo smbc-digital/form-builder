@@ -150,17 +150,6 @@ namespace form_builder.Models.Elements
             return data;
         }
 
-        // TODO: We should be able to get rid of this eventually
-        public string WriteOptional(string prefix = "")
-        {
-            if (DisplayOptional)
-            {
-                return "class = optional";
-            }
-
-            return null;
-        }
-
         private bool DisplayOptional
         {
             get

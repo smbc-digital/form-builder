@@ -61,7 +61,6 @@ namespace form_builder.Validators
                 else
                 {
                     key = streetElement.StreetSearchQuestionId;
-                    // TODO: Not sure whether validation messages should be needed in the validator... these should just say valid = true/false?
                     validationMessage = "Check the " + element.Properties.Label.ToLower() + " and try again";
                 }
             }

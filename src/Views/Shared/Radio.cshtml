@@ -2,8 +2,6 @@
 @model form_builder.Models.Elements.Element
 
 @* TODO: Do we need to worry about making radios inline? *@
-@* TODO: Conditional content revealed of option Selected?  *@
-
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)" />
     @await Html.BeginFieldSet(Model, new string[] {"govuk-fieldset"})
 

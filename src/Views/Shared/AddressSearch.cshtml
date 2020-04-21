@@ -13,6 +13,7 @@
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    @* TODO: Label as H1 causes this to not display correctly as per styleguide, check with UX *@
     <partial name="LabelH1" />
     
     @if (@Model.Properties.StockportPostcode == true)
