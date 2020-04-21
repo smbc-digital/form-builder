@@ -22,7 +22,7 @@ namespace form_builder.Comparators
 
 
 
-            if (DateTime.Compare(dateValue, newComparisonDate) <= 0)
+            if (DateTime.Compare(dateValue, newComparisonDate) < 0)
             {
                 return true;
             }
@@ -45,6 +45,28 @@ namespace form_builder.Comparators
 
 
             if (DateTime.Compare(dateValue, newComparisonDate) > 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool DateIsEqual(Condition condition, Dictionary<string, dynamic> viewModel)
+        {
+            var dateComparison = DateTime.Today;
+            if (condition.ComparisonDate.ToLower() != "today")
+            {
+                dateComparison = DateTime.Parse(condition.ComparisonDate);
+            }
+
+            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, condition.IsAfter);
+
+            var dateValue = GetDateValue(condition.QuestionId, viewModel);
+
+
+
+            if (DateTime.Compare(dateValue, newComparisonDate) == 0)
             {
                 return true;
             }
