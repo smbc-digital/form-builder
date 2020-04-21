@@ -77,28 +77,23 @@ namespace form_builder.Models
             {
                 foreach (var behaviour in Behaviours.OrderByDescending(_ => _.Conditions.Count))
                 {
-                    foreach (var condition in behaviour.Conditions)
-                    {
-                        var found = false;
-                        if (condition.EqualTo != null)
-                        {
-                            found = behaviour.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
-                        }
-                        else
-                        {
-                             found = behaviour.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
-                        }
+                    var equalToConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.EqualTo));
+                    var checkBoxContainsConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.CheckboxContains));
 
-                        if (found)
-                            return behaviour;
-                    }
+                    var equalToValid = !equalToConditions.Any();
+                    var checkBoxContainsValid = !checkBoxContainsConditions.Any();
 
-                    if (!behaviour.Conditions.Any())
-                    {
+                    if(equalToConditions.Any())
+                        equalToValid = equalToConditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
+
+                    if(checkBoxContainsConditions.Any())
+                        checkBoxContainsValid = checkBoxContainsConditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
+
+                    if (equalToValid && checkBoxContainsValid)
                         return behaviour;
-                    }
                 }
             }
+
             throw new Exception("Behaviour issues");
         }
 
