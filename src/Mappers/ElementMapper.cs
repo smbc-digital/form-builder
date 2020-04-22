@@ -175,7 +175,7 @@ namespace form_builder.Mappers
             addressObject.Town = value.FirstOrDefault(_ => _.QuestionId == manualAddressLineTown)?.Response ?? string.Empty;
             addressObject.Postcode = value.FirstOrDefault(_ => _.QuestionId == manualAddressLinePostcode)?.Response ?? string.Empty;
             addressObject.PlaceRef = value.FirstOrDefault(_ => _.QuestionId == urpnKey)?.Response ?? string.Empty;
-            addressObject.SelectedAddress = value.FirstOrDefault(_ => _.QuestionId == addressDescription)?.Response ?? string.Empty;
+            addressObject.SelectedAddress = value.FirstOrDefault(_ => _.QuestionId == addressDescription)?.Response ?? null;
 
             return addressObject;
 
@@ -192,7 +192,7 @@ namespace form_builder.Mappers
                 .ToList();
 
             addressObject.PlaceRef = value.FirstOrDefault(_ => _.QuestionId == uspnKey)?.Response ?? string.Empty;
-            addressObject.SelectedAddress = value.FirstOrDefault(_ => _.QuestionId == streetDescription)?.Response ?? string.Empty;
+            addressObject.SelectedAddress = value.FirstOrDefault(_ => _.QuestionId == streetDescription)?.Response ?? null;
 
             return addressObject;
         }

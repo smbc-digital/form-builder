@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
 using form_builder.Enum;
 using form_builder.Models.Elements;
 

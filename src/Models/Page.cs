@@ -1,3 +1,4 @@
+using form_builder.Comparators;
 using form_builder.Enum;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties;
@@ -33,7 +34,7 @@ namespace form_builder.Models
 
         [JsonIgnore]
         public bool IsValid => !InvalidElements.Any();
-        
+
         [JsonIgnore]
         public IEnumerable<BaseProperty> InvalidElements
         {
@@ -75,31 +76,38 @@ namespace form_builder.Models
             {
                 return Behaviours.FirstOrDefault();
             }
-
-            foreach (var behaviour in Behaviours)
+            else
             {
-                /* 
-                 * TODO : Should this be abstracted away into some for of ICondition interface for MatchesAnswerCondition?
-                 * ICondition would then have and interface IsMatching() that would then allow for other condition types to be easily added?
-                 */
-                foreach (var condition in behaviour.Conditions)
+                foreach (var behaviour in Behaviours.OrderByDescending(_ => _.Conditions.Count))
                 {
-                    if (condition.EqualTo != null)
-                    {
-                        return Behaviours
-                            .OrderByDescending(_ => _.Conditions.Count)
-                            .FirstOrDefault(_ => _.Conditions.All(x => x.EqualTo == viewModel[x.QuestionId]));
-                    }
-                    else
-                    {
-                        return Behaviours
-                            .OrderByDescending(_ => _.Conditions.Count)
-                            .FirstOrDefault(_ => _.Conditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains)));
-                    }
+                    var equalToConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.EqualTo));
+                    var checkBoxContainsConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.CheckboxContains));
+                    var dateIsBeforeConditions = behaviour.Conditions.Where(x => x.IsBefore != null);
+                    var dateIsAfterConditions = behaviour.Conditions.Where(x => x.IsAfter != null);
+
+                    var equalToValid = !equalToConditions.Any();
+                    var checkBoxContainsValid = !checkBoxContainsConditions.Any();
+                    var dateIsBeforeValid = !dateIsBeforeConditions.Any();
+                    var dateIsAfterValid = !dateIsAfterConditions.Any();
+
+                    if(equalToConditions.Any())
+                        equalToValid = equalToConditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
+
+                    if(checkBoxContainsConditions.Any())
+                        checkBoxContainsValid = checkBoxContainsConditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
+                        
+                    if(dateIsBeforeConditions.Any())
+                        dateIsBeforeValid = dateIsBeforeConditions.All(x => DateComparator.DateIsBefore(x, viewModel));
+                        
+                    if(dateIsAfterConditions.Any())
+                        dateIsAfterValid = dateIsAfterConditions.All(x => DateComparator.DateIsAfter(x, viewModel));  
+
+                    if (equalToValid && checkBoxContainsValid && dateIsBeforeValid && dateIsAfterValid)
+                        return behaviour;
                 }
             }
 
-            throw new Exception("Behaviour issues");
+            throw new Exception("Page model, There was a problem whilst processing behaviors");
         }
 
         public SubmitSlug GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)
@@ -115,11 +123,16 @@ namespace form_builder.Models
             if (Behaviours.Count > 1)
             {
                 var previousPage = formAnswers.Pages
-                    .FirstOrDefault(_ => _.PageSlug == formAnswers.Path);
+                    .SelectMany(_ => _.Answers)
+                    .ToList();
 
                 var viewModel = new Dictionary<string, dynamic>();
-                previousPage.Answers.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
-                submitBehaviour.URL = GetNextPage(viewModel).PageSlug;
+                previousPage.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
+                var foundSubmitBehaviour = GetNextPage(viewModel);
+
+                submitBehaviour = foundSubmitBehaviour.SubmitSlugs.ToList()
+                            .Where(x => x.Environment.ToLower() == environment.ToLower())
+                            .FirstOrDefault();
             }
             else
             {
@@ -135,7 +148,7 @@ namespace form_builder.Models
 
                     if (behaviour == null)
                     {
-                        throw new NullReferenceException("HomeController, Submit: No Url supplied for submit form");
+                        throw new NullReferenceException("Page model, Submit: No Url supplied for submit form");
                     }
 
                     submitBehaviour = behaviour;
@@ -144,7 +157,7 @@ namespace form_builder.Models
 
             if (string.IsNullOrEmpty(submitBehaviour.URL))
             {
-                throw new NullReferenceException("HomeController, Submit: No postUrl supplied for submit form");
+                throw new NullReferenceException("Page model, Submit: No postUrl supplied for submit form");
             }
 
             return submitBehaviour;

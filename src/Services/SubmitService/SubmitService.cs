@@ -70,8 +70,6 @@ namespace form_builder.Services.SubmtiService
                 _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
             }
 
-            var data = JsonConvert.SerializeObject(mappingEntity.Data);
-
             var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
             if (!response.IsSuccessStatusCode)
             {
