@@ -1,6 +1,6 @@
     @if(!string.IsNullOrEmpty(Model.Label))
     {
-        @if(Model.Properties.LabelAsH1)
+        @if(Model.Properties.LabelAsH1 || Model.Properties.LegendAsH1)
         {
             <h1 class="govuk-label-heading">
                 <label class="govuk-label govuk-label--xl" for="@Model.QuestionId">
