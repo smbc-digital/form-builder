@@ -22,7 +22,7 @@ namespace form_builder.Comparators
 
 
 
-            if (DateTime.Compare(dateValue, newComparisonDate) < 0)
+            if (DateTime.Compare(dateValue, newComparisonDate) <= 0)
             {
                 return true;
             }
