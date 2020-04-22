@@ -9,7 +9,7 @@ namespace form_builder.Providers.Address
         public string ProviderName { get => "Fake"; }
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string postcode)
         {
-            return new List<AddressSearchResult> {
+            return await Task.FromResult(new List<AddressSearchResult> {
                 new AddressSearchResult {
                     Name = "address 1",
                     UniqueId = "123456789012"
@@ -22,7 +22,7 @@ namespace form_builder.Providers.Address
                     Name = "address 3",
                     UniqueId = "564737838937"
                 }
-            };
+            });
         }
     }
 }
