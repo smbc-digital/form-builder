@@ -145,9 +145,7 @@ namespace form_builder.Models
                             .FirstOrDefault();
 
                     if (behaviour == null)
-                    {
                         throw new NullReferenceException("HomeController, Submit: No Url supplied for submit form");
-                    }
 
                     submitBehaviour = behaviour;
                 }

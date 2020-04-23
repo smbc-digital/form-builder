@@ -9,7 +9,7 @@ namespace form_builder.Providers.Organisation
         public string ProviderName => "Fake";
         public async Task<IEnumerable<OrganisationSearchResult>> SearchAsync(string organisation)
         {
-            return new List<OrganisationSearchResult> {
+            return await Task.FromResult(new List<OrganisationSearchResult> {
                 new OrganisationSearchResult {
                     Name = "Organisation 1",
                     Reference = "0101010101"
@@ -24,7 +24,7 @@ namespace form_builder.Providers.Organisation
                     Reference = "030303030303",
                     Address = "3 town hall lane, city, sk11aa"
                 }
-            };
+            });
         }
     }
 }
