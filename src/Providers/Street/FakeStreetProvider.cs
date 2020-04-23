@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Models.Addresses;
 
@@ -11,7 +9,7 @@ namespace form_builder.Providers.Street
         public string ProviderName { get => "Fake"; }
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string street)
         {
-            return new List<AddressSearchResult> {
+            return await Task.FromResult(new List<AddressSearchResult> {
                 new AddressSearchResult {
                     Name = "Green lane",
                     UniqueId = "123456789012"
@@ -24,7 +22,7 @@ namespace form_builder.Providers.Street
                     Name = "Green street",
                     UniqueId = "564737838937"
                 }
-            };
+            });
         }
     }
 }
