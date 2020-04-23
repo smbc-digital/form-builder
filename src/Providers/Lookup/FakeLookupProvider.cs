@@ -4,7 +4,7 @@ using form_builder.Models;
 
 namespace form_builder.Providers.Lookup
 {
-    public class FakeLookupProvider: ILookupProvider
+    public class FakeLookupProvider : ILookupProvider
     {
         public async Task<IList<Option>> GetAsync(string key)
         {
@@ -29,10 +29,9 @@ namespace form_builder.Providers.Lookup
                     Value = "False",
                     Checked = false
                 }
-            
             };
 
-            return options;
+            return await Task.FromResult(options);
         }
     }
 }

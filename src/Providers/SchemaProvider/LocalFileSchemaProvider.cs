@@ -19,8 +19,8 @@ namespace form_builder.Providers.SchemaProvider
         }
         async Task<T> ISchemaProvider.Get<T>(string schemaName)
         {
-           var baseForm = System.IO.File.ReadAllText($@".\DSL\{schemaName}.json");
-            return JsonConvert.DeserializeObject<T>(baseForm);
+            var baseForm = System.IO.File.ReadAllText($@".\DSL\{schemaName}.json");
+            return await Task.FromResult(JsonConvert.DeserializeObject<T>(baseForm));
         }
     }
 }
