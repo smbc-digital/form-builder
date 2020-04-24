@@ -2,6 +2,10 @@
 @{    
     var elementProperties = Model.GenerateElementProperties("Select");
     elementProperties.Add("class", "govuk-select");
+
+    if(!Model.IsValid){
+        elementProperties.Add("class", "govuk-select--error");
+    }
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">

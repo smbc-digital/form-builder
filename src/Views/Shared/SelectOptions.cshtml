@@ -1,6 +1,6 @@
 ﻿@model form_builder.Models.Elements.Element
 
-<select class="govuk-select" id="@Model.QuestionId " name="@Model.QuestionId" @Html.Raw(Model.DescribedByAttribute())>
+<select class="govuk-select @(!Model.IsValid ? "govuk-select--error" : string.Empty)" id="@Model.QuestionId " name="@Model.QuestionId" @Html.Raw(Model.DescribedByAttribute())>
     <option value="">Select an option...</option>
     @for (var i = 0; i < Model.Properties.Options.Count; i++)
     {
