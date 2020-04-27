@@ -4,7 +4,8 @@
     var errorId = $"{Model.Properties.QuestionId}-error";
 }
 
-@if(Model.Properties.LabelAsH1) {
+@if (Model.Properties.LabelAsH1)
+{
     <h1>
         <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
         @if (Model.Properties.Optional)
@@ -12,8 +13,14 @@
             <span class="optional">(optional)</span>
         }
     </h1>
-} else {
+}
+else
+{
     <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
+    @if (Model.Properties.Optional)
+    {
+        <span class="optional">(optional)</span>
+    }
 }
 
 @if (!string.IsNullOrEmpty(Model.Properties.Hint))
