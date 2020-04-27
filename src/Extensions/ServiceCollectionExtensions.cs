@@ -178,7 +178,7 @@ namespace form_builder.Extensions
             services.AddTransient<ISuccessPageContentFactory, SuccessPageContentFactory>();
             services.AddTransient<IPageContentFactory, PageContentFactory>();
             services.AddTransient<ISchemaFactory, SchemaFactory>();
-            services.AddTransient<ISchemaTransformFactory, LookupSchemaFactory>();
+            services.AddTransient<ISchemaTransformFactory, LookupSchemaTransformFactory>();
 
             return services;
         }

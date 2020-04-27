@@ -3,6 +3,7 @@ using form_builder.Models.Elements;
 using form_builder.Providers.TransformDataProvider;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace form_builder.Factories.Transform
@@ -12,11 +13,11 @@ namespace form_builder.Factories.Transform
         Task<T> Build<T>(IElement entry);
     }
 
-    public class LookupSchemaFactory : ISchemaTransformFactory
+    public class LookupSchemaTransformFactory : ISchemaTransformFactory
     {
         private readonly ITransformDataProvider _transformDataProvider;
 
-        public LookupSchemaFactory(ITransformDataProvider transformDataProvider)
+        public LookupSchemaTransformFactory(ITransformDataProvider transformDataProvider)
         {
             _transformDataProvider = transformDataProvider;
         }
@@ -25,7 +26,7 @@ namespace form_builder.Factories.Transform
         {
             var lookupOptions = await _transformDataProvider.Get<List<Option>>(entry.Lookup);
 
-            if(lookupOptions == null)
+            if(!lookupOptions.Any())
                 throw new Exception($"LookupSchemaFactory::Build, No lookup options found for question {entry.Properties.QuestionId} with lookup value {entry.Lookup}");
 
             entry.Properties.Options.AddRange(lookupOptions);
