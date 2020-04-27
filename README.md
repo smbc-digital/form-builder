@@ -256,7 +256,7 @@ The target mapping above would produce this object
     * [Textbox(Postcode)](https://github.com/smbc-digital/form-builder/wiki/Textbox)
     * [Textbox(Stockport postcode)](https://github.com/smbc-digital/form-builder/wiki/Textbox)
     * [RequiredIf](#requiredif)
-    * [Textarea](#textareaprops) (Large text box)
+    * [Textarea](https://github.com/smbc-digital/form-builder/wiki/Textarea)
     * [Radio](#radioprops)
     * [Select](#selectprops)
     * [Checkbox](#checkboxprops)
@@ -315,30 +315,6 @@ Paragraph text JSON example:
   }
 ```
 
-#
-   * <a name="textareaprops">**Textarea**</a>
-        * Label (*string*) __*__
-        * QuestionId (*string*) __*__
-        * CustomValidationMessage (*string*)
-        * Hint (*string*)
-        * MaxLength (*int*) (defaults to 200)
-        * Optional (*boolean*) (defaults to false)
-        * TargetMapping (*string*)  
-
-Textarea (Email) JSON example:
-```json
-  {
-    "Type": "Textarea",
-    "Properties": {
-      "Label": "Enter your issue",
-      "QuestionId": "issueOne",
-      "CustomValidationMessage": "Custom validation message",
-      "Hint": "Hint text",
-      "MaxLength": "2000",
-      "Optional": false
-    }
-  }
-```
 #
    * <a name="radioprops">**Radio**</a>
         * Label (*string*) __*__
