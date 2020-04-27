@@ -250,7 +250,7 @@ The target mapping above would produce this object
 * **Type** (*string*) (HTML element)
     * [H2-H6](#headingprops) (Heading levels)
     * [P](#ptextprops) (Paragraph text)
-    * [Textbox](#textboxprops)
+    * [Textbox](https://github.com/smbc-digital/form-builder/wiki/Textbox)
     * [RequiredIf](#requiredif)
     * [TextBox(Numeric)](#textboxnumeric)
     * [Textbox(Email)](#textboxemailprops)
