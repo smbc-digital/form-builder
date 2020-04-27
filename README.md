@@ -251,11 +251,11 @@ The target mapping above would produce this object
     * [H2-H6](#headingprops) (Heading levels)
     * [P](#ptextprops) (Paragraph text)
     * [Textbox](https://github.com/smbc-digital/form-builder/wiki/Textbox)
+    * [TextBox(Numeric)](https://github.com/smbc-digital/form-builder/wiki/Textbox)
+    * [Textbox(Email)](https://github.com/smbc-digital/form-builder/wiki/Textbox)
+    * [Textbox(Postcode)](https://github.com/smbc-digital/form-builder/wiki/Textbox)
+    * [Textbox(Stockport postcode)](https://github.com/smbc-digital/form-builder/wiki/Textbox)
     * [RequiredIf](#requiredif)
-    * [TextBox(Numeric)](#textboxnumeric)
-    * [Textbox(Email)](#textboxemailprops)
-    * [Textbox(Postcode)](#textboxpostcodeprops)
-    * [Textbox(Stockport postcode)](#textboxstockportpostcodeprops)
     * [Textarea](#textareaprops) (Large text box)
     * [Radio](#radioprops)
     * [Select](#selectprops)
@@ -293,34 +293,6 @@ Paragraph text JSON example:
 }
 ```
 #
-   * <a name="textboxprops">**Textbox**</a>
-        * Label (*string*) __*__
-        * QuestionId (*string*) __*__
-        * CustomValidationMessage (*string*)
-        * Hint (*string*)
-        * MaxLength (*int*) (defaulted to 200)
-        * Optional (*boolean*) (defaults to false)
-        * Regex (*string*) - The regex pattern to use
-        * RegexValidationMessage (*string*) -  The validation message that appears if the input does not match the Regex pattern         (Default: Check the {Label} and try again)
-        * TargetMapping (*string*)  
-        
-### Textbox JSON example (has to be a valid UK National Insurance Number):
-```json
-  {
-    "Type": "Textbox",
-    "Properties": {
-      "QuestionId": "niNumber",
-      "Label": "NI Number",
-      "Hint": "e.g: AB123456Z",     
-      "Optional": false,
-      "MaxLength": 9,
-      "Regex": "^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$",
-      "RegexValidationMessage": "Enter a valid NI Number",
-      "TargetMapping": "customer.ninumber"
-    }
-  }
-```
-#
    * <a name="requiredif">**Required if**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
@@ -342,112 +314,7 @@ Paragraph text JSON example:
     }
   }
 ```
-#
-   * <a name="textboxnumeric">**Textbox(Numeric)**</a>
-        * Label (*string*) __*__
-        * QuestionId (*string*) __*__
-        * CustomValidationMessage (*string*)
-        * Hint (*string*)        
-        * Optional (*boolean*) (defaults to false)
-        * Numeric (*boolean*) (need this to validate it as an email address)
-        * Max (*string*) (maxium value in integer e.g '25')
-        * Min (*string*) (maxium value in integer e.g '0')
-        * TargetMapping (*string*)  
-        
-Textbox Numeric JSON example:
-```json
-  {
-    "Type": "Textbox",
-    "Properties": {
-      "QuestionId": "howManyChildren",
-      "Label": "How Many Children",
-      "Hint": "3",
-      "CustomValidationMessage": "The children should be between 0 and 20",
-      "Optional": false,
-      "Max": 20,
-      "Min": 0,
-      "Numeric": true
-    }
-  }
-```
-#
-   * <a name="textboxemailprops">**Textbox(Email)**</a>
-        * Label (*string*) __*__
-        * QuestionId (*string*) __*__
-        * CustomValidationMessage (*string*)
-        * Hint (*string*)
-        * MaxLength (*int*) (defaulted to 200)
-        * Optional (*boolean*) (defaults to false)
-        * Email (*boolean*) (need this to validate it as an email address)
-        * TargetMapping (*string*)  
-        
-Textbox JSON example:
-```json
-  {
-    "Type": "Textbox",
-    "Properties": {
-      "QuestionId": "emailAddress",
-      "Label": "Email address",
-      "Hint": "ie: someone@example.com",
-      "CustomValidationMessage": "Check the email address and try again",
-      "Optional": false,
-      "MaxLength": 60,
-      "Email": true
-    }
-  }
-```
-#
-   * <a name="textboxpostcodeprops">**Textbox(Postcode)**</a>
-        * Label (*string*) __*__
-        * QuestionId (*string*) __*__
-        * CustomValidationMessage (*string*)
-        * Hint (*string*)
-        * MaxLength (*int*) (defaulted to 200)
-        * Optional (*boolean*) (defaults to false)
-        * Postcode (*boolean*) (need this to validate it as a postcode e.g. L15 3HJ)
-        * TargetMapping (*string*)  
-        
-Textbox JSON example:
-```json
-  {
-    "Type": "Textbox",
-    "Properties": {
-      "QuestionId": "emailAddress",
-      "Label": "Email address",
-      "Hint": "ie: someone@example.com",
-      "CustomValidationMessage": "Check the email address and try again",
-      "Optional": false,
-      "MaxLength": 60,
-      "Postcode": true
-    }
-  }
-```
-#
-   * <a name="textboxstockportpostcodeprops">**Textbox(Stockport postcode)**</a>
-        * Label (*string*) __*__
-        * QuestionId (*string*) __*__
-        * CustomValidationMessage (*string*)
-        * Hint (*string*)
-        * MaxLength (*int*) (defaulted to 200)
-        * Optional (*boolean*) (defaults to false)
-        * StockportPostcode (*boolean*) (need this to validate it as a Stockport postcode e.g. SK1 3HJ)
-        * TargetMapping (*string*)  
-        
-Textbox JSON example:
-```json
-  {
-    "Type": "Textbox",
-    "Properties": {
-      "QuestionId": "emailAddress",
-      "Label": "Email address",
-      "Hint": "ie: someone@example.com",
-      "CustomValidationMessage": "Check the email address and try again",
-      "Optional": false,
-      "MaxLength": 60,
-      "StockportPostcode": true
-    }
-  }
-```
+
 #
    * <a name="textareaprops">**Textarea**</a>
         * Label (*string*) __*__
