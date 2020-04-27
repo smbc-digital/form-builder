@@ -90,30 +90,6 @@ If the availabilities block is not present or the availability for the requested
 
 ## Element Types & Properties
 **Elements[*object*]**:
-
-Example JSON:
-```json
-    {
-        "Elements": [
-            {
-                "Type": "H1",
-                "Properties":
-                {
-                    "Text": "Hello World",
-                }
-            },
-            {
-                "Type": "Textbox",
-                "Properties":
-                {
-                    "Label": "Enter your first name",
-                    "Name": "firstName",
-                    "QuestionId": "first-name"
-                }
-            }
-        ]
-    }
-```
 ## Target Mapping
 
 Example JSON:
