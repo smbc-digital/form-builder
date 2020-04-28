@@ -10,18 +10,27 @@
 
 @await Html.BeginFieldSet(Model)
 
-<legend>
-    @if (Model.Properties.LegendAsH1)
-    {
-        <h1>
+    <legend>
+        @if (Model.Properties.LegendAsH1)
+        {
+            <h1>
+                @Model.Properties.Label
+                @if (Model.Properties.Optional)
+                {
+                    <span class="optional">(optional)</span>
+                }
+
+            </h1>
+        }
+        else
+        {
             @Model.Properties.Label
-        </h1>
-    }
-    else
-    {
-        @Model.Properties.Label
-    }
-</legend>
+            @if (Model.Properties.Optional)
+            {
+                <span class="optional">(optional)</span>
+            }
+        }
+    </legend>
 
 @if (!string.IsNullOrEmpty(Model.Properties.Hint))
 {
@@ -32,16 +41,16 @@
 <div class="input-checkbox-container">
     @if (Model.Properties.Checked)
     {
-        <input type="checkbox" value="Accept Declaration" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
+        <input type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
     }
     else if (!string.IsNullOrEmpty(Model.Properties.Value))
 
     {
-        <input type="checkbox" value="Accept Declaration" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
+        <input type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
     }
     else
     {
-        <input type="checkbox" value="Accept Declaration" name="@itemName" id="@itemId" aria-describedby="@hintId" />
+        <input type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" />
     }
     <label for="@itemId" @Model.WriteOptional()>@Model.Properties.Text</label>
 </div>
