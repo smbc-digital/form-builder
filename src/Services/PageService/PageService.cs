@@ -52,7 +52,20 @@ namespace form_builder.Services.PageService
         private readonly IHostingEnvironment _environment;
         private readonly ISuccessPageContentFactory _successPageContentFactory;
 
-        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IHttpContextAccessor httpContextAccessor,  IHostingEnvironment environment, ISuccessPageContentFactory successPageContentFactory, ISchemaFactory schemaFactory)        {
+        public PageService(ILogger<PageService> logger, 
+            IEnumerable<IElementValidator> validators, 
+            IPageHelper pageHelper, 
+            ISessionHelper sessionHelper, 
+            IAddressService addressService, 
+            IStreetService streetService, 
+            IOrganisationService organisationService, 
+            IDistributedCacheWrapper distributedCache, 
+            IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, 
+            IHttpContextAccessor httpContextAccessor, 
+            IHostingEnvironment environment, 
+            ISuccessPageContentFactory successPageContentFactory, 
+            ISchemaFactory schemaFactory)
+        {
             _validators = validators;
             _pageHelper = pageHelper;
             _sessionHelper = sessionHelper;

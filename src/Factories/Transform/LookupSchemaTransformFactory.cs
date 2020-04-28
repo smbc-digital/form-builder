@@ -27,7 +27,7 @@ namespace form_builder.Factories.Transform
             var lookupOptions = await _transformDataProvider.Get<List<Option>>(entry.Lookup);
 
             if(!lookupOptions.Any())
-                throw new Exception($"LookupSchemaFactory::Build, No lookup options found for question {entry.Properties.QuestionId} with lookup value {entry.Lookup}");
+                throw new Exception($"LookupSchemaTransformFactory::Build, No lookup options found for question {entry.Properties.QuestionId} with lookup value {entry.Lookup}");
 
             entry.Properties.Options.AddRange(lookupOptions);
 
