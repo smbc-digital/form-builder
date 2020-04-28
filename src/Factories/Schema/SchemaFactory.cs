@@ -37,10 +37,13 @@ namespace form_builder.Factories.Schema
 
         public async Task<FormSchema> Build(string formKey)
         {
-            var data = _distrbutedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{formKey}");
+            if(_distrbutedCacheConfiguration.UseDistrbutedCache && _distrbutedCacheExpirationConfiguration.FormJson > 0)
+            {
+                var data = _distrbutedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{formKey}");
 
-            if(data != null)
-                return JsonConvert.DeserializeObject<FormSchema>(data);
+                if(data != null)
+                    return JsonConvert.DeserializeObject<FormSchema>(data);
+            }
 
             var formSchema = await _schemaProvider.Get<FormSchema>(formKey);
 

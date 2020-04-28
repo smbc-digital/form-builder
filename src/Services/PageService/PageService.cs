@@ -46,7 +46,6 @@ namespace form_builder.Services.PageService
         private readonly IStreetService _streetService;
         private readonly IAddressService _addressService;
         private readonly IOrganisationService _organisationService;
-        private readonly ICache _cache;
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -62,12 +61,11 @@ namespace form_builder.Services.PageService
             _addressService = addressService;
             _organisationService = organisationService;
             _distributedCache = distributedCache;
-            _cache = cache;
-            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _schemaFactory = schemaFactory;
+            _successPageContentFactory = successPageContentFactory;
             _httpContextAccessor = httpContextAccessor;
             _environment = environment;
-            _successPageContentFactory = successPageContentFactory;
-            _schemaFactory = schemaFactory;
+            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
         }
         
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false)
