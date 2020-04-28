@@ -59,7 +59,7 @@ namespace form_builder.Controllers.Payment
         [Route("{form}/payment-success")]
         public async Task<IActionResult> PaymentSuccess(string form, [FromQuery] string reference)
         {
-            var result = await _pageService.FinalisePageJoueny(form, EBehaviourType.SubmitAndPay);
+            var result = await _pageService.FinalisePageJourney(form, EBehaviourType.SubmitAndPay);
 
             var success = new SuccessViewModel {
                 Reference = reference,
