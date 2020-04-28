@@ -43,7 +43,7 @@
     {
         <input type="checkbox" value="Accept Declaration" name="@itemName" id="@itemId" aria-describedby="@hintId" />
     }
-    <label for="@itemId" @Model.WriteOptional()></label>
+    <label for="@itemId" @Model.WriteOptional()>@Model.Properties.Text</label>
 </div>
 
     @if (!Model.IsValid)
