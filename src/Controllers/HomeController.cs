@@ -186,7 +186,7 @@ namespace form_builder.Controllers
                 FormAnswers = result.FormAnswers,
                 FormName = result.FormName,
                 StartFormUrl = result.StartFormUrl,
-                SecondaryHeader = "Success",
+                SecondaryHeader = "",
                 PageTitle = result.PageTitle
             };
 
