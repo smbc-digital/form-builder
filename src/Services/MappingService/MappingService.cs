@@ -13,6 +13,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Models.FileManagement;
+using form_builder.Factories.Schema;
 
 namespace form_builder.Services.MappingService
 {
@@ -25,21 +26,23 @@ namespace form_builder.Services.MappingService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IElementMapper _elementMapper;
-        private readonly ICache _cache;
+        private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
         public MappingService(IDistributedCacheWrapper distributedCache,
-            IElementMapper elementMapper, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
+            IElementMapper elementMapper, 
+            ISchemaFactory schemaFactory,
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
             _distributedCache = distributedCache;
             _elementMapper = elementMapper;
-            _cache = cache;
+            _schemaFactory = schemaFactory;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
         public async Task<MappingEntity> Map(string sessionGuid, string form)
         {
-            var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distributedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
+            var baseForm = await _schemaFactory.Build(form);
 
             var formData = _distributedCache.GetString(sessionGuid);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);

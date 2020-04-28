@@ -4,6 +4,7 @@ using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Exceptions;
+using form_builder.Factories.Schema;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.DocumentService.Entities;
@@ -22,14 +23,14 @@ namespace form_builder.Services.DocumentService
         private IDocumentSummaryService _documentSummaryService;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
-        private readonly ICache _cache;
+        private readonly ISchemaFactory _schemaFactory;
 
-        public DocumentWorkflow(IDocumentSummaryService documentSummaryService, IDistributedCacheWrapper distributedCache, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
+        public DocumentWorkflow(IDocumentSummaryService documentSummaryService, IDistributedCacheWrapper distributedCache, ISchemaFactory schemaFactory, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
         {
             _documentSummaryService = documentSummaryService;
             _distributedCache = distributedCache;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
-            _cache = cache;
+            _schemaFactory = schemaFactory;
         }
 
         public async Task<byte[]> GenerateSummaryDocumentAsync(EDocumentType documentType, Guid id)
@@ -41,10 +42,7 @@ namespace form_builder.Services.DocumentService
 
             var previousAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
             
-            var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(
-                previousAnswers.FormName,
-                _distrbutedCacheExpirationConfiguration.FormJson,
-                ESchemaType.FormJson);
+            var baseForm = await _schemaFactory.Build(previousAnswers.FormName);
 
             return _documentSummaryService.GenerateDocument(
                 new DocumentSummaryEntity{

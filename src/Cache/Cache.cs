@@ -49,10 +49,8 @@ namespace form_builder.Cache
 
                 return JsonConvert.DeserializeObject<T>(data);
             }
-            else
-            {
-                return await _schemaProvider.Get<T>($"{prefix}{cacheKey}");
-            }
+            
+            return await _schemaProvider.Get<T>($"{prefix}{cacheKey}");
         }
     }
 }

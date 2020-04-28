@@ -24,6 +24,8 @@ namespace form_builder.Models.Elements
 
         public BaseProperty Properties { get; set; }
 
+        public string Lookup { get; set; }
+
         public bool DisplayAriaDescribedby
         {
             get
@@ -180,6 +182,8 @@ namespace form_builder.Models.Elements
                 return Properties.Optional;
             }
         }
+
+        
 
         public virtual string GetLabelText(){
             var optionalLabelText = Properties.Optional ? " (optional)" : string.Empty;

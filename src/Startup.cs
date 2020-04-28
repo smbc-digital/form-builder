@@ -37,6 +37,7 @@ namespace form_builder
                 .AddValidators()
                 .AddStorageProvider(Configuration)
                 .AddSchemaProvider(HostingEnvironment)
+                .AddTransformDataProvider(HostingEnvironment)
                 .AddAmazonS3Client(Configuration.GetSection("AmazonS3Configuration")["AccessKey"], Configuration.GetSection("AmazonS3Configuration")["SecretKey"])
                 .AddGateways()
                 .AddIOptionsConfiguration(Configuration)
