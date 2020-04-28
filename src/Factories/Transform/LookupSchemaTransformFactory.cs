@@ -10,7 +10,7 @@ namespace form_builder.Factories.Transform
 {
     public interface ISchemaTransformFactory
     {
-        Task<T> Build<T>(IElement entry);
+        Task<T> Transform<T>(IElement entry);
     }
 
     public class LookupSchemaTransformFactory : ISchemaTransformFactory
@@ -22,7 +22,7 @@ namespace form_builder.Factories.Transform
             _transformDataProvider = transformDataProvider;
         }
 
-        public async Task<T> Build<T>(IElement entry)
+        public async Task<T> Transform<T>(IElement entry)
         {
             var lookupOptions = await _transformDataProvider.Get<List<Option>>(entry.Lookup);
 
