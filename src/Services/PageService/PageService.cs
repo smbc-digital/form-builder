@@ -33,7 +33,7 @@ namespace form_builder.Services.PageService
         Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> file, bool processManual = false);
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid);
         Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
-        Task<SuccessPageEntity> FinalisePageJoueny(string form, EBehaviourType behaviourType);
+        Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType);
     }
 
     public class PageService : IPageService
@@ -288,7 +288,7 @@ namespace form_builder.Services.PageService
 
             return currentPageResult.Page.GetNextPage(answers);
         }
-        public async Task<SuccessPageEntity> FinalisePageJoueny(string form, EBehaviourType behaviourType)
+        public async Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
 

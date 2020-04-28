@@ -30,6 +30,7 @@
         Organisation,
         Numeric,
         FileUpload,
-        DocumentDownload
+        DocumentDownload,
+        Declaration
     }
 }
