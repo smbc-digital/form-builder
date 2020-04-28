@@ -702,7 +702,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             // Act
-            var result = await _service.FinalisePageJoueny("form", EBehaviourType.SubmitAndPay);
+            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay);
 
             // Assert
             _sessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
@@ -742,7 +742,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             // Act
-            var result = await _service.FinalisePageJoueny("form", EBehaviourType.SubmitAndPay);
+            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay);
 
             // Assert
             _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"file-{questionIDOne}-fileupload-{guid}")), Times.Once);
@@ -783,7 +783,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             // Act
-            var result = await _service.FinalisePageJoueny("form", EBehaviourType.SubmitAndPay);
+            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay);
 
             // Assert
             _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"document-{guid.ToString()}"), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
