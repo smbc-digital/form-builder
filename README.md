@@ -191,6 +191,7 @@ The target mapping above would produce this object
       * **Street**
       * **Radio**
       * **Checkbox**
+      * **Declaration**
       * **Time**
 
     Sets the heading level of the legend to H1
@@ -236,6 +237,7 @@ The target mapping above would produce this object
     * [Radio](https://github.com/smbc-digital/form-builder/wiki/Radio)
     * [Select](https://github.com/smbc-digital/form-builder/wiki/Select)
     * [Checkbox](https://github.com/smbc-digital/form-builder/wiki/Checkbox)
+    * [Declaration](https://github.com/smbc-digital/form-builder/wiki/Declaration)
     * [Link](https://github.com/smbc-digital/form-builder/wiki/Link)
     * [InlineAlert](https://github.com/smbc-digital/form-builder/wiki/InlineAlert)
     * [Button](https://github.com/smbc-digital/form-builder/wiki/Button)
