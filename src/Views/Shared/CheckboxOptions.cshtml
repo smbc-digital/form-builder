@@ -1,4 +1,5 @@
-﻿@model form_builder.Models.Elements.Element
+﻿@model form_builder.Models.Elements.Checkbox
+
 @for (var i = 0; i < Model.Properties.Options.Count; i++)
 {
     var item = Model.Properties.Options[i];
@@ -25,7 +26,7 @@
         {
             <input type="checkbox" value="@item.Value" name="@itemName" id="@itemId" aria-describedby="@itemHint"/>
         }
-        <label for="@itemId" @Model.WriteOptional()>@item.Text</label>
+        <label for="@itemId" @Model.WriteOptional()></label>
         @if (!string.IsNullOrWhiteSpace(item.Hint))
         {
             <span class="radio-sub-label" id="@itemHint">@Html.Raw(item.Hint)</span>
