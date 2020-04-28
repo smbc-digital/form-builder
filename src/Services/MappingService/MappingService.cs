@@ -30,7 +30,9 @@ namespace form_builder.Services.MappingService
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
         public MappingService(IDistributedCacheWrapper distributedCache,
-            IElementMapper elementMapper, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration, ISchemaFactory schemaFactory)
+            IElementMapper elementMapper, 
+            ISchemaFactory schemaFactory,
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
             _distributedCache = distributedCache;
             _elementMapper = elementMapper;
