@@ -85,7 +85,6 @@ namespace form_builder.Services.PageService
                 _sessionHelper.SetSessionGuid(sessionGuid);
             }
 
-            //var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
             var baseForm = await _schemaFactory.Build(form);
 
             if(!baseForm.IsAvailable(_environment.EnvironmentName))
@@ -178,7 +177,6 @@ namespace form_builder.Services.PageService
         }
         public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> files, bool processManual)
         {
-            //var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
             var baseForm = await _schemaFactory.Build(form);
 
             if(!baseForm.IsAvailable(_environment.EnvironmentName))
@@ -291,7 +289,7 @@ namespace form_builder.Services.PageService
             var formData = _distributedCache.GetString(sessionGuid);
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-            var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
+            var baseForm = await _schemaFactory.Build(form);
 
             var formFileUploadElements = baseForm.Pages.SelectMany(_ => _.Elements)
                 .Where(_ => _.Type == EElementType.FileUpload)
