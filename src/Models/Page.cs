@@ -52,6 +52,7 @@ namespace form_builder.Models
                                                                 element.Type == EElementType.Select ||
                                                                 element.Type == EElementType.Textbox ||
                                                                 element.Type == EElementType.Checkbox ||
+                                                                element.Type == EElementType.Declaration ||
                                                                 element.Type == EElementType.Address ||
                                                                 element.Type == EElementType.AddressManual ||
                                                                 element.Type == EElementType.DateInput ||

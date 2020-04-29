@@ -2,6 +2,7 @@
 using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Enum;
+using form_builder.Factories.Schema;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -26,7 +27,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISchemaProvider> _mockSchemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistrubutedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
-        private readonly Mock<ICache> _mockCache = new Mock<ICache>();
+        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
 
         public MappingServiceTests()
@@ -60,10 +61,10 @@ namespace form_builder_tests.UnitTests.Services
                 FormJson = 1
             });
 
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _service = new MappingService( _mockDistrubutedCache.Object, _mockElementMapper.Object, _mockCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object);
+            _service = new MappingService( _mockDistrubutedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockDistrbutedCacheExpirationConfiguration.Object);
         }
 
         [Fact]
@@ -85,8 +86,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.Map("form", "guid");
 
             // Assert
-            _mockCache.Verify(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>
-                (It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()), Times.Once);
+            _mockSchemaFactory.Verify(_ => _.Build(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -119,7 +119,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             // Act
@@ -155,8 +155,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
-                .ReturnsAsync(schema); ;
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
                 .Returns(new { });
@@ -206,7 +206,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             // Act
@@ -244,7 +244,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
                 .Returns(new { });
 
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
@@ -299,7 +299,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
@@ -351,7 +351,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
@@ -397,7 +397,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
@@ -456,7 +456,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))

@@ -10,6 +10,7 @@
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Address - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Button - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\CheckBoxList - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\ComplexPath - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Email - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\HideTitle - Copy.feature.cs" />
@@ -41,6 +42,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\Declaration.feature.cs">
+      <DependentUpon>Declaration.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\Organisation.feature.cs">
       <DependentUpon>Organisation.feature</DependentUpon>
     </Compile>
@@ -76,6 +80,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\Declaration.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\LegendHideShow.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

@@ -178,7 +178,7 @@ namespace form_builder.Controllers
         [Route("{form}/success")]
         public async Task<IActionResult> Success(string form)
         {
-            var result = await _pageService.FinalisePageJoueny(form, EBehaviourType.SubmitForm);
+            var result = await _pageService.FinalisePageJourney(form, EBehaviourType.SubmitForm);
             
             var success = new SuccessViewModel {
                 Reference = (string)TempData["reference"],
@@ -186,7 +186,8 @@ namespace form_builder.Controllers
                 FormAnswers = result.FormAnswers,
                 FormName = result.FormName,
                 StartFormUrl = result.StartFormUrl,
-                SecondaryHeader = "Success"
+                SecondaryHeader = "",
+                PageTitle = result.PageTitle
             };
 
             return View(result.ViewName, success);

@@ -37,6 +37,9 @@ using form_builder.Helpers.DocumentCreation;
 using form_builder.ContentFactory;
 using form_builder.Providers.Organisation;
 using form_builder.Providers.Street;
+using form_builder.Providers.TransformDataProvider;
+using form_builder.Factories.Schema;
+using form_builder.Factories.Transform;
 
 namespace form_builder.Extensions
 {
@@ -174,6 +177,8 @@ namespace form_builder.Extensions
         {
             services.AddTransient<ISuccessPageContentFactory, SuccessPageContentFactory>();
             services.AddTransient<IPageContentFactory, PageContentFactory>();
+            services.AddTransient<ISchemaFactory, SchemaFactory>();
+            services.AddTransient<ISchemaTransformFactory, LookupSchemaTransformFactory>();
 
             return services;
         }
@@ -192,6 +197,20 @@ namespace form_builder.Extensions
             return services;
         }
 
+        public static IServiceCollection AddTransformDataProvider(this IServiceCollection services, IHostingEnvironment HostingEnvironment)
+        {
+            if (HostingEnvironment.IsEnvironment("local") || HostingEnvironment.IsEnvironment("uitest"))
+            {
+                services.AddSingleton<ITransformDataProvider, LocalTransformDataProvider>();
+            }
+            else
+            {
+                services.AddSingleton<ITransformDataProvider, S3TransformDataProvider>();
+            }
+
+            return services;
+        }
+        
         public static IServiceCollection AddIOptionsConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<DisallowedAnswerKeysConfiguration>(configuration.GetSection("FormConfig"));
