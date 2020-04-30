@@ -18,9 +18,7 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
         private readonly Mock<IS3Gateway> _mockS3gateway = new Mock<IS3Gateway>();
         private readonly Mock<ILogger<S3FileSchemaProvider>> _mockLogger = new Mock<ILogger<S3FileSchemaProvider>>();
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
-
         private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
-        private readonly Mock<StreamResponse> _mockStreamResponse = new Mock<StreamResponse>();
 
         public S3FileSchemaProviderTests()
         {

@@ -47,6 +47,8 @@ namespace form_builder.Mappers
                     return GetDatePickerElementValue(key, formAnswers);
                 case EElementType.Checkbox:
                     return GetCheckboxElementValue(key, formAnswers);
+                case EElementType.Declaration:
+                    return GetDeclarationElementValue(key, formAnswers);
                 case EElementType.TimeInput:
                     return GetTimeElementValue(key, formAnswers);
                 case EElementType.Address:
@@ -70,6 +72,20 @@ namespace form_builder.Mappers
                     return value?.Response ?? "";
             }
         }
+
+        private object GetDeclarationElementValue(string key, FormAnswers formAnswers)
+        {
+            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+                .Where(_ => _.QuestionId == key)
+                .FirstOrDefault();
+
+            if (value == null || string.IsNullOrEmpty(value.Response))
+            {
+                return new List<string>();
+            }
+            var val = value.Response.Split(",");
+            return new List<string>(val);
+                }
 
         public string GetAnswerStringValue(IElement question, FormAnswers formAnswers)
         {

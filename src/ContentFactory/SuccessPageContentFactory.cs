@@ -82,7 +82,8 @@ namespace form_builder.ContentFactory
                 HtmlContent = result,
                 FeedbackFormUrl = baseForm.FeedbackForm,
                 FormName = baseForm.FormName,
-                StartFormUrl = startFormUrl
+                StartFormUrl = startFormUrl,
+                PageTitle = page.Title
             };
         }
 

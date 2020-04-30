@@ -23,10 +23,10 @@ using form_builder.Cache;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
 using form_builder.ContentFactory;
+using form_builder.Factories.Schema;
 
 namespace form_builder.Services.PageService
 {
-
     public class PageService : IPageService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
@@ -37,13 +37,25 @@ namespace form_builder.Services.PageService
         private readonly IStreetService _streetService;
         private readonly IAddressService _addressService;
         private readonly IOrganisationService _organisationService;
-        private readonly ICache _cache;
+        private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _environment;
         private readonly ISuccessPageContentFactory _successPageContentFactory;
 
-        public PageService(ILogger<PageService> logger, IEnumerable<IElementValidator> validators, IPageHelper pageHelper, ISessionHelper sessionHelper, IAddressService addressService, IStreetService streetService, IOrganisationService organisationService, IDistributedCacheWrapper distributedCache, ICache cache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IHttpContextAccessor httpContextAccessor,  IHostingEnvironment environment, ISuccessPageContentFactory successPageContentFactory)
+        public PageService(ILogger<PageService> logger, 
+            IEnumerable<IElementValidator> validators, 
+            IPageHelper pageHelper, 
+            ISessionHelper sessionHelper, 
+            IAddressService addressService, 
+            IStreetService streetService, 
+            IOrganisationService organisationService, 
+            IDistributedCacheWrapper distributedCache, 
+            IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, 
+            IHttpContextAccessor httpContextAccessor, 
+            IHostingEnvironment environment, 
+            ISuccessPageContentFactory successPageContentFactory, 
+            ISchemaFactory schemaFactory)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -53,12 +65,13 @@ namespace form_builder.Services.PageService
             _addressService = addressService;
             _organisationService = organisationService;
             _distributedCache = distributedCache;
-            _cache = cache;
-            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _schemaFactory = schemaFactory;
+            _successPageContentFactory = successPageContentFactory;
             _httpContextAccessor = httpContextAccessor;
             _environment = environment;
-            _successPageContentFactory = successPageContentFactory;
+            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
         }
+        
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false)
         {
             if (string.IsNullOrEmpty(path))
@@ -74,7 +87,7 @@ namespace form_builder.Services.PageService
                 _sessionHelper.SetSessionGuid(sessionGuid);
             }
 
-            var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
+            var baseForm = await _schemaFactory.Build(form);
 
             if(!baseForm.IsAvailable(_environment.EnvironmentName))
             {
@@ -166,7 +179,7 @@ namespace form_builder.Services.PageService
         }
         public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> files, bool processManual)
         {
-            var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
+            var baseForm = await _schemaFactory.Build(form);
 
             if(!baseForm.IsAvailable(_environment.EnvironmentName))
             {
@@ -280,7 +293,7 @@ namespace form_builder.Services.PageService
             var formData = _distributedCache.GetString(sessionGuid);
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-            var baseForm = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>(form, _distrbutedCacheExpirationConfiguration.FormJson, ESchemaType.FormJson);
+            var baseForm = await _schemaFactory.Build(form);
 
             var formFileUploadElements = baseForm.Pages.SelectMany(_ => _.Elements)
                 .Where(_ => _.Type == EElementType.FileUpload)

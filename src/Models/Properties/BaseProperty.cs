@@ -11,7 +11,7 @@ namespace form_builder.Models.Properties
         public bool Optional { get; set; } = false;
         public bool? Email { get; set; }
         public bool Numeric { get; set; } = false;
-        public List<Option> Options { get; set; }
+        public List<Option> Options { get; set; } = new List<Option>();
         public int MaxLength { get; set; } = 200;
         public string Value { get; set; } = string.Empty;
         public string Hint { get; set; } = string.Empty;

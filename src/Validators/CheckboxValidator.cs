@@ -8,7 +8,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            if (element.Type != EElementType.Checkbox)
+            if (element.Type != EElementType.Checkbox && element.Type != EElementType.Declaration)
             {
                 return new ValidationResult
                 {

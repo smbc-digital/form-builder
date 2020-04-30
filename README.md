@@ -136,30 +136,6 @@ List of HTML elements to display on page
 
 ## Element Types & Properties
 **Elements[*object*]**:
-
-Example JSON:
-```json
-    {
-        "Elements": [
-            {
-                "Type": "H1",
-                "Properties":
-                {
-                    "Text": "Hello World",
-                }
-            },
-            {
-                "Type": "Textbox",
-                "Properties":
-                {
-                    "Label": "Enter your first name",
-                    "Name": "firstName",
-                    "QuestionId": "first-name"
-                }
-            }
-        ]
-    }
-```
 ## Target Mapping
 
 Example JSON:
@@ -259,6 +235,7 @@ The target mapping above would produce this object
       * **Street**
       * **Radio**
       * **Checkbox**
+      * **Declaration**
       * **Time**
 
     Sets the heading level of the legend to H1
@@ -293,32 +270,36 @@ The target mapping above would produce this object
     ```
 #
 
+* **Lookup** (*string*)
+  * [Lookup](https://github.com/smbc-digital/form-builder/wiki/Lookup)
+
 * **Type** (*string*) (HTML element)
     * [H2-H6](#headingprops) (Heading levels)
     * [P](#ptextprops) (Paragraph text)
-    * [Textbox](#textboxprops)
+    * [Textbox](https://github.com/smbc-digital/form-builder/wiki/Textbox)
+    * [TextBox(Numeric)](https://github.com/smbc-digital/form-builder/wiki/Textbox)
+    * [Textbox(Email)](https://github.com/smbc-digital/form-builder/wiki/Textbox)
+    * [Textbox(Postcode)](https://github.com/smbc-digital/form-builder/wiki/Textbox)
+    * [Textbox(Stockport postcode)](https://github.com/smbc-digital/form-builder/wiki/Textbox)
     * [RequiredIf](#requiredif)
-    * [TextBox(Numeric)](#textboxnumeric)
-    * [Textbox(Email)](#textboxemailprops)
-    * [Textbox(Postcode)](#textboxpostcodeprops)
-    * [Textbox(Stockport postcode)](#textboxstockportpostcodeprops)
-    * [Textarea](#textareaprops) (Large text box)
-    * [Radio](#radioprops)
-    * [Select](#selectprops)
-    * [Checkbox](#checkboxprops)
-    * [Link](#linkprops) (Anchor styled as button)
-    * [InlineAlert](#inlinealertprops)
-    * [Button](#buttonprops)
-    * [UL](#Ulprops) (Unordered List)
-    * [OL](#olprops) (Ordered List)
-    * [Img](#Imgprops) (Image)
-    * [DateInput](#DateInputprops)
-    * [Address](#Address)
-    * [Street](#Street)
-    * [Time](#Time)
-    * [DatePicker](#DatePicker)
-    * [Organisation](#Organisation)
-    * [FileUpload](#FileUpload)
+    * [Textarea](https://github.com/smbc-digital/form-builder/wiki/Textarea)
+    * [Radio](https://github.com/smbc-digital/form-builder/wiki/Radio)
+    * [Select](https://github.com/smbc-digital/form-builder/wiki/Select)
+    * [Checkbox](https://github.com/smbc-digital/form-builder/wiki/Checkbox)
+    * [Declaration](https://github.com/smbc-digital/form-builder/wiki/Declaration)
+    * [Link](https://github.com/smbc-digital/form-builder/wiki/Link)
+    * [InlineAlert](https://github.com/smbc-digital/form-builder/wiki/InlineAlert)
+    * [Button](https://github.com/smbc-digital/form-builder/wiki/Button)
+    * [UL](https://github.com/smbc-digital/form-builder/wiki/UL) (Unordered List)
+    * [OL](https://github.com/smbc-digital/form-builder/wiki/OL) (Ordered List)
+    * [Img](https://github.com/smbc-digital/form-builder/wiki/Image) (Image)
+    * [DateInput](https://github.com/smbc-digital/form-builder/wiki/DateInput)
+    * [Address](https://github.com/smbc-digital/form-builder/wiki/Address)
+    * [Street](https://github.com/smbc-digital/form-builder/wiki/Street)
+    * [Time](https://github.com/smbc-digital/form-builder/wiki/Time)
+    * [DatePicker](https://github.com/smbc-digital/form-builder/wiki/DatePicker)
+    * [Organisation](https://github.com/smbc-digital/form-builder/wiki/Organisation)
+    * [FileUpload](https://github.com/smbc-digital/form-builder/wiki/FileUpload)
     
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)
@@ -372,6 +353,7 @@ Paragraph text JSON example:
   }
 ```
 #
+
    * <a name="requiredif">**Required if**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
@@ -393,6 +375,7 @@ Paragraph text JSON example:
     }
   }
 ```
+
 #
    * <a name="textboxnumeric">**Textbox(Numeric)**</a>
         * Label (*string*) __*__

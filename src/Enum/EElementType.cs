@@ -32,6 +32,7 @@
         Numeric,
         FileUpload,
         DocumentDownload,
-        Warning
+        Warning,
+        Declaration
     }
 }

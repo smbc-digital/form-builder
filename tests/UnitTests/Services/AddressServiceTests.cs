@@ -10,7 +10,6 @@ using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
-using StockportGovUK.NetStandard.Gateways.AddressService;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,7 +24,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
         private readonly Mock<IAddressProvider> _addressProvider = new Mock<IAddressProvider>();
-        private IEnumerable<IAddressProvider> _addressProviders;
+        private readonly IEnumerable<IAddressProvider> _addressProviders;
 
         public AddressServiceTests()
         {
@@ -35,12 +34,11 @@ namespace form_builder_tests.UnitTests.Services
                 _addressProvider.Object
             };
 
-
             _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders);
         }
         
-        [InlineData(true, "Search")]
-        public async Task ProcesssAddress_ShouldCallAddressProvider_WhenCorrectJourney(bool isValid, string journey)
+        [Fact]
+        public async Task ProcesssAddress_ShouldCallAddressProvider_WhenCorrectJourney()
         {
             var questionId = "test-address";
 
@@ -73,7 +71,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithValidatedModel(isValid)
+                .WithValidatedModel(true)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -84,7 +82,7 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", journey },
+                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
@@ -150,6 +148,7 @@ namespace form_builder_tests.UnitTests.Services
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
         }
 
+        [Fact]
         public async Task ProcesssAddress_ShouldCall_PageHelper_ToProcessSearchResults()
         {
             var element = new ElementBuilder()
@@ -184,6 +183,7 @@ namespace form_builder_tests.UnitTests.Services
             _pageHelper.Verify(_ => _.ProcessAddressJourney("Search", It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
         }
 
+        [Fact]
         public async Task ProcesssAddress_Application_ShouldThrowApplicationException_WhenNoMatchingAddressProvider()
         {
             var addressProvider = "NON-EXIST-PROVIDER";
@@ -213,9 +213,10 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssAddress(viewModel, page, schema, "", "page-one"));
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            Assert.Equal($"No address provider configure for {addressProvider}", result.Message);
+            Assert.Equal($"AddressController: An exception has occured while attempting to perform postcode lookup", result.Message);
         }
 
+        [Fact]
         public async Task ProcesssAddress_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
         {
 
@@ -247,9 +248,8 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssAddress(viewModel, page, schema, "", "page-one"));
-            
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Never);
-            Assert.StartsWith($"AddressController: An exception has occured while attempting to perform postcode lookup, Exception: ", result.Message);
+            Assert.StartsWith($"AddressController: An exception has occured while attempting to perform postcode lookup", result.Message);
         }
     }
 }

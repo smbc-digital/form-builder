@@ -12,7 +12,7 @@
 
 @if(Model.DisplayCharacterCount)
 {
-    <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength=@Model.Properties.MaxLength>
+    <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="@Model.Properties.MaxLength">
         <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
             <partial name="LabelH1" />
 

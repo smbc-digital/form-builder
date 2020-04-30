@@ -32,7 +32,8 @@ namespace form_builder.Models.Elements
         public bool DisplayAriaDescribedby => DisplayHint || !IsValid; 
         public bool IsValid => validationResult.IsValid; 
         public string ValidationMessage => validationResult.Message;
-        
+        public string Lookup { get; set; }
+
         public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             return viewRender.RenderAsync(Type.ToString(), this, null);
@@ -141,6 +142,8 @@ namespace form_builder.Models.Elements
                 return Properties.Optional;
             }
         }
+
+        
 
         public virtual string GetLabelText(){
             var optionalLabelText = Properties.Optional ? " (optional)" : string.Empty;

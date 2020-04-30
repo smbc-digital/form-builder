@@ -12,6 +12,8 @@ namespace form_builder.Builders
     public class ElementBuilder
     {
         private EElementType _type = EElementType.H1;
+        private string _lookup = string.Empty;
+
         private BaseProperty _property = new BaseProperty();
 
         public Element Build()
@@ -24,12 +26,19 @@ namespace form_builder.Builders
             var element = (Element)Activator.CreateInstance(elementType);
 
             element.Properties = _property;
+            element.Lookup = _lookup;
             return element;
         }
 
         public ElementBuilder WithType(EElementType type)
         {
             _type = type;
+            return this;
+        }
+
+        public ElementBuilder WithLookup(string lookup)
+        {
+            _lookup = lookup;
             return this;
         }
 
