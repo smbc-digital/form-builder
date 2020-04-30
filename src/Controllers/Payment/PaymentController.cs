@@ -67,7 +67,7 @@ namespace form_builder.Controllers.Payment
                 FormName = result.FormName,
                 StartFormUrl = result.StartFormUrl,
                 //SecondaryHeader = "Payment Success",
-                SecondaryHeader = "",
+                //SecondaryHeader = "",
                 PageTitle = result.PageTitle
             };
 
