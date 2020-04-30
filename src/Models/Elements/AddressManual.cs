@@ -74,6 +74,30 @@ namespace form_builder.Models.Elements
             
             return string.Empty;
         }
+
+        private Dictionary<string, dynamic> GenerateElementProperties(string errorMessage= "", string errorId = "", string autocomplete= "")
+        {
+            var properties = new Dictionary<string, dynamic>();
+            if(!IsValid && !string.IsNullOrEmpty(errorMessage))
+            {
+                properties.Add("aria-describedby", errorId);
+            }
+
+            if(!string.IsNullOrEmpty(autocomplete))
+            {
+                properties.Add("autocomplete", autocomplete);
+            }
+            
+            return properties;
+        }
+
+        public Dictionary<string, dynamic> GenerateAddress1ElementProperties() => GenerateElementProperties(Line1ValdationMessage, GetCustomErrorId(AddressManualConstants.ADDRESS_LINE_1), "address-line1");
+
+        public Dictionary<string, dynamic> GenerateAddress2ElementProperties() => GenerateElementProperties(autocomplete: "address-line2");
+
+        public Dictionary<string, dynamic> GenerateTownElementProperties() => GenerateElementProperties(TownValdationMessage, GetCustomErrorId(AddressManualConstants.TOWN), "address-level1");
+
+        public Dictionary<string, dynamic> GeneratePostcodeElementProperties() => GenerateElementProperties(PostcodeValdationMessage, GetCustomErrorId(AddressManualConstants.POSTCODE), "postal-code");
         
         protected void SetAddressProperties(Dictionary<string, dynamic> viewModel, string searchTerm)
         {

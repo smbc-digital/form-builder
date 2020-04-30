@@ -31,6 +31,7 @@
         Organisation,
         Numeric,
         FileUpload,
-        DocumentDownload
+        DocumentDownload,
+        Warning
     }
 }

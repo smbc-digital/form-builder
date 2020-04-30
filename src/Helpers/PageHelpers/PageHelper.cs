@@ -178,7 +178,7 @@ namespace form_builder.Helpers.PageHelpers
                     }
                     catch (Exception e)
                     {
-                        throw new ApplicationException($"PageHelper.ProcessAddressJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
+                        throw new ApplicationException($"PageHelper.ProcessAddressJourney: An exception has occurred while attempting to generate Html, Exception: {e.Message}", e);
                     };
                 case "Select":
                     return new ProcessRequestEntity

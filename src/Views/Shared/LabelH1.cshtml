@@ -11,7 +11,7 @@
         } 
         else 
         {
-            <label class="govuk-label" for="@Model.QuestionId">@Model.Label
+            <label class="govuk-label @(Model.Properties.StrongLabel ? "govuk-label--m" : string.Empty)" for="@Model.QuestionId">@Model.Label
             @if (Model.Properties.Optional)
             {
                 <span>(optional)</span>

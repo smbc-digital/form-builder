@@ -61,22 +61,6 @@ namespace form_builder.Models.Elements
             return new Dictionary<string, dynamic>();
         }
 
-        public Dictionary<string, dynamic> GenerateElementProperties(string errorMessage, string errorId)
-        {
-            if (Type == EElementType.AddressManual)
-            {            
-                var properties = new Dictionary<string, dynamic>();
-                if(!IsValid && !string.IsNullOrEmpty(errorMessage))
-                {
-                    properties.Add("aria-describedby", errorId);
-                }
-                
-                return properties;
-            }
-
-            return null;
-        }
-
         public string GetListItemId(int index)
         {
             return $"{QuestionId}-{index}";

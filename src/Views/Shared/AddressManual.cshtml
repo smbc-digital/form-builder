@@ -1,21 +1,20 @@
 ﻿@using form_builder.Models.Elements;
 @model form_builder.Models.Elements.AddressManual;
 @{    
-    var line1ElementProperties = Model.GenerateElementProperties(Model.Line1ValdationMessage, Model.GetCustomErrorId(AddressManualConstants.ADDRESS_LINE_1));
-    line1ElementProperties.Add("autocomplete", "address-line1");
-    line1ElementProperties.Add("class", Model.IsLine1Valid ? "govuk-input" : "govuk-input govuk-input--error");
+    var inputClass = "govuk-input";
+    var invalidInputClasses = $"{inputClass} govuk-input--error";
+
+    var line1ElementProperties = Model.GenerateAddress1ElementProperties();
+    line1ElementProperties.Add("class", Model.IsLine1Valid ? inputClass : invalidInputClasses);
     
-    var line2Elements = Model.GenerateElementProperties();
-    line2Elements.Add("autocomplete", "address-line2");
-    line2Elements.Add("class", "govuk-input");
+    var line2ElementProperties = Model.GenerateAddress2ElementProperties();
+    line2ElementProperties.Add("class", inputClass);
     
-    var townElements = Model.GenerateElementProperties(Model.TownValdationMessage, Model.GetCustomErrorId(AddressManualConstants.TOWN));
-    townElements.Add("autocomplete", "address-level1");
-    townElements.Add("class", Model.IsTownValid ? "govuk-input" : "govuk-input govuk-input--error");
+    var townElementProperties = Model.GenerateTownElementProperties();
+    townElementProperties.Add("class", Model.IsTownValid ? inputClass : invalidInputClasses);
     
-    var postcodeElements = Model.GenerateElementProperties(Model.PostcodeValdationMessage, Model.GetCustomErrorId(AddressManualConstants.POSTCODE));
-    postcodeElements.Add("autocomplete", "postal-code");
-    postcodeElements.Add("class", Model.IsPostcodeValid ? "govuk-input--width-10 govuk-input" : "govuk-input--width-10 govuk-input govuk-input--error");
+    var postcodeElementProperties = Model.GeneratePostcodeElementProperties();
+    postcodeElementProperties.Add("class", Model.IsPostcodeValid ? $"{inputClass} govuk-input--width-10" : $"{invalidInputClasses} govuk-input--width-10");
 }
 
 @Html.Hidden(@Model.GetCustomItemId("postcode"), Model.Properties.Value)
@@ -47,19 +46,19 @@
         <label class="govuk-label" class="optional" for=@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_2)>Address line 2
             <span>(optional)</span>
         </label>    
-        @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_2), Model.Properties.AddressManualAddressLine2, line2Elements)
+        @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_2), Model.Properties.AddressManualAddressLine2, line2ElementProperties)
     </div>
 
     <div class="govuk-form-group @(Model.IsTownValid ? string.Empty : " govuk-form-group--error")">
         <label class="govuk-label" for=@Model.GetCustomItemId(AddressManualConstants.TOWN)>Town</label>
         <partial name="ErrorBase" model=Model.TownValidationModel />
-        @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.TOWN), Model.Properties.AddressManualAddressTown, townElements)
+        @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.TOWN), Model.Properties.AddressManualAddressTown, townElementProperties)
     </div>
 
     <div class="govuk-form-group @(Model.IsPostcodeValid ? string.Empty : " govuk-form-group--error")">
         <label class="govuk-label" for=@Model.GetCustomItemId(AddressManualConstants.POSTCODE)>Postcode</label>
         <partial name="ErrorBase" model=Model.PostcodeValidationModel />
 
-        @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.POSTCODE), Model.Properties.AddressManualAddressPostcode, postcodeElements)
+        @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.POSTCODE), Model.Properties.AddressManualAddressPostcode, postcodeElementProperties)
     </div>
 </fieldset>
