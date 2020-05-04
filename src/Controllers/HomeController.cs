@@ -200,7 +200,7 @@ namespace form_builder.Controllers
                 FormAnswers = result.FormAnswers,
                 FormName = result.FormName,
                 StartFormUrl = result.StartFormUrl,
-                SecondaryHeader = "",
+                //SecondaryHeader = "",
                 PageTitle = result.PageTitle
             };
 
