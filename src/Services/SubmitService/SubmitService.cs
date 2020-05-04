@@ -38,8 +38,10 @@ namespace form_builder.Services.SubmtiService
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
 
+        private readonly SubmissionServiceConfiguration _submissionServiceConfiguration;
 
-        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper, IHostingEnvironment environment, IHttpContextAccessor httpContextAccessor, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
+
+        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper, IHostingEnvironment environment, IHttpContextAccessor httpContextAccessor, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration)
         {
             _distributedCache = distributedCache;
             _gateway = gateway;
@@ -49,13 +51,15 @@ namespace form_builder.Services.SubmtiService
             _environment = environment;
             _httpContextAccessor = httpContextAccessor;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _submissionServiceConfiguration = submissionServiceConfiguration.Value;
         }
 
         public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
-
-            // Return some fake data and don't actually submit
-            // return "123456";
+            if(_submissionServiceConfiguration.FakeSubmissions)
+            {
+                return "123456"; 
+            }
             var reference = string.Empty;
 
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);

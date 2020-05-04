@@ -53,7 +53,7 @@ namespace form_builder
                 .AddSession(_ => _.IdleTimeout = TimeSpan.FromMinutes(30));
 
             services.AddTransient<ICache, Cache.Cache>();
-
+            services.Configure<SubmissionServiceConfiguration>(Configuration.GetSection("SubmissionServiceConfiguration"));
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
             services.AddMvc()
                 .AddMvcOptions(options => {

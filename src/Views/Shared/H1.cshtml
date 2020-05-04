@@ -1,3 +1,18 @@
-﻿@model form_builder.Models.Elements.Element
-
-<h1 class="govuk-heading-xl">@Model.Properties.Text</h1>
+﻿@using form_builder.Enum
+@model form_builder.Models.Elements.Element
+@{
+    var cssClass = "govuk-heading-xl";
+    switch(Model.Properties.Size)
+    {
+        case ESize.Large: 
+            cssClass = "govuk-heading-l";
+            break;
+        case ESize.Medium: 
+            cssClass = "govuk-heading-m";
+            break;
+        case ESize.Small: 
+            cssClass = "govuk-heading-s";
+            break;
+    }
+}
+<h1 class="@cssClass">@Model.Properties.Text</h1>
