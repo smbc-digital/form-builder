@@ -47,39 +47,42 @@
         ],
     }
 ```
-## Form Settings
+# Form Settings
 
-### **FormName** (*string*)
-The name of the form this will display in the browser tab/window title
+## **FormName** (*string*)
+The name of the form this will display in the browser tab/window title#
 
-### **BaseURL** (*string*)
+
+## **BaseURL** (*string*)
 The path of this form, this will come after the domain e.g. `test-form` would create `forms.yourdomain.gov.uk/test-form/`
 
-### **StartPageSlug** (*string*) 
+## **StartPageSlug** (*string*) 
 The first PageSlug users will visit
 
-### **DocumentDownload** (*bool*) 
+
+## **DocumentDownload** (*bool*) 
 Enable Document download (optional)
 
-#### **DocumentType** (*Array[string]*)
+## **DocumentType** (*Array[string]*)
 If Document download is enabled what document type is required.
 
 Allowed Values:
 **Txt**
 
-### **FeedbackForm** (*string*) 
-If present this will be used at the top of the form to link them to, commonly, a TypeForm form that will be created to capture feedback on the new form.
+## **FeedbackForm** (*string*, url) 
+If present this will be used at the top of the form to link users to, a feedback to capture feedback on the new form.
 
-### **FeedbackPhase** (*string*, usually *alpha", *beta*)
+## **FeedbackPhase** (*string, usually "alpha" or "beta"*)
 If present this will be used to communicate to the user this form is still in a testing phase.
 
-### [**EnvironmentAvailabilities** [*object*]](Controlling-Form-Availability)
+## [**EnvironmentAvailabilities** [*object*]](Controlling-Form-Availability)
 List of environments and the current availability status
-
-### [**Pages** [*object*]](Creating-Pages)
+___### [**Pages** [*object*]](Creating-Pages)
 List of the pages in this form
 
-## Controlling Form Availaiblity ##
+
+
+# Controlling Form Availaiblity #
 
 Form availability can be controlled per Environment by setting a boolean availability value against the ```ASPNETCORE_ENVIRONMENT``` value for the specified environment. 
 
@@ -106,23 +109,25 @@ For example:
 
 If the availabilities block is not present or the availability for the requested environment is not specified **forms will be assumed to be available**.
 
-## Creating Pages
+# Creating Pages
 
-### **PageSlug** (*string*) 
+## **PageSlug** (*string*) 
 The slug (path) of a page after the domain and BaseURL e.g. `contact-details` would create a URL of `forms.yourdomain.uk/{BaseURL}/contact-details`
 
-### **HideTitle** (*bool*) 
+## **HideTitle** (*bool*) 
 Hides the default page title when set to true, this can be used if there is only a single control on the page, use the legend/label as the page title if appropriate.
 
-### **HideBackButton** (*bool*) 
+## **HideBackButton** (*bool*) 
 Hide the in page back button when set to true
 
-### **Title** (*string*)
+## **Title** (*string*)
 The Title is used within the browser tab along with the form name e.g. Page 1 - Contact us - Stockport Council
 
-### **Elements** [*object*]
+## [Elements [*object*]](#elementtypesandproperties)
 List of HTML elements to display on page
-* [Behaviours[*object*]](#pagebehaviours) - List of conditionals & page redirects for the page
+
+## [Behaviours[*object*]](#pagebehaviours) 
+A List of conditionals and page actions, ie. what should happen next based on the information provided
 
 
 ```json
@@ -134,8 +139,8 @@ List of HTML elements to display on page
       "Behaviours": [ ... ]
 ```
 
-## Element Types & Properties
-**Elements[*object*]**:
+# Element Types and Properties
+
 ## Target Mapping
 
 Example JSON:
@@ -220,13 +225,12 @@ The target mapping above would produce this object
     }
 ```
 
-* **Generic Options**
+## Generic Options
     * [LegendAsH1](#LegendAsH1) (Set legend to a h1 heading)
     * [LabelAsH1](#LabelAsH1) (Set label to a h1 heading)
 
 
-* <a name="LegendAsH1">**LegendAsH1**</a>
-    * LegendAsH1 (*boolean*) (defaults to false)
+### <a name="LegendAsH1">**LegendAsH1**</a> (*boolean*) (defaults to false)
 
       This is only valid for the elements listed below:    
       * **DateInput**
@@ -248,8 +252,7 @@ The target mapping above would produce this object
     }
     ```
 
-* <a name="LabelAsH1">**LabelAsH1**</a>
-    * LabelAsH1 (*boolean*) (defaults to false)
+### <a name="LabelAsH1">**LabelAsH1**</a>(*boolean*) (defaults to false)
 
       This is only valid for the elements listed below:    
       * **Select**
@@ -268,10 +271,19 @@ The target mapping above would produce this object
         }
     }
     ```
-#
+### A note about Labels
 
-* **Lookup** (*string*)
-  * [Lookup](https://github.com/smbc-digital/form-builder/wiki/Lookup)
+Most controls come with labels which can be configured in that controls properties.
+
+In some cases there maybe a need to emphasize a label (this is seen commonly on the address control), in the case the ```"StrongLabel": true``` property should be specified.
+
+**note**: This feature is new an may not work in some controls.
+
+
+### **[Lookups](https://github.com/smbc-digital/form-builder/wiki/Lookup)** (*string*)
+For controls that have multiple options you can use the Lookup property to reference an existing list.
+
+## Available Elements
 
 * **Type** (*string*) (HTML element)
     * [H2-H6](#headingprops) (Heading levels)
@@ -303,11 +315,14 @@ The target mapping above would produce this object
     
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)
-#
-   * <a name="headingprops">**H2-H6** (Heading levels)</a>
+___
+### <a name="headingprops">**H2-H6** (Heading levels)</a>
         * Text (*string*) __*__
-#
-   * <a name="ptextprops">**P** (Paragraph text)</a>
+        * Size (*string*, "Small", "Medium", "Large", "ExtraLarge")
+
+        Each heading level has it's own default size but these can be overridden, changing the size of the heading visually without changing the semantics of the page
+
+### <a name="ptextprops">**P** (Paragraph text)</a>
         * Text (*string*) (Can embed HTML code e.g. \<strong\>) __*__
 
 Paragraph text JSON example:
@@ -319,8 +334,8 @@ Paragraph text JSON example:
   }
 }
 ```
-#
-   * <a name="textboxprops">**Textbox**</a>
+
+### <a name="textboxprops">**Textbox**</a>
         * **Label** (*string*) __*__
         * **LabelAsH1** (*string*) __*__
         * **QuestionId** (*string*) __*__
@@ -352,9 +367,8 @@ Paragraph text JSON example:
     }
   }
 ```
-#
 
-   * <a name="requiredif">**Required if**</a>
+### <a name="requiredif">**Required if**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
         * MaxLength (*int*) (defaulted to 200)
@@ -376,8 +390,8 @@ Paragraph text JSON example:
   }
 ```
 
-#
-   * <a name="textboxnumeric">**Textbox(Numeric)**</a>
+### <a name="textboxnumeric">**Textbox(Numeric)**</a>
+
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
         * CustomValidationMessage (*string*)
@@ -404,8 +418,8 @@ Textbox Numeric JSON example:
     }
   }
 ```
-#
-   * <a name="textboxemailprops">**Textbox(Email)**</a>
+
+### <a name="textboxemailprops">**Textbox(Email)**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
         * CustomValidationMessage (*string*)
@@ -430,8 +444,7 @@ Textbox JSON example:
     }
   }
 ```
-#
-   * <a name="textboxpostcodeprops">**Textbox(Postcode)**</a>
+### <a name="textboxpostcodeprops">**Textbox(Postcode)**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
         * CustomValidationMessage (*string*)
@@ -456,8 +469,7 @@ Textbox JSON example:
     }
   }
 ```
-#
-   * <a name="textboxstockportpostcodeprops">**Textbox(Stockport postcode)**</a>
+### <a name="textboxstockportpostcodeprops">**Textbox(Stockport postcode)**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
         * CustomValidationMessage (*string*)
@@ -482,8 +494,7 @@ Textbox JSON example:
     }
   }
 ```
-#
-   * <a name="textareaprops">**Textarea**</a>
+### <a name="textareaprops">**TextArea**</a>
         * **Label** (*string*) __*__
         * **QuestionId** (*string*) __*__
         * **CustomValidationMessage** (*string*)
@@ -512,8 +523,8 @@ Textarea (Email) JSON example:
     }
   }
 ```
-#
-   * <a name="radioprops">**Radio**</a>
+
+### <a name="radioprops">**Radio**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
         * Options[*object*] __*__
@@ -552,8 +563,7 @@ Textarea (Email) JSON example:
       ]
  }
  ```
-#
-   * <a name="selectprops">**Select**</a>
+### <a name="selectprops">**Select**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
         * Options[*object*] __*__
@@ -605,8 +615,7 @@ Textarea (Email) JSON example:
           }
         }
 ```        
-#
-   * <a name="checkboxprops">**Checkbox**</a>
+### <a name="checkboxprops">**Checkbox**</a>
         * Label (*string*) __*__
         * QuestionId (*string*) __*__
         * Options[*object*] __*__
@@ -662,15 +671,14 @@ Textarea (Email) JSON example:
     }
   }
  ```  
-#
-   * <a name="linkprops">**Link**</a>
+### <a name="linkprops">**Link**</a>
         * Text (*string*) __*__
         * Name (*string*) __*__
         * URL (*string*) __*__
         * ClassName (*string*)
         * QuestionId (*string*)
-#        
-   * <a name="inlinealertprops">**InlineAlert**</a>
+
+### <a name="inlinealertprops">**InlineAlert**</a>
       * Text (*string*) 
       * Label (*string*) (at least one Text or Label must be entered for it to render) 
       
@@ -684,8 +692,7 @@ Textarea (Email) JSON example:
     }
   }
  ```     
- #
-   * <a name="buttonprops">**Button**</a>
+ ### <a name="buttonprops">**Button**</a>
         * Text (*string*) (defaulted to "Next step")
         * ClassName (*string*) (defaulted to "button-primary")
         * ButtonId (*string*)
@@ -703,8 +710,7 @@ Button JSON example:
     }
   }
 ```
-#
-   * <a name="ulprops">**UL** (Unordered List)</a>
+### <a name="ulprops">**UL** (Unordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
       
@@ -722,8 +728,7 @@ Unordered List JSON example:
   }
 }
 ```
-#      
-   * <a name="olprops">**OL** (Ordered List)</a>
+### <a name="olprops">**OL** (Ordered List)</a>
       * ListItems[*string*] __*__
       * ClassName (*string*)
  
@@ -740,8 +745,7 @@ Ordered List JSON example:
   }
 }
 ```
-#
-   * <a name="imgprops">**Img** (Image)</a>
+### <a name="imgprops">**Img** (Image)</a>
       * AltText (*string*) __*__
       * Source (*string*) __*__
       * ClassName (*string*)
@@ -757,8 +761,7 @@ Image JSON example:
     }
   }
 ```
-#
-  * <a name="DateInputprops">**DateInput**</a>
+### <a name="DateInputprops">**DateInput**</a>
     * Label (*string*) __*__
     * QuestionId (*string*) __*__
     * Hint (*string*)
@@ -790,8 +793,7 @@ Date Input example:
         }
     }
 ```
-#
-  * <a name="DatePicker">**DatePicker**</a>
+### <a name="DatePicker">**DatePicker**</a>
     * Label (*string*) __*__
     * QuestionId (*string*) __*__
     * Hint (*string*)
@@ -819,8 +821,7 @@ Date Picker example:
     }
 ```
 
-#
-  * <a name="Address">**Address**</a>
+### <a name="Address">**Address**</a>
     * QuestionId (*string*) __*__
     * AddressProvider (*string*) __*__
     * PostcodeLabel (*string*) __*__
@@ -857,8 +858,7 @@ Address example:
             }
     }
 ```
-#
-  * <a name="Street">**Street**</a>
+### <a name="Street">**Street**</a>
     * QuestionId (*string*) __*__
     * StreetProvider (*string*) __*__ (Fake or CRM)
     * StreetLabel (*string*) (Default: Search for a street)
@@ -885,8 +885,7 @@ Street example:
 ```
 
 
-#
-  * <a name="Organisation">**Organisation**</a>
+### <a name="Organisation">**Organisation**</a>
     * QuestionId (*string*) __*__
     * OrganisationProvider (*string*) __*__ (Fake or CRM)
     * Label (*string*) (Default: Search for a organisation)
@@ -913,8 +912,7 @@ Organisation example:
     }
 ```
 
-#
-* <a name="Time">**Time**</a>
+### <a name="Time">**Time**</a>
   * QuestionId (*string*) __*__
   * Label (*string*) __*__
   * Hint (*string*) 
@@ -941,8 +939,7 @@ Time example
 
 ```
 
-#
-* <a name="FileUpload">**FileUpload**</a>
+### <a name="FileUpload">**FileUpload**</a>
   * QuestionId (*string*) __*__
   * Label (*string*) __*__
   * TargetMapping (*string*)
