@@ -9,6 +9,8 @@ namespace form_builder.Models.Properties
         public string Label { get; set; }
         public bool Optional { get; set; } = false;
         public bool? Email { get; set; }
+
+        public bool? Tel { get; set; }
         public bool Numeric { get; set; } = false;
         public List<Option> Options { get; set; } = new List<Option>();
         public int MaxLength { get; set; } = 200;

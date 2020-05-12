@@ -35,6 +35,11 @@ namespace form_builder.Models.Elements
                 { "autocomplete", "on" }
             };
 
+            if(Properties.Tel == true)
+            {
+                properties["autocomplete"] = "tel";
+            }
+
             if (DisplayAriaDescribedby)
             {
                 properties.Add("aria-describedby", DescribedByValue());
