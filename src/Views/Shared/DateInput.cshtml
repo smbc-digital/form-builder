@@ -13,7 +13,7 @@
 }
 
 @await Html.BeginFieldSet(Model, classes)
-    <partial name="Legend" model="@Model">
+    <partial name="Legend" model="@Model"/>
 
     <p id="@hintId">@Model.Properties.Hint</p>
     <div>

@@ -5,7 +5,7 @@
     var errorId = $"{Model.Properties.QuestionId}-error";
 }
 @await Html.BeginFieldSet(Model)
-    <partial name="Legend" model="@Model">
+    <partial name="Legend" model="@Model"/>
 
     @if (!string.IsNullOrEmpty(Model.Properties.Hint))
     {

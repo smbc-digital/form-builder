@@ -7,7 +7,7 @@
 }
 
 @await Html.BeginFieldSet(Model, classes)
-    <partial name="Legend" model="@Model">
+    <partial name="Legend" model="@Model"/>
 
     @if(!string.IsNullOrEmpty(Model.Properties.Hint)){
         <p id="@hintId">@Model.Properties.Hint</p>

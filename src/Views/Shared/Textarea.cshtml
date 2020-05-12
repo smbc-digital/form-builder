@@ -25,7 +25,7 @@ else
 
 @if (!string.IsNullOrEmpty(Model.Properties.Hint))
 {
-    <div id=@hintId>@Html.Raw(Model.Properties.Hint)</div>
+    <div id=@hintId>@Html.Raw(Model.Properties.Hint)</div><br />
 }
 
 <p>Your description can be up to @Model.Properties.MaxLength characters</p>
