@@ -35,7 +35,7 @@ namespace form_builder.Models.Elements
                 { "autocomplete", "on" }
             };
 
-            if(Properties.Tel == true)
+            if(Properties.Telephone == true)
             {
                 properties["autocomplete"] = "tel";
             }
