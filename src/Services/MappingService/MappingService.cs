@@ -81,7 +81,7 @@ namespace form_builder.Services.MappingService
                 {
                     var combinedValue = $"{objectValue} {_elementMapper.GetAnswerValue(element, formAnswers)}";
                     obj.Remove(splitTargets[0]);
-                    obj.Add(splitTargets[0], combinedValue);
+                    obj.Add(splitTargets[0], combinedValue.Trim());
                     return obj;
                 }
 
