@@ -45,7 +45,7 @@ namespace form_builder.Validators
 
             return new ValidationResult {
                 IsValid = isValid,
-                Message = isValid ? string.Empty : !string.IsNullOrEmpty(element.Properties.RegexValidationMessage) ? element.Properties.RegexValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again"
+                Message = !string.IsNullOrEmpty(element.Properties.RegexValidationMessage) ? element.Properties.RegexValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again"
         };          
         }
     }
