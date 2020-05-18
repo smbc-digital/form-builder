@@ -8,12 +8,23 @@
 @await Html.BeginFieldSet(Model)
 
     <legend>
-        @if(Model.Properties.LegendAsH1) {
+        @if (Model.Properties.LegendAsH1)
+        {
             <h1>
                 @Model.Properties.Label
             </h1>
-        } else {
+            @if (Model.Properties.Optional)
+            {
+                <p class="optional">(optional)</p>
+            }
+        }
+        else
+        {
             @Model.Properties.Label
+            @if (Model.Properties.Optional)
+            {
+                <p class="optional">(optional)</p>
+            }
         }
     </legend>
 
