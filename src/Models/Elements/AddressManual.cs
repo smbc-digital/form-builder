@@ -32,7 +32,7 @@ namespace form_builder.Models.Elements
         public bool IsLine1Valid => IsValid && string.IsNullOrEmpty(Line1ValdationMessage);
 
         public ErrorViewModel Line1ValidationModel => new ErrorViewModel {
-                Id = GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1),
+                Id = GetCustomErrorId(AddressManualConstants.ADDRESS_LINE_1),
                 IsValid = IsLine1Valid,
                 Message = Line1ValdationMessage
             } ;
@@ -42,7 +42,7 @@ namespace form_builder.Models.Elements
         public bool IsTownValid => IsValid && string.IsNullOrEmpty(TownValdationMessage);
 
         public ErrorViewModel TownValidationModel => new ErrorViewModel {
-        Id = GetCustomItemId(AddressManualConstants.TOWN),
+        Id = GetCustomErrorId(AddressManualConstants.TOWN),
                 IsValid = IsTownValid,
                 Message = TownValdationMessage
             } ;
@@ -56,10 +56,10 @@ namespace form_builder.Models.Elements
         public override string Label => Properties.AddressManualLabel;
 
         public ErrorViewModel PostcodeValidationModel => new ErrorViewModel {
-        Id = GetCustomItemId(AddressManualConstants.POSTCODE),
+        Id = GetCustomErrorId(AddressManualConstants.POSTCODE),
                 IsValid = IsPostcodeValid,
                 Message = PostcodeValdationMessage
-            } ;
+            };
 
         public string ReturnURL { get; set; }
         public AddressManual()

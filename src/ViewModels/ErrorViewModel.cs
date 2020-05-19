@@ -1,5 +1,3 @@
-using form_builder.Models.Elements;
-
 namespace form_builder.ViewModels
 {
     public class ErrorViewModel
