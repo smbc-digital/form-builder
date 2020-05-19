@@ -78,35 +78,33 @@ this.ScenarioInitialize(scenarioInfo);
 #line 6
  testRunner.Given("I navigate to \"/declaration/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 7
- testRunner.When("I click the \"Declaration\" checkbox", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 8
  testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 9
+#line 8
  testRunner.Then("I should see a validation message for \"Declaration-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 10
+#line 9
  testRunner.When("I click the \"Declaration\" checkbox", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 11
+#line 10
  testRunner.Then("The \"Declaration\" checkbox should be checked", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("User uses a  page next step and back.", SourceLine=12)]
+        [TechTalk.SpecRun.ScenarioAttribute("User uses a  page next step and back.", SourceLine=11)]
         public virtual void UserUsesAPageNextStepAndBack_()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User uses a  page next step and back.", null, ((string[])(null)));
-#line 13
+#line 12
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
-#line 14
+#line 13
  testRunner.Given("I navigate to \"/declaration/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 15
+#line 14
  testRunner.When("I click the \"Declaration\" checkbox", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 16
+#line 15
  testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 17
+#line 16
  testRunner.Then("The the previous link is clicked", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 18
+#line 17
  testRunner.Then("The \"Declaration\" checkbox should be checked", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();

@@ -16,6 +16,6 @@ Scenario: Textbox standard use
 	Then I fill in page1
 	Then I click the "nextStep" button
 	Then I should see the "emailAddress" input
-	And I should see a "p" element with "ie: someone@example.com" text
+	And I should see a "span" element with "ie: someone@example.com" text
 	And I should see the "phoneNumber" input
-	And I should see a "p" element with "ie: 01615347890" text
+	And I should see a "span" element with "ie: 01615347890" text

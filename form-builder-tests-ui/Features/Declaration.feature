@@ -4,7 +4,6 @@ Feature: Declaration
 
 Scenario: User uses a declaration page.
 	Given I navigate to "/declaration/page1"
-	When I click the "Declaration" checkbox
 	Then I click the "nextStep" button
 	Then I should see a validation message for "Declaration-error" input
 	When I click the "Declaration" checkbox
