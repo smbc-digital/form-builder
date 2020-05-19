@@ -14,4 +14,3 @@ Scenario: Success page standard use
 	Then I should see a ".govuk-panel__title" html element
 	Then I should see a ".govuk-panel__body" html element
 	Then I should see a "p" element with "The wikipedia page on fruit is at Fruits" text
-
