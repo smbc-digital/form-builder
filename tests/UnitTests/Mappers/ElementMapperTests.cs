@@ -462,8 +462,8 @@ namespace form_builder_tests.UnitTests.Mappers
                   .WithType(EElementType.Street)
                   .Build();
 
-            var streetUspr = "testStreetAddress-streetaddress";
-            var streetDescription = "testStreetAddress-streetaddress-description";
+            var streetUspr = "testStreetAddress-street";
+            var streetDescription = "testStreetAddress-street-description";
 
             var formAnswers = new FormAnswers
             {

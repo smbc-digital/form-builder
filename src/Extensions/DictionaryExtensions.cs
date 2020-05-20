@@ -26,7 +26,7 @@ namespace form_builder.Extensions
                             normalisedFormData.Add($"{item.Key}-description", addressDetails[1]);
                         }
                     }
-                    else if (item.Key.EndsWith("-streetaddress") && !string.IsNullOrEmpty(item.Value[0]))
+                    else if (item.Key.EndsWith("-street") && !string.IsNullOrEmpty(item.Value[0]))
                     {
                         string[] streetDetails = item.Value[0].Split('|');
                         if (!string.IsNullOrEmpty(streetDetails[0]))

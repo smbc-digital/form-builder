@@ -194,14 +194,14 @@ namespace form_builder.Mappers
             addressObject.SelectedAddress = value.FirstOrDefault(_ => _.QuestionId == addressDescription)?.Response ?? null;
 
             return addressObject;
-
         }
+        
         private Address GetStreetElementValue(string key, FormAnswers formAnswers)
         {
             var addressObject = new Address();
 
-            var uspnKey = $"{key}-streetaddress";
-            var streetDescription = $"{key}-streetaddress-description";
+            var uspnKey = $"{key}-street";
+            var streetDescription = $"{key}-street-description";
 
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == uspnKey || _.QuestionId == streetDescription)

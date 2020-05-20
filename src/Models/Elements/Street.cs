@@ -2,11 +2,9 @@
 using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
-using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,11 +13,11 @@ namespace form_builder.Models.Elements
 {
     public class Street : Element
     {
-        public const string SEARCH_QUESTION_SUFFIX = "-street";
+        public const string SELECT_QUESTION_SUFFIX = "-street";
         public List<SelectListItem> Items { get; set; }
         public string ReturnURL { get; set; }
-        public string StreetSearchQuestionId => $"{Properties.QuestionId}{SEARCH_QUESTION_SUFFIX}";
-        public string StreetSelectQuestionId => $"{Properties.QuestionId}";
+        public string StreetSearchQuestionId => $"{Properties.QuestionId}";
+        public string StreetSelectQuestionId => $"{Properties.QuestionId}{SELECT_QUESTION_SUFFIX}";
         private bool IsSelect { get; set; } = false; 
         public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
         public override string  QuestionId => IsSelect ? StreetSelectQuestionId : StreetSearchQuestionId;
@@ -47,7 +45,7 @@ namespace form_builder.Models.Elements
             IsSelect = answers.ContainsKey("StreetStatus") && answers["StreetStatus"] == "Select" || answers.ContainsKey(StreetSearchQuestionId) && !string.IsNullOrEmpty(answers[StreetSearchQuestionId]);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
-            Properties.Value = answers.ContainsKey(StreetSearchQuestionId) ? answers[StreetSearchQuestionId] : string.Empty;
+                
 
             if (IsSelect)
             {
