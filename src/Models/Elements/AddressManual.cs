@@ -1,4 +1,5 @@
-﻿using form_builder.Enum;
+﻿using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
@@ -104,7 +105,7 @@ namespace form_builder.Models.Elements
             Properties.AddressManualAddressLine1 = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.ADDRESS_LINE_1)).Value;
             Properties.AddressManualAddressLine2 = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.ADDRESS_LINE_2)).Value;
             Properties.AddressManualAddressTown = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.TOWN)).Value;
-            Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.POSTCODE)).Value ?? searchTerm;           
+            Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.POSTCODE)).Value ?? searchTerm;
         }
 
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
