@@ -1,4 +1,5 @@
-﻿using form_builder.Enum;
+﻿using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
@@ -13,11 +14,10 @@ namespace form_builder.Models.Elements
 {
     public class Organisation : Element
     {
-        public const string SEARCH_QUESTION_SUFFIX = "-organisation-searchterm";
         public List<SelectListItem> Items { get; set; }
         public string ReturnURL { get; set; }
-        public string OrganisationSearchQuestionId => $"{Properties.QuestionId}{SEARCH_QUESTION_SUFFIX}";
-        public string OrganisationSelectQuestionId => $"{Properties.QuestionId}";
+        public string OrganisationSearchQuestionId => $"{Properties.QuestionId}";
+        public string OrganisationSelectQuestionId => $"{Properties.QuestionId}{OrganisationConstants.SELECT_SUFFIX}";
         private bool IsSelect { get; set; } = false; 
         public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
         public override string  QuestionId => IsSelect ? OrganisationSelectQuestionId : OrganisationSearchQuestionId;

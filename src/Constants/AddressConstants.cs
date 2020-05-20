@@ -11,5 +11,9 @@ namespace form_builder.Constants
         
         // TODO: Think this should be renamed "Custom" rather than "Stockport" and value moved to config
         public static Regex STOCKPORT_POSTCODE_REGEX = new Regex(@"^(sK|Sk|SK|sk|M|m)[0-9][0-9A-Za-z]?\s?[0-9][A-Za-z]{2}");
+
+        public const string SEARCH_SUFFIX = "-postcode";
+        public const string SELECT_SUFFIX = "-address";
+        public const string DESCRIPTION_SUFFIX= "-address-description";
     }
 }

@@ -116,7 +116,7 @@ namespace form_builder.Models.Elements
             };
 
             viewModel.Add("AddressStatus", "Manual");
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
+            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
             SetAddressProperties(viewModel, Properties.Value);
             var searchResultsCount =  elementHelper.GetFormDataValue(guid, $"{Properties.QuestionId}-srcount");
             var isValid = int.TryParse(searchResultsCount.ToString(), out int output);

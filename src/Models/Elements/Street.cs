@@ -8,16 +8,16 @@ using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using form_builder.Constants;
 
 namespace form_builder.Models.Elements
 {
     public class Street : Element
     {
-        public const string SELECT_QUESTION_SUFFIX = "-street";
         public List<SelectListItem> Items { get; set; }
         public string ReturnURL { get; set; }
         public string StreetSearchQuestionId => $"{Properties.QuestionId}";
-        public string StreetSelectQuestionId => $"{Properties.QuestionId}{SELECT_QUESTION_SUFFIX}";
+        public string StreetSelectQuestionId => $"{Properties.QuestionId}{StreetConstants.SELECT_SUFFIX}";
         private bool IsSelect { get; set; } = false; 
         public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
         public override string  QuestionId => IsSelect ? StreetSelectQuestionId : StreetSearchQuestionId;
