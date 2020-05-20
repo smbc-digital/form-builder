@@ -43,9 +43,9 @@ namespace form_builder.Models.Elements
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> searchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> answers, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             IsSelect = answers.ContainsKey("StreetStatus") && answers["StreetStatus"] == "Select" || answers.ContainsKey(StreetSearchQuestionId) && !string.IsNullOrEmpty(answers[StreetSearchQuestionId]);
+            Properties.Value = answers.ContainsKey(StreetSearchQuestionId) ? answers[StreetSearchQuestionId] : string.Empty;
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
-                
 
             if (IsSelect)
             {
