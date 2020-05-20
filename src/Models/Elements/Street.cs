@@ -54,13 +54,7 @@ namespace form_builder.Models.Elements
                 ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
                 if (string.IsNullOrEmpty(Properties.Value))
-                {
                     Properties.Value = (string)answers[StreetSearchQuestionId];
-                    if ((string)answers["StreetStatus"] == "Select")
-                    {
-                        Properties.Value = (string)answers[QuestionId];
-                    }
-                }
 
                 return await viewRender.RenderAsync("StreetSelect", this);
             }
