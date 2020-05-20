@@ -81,10 +81,14 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("I should see a \"button\" element with \"Secondary Button\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 8
  testRunner.Then("I should find an element with class \".govuk-button--secondary\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 9
+    testRunner.Then("I should not see any \".govuk-back-link\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 10
  testRunner.When("I click the \"nextStep1\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 12
+#line 11
  testRunner.Then("I should see a \".govuk-back-link\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 12
+ testRunner.When("I click the \"nextStep1\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             this.ScenarioCleanup();
         }
