@@ -34,14 +34,14 @@ namespace form_builder.Helpers.ElementHelpers
             _distributedCache = distributedCacheWrapper;
         }
 
-        public string CurrentValue(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "")
+        public string CurrentValue(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
         {
             if (element.Type == EElementType.FileUpload)
             {
                 return string.Empty;
             };
 
-            var currentValue = viewModel.ContainsKey($"{element.Properties.QuestionId}{suffix}");
+            var currentValue = answers.ContainsKey($"{element.Properties.QuestionId}{suffix}");
             var cacheData = _distributedCache.GetString(guid);
 
             if (!currentValue && cacheData != null)
@@ -59,7 +59,7 @@ namespace form_builder.Helpers.ElementHelpers
                 return string.Empty;
             }
 
-            return currentValue ? viewModel[$"{element.Properties.QuestionId}{suffix}"] : string.Empty;
+            return currentValue ? answers[$"{element.Properties.QuestionId}{suffix}"] : string.Empty;
         }
 
         public bool CheckForLabel(Element element)
