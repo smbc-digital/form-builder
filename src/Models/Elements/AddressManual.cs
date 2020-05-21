@@ -29,7 +29,7 @@ namespace form_builder.Models.Elements
 
         public string ChangeHeader => "Postcode";
 
-        public bool IsLine1Valid => IsValid && string.IsNullOrEmpty(Line1ValdationMessage);
+        public bool IsLine1Valid => string.IsNullOrEmpty(Line1ValdationMessage);
 
         public ErrorViewModel Line1ValidationModel => new ErrorViewModel {
                 Id = GetCustomErrorId(AddressManualConstants.ADDRESS_LINE_1),
@@ -39,7 +39,7 @@ namespace form_builder.Models.Elements
 
         public string Line1ValdationMessage => ErrorMessages[0];
 
-        public bool IsTownValid => IsValid && string.IsNullOrEmpty(TownValdationMessage);
+        public bool IsTownValid => string.IsNullOrEmpty(TownValdationMessage);
 
         public ErrorViewModel TownValidationModel => new ErrorViewModel {
         Id = GetCustomErrorId(AddressManualConstants.TOWN),
@@ -49,7 +49,7 @@ namespace form_builder.Models.Elements
 
         public string TownValdationMessage => ErrorMessages[1];
     
-        public bool IsPostcodeValid => IsValid && string.IsNullOrEmpty(TownValdationMessage);
+        public bool IsPostcodeValid => string.IsNullOrEmpty(PostcodeValdationMessage);
 
         public string PostcodeValdationMessage => ErrorMessages[2];
 
