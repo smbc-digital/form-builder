@@ -240,9 +240,9 @@ namespace form_builder.Mappers
         private TimeSpan? GetTimeElementValue(string key, FormAnswers formAnswers)
         {
             dynamic dateObject = new ExpandoObject();
-            var timeMinutesKey = $"{key}-minutes";
-            var timeHoursKey = $"{key}-hours";
-            var timeAmPmKey = $"{key}-ampm";
+            var timeMinutesKey = $"{key}{TimeConstants.MINUTES_SUFFIX}";
+            var timeHoursKey = $"{key}{TimeConstants.HOURS_SUFFIX}";
+            var timeAmPmKey = $"{key}{TimeConstants.AM_PM_SUFFIX}";
 
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == timeMinutesKey || _.QuestionId == timeHoursKey ||
