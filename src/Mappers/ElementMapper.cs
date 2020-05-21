@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Microsoft.Extensions.Logging;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
+using form_builder.Constants;
 
 namespace form_builder.Mappers
 {
@@ -173,12 +174,12 @@ namespace form_builder.Mappers
         {
             var addressObject = new Address();
 
-            var urpnKey = $"{key}-address";
-            var addressDescription = $"{key}-address-description";
-            var manualAddressLineOne = $"{key}-AddressManualAddressLine1";
-            var manualAddressLineTwo = $"{key}-AddressManualAddressLine2";
-            var manualAddressLineTown = $"{key}-AddressManualAddressTown";
-            var manualAddressLinePostcode = $"{key}-AddressManualAddressPostcode";
+            var urpnKey = $"{key}{AddressConstants.SELECT_SUFFIX}";
+            var addressDescription = $"{key}{AddressConstants.DESCRIPTION_SUFFIX}";
+            var manualAddressLineOne = $"{key}-{AddressManualConstants.ADDRESS_LINE_1}";
+            var manualAddressLineTwo = $"{key}-{AddressManualConstants.ADDRESS_LINE_2}";
+            var manualAddressLineTown = $"{key}-{AddressManualConstants.TOWN}";
+            var manualAddressLinePostcode = $"{key}-{AddressManualConstants.POSTCODE}";
 
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == manualAddressLineOne || _.QuestionId == manualAddressLineTwo ||
@@ -194,14 +195,14 @@ namespace form_builder.Mappers
             addressObject.SelectedAddress = value.FirstOrDefault(_ => _.QuestionId == addressDescription)?.Response ?? null;
 
             return addressObject;
-
         }
+        
         private Address GetStreetElementValue(string key, FormAnswers formAnswers)
         {
             var addressObject = new Address();
 
-            var uspnKey = $"{key}-streetaddress";
-            var streetDescription = $"{key}-streetaddress-description";
+            var uspnKey = $"{key}{StreetConstants.SELECT_SUFFIX}";
+            var streetDescription = $"{key}{StreetConstants.DESCRIPTION_SUFFIX}";
 
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == uspnKey || _.QuestionId == streetDescription)
@@ -264,8 +265,8 @@ namespace form_builder.Mappers
         private StockportGovUK.NetStandard.Models.Verint.Organisation GetOrganisationElementValue(string key, FormAnswers formAnswers)
         {
             var orgObject = new StockportGovUK.NetStandard.Models.Verint.Organisation();
-            var organisationKey = $"{key}-organisation";
-            var organisationDescriptionKey = $"{key}-organisation-description";
+            var organisationKey = $"{key}{OrganisationConstants.SELECT_SUFFIX}";
+            var organisationDescriptionKey = $"{key}{OrganisationConstants.DESCRIPTION_SUFFIX}";
 
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == organisationKey || _.QuestionId == organisationDescriptionKey)

@@ -12,6 +12,7 @@ using form_builder.Enum;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using form_builder.Builders;
+using form_builder.Constants;
 
 namespace form_builder_tests.UnitTests.Mappers
 {
@@ -410,10 +411,10 @@ namespace form_builder_tests.UnitTests.Mappers
                   .WithType(EElementType.Address)
                   .Build();
 
-            var manualAddressLineOne = "testAddress-AddressManualAddressLine1";
-            var manualAddressLineTwo = "testAddress-AddressManualAddressLine2";
-            var manualAddressLineTown = "testAddress-AddressManualAddressTown";
-            var manualAddressLinePostcode = "testAddress-AddressManualAddressPostcode";
+            var manualAddressLineOne = $"testAddress-{AddressManualConstants.ADDRESS_LINE_1}";
+            var manualAddressLineTwo = $"testAddress-{AddressManualConstants.ADDRESS_LINE_2}";
+            var manualAddressLineTown = $"testAddress-{AddressManualConstants.TOWN}";
+            var manualAddressLinePostcode = $"testAddress-{AddressManualConstants.POSTCODE}";
 
             var formAnswers = new FormAnswers
             {
@@ -462,8 +463,8 @@ namespace form_builder_tests.UnitTests.Mappers
                   .WithType(EElementType.Street)
                   .Build();
 
-            var streetUspr = "testStreetAddress-streetaddress";
-            var streetDescription = "testStreetAddress-streetaddress-description";
+            var streetUspr = "testStreetAddress-street";
+            var streetDescription = "testStreetAddress-street-description";
 
             var formAnswers = new FormAnswers
             {
@@ -835,8 +836,8 @@ namespace form_builder_tests.UnitTests.Mappers
             var questionId = "test-questionID";
             var labelText = "Enter the Street";
 
-            var uspn = "test-questionID-streetaddress";
-            var addressDescription = "test-questionID-streetaddress-description";
+            var uspn = $"{questionId}{StreetConstants.SELECT_SUFFIX}";
+            var addressDescription = $"{questionId}{StreetConstants.DESCRIPTION_SUFFIX}";
 
             var formAnswers = new FormAnswers
             {

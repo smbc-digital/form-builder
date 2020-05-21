@@ -1,5 +1,5 @@
 
-namespace form_builder.Models.Elements
+namespace form_builder.Constants
 {
     public class AddressManualConstants
     {

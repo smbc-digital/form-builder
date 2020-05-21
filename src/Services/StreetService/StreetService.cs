@@ -6,10 +6,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways.StreetServiceGateway;
 using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Enums;
-using StockportGovUK.NetStandard.Models.Street;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,8 +43,8 @@ namespace form_builder.Services.StreetService
                         ? new FormAnswers { Pages = new List<PageAnswers>() }
                         : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
             var street = journey == "Select"
-                ? (string) convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}-street").Response
-                : (string) viewModel[$"{streetElement.Properties.QuestionId}-street"];
+                ? (string) convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == streetElement.Properties.QuestionId).Response
+                : (string) viewModel[streetElement.Properties.QuestionId];
 
             if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
             {
