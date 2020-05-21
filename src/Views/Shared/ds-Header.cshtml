@@ -1,5 +1,6 @@
 ﻿@{
     var displayHeading = (string)ViewData["Title"] != "Error";
+    var baseUrl = (string)ViewData["BaseUrl"];
 }
 
     <header class="smbc-header " role="banner" data-module="govuk-header">
@@ -10,7 +11,7 @@
             <div class="govuk-header__content">
             @if (displayHeading)
             {
-                <a href="../@Model.BaseURL" class="govuk-header__link govuk-header__link--service-name">
+                <a href="@baseUrl" class="govuk-header__link govuk-header__link--service-name">
                     @Model.FormName
                 </a>
             }
