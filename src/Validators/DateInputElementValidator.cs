@@ -2,7 +2,6 @@
 using form_builder.Models.Elements;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace form_builder.Validators
 {
@@ -58,11 +57,11 @@ namespace form_builder.Validators
                 var maxYear = DateTime.Now.Year + 100;
                 if (date.Year > maxYear)
                 {
-                        return new ValidationResult
-                        {
-                            IsValid = false,
-                            Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) ? element.Properties.UpperLimitValidationMessage : $"Year must be less than or equal to {maxYear}"
-                        };
+                    return new ValidationResult
+                    {
+                        IsValid = false,
+                        Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) ? element.Properties.UpperLimitValidationMessage : $"Year must be less than or equal to {maxYear}"
+                    };
                 }
             }
 
