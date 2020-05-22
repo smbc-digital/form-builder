@@ -4,7 +4,6 @@
     ViewData["PageTitle"] = Model.PageTitle;
     ViewData["FeedbackUrl"] = Model.FeedbackForm;
     ViewData["FeedbackPhase"] = Model.FeedbackPhase;
-    ViewData["BaseUrl"] = $"../{Model.BaseURL}";
 }
 
 @using (Html.BeginForm("Index", "Address", FormMethod.Post))
