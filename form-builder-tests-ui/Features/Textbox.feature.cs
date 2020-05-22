@@ -102,11 +102,11 @@ this.ScenarioInitialize(scenarioInfo);
 #line 18
  testRunner.Then("I should see the \"emailAddress\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 19
- testRunner.And("I should see a \"p\" element with \"ie: someone@example.com\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"span\" element with \"ie: someone@example.com\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 20
  testRunner.And("I should see the \"phoneNumber\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 21
- testRunner.And("I should see a \"p\" element with \"ie: 01615347890\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"span\" element with \"ie: 01615347890\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }

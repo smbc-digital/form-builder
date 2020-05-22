@@ -13,5 +13,3 @@ Scenario: Renders Select on the page
 	When I select "tuesday" in "select" dropdown
 	Then I should see "Tuesday" is selected in "select" dropdown with the value "tuesday"
 	When I click the "submit" button
-	Then I should see a validation message for "favFood-error" input
-	

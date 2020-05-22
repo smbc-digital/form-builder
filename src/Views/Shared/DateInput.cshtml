@@ -9,8 +9,8 @@
     }
 }
 
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)" />
-    @await Html.BeginFieldSet(Model, new string[] {"govuk-fieldset" })
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    @Html.BeginFieldSet(Model, new string[] {"govuk-fieldset" })
 
     <partial name="LegendH1" />
 
@@ -30,7 +30,7 @@
 
         <div class="govuk-date-input__item">
             <div class="govuk-form-group">
-                <label class="govuk-label govuk-date-input__label" for=Model.GetCustomItemId("month")>
+                <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("month")>
                     Month
                 </label>
                 @Html.TextBox(Model.GetCustomItemId("month"), Model.Properties.Month, new { maxlength = "2", type = "number", @class = inputClasses })
@@ -39,12 +39,12 @@
 
         <div class="govuk-date-input__item">
             <div class="govuk-form-group">
-                <label class="govuk-label govuk-date-input__label" for=Model.GetCustomItemId("year")>
+                <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("year")>
                     Year
                 </label>
                 @Html.TextBox(Model.GetCustomItemId("year"), Model.Properties.Year, new { maxlength = "4", type = "number", @class= inputClasses, max = maxYear })
             </div>
         </div>
     </div>
-    @await Html.EndFieldSet()
+    @Html.EndFieldSet()
 </div>

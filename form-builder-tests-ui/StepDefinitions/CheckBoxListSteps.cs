@@ -65,7 +65,7 @@ namespace form_builder_tests_ui.StepDefinitions
             //Act
 
             //Assert
-            webDriver.FindElement(By.ClassName("back-button")).Click();
+            webDriver.FindElement(By.ClassName("govuk-back-link")).Click();
         }
     }
 }

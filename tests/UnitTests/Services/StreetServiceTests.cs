@@ -55,7 +55,7 @@ namespace form_builder_tests.UnitTests.Services
                         {
                             new Answers
                             {
-                                QuestionId = $"{questionId}-street",
+                                QuestionId = questionId,
                                 Response = "test street"
                             }
                         },
@@ -86,7 +86,7 @@ namespace form_builder_tests.UnitTests.Services
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "StreetStatus", journey },
-                { $"{element.Properties.QuestionId}-street", "test street" },
+                { questionId, "test street" },
             };
 
             var result = await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
@@ -111,7 +111,7 @@ namespace form_builder_tests.UnitTests.Services
                         {
                             new Answers
                             {
-                                QuestionId = $"{questionId}-street",
+                                QuestionId = questionId,
                                 Response = "test street"
                             }
                         },
@@ -146,7 +146,7 @@ namespace form_builder_tests.UnitTests.Services
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "StreetStatus", "Search" },
-                { $"{element.Properties.QuestionId}-street", "Test street" },
+                { element.Properties.QuestionId, "Test street" },
             };
 
             var result = await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
