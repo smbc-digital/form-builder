@@ -90,7 +90,7 @@ namespace form_builder.Models
                     var dateIsAfterValid = !dateIsAfterConditions.Any();
 
                     if(equalToConditions.Any())
-                        equalToValid = equalToConditions.All(x => viewModel.ContainsKey(x.QuestionId) ? x.EqualTo == viewModel[x.QuestionId] : true);
+                        equalToValid = equalToConditions.All(x => x.EqualTo.Equals(viewModel.ContainsKey(x.QuestionId) ? viewModel[x.QuestionId] : string.Empty));
 
                     if(checkBoxContainsConditions.Any())
                         checkBoxContainsValid = checkBoxContainsConditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
