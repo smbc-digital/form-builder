@@ -57,7 +57,8 @@ namespace form_builder.Validators
                     return new ValidationResult
                     {
                         IsValid = false,
-                        Message = $"{element.Properties.Label} must be between {min} and {max} inclusive"
+                        Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) ? element.Properties.UpperLimitValidationMessage : $"{ element.Properties.Label} must be between {min} and {max} inclusive"
+
                     };
                 }
 
