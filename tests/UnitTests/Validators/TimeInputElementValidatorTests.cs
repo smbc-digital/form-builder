@@ -1,4 +1,5 @@
 ﻿using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Validators;
 using System.Collections.Generic;
@@ -50,9 +51,9 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("test-time-hours", "aa");
-            viewModel.Add("test-time-minutes", "aa");
-            viewModel.Add("test-time-ampm", "aaaa");
+            viewModel.Add($"test-time{TimeConstants.HOURS_SUFFIX}", "aa");
+            viewModel.Add($"test-time{TimeConstants.MINUTES_SUFFIX}s", "aa");
+            viewModel.Add($"test-time{TimeConstants.AM_PM_SUFFIX}", "aaaa");
 
             //Assert
             var result = _dateInputElementValidator.Validate(element, viewModel);
