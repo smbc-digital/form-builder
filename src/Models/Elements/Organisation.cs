@@ -55,10 +55,6 @@ namespace form_builder.Models.Elements
             Items = new List<SelectListItem>{ new SelectListItem($"{organisationResults.Count} organisations found", string.Empty)};
             organisationResults.ForEach((_) => { Items.Add(new SelectListItem(_.Name, $"{_.Reference}|{_.Name}")); });
             ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
-            // if (string.IsNullOrEmpty(Properties.Value))
-            // {
-            //     Properties.Value = (string)answers[OrganisationSearchQuestionId];
-            // }
             return await viewRender.RenderAsync("OrganisationSelect", this);
         }
 
