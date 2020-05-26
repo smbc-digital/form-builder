@@ -1,8 +1,8 @@
 ﻿@using form_builder.Helpers
 @model form_builder.Models.Elements.Element
 
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)" />
-    @await Html.BeginFieldSet(Model, new string[] {"govuk-fieldset" })
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    @Html.BeginFieldSet(Model, new string[] {"govuk-fieldset" })
 
         <partial name="LegendH1" />
         
@@ -12,5 +12,5 @@
 
         <partial name="CheckboxOptions" />
 
-    @await Html.EndFieldSet()
+    @Html.EndFieldSet()
 </div>

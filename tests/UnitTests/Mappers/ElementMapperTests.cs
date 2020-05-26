@@ -291,9 +291,9 @@ namespace form_builder_tests.UnitTests.Mappers
                    .WithType(EElementType.TimeInput)
                    .Build();
 
-            var timeMinutesKey = "testTime-minutes";
-            var timeHoursKey = "testTime-hours";
-            var timeAmPmKey = "testTime-ampm";
+            var timeMinutesKey = $"testTime{TimeConstants.MINUTES_SUFFIX}";
+            var timeHoursKey = $"testTime{TimeConstants.HOURS_SUFFIX}";
+            var timeAmPmKey = $"testTime{TimeConstants.AM_PM_SUFFIX}";
 
             var formAnswers = new FormAnswers
             {
@@ -332,9 +332,9 @@ namespace form_builder_tests.UnitTests.Mappers
                   .WithType(EElementType.TimeInput)
                   .Build();
 
-            var timeMinutesKey = "testTime-minutes";
-            var timeHoursKey = "testTime-hours";
-            var timeAmPmKey = "testTime-ampm";
+            var timeMinutesKey = $"testTime{TimeConstants.MINUTES_SUFFIX}";
+            var timeHoursKey = $"testTime{TimeConstants.HOURS_SUFFIX}";
+            var timeAmPmKey = $"testTime{TimeConstants.AM_PM_SUFFIX}";
 
             var formAnswers = new FormAnswers
             {
@@ -676,17 +676,17 @@ namespace form_builder_tests.UnitTests.Mappers
                         Answers = new List<Answers> {
                             new Answers
                             {
-                                QuestionId = "timeInput-minutes",
+                                QuestionId = $"timeInput{TimeConstants.MINUTES_SUFFIX}",
                                 Response = elementMinutes
                             },
                             new Answers
                             {
-                                QuestionId = "timeInput-hours",
+                                QuestionId = $"timeInput{TimeConstants.HOURS_SUFFIX}",
                                 Response = elementHours
                             },
                             new Answers
                             {
-                                QuestionId = "timeInput-ampm",
+                                QuestionId = $"timeInput{TimeConstants.AM_PM_SUFFIX}",
                                 Response = elementAmPm
                             }
                         }
@@ -972,7 +972,7 @@ namespace form_builder_tests.UnitTests.Mappers
 
             var questionId = "test-questionID";
             var labelText = "What Time do you like";
-            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-hours", Response = hour }, new Answers { QuestionId = $"{questionId}-minutes", Response = min }, new Answers { QuestionId = $"{questionId}-ampm", Response = amPm } } }}};
+            var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}{TimeConstants.HOURS_SUFFIX}", Response = hour }, new Answers { QuestionId = $"{questionId}{TimeConstants.MINUTES_SUFFIX}", Response = min }, new Answers { QuestionId = $"{questionId}{TimeConstants.AM_PM_SUFFIX}", Response = amPm } } }}};
 
             var element = new ElementBuilder()
                 .WithType(EElementType.TimeInput)
