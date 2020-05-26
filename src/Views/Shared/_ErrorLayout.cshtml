@@ -1,9 +1,4 @@
-﻿@{
-    var feedbackFormUrl = (string)ViewData["FeedbackUrl"];
-    var feedbackPhase = (string)ViewData["FeedbackPhase"];
-}
-
-<!doctype html>
+﻿<!doctype html>
 <html lang="en" class="govuk-template flexbox no-flexboxtweener">
 
 <head>
@@ -16,7 +11,7 @@
     <partial name="TagManagerHead" />
 </head>
 
-<body class="govuk-template__body  js-enabled">
+<body class="govuk-template__body js-enabled">
     <partial name="TagManagerBody" />
 
     <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
@@ -26,7 +21,7 @@
     <partial name="ds-Header" />
 
     <div class="govuk-width-container">
-        <main class="govuk-main-wrapper " id="main-content" role="main">
+        <main class="govuk-main-wrapper" id="main-content" role="main">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
                     @RenderBody()

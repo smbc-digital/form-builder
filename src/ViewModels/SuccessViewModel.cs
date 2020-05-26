@@ -1,15 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using form_builder.Models;
 
-namespace form_builder.Models
+namespace form_builder.ViewModels
 {
     public class SuccessViewModel
     {
         public string FormName { get; set; }
 
-        public string SecondaryHeader { get; set; }
+
+        public string FeedbackPhase { get; set; }
+
+        public string FeedbackFormUrl { get; set; }
 
         public FormAnswers FormAnswers {get; set;}
 

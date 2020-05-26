@@ -80,6 +80,7 @@ namespace form_builder.ContentFactory
             {
                 HtmlContent = result,
                 FeedbackFormUrl = baseForm.FeedbackForm,
+                FeedbackPhase= baseForm.FeedbackPhase,
                 FormName = baseForm.FormName,
                 StartFormUrl = startFormUrl,
                 PageTitle = page.Title

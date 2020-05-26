@@ -9,6 +9,7 @@ using form_builder.Services.FileUploadService;
 using form_builder.Workflows;
 using Microsoft.EntityFrameworkCore.Internal;
 using form_builder.Models;
+using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Controllers
@@ -200,7 +201,8 @@ namespace form_builder.Controllers
                 FormAnswers = result.FormAnswers,
                 FormName = result.FormName,
                 StartFormUrl = result.StartFormUrl,
-                //SecondaryHeader = "",
+                FeedbackPhase = result.FeedbackPhase,
+                FeedbackFormUrl = result.FeedbackFormUrl,
                 PageTitle = result.PageTitle
             };
 
