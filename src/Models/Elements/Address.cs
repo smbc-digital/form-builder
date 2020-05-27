@@ -47,7 +47,7 @@ namespace form_builder.Models.Elements
         {
             IsSearch =  answers.ContainsKey("AddressStatus") && answers["AddressStatus"] == "Search";
             IsSelect = answers.ContainsKey("AddressStatus") && answers["AddressStatus"] == "Select" || answers.ContainsKey(AddressSearchQuestionId) && !string.IsNullOrEmpty(answers[AddressSearchQuestionId]);
-            Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid);
+            Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
 
