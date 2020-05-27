@@ -14,6 +14,13 @@ namespace form_builder_tests_ui.StepDefinitions
             BrowserSession.FillIn("customersaddresswithtitle-postcode").With("sk1 1aa");
         }
 
+        [Then(@"I fill in page2")]
+        [When(@"I fill in page2")]
+        public void ThenIFillInPage2()
+        {
+            BrowserSession.FillIn("customersaddressnotitle-postcode").With("sk1 1aa");
+        }
+
         [Then(@"I fill in page1 with invalid postcode")]
         [When(@"I fill in page1 with invalid postcode")]
         public void ThenIFillInPage1WithInvalidPostcode()
@@ -28,9 +35,9 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.True(BrowserSession.FindId(inputName).Exists());
         }
 
-        [Then(@"I fill in page2")]
-        [When(@"I fill in page2")]
-        public void ThenIFillInPage2()
+        [Then(@"I fill in page3")]
+        [When(@"I fill in page3")]
+        public void ThenIFillInPage3()
         {
             BrowserSession.FillIn("optionaladdress-postcode").With("sk1 1aa");
         }

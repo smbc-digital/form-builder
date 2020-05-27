@@ -9,13 +9,13 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then(@"I fill in page1")]
         public void ThenIFillInPage1()
         {
-            BrowserSession.FillIn("organisation-organisation-searchterm").With("test org");
+            BrowserSession.FillIn("organisation").With("test org");
         }
 
         [Then(@"I fill in page2")]
         public void ThenIFillInPage2()
         {
-            BrowserSession.FillIn("optorganisation-organisation-searchterm").With("test org optional");
+            BrowserSession.FillIn("optorganisation").With("test org optional");
         }
 
         [Then(@"I wait one second")]
