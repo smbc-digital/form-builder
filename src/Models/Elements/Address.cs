@@ -20,6 +20,9 @@ namespace form_builder.Models.Elements
         public string AddressSearchQuestionId => $"{Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}";
         public string AddressSelectQuestionId => $"{Properties.QuestionId}{AddressConstants.SELECT_SUFFIX}";
         private bool IsSelect { get; set; } = false; 
+
+        private bool IsSearch { get; set; } = false; 
+
         public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
         public override string  QuestionId => IsSelect ? AddressSelectQuestionId : AddressSearchQuestionId;
         public string ChangeHeader => "Postcode";
@@ -42,13 +45,14 @@ namespace form_builder.Models.Elements
 
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> searchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> answers, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            var isSearch =  answers.ContainsKey("AddressStatus") && answers["AddressStatus"] == "Search";
+            IsSearch =  answers.ContainsKey("AddressStatus") && answers["AddressStatus"] == "Search";
             IsSelect = answers.ContainsKey("AddressStatus") && answers["AddressStatus"] == "Select" || answers.ContainsKey(AddressSearchQuestionId) && !string.IsNullOrEmpty(answers[AddressSearchQuestionId]);
+            Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
-            Properties.Value = answers.ContainsKey(AddressSearchQuestionId) ? answers[AddressSearchQuestionId] : string.Empty;
+            
 
-            if(isSearch && !IsValid || !IsSelect)
+            if(IsSearch && !IsValid || !IsSelect)
             {
                 IsSelect = false;
                 return await viewRender.RenderAsync("AddressSearch", this);
