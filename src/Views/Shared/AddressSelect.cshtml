@@ -1,8 +1,7 @@
 ﻿@model form_builder.Models.Elements.Address
 @{
     var elementProperties = Model.GenerateElementProperties("Select");
-
-    elementProperties.Add("class", "govuk-select @(!Model.IsValid ? \"govuk-select--error\" : string.Empty)");
+    elementProperties.Add("class", Model.IsValid ? "govuk-select" : "govuk-select govuk-select--error");
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
