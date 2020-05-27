@@ -2,14 +2,16 @@
 @model form_builder.Models.Elements.Element
 @{
     var maxYear = DateTime.Now.Year + 100;
-    var inputClasses = "govuk-input govuk-date-input__input govuk-input--width-2";
-    if(!Model.IsValid)
+    var inputClassesShort = "govuk-input govuk-date-input__input govuk-input--width-2";
+    var inputClassesLong = "govuk-input govuk-date-input__input govuk-input--width-4";
+    if (!Model.IsValid)
     {
-        inputClasses += " govuk-input--error";
+        inputClassesShort += " govuk-input--error";
+        inputClassesLong += " govuk-input--error";
     }
 }
 
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)" />
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
     @await Html.BeginFieldSet(Model, new string[] {"govuk-fieldset" })
 
     <partial name="LegendH1" />
@@ -24,25 +26,25 @@
                 <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("day")>
                     Day
                 </label>
-                @Html.TextBox(Model.GetCustomItemId("day"), Model.Properties.Day, new { maxlength = "2", type = "number", @class = inputClasses })
+                @Html.TextBox(Model.GetCustomItemId("day"), Model.Properties.Day, new { autocomplete = "bday-day", maxlength = "2", type = "number", @class = inputClassesShort })
             </div>
         </div>
 
         <div class="govuk-date-input__item">
             <div class="govuk-form-group">
-                <label class="govuk-label govuk-date-input__label" for=Model.GetCustomItemId("month")>
+                <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("month")>
                     Month
                 </label>
-                @Html.TextBox(Model.GetCustomItemId("month"), Model.Properties.Month, new { maxlength = "2", type = "number", @class = inputClasses })
+                @Html.TextBox(Model.GetCustomItemId("month"), Model.Properties.Month, new { autocomplete = "bday-month", maxlength = "2", type = "number", @class = inputClassesShort })
             </div>
         </div>
 
         <div class="govuk-date-input__item">
             <div class="govuk-form-group">
-                <label class="govuk-label govuk-date-input__label" for=Model.GetCustomItemId("year")>
+                <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("year")>
                     Year
                 </label>
-                @Html.TextBox(Model.GetCustomItemId("year"), Model.Properties.Year, new { maxlength = "4", type = "number", @class= inputClasses, max = maxYear })
+                @Html.TextBox(Model.GetCustomItemId("year"), Model.Properties.Year, new { autocomplete = "bday-year", maxlength = "4", type = "number", @class= inputClassesLong, max = maxYear })
             </div>
         </div>
     </div>

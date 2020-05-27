@@ -1,28 +1,26 @@
 ﻿@model form_builder.Models.Elements.Address
-@{    
+@{
     var elementProperties = Model.GenerateElementProperties("Select");
-    elementProperties.Add("class", "govuk-select");
 
-    if(!Model.IsValid){
-        elementProperties.Add("class", "govuk-select--error");
-    }
+    elementProperties.Add("class", "govuk-select @(!Model.IsValid ? \"govuk-select--error\" : string.Empty)");
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
     @Html.Hidden(@Model.AddressSearchQuestionId, @Model.Properties.Value)
-    
-    @if(Model.Properties.LabelAsH1)
+
+    @if (Model.Properties.LabelAsH1)
     {
         <partial name="LabelH1" />
-    
+
         <partial name="ChangeSearch" />
     }
-    else{
+    else
+    {
         <partial name="ChangeSearch" />
 
         <partial name="LabelH1" />
     }
-    
+
 
     <partial name="Hint" />
 

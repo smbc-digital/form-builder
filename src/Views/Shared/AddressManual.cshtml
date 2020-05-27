@@ -6,13 +6,13 @@
 
     var line1ElementProperties = Model.GenerateAddress1ElementProperties();
     line1ElementProperties.Add("class", Model.IsLine1Valid ? inputClass : invalidInputClasses);
-    
+
     var line2ElementProperties = Model.GenerateAddress2ElementProperties();
     line2ElementProperties.Add("class", inputClass);
-    
+
     var townElementProperties = Model.GenerateTownElementProperties();
     townElementProperties.Add("class", Model.IsTownValid ? inputClass : invalidInputClasses);
-    
+
     var postcodeElementProperties = Model.GeneratePostcodeElementProperties();
     postcodeElementProperties.Add("class", Model.IsPostcodeValid ? $"{inputClass} govuk-input--width-10" : $"{invalidInputClasses} govuk-input--width-10");
 }
@@ -37,26 +37,26 @@
     }
 
     <div class="govuk-form-group @(Model.IsLine1Valid ? string.Empty : " govuk-form-group--error")">
-        <label class="govuk-label" for=@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1)>Address line 1</label>
+        <label class="govuk-label govuk-label--m" for=@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1)>Address line 1</label>
         <partial name="ErrorBase" model=Model.Line1ValidationModel />
         @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1), Model.Properties.AddressManualAddressLine1, line1ElementProperties)
     </div>
 
     <div class="govuk-form-group">
-        <label class="govuk-label" class="optional" for=@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_2)>Address line 2
-            <span>(optional)</span>
+        <label class="govuk-label govuk-label--m" class="optional" for=@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_2)>Address line 2
+            <span class="govuk-body">(optional)</span>
         </label>    
         @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_2), Model.Properties.AddressManualAddressLine2, line2ElementProperties)
     </div>
 
     <div class="govuk-form-group @(Model.IsTownValid ? string.Empty : " govuk-form-group--error")">
-        <label class="govuk-label" for=@Model.GetCustomItemId(AddressManualConstants.TOWN)>Town</label>
+        <label class="govuk-label govuk-label--m" for=@Model.GetCustomItemId(AddressManualConstants.TOWN)>Town</label>
         <partial name="ErrorBase" model=Model.TownValidationModel />
         @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.TOWN), Model.Properties.AddressManualAddressTown, townElementProperties)
     </div>
 
     <div class="govuk-form-group @(Model.IsPostcodeValid ? string.Empty : " govuk-form-group--error")">
-        <label class="govuk-label" for=@Model.GetCustomItemId(AddressManualConstants.POSTCODE)>Postcode</label>
+        <label class="govuk-label govuk-label--m" for=@Model.GetCustomItemId(AddressManualConstants.POSTCODE)>Postcode</label>
         <partial name="ErrorBase" model=Model.PostcodeValidationModel />
 
         @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.POSTCODE), Model.Properties.AddressManualAddressPostcode, postcodeElementProperties)
