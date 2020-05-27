@@ -24,6 +24,7 @@ namespace form_builder.Models.Elements
         private bool IsSearch { get; set; } = false; 
 
         public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
+        public override bool DisplayHint => !string.IsNullOrEmpty(Hint);
         public override string  QuestionId => IsSelect ? AddressSelectQuestionId : AddressSearchQuestionId;
         public string ChangeHeader => "Postcode";
         public override string Label
