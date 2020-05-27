@@ -1,7 +1,6 @@
 ﻿using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
-using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Addresses;
 using System.Collections.Generic;
@@ -9,18 +8,17 @@ using System.Threading.Tasks;
 using form_builder.Extensions;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using form_builder.Constants;
 
 namespace form_builder.Models.Elements
 {
     public class Address : Element
     {
-        public const string SEARCH_QUESTION_SUFFIX = "-postcode";
-        public const string SELECT_QUESTION_SUFFIX = "-address";
         public List<SelectListItem> Items { get; set; }
         public string ReturnURL { get; set; }
         public string ManualAddressURL { get; set; }
-        public string AddressSearchQuestionId => $"{Properties.QuestionId}{SEARCH_QUESTION_SUFFIX}";
-        public string AddressSelectQuestionId => $"{Properties.QuestionId}{SELECT_QUESTION_SUFFIX}";
+        public string AddressSearchQuestionId => $"{Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}";
+        public string AddressSelectQuestionId => $"{Properties.QuestionId}{AddressConstants.SELECT_SUFFIX}";
         private bool IsSelect { get; set; } = false; 
         public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
         public override string  QuestionId => IsSelect ? AddressSelectQuestionId : AddressSearchQuestionId;

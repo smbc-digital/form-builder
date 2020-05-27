@@ -7,8 +7,8 @@
         inputClasses += " govuk-input--error";
     }
 }
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)" />
-    @await Html.BeginFieldSet(Model, new string[] {"govuk-fieldset" })
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    @Html.BeginFieldSet(Model, new string[] {"govuk-fieldset" })
         <partial name="LegendH1" />
 
         <partial name="Hint" />
@@ -18,7 +18,7 @@
         <div class="govuk-date-input">
             <div class="govuk-date-input__item">
                 <div class="govuk-form-group">
-                    <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("day")>
+                    <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("hours")>
                         Hours
                     </label>
                     @Html.TextBox(Model.GetCustomItemId("hours"), Model.Properties.Hours, new { @class = inputClasses, maxLength="2", type="number", pattern="[0-9]*", min="1", max="12", style="width:3em" }):
@@ -27,10 +27,10 @@
 
             <div class="govuk-date-input__item">
                 <div class="govuk-form-group">
-                    <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("day")>
+                    <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("minutes")>
                         Minutes
                     </label>
-                    @Html.TextBox(Model.GetCustomItemId("minutes"), Model.Properties.Hours, new { @class = inputClasses, maxLength="2", type="number", pattern="[0-9]*", min="1", max="12", style="width:3em" })
+                    @Html.TextBox(Model.GetCustomItemId("minutes"), Model.Properties.Minutes, new { @class = inputClasses, maxLength="2", type="number", pattern="[0-9]*", min="1", max="12", style="width:3em" })
                 </div>
             </div>
         
@@ -48,5 +48,5 @@
             </div>
         </div>
 
-    @await Html.EndFieldSet()
+    @Html.EndFieldSet()
 </div>

@@ -64,7 +64,7 @@ namespace form_builder_tests.UnitTests.Services
                         {
                             new Answers
                             {
-                                QuestionId = $"{questionId}-organisation-searchterm",
+                                QuestionId = questionId,
                                 Response = "searchTerm"
                             }
                         },
@@ -95,7 +95,7 @@ namespace form_builder_tests.UnitTests.Services
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "OrganisationStatus", "Search" },
-                { $"{element.Properties.QuestionId}-organisation-searchterm", "searchTerm" },
+                { element.Properties.QuestionId, "searchTerm" },
             };
 
             var result = await _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one");
@@ -119,7 +119,7 @@ namespace form_builder_tests.UnitTests.Services
                         {
                             new Answers
                             {
-                                QuestionId = $"{questionId}-organisation-searchterm",
+                                QuestionId = questionId,
                                 Response = ""
                             }
                         },
@@ -151,7 +151,7 @@ namespace form_builder_tests.UnitTests.Services
             {
                { "Guid", Guid.NewGuid().ToString() },
                 { "OrganisationStatus", "Search" },
-                { $"{element.Properties.QuestionId}-organisation-searchterm", "" },
+                { element.Properties.QuestionId, "" },
             };
 
             var result = await _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one");
@@ -185,7 +185,7 @@ namespace form_builder_tests.UnitTests.Services
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "OrganisationStatus", "Search" },
-                { $"{element.Properties.QuestionId}-organisation-searchterm", "searchTerm" },
+                { element.Properties.QuestionId, "searchTerm" },
             };
 
             var result = await _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one");
@@ -219,7 +219,7 @@ namespace form_builder_tests.UnitTests.Services
             {
                 { "Guid", Guid.NewGuid().ToString() },
                 { "OrganisationStatus", "Search" },
-                { $"{element.Properties.QuestionId}-organisation-searchterm", _searchModel.SearchTerm },
+                { element.Properties.QuestionId, _searchModel.SearchTerm },
             };
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one"));

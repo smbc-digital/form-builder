@@ -168,6 +168,15 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.True(webDriver.FindElement(By.XPath($"//{elementType}[text() = '{elementText}']")).Displayed);
         }
 
+        [Then(@"I should see a validation error with an id ""(.*)"" with ""(.*)"" text")]
+        public void ThenIShouldSeeAValidationError_WithText(string id, string text)
+        {
+            var webDriver = BrowserSession.Native as IWebDriver;
+            var input = webDriver.FindElement(By.Id(id));
+            Assert.True(input.Displayed);
+            Assert.Contains(text, input.Text);
+        }
+
         [Then(@"I should not see a ""(.*)"" element with ""(.*)"" text")]
         public void ThenIShouldNotSeeAElement(string elementType, string elementText)
         {

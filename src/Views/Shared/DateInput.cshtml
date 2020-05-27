@@ -12,7 +12,7 @@
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-    @await Html.BeginFieldSet(Model, new string[] {"govuk-fieldset" })
+    @Html.BeginFieldSet(Model, new string[] {"govuk-fieldset" })
 
     <partial name="LegendH1" />
 
@@ -48,5 +48,5 @@
             </div>
         </div>
     </div>
-    @await Html.EndFieldSet()
+    @Html.EndFieldSet()
 </div>

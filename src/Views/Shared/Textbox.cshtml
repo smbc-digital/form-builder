@@ -1,7 +1,7 @@
 ﻿@model form_builder.Models.Elements.Element
 @{
     var elements = Model.GenerateElementProperties();
-    if(!Model.IsValid)
+    if (!Model.IsValid)
     {
         elements.Add("class", "govuk-input govuk-input--error");
     }
@@ -18,6 +18,6 @@
     <partial name="Hint" />
 
     <partial name="Error" />
-    
+
     @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
 </div>

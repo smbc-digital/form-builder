@@ -13,5 +13,5 @@ Scenario: Datepicker standard use
 	Then I select "12052018" on "passportIssuedtwo" date picker
 	Then I click the "nextPage3" button
 	Then I sleep "1000"
-	Then I should see a "th" element with "passportIssuedone" text
-	And I should see a "th" element with "passportIssuedtwo" text
+	Then I should see a "dt" element with "passportIssuedone" text
+	And I should see a "dt" element with "passportIssuedtwo" text

@@ -96,9 +96,9 @@ this.ScenarioInitialize(scenarioInfo);
 #line 15
  testRunner.Then("I sleep \"1000\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 16
- testRunner.Then("I should see a \"th\" element with \"passportIssuedone\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see a \"dt\" element with \"passportIssuedone\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 17
- testRunner.And("I should see a \"th\" element with \"passportIssuedtwo\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"dt\" element with \"passportIssuedtwo\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }

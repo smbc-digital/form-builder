@@ -8,7 +8,7 @@
     var hint = Model.Properties.Hint;
 }
 
-@await Html.BeginFieldSet(Model)
+@Html.BeginFieldSet(Model)
 
     <legend>
         @if (Model.Properties.LegendAsH1)
@@ -72,4 +72,4 @@
         }
     }
 
-    @await Html.EndFieldSet()
+    @Html.EndFieldSet()

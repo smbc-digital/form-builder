@@ -1,4 +1,5 @@
-﻿using form_builder.Enum;
+﻿using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
@@ -13,11 +14,10 @@ namespace form_builder.Models.Elements
 {
     public class Organisation : Element
     {
-        public const string SEARCH_QUESTION_SUFFIX = "-organisation-searchterm";
         public List<SelectListItem> Items { get; set; }
         public string ReturnURL { get; set; }
-        public string OrganisationSearchQuestionId => $"{Properties.QuestionId}{SEARCH_QUESTION_SUFFIX}";
-        public string OrganisationSelectQuestionId => $"{Properties.QuestionId}";
+        public string OrganisationSearchQuestionId => $"{Properties.QuestionId}";
+        public string OrganisationSelectQuestionId => $"{Properties.QuestionId}{OrganisationConstants.SELECT_SUFFIX}";
         private bool IsSelect { get; set; } = false; 
         public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
         public override string  QuestionId => IsSelect ? OrganisationSelectQuestionId : OrganisationSearchQuestionId;
@@ -43,29 +43,19 @@ namespace form_builder.Models.Elements
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> searchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> answers, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             IsSelect = answers.ContainsKey("OrganisationStatus") && answers["OrganisationStatus"] == "Select" || answers.ContainsKey(OrganisationSearchQuestionId) && !string.IsNullOrEmpty(answers[OrganisationSearchQuestionId]);
-            Properties.Value = answers.ContainsKey(OrganisationSearchQuestionId) ? answers[OrganisationSearchQuestionId] : string.Empty;
+            Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
 
-            if (IsSelect)
+            if (!IsSelect)
             {
-                Items = new List<SelectListItem>{ new SelectListItem($"{organisationResults.Count} organisations found", string.Empty)};
-                organisationResults.ForEach((_) => { Items.Add(new SelectListItem(_.Name, $"{_.Reference}|{_.Name}")); });
-                ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
-                
-                if (string.IsNullOrEmpty(Properties.Value))
-                {
-                    Properties.Value = (string)answers[OrganisationSearchQuestionId];
-                    if ((string)answers["OrganisationStatus"] == "Select")
-                    {
-                        Properties.Value = (string)answers[QuestionId];
-                    }
-                }
-
-                return await viewRender.RenderAsync("OrganisationSelect", this);
+                return await viewRender.RenderAsync("OrganisationSearch", this);
             }
-            
-            return await viewRender.RenderAsync("OrganisationSearch", this);
+
+            Items = new List<SelectListItem>{ new SelectListItem($"{organisationResults.Count} organisations found", string.Empty)};
+            organisationResults.ForEach((_) => { Items.Add(new SelectListItem(_.Name, $"{_.Reference}|{_.Name}")); });
+            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
+            return await viewRender.RenderAsync("OrganisationSelect", this);
         }
 
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")

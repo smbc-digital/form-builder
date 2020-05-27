@@ -1,11 +1,8 @@
 ﻿@model form_builder.Models.Elements.Street
 @{    
     var elementProperties = Model.GenerateElementProperties("Select");
-    elementProperties.Add("class", "govuk-select");
-
-    if(!Model.IsValid){
-        elementProperties.Add("class", "govuk-select--error");
-    }
+    
+    elementProperties.Add("class", "govuk-select @(!Model.IsValid ? \"govuk-select--error\" : string.Empty)");
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">

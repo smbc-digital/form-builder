@@ -1,4 +1,5 @@
-﻿using form_builder.Enum;
+﻿using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
@@ -29,37 +30,37 @@ namespace form_builder.Models.Elements
 
         public string ChangeHeader => "Postcode";
 
-        public bool IsLine1Valid => IsValid && string.IsNullOrEmpty(Line1ValdationMessage);
+        public bool IsLine1Valid => string.IsNullOrEmpty(Line1ValdationMessage);
 
         public ErrorViewModel Line1ValidationModel => new ErrorViewModel {
-                Id = GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1),
+                Id = GetCustomErrorId(AddressManualConstants.ADDRESS_LINE_1),
                 IsValid = IsLine1Valid,
                 Message = Line1ValdationMessage
             } ;
 
         public string Line1ValdationMessage => ErrorMessages[0];
 
-        public bool IsTownValid => IsValid && string.IsNullOrEmpty(TownValdationMessage);
+        public bool IsTownValid => string.IsNullOrEmpty(TownValdationMessage);
 
         public ErrorViewModel TownValidationModel => new ErrorViewModel {
-        Id = GetCustomItemId(AddressManualConstants.TOWN),
+        Id = GetCustomErrorId(AddressManualConstants.TOWN),
                 IsValid = IsTownValid,
                 Message = TownValdationMessage
             } ;
 
         public string TownValdationMessage => ErrorMessages[1];
     
-        public bool IsPostcodeValid => IsValid && string.IsNullOrEmpty(TownValdationMessage);
+        public bool IsPostcodeValid => string.IsNullOrEmpty(PostcodeValdationMessage);
 
         public string PostcodeValdationMessage => ErrorMessages[2];
 
         public override string Label => Properties.AddressManualLabel;
 
         public ErrorViewModel PostcodeValidationModel => new ErrorViewModel {
-        Id = GetCustomItemId(AddressManualConstants.POSTCODE),
+        Id = GetCustomErrorId(AddressManualConstants.POSTCODE),
                 IsValid = IsPostcodeValid,
                 Message = PostcodeValdationMessage
-            } ;
+            };
 
         public string ReturnURL { get; set; }
         public AddressManual()
@@ -104,7 +105,7 @@ namespace form_builder.Models.Elements
             Properties.AddressManualAddressLine1 = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.ADDRESS_LINE_1)).Value;
             Properties.AddressManualAddressLine2 = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.ADDRESS_LINE_2)).Value;
             Properties.AddressManualAddressTown = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.TOWN)).Value;
-            Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.POSTCODE)).Value ?? searchTerm;           
+            Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.POSTCODE)).Value ?? searchTerm;
         }
 
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
@@ -115,7 +116,7 @@ namespace form_builder.Models.Elements
             };
 
             viewModel.Add("AddressStatus", "Manual");
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
+            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
             SetAddressProperties(viewModel, Properties.Value);
             var searchResultsCount =  elementHelper.GetFormDataValue(guid, $"{Properties.QuestionId}-srcount");
             var isValid = int.TryParse(searchResultsCount.ToString(), out int output);

@@ -143,11 +143,11 @@ this.ScenarioInitialize(scenarioInfo);
 #line 34
  testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 35
- testRunner.Then("I should see a \"th\" element with \"customersaddress-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see a \"dt\" element with \"customersaddress-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 36
- testRunner.And("I should see a \"th\" element with \"customersaddress-address-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"dt\" element with \"customersaddress-address-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 37
- testRunner.And("I should see a \"th\" element with \"optionaladdress-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"dt\" element with \"optionaladdress-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -186,33 +186,38 @@ this.ScenarioInitialize(scenarioInfo);
 #line 52
  testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 53
- testRunner.Then("I should see a \"th\" element with \"customersaddress-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see a \"dt\" element with \"customersaddress-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 54
- testRunner.And("I should see a \"th\" element with \"customersaddress-address-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"dt\" element with \"customersaddress-address-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 55
- testRunner.And("I should see a \"th\" element with \"optionaladdress-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"dt\" element with \"optionaladdress-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 56
- testRunner.And("I should see a \"th\" element with \"optionaladdress-address-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"dt\" element with \"optionaladdress-address-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Validation message should apear if I Enter Invalid Postcode", SourceLine=58)]
+        [TechTalk.SpecRun.ScenarioAttribute("Validation message should apear if I Enter Invalid Postcode", SourceLine=57)]
         public virtual void ValidationMessageShouldApearIfIEnterInvalidPostcode()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Validation message should apear if I Enter Invalid Postcode", null, ((string[])(null)));
-#line 59
+#line 58
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
-#line 60
+#line 59
  testRunner.Given("I navigate to \"/address/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 61
+#line 60
  testRunner.When("I fill in page1 with invalid postcode", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 62
+#line 61
  testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+<<<<<<< HEAD
 #line 63
  testRunner.Then("I should see a validation message for \"customersaddresswithtitle-postcode-error\" " +
                     "input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+=======
+#line 62
+ testRunner.Then("I should see a validation message for \"customersaddress-postcode-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+>>>>>>> design-system
 #line hidden
             this.ScenarioCleanup();
         }

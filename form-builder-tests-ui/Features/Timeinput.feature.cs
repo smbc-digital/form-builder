@@ -91,8 +91,8 @@ this.ScenarioInitialize(scenarioInfo);
 #line 14
  testRunner.Then("I should see a validation message for \"timeid-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 15
- testRunner.Then("I should see time refilled in the time input with \"23\" value, minutes with \"34\" v" +
-                    "alue and ampm with \"am\"  in for \"timeid\" blah", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see time refilled in the time input with \"23\" value, minutes with \"23\" v" +
+                    "alue in for \"timeid\" blah", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }

@@ -1,7 +1,7 @@
 ﻿@model form_builder.Models.Elements.FileUpload
 @{
     var sizeValidationError = $"{Model.QuestionId}-fileSizeError";
-    var elements =  Model.GenerateElementProperties();
+    var elements = Model.GenerateElementProperties();
     elements.Add("class", "govuk-file-upload");
 }
 

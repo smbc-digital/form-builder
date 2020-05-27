@@ -1,4 +1,5 @@
-﻿using form_builder.Enum;
+﻿using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
@@ -18,9 +19,9 @@ namespace form_builder.Models.Elements
 
         public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            Properties.Hours = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-hours");
-            Properties.Minutes = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-minutes");
-            Properties.AmPm = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-ampm");
+            Properties.Hours = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, TimeConstants.HOURS_SUFFIX);
+            Properties.Minutes = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, TimeConstants.MINUTES_SUFFIX);
+            Properties.AmPm = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, TimeConstants.AM_PM_SUFFIX);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             return viewRender.RenderAsync(Type.ToString(), this);
