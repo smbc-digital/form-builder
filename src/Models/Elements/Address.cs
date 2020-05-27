@@ -50,7 +50,6 @@ namespace form_builder.Models.Elements
             Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
-            
 
             if(IsSearch && !IsValid || !IsSelect)
             {
@@ -81,7 +80,6 @@ namespace form_builder.Models.Elements
             var elemnentProperties = new Dictionary<string, dynamic>();
             elemnentProperties.Add("id", $"{QuestionId}");
             elemnentProperties.Add("name", $"{QuestionId}");
-
             
             if (DisplayAriaDescribedby)
             {
