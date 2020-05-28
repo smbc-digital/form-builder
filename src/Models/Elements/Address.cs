@@ -64,15 +64,6 @@ namespace form_builder.Models.Elements
             ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
             ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
-            if (string.IsNullOrEmpty(Properties.Value))
-            {
-                Properties.Value = (string)answers[AddressSearchQuestionId];
-                if ((string)answers["AddressStatus"] == "Select")
-                {
-                    Properties.Value = (string)answers[QuestionId];
-                }
-            }
-
             return await viewRender.RenderAsync("AddressSelect", this);
         }
 
