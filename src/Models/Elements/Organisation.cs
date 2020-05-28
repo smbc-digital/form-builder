@@ -43,23 +43,19 @@ namespace form_builder.Models.Elements
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> searchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> answers, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
             IsSelect = answers.ContainsKey("OrganisationStatus") && answers["OrganisationStatus"] == "Select" || answers.ContainsKey(OrganisationSearchQuestionId) && !string.IsNullOrEmpty(answers[OrganisationSearchQuestionId]);
-            Properties.Value = answers.ContainsKey(OrganisationSearchQuestionId) ? answers[OrganisationSearchQuestionId] : string.Empty;
+            Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
 
-            if (IsSelect)
+            if (!IsSelect)
             {
-                Items = new List<SelectListItem>{ new SelectListItem($"{organisationResults.Count} organisations found", string.Empty)};
-                organisationResults.ForEach((_) => { Items.Add(new SelectListItem(_.Name, $"{_.Reference}|{_.Name}")); });
-                ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
-                
-                if (string.IsNullOrEmpty(Properties.Value))
-                    Properties.Value = (string)answers[OrganisationSearchQuestionId];
-
-                return await viewRender.RenderAsync("OrganisationSelect", this);
+                return await viewRender.RenderAsync("OrganisationSearch", this);
             }
-            
-            return await viewRender.RenderAsync("OrganisationSearch", this);
+
+            Items = new List<SelectListItem>{ new SelectListItem($"{organisationResults.Count} organisations found", string.Empty)};
+            organisationResults.ForEach((_) => { Items.Add(new SelectListItem(_.Name, $"{_.Reference}|{_.Name}")); });
+            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
+            return await viewRender.RenderAsync("OrganisationSelect", this);
         }
 
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
