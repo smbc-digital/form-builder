@@ -1,9 +1,13 @@
 ﻿@textbox
 Feature: Textbox
-	In order to fill in my details I have to navigate to Page1
+	In order to fill in my details I have to navigate to Page0
 
 Scenario: Textbox standard use
-	Given I navigate to "/textbox/page2"
+	Given I navigate to "/textbox/page0"
+	Then I should see the header
+	And I should see the "firstQuestion" input
+	Then I fill in page0
+	Then I click the "nextStep" button
 	Then I should see the header
 	And I should see the "firstName" input
 	And I should see the "middleName" input
