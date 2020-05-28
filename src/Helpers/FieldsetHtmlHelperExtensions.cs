@@ -14,7 +14,7 @@ namespace form_builder.Helpers
             {
                 fieldsetBuilder.Attributes.Add("aria-describedby", element.GetDescribedByAttributeValue());
             }
-            fieldsetBuilder.AddCssClass("form-section question-section");
+            fieldsetBuilder.AddCssClass("govuk-fieldset");
 
             return fieldsetBuilder.RenderStartTag();
         }
@@ -33,8 +33,6 @@ namespace form_builder.Helpers
                 fieldsetBuilder.AddCssClass(className);
             }
 
-            // fieldsetBuilder.AddCssClass("form-section question-section");
-
             return fieldsetBuilder.RenderStartTag();
         }
 
@@ -47,7 +45,7 @@ namespace form_builder.Helpers
                 fieldsetBuilder.Attributes.Add("aria-describedby", element.GetDescribedByAttributeValue(prefix));
             }
             
-            fieldsetBuilder.AddCssClass("form-section question-section");
+            fieldsetBuilder.AddCssClass("govuk-fieldset");
 
             return fieldsetBuilder.RenderStartTag();
         }
