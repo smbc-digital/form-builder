@@ -18,7 +18,7 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenIShouldSeeAElement(string elementType, string elementText)
         {
             var webDriver = BrowserSession.Native as IWebDriver;
-            Assert.True(webDriver.FindElement(By.XPath($"//button[text() = '{elementText}']")).Displayed);
+            Assert.True(webDriver.FindElement(By.XPath($"//{elementType}[text() = '{elementText}']")).Displayed);
         }
 
         [Then(@"I should see a ""(.*)"" element containing ""(.*)"" text")]
