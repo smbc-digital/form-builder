@@ -115,7 +115,7 @@ namespace form_builder.ContentFactory
 
             var aElement = new ElementBuilder()
                 .WithType(EElementType.P)
-                .WithPropertyText("<a class=\"button-primary\" href=\"https://www.stockport.gov.uk\">Go to home page</a>")
+                .WithPropertyText("<a class=\"govuk-button\" href=\"https://www.stockport.gov.uk\">Go to home page</a>")
                 .Build();
 
             return new Page

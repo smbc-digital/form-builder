@@ -7,10 +7,11 @@
     @* var spinnerButton = showSpinner ? $"onclick=spinnerButton('{@Model.Properties.ButtonId}');" : null; *@
 }
 
-<button data-prevent-double-click="true"
-        class="govuk-button @Model.Properties.ClassName"
-        type="submit"
-        id="@Model.Properties.ButtonId"
-        @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)>
-    @((string)ViewData["buttonText"])
+<button 
+    data-prevent-double-click="true"
+    class="govuk-button @Model.Properties.ClassName"
+    type="submit"
+    id="@Model.Properties.ButtonId"
+    @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)>
+    @Model.Properties.Text
 </button>

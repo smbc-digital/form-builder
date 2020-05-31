@@ -124,7 +124,7 @@ namespace form_builder.Models.Elements
 
             if (DisplayOptional)
             {
-                data = "class = optional";
+                data = "class = smbc-body";
             }
 
             if (!Properties.LegendAsH1)
