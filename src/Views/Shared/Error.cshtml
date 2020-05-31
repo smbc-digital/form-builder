@@ -3,7 +3,7 @@
         var viewModel = new form_builder.ViewModels.ErrorViewModel
         {
             IsValid = Model.IsValid,
-            Message =  string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage,
+            Message = Model.ValidationMessage,
             Id = Model.ErrorId
         };
 
