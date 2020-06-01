@@ -37,9 +37,14 @@ namespace form_builder.Models.Elements
             };
             
             properties.Add("maxlength", Properties.MaxLength);
-            if (Properties.MaxLength <= 200 || Properties.MaxLength > 500)
+            if (Properties.MaxLength >= 200 && Properties.MaxLength <= 500)
             {
-                properties.Add("rows", Properties.MaxLength > 500 ? "15" : "5");
+                properties.Add("rows", "5");
+            }
+
+            if (Properties.MaxLength > 500)
+            {
+                properties.Add("rows", "15");
             }
 
             if (DisplayAriaDescribedby)
