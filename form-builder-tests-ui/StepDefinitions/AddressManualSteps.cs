@@ -17,25 +17,39 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then(@"I fill in address line one")]
         public void ThenIFillInAddressLineOne()
         {
-            BrowserSession.FillIn("customersaddress-AddressLine1").With("test");
+            BrowserSession.FillIn("customersaddresswithtitle-AddressLine1").With("test");
         }
 
         [Then(@"I fill in town")]
         public void ThenIFillInTown()
         {
-            BrowserSession.FillIn("customersaddress-AddressTown").With("town");
+            BrowserSession.FillIn("customersaddresswithtitle-AddressTown").With("town");
         }
 
         [Then(@"I fill in invalid postcode")]
         public void ThenIFillInInvalidPostcode()
         {
-            BrowserSession.FillIn("customersaddress-ManualPostcode").With("ahskdoen");
+            BrowserSession.FillIn("customersaddresswithtitle-ManualPostcode").With("ahskdoen");
         }
 
         [Then(@"I fill in postcode")]
         public void ThenIFillInPostcode()
         {
-            BrowserSession.FillIn("customersaddress-ManualPostcode").With("sk1 3xe");
+            BrowserSession.FillIn("customersaddresswithtitle-ManualPostcode").With("sk1 3xe");
+        }
+
+        [Then(@"I fill in page2")]
+        [When(@"I fill in page2")]
+        public void ThenIFillInPage2()
+        {
+            BrowserSession.FillIn("customersaddressnotitle-postcode").With("sk1 1aa");
+        }
+
+        [Then(@"I fill in page3")]
+        [When(@"I fill in page3")]
+        public void ThenIFillInPage3()
+        {
+            BrowserSession.FillIn("optionaladdress-postcode").With("sk1 1aa");
         }
 
         [Then(@"I wait one second")]

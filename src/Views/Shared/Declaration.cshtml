@@ -8,68 +8,64 @@
     var hint = Model.Properties.Hint;
 }
 
-@Html.BeginFieldSet(Model)
+    <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+        @Html.BeginFieldSet(Model)
 
-    <legend>
+
         @if (Model.Properties.LegendAsH1)
         {
-            <h1>
-                @Model.Properties.Label
-                @if (Model.Properties.Optional)
-                {
-                    <span class="optional">(optional)</span>
-                }
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                <h1 class="govuk-heading-xl">
+                    @Model.Properties.Label
+                    @if (Model.Properties.Optional)
+                    {
+                        <span class="smbc-body">(optional)</span>
+                    }
 
-            </h1>
+                </h1>
+            </legend>
         }
         else
         {
-            @Model.Properties.Label
-            @if (Model.Properties.Optional)
-            {
-                <span class="optional">(optional)</span>
-            }
+            <legend class="govuk-fieldset__legend">
+                @Model.Properties.Label
+                @if (Model.Properties.Optional)
+                {
+                    <span class="smbc-body">(optional)</span>
+                }
+            </legend>
         }
-    </legend>
 
-@if (!string.IsNullOrEmpty(Model.Properties.Hint))
-{
-    <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
-}
-   
+        <partial name="Hint" />
 
-<div class="input-checkbox-container">
-    @if (Model.Properties.Checked)
-    {
-        <input type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
-    }
-    else if (!string.IsNullOrEmpty(Model.Properties.Value))
+        <partial name="Error" />
 
-    {
-        <input type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
-    }
-    else
-    {
-        <input type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" />
-    }
-    if(Model.Properties.Optional)
-    {
-        <label for="@itemId" class="optional">@Model.Properties.Text</label>
-    }
-    else
-    {
-        <label for="@itemId">@Model.Properties.Text</label>
-    }
-    
-</div>
+        <div class="govuk-checkboxes">
+            <div class="govuk-checkboxes__item">
+                @if (Model.Properties.Checked)
+                {
+                    <input class="govuk-checkboxes__input" type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
+                }
+                else if (!string.IsNullOrEmpty(Model.Properties.Value))
 
-    @if (!Model.IsValid)
-    {
-        {
-            var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+                {
+                    <input class="govuk-checkboxes__input" type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
+                }
+                else
+                {
+                    <input class="govuk-checkboxes__input" type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" />
+                }
 
-            <p class="input-error-content" id="@errorId">@validationMessage</p>
-        }
-    }
+                @if (Model.Properties.Optional)
+                {
+                    <label class="govuk-label govuk-checkboxes__label" for="@itemId">@Model.Properties.Text</label>
+                }
+                else
+                {
+                    <label class="govuk-label govuk-checkboxes__label" for="@itemId">@Model.Properties.Text</label>
+                }
+            </div>
+        </div>
 
-    @Html.EndFieldSet()
+        @Html.EndFieldSet()
+    </div>

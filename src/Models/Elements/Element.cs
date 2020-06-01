@@ -22,7 +22,7 @@ namespace form_builder.Models.Elements
 
         public EElementType Type { get; set; }
         public BaseProperty Properties { get; set; }
-        public bool DisplayHint => !string.IsNullOrEmpty(Properties.Hint.Trim());
+        public virtual bool DisplayHint => !string.IsNullOrEmpty(Properties.Hint.Trim());
         public bool HadCustomClasses => !string.IsNullOrEmpty(Properties.ClassName);
         public virtual string QuestionId => Properties.QuestionId;
         public virtual string Label => Properties.Label;        
@@ -124,7 +124,7 @@ namespace form_builder.Models.Elements
 
             if (DisplayOptional)
             {
-                data = "class = optional";
+                data = "class = smbc-body";
             }
 
             if (!Properties.LegendAsH1)

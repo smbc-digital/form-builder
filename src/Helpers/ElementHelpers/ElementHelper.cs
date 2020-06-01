@@ -37,25 +37,25 @@ namespace form_builder.Helpers.ElementHelpers
         public string CurrentValue(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
         {
             if (element.Type == EElementType.FileUpload)
-            {
                 return string.Empty;
-            };
 
             var currentValue = answers.ContainsKey($"{element.Properties.QuestionId}{suffix}");
-            var cacheData = _distributedCache.GetString(guid);
 
-            if (!currentValue && cacheData != null)
+            if (!currentValue)
             {
-                var mappedCacheData = JsonConvert.DeserializeObject<FormAnswers>(cacheData);
-                var storedValue = mappedCacheData.Pages.FirstOrDefault(_ => _.PageSlug == pageSlug);
-
-                if (storedValue != null)
+                var cacheData = _distributedCache.GetString(guid);
+                if(cacheData != null)
                 {
-                    var value = storedValue.Answers.FirstOrDefault(_ => _.QuestionId == $"{element.Properties.QuestionId}{suffix}");
+                    var mappedCacheData = JsonConvert.DeserializeObject<FormAnswers>(cacheData);
+                    var storedValue = mappedCacheData.Pages.FirstOrDefault(_ => _.PageSlug == pageSlug);
 
-                    return value != null ? value.Response : string.Empty;
+                    if (storedValue != null)
+                    {
+                        var value = storedValue.Answers.FirstOrDefault(_ => _.QuestionId == $"{element.Properties.QuestionId}{suffix}");
+
+                        return value != null ? value.Response : string.Empty;
+                    }
                 }
-
                 return string.Empty;
             }
 

@@ -17,7 +17,8 @@ namespace form_builder_tests_ui.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [TechTalk.SpecRun.FeatureAttribute("Button", Description="\tIn order to verify buttons are renderd correctly", SourceFile="Features\\Button.feature", SourceLine=0)]
+    [TechTalk.SpecRun.FeatureAttribute("Button", new string[] {
+            "button"}, Description="\tIn order to verify buttons are renderd correctly", SourceFile="Features\\Button.feature", SourceLine=1)]
     public partial class ButtonFeature
     {
         
@@ -30,7 +31,8 @@ namespace form_builder_tests_ui.Features
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Button", "\tIn order to verify buttons are renderd correctly", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Button", "\tIn order to verify buttons are renderd correctly", ProgrammingLanguage.CSharp, new string[] {
+                        "button"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -66,28 +68,34 @@ namespace form_builder_tests_ui.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Render buttons correctly and show and hide the previous button.", SourceLine=3)]
+        [TechTalk.SpecRun.ScenarioAttribute("Render buttons correctly and show and hide the previous button.", SourceLine=4)]
         public virtual void RenderButtonsCorrectlyAndShowAndHideThePreviousButton_()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Render buttons correctly and show and hide the previous button.", null, ((string[])(null)));
-#line 4
+#line 5
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
-#line 5
- testRunner.Given("I navigate to \"/button/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 6
- testRunner.Then("I should see a \"button\" element with \"Next step\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Given("I navigate to \"/button/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 7
- testRunner.Then("I should see a \"button\" element with \"Secondary Button\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 8
- testRunner.Then("I should find an element with class \".govuk-button--secondary\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see an element with ID of \"nextStep1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 9
-    testRunner.Then("I should not see any \".govuk-back-link\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see an element with ID of \"nextStep2\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 10
- testRunner.When("I click the \"nextStep1\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.Then("I should find an element with class \".govuk-button--secondary\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 11
- testRunner.Then("I should see a \".govuk-back-link\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see an element with ID of \"nextStep3\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 12
+ testRunner.Then("I should find an element with class \".govuk-button--warning\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 13
+    testRunner.Then("I should not see any \".govuk-back-link\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 14
+ testRunner.When("I click the \"nextStep1\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 15
+ testRunner.Then("I should see a \".govuk-back-link\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 16
  testRunner.When("I click the \"nextStep1\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             this.ScenarioCleanup();
