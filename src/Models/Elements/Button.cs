@@ -20,14 +20,11 @@ namespace form_builder.Models.Elements
 
         public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
         {
-            var viewData = new Dictionary<string, dynamic> { { "displayAnchor", !CheckForStartPageSlug(formSchema, page) }, { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) }, { "buttonText", GetButtonText(page.Elements, viewModel, page) } };
+            var viewData = new Dictionary<string, dynamic> { { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) } };
+
+            Properties.Text = GetButtonText(page.Elements, viewModel, page);
 
             return viewRender.RenderAsync("Button", this, viewData);
-        }
-
-        private bool CheckForStartPageSlug(FormSchema form, Page page)
-        {
-            return form.StartPageSlug == page.PageSlug;
         }
 
         private bool CheckForBehaviour(List<Behaviour> behaviour)
@@ -49,12 +46,7 @@ namespace form_builder.Models.Elements
 
         private bool ShowSpinner(List<Behaviour> behaviour, List<IElement> element, Dictionary<string, dynamic> viewModel)
         {
-            if (CheckForBehaviour(behaviour) || CheckForStreetAddress(element, viewModel))
-            {
-                return true;
-            }
-
-            return false;
+             return CheckForBehaviour(behaviour) || CheckForStreetAddress(element, viewModel);
         }
 
         private string GetButtonText(List<IElement> element, Dictionary<string, dynamic> viewModel, Page page)
