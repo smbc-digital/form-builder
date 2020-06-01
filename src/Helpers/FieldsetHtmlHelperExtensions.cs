@@ -33,8 +33,6 @@ namespace form_builder.Helpers
                 fieldsetBuilder.AddCssClass(className);
             }
 
-            // fieldsetBuilder.AddCssClass("form-section question-section");
-
             return fieldsetBuilder.RenderStartTag();
         }
 

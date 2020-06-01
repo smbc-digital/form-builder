@@ -1,52 +1,52 @@
 ﻿@using form_builder.Helpers
 @model form_builder.Models.Elements.Element
-@{   
+@{
     var inputClasses = "govuk-input govuk-date-input__input govuk-input--width-2";
-    if(!Model.IsValid)
+    if (!Model.IsValid)
     {
         inputClasses += " govuk-input--error";
     }
 }
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-    @Html.BeginFieldSet(Model, new string[] {"govuk-fieldset" })
-        <partial name="LegendH1" />
+    @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
+    <partial name="LegendH1" />
 
-        <partial name="Hint" />
+    <partial name="Hint" />
 
-        <partial name="Error" />
-        
-        <div class="govuk-date-input">
-            <div class="govuk-date-input__item">
-                <div class="govuk-form-group">
-                    <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("hours")>
-                        Hours
-                    </label>
-                    @Html.TextBox(Model.GetCustomItemId("hours"), Model.Properties.Hours, new { @class = inputClasses, maxLength="2", type="number", pattern="[0-9]*", min="1", max="12", style="width:3em" }):
-                </div>
+    <partial name="Error" />
+
+    <div class="govuk-date-input">
+        <div class="govuk-date-input__item">
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("hours")>
+                    Hours
+                </label>
+                @Html.TextBox(Model.GetCustomItemId("hours"), Model.Properties.Hours, new { @class = inputClasses, maxLength = "2", type = "number", pattern = "[0-9]*", min = "1", max = "12", style = "width:3em" }):
             </div>
+        </div>
 
-            <div class="govuk-date-input__item">
-                <div class="govuk-form-group">
-                    <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("minutes")>
-                        Minutes
-                    </label>
-                    @Html.TextBox(Model.GetCustomItemId("minutes"), Model.Properties.Minutes, new { @class = inputClasses, maxLength="2", type="number", pattern="[0-9]*", min="1", max="12", style="width:3em" })
-                </div>
+        <div class="govuk-date-input__item">
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("minutes")>
+                    Minutes
+                </label>
+                @Html.TextBox(Model.GetCustomItemId("minutes"), Model.Properties.Minutes, new { @class = inputClasses, maxLength = "2", type = "number", pattern = "[0-9]*", min = "1", max = "12", style = "width:3em" })
             </div>
-        
-            <div class="govuk-form-group govuk-!-margin-top-2">
-                <div class="govuk-radios govuk-radios--inline govuk-radios--small">
-                    <div class="govuk-radios__item govuk-!-margin-right-2">
-                        <input type="radio" class="govuk-radios__input" name=@Model.GetCustomItemId("ampm") id=@Model.GetCustomItemId("am") value="am" @(Model.Properties.AmPm.ToLower() == "am" ? "checked" : string.Empty) />
-                        <label class="govuk-label govuk-radios__label" for=@Model.GetCustomItemId("am")>am</label>
-                    </div>
-                    <div class="govuk-radios__item">
-                        <input type="radio" class="govuk-radios__input" name=@Model.GetCustomItemId("ampm") id=@Model.GetCustomItemId("pm") value="pm" @(Model.Properties.AmPm.ToLower() == "pm" ? "checked" : string.Empty) />
-                        <label class="govuk-label govuk-radios__label" for=@Model.GetCustomItemId("pm")>pm</label>
-                    </div>
+        </div>
+
+        <div class="govuk-form-group govuk-!-margin-top-2">
+            <div class="govuk-radios govuk-radios--inline govuk-radios--small">
+                <div class="govuk-radios__item govuk-!-margin-right-2">
+                    <input type="radio" class="govuk-radios__input" name=@Model.GetCustomItemId("ampm") id=@Model.GetCustomItemId("am") value="am" @(Model.Properties.AmPm.ToLower() == "am" ? "checked" : string.Empty) />
+                    <label class="govuk-label govuk-radios__label" for=@Model.GetCustomItemId("am")>am</label>
+                </div>
+                <div class="govuk-radios__item">
+                    <input type="radio" class="govuk-radios__input" name=@Model.GetCustomItemId("ampm") id=@Model.GetCustomItemId("pm") value="pm" @(Model.Properties.AmPm.ToLower() == "pm" ? "checked" : string.Empty) />
+                    <label class="govuk-label govuk-radios__label" for=@Model.GetCustomItemId("pm")>pm</label>
                 </div>
             </div>
         </div>
+    </div>
 
     @Html.EndFieldSet()
 </div>

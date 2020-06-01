@@ -1,5 +1,5 @@
 @model form_builder.Models.Elements.Checkbox
-<p class="govuk-checkboxes">
+<div class="govuk-checkboxes">
     @for (var i = 0; i < Model.Properties.Options.Count; i++)
     {
         <div class="govuk-checkboxes__item">            
@@ -7,13 +7,12 @@
                 type="checkbox" 
                 value="@Model.Properties.Options[i].Value" 
                 name="@Model.Properties.QuestionId" 
-                id="@Model.GetListItemId(i)" 
+                id="@Model.GetListItemId(i)"
                 aria-describedby="@Model.GetListItemHintId(i)" 
                 @(Model.Properties.Checked ||  Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty) />
 
             <label class="govuk-label govuk-checkboxes__label" 
-                for="@Model.GetListItemId(i)"
-                id="@Model.GetListItemId(i)">@Model.Properties.Options[i].Text</label>
+                for="@Model.GetListItemId(i)">@Model.Properties.Options[i].Text</label>
 
             @if (Model.Properties.Options[i].HasHint)
             {
@@ -21,4 +20,4 @@
             }
         </div>
     }
-</p>
+</div>

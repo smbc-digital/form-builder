@@ -1,12 +1,21 @@
-        @if(Model.Properties.LegendAsH1 || Model.Properties.LabelAsH1) {
-            <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                <h1 class="govuk-fieldset__heading">
-                    @Model.Label
-                </h1>
-            </legend>
+@if (Model.Properties.LegendAsH1 || Model.Properties.LabelAsH1)
+{
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+        <h1 class="govuk-fieldset__heading">
+            @Model.Label
+            
+            @if (Model.Properties.Optional)
+            { <span class="smbc-body">(optional)</span> }
+        </h1>
+    </legend>
+}
+else
+{
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+        @Model.Label
+        @if (Model.Properties.Optional)
+        {
+            <span class="smbc-body">(optional)</span>
         }
-        else {
-            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                @Model.Label
-            </legend>
-        }
+    </legend>
+}

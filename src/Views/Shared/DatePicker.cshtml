@@ -1,14 +1,7 @@
 ﻿@model form_builder.Models.Elements.Element
 @{
     var elements = Model.GenerateElementProperties();
-    if(!Model.IsValid)
-    {
-        elements.Add("class", "govuk-input govuk-input--width-10 govuk-input--error");
-    }
-    else
-    {
-        elements.Add("class", "govuk-input govuk-input--width-10");
-    }
+    elements.Add("class", !Model.IsValid ? "govuk-input govuk-input--width-10 govuk-input--error" : "govuk-input govuk-input--width-10");
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
@@ -19,5 +12,5 @@
 
     <partial name="Error" />
 
-    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)    
+    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
 </div>
