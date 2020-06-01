@@ -35,24 +35,20 @@ namespace form_builder.Models.Elements
                 { "value", Properties.Value},
                 { "spellcheck", Properties.Spellcheck.ToString().ToLower() }
             };
-            
+
             properties.Add("maxlength", Properties.MaxLength);
-            if (Properties.MaxLength <= 200 || Properties.MaxLength > 500)
+            if (Properties.MaxLength >= 200)
             {
                 properties.Add("rows", Properties.MaxLength > 500 ? "15" : "5");
             }
 
-            if (DisplayAriaDescribedby)
-            {
-                if(DisplayCharacterCount)
-                {
-                    properties.Add("aria-describedby", $"{GetCustomItemId("info")} {GetDescribedByAttributeValue()}");
-                }
-                else
-                {
-                    properties.Add("aria-describedby", GetDescribedByAttributeValue());
-                }    
-            }
+            if (!DisplayAriaDescribedby)
+                return properties;
+
+            properties.Add("aria-describedby",
+                DisplayCharacterCount
+                    ? $"{GetCustomItemId("info")} {GetDescribedByAttributeValue()}"
+                    : GetDescribedByAttributeValue());
 
             return properties;
         }
