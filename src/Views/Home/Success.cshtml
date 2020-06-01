@@ -1,7 +1,9 @@
-﻿@model SuccessViewModel
+@model form_builder.ViewModels.SuccessViewModel
 @{
     ViewData["Title"] = Model.FormName;
     ViewData["PageTitle"] = Model.PageTitle;
+    ViewData["FeedbackPhase"] = Model.FeedbackPhase;
+    ViewData["FeedbackForm"] = Model.FeedbackFormUrl;
 }
 
 <div class="smbc-panel smbc-panel--confirmation">
@@ -15,7 +17,5 @@
         </div>
     }
 </div>
-
-@* <h2 class="govuk-heading-m">@Model.SecondaryHeader</h2> *@
 
 @Html.Raw(Model.PageContent)

@@ -1,6 +1,7 @@
-﻿@{
+@{
     var displayHeading = (string)ViewData["Title"] != "Error";
     var startFormUrl = string.Empty;
+
     if(!string.IsNullOrWhiteSpace(Model?.StartFormUrl))
     {
         startFormUrl = Model.StartFormUrl;
@@ -10,18 +11,18 @@
         startFormUrl = $"../{Model.BaseURL}";
     }
 }
-    <header class="smbc-header " role="banner" data-module="govuk-header">
-        <div class="smbc-header__container govuk-width-container">
-            <div class="govuk-header__logo">
-                <a href="https://www.stockport.gov.uk/" class="govuk-header__link smbc-header__link--homepage">STOCKPORT.GOV.UK</a>
-            </div>
-            <div class="govuk-header__content">
-            @if (displayHeading)
-            {
-                <a href="@startFormUrl" class="govuk-header__link govuk-header__link--service-name">
-                    @Model.FormName
-                </a>
-            }
-            </div>
+<header class="smbc-header " role="banner" data-module="govuk-header">
+    <div class="smbc-header__container govuk-width-container">
+        <div class="govuk-header__logo">
+            <a href="https://www.stockport.gov.uk/" class="govuk-header__link smbc-header__link--homepage">STOCKPORT.GOV.UK</a>
         </div>
-    </header>
+        <div class="govuk-header__content">
+        @if (displayHeading)
+        {
+            <a href="@startFormUrl" class="govuk-header__link govuk-header__link--service-name">
+                @Model.FormName
+            </a>
+        }
+        </div>
+    </div>
+</header>
