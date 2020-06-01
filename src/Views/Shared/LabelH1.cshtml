@@ -2,10 +2,10 @@
     {
         @if(Model.Properties.LabelAsH1 || Model.Properties.LegendAsH1)
         {
-            <h1 class="govuk-label-heading">
+            <h1 class="govuk-label-wrapper">
                 <label class="govuk-label govuk-label--xl" for="@Model.QuestionId">
                     @Model.Label
-                    @if (Model.Properties.Optional) { <span>(optional)</span> }
+                    @if (Model.Properties.Optional) { <span class="smbc-body">(optional)</span> }
                 </label>
             </h1>
         } 
@@ -14,7 +14,7 @@
             <label class="govuk-label @(Model.Properties.StrongLabel ? "govuk-label--m" : string.Empty)" for="@Model.QuestionId">@Model.Label
             @if (Model.Properties.Optional)
             {
-                <span class="govuk-body">(optional)</span>
+                <span class="smbc-body">(optional)</span>
             }    
             </label>
         }

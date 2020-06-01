@@ -139,9 +139,13 @@ namespace form_builder_tests.UnitTests.Helpers
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenAddressSelect()
         {
             //Arrange
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
+                .Returns("SK1 3XE");
+
             var element = (form_builder.Models.Elements.Address)new ElementBuilder()
                 .WithType(EElementType.Address)
                 .WithPropertyText("text")
+                .WithQuestionId("address-test")
                 .WithValue("SK1 3XE")
                 .Build();
 
@@ -174,6 +178,9 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Address>(), null))
                 .Callback<string, form_builder.Models.Elements.Address, Dictionary<string, object>>((x, y, z) => callback = y);
+
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
+                .Returns("SK1 3XE");
 
             var pageSlug = "page-one";
             var baseUrl = "test";

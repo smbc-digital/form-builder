@@ -20,6 +20,7 @@ namespace form_builder.Models.Elements
         public string StreetSelectQuestionId => $"{Properties.QuestionId}{StreetConstants.SELECT_SUFFIX}";
         private bool IsSelect { get; set; } = false; 
         public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
+        public override bool DisplayHint => !string.IsNullOrEmpty(Hint);
         public override string  QuestionId => IsSelect ? StreetSelectQuestionId : StreetSearchQuestionId;
         public string ChangeHeader => "Street";
         

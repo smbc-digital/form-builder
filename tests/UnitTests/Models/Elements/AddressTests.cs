@@ -1,5 +1,6 @@
 ﻿using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Models.Elements;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
@@ -65,8 +66,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("AddressStatus", "Select");
-            viewModel.Add(element.AddressSearchQuestionId, "SK1 3XE");
 
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
+                .Returns("SK1 3XE");
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -87,6 +89,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var addressList = new List<SelectListItem>();
             var callback = new form_builder.Models.Elements.Address();
 
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
+                .Returns("SK1 3XE");
+
             _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Address>(), null))
                 .Callback<string, form_builder.Models.Elements.Address, Dictionary<string, object>>((x, y, z) => callback = y);
 
@@ -105,7 +110,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("AddressStatus", "Select");
-            viewModel.Add(element.AddressSearchQuestionId, "sk1 3xe");
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
