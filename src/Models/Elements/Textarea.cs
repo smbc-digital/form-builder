@@ -37,22 +37,18 @@ namespace form_builder.Models.Elements
             };
 
             properties.Add("maxlength", Properties.MaxLength);
-            if (Properties.MaxLength >= 200 && Properties.MaxLength <= 2000)
+            if (Properties.MaxLength >= 200)
             {
                 properties.Add("rows", Properties.MaxLength > 500 ? "15" : "5");
             }
 
-            if (DisplayAriaDescribedby)
+            if (!DisplayAriaDescribedby)
                 return properties;
 
-            if (DisplayCharacterCount)
-            {
-                properties.Add("aria-describedby", $"{GetCustomItemId("info")} {GetDescribedByAttributeValue()}");
-            }
-            else
-            {
-                properties.Add("aria-describedby", GetDescribedByAttributeValue());
-            }
+            properties.Add("aria-describedby",
+                DisplayCharacterCount
+                    ? $"{GetCustomItemId("info")} {GetDescribedByAttributeValue()}"
+                    : GetDescribedByAttributeValue());
 
             return properties;
         }
