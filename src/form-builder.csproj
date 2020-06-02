@@ -43,7 +43,7 @@
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
   <ItemGroup>
-    <Content Update="wwwroot\assets\javascript\govuk-frontend-3.6.0.js">
+    <Content Update="wwwroot\assets\javascript\govuk-frontend-3.6.0.min.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
