@@ -76,18 +76,17 @@ namespace form_builder.Services.MappingService
                 if (element.Type == EElementType.FileUpload)
                     return CheckAndCreateForFileUpload(splitTargets[0], element, formAnswers, obj);
 
-                object objectValue;
-                if (obj.TryGetValue(splitTargets[0], out objectValue))
+                object answerValue = _elementMapper.GetAnswerValue(element, formAnswers);
+                if (answerValue != null && obj.TryGetValue(splitTargets[0], out var objectValue))
                 {
-                    var combinedValue = $"{objectValue} {_elementMapper.GetAnswerValue(element, formAnswers)}";
+                    var combinedValue = $"{objectValue} {answerValue}";
                     obj.Remove(splitTargets[0]);
                     obj.Add(splitTargets[0], combinedValue.Trim());
                     return obj;
                 }
 
-                objectValue = _elementMapper.GetAnswerValue(element, formAnswers);
-                if(objectValue != null)
-                    obj.Add(splitTargets[0], objectValue);
+                if(answerValue != null)
+                    obj.Add(splitTargets[0], answerValue);
 
                 return obj;
             }
