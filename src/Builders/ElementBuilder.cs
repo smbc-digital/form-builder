@@ -113,21 +113,24 @@ namespace form_builder.Builders
             return this;
         }
 
-        public ElementBuilder WithRestrictFutureDate(bool value)
+        public ElementBuilder WithRestrictFutureDate(bool value, string validMessage ="")
         {
             _property.RestrictFutureDate = value;
+            _property.ValidationMessageRestrictFutureDate = validMessage;
             return this;
         }
 
-        public ElementBuilder WithRestrictPastDate(bool value)
+        public ElementBuilder WithRestrictPastDate(bool value, string validMessage = "") 
         {
             _property.RestrictPastDate = value;
+            _property.ValidationMessageRestrictPastDate = validMessage;
             return this;
         }
 
-        public ElementBuilder WithRestrictCurrentDate(bool value)
+        public ElementBuilder WithRestrictCurrentDate(bool value, string validMessage = "")
         {
             _property.RestrictCurrentDate = value;
+            _property.ValidationMessageRestrictCurrentDate = validMessage;
             return this;
         }
 
