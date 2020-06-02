@@ -1,7 +1,6 @@
 ﻿@using form_builder.Helpers
 @model form_builder.Models.Elements.Element
 
-@* TODO: Do we need to worry about making radios inline? *@
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
     @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
 

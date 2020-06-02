@@ -61,8 +61,8 @@ namespace form_builder.Models.Elements
             Items = new List<SelectListItem>{ new SelectListItem($"{searchResults.Count} addresses found", string.Empty)};
             searchResults.ForEach((_) => { Items.Add(new SelectListItem(_.Name, $"{_.UniqueId}|{_.Name}")); });
 
-            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
-            ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
+            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
+            ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
             return await viewRender.RenderAsync("AddressSelect", this);
         }

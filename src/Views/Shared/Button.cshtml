@@ -1,7 +1,7 @@
 ﻿@model form_builder.Models.Elements.Element
 @{
     @* TODO: Not sure what to do about spinners - have included double click protection from gds (Probably still needs js file refs for this to work) *@
-    @* TODO: Why is button text in viewdata not in Properties.Value?*@
+    @* TODO: Remove id once UX confirmed we don't need the spinner*@
     @* var showSpinner = (bool)ViewData["showSpinner"]; *@
     @* var displayAnchor = (bool)ViewData["displayAnchor"]; *@
     @* var spinnerButton = showSpinner ? $"onclick=spinnerButton('{@Model.Properties.ButtonId}');" : null; *@
@@ -10,7 +10,6 @@
 <button 
     data-prevent-double-click="true"
     class="govuk-button @Model.Properties.ClassName"
-    type="submit"
     id="@Model.Properties.ButtonId"
     @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)>
     @Model.Properties.Text
