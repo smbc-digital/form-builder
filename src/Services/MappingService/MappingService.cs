@@ -85,7 +85,10 @@ namespace form_builder.Services.MappingService
                     return obj;
                 }
 
-                obj.Add(splitTargets[0], _elementMapper.GetAnswerValue(element, formAnswers));
+                objectValue = _elementMapper.GetAnswerValue(element, formAnswers);
+                if(objectValue != null)
+                    obj.Add(splitTargets[0], objectValue);
+
                 return obj;
             }
 

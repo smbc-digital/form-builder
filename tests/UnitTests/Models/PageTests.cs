@@ -797,6 +797,56 @@ namespace form_builder_tests.UnitTests.Models
             Assert.Equal(PageSlugGreaterThan, result.PageSlug);
         }
 
+        [Fact]
+        public void GetNextPage_ShouldReturn_Behaviour_WhenIsNullOrEmpty_Condition_True()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToExternalPage)
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition { IsNullOrEmpty = true, QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "value");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.GoToExternalPage, result.BehaviourType);
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_Behaviour_WhenIsNullOrEmpty_Condition_False()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToExternalPage)
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition { IsNullOrEmpty = false, QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "value");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.GoToPage, result.BehaviourType);
+        }
+
         #endregion
     }
 }

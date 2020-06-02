@@ -45,7 +45,11 @@ namespace form_builder.Validators
 
             return new ValidationResult {
                 IsValid = isValid,
+<<<<<<< HEAD
                 Message = !string.IsNullOrEmpty(element.Properties.RegexValidationMessage) ? element.Properties.RegexValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again"
+=======
+                Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : $"Check the {element.Properties.Label.ToLower()} and try again"
+>>>>>>> 68280c3ec83856ad266445d5b870e12050dd8f83
         };          
         }
     }
