@@ -68,12 +68,20 @@ namespace form_builder.Factories.Transform.ReusableElements
 
             if(substituteElement == null)
             {
-                throw new Exception($"ReusableElementSchemaTransformFactory::TransformElement, No lookup options found for question {entry.Properties.QuestionId} with lookup value {entry.Lookup}");
+                throw new Exception($"ReusableElementSchemaTransformFactory::TransformElement, No subsitute element could be created for question {entry.Properties.QuestionId}");
             }   
 
             substituteElement.Properties.QuestionId = entry.Properties.QuestionId;
-            substituteElement.Properties.TargetMapping = entry.Properties.TargetMapping;
-            substituteElement.Properties.Optional = entry.Properties.Optional;            
+
+            if(!string.IsNullOrEmpty(entry.Properties.TargetMapping))
+            {
+                substituteElement.Properties.TargetMapping = entry.Properties.TargetMapping;
+            }
+            
+            if(entry.Properties.Optional)
+            {
+                substituteElement.Properties.Optional = true;            
+            }
 
             entry = substituteElement;
             return entry;
