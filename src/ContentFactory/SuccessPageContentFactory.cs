@@ -83,7 +83,9 @@ namespace form_builder.ContentFactory
                 FeedbackPhase= baseForm.FeedbackPhase,
                 FormName = baseForm.FormName,
                 StartFormUrl = startFormUrl,
-                PageTitle = page.Title
+                PageTitle = page.Title,
+                BannerTitle = page.BannerTitle,
+                LeadingParagraph = page.LeadingParagraph
             };
         }
 

@@ -63,7 +63,7 @@ namespace form_builder.Helpers.PageHelpers
             }
                                            
             formModel.FeedbackForm = baseForm.FeedbackForm;
-             formModel.FeedbackPhase = baseForm.FeedbackPhase;
+            formModel.FeedbackPhase = baseForm.FeedbackPhase;
 
             foreach (var element in page.Elements)
             {
