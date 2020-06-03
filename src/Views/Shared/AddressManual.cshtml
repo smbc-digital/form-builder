@@ -20,8 +20,6 @@
 @Html.Hidden(@Model.GetCustomItemId("postcode"), Model.Properties.Value)
 
 <fieldset class="govuk-fieldset" @Model.GenerateFieldsetProperties()>
-    <partial name="LegendH1" />
-    
     <partial name="ChangeSearch" />
     
     @if (Model.Properties.DisplayNoResultsIAG)
