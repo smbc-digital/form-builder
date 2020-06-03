@@ -20,6 +20,13 @@ namespace form_builder.Factories.Transform.ReusableElements
 
         public async Task<FormSchema> Transform(FormSchema formSchema)
         {
+            // I haven't found a reasonable way to both calculate then changes required and apply them concurrently, 
+            // this might be a possible solution; https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8
+            // however updating as you enumerate is problematic 
+            // so this is split into to parts 
+            // The first part traverses the lists builds and returns a list of reusable element references that require substiuting into the schema (async)
+            // The second part applies the substitutions (sync)
+            // TODO: Check the performance of this with larger schemas
             var elementSubstitutions = await GetReusableElementSubstitutions(formSchema);
             return ApplyReusableElementSubstitutions(formSchema, elementSubstitutions);
         }
@@ -49,16 +56,6 @@ namespace form_builder.Factories.Transform.ReusableElements
                         };
         }
 
-        public FormSchema ApplyReusableElementSubstitutions(FormSchema formSchema, IEnumerable<ElementSubstitutionRecord> substitutions)
-        {
-            substitutions
-                .ToList()
-                .ForEach(substitution => formSchema.Pages
-                                                    .First(_ => _.PageSlug == substitution.PageSlug).Elements[substitution.OriginalElementIndex] = substitution.SubstituteElement);
-
-            return formSchema;
-        }
-
         private async Task<IElement> CreateSubstituteRecord(IElement entry)
         {
             var elementRef = ((Reusable)entry).ElementRef;
@@ -81,8 +78,20 @@ namespace form_builder.Factories.Transform.ReusableElements
             entry = substituteElement;
             return entry;
         }
+
+        public FormSchema ApplyReusableElementSubstitutions(FormSchema formSchema, IEnumerable<ElementSubstitutionRecord> substitutions)
+        {
+            substitutions
+                .ToList()
+                .ForEach(substitution => formSchema
+                                        .Pages
+                                        .First(_ => _.PageSlug == substitution.PageSlug).Elements[substitution.OriginalElementIndex] = substitution.SubstituteElement);
+
+            return formSchema;
+        }
     }
-    
+
+
     public class ElementSubstitutionRecord
     {
         public string PageSlug { get; set; }
