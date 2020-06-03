@@ -205,7 +205,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
 
             //Assert
-            Assert.Equal($"/{baseUrl}/{pageSlug}", callback.ReturnURL);
+            Assert.Equal($"/v2/{baseUrl}/{pageSlug}", callback.ReturnURL);
         }
 
         [Fact]
@@ -321,7 +321,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
 
             //Assert
-            Assert.Equal($"/{baseUrl}/{pageSlug}", callback.ReturnURL);
+            Assert.Equal($"/v2/{baseUrl}/{pageSlug}", callback.ReturnURL);
         }
 
         [Theory]
