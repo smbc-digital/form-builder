@@ -2,7 +2,6 @@ using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Helpers.Session;
-using form_builder.Models;
 using form_builder.Services.PageService;
 using form_builder.Services.PayService;
 using form_builder.ViewModels;
@@ -66,7 +65,9 @@ namespace form_builder.Controllers.Payment
                 PageContent = result.HtmlContent,
                 FormName = result.FormName,
                 StartFormUrl = result.StartFormUrl,
-                PageTitle = result.PageTitle
+                PageTitle = result.PageTitle,
+                BannerTitle = result.BannerTitle,
+                LeadingParagraph = result.LeadingParagraph
             };
 
             return View("../Home/Success", success);

@@ -288,7 +288,7 @@ namespace form_builder.Services.PageService
 
             if (string.IsNullOrEmpty(sessionGuid))
             {
-                throw new Exception("PageService::FinalisePageJoueny: Session has expired");
+                throw new Exception("PageService::FinalisePageJourney: Session has expired");
             }
 
             var formData = _distributedCache.GetString(sessionGuid);
