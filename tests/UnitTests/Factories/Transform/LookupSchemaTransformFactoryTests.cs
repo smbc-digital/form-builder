@@ -1,12 +1,14 @@
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Factories.Transform;
+using form_builder.Factories.Transform.Lookups;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Providers.TransformDataProvider;
+using form_builder.Providers.Transforms.Lookups;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -15,7 +17,9 @@ namespace form_builder_tests.UnitTests.Factories.Schema
     public class LookupSchemaTransformFactoryTests
     {
         private readonly LookupSchemaTransformFactory _lookupSchemaTransformFactory;
-        private readonly Mock<ITransformDataProvider> _TransformDataProvider = new Mock<ITransformDataProvider>();
+        private readonly Mock<ILookupTransformDataProvider> _TransformDataProvider = new Mock<ILookupTransformDataProvider>();
+
+        public LookupSchemaTransformFactory LookupSchemaTransformFactory => _lookupSchemaTransformFactory;
 
         public LookupSchemaTransformFactoryTests()
         {
@@ -33,9 +37,20 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .WithLookup("lookup")
                 .Build();
 
-            var result = await _lookupSchemaTransformFactory.Transform<IElement>(element);
+            var result = await LookupSchemaTransformFactory.Transform(new FormSchema(){
+                Pages = new List<Page>{
+                    new Page()
+                    {
+                        Elements = new List<IElement>
+                        {
+                            element
+                        }
+                    }
+                }
+            });
+
             Assert.IsType<Select>(result);
-            Assert.Single(result.Properties.Options);
+            Assert.Single(result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.Options);
             _TransformDataProvider.Verify(_ => _.Get<List<Option>>(It.Is<string>(x => x == "lookup")), Times.Once);
         }
 
@@ -50,7 +65,18 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .WithQuestionId("testid")
                 .Build();
 
-            var result = await Assert.ThrowsAsync<Exception>(() => _lookupSchemaTransformFactory.Transform<IElement>(element));
+            var result = await Assert.ThrowsAsync<Exception>(() => LookupSchemaTransformFactory.Transform(new FormSchema(){
+                Pages = new List<Page>{
+                    new Page()
+                    {
+                        Elements = new List<IElement>
+                        {
+                            element
+                        }
+                    }
+                }
+            }));
+
             Assert.Equal($"LookupSchemaTransformFactory::Build, No lookup options found for question {element.Properties.QuestionId} with lookup value {element.Lookup}", result.Message);
         }
 
@@ -63,11 +89,21 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .WithOptions(new List<Option>{ new Option { Value = "anotheroption" } })
                 .Build();
 
-            var result = await _lookupSchemaTransformFactory.Transform<IElement>(element);
+            var result = await LookupSchemaTransformFactory.Transform(new FormSchema(){
+                Pages = new List<Page>{
+                    new Page()
+                    {
+                        Elements = new List<IElement>
+                        {
+                            element
+                        }
+                    }
+                }
+            });
 
-            Assert.Equal(2, result.Properties.Options.Count);
-            Assert.Equal("anotheroption", result.Properties.Options[0].Value);
-            Assert.Equal("test", result.Properties.Options[1].Value);
+            Assert.Equal(2, result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.Options.Count);
+            Assert.Equal("anotheroption", result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.Options[0].Value);
+            Assert.Equal("test", result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.Options[1].Value);
         }
     }
 }

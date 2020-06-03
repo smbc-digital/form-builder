@@ -1,6 +1,7 @@
 using Amazon.S3;
 using form_builder.Gateways;
 using form_builder.Providers.SchemaProvider;
+using form_builder.Providers.Transforms.Lookups;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -13,9 +14,9 @@ namespace form_builder_tests.UnitTests.Providers.TransformDataProvider
 {
     public class S3TransformDataProviderTests
     {
-        private readonly S3TransformDataProvider _s3TransformProvider;
+        private readonly S3LookupTransformDataProvider _s3TransformProvider;
         private readonly Mock<IS3Gateway> _mockS3gateway = new Mock<IS3Gateway>();
-        private readonly Mock<ILogger<S3TransformDataProvider>> _mockLogger = new Mock<ILogger<S3TransformDataProvider>>();
+        private readonly Mock<ILogger<S3LookupTransformDataProvider>> _mockLogger = new Mock<ILogger<S3LookupTransformDataProvider>>();
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
 
         private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
@@ -24,7 +25,7 @@ namespace form_builder_tests.UnitTests.Providers.TransformDataProvider
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("uitest");
             _mockConfiguration.Setup(_ => _["S3BucketKey"]).Returns("forms-storage");
-            _s3TransformProvider = new S3TransformDataProvider(_mockS3gateway.Object, _mockLogger.Object, _mockHostingEnv.Object, _mockConfiguration.Object);
+            _s3TransformProvider = new S3LookupTransformDataProvider(_mockS3gateway.Object, _mockLogger.Object, _mockHostingEnv.Object, _mockConfiguration.Object);
         }
 
         [Fact]
