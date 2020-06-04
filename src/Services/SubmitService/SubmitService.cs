@@ -56,7 +56,7 @@ namespace form_builder.Services.SubmtiService
 
         public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
-            if(_submissionServiceConfiguration.FakePaymentSubmission)
+            if(_submissionServiceConfiguration.FakeSubmission)
             {
                 return "123456"; 
             }
