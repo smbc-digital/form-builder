@@ -48,7 +48,7 @@
     </div>
 
     <div class="govuk-form-group @(Model.IsTownValid ? string.Empty : " govuk-form-group--error")">
-        <label class="govuk-label govuk-label--m" for=@Model.GetCustomItemId(AddressManualConstants.TOWN)>Town</label>
+        <label class="govuk-label govuk-label--m" for=@Model.GetCustomItemId(AddressManualConstants.TOWN)>Town or city</label>
         <partial name="ErrorBase" model=Model.TownValidationModel />
         @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.TOWN), Model.Properties.AddressManualAddressTown, townElementProperties)
     </div>
