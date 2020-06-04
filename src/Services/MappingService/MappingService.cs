@@ -14,6 +14,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using form_builder.Factories.Schema;
+using Amazon.S3.Model;
+using Microsoft.IdentityModel.Tokens;
+using form_builder.Extensions;
 
 namespace form_builder.Services.MappingService
 {
@@ -46,7 +49,9 @@ namespace form_builder.Services.MappingService
 
             var formData = _distributedCache.GetString(sessionGuid);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
             convertedAnswers.FormName = form;
+            convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
 
             return new MappingEntity
             {
