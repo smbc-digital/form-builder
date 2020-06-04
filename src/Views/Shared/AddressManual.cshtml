@@ -11,7 +11,7 @@
     line2ElementProperties.Add("class", inputClass);
 
     var townElementProperties = Model.GenerateTownElementProperties();
-    townElementProperties.Add("class", Model.IsTownValid ? inputClass : invalidInputClasses);
+    townElementProperties.Add("class", Model.IsTownValid ? $"{inputClass} govuk-!-width-two-thirds" : $"{invalidInputClasses} govuk-!-width-two-thirds");
 
     var postcodeElementProperties = Model.GeneratePostcodeElementProperties();
     postcodeElementProperties.Add("class", Model.IsPostcodeValid ? $"{inputClass} govuk-input--width-10" : $"{invalidInputClasses} govuk-input--width-10");
@@ -20,8 +20,6 @@
 @Html.Hidden(@Model.GetCustomItemId("postcode"), Model.Properties.Value)
 
 <fieldset class="govuk-fieldset" @Model.GenerateFieldsetProperties()>
-    <partial name="LegendH1" />
-    
     <partial name="ChangeSearch" />
     
     @if (Model.Properties.DisplayNoResultsIAG)
