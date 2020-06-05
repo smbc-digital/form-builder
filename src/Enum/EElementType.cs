@@ -33,6 +33,7 @@
         FileUpload,
         DocumentDownload,
         Warning,
-        Declaration
+        Declaration,
+        Summary
     }
 }

@@ -24,6 +24,7 @@ namespace form_builder.Helpers.ElementHelpers
         void ReCheckPreviousRadioOptions(Element element);
         bool CheckForProvider(Element element);
         object GetFormDataValue(string guid, string key);
+        FormAnswers GetFormData(string guid);
     }
 
     public class ElementHelper : IElementHelper
@@ -193,6 +194,21 @@ namespace form_builder.Helpers.ElementHelpers
             }
 
             return convertedAnswers.FormData.ContainsKey(key) ? convertedAnswers.FormData.GetValueOrDefault(key) : string.Empty;
+        }
+
+
+        public FormAnswers GetFormData(string guid)
+        {
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+
+            if (!string.IsNullOrEmpty(formData))
+            {
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+            }
+
+            return convertedAnswers;
         }
     }
 }

@@ -12,6 +12,7 @@ namespace form_builder.Services.PageService
         Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false);
         Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> file, bool processManual = false);
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid);
+        Task<SummaryViewModel> GetSummary(Page page, FormSchema baseForm, string path, string sessionGuid);
         Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
         Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType);
     }

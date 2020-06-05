@@ -266,6 +266,13 @@ namespace form_builder.Services.PageService
             return viewModel;
         }
 
+        public async Task<SummaryViewModel> GetSummary(Page page, FormSchema baseForm, string path, string sessionGuid)
+        {
+            var viewModel = _pageHelper.GenerateSummary(baseForm,  sessionGuid);
+
+            return viewModel;
+        }
+
         public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
             Dictionary<string, dynamic> answers = new Dictionary<string, dynamic>();
