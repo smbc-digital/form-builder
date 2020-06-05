@@ -1,5 +1,4 @@
-﻿using form_builder.Cache;
-using form_builder.Configuration;
+﻿using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Mappers;
 using form_builder.Models;
@@ -14,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using form_builder.Factories.Schema;
+using form_builder.Extensions;
 
 namespace form_builder.Services.MappingService
 {
@@ -46,7 +46,9 @@ namespace form_builder.Services.MappingService
 
             var formData = _distributedCache.GetString(sessionGuid);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
             convertedAnswers.FormName = form;
+            convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
 
             return new MappingEntity
             {
