@@ -9,9 +9,6 @@ namespace form_builder.Providers.Address
         public string ProviderName { get => "Fake"; }
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string postcode)
         {
-            if(postcode.Equals("sk11zz"))
-                return await Task.FromResult(new List<AddressSearchResult>());
-
             return await Task.FromResult(new List<AddressSearchResult> {
                 new AddressSearchResult {
                     Name = "address 1",
