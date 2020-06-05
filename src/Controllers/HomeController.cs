@@ -60,10 +60,10 @@ namespace form_builder.Controllers
         }
 
         [HttpGet]
-        [Route("{form}/{path}/manual")]
-        public async Task<IActionResult> AddressManual(string form, string path)
+        [Route("{form}/{path}/{subPath}")]
+        public async Task<IActionResult> AddressManual(string form, string path, string subPath)
         {
-            var response = await _pageService.ProcessPage(form, path, true);
+            var response = await _pageService.ProcessPage(form, path, subPath);
             if (response.ShouldRedirect)
             {
                 return RedirectToAction("Index", new
@@ -79,7 +79,8 @@ namespace form_builder.Controllers
         [HttpPost]
         [Route("{form}")]
         [Route("{form}/{path}")]
-        public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData, IEnumerable<CustomFormFile> fileUpload)
+        [Route("{form}/{path}/{subPath}")]
+        public async Task<IActionResult> Index(string form, string path, string subPath, Dictionary<string, string[]> formData, IEnumerable<CustomFormFile> fileUpload)
         {
             var viewModel = formData.ToNormaliseDictionary();
 
@@ -93,7 +94,7 @@ namespace form_builder.Controllers
                     {
                         form,
                         path
-                    });
+                });
             }
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)

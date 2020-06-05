@@ -130,7 +130,6 @@ namespace form_builder.Services.PageService
                     _distributedCache.Remove(sessionGuid);
             }
 
-
             var page = baseForm.GetPage(path);
             if (page == null)
             {
@@ -219,7 +218,7 @@ namespace form_builder.Services.PageService
 
             currentPage.Validate(viewModel, _validators);
 
-            if (currentPage.Elements.Any(_ => _.Type == EElementType.Address) && !processManual)
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
             {
                 return await _addressService.ProcesssAddress(viewModel, currentPage, baseForm, sessionGuid, path);
             }
