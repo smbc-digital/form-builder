@@ -13,16 +13,13 @@ namespace form_builder.Validators
 
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-
-            if (element.Type != EElementType.AddressManual)
+            if (!(element.Type == EElementType.Address && viewModel.ContainsKey("subPath") && viewModel["subPath"] == "manual"))
             {
                 return new ValidationResult
                 {
                     IsValid = true
                 };
             }
-
-           
 
             var valueAddressLine1 = viewModel.ContainsKey($"{element.Properties.QuestionId}-AddressManualAddressLine1")
                  ? viewModel[$"{element.Properties.QuestionId}-AddressManualAddressLine1"]
@@ -31,8 +28,6 @@ namespace form_builder.Validators
             var addressLine1Valid = !string.IsNullOrEmpty(valueAddressLine1);
 
             var addressLine1Message = addressLine1Valid ? string.Empty : "Please enter Address Line 1";
-
-
 
             var valueAddressTown = viewModel.ContainsKey($"{element.Properties.QuestionId}-AddressManualAddressTown")
                 ? viewModel[$"{element.Properties.QuestionId}-AddressManualAddressTown"]

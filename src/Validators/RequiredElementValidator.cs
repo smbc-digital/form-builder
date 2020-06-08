@@ -11,8 +11,7 @@ namespace form_builder.Validators
         {
 
             if (element.Type == EElementType.DateInput || element.Type == EElementType.TimeInput ||
-                element.Type == EElementType.AddressManual || element.Type == EElementType.DatePicker ||
-                element.Properties.Optional)
+                element.Type == EElementType.DatePicker || element.Properties.Optional)
             {
                 return new ValidationResult
                 {
@@ -36,10 +35,18 @@ namespace form_builder.Validators
 
             if (element.Type == EElementType.Address)
             {
-                if (viewModel.ContainsKey("AddressStatus") &&viewModel["AddressStatus"] == "Select")
+                if (viewModel.ContainsKey("subPath") && viewModel["subPath"] == "automatic")
                 {
                     key = $"{element.Properties.QuestionId}-address";
                     validationMessage = "Check the " + element.Properties.AddressLabel.ToLower() + " and try again";
+                }
+                else if(viewModel.ContainsKey("subPath") && viewModel["subPath"] == "manual")
+                {
+                    // TODO:: manual address validation
+                    return new ValidationResult
+                    {
+                        IsValid = true
+                    };
                 }
                 else
                 {

@@ -1,25 +1,33 @@
 ﻿@model Tuple<form_builder.ViewModels.ElementViewModel, List<SelectListItem>>
 @{
     var questionId = $"{Model.Item1.Element.Properties.QuestionId}-address";
+    var searchQuestionId = $"{Model.Item1.Element.Properties.QuestionId}-postcode";
     var hintId = $"{questionId}-hint";
     var errorId = $"{questionId}-error";
 }
 
-@if(Model.Item1.Element.Properties.LegendAsH1) {
-    <h1>@Model.Item1.Element.Properties.AddressLabel
+@Html.Hidden(@searchQuestionId, Model.Item1.Element.Properties.Value)
+
+@if (Model.Item1.Element.Properties.LegendAsH1)
+{
+    <h1>
+        @Model.Item1.Element.Properties.AddressLabel
 
     @if (Model.Item1.Element.Properties.Optional)
     {
         <span class="optional">(optional)</span>
     }
-    </h1>
-} else {
-    <label class="h2">@Model.Item1.Element.Properties.AddressLabel
-    @if (Model.Item1.Element.Properties.Optional)
-    {
-        <span class="optional">(optional)</span>
-    }
-    </label>
+</h1>
+}
+else
+{
+<label class="h2">
+    @Model.Item1.Element.Properties.AddressLabel
+@if (Model.Item1.Element.Properties.Optional)
+{
+    <span class="optional">(optional)</span>
+}
+</label>
 }
 
 <div class="user-search-term">
@@ -32,7 +40,8 @@
     <p id=@hintId>@Html.Raw(Model.Item1.Element.Properties.SelectHint)</p>
 }
 
-@if(!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectLabel)){
+@if (!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectLabel))
+{
     <label for="@questionId" @Model.Item1.Element.WriteOptional()>@Model.Item1.Element.Properties.SelectLabel</label>
     @if (Model.Item1.Element.Properties.Optional)
     {

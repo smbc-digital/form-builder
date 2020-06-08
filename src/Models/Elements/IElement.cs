@@ -23,7 +23,7 @@ namespace form_builder.Models.Elements
             string Lookup { get;set; }
             bool IsValid { get; }
             void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder);
-            Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationSearchResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment);
+            Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationSearchResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment, string subPath = "", List<object> results = null);
             Dictionary<string, dynamic> GenerateElementProperties(string type = "");
             string GenerateFieldsetProperties();
             string GetLabelText();

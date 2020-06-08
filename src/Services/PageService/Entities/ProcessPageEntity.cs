@@ -1,5 +1,7 @@
 ﻿using form_builder.Models;
 using form_builder.ViewModels;
+using Microsoft.AspNetCore.Rewrite.Internal.UrlActions;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace form_builder.Services.PageService.Entities
 {
@@ -12,17 +14,19 @@ namespace form_builder.Services.PageService.Entities
 
     public class ProcessPageEntity : PageEntity
     {
-        public bool ShouldRedirect { get; set; } = false;
+        public bool ShouldRedirect { get; set; }
 
         public string TargetPage { get; set; } = string.Empty;
     }
 
     public class ProcessRequestEntity : PageEntity
     {
-        public bool UseGeneratedViewModel { get; set; } = false;
+        public bool UseGeneratedViewModel { get; set; }
 
-        public bool RedirectToAction { get; set; } = false;
+        public bool RedirectToAction { get; set; }
 
         public string RedirectAction { get; set; } = string.Empty;
+
+        public object RouteValues { get; set; }
     }
 }

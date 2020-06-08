@@ -28,7 +28,7 @@ namespace form_builder.Helpers.PageHelpers
     public interface IPageHelper
     {
         void HasDuplicateQuestionIDs(List<Page> pages, string formName);
-        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null);
+        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null, string subPath = "", List<object> results = null);
         void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid);
         Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults);
         Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
@@ -71,7 +71,7 @@ namespace form_builder.Helpers.PageHelpers
             _fileUploadService = fileUploadService;
         }
 
-        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null)
+        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null, string subPath = "", List<object> results = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
             
@@ -84,7 +84,18 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var element in page.Elements)
             {
-                formModel.RawHTML += await element.RenderAsync(_viewRender, _elementHelper, guid, addressAndStreetSearchResults, organisationSearchResults, viewModel, page, baseForm, _enviroment);
+                formModel.RawHTML += await element.RenderAsync(
+                    _viewRender,
+                    _elementHelper,
+                    guid,
+                    addressAndStreetSearchResults,
+                    organisationSearchResults,
+                    viewModel,
+                    page,
+                    baseForm,
+                    _enviroment,
+                    subPath,
+                    results);
             }
 
             return formModel;

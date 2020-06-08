@@ -18,7 +18,9 @@ namespace form_builder.Models.Elements
             Type = EElementType.Button;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment,
+            string subPath = "",
+            List<object> results = null)
         {
             var viewData = new Dictionary<string, dynamic> { { "displayAnchor", !CheckForStartPageSlug(formSchema, page) }, { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) }, { "buttonText", GetButtonText(page.Elements, viewModel, page) } };
 
@@ -61,8 +63,7 @@ namespace form_builder.Models.Elements
         {
             var containsAddressElement = element.Any(_ => _.Type == EElementType.Address);
 
-            if (containsAddressElement && 
-                (!viewModel.ContainsKey("AddressStatus") || !page.IsValid && viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Search"))
+            if (containsAddressElement && viewModel.ContainsKey("subPath") && viewModel["subPath"] == string.Empty)
             {
                 return SystemConstants.AddressSearchButtonText;
             }
