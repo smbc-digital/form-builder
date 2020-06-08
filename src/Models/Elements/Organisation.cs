@@ -20,8 +20,8 @@ namespace form_builder.Models.Elements
             Type = EElementType.Organisation;
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment,
-            string subPath = "", List<object> results = null)
+        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment,
+            List<object> results = null)
         {
             var organisationKey = $"{Properties.QuestionId}-organisation-searchterm";
 

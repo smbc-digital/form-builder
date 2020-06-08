@@ -4,7 +4,6 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Models.Properties;
 using form_builder.Validators;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -170,7 +169,7 @@ namespace form_builder.Models.Elements
             return null;
         }
 
-        public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment, string subPath = "",
+        public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment,
             List<object> results = null)
         {
             return viewRender.RenderAsync(Type.ToString(), this, null);

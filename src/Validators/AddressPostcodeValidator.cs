@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using form_builder.Enum;
 using form_builder.Models.Elements;
 
 
@@ -9,7 +10,9 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            if (element.Type != Enum.EElementType.Address || (viewModel.ContainsKey("subPath") && viewModel["subPath"] == "manual"))
+            if (element.Type != EElementType.Address 
+                || (element.Type == EElementType.Address && viewModel.ContainsKey("subPath") && viewModel["subPath"] == "manual")
+                || (element.Type == EElementType.Address && viewModel.ContainsKey("subPath") && viewModel["subPath"] == "automatic"))
             {
                 return new ValidationResult
                 {

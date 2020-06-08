@@ -73,7 +73,7 @@ namespace form_builder.Services.StreetService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, streetResults);
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null); // NOTE:: null is streetResults
                 formModel.Path = currentPage.PageSlug;
                 formModel.StreetStatus = journey;
                 formModel.FormName = baseForm.FormName;

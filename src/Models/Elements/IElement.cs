@@ -7,7 +7,6 @@ using JsonSubTypes;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -23,7 +22,16 @@ namespace form_builder.Models.Elements
             string Lookup { get;set; }
             bool IsValid { get; }
             void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder);
-            Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationSearchResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment, string subPath = "", List<object> results = null);
+            Task<string> RenderAsync(
+                IViewRender viewRender,
+                IElementHelper elementHelper,
+                string guid,
+                List<OrganisationSearchResult> organisationSearchResults,
+                Dictionary<string, dynamic> viewModel,
+                Page page,
+                FormSchema formSchema,
+                IHostingEnvironment environment,
+                List<object> results = null);
             Dictionary<string, dynamic> GenerateElementProperties(string type = "");
             string GenerateFieldsetProperties();
             string GetLabelText();

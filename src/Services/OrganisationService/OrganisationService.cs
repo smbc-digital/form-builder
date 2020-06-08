@@ -91,7 +91,7 @@ namespace form_builder.Services.OrganisationService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, organisationResults);
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, organisationResults);
                 formModel.Path = currentPage.PageSlug;
                 formModel.OrganisationStatus = journey;
                 formModel.FormName = baseForm.FormName;

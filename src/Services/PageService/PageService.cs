@@ -11,7 +11,6 @@ using System.Linq;
 using form_builder.Enum;
 using form_builder.Services.AddressService;
 using form_builder.Services.StreetService;
-using form_builder.Models.Elements;
 using form_builder.ViewModels;
 using form_builder.Providers.StorageProvider;
 using form_builder.Extensions;
@@ -19,19 +18,17 @@ using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
-using form_builder.Cache;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
 using form_builder.ContentFactory;
 using form_builder.Factories.Schema;
-using Amazon.S3.Model;
 
 namespace form_builder.Services.PageService
 {
     public interface IPageService
     {
-        Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, List<object> results);
-        Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> file, string subPath);
+        Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath);
+        Task<ProcessRequestEntity> ProcessRequest(string form, string path, string subPath, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> file);
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid, string subPath, List<object> results);
         Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
         Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType);
@@ -82,7 +79,7 @@ namespace form_builder.Services.PageService
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
         }
         
-        public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, List<object> results)
+        public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -131,7 +128,6 @@ namespace form_builder.Services.PageService
                     _distributedCache.Remove(sessionGuid);
             }
 
-
             var page = baseForm.GetPage(path);
             if (page == null)
             {
@@ -140,106 +136,58 @@ namespace form_builder.Services.PageService
 
             await baseForm.ValidateFormSchema(_pageHelper, form, path);
 
-            //if (isAddressManual)
-            //{
-            //    var addressElement = page.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
-            //    var addressIndex = page.Elements.IndexOf(addressElement);
-            //    var manualAddressElement = new AddressManual { Properties = addressElement.Properties, Type = EElementType.AddressManual };
-            //    page.Elements[addressIndex] = manualAddressElement;
-            //}
-
+            List<object> searchResults = null;
             if (subPath.Equals("automatic"))
             {
                 var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
                 if (!string.IsNullOrEmpty(formData))
-                {
                     convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-                }
-
-                results = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}-sr"]).ToList();
+                searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}-sr"]).ToList();
             }
 
-            var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, results);
-            var startFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{viewModel.BaseURL}/{viewModel.StartPageSlug}";
-            viewModel.StartFormUrl = startFormUrl;
-
-            //if (page.Elements.Any(_ => _.Type == EElementType.Street))
-            //{
-            //    viewModel.StreetStatus = "Search";
-            //    return new ProcessPageEntity
-            //    {
-            //        ViewModel = viewModel,
-            //        ViewName = "../Street/Index"
-            //    };
-            //}
-
-            //if (page.Elements.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.AddressManual))
-            //{
-            //    viewModel.AddressStatus = "Search";
-            //    return new ProcessPageEntity
-            //    {
-            //        ViewModel = viewModel,
-            //        ViewName = "../Address/Index"
-            //    };
-            //}
-
-            //if (page.Elements.Any(_ => _.Type == EElementType.Organisation))
-            //{
-            //    viewModel.OrganisationStatus = "Search";
-            //    return new ProcessPageEntity
-            //    {
-            //        ViewModel = viewModel,
-            //        ViewName = "../Organisation/Index"
-            //    };
-            //}
+            var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
+            viewModel.StartFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{viewModel.BaseURL}/{viewModel.StartPageSlug}";
 
             return new ProcessPageEntity
             {
                 ViewModel = viewModel
             };
         }
-        public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> files, string subPath)
+        public async Task<ProcessRequestEntity> ProcessRequest(
+            string form,
+            string path,
+            string subPath,
+            Dictionary<string, dynamic> viewModel,
+            IEnumerable<CustomFormFile> files)
         {
             var baseForm = await _schemaFactory.Build(form);
 
             if(!baseForm.IsAvailable(_environment.EnvironmentName))
-            {
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
-            }
 
             var currentPage = baseForm.GetPage(path);
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (sessionGuid == null)
-            {
                 throw new NullReferenceException($"Session guid null.");
-            }
 
             if (currentPage == null)
-            {
                 throw new NullReferenceException($"Current page '{path}' object could not be found.");
-            }
 
-            viewModel["subPath"] = subPath;
+            viewModel["subPath"] = subPath; // used in the validators for validating lookup pages
             currentPage.Validate(viewModel, _validators);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
-            {
                 return await _addressService.ProcesssAddress(viewModel, currentPage, baseForm, sessionGuid, path, subPath);
-            }
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Street))
-            {
                 return await _streetService.ProcessStreet(viewModel, currentPage, baseForm, sessionGuid, path);
-            }
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Organisation))
-            {
                 return await _organisationService.ProcesssOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
-            }
 
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
@@ -273,7 +221,7 @@ namespace form_builder.Services.PageService
             var viewModelData = new Dictionary<string, dynamic>();
             viewModelData.Add("subPath", subPath);
 
-            var viewModel = await _pageHelper.GenerateHtml(page, viewModelData, baseForm, sessionGuid, null, null, subPath, results);
+            var viewModel = await _pageHelper.GenerateHtml(page, viewModelData, baseForm, sessionGuid, null, results);
             viewModel.FormName = baseForm.FormName;
             viewModel.PageTitle = page.Title;
             viewModel.Path = path;

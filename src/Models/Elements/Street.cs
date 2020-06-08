@@ -20,8 +20,8 @@ namespace form_builder.Models.Elements
             Type = EElementType.Street;
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment,
-            string subPath = "", List<object> results = null)
+        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment,
+           List<object> results = null)
         {
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
@@ -56,12 +56,12 @@ namespace form_builder.Models.Elements
                     ReturnURL = url
                 };
 
-                var optionsList = new List<SelectListItem>{ new SelectListItem($"{addressSearchResults.Count} streets found", string.Empty)};
-                addressSearchResults.ForEach((searchResult) => {
-                    optionsList.Add(new SelectListItem(searchResult.Name, $"{searchResult.UniqueId}|{searchResult.Name}"));
-                });
+                //var optionsList = new List<SelectListItem>{ new SelectListItem($"{addressSearchResults.Count} streets found", string.Empty)};
+                //addressSearchResults.ForEach((searchResult) => {
+                //    optionsList.Add(new SelectListItem(searchResult.Name, $"{searchResult.UniqueId}|{searchResult.Name}"));
+                //});
 
-                return await viewRender.RenderAsync("StreetSelect", new Tuple<ElementViewModel, List<SelectListItem>>(viewElement, optionsList));
+                return await viewRender.RenderAsync("StreetSelect", new Tuple<ElementViewModel, List<SelectListItem>>(viewElement, null)); // NOTE:: null is options list
             }
 
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-street");

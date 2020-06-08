@@ -1,5 +1,4 @@
-﻿using form_builder.Enum;
-using form_builder.Helpers;
+﻿using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
@@ -25,13 +24,11 @@ namespace form_builder.Models.Elements
             IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
-            List<AddressSearchResult> addressSearchResults,
             List<OrganisationSearchResult> organisationResults,
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
             IHostingEnvironment environment,
-            string subPath,
             List<object> results = null)
         {
             var viewElement = new ElementViewModel
@@ -39,7 +36,8 @@ namespace form_builder.Models.Elements
                 Element = this,
             };
 
-            switch (subPath) {
+            viewModel.TryGetValue("subPath", out var subPath);
+            switch (subPath as string) {
                 case "manual": // requesting manual enter page
                     Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
 
@@ -141,7 +139,7 @@ namespace form_builder.Models.Elements
             return $"{Properties.AddressLabel}{optionalLabelText}";
         }
 
-        protected void SetAddressProperties(Dictionary<string, dynamic> viewModel, string searchTerm)
+        private void SetAddressProperties(Dictionary<string, dynamic> viewModel, string searchTerm)
         {
             Properties.AddressManualAddressLine1 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine1")).Value;
             Properties.AddressManualAddressLine2 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine2")).Value;

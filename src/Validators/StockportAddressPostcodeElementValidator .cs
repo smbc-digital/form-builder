@@ -7,12 +7,11 @@ namespace form_builder.Validators
 {
     public class StockportAddressPostcodeElementValidator : IElementValidator
     {
-       
-        
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-
-            if (element.Type != EElementType.Address)
+            if (element.Type != EElementType.Address
+                || (element.Type == EElementType.Address && viewModel.ContainsKey("subPath") && viewModel["subPath"] == "manual")
+                || (element.Type == EElementType.Address && viewModel.ContainsKey("subPath") && viewModel["subPath"] == "automatic"))
             {
                 return new ValidationResult
                 {

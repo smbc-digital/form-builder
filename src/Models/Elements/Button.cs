@@ -18,8 +18,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.Button;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment,
-            string subPath = "",
+        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment,
             List<object> results = null)
         {
             var viewData = new Dictionary<string, dynamic> { { "displayAnchor", !CheckForStartPageSlug(formSchema, page) }, { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) }, { "buttonText", GetButtonText(page.Elements, viewModel, page) } };

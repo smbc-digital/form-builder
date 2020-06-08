@@ -10,7 +10,6 @@ using form_builder.Workflows;
 using Microsoft.EntityFrameworkCore.Internal;
 using form_builder.Models;
 using Microsoft.AspNetCore.Hosting;
-using Amazon.S3.Model;
 
 namespace form_builder.Controllers
 {
@@ -46,9 +45,9 @@ namespace form_builder.Controllers
         [Route("{form}")]
         [Route("{form}/{path}")]
         [Route("{form}/{path}/{subPath}")]
-        public async Task<IActionResult> Index(string form, string path, string subPath = "", List<object> results = null)
+        public async Task<IActionResult> Index(string form, string path, string subPath = "")
         {
-            var response = await _pageService.ProcessPage(form, path, subPath, results);
+            var response = await _pageService.ProcessPage(form, path, subPath);
             if (response.ShouldRedirect)
             {
                 return RedirectToAction("Index", new
@@ -61,48 +60,26 @@ namespace form_builder.Controllers
             return View(response.ViewName, response.ViewModel);
         }
 
-        //[HttpGet]
-        //[Route("{form}/{path}/manual")]
-        //public async Task<IActionResult> AddressManual(string form, string path)
-        //{
-        //    var response = await _pageService.ProcessPage(form, path, true);
-        //    if (response.ShouldRedirect)
-        //    {
-        //        return RedirectToAction("Index", new
-        //        {
-        //            path = response.TargetPage,
-        //            form
-        //        });
-        //    }
-
-        //    return View(response.ViewName, response.ViewModel);
-        //}
-
         [HttpPost]
         [Route("{form}")]
         [Route("{form}/{path}")]
         [Route("{form}/{path}/{subPath}")]
-        public async Task<IActionResult> Index(string form, string path, Dictionary<string, string[]> formData, IEnumerable<CustomFormFile> fileUpload, string subPath = "")
+        public async Task<IActionResult> Index(
+            string form,
+            string path,
+            Dictionary<string, string[]> formData,
+            IEnumerable<CustomFormFile> fileUpload,
+            string subPath = "")
         {
             var viewModel = formData.ToNormaliseDictionary();
 
             if(fileUpload != null && fileUpload.Any())
                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
 
-            var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload, subPath);
+            var currentPageResult = await _pageService.ProcessRequest(form, path, subPath, viewModel, fileUpload);
 
-            if(currentPageResult.RedirectToAction 
-                && !string.IsNullOrWhiteSpace(currentPageResult.RedirectAction)
-                && currentPageResult.RouteValues != null)
-                return RedirectToAction(currentPageResult.RedirectAction, currentPageResult.RouteValues);
-
-            if (currentPageResult.RedirectToAction && !string.IsNullOrWhiteSpace(currentPageResult.RedirectAction)){
-                return RedirectToAction(currentPageResult.RedirectAction, new
-                    {
-                        form,
-                        path
-                    });
-            }
+            if (currentPageResult.RedirectToAction && !string.IsNullOrWhiteSpace(currentPageResult.RedirectAction))
+                return RedirectToAction(currentPageResult.RedirectAction, currentPageResult.RouteValues != null ? currentPageResult.RouteValues : new { form, path });
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
@@ -130,44 +107,6 @@ namespace form_builder.Controllers
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
             }
         }
-
-        //[HttpPost]
-        //[Route("{form}/{path}/manual")]
-        //public async Task<IActionResult> AddressManual(string form, string path, Dictionary<string, string[]> formData)
-        //{
-        //    var viewModel = formData.ToNormaliseDictionary();
-        //    var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, null, true);
-
-        //    if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
-        //    {
-        //        return View(currentPageResult.ViewName, currentPageResult.ViewModel);
-        //    }
-
-        //    var behaviour = _pageService.GetBehaviour(currentPageResult);
-
-        //    switch (behaviour.BehaviourType)
-        //    {
-        //        case EBehaviourType.GoToExternalPage:
-        //            return Redirect(behaviour.PageSlug);
-        //        case EBehaviourType.GoToPage:
-        //            return RedirectToAction("Index", new
-        //            {
-        //                path = behaviour.PageSlug,
-        //                form
-        //            });
-        //        case EBehaviourType.SubmitForm:
-        //            return RedirectToAction("Submit", new
-        //            {
-        //                form,
-        //                path
-        //            });
-        //        case EBehaviourType.SubmitAndPay:
-        //            var result = await _paymentWorkflow.Submit(form, path);
-        //            return Redirect(result);
-        //        default:
-        //            throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
-        //    }
-        //}
 
         [HttpGet]
         [Route("{form}/submit")]

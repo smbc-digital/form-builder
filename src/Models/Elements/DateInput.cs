@@ -16,8 +16,8 @@ namespace form_builder.Models.Elements
             Type = EElementType.DateInput;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment,
-            string subPath = "", List<object> results = null)
+        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment,
+            List<object> results = null)
         {
             Properties.Day = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-day");
             Properties.Month = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-month");
