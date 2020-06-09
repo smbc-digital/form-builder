@@ -4,7 +4,7 @@
     {
         public const string Manual = "manual";
         public const string Automatic = "automatic";
-        public const string SearchResultsKeyPostFix = "-serach-results";
+        public const string SearchResultsKeyPostFix = "-search-results";
         public const string SubPathViewModelKey = "subPath";
     }
 }

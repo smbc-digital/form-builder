@@ -32,10 +32,8 @@ namespace form_builder.Helpers.PageHelpers
             Dictionary<string, dynamic> viewModel,
             FormSchema baseForm,
             string guid,
-            List<OrganisationSearchResult> organisationSearchResults = null,
             List<object> results = null);
         void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid);
-        Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults);
         void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName);
         Task CheckForPaymentConfiguration(List<Page> pages, string formName);
         void CheckForDocumentDownload(FormSchema formSchema);
@@ -79,7 +77,6 @@ namespace form_builder.Helpers.PageHelpers
             Dictionary<string, dynamic> viewModel,
             FormSchema baseForm,
             string guid,
-            List<OrganisationSearchResult> organisationSearchResults = null,
             List<object> results = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
@@ -97,7 +94,6 @@ namespace form_builder.Helpers.PageHelpers
                     _viewRender,
                     _elementHelper,
                     guid,
-                    organisationSearchResults,
                     viewModel,
                     page,
                     baseForm,
@@ -146,40 +142,6 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.FormName = form;
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
-        }
-
-        public async Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults)
-        {
-            switch (journey)
-            {
-                case "Search":
-                    try
-                    {
-                        var organisationViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, organisationResults);
-                        organisationViewModel.OrganisationStatus = "Select";
-                        organisationViewModel.FormName = baseForm.FormName;
-                        organisationViewModel.PageTitle = currentPage.Title;
-
-                        return new ProcessRequestEntity
-                        {
-                            Page = currentPage,
-                            ViewModel = organisationViewModel,
-                            UseGeneratedViewModel = true,
-                            ViewName = "../Organisation/Index"
-                        };
-                    }
-                    catch (Exception e)
-                    {
-                        throw new ApplicationException($"PageHelper.ProcessOrganisationJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
-                    };
-                case "Select":
-                    return new ProcessRequestEntity
-                    {
-                        Page = currentPage
-                    };
-                default:
-                    throw new ApplicationException($"PageHelper.ProcessOrganisationJourney: Unknown journey type");
-            }
         }
 
         public void HasDuplicateQuestionIDs(List<Page> pages, string formName)

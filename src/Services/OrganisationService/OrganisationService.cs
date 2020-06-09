@@ -79,9 +79,9 @@ namespace form_builder.Services.OrganisationService
 
             if (!currentPage.IsValid)
             {
-                var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as List<object>;
+                var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
 
-                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, cachedSearchResults);
+                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
                 model.Path = currentPage.PageSlug;
                 model.FormName = baseForm.FormName;
                 model.PageTitle = currentPage.Title;
@@ -147,7 +147,7 @@ namespace form_builder.Services.OrganisationService
             }
             catch (Exception e)
             {
-                throw new ApplicationException($"OrganisationProvider:: An exception has occured while attempting to perform organisation lookup, Exception: {e.Message}");
+                throw new ApplicationException($"OrganisationService.ProccessInitialOrganisation:: An exception has occured while attempting to perform organisation lookup, Exception: {e.Message}");
             }
 
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);

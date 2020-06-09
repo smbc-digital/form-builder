@@ -157,6 +157,7 @@ namespace form_builder.Services.PageService
                 ViewModel = viewModel
             };
         }
+
         public async Task<ProcessRequestEntity> ProcessRequest(
             string form,
             string path,
@@ -183,15 +184,14 @@ namespace form_builder.Services.PageService
             viewModel[LookUpConstants.SubPathViewModelKey] = subPath; 
             currentPage.Validate(viewModel, _validators);
 
-            //TODO:: remove subPath from call to processAddress
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
-                return await _addressService.ProcesssAddress(viewModel, currentPage, baseForm, sessionGuid, path, subPath);
+                return await _addressService.ProcessAddress(viewModel, currentPage, baseForm, sessionGuid, path);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Street))
                 return await _streetService.ProcessStreet(viewModel, currentPage, baseForm, sessionGuid, path);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Organisation))
-                return await _organisationService.ProcesssOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
+                return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
@@ -225,7 +225,7 @@ namespace form_builder.Services.PageService
             var viewModelData = new Dictionary<string, dynamic>();
             viewModelData.Add(LookUpConstants.SubPathViewModelKey, subPath);
 
-            var viewModel = await _pageHelper.GenerateHtml(page, viewModelData, baseForm, sessionGuid, null, results);
+            var viewModel = await _pageHelper.GenerateHtml(page, viewModelData, baseForm, sessionGuid, results);
             viewModel.FormName = baseForm.FormName;
             viewModel.PageTitle = page.Title;
             viewModel.Path = path;

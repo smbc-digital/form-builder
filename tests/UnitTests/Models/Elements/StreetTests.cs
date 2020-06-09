@@ -47,7 +47,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object);
 
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
@@ -74,7 +74,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 "",
-                new List<OrganisationSearchResult>(),
                 viewModel,
                 page,
                 schema,

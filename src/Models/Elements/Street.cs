@@ -5,7 +5,6 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,25 +21,25 @@ namespace form_builder.Models.Elements
             Type = EElementType.Street;
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment,
-           List<object> results = null)
+        public override async Task<string> RenderAsync(
+            IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,
+            Dictionary<string, dynamic> viewModel,
+            Page page,
+            FormSchema formSchema,
+            IHostingEnvironment environment,
+            List<object> results = null)
         {
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
 
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
-            //var hasStreet = viewModel.TryGetValue($"{Properties.QuestionId}-street", out var streetValue);
-            //if (hasStreet && string.IsNullOrEmpty(streetValue))
-            //    subPath = "";
 
             switch (subPath as string)
             {
                 case LookUpConstants.Automatic:
                     Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-street");
-                    //if (string.IsNullOrEmpty(Properties.Value))
-                    //{
-                    //    Properties.Value = streetValue;
-                    //}
 
                     var url = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 

@@ -158,7 +158,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, null, new List<object>());
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, new List<object>());
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), null), Times.Once);
@@ -194,7 +194,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, null, new List<object>());
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, new List<object>());
 
             //Assert
             Assert.Equal($"/{baseUrl}/{pageSlug}", callback.Item1.ReturnURL);
@@ -725,31 +725,6 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Act
             _pageHelper.HasDuplicateQuestionIDs(pages, "form");
-        }
-
-        [Fact]
-        public async Task ProcessOrganisationJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
-        {
-            var result = await _pageHelper.ProcessOrganisationJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
-
-            var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
-            Assert.Equal("../Organisation/Index", journeyResult.ViewName);
-            Assert.True(journeyResult.UseGeneratedViewModel);
-        }
-
-        [Fact]
-        public async Task ProcessOrganisationJourney_ShouldGenerteCorrectHtml_WhenSelectJourney()
-        {
-            var result = await _pageHelper.ProcessOrganisationJourney("Select", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
-
-            Assert.IsType<ProcessRequestEntity>(result);
-        }
-
-        [Fact]
-        public async Task ProcessOrganisationJourney_ShouldThrowException_WhenUnknownJourneyType()
-        {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessOrganisationJourney("UnknownType", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>()));
-            Assert.Equal($"PageHelper.ProcessOrganisationJourney: Unknown journey type", result.Message);
         }
 
         [Theory]

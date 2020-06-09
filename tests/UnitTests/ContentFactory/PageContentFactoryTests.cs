@@ -29,7 +29,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 It.IsAny<Dictionary<string, dynamic>>(),
                 It.IsAny<FormSchema>(),
                 It.IsAny<string>(),
-                It.IsAny<List<OrganisationSearchResult>>(),
                 It.IsAny<List<object>>()))
                 .ReturnsAsync(new form_builder.ViewModels.FormBuilderViewModel{ RawHTML = html });
 
@@ -43,7 +42,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 It.IsAny<Dictionary<string, dynamic>>(),
                 It.IsAny<FormSchema>(),
                 It.IsAny<string>(),
-                It.IsAny<List<OrganisationSearchResult>>(),
                 It.IsAny<List<object>>()), Times.Once);
         }
     }

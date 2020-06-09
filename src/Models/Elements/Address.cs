@@ -27,7 +27,6 @@ namespace form_builder.Models.Elements
             IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
-            List<OrganisationSearchResult> organisationResults,
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,

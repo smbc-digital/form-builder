@@ -79,9 +79,9 @@ namespace form_builder.Services.StreetService
 
             if (!currentPage.IsValid)
             {
-                var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as List<object>;
+                var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
 
-                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, cachedSearchResults);
+                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
                 model.Path = currentPage.PageSlug;
                 model.FormName = baseForm.FormName;
                 model.PageTitle = currentPage.Title;

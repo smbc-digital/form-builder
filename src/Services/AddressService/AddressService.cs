@@ -16,13 +16,12 @@ namespace form_builder.Services.AddressService
 {
     public interface IAddressService
     {
-        Task<ProcessRequestEntity> ProcesssAddress(
+        Task<ProcessRequestEntity> ProcessAddress(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,
             string guid,
-            string path,
-            string subPath);
+            string path);
     }
 
     public class AddressService : IAddressService
@@ -41,14 +40,15 @@ namespace form_builder.Services.AddressService
             _addressProviders = addressProviders;
         }
 
-        public async Task<ProcessRequestEntity> ProcesssAddress(
+        public async Task<ProcessRequestEntity> ProcessAddress(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,
             string guid,
-            string path,
-            string subPath)
+            string path)
         {
+            viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
+
             switch (subPath)
             {
                 case LookUpConstants.Manual:
@@ -79,7 +79,7 @@ namespace form_builder.Services.AddressService
 
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
 
-                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, cachedSearchResults.ToList());
+                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
                 model.Path = currentPage.PageSlug;
                 model.FormName = baseForm.FormName;
                 model.PageTitle = currentPage.Title;
@@ -144,7 +144,7 @@ namespace form_builder.Services.AddressService
             {
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
                 
-                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, cachedSearchResults.ToList());
+                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
                 model.Path = currentPage.PageSlug;
                 model.FormName = baseForm.FormName;
                 model.PageTitle = currentPage.Title;

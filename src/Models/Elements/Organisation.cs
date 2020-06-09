@@ -21,8 +21,14 @@ namespace form_builder.Models.Elements
             Type = EElementType.Organisation;
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment,
-           List<object> results = null)
+        public override async Task<string> RenderAsync(
+            IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,Dictionary<string, dynamic> viewModel,
+            Page page,
+            FormSchema formSchema,
+            IHostingEnvironment environment,
+            List<object> results = null)
         {
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
@@ -57,9 +63,9 @@ namespace form_builder.Models.Elements
 
                     return await viewRender.RenderAsync("OrganisationSelect", new Tuple<ElementViewModel, List<SelectListItem>>(viewElement, optionsList));
                 default:
-
                     Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-organisation-searchterm");
-                    return await viewRender.RenderAsync("OrganisationSearch", this);
+                    var test = await viewRender.RenderAsync("OrganisationSearch", new ElementViewModel { Element = this });
+                    return test;
             }
         }
 

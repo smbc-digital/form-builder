@@ -7,7 +7,6 @@ using JsonSubTypes;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -26,7 +25,6 @@ namespace form_builder.Models.Elements
                 IViewRender viewRender,
                 IElementHelper elementHelper,
                 string guid,
-                List<OrganisationSearchResult> organisationSearchResults,
                 Dictionary<string, dynamic> viewModel,
                 Page page,
                 FormSchema formSchema,

@@ -49,7 +49,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 "",
-                new List<OrganisationSearchResult>(),
                 viewModel,
                 page,
                 schema,
@@ -83,7 +82,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 "",
-                new List<OrganisationSearchResult>(),
+                
                 viewModel,
                 page,
                 schema,
@@ -131,7 +130,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var result = await element.RenderAsync(_mockIViewRender.Object,
                 _mockElementHelper.Object,
                 "",
-                new List<OrganisationSearchResult>(),
+                
                 viewModel,
                 page,
                 schema,
