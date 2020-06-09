@@ -66,7 +66,7 @@ namespace form_builder.Validators
 
             if (element.Type == EElementType.Organisation)
             {
-                if (viewModel["OrganisationStatus"] == "Select")
+                if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-organisation";
                     validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";

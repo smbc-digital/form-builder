@@ -4,12 +4,13 @@ using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using form_builder.Constants;
+using Newtonsoft.Json.Linq;
 
 namespace form_builder.Models.Elements
 {
@@ -21,50 +22,49 @@ namespace form_builder.Models.Elements
         }
 
         public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment,
-            List<object> results = null)
+           List<object> results = null)
         {
-            var organisationKey = $"{Properties.QuestionId}-organisation-searchterm";
+            elementHelper.CheckForQuestionId(this);
+            elementHelper.CheckForProvider(this);
 
-            if (viewModel.ContainsKey("OrganisationStatus") && viewModel["OrganisationStatus"] == "Select" || viewModel.ContainsKey(organisationKey) && !string.IsNullOrEmpty(viewModel[organisationKey]))
+            viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
+
+            switch (subPath as string)
             {
-                Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
-                if (string.IsNullOrEmpty(Properties.Value))
-                {
-                    if (viewModel["OrganisationStatus"] == "Select")
-                    {
-                        var organisation = $"{Properties.QuestionId}-organisation";
-                        Properties.Value = viewModel[organisation];
-                        if (string.IsNullOrEmpty(Properties.Value))
-                        {
-                            Properties.Value = viewModel[organisationKey];
-                        }
-                    }
-                    else
-                    {
-                        Properties.Value = viewModel[organisationKey];
-                    }
-                }
+                case LookUpConstants.Automatic:
+                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-organisation-searchterm");
 
-                var optionsList = new List<SelectListItem>{ new SelectListItem($"{organisationResults.Count} organisations found", string.Empty)};
-                organisationResults.ForEach((searchResult) => {
-                    optionsList.Add(new SelectListItem(searchResult.Name, $"{searchResult.Reference}|{searchResult.Name}"));
-                });
+                    var url = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
-                var returnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
-                return await viewRender.RenderAsync("OrganisationSelect", new Tuple<ElementViewModel, List<SelectListItem>>(new ElementViewModel{Element = this, ReturnURL = returnURL }, optionsList));
+                    var viewElement = new ElementViewModel
+                    {
+                        Element = this,
+                        ReturnURL = url
+                    };
+
+                    var optionsList = new List<SelectListItem> { new SelectListItem($"{results?.Count} organisations found", string.Empty) };
+                    results?.ForEach((objectResult) =>
+                    {
+                        OrganisationSearchResult searchResult;
+
+                        if ((objectResult as JObject) != null)
+                            searchResult = (objectResult as JObject).ToObject<OrganisationSearchResult>();
+                        else
+                            searchResult = objectResult as OrganisationSearchResult;
+
+                        optionsList.Add(new SelectListItem(searchResult.Name, $"{searchResult.Reference}|{searchResult.Name}"));
+                    });
+
+                    return await viewRender.RenderAsync("OrganisationSelect", new Tuple<ElementViewModel, List<SelectListItem>>(viewElement, optionsList));
+                default:
+
+                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-organisation-searchterm");
+                    return await viewRender.RenderAsync("OrganisationSearch", this);
             }
-
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-organisation-searchterm");
-
-            var viewElement = new ElementViewModel
-            {
-                Element = this
-            };
-
-            return await viewRender.RenderAsync("OrganisationSearch", viewElement);
         }
 
-        private string OrganisationSelectDescribeByValue(){
+        private string OrganisationSelectDescribeByValue()
+        {
             var describedByValue = string.Empty;
 
             if (!string.IsNullOrEmpty(Properties.SelectHint))
@@ -79,6 +79,7 @@ namespace form_builder.Models.Elements
 
             return describedByValue.Trim();
         }
+
 
         public override Dictionary<string, dynamic> GenerateElementProperties(string type)
         {
@@ -95,7 +96,8 @@ namespace form_builder.Models.Elements
                         properties.Add("aria-describedby", OrganisationSelectDescribeByValue());
                     }
 
-                return properties;
+                    return properties;
+
                 default:
                     properties.Add("id", $"{Properties.QuestionId}-organisation-searchterm");
                     properties.Add("maxlength", Properties.MaxLength);
@@ -105,9 +107,17 @@ namespace form_builder.Models.Elements
                         properties.Add("aria-describedby", DescribedByValue("-organisation-searchterm"));
                     }
 
-                return properties;
-
+                    return properties;
             }
+        }
+
+        public override string GetLabelText()
+        {
+            var optionalLabelText = Properties.Optional ? " (optional)" : string.Empty;
+
+            return string.IsNullOrEmpty(Properties.OrganisationLabel)
+            ? $"Search for an organisation{optionalLabelText}"
+            : $"{Properties.OrganisationLabel}{optionalLabelText}";
         }
     }
 }
