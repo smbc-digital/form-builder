@@ -25,15 +25,6 @@ namespace form_builder_tests_ui.StepDefinitions
         {
             Thread.Sleep(sleepTime);
         }
-        
-        [Given("I have signed in as UiTest")]
-        public static void IHaveSignedIn()
-        {
-            BrowserSession.Visit("/this-is-a-invalid-url-to-allow-adding-a-cookie");
-            var webDriver = BrowserSession.Native as IWebDriver;
-
-            webDriver.Manage().Cookies.AddCookie(new Cookie("jwtCookie", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVUkgVGVzdCIsImVtYWlsIjoic2NuLnVpdGVzdEBnbWFpbC5jb20ifQ.-LHnC83W_1jEC9PZALbQBYifzNLYwryUgi0GimD8SWY", "127.0.0.1", "/", DateTime.Now.AddDays(1)));
-        }
 
         [Then("I should see the header")]
         public void ThenIShouldSeeTheHeaderSection()
@@ -77,6 +68,18 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenIShouldSeeTheLink(string href)
         {
             Assert.True(BrowserSession.FindAllCss(string.Format("a[href*='{0}']", href)).Any());
+        }
+
+        [Then(@"I wait one second")]
+        public void ThenIWaitOneSecond()
+        {
+            Thread.Sleep(1000);
+        }
+
+        [Then(@"I should see that ""(.*)"" input has value ""(.*)""")]
+        public void ThenIShouldSeeTheInput(string inputName, string value)
+        {
+            Assert.True(BrowserSession.FindField(inputName).HasValue(value));
         }
 
         [When(@"I click the ""(.*)"" button")]
@@ -141,6 +144,7 @@ namespace form_builder_tests_ui.StepDefinitions
         }
 
         [When(@"I enter ""(.*)"" in ""(.*)""")]
+        [Then(@"I enter ""(.*)"" in ""(.*)""")]
         public void WhenIEnter(string value, string fieldName)
         {
             BrowserSession.FillIn(fieldName).With(value);
