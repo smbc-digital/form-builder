@@ -25,8 +25,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
         public async Task RenderAsync_ShouldUseAddressSearchText_ForButton_WhenAddressSearch()
         {
             var callback = new Dictionary<string, dynamic>();
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Button>(), It.IsAny<Dictionary<string, dynamic>>()))
-                    .Callback<string, Button, Dictionary<string, dynamic>>((a,b,c) => callback = c);
+            _mockIViewRender
+                .Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Button>(), It.IsAny<Dictionary<string, dynamic>>()))
+                .Callback<string, Button, Dictionary<string, dynamic>>((a,b,c) => callback = c);
 
             //Arrange
             var element = new ElementBuilder()

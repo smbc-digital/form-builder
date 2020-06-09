@@ -220,6 +220,7 @@ namespace form_builder_tests.UnitTests.Extensions
                 {
                     new PageAnswers
                     {
+                        Answers = new List<Answers>(),
                         PageSlug = "page-1"
                     },
                     new PageAnswers

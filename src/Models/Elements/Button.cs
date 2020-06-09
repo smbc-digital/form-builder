@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using form_builder.Constants;
+using form_builder.Extensions;
 
 namespace form_builder.Models.Elements
 {
@@ -62,7 +63,7 @@ namespace form_builder.Models.Elements
         {
             var containsAddressElement = element.Any(_ => _.Type == EElementType.Address);
 
-            if (containsAddressElement && viewModel.ContainsKey("subPath") && viewModel["subPath"] == string.Empty)
+            if (containsAddressElement && viewModel.IsInitial())
             {
                 return SystemConstants.AddressSearchButtonText;
             }

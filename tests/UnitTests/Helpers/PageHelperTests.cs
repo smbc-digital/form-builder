@@ -1,6 +1,7 @@
 ﻿using form_builder.Builders;
 using form_builder.Cache;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
@@ -150,14 +151,14 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("AddressStatus", "Select");
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, null, new List<object>());
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), null), Times.Once);
@@ -185,7 +186,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("AddressStatus", "Select");
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -193,7 +194,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, null, new List<object>());
 
             //Assert
             Assert.Equal($"/{baseUrl}/{pageSlug}", callback.Item1.ReturnURL);
@@ -234,7 +235,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("StreetStatus", "Select");
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
             viewModel.Add("street-streetaddress", string.Empty);
             viewModel.Add("street-street", "street");
 
@@ -298,7 +299,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("StreetStatus", "Select");
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
             viewModel.Add("-streetaddress", string.Empty);
             viewModel.Add("-street", "street");
 

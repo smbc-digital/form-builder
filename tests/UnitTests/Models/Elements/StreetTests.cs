@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using form_builder.Constants;
 
 namespace form_builder_tests.UnitTests.Models.Elements
 {
@@ -37,7 +38,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("StreetStatus", "Select");
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
             viewModel.Add("street-streetaddress", "");
             viewModel.Add("street-street", "street");
 

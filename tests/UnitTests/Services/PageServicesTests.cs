@@ -31,6 +31,8 @@ using form_builder.ContentFactory;
 using System.Threading;
 using form_builder.Factories.Schema;
 using Amazon.S3.Model;
+using form_builder.Constants;
+using System.Linq;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -60,7 +62,12 @@ namespace form_builder_tests.UnitTests.Services
             var elementValidatorItems = new List<IElementValidator> { _validator.Object };
             _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<OrganisationSearchResult>>(), It.IsAny<List<object>>()))
+            _pageHelper
+                .Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<OrganisationSearchResult>>(), It.IsAny<List<object>>()))
+                        .ReturnsAsync(new FormBuilderViewModel());
+
+            _pageHelper
+                .Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<OrganisationSearchResult>>(), null))
                         .ReturnsAsync(new FormBuilderViewModel());
 
             _mockEnvironment.Setup(_ => _.EnvironmentName)
@@ -315,34 +322,6 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ShouldReturnAddressView_WhenTypeContainsAddress()
-        {
-            var element = new ElementBuilder()
-                    .WithType(EElementType.Address)
-                    .WithQuestionId("address-test")
-                    .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            // Act
-            var result = await _service.ProcessPage("form", "page-one", "");
-
-            // Assert
-            var entityResult = Assert.IsType<ProcessPageEntity>(result);
-            Assert.Equal("../Address/Index", entityResult.ViewName);
-        }
-
-        [Fact]
         public async Task ProcessPage_ShouldGenerateGuidWhenGuidIsEmpty()
         {
             // Arrange
@@ -407,34 +386,6 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_Get_ShouldSetAddressStatusToSearch()
-        {
-            var element = new ElementBuilder()
-                .WithType(EElementType.Address)
-                .WithQuestionId("test-address")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            var result = await _service.ProcessPage("form", "page-one", "");
-
-            var viewResult = Assert.IsType<ProcessPageEntity>(result);
-            var viewModel = Assert.IsType<FormBuilderViewModel>(viewResult.ViewModel);
-
-            Assert.Equal("Search", viewModel.AddressStatus);
-        }
-
-        [Fact]
         public async Task ProcessPage_AddressManual_Should_Return_index()
         {
             var element = new ElementBuilder()
@@ -451,43 +402,14 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+            _mockSchemaFactory
+                .Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            var result = await _service.ProcessPage("form", "page-one", "");
-            var viewResult = Assert.IsType<ProcessPageEntity>(result);
-            var viewModel = Assert.IsType<FormBuilderViewModel>(viewResult.ViewModel);
+            var result = await _service.ProcessPage("form", "page-one", LookUpConstants.Manual);
 
-            Assert.Equal("Search", viewModel.AddressStatus);
-        }
-
-        [Fact]
-        public async Task ProcessPage_Get_ShouldSetStreetStatusToSearch()
-        {
-            var element = new ElementBuilder()
-                .WithType(EElementType.Street)
-                .WithQuestionId("test-street")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
-            var result = await _service.ProcessPage("form", "page-one", "");
-
-            var viewResult = Assert.IsType<ProcessPageEntity>(result);
-            var viewModel = Assert.IsType<FormBuilderViewModel>(viewResult.ViewModel);
-
-            Assert.Equal("Search", viewModel.StreetStatus);
-            Assert.Equal("../Street/Index", viewResult.ViewName);
+            Assert.Equal("Index", result.ViewName);
+            Assert.False(result.ShouldRedirect);
         }
 
         [Fact]
@@ -680,7 +602,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns("guid");
 
             //Act
-            var result = await _service.ProcessRequest("form", "first-page", "", It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>());
+            var result = await _service.ProcessRequest("form", "first-page", "", new Dictionary<string, dynamic>(), It.IsAny<IEnumerable<CustomFormFile>>());
 
             //Assert
             Assert.Equal(viewModel.StartFormUrl, result.ViewModel.StartFormUrl);
