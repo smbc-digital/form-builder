@@ -52,7 +52,7 @@ namespace form_builder.Validators
 
             if (element.Type == EElementType.Street)
             {
-                if (viewModel["StreetStatus"] == "Select")
+                if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-streetaddress";
                     validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";

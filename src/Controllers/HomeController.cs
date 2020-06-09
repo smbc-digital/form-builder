@@ -21,7 +21,11 @@ namespace form_builder.Controllers
         private readonly IFileUploadService _fileUploadService;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public HomeController(IPageService pageService, ISubmitWorkflow submitWorkflow, IPaymentWorkflow paymentWorkflow, IFileUploadService fileUploadService, IHostingEnvironment hostingEnvironment)
+        public HomeController(IPageService pageService,
+            ISubmitWorkflow submitWorkflow,
+            IPaymentWorkflow paymentWorkflow,
+            IFileUploadService fileUploadService,
+            IHostingEnvironment hostingEnvironment)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;

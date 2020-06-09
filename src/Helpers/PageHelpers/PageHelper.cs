@@ -36,7 +36,6 @@ namespace form_builder.Helpers.PageHelpers
             List<object> results = null);
         void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid);
         Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults);
-        Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
         void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName);
         Task CheckForPaymentConfiguration(List<Page> pages, string formName);
         void CheckForDocumentDownload(FormSchema formSchema);
@@ -147,40 +146,6 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.FormName = form;
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
-        }
-
-        public async Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
-        {
-            switch (journey)
-            {
-                case "Search":
-                    try
-                    {
-                        var streetViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, null, null); // NOTE:: first null is address results
-                        streetViewModel.StreetStatus = "Select";
-                        streetViewModel.FormName = baseForm.FormName;
-                        streetViewModel.PageTitle = currentPage.Title;
-
-                        return new ProcessRequestEntity
-                        {
-                            Page = currentPage,
-                            ViewModel = streetViewModel,
-                            UseGeneratedViewModel = true,
-                            ViewName = "../Street/Index"
-                        };
-                    }
-                    catch (Exception e)
-                    {
-                        throw new ApplicationException($"PageHelper.ProcessStreetJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
-                    };
-                case "Select":
-                    return new ProcessRequestEntity
-                    {
-                        Page = currentPage
-                    };
-                default:
-                    throw new ApplicationException($"PageHelper.ProcessStreetJourney: Unknown journey type");
-            }
         }
 
         public async Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults)

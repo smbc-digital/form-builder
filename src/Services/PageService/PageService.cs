@@ -146,7 +146,7 @@ namespace form_builder.Services.PageService
                     convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
                 if(convertedAnswers.FormData.ContainsKey($"{path}{LookUpConstants.SearchResultsKeyPostFix}"))
-                    searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"]).ToList();
+                    searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
             }
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
@@ -183,6 +183,7 @@ namespace form_builder.Services.PageService
             viewModel[LookUpConstants.SubPathViewModelKey] = subPath; 
             currentPage.Validate(viewModel, _validators);
 
+            //TODO:: remove subPath from call to processAddress
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
                 return await _addressService.ProcesssAddress(viewModel, currentPage, baseForm, sessionGuid, path, subPath);
 
