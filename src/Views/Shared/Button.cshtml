@@ -5,7 +5,6 @@
     @* var showSpinner = (bool)ViewData["showSpinner"]; *@
     @* var displayAnchor = (bool)ViewData["displayAnchor"]; *@
     @* var spinnerButton = showSpinner ? $"onclick=spinnerButton('{@Model.Properties.ButtonId}');" : null; *@
-    var buttonText = Model.Properties.ButtonId == "submit" ? "Submit" : Model.Properties.Text;
 }
 
 <button 
@@ -13,5 +12,5 @@
     class="govuk-button @Model.Properties.ClassName"
     id="@Model.Properties.ButtonId"
     @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)>
-    @buttonText
+    @Model.Properties.Text
 </button>
