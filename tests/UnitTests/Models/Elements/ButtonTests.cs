@@ -50,7 +50,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var viewModel = new Dictionary<string, dynamic>();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "",new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             Assert.True(callback.ContainsKey("buttonText"));
@@ -86,7 +86,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var viewModel = new Dictionary<string, dynamic>();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             Assert.True(callback.ContainsKey("buttonText"));
@@ -124,7 +124,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var viewModel = new Dictionary<string, dynamic>();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             Assert.True(callback.ContainsKey("buttonText"));

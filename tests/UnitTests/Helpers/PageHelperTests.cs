@@ -157,7 +157,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), null), Times.Once);
@@ -193,7 +193,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
             Assert.Equal($"/{baseUrl}/{pageSlug}", callback.Item1.ReturnURL);
@@ -243,7 +243,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), null), Times.Once);
@@ -308,7 +308,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
             Assert.Equal($"/{baseUrl}/{pageSlug}", callback.Item1.ReturnURL);
@@ -749,67 +749,6 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessOrganisationJourney("UnknownType", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>()));
             Assert.Equal($"PageHelper.ProcessOrganisationJourney: Unknown journey type", result.Message);
-        }
-
-        [Fact]
-        public async Task ProcessAddressJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
-        {
-            var result = await _pageHelper.ProcessAddressJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult> { new AddressSearchResult() });
-
-            var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
-            Assert.Equal("../Address/Index", journeyResult.ViewName);
-            Assert.True(journeyResult.UseGeneratedViewModel);
-        }
-
-        [Fact]
-        public async Task ProcessAddressJourney_ReturnRedirectAction_True_WhenNoSearchResults_AndOnSearchJourney()
-        {
-            var result = await _pageHelper.ProcessAddressJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult> { });
-
-            var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
-            Assert.Equal("AddressManual", journeyResult.RedirectAction);
-            Assert.True(journeyResult.RedirectToAction);
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task ProcessAddressJourney_ShouldGenerteCorrectHtml_WhenSelectJourney()
-        {
-            var result = await _pageHelper.ProcessAddressJourney("Select", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
-
-            Assert.IsType<ProcessRequestEntity>(result);
-        }
-
-        [Fact]
-        public async Task ProcessAddressJourney_ShouldThrowException_WhenUnknownJourneyType()
-        {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessAddressJourney("UnknownType", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>()));
-            Assert.Equal($"PageHelper.ProcessAddressJourney: Unknown journey type", result.Message);
-        }
-
-        [Fact]
-        public async Task ProcessStreetJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
-        {
-            var result = await _pageHelper.ProcessStreetJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
-
-            var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
-            Assert.Equal("../Street/Index", journeyResult.ViewName);
-            Assert.True(journeyResult.UseGeneratedViewModel);
-        }
-
-        [Fact]
-        public async Task ProcessStreetJourney_ShouldGenerteCorrectHtml_WhenSelectJourney()
-        {
-            var result = await _pageHelper.ProcessStreetJourney("Select", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
-
-            Assert.IsType<ProcessRequestEntity>(result);
-        }
-
-        [Fact]
-        public async Task ProcessStreetJourney_ShouldThrowException_WhenUnknownJourneyType()
-        {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessStreetJourney("UnknownType", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>()));
-            Assert.Equal($"PageHelper.ProcessStreetJourney: Unknown journey type", result.Message);
         }
 
         [Theory]

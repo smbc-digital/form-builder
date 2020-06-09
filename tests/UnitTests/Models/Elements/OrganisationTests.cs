@@ -55,7 +55,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             viewModel.Add($"{addressEleement.Properties.QuestionId}-organisation", "test org");
 
             //Act
-            var result = await addressEleement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await addressEleement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"),It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -91,7 +91,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             viewModel.Add($"{addressEleement.Properties.QuestionId}-organisation", "test org");
 
             //Act
-            var result = await addressEleement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>{ new OrganisationSearchResult{ Reference = "123455", Name = "name123" } }, viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await addressEleement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<OrganisationSearchResult>{ new OrganisationSearchResult{ Reference = "123455", Name = "name123" } }, viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"),It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
