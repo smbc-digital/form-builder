@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using form_builder.Enum;
 using form_builder.Models.Elements;
 using form_builder.Models;
+using form_builder.Constants;
+using form_builder.Extensions;
 
 namespace form_builder.Validators
 {
@@ -11,7 +13,8 @@ namespace form_builder.Validators
         {
 
             if (element.Type == EElementType.DateInput || element.Type == EElementType.TimeInput ||
-                element.Type == EElementType.DatePicker || element.Properties.Optional)
+                element.Type == EElementType.DatePicker || element.Properties.Optional 
+                || (element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
                 {
@@ -35,18 +38,10 @@ namespace form_builder.Validators
 
             if (element.Type == EElementType.Address)
             {
-                if (viewModel.ContainsKey("subPath") && viewModel["subPath"] == "automatic")
+                if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-address";
                     validationMessage = "Check the " + element.Properties.AddressLabel.ToLower() + " and try again";
-                }
-                else if(viewModel.ContainsKey("subPath") && viewModel["subPath"] == "manual")
-                {
-                    // TODO:: manual address validation
-                    return new ValidationResult
-                    {
-                        IsValid = true
-                    };
                 }
                 else
                 {

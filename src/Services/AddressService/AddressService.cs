@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Providers.Address;
 using form_builder.Extensions;
+using form_builder.Constants;
 
 namespace form_builder.Services.AddressService
 {
@@ -50,9 +51,9 @@ namespace form_builder.Services.AddressService
         {
             switch (subPath)
             {
-                case "manual":
-                    return await ProcesssManualAddress(viewModel, currentPage, baseForm, guid);
-                case "automatic":
+                case LookUpConstants.Manual:
+                    return await ProcesssManualAddress(viewModel, currentPage, baseForm, guid, path);
+                case LookUpConstants.Automatic:
                     return await ProcesssAutomaticAddress(viewModel, currentPage, baseForm, guid, path);
                 default:
                     return await ProcesssSearchAddress(viewModel, currentPage, baseForm, guid, path);
@@ -63,13 +64,22 @@ namespace form_builder.Services.AddressService
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,
-            string guid)
+            string guid,
+            string path)
         {
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
             if (!currentPage.IsValid)
             {
-                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid);
+                var cachedAnswers = _distributedCache.GetString(guid);
+
+                var convertedAnswers = cachedAnswers == null
+                    ? new FormAnswers { Pages = new List<PageAnswers>() }
+                    : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+
+                var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
+
+                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, cachedSearchResults.ToList());
                 model.Path = currentPage.PageSlug;
                 model.FormName = baseForm.FormName;
                 model.PageTitle = currentPage.Title;
@@ -132,7 +142,7 @@ namespace form_builder.Services.AddressService
 
             if (!currentPage.IsValid)
             {
-                var cachedSearchResults = convertedAnswers.FormData[$"{path}-sr"] as IEnumerable<object>;
+                var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
                 
                 var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, null, cachedSearchResults.ToList());
                 model.Path = currentPage.PageSlug;
@@ -206,7 +216,7 @@ namespace form_builder.Services.AddressService
             }
 
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-            _pageHelper.SaveFormData($"{path}-sr", addressResults, guid);
+            _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", addressResults, guid);
 
             if (!addressResults.Any())
             {
@@ -218,7 +228,7 @@ namespace form_builder.Services.AddressService
                     {
                         form = baseForm.BaseURL,
                         path,
-                        subPath = "manual"
+                        subPath = LookUpConstants.Manual
                     }
                 };
             }
@@ -231,7 +241,7 @@ namespace form_builder.Services.AddressService
                 {
                     form = baseForm.BaseURL,
                     path,
-                    subPath = "automatic"
+                    subPath = LookUpConstants.Automatic
                 }
             };
         }

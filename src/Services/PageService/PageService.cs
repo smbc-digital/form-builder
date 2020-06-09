@@ -22,6 +22,7 @@ using form_builder.Configuration;
 using Microsoft.Extensions.Options;
 using form_builder.ContentFactory;
 using form_builder.Factories.Schema;
+using form_builder.Constants;
 
 namespace form_builder.Services.PageService
 {
@@ -137,14 +138,15 @@ namespace form_builder.Services.PageService
             await baseForm.ValidateFormSchema(_pageHelper, form, path);
 
             List<object> searchResults = null;
-            if (subPath.Equals("automatic"))
+            if (subPath.Equals(LookUpConstants.Automatic) || subPath.Equals(LookUpConstants.Manual))
             {
                 var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
                 if (!string.IsNullOrEmpty(formData))
                     convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-                searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}-sr"]).ToList();
+                if(convertedAnswers.FormData.ContainsKey($"{path}{LookUpConstants.SearchResultsKeyPostFix}"))
+                    searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"]).ToList();
             }
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
@@ -177,7 +179,8 @@ namespace form_builder.Services.PageService
             if (currentPage == null)
                 throw new NullReferenceException($"Current page '{path}' object could not be found.");
 
-            viewModel["subPath"] = subPath; // used in the validators for validating lookup pages
+            // used in the validators for validating lookup pages
+            viewModel[LookUpConstants.SubPathViewModelKey] = subPath; 
             currentPage.Validate(viewModel, _validators);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
@@ -219,7 +222,7 @@ namespace form_builder.Services.PageService
         public async Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid, string subPath, List<object> results)
         {
             var viewModelData = new Dictionary<string, dynamic>();
-            viewModelData.Add("subPath", subPath);
+            viewModelData.Add(LookUpConstants.SubPathViewModelKey, subPath);
 
             var viewModel = await _pageHelper.GenerateHtml(page, viewModelData, baseForm, sessionGuid, null, results);
             viewModel.FormName = baseForm.FormName;
