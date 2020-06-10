@@ -61,6 +61,10 @@ namespace form_builder_tests.UnitTests.Services
                         },
                         PageSlug = "page-one"
                     }
+                },
+                FormData = new Dictionary<string, object>
+                {
+                    { "page-one-search-results" , new List<object>() }
                 }
             };
 
@@ -91,7 +95,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
 
-            _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
         }
     }
 }

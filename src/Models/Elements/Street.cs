@@ -49,6 +49,7 @@ namespace form_builder.Models.Elements
                         ReturnURL = url
                     };
 
+                    var selectedStreet = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-streetaddress");
                     var optionsList = new List<SelectListItem> { new SelectListItem($"{results?.Count} addresses found", string.Empty) };
                     results?.ForEach((objectResult) => {
                         AddressSearchResult searchResult;
@@ -58,7 +59,7 @@ namespace form_builder.Models.Elements
                         else
                             searchResult = objectResult as AddressSearchResult;
 
-                        optionsList.Add(new SelectListItem(searchResult.Name, $"{searchResult.UniqueId}|{searchResult.Name}"));
+                        optionsList.Add(new SelectListItem(searchResult.Name, $"{searchResult.UniqueId}|{searchResult.Name}", searchResult.UniqueId.Equals(selectedStreet)));
                     });
 
                     return await viewRender.RenderAsync("StreetSelect", new Tuple<ElementViewModel, List<SelectListItem>>(viewElement, optionsList));

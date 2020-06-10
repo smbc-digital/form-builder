@@ -62,6 +62,7 @@ namespace form_builder.Models.Elements
                     viewElement.ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
                     viewElement.ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/{LookUpConstants.Manual}";
 
+                    var selectedAddress = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-address");
                     var optionsList = new List<SelectListItem> { new SelectListItem($"{results.Count} addresses found", string.Empty) };
                     results.ForEach((objectResult) => {
                         AddressSearchResult searchResult;
@@ -77,7 +78,7 @@ namespace form_builder.Models.Elements
 
                         optionsList.Add(new SelectListItem(
                             searchResult.Name,
-                            $"{searchResult.UniqueId}|{searchResult.Name}"));
+                            $"{searchResult.UniqueId}|{searchResult.Name}", searchResult.UniqueId.Equals(selectedAddress)));
                     });
 
                     return await viewRender.RenderAsync("AddressSelect", new Tuple<ElementViewModel, List<SelectListItem>>(viewElement, optionsList));

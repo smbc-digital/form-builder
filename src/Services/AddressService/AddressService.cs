@@ -204,19 +204,31 @@ namespace form_builder.Services.AddressService
                 };
             }
 
-            var addressResults = new List<object>();
-            try
-            {
-                var searchResult = await _addressProviders.Get(addressElement.Properties.AddressProvider).SearchAsync(postcode);
-                addressResults = searchResult.ToList<object>();
-            }
-            catch (Exception e)
-            {
-                throw new ApplicationException($"AddressController: An exception has occured while attempting to perform postcode lookup", e);
-            }
+            var foundPostCode = convertedAnswers
+                .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
+                .Answers?.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode")?
+                .Response;
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-            _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", addressResults, guid);
+            var addressResults = new List<object>();
+            if (postcode.Equals(foundPostCode))
+            {
+                addressResults = (convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>).ToList();
+            }
+            else
+            {
+                try
+                {
+                    var searchResult = await _addressProviders.Get(addressElement.Properties.AddressProvider).SearchAsync(postcode);
+                    addressResults = searchResult.ToList<object>();
+                }
+                catch (Exception e)
+                {
+                    throw new ApplicationException($"AddressController: An exception has occured while attempting to perform postcode lookup", e);
+                }
+
+                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", addressResults, guid);
+            }
 
             if (!addressResults.Any())
             {

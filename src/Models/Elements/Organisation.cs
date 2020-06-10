@@ -48,6 +48,7 @@ namespace form_builder.Models.Elements
                         ReturnURL = url
                     };
 
+                    var selectedOrganisation = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-organisation");
                     var optionsList = new List<SelectListItem> { new SelectListItem($"{results?.Count} organisations found", string.Empty) };
                     results?.ForEach((objectResult) =>
                     {
@@ -58,7 +59,7 @@ namespace form_builder.Models.Elements
                         else
                             searchResult = objectResult as OrganisationSearchResult;
 
-                        optionsList.Add(new SelectListItem(searchResult.Name, $"{searchResult.Reference}|{searchResult.Name}"));
+                        optionsList.Add(new SelectListItem(searchResult.Name, $"{searchResult.Reference}|{searchResult.Name}", searchResult.Reference.Equals(selectedOrganisation)));
                     });
 
                     return await viewRender.RenderAsync("OrganisationSelect", new Tuple<ElementViewModel, List<SelectListItem>>(viewElement, optionsList));

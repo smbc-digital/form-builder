@@ -128,7 +128,7 @@ namespace form_builder.Services.StreetService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid); // NOTE:: null is streetResults
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid);
                 formModel.Path = currentPage.PageSlug;
                 formModel.FormName = baseForm.FormName;
                 formModel.PageTitle = currentPage.Title;
@@ -140,19 +140,30 @@ namespace form_builder.Services.StreetService
                 };
             }
 
+            var foundStreet = convertedAnswers
+                .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
+                .Answers?.FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}-street")?
+                .Response;
+
             List<object> searchResults;
-            try
+            if (street.Equals(foundStreet))
             {
-                searchResults = (await _streetProviders.Get(streetElement.Properties.StreetProvider).SearchAsync(street)).ToList<object>();
+                searchResults = (convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>).ToList();
             }
-            catch (Exception e)
-            {
-                throw new ApplicationException($"StreetService::ProcessStreet: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
+            else
+            { 
+                try
+                {
+                    searchResults = (await _streetProviders.Get(streetElement.Properties.StreetProvider).SearchAsync(street)).ToList<object>();
+                }
+                catch (Exception e)
+                {
+                    throw new ApplicationException($"StreetService::ProcessStreet: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
+                }
+
+                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, guid);
             }
-
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-
-            _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, guid);
 
             try
             {

@@ -140,19 +140,30 @@ namespace form_builder.Services.OrganisationService
                 };
             }
 
+            var foundOrganisationSearchTerm = convertedAnswers
+                .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
+                .Answers?.FirstOrDefault(_ => _.QuestionId == $"{organisationElement.Properties.QuestionId}-organisation-searchterm")?
+                .Response;
+
             List<object> searchResults;
-            try
+            if (organisation.Equals(foundOrganisationSearchTerm))
             {
-                searchResults = (await _organisationProviders.Get(organisationElement.Properties.OrganisationProvider).SearchAsync(organisation)).ToList<object>();
+                searchResults = (convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>).ToList();
             }
-            catch (Exception e)
+            else
             {
-                throw new ApplicationException($"OrganisationService.ProccessInitialOrganisation:: An exception has occured while attempting to perform organisation lookup, Exception: {e.Message}");
+                try
+                {
+                    searchResults = (await _organisationProviders.Get(organisationElement.Properties.OrganisationProvider).SearchAsync(organisation)).ToList<object>();
+                }
+                catch (Exception e)
+                {
+                    throw new ApplicationException($"OrganisationService.ProccessInitialOrganisation:: An exception has occured while attempting to perform organisation lookup, Exception: {e.Message}");
+                }
+
+                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, guid);
             }
-
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-
-            _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, guid);
 
             return new ProcessRequestEntity
             {

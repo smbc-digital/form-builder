@@ -19,6 +19,7 @@ using StockportGovUK.NetStandard.Models.Organisation;
 using form_builder.Builders;
 using form_builder.Providers.Organisation;
 using Amazon.S3.Model;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -71,6 +72,10 @@ namespace form_builder_tests.UnitTests.Services
                         },
                         PageSlug = "page-one"
                     }
+                },
+                FormData = new Dictionary<string, object>
+                {
+                    { "page-one-search-results" , new List<object>() } 
                 }
             };
 
@@ -101,7 +106,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
 
-            _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
