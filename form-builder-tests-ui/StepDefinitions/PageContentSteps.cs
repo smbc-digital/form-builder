@@ -40,22 +40,12 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.Equal("This is strong text", strongText.Text);
         }
 
-        [Then(@"I should see an image element within a p tag")]
-        public void ThenIShouldSeeAnImageElement()
-        {
-            var webDriver = BrowserSession.Native as IWebDriver;
-
-            var imageDisplayed = webDriver.FindElements(By.TagName("p"))[1].FindElement(By.TagName("img")).Displayed;
-
-            Assert.True(imageDisplayed);
-        }
-
         [Then(@"I should see a link element within a p tag")]
         public void ThenIShouldSeeALinkElement()
         {
             var webDriver = BrowserSession.Native as IWebDriver;
 
-            var linkHref = webDriver.FindElements(By.TagName("p"))[3].FindElement(By.TagName("a")).GetAttribute("href");
+            var linkHref = webDriver.FindElements(By.TagName("p"))[0].FindElement(By.TagName("a")).GetAttribute("href");
 
             Assert.Equal("https://www.stockport.gov.uk/", linkHref);
         }
@@ -65,9 +55,9 @@ namespace form_builder_tests_ui.StepDefinitions
         {
             var webDriver = BrowserSession.Native as IWebDriver;
 
-            var src = webDriver.FindElements(By.TagName("img"))[1].GetAttribute("src");
-            var alt = webDriver.FindElements(By.TagName("img"))[1].GetAttribute("alt");
-            var cssClass = webDriver.FindElements(By.TagName("img"))[1].GetAttribute("class");
+            var src = webDriver.FindElements(By.TagName("img"))[0].GetAttribute("src");
+            var alt = webDriver.FindElements(By.TagName("img"))[0].GetAttribute("alt");
+            var cssClass = webDriver.FindElements(By.TagName("img"))[0].GetAttribute("class");
 
             Assert.Equal("http://images.contentful.com/6cfgzlmcakf7/2FNKi2ZYcomigKGAqWiSyC/aec4f120903972fd6c842e84603c6a50/Flu_Jab.jpg", src);
             Assert.Equal("Flu Jab", alt);
