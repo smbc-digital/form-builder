@@ -88,7 +88,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 11
  testRunner.Then("I should see a \".govuk-error-message\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 12
- testRunner.Then("I fill in page1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I enter \"org name\" in \"organisation\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 13
  testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 14
@@ -105,7 +105,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 19
  testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 20
- testRunner.Then("I fill in page2", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I enter \"org name\" in \"optorganisation\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 21
  testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 22
@@ -119,12 +119,10 @@ this.ScenarioInitialize(scenarioInfo);
 #line 26
  testRunner.Then("I should see a \"dt\" element with \"organisation\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 27
- testRunner.And("I should see a \"dt\" element with \"optorganisation\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 28
  testRunner.And("I should see a \"dt\" element with \"organisation\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 28
+ testRunner.And("I should see a \"dt\" element with \"optorganisation\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 29
- testRunner.And("I should see a \"dt\" element with \"optorganisation-organisation\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 30
  testRunner.And("I should see a \"dt\" element with \"optorganisation\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
