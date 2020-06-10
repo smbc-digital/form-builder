@@ -22,7 +22,7 @@ namespace form_builder.Models.Elements
         public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
         public override bool DisplayHint => !string.IsNullOrEmpty(Hint);
         public override string  QuestionId => IsSelect ? StreetSelectQuestionId : StreetSearchQuestionId;
-        public string ChangeHeader => "Street";
+        public string ChangeHeader => "Street:";
         
         public override string Label
         {
@@ -55,10 +55,9 @@ namespace form_builder.Models.Elements
 
             Items = new List<SelectListItem>{ new SelectListItem($"{searchResults.Count} streets found", string.Empty)};
             searchResults.ForEach((_) => { Items.Add(new SelectListItem(_.Name, $"{_.UniqueId}|{_.Name}")); });
-            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
+            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
             return await viewRender.RenderAsync("StreetSelect", this);
         }
-
 
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {

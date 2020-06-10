@@ -56,7 +56,7 @@ namespace form_builder.Services.SubmtiService
 
         public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
-            if(_submissionServiceConfiguration.FakeSubmissions)
+            if(_submissionServiceConfiguration.FakeSubmission)
             {
                 return "123456"; 
             }
@@ -91,6 +91,11 @@ namespace form_builder.Services.SubmtiService
 
         public async Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
+            if (_submissionServiceConfiguration.FakePaymentSubmission)
+            {
+                return "123456";
+            }
+
             var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
 
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());

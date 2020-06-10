@@ -72,8 +72,8 @@ namespace form_builder_tests.UnitTests.Models
         }
 
         [Theory]
-        [InlineData(50, "5")]
-        [InlineData(199, "5")]
+        [InlineData(200, "5")]
+        [InlineData(500, "5")]
         [InlineData(501, "15")]
         [InlineData(2000, "15")]
         public void GenerateElementProperties_ShouldReturnCorrectRowsSize_When_MaxLengthSupllied(int length, string expectedValue)
@@ -93,6 +93,27 @@ namespace form_builder_tests.UnitTests.Models
             Assert.NotEmpty(result);
             Assert.True(result.ContainsKey("rows"));
             Assert.True(result.ContainsValue(expectedValue));
+        }
+
+        [Theory]
+        [InlineData(50)]
+        [InlineData(199)]
+        public void GenerateElementProperties_ShouldReturn_NoRowsSize_When_MaxLengthSupllied_Below200(int length)
+        {
+            var questionId = "test-question-id";
+            var value = "test-value";
+
+            var element = new ElementBuilder()
+                            .WithType(EElementType.Textarea)
+                            .WithQuestionId(questionId)
+                            .WithValue(value)
+                            .WithMaxLength(length)
+                            .Build();
+
+            var result = element.GenerateElementProperties();
+
+            Assert.NotEmpty(result);
+            Assert.False(result.ContainsKey("rows"));
         }
 
         [Fact]

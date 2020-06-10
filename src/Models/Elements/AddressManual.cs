@@ -28,7 +28,7 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public string ChangeHeader => "Postcode";
+        public string ChangeHeader => "Postcode:";
 
         public bool IsLine1Valid => string.IsNullOrEmpty(Line1ValdationMessage);
 
@@ -126,7 +126,7 @@ namespace form_builder.Models.Elements
                 Properties.DisplayNoResultsIAG = true;
             }
             
-            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
+            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
             return await viewRender.RenderAsync(Type.ToString(), this);
         }
     }
