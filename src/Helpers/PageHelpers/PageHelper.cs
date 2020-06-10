@@ -22,7 +22,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Services.FileUploadService;
-using Amazon.Runtime.Internal;
 
 namespace form_builder.Helpers.PageHelpers
 {
@@ -74,24 +73,6 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        public SummaryViewModel GenerateSummary(FormSchema baseForm, string guid)
-        {
-            SummaryViewModel summaryModel = new SummaryViewModel();
-            var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-
-            if (!string.IsNullOrEmpty(formData))
-            {
-                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-            }
-            summaryModel.FormName = baseForm.FormName;
-            summaryModel.FeedbackFormUrl = baseForm.FeedbackForm;
-            summaryModel.StartFormUrl = baseForm.StartPageSlug;
-            summaryModel.FormAnswers = convertedAnswers;
-            return summaryModel;
-        }
-
-        
         public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid)
         {
             var formData = _distributedCache.GetString(guid);
@@ -264,6 +245,7 @@ namespace form_builder.Helpers.PageHelpers
                         && element.Type != EElementType.UL
                         && element.Type != EElementType.OL
                         && element.Type != EElementType.Button
+                        && element.Type != EElementType.HR
                         && element.Type != EElementType.Summary
                         )
                     {

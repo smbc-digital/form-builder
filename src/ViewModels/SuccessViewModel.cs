@@ -6,7 +6,6 @@ namespace form_builder.ViewModels
     {
         public string FormName { get; set; }
 
-
         public string FeedbackPhase { get; set; }
 
         public string FeedbackFormUrl { get; set; }
@@ -22,5 +21,9 @@ namespace form_builder.ViewModels
         public bool HideBackButton => true;
 
         public string PageTitle { get; set; }
+
+        public string BannerTitle { get; set; }
+
+        public string LeadingParagraph { get; set; }
     }
 }

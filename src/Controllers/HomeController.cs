@@ -203,7 +203,9 @@ namespace form_builder.Controllers
                 StartFormUrl = result.StartFormUrl,
                 FeedbackPhase = result.FeedbackPhase,
                 FeedbackFormUrl = result.FeedbackFormUrl,
-                PageTitle = result.PageTitle
+                PageTitle = result.PageTitle,
+                BannerTitle = result.BannerTitle,
+                LeadingParagraph = result.LeadingParagraph
             };
 
             return View(result.ViewName, success);

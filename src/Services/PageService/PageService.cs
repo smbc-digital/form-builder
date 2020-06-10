@@ -266,13 +266,7 @@ namespace form_builder.Services.PageService
             return viewModel;
         }
 
-        public async Task<SummaryViewModel> GetSummary(Page page, FormSchema baseForm, string path, string sessionGuid)
-        {
-            var viewModel = _pageHelper.GenerateSummary(baseForm,  sessionGuid);
-
-            return viewModel;
-        }
-
+       
         public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
             Dictionary<string, dynamic> answers = new Dictionary<string, dynamic>();
@@ -295,7 +289,7 @@ namespace form_builder.Services.PageService
 
             if (string.IsNullOrEmpty(sessionGuid))
             {
-                throw new Exception("PageService::FinalisePageJoueny: Session has expired");
+                throw new Exception("PageService::FinalisePageJourney: Session has expired");
             }
 
             var formData = _distributedCache.GetString(sessionGuid);

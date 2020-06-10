@@ -80,7 +80,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(new HostString("www.test.com"));
 
             _mockIOptons.Setup(_ => _.Value).Returns(new SubmissionServiceConfiguration {
-                FakeSubmissions = false
+                FakePaymentSubmission = false
             });
 
             _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockGateway.Object, _pageHelper.Object, _sessionHelper.Object, _mockEnvironment.Object, _mockHttpContextAccessor.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockIOptons.Object);

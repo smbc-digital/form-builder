@@ -13,8 +13,6 @@ namespace form_builder.Helpers.PageHelpers
         void HasDuplicateQuestionIDs(List<Page> pages, string formName);
         
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null);
-
-        SummaryViewModel GenerateSummary(FormSchema baseForm, string guid);
         void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid);
         Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults);
         Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);

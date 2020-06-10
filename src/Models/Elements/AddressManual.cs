@@ -28,7 +28,7 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public string ChangeHeader => "Postcode";
+        public string ChangeHeader => "Postcode:";
 
         public bool IsLine1Valid => string.IsNullOrEmpty(Line1ValdationMessage);
 

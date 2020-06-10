@@ -80,7 +80,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 7
  testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 8
- testRunner.And("I should see the \"customersaddresswithtitle-postcode\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see the \"address-postcode\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 9
  testRunner.And("I should see the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 10
@@ -88,157 +88,70 @@ this.ScenarioInitialize(scenarioInfo);
 #line 11
  testRunner.Then("I should see a \".govuk-error-message\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 12
- testRunner.Then("I fill in page1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I enter \"sk11aa\" in \"address-postcode\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 13
  testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 14
  testRunner.Then("I should see a \".govuk-back-link\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 15
- testRunner.Then("I should see the \"customersaddresswithtitle-address\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see the \"address-address\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 16
- testRunner.Then("I should see \"3 addresses found\" is selected in \"customersaddresswithtitle-addres" +
-                    "s\" dropdown with the value \"\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see \"3 addresses found\" is selected in \"address-address\" dropdown with t" +
+                    "he value \"\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 17
  testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 18
  testRunner.Then("I should see a \".govuk-error-message\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 19
- testRunner.Then("I select \"address 2\" in \"customersaddresswithtitle-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I select \"address 2\" in \"address-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 20
- testRunner.Then("I should see \"address 2\" is selected in \"customersaddresswithtitle-address\" dropd" +
-                    "own with the value \"098765432109|address 2\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see \"address 2\" is selected in \"address-address\" dropdown with the value" +
+                    " \"098765432109|address 2\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Address element optional no address selected", SourceLine=21)]
-        public virtual void AddressElementOptionalNoAddressSelected()
+        [TechTalk.SpecRun.ScenarioAttribute("Address element optional address selected", SourceLine=21)]
+        public virtual void AddressElementOptionalAddressSelected()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Address element optional no address selected", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Address element optional address selected", null, ((string[])(null)));
 #line 22
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 23
  testRunner.Given("I navigate to \"/address/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 24
- testRunner.Then("I fill in page1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I enter \"sk11aa\" in \"address-postcode\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 25
  testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 26
- testRunner.Then("I should see the \"customersaddresswithtitle-address\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see the \"address-address\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 27
- testRunner.Then("I select \"address 2\" in \"customersaddresswithtitle-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I select \"address 2\" in \"address-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 28
  testRunner.And("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 29
  testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 30
- testRunner.Then("I fill in page2", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I enter \"sk11aa\" in \"addressopt-postcode\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 31
- testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 32
- testRunner.Then("I should see the \"customersaddressnotitle-address\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 33
- testRunner.Then("I select \"address 2\" in \"customersaddressnotitle-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 34
  testRunner.And("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 32
+ testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 33
+ testRunner.And("I select \"address 2\" in \"addressopt-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 34
+ testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 35
  testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 36
- testRunner.Then("I fill in page3", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see a \"dt\" element with \"address-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 37
- testRunner.And("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"dt\" element with \"address-address-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 38
- testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see a \"dt\" element with \"addressopt-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 39
- testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 40
- testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 41
- testRunner.Then("I should see a \"dt\" element with \"customersaddresswithtitle-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 42
- testRunner.And("I should see a \"dt\" element with \"customersaddresswithtitle-address-description\" " +
-                    "text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 43
- testRunner.And("I should see a \"dt\" element with \"optionaladdress-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            this.ScenarioCleanup();
-        }
-        
-        [TechTalk.SpecRun.ScenarioAttribute("Address element optional address selected", SourceLine=44)]
-        public virtual void AddressElementOptionalAddressSelected()
-        {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Address element optional address selected", null, ((string[])(null)));
-#line 45
-this.ScenarioInitialize(scenarioInfo);
-            this.ScenarioStart();
-#line 46
- testRunner.Given("I navigate to \"/address/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 47
- testRunner.Then("I fill in page1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 48
- testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 49
- testRunner.Then("I should see the \"customersaddresswithtitle-address\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 50
- testRunner.Then("I select \"address 2\" in \"customersaddresswithtitle-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 51
- testRunner.And("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 52
- testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 53
- testRunner.Then("I fill in page2", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 54
- testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 55
- testRunner.Then("I should see the \"customersaddressnotitle-address\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 56
- testRunner.Then("I select \"address 2\" in \"customersaddressnotitle-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 57
- testRunner.And("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 58
- testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 59
- testRunner.Then("I fill in page3", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 60
- testRunner.And("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 61
- testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 62
- testRunner.And("I select \"address 2\" in \"optionaladdress-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 63
- testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 64
- testRunner.And("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 65
- testRunner.Then("I should see a \"dt\" element with \"customersaddresswithtitle-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 66
- testRunner.And("I should see a \"dt\" element with \"customersaddresswithtitle-address-description\" " +
-                    "text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 67
- testRunner.And("I should see a \"dt\" element with \"optionaladdress-address\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 68
- testRunner.And("I should see a \"dt\" element with \"optionaladdress-address-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            this.ScenarioCleanup();
-        }
-        
-        [TechTalk.SpecRun.ScenarioAttribute("Validation message should apear if I Enter Invalid Postcode", SourceLine=69)]
-        public virtual void ValidationMessageShouldApearIfIEnterInvalidPostcode()
-        {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Validation message should apear if I Enter Invalid Postcode", null, ((string[])(null)));
-#line 70
-this.ScenarioInitialize(scenarioInfo);
-            this.ScenarioStart();
-#line 71
- testRunner.Given("I navigate to \"/address/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 72
- testRunner.When("I fill in page1 with invalid postcode", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 73
- testRunner.Then("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 74
- testRunner.Then("I should see a validation message for \"customersaddresswithtitle-postcode-error\" " +
-                    "input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("I should see a \"dt\" element with \"addressopt-address-description\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();
         }
