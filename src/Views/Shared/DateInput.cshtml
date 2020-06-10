@@ -4,6 +4,16 @@
     var maxYear = DateTime.Now.Year + 100;
     var inputClassesShort = "govuk-input govuk-date-input__input govuk-input--width-2";
     var inputClassesLong = "govuk-input govuk-date-input__input govuk-input--width-4";
+    var labelClasses = "govuk-label";
+    if (Model.Properties.StrongLabel)
+    {
+        labelClasses += " govuk-label--s";
+    }
+    else
+    {
+        labelClasses += " govuk-date-input__label";
+    }
+
     if (!Model.IsValid)
     {
         inputClassesShort += " govuk-input--error";
@@ -23,7 +33,7 @@
     <div class="govuk-date-input">
         <div class="govuk-date-input__item">
             <div class="govuk-form-group">
-                <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("day")>
+                <label class="@labelClasses" for=@Model.GetCustomItemId("day")>
                     Day
                 </label>
                 @Html.TextBox(Model.GetCustomItemId("day"), Model.Properties.Day, new { autocomplete = "bday-day", maxlength = "2", type = "number", @class = inputClassesShort })
@@ -32,7 +42,7 @@
 
         <div class="govuk-date-input__item">
             <div class="govuk-form-group">
-                <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("month")>
+                <label class="@labelClasses" for=@Model.GetCustomItemId("month")>
                     Month
                 </label>
                 @Html.TextBox(Model.GetCustomItemId("month"), Model.Properties.Month, new { autocomplete = "bday-month", maxlength = "2", type = "number", @class = inputClassesShort })
@@ -41,7 +51,7 @@
 
         <div class="govuk-date-input__item">
             <div class="govuk-form-group">
-                <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("year")>
+                <label class="@labelClasses" for=@Model.GetCustomItemId("year")>
                     Year
                 </label>
                 @Html.TextBox(Model.GetCustomItemId("year"), Model.Properties.Year, new { autocomplete = "bday-year", maxlength = "4", type = "number", @class= inputClassesLong, max = maxYear })
