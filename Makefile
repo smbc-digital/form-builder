@@ -1,5 +1,3 @@
-CUR_DIR = $(CURDIR)
-
 .PHONY: help
 help:
 	@cat ./MakefileHelp
