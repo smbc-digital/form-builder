@@ -12,5 +12,7 @@ namespace form_builder.Services.PageService.Entities
         public string FormName { get; set; }
         public string StartFormUrl { get; set; }
         public string PageTitle { get; set; }
+        public string BannerTitle { get; set; }
+        public string LeadingParagraph { get; set; }
     }
 }

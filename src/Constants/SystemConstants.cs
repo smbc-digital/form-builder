@@ -10,6 +10,8 @@ namespace form_builder.Constants
 
         public static readonly string NextStepButtonText = "Continue";
 
+        public static readonly string SubmitButtonText = "Submit";
+
         public static readonly string AddressSearchButtonText = "Find address";
     }
 }
