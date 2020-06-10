@@ -49,7 +49,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 }
             });
 
-            Assert.IsType<Select>(result);
+            Assert.IsType<FormSchema>(result);
             Assert.Single(result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.Options);
             _TransformDataProvider.Verify(_ => _.Get<List<Option>>(It.Is<string>(x => x == "lookup")), Times.Once);
         }
@@ -65,7 +65,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .WithQuestionId("testid")
                 .Build();
 
-            var result = await Assert.ThrowsAsync<Exception>(() => LookupSchemaTransformFactory.Transform(new FormSchema(){
+            var result = await Assert.ThrowsAsync<AggregateException>(() => LookupSchemaTransformFactory.Transform(new FormSchema(){
                 Pages = new List<Page>{
                     new Page()
                     {
@@ -77,7 +77,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 }
             }));
 
-            Assert.Equal($"LookupSchemaTransformFactory::Build, No lookup options found for question {element.Properties.QuestionId} with lookup value {element.Lookup}", result.Message);
+            Assert.Equal($"LookupSchemaTransformFactory::Build, No lookup options found for question {element.Properties.QuestionId} with lookup value {element.Lookup}", result.InnerException.Message);
         }
 
         [Fact]

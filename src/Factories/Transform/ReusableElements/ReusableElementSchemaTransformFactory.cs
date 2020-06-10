@@ -94,6 +94,11 @@ namespace form_builder.Factories.Transform.ReusableElements
 
         public FormSchema ApplyReusableElementSubstitutions(FormSchema formSchema, IEnumerable<ElementSubstitutionRecord> substitutions)
         {
+            if(!substitutions.Any())
+            {
+                return formSchema;
+            }
+            
             substitutions
                 .ToList()
                 .ForEach(substitution => formSchema
