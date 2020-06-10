@@ -1,16 +1,15 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
-using form_builder.Enum;
-using System.Threading.Tasks;
-using System;
-using form_builder.Services.PageService;
+﻿using form_builder.Enum;
 using form_builder.Extensions;
-using form_builder.Services.FileUploadService;
-using form_builder.Workflows;
-using Microsoft.EntityFrameworkCore.Internal;
 using form_builder.Models;
+using form_builder.Services.FileUploadService;
+using form_builder.Services.PageService;
+using form_builder.Workflows;
 using Microsoft.AspNetCore.Hosting;
-using form_builder.Constants;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace form_builder.Controllers
 {
@@ -50,17 +49,18 @@ namespace form_builder.Controllers
         [Route("{form}")]
         [Route("{form}/{path}")]
         [Route("{form}/{path}/{subPath}")]
-        public async Task<IActionResult> Index(string form, string path, string subPath = "")
+        public async Task<IActionResult> Index(
+            string form,
+            string path,
+            string subPath = "")
         {
             var response = await _pageService.ProcessPage(form, path, subPath);
             if (response.ShouldRedirect)
-            {
                 return RedirectToAction("Index", new
                 {
                     path = response.TargetPage,
                     form
                 });
-            }
 
             return View(response.ViewName, response.ViewModel);
         }

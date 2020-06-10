@@ -8,20 +8,17 @@ using form_builder.Models.Elements;
 using form_builder.Models.Properties;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
-using form_builder.Services.PageService.Entities;
+using form_builder.Services.FileUploadService;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using form_builder.Services.FileUploadService;
 
 namespace form_builder.Helpers.PageHelpers
 {
@@ -82,14 +79,11 @@ namespace form_builder.Helpers.PageHelpers
             FormBuilderViewModel formModel = new FormBuilderViewModel();
             
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
-            {
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
-            }
 
             formModel.FeedbackForm = baseForm.FeedbackForm;
 
             foreach (var element in page.Elements)
-            {
                 formModel.RawHTML += await element.RenderAsync(
                     _viewRender,
                     _elementHelper,
@@ -99,7 +93,6 @@ namespace form_builder.Helpers.PageHelpers
                     baseForm,
                     _enviroment,
                     results);
-            }
 
             return formModel;
         }
