@@ -216,16 +216,29 @@ namespace form_builder_tests.UnitTests.Extensions
         {
             var formAnswers = new FormAnswers
             {
+                FormName = "test",
                 Pages = new List<PageAnswers>
                 {
                     new PageAnswers
                     {
-                        Answers = new List<Answers>(),
-                        PageSlug = "page-1"
+                        PageSlug = "page-1",
+                        Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                QuestionId = "test1"
+                            }
+                        }
                     },
                     new PageAnswers
                     {
-                        Answers = new List<Answers>(),
+                        Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                QuestionId = "test"
+                            }
+                        },
                         PageSlug = "page-2"
                     }
                 }
