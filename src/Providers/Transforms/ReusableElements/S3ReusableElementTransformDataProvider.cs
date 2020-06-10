@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Amazon.S3;
 using form_builder.Extensions;
 using form_builder.Gateways;
+using form_builder.Models.Elements;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -26,7 +27,7 @@ namespace form_builder.Providers.Transforms.ReusableElements
             _configuration = configuration;
         }
 
-        public async Task<T> Get<T>(string schemaName)
+        public async Task<IElement> Get(string schemaName)
         {
             try
             {
@@ -36,17 +37,17 @@ namespace form_builder.Providers.Transforms.ReusableElements
                 using (StreamReader reader = new StreamReader(responseStream))
                 {
                     var responseBody = reader.ReadToEnd();
-                    return JsonConvert.DeserializeObject<T>(responseBody);
+                    return JsonConvert.DeserializeObject<Element>(responseBody);
                 }
             }
             catch (AmazonS3Exception e)
             {
-                var ex = new Exception($"S3TransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_enviroment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName} ", e);
+                var ex = new Exception($"S3ReusableElementTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_enviroment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName} ", e);
                 throw ex;
             }
             catch (Exception e)
             {
-                var ex = new Exception($"S3TransformDataProvider: An error has occured while attempting to deserialise object, Exception: {e.Message}", e);
+                var ex = new Exception($"S3ReusableElementTransformDataProvider: An error has occured while attempting to deserialise object, Exception: {e.Message}", e);
                 throw ex;
             }
         }

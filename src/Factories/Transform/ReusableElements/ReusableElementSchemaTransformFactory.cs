@@ -58,33 +58,38 @@ namespace form_builder.Factories.Transform.ReusableElements
 
         private async Task<IElement> CreateSubstituteRecord(IElement entry)
         {
-            var elementRef = ((Reusable)entry).ElementRef;
-            var substituteElement = await _reusableElementTransformDataProvider.Get<IElement>(elementRef);
+            var resuableElement = (Reusable)entry;
 
-            if(string.IsNullOrEmpty(entry.Properties.QuestionId))
+            if(string.IsNullOrEmpty(resuableElement.Properties.QuestionId))
             {
-                throw new Exception($"ReusableElementSchemaTransformFactory::TransformElement, no question ID was specified");
+                throw new Exception($"ReusableElementSchemaTransformFactory::CreateSubstituteRecord, no question ID was specified");
             }
+            
+            if(string.IsNullOrEmpty(resuableElement.ElementRef))
+            {
+                throw new Exception($"ReusableElementSchemaTransformFactory::CreateSubstituteRecord, no resusable element reference ID was specified");
+            }
+            
+            var substituteElement = await _reusableElementTransformDataProvider.Get(resuableElement.ElementRef);
 
             if(substituteElement == null)
             {
-                throw new Exception($"ReusableElementSchemaTransformFactory::TransformElement, No subsitute element could be created for question {entry.Properties.QuestionId}");
+                throw new Exception($"ReusableElementSchemaTransformFactory::CreateSubstituteRecord, No subsitute element could be created for question {resuableElement.Properties.QuestionId}");
             }   
 
-            substituteElement.Properties.QuestionId = entry.Properties.QuestionId;
+            substituteElement.Properties.QuestionId = resuableElement.Properties.QuestionId;
 
             if(!string.IsNullOrEmpty(entry.Properties.TargetMapping))
             {
-                substituteElement.Properties.TargetMapping = entry.Properties.TargetMapping;
+                substituteElement.Properties.TargetMapping = resuableElement.Properties.TargetMapping;
             }
             
-            if(entry.Properties.Optional)
+            if(resuableElement.Properties.Optional)
             {
                 substituteElement.Properties.Optional = true;            
             }
 
-            entry = substituteElement;
-            return entry;
+            return substituteElement;
         }
 
         public FormSchema ApplyReusableElementSubstitutions(FormSchema formSchema, IEnumerable<ElementSubstitutionRecord> substitutions)

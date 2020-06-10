@@ -41,12 +41,12 @@ namespace form_builder.Providers.Transforms.Lookups
             }
             catch (AmazonS3Exception e)
             {
-                var ex = new Exception($"S3TransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_enviroment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName} ", e);
+                var ex = new Exception($"S3LookupTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_enviroment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName} ", e);
                 throw ex;
             }
             catch (Exception e)
             {
-                var ex = new Exception($"S3TransformDataProvider: An error has occured while attempting to deserialise object, Exception: {e.Message}", e);
+                var ex = new Exception($"S3LookupTransformDataProvider: An error has occured while attempting to deserialise object, Exception: {e.Message}", e);
                 throw ex;
             }
         }

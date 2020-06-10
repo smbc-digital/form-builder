@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
+using form_builder.Models.Elements;
 
 namespace form_builder.Providers.Transforms.ReusableElements
 {
     public interface IReusableElementTransformDataProvider
     {
-        Task<T> Get<T>(string schemaName);
+        Task<IElement> Get(string schemaName);
     }
 }

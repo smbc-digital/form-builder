@@ -12,7 +12,7 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.Providers.TransformDataProvider
 {
-    public class S3TransformDataProviderTests
+    public class S3LookupTransformDataProviderTests
     {
         private readonly S3LookupTransformDataProvider _s3TransformProvider;
         private readonly Mock<IS3Gateway> _mockS3gateway = new Mock<IS3Gateway>();
@@ -21,7 +21,7 @@ namespace form_builder_tests.UnitTests.Providers.TransformDataProvider
 
         private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
 
-        public S3TransformDataProviderTests()
+        public S3LookupTransformDataProviderTests()
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("uitest");
             _mockConfiguration.Setup(_ => _["S3BucketKey"]).Returns("forms-storage");
@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Providers.TransformDataProvider
 
             var result = await Assert.ThrowsAsync<Exception>(() => _s3TransformProvider.Get<string>("name"));
             _mockS3gateway.Verify(_ => _.GetObject(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            Assert.StartsWith("S3TransformDataProvider: An error has occured while attempting to get S3 Object, Exception:", result.Message);
+            Assert.StartsWith("S3LookupTransformDataProvider: An error has occured while attempting to get S3 Object, Exception:", result.Message);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace form_builder_tests.UnitTests.Providers.TransformDataProvider
 
             var result = await Assert.ThrowsAsync<Exception>(() => _s3TransformProvider.Get<string>("name"));
             _mockS3gateway.Verify(_ => _.GetObject(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            Assert.StartsWith("S3TransformDataProvider: An error has occured while attempting to deserialise object, Exception:", result.Message);
+            Assert.StartsWith("S3LookupTransformDataProvider: An error has occured while attempting to deserialise object, Exception:", result.Message);
         }
     }
 }
