@@ -1,4 +1,5 @@
-﻿using form_builder.Models;
+﻿using form_builder.Builders;
+using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using form_builder.Enum;
+using form_builder.Mappers;
 
 namespace form_builder.Helpers.ElementHelpers
 {
@@ -25,14 +27,18 @@ namespace form_builder.Helpers.ElementHelpers
         bool CheckForProvider(Element element);
         object GetFormDataValue(string guid, string key);
         FormAnswers GetFormData(string guid);
+        List <PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema);
     }
 
     public class ElementHelper : IElementHelper
     {
         private readonly IDistributedCacheWrapper _distributedCache;
-        public ElementHelper(IDistributedCacheWrapper distributedCacheWrapper)
+        private readonly IElementMapper _elementMapper;
+        public ElementHelper(IDistributedCacheWrapper distributedCacheWrapper, IElementMapper elementMapper)
         {
             _distributedCache = distributedCacheWrapper;
+            _elementMapper = elementMapper;
+
         }
 
         public string CurrentValue(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
@@ -209,6 +215,43 @@ namespace form_builder.Helpers.ElementHelpers
             }
 
             return convertedAnswers;
+        }
+
+        public List<PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema)
+        {
+            var formAnswers = GetFormData(guid);
+            var FormSummary = new List<PageSummary>();
+
+           var pages = formSchema.Pages.ToList();
+
+            foreach (var page in pages)
+            {
+
+                var pSummary = new PageSummary();
+                pSummary.PageTitle = page.Title;
+                pSummary.PageSlug = page.PageSlug;
+
+                var summaryBuilder = new SummaryDictionaryBuilder();
+
+                var formSchemaQuestions = page.ValidatableElements
+                    .Where(_ => _ != null)                    
+                    .ToList();
+
+                if(formSchemaQuestions.Count() ==  0)
+                {
+                    continue;
+                }
+
+                formSchemaQuestions.ForEach((question) => {
+                    var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
+
+                    summaryBuilder.Add(question.GetLabelText(), answer, question.Type);
+                });
+                pSummary.Answers = summaryBuilder.Build();
+
+                FormSummary.Add(pSummary);
+            }
+            return FormSummary;
         }
     }
 }
