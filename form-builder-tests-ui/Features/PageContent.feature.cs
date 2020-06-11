@@ -80,7 +80,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 6
  testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 7
- testRunner.Then("I should see a \"h1\" element with \"This is a H1\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("I should see a \"h1\" element with \"This is a H1\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 8
  testRunner.And("I should see a \"h2\" element with \"This is a H2\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 9
@@ -101,7 +101,8 @@ this.ScenarioInitialize(scenarioInfo);
 #line 16
  testRunner.And("I should see an img element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 17
- testRunner.And("I should see a strong element within a p tag", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I should see an inline alert element with label \"Inline alert with additional tex" +
+                    "t\" and text \"This is some text\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 18
  testRunner.And("I should see a link element within a p tag", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
