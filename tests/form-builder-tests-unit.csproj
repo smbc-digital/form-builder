@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>form_builder_tests</RootNamespace>
+    <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
