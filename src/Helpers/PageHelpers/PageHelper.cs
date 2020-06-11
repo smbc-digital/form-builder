@@ -362,7 +362,6 @@ namespace form_builder.Helpers.PageHelpers
             }
             convertedAnswers.FormData.Add(key, value);
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
-
         }
 
         public void CheckForDocumentDownload(FormSchema formSchema)

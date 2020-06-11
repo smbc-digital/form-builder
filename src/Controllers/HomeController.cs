@@ -76,7 +76,7 @@ namespace form_builder.Controllers
             IEnumerable<CustomFormFile> fileUpload,
             string subPath = "")
         {
-            var viewModel = formData.ToNormaliseDictionary();
+            var viewModel = formData.ToNormaliseDictionary(subPath);
 
             if(fileUpload != null && fileUpload.Any())
                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);

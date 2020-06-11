@@ -180,8 +180,6 @@ namespace form_builder.Services.PageService
             if (currentPage == null)
                 throw new NullReferenceException($"Current page '{path}' object could not be found.");
 
-            // used in the validators for validating lookup pages
-            viewModel[LookUpConstants.SubPathViewModelKey] = subPath; 
             currentPage.Validate(viewModel, _validators);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
