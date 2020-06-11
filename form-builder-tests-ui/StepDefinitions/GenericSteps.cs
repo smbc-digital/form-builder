@@ -48,8 +48,6 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then("I should see the footer")]
         public void ThenIShouldSeeTheFooterSection()
         {
-            var webDriver = BrowserSession.Native as IWebDriver;
-
             Assert.True(BrowserSession.FindCss(".smbc-footer").Exists());
         }
 

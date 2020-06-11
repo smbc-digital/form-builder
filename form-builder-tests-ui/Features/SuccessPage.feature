@@ -13,5 +13,5 @@ Scenario: Success page standard use
 	Then I should see a ".govuk-panel__body" html element
     And I should see a "h1" element with "Application complete" text
 	And I should see a "div" element with "Some additional information" text
-    Then I should see a "h2" element with "What happens next" text
+	Then I should see a "h2" element with "What happens next" text
     Then I should see a "p" element with "We will contact you shortly to confirm if your request has been accepted." text
