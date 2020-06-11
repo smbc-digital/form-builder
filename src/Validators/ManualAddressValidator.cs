@@ -1,7 +1,7 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators
@@ -13,16 +13,13 @@ namespace form_builder.Validators
 
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-
-            if (element.Type != EElementType.AddressManual)
+            if (!(element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
                 {
                     IsValid = true
                 };
             }
-
-           
 
             var valueAddressLine1 = viewModel.ContainsKey($"{element.Properties.QuestionId}-AddressManualAddressLine1")
                  ? viewModel[$"{element.Properties.QuestionId}-AddressManualAddressLine1"]
@@ -31,8 +28,6 @@ namespace form_builder.Validators
             var addressLine1Valid = !string.IsNullOrEmpty(valueAddressLine1);
 
             var addressLine1Message = addressLine1Valid ? string.Empty : "Please enter Address Line 1";
-
-
 
             var valueAddressTown = viewModel.ContainsKey($"{element.Properties.QuestionId}-AddressManualAddressTown")
                 ? viewModel[$"{element.Properties.QuestionId}-AddressManualAddressTown"]

@@ -9,12 +9,6 @@ namespace form_builder.ViewModels
 
         public string FeedbackForm { get; set; }
 
-        public string AddressStatus { get; set; }
-
-        public string StreetStatus { get; set; }
-
-        public string OrganisationStatus { get; set; }
-
         public string FormName { get; set; }
 
         public string BaseURL { get; set; }

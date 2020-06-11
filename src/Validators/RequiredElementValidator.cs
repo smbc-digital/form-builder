@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using form_builder.Enum;
 using form_builder.Models.Elements;
 using form_builder.Models;
+using form_builder.Constants;
+using form_builder.Extensions;
 
 namespace form_builder.Validators
 {
@@ -11,8 +13,8 @@ namespace form_builder.Validators
         {
 
             if (element.Type == EElementType.DateInput || element.Type == EElementType.TimeInput ||
-                element.Type == EElementType.AddressManual || element.Type == EElementType.DatePicker ||
-                element.Properties.Optional)
+                element.Type == EElementType.DatePicker || element.Properties.Optional 
+                || (element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
                 {
@@ -36,7 +38,7 @@ namespace form_builder.Validators
 
             if (element.Type == EElementType.Address)
             {
-                if (viewModel.ContainsKey("AddressStatus") &&viewModel["AddressStatus"] == "Select")
+                if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-address";
                     validationMessage = "Check the " + element.Properties.AddressLabel.ToLower() + " and try again";
@@ -50,7 +52,7 @@ namespace form_builder.Validators
 
             if (element.Type == EElementType.Street)
             {
-                if (viewModel["StreetStatus"] == "Select")
+                if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-streetaddress";
                     validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
@@ -64,7 +66,7 @@ namespace form_builder.Validators
 
             if (element.Type == EElementType.Organisation)
             {
-                if (viewModel["OrganisationStatus"] == "Select")
+                if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-organisation";
                     validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";

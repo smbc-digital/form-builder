@@ -1,11 +1,11 @@
-﻿using form_builder.Helpers;
+﻿using form_builder.Constants;
+using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Moq;
-using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
@@ -45,7 +45,14 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(
+                _mockIViewRender.Object,
+                _mockElementHelper.Object,
+                "",
+                viewModel,
+                page,
+                schema,
+                _mockHostingEnv.Object);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<ElementViewModel>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -64,14 +71,23 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("AddressStatus", "Select");
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .Build();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(
+                _mockIViewRender.Object,
+                _mockElementHelper.Object,
+                "",
+                
+                viewModel,
+                page,
+                schema,
+                _mockHostingEnv.Object,
+                new List<object>());
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"),It.IsAny<Tuple<ElementViewModel, List<SelectListItem>>>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -103,6 +119,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("AddressStatus", "Select");
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -110,7 +127,15 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object,
+                _mockElementHelper.Object,
+                "",
+                
+                viewModel,
+                page,
+                schema,
+                _mockHostingEnv.Object,
+                new List<object>());
 
             //Assert
             Assert.Equal($"/{baseUrl}/{pageSlug}", callback.Item1.ReturnURL);

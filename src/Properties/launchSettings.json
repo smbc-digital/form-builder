@@ -16,7 +16,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "multi-agency-option1",
+      "launchUrl": "address-picker",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       }

@@ -1,12 +1,15 @@
 using System.Collections.Generic;
+using form_builder.Constants;
 
 namespace form_builder.Extensions
 {
     public static class DictionaryExtensions
     {
-        public static Dictionary<string,object> ToNormaliseDictionary(this Dictionary<string, string[]> formData)
+        public static Dictionary<string,object> ToNormaliseDictionary(this Dictionary<string, string[]> formData, string subPath)
         {
             var normalisedFormData = new Dictionary<string, dynamic>();
+            normalisedFormData.Add(LookUpConstants.SubPathViewModelKey, subPath);
+            
             foreach (var item in formData)
             {
                 if (item.Key.EndsWith("-fileupload"))

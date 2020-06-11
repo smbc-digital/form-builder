@@ -40,6 +40,7 @@ using form_builder.Providers.Street;
 using form_builder.Providers.TransformDataProvider;
 using form_builder.Factories.Schema;
 using form_builder.Factories.Transform;
+using form_builder.Models.Elements;
 
 namespace form_builder.Extensions
 {
