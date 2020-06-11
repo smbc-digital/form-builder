@@ -16,3 +16,4 @@ Scenario: Render information on the page correctly
 	And I should see an img element
 	And I should see an inline alert element with label "Inline alert with additional text" and text "This is some text"
 	And I should see a link element within a p tag
+	And I should see the footer
