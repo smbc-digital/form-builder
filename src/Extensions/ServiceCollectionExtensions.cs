@@ -247,9 +247,6 @@ namespace form_builder.Extensions
                     break;
             }
 
-            services.AddDataProtection().SetApplicationName("formbulder-v2");
-
-
             services.AddSingleton<IDistributedCacheWrapper, DistributedCacheWrapper>();
             return services;
         }
