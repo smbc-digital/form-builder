@@ -14,14 +14,19 @@ using form_builder.Extensions;
 using form_builder.Helpers.Session;
 using form_builder.Services.MappingService;
 using Microsoft.AspNetCore.Hosting;
+using form_builder.Services.MappingService.Entities;
+using Amazon.S3.Model;
+using Newtonsoft.Json;
 
 namespace form_builder.Services.PayService
 {
     public interface IPayService
     {
         Task<string> ProcessPayment(string form, string path, string reference, string sessionGuid);
+        Task<string> ProcessPayment(MappingEntity mappingEntity, string form, string path, string reference, string sessionGuid);
         Task<string> ProcessPaymentResponse(string form, string responseCode, string reference);
         Task<PaymentInformation> GetFormPaymentInformation(string form);
+        Task<PaymentInformation> GetFormPaymentInformation(MappingEntity mappingEntity, string form);
     }
 
     public class PayService : IPayService
@@ -53,6 +58,13 @@ namespace form_builder.Services.PayService
         public async Task<string> ProcessPayment(string form, string path, string reference, string sessionGuid)
         {
             var paymentInformation = await GetFormPaymentInformation(form);
+            var paymentProvider = GetFormPaymentProvider(paymentInformation);
+
+            return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, paymentInformation);
+        }
+        public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string sessionGuid)
+        {
+            var paymentInformation = await GetFormPaymentInformation(formData, form);
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
             return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, paymentInformation);
@@ -114,6 +126,42 @@ namespace form_builder.Services.PayService
             }
 
             return paymentInfo;
+        }
+
+        public async Task<PaymentInformation> GetFormPaymentInformation(MappingEntity formData, string form)
+        {
+            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_hostingEnvironment.EnvironmentName}", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
+
+            var paymentInfo = paymentInformation.Select(x => x)
+               .Where(c => c.FormName == form)
+               .FirstOrDefault();
+
+            if (paymentInfo == null)
+            {
+                throw new ApplicationException($"PayService:: No payment information found for {form}");
+            }
+
+            paymentInfo.Settings.Amount = await CalculateAmountAsync(formData, paymentInfo);
+
+            return paymentInfo;
+        }
+
+        private async Task<string> CalculateAmountAsync(MappingEntity formData, PaymentInformation paymentInfo)
+        {
+            var currentPage = formData.BaseForm.GetPage(formData.FormAnswers.Path);
+            var postUrl = currentPage.GetSubmitFormEndpoint(formData.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
+            _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
+            var response = await _gateway.PostAsync(postUrl.CalculateCostUrl, formData);
+            var reference = string.Empty;
+            if (response.Content != null)
+            {
+                var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
+                reference = JsonConvert.DeserializeObject<string>(content);
+
+            }
+            //return reference;
+
+            return reference;
         }
 
         private IPaymentProvider GetFormPaymentProvider(PaymentInformation paymentInfo)
