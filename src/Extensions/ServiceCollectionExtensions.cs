@@ -239,11 +239,11 @@ namespace form_builder.Extensions
                     break;
 
                 case "Application":
-                    services.AddDistributedMemoryCache();
+                    services.AddDistributedMemoryCache().AddDataProtection().SetApplicationName("formbulder-v2");;
                     break;
 
                 default:
-                    services.AddDistributedMemoryCache();
+                    services.AddDistributedMemoryCache().AddDataProtection().SetApplicationName("formbulder-v2");
                     break;
             }
 
