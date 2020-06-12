@@ -92,7 +92,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 15
  testRunner.And("I should see a \"div\" element with \"Some additional information\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 16
-    testRunner.Then("I should see a \"h2\" element with \"What happens next\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see a \"h2\" element with \"What happens next\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 17
     testRunner.Then("I should see a \"p\" element with \"We will contact you shortly to confirm if your r" +
                     "equest has been accepted.\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
