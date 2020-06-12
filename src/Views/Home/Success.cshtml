@@ -8,22 +8,16 @@
 }
 
 <div class="smbc-panel smbc-panel--confirmation">
-    <h1 class="govuk-panel__title">
-        @Model.BannerTitle
-    </h1>
+    <h1 class="govuk-panel__title">@Model.BannerTitle</h1>
 
     @if (!string.IsNullOrEmpty(Model.LeadingParagraph))
     {
-        <div class="govuk-body-l">
-            @Model.LeadingParagraph
-        </div>
+        <div class="govuk-body-l">@Model.LeadingParagraph</div>
     }
 
     @if (!string.IsNullOrWhiteSpace(Model.Reference))
     {
-        <div class="govuk-panel__body">
-            Your reference number is: <strong>@Html.Raw(Model.Reference)</strong>
-        </div>
+        <div class="govuk-panel__body">Your reference number is: <strong>@Html.Raw(Model.Reference)</strong></div>
     }
 </div>
 
