@@ -13,6 +13,7 @@
         public string Reference { get; set; }
 
         public string StartFormUrl { get; set; }
-        
+
+        public bool HideBackButton { get; set; } = true;
     }
 }
