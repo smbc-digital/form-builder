@@ -50,7 +50,10 @@ namespace form_builder
                 .AddServices()
                 .AddWorkflows()
                 .AddFactories()
-                .AddSession(_ => _.IdleTimeout = TimeSpan.FromMinutes(30));
+                .AddSession(_ => {
+                    _.IdleTimeout = TimeSpan.FromMinutes(30);
+                    _.Cookie.Path = "/";
+                });
 
             services.AddTransient<ICache, Cache.Cache>();
             services.Configure<SubmissionServiceConfiguration>(Configuration.GetSection("SubmissionServiceConfiguration"));
