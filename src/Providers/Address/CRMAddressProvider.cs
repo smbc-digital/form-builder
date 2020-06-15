@@ -23,7 +23,7 @@ namespace form_builder.Providers.Address
         {
             var response = await _verintServiceGateway.SearchForPropertyByPostcode(streetOrPostcode);
 
-            _logger.LogInformation(Newtonsoft.Json.JsonConvert.SerializeObject(response));
+            _logger.LogDebug(Newtonsoft.Json.JsonConvert.SerializeObject(response));
 
             return response.ResponseContent ?? new List<AddressSearchResult>();
         }
