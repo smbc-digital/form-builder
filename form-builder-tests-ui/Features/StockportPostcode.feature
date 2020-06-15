@@ -10,7 +10,6 @@ Scenario: Postcode validation standard use
 	Then I fill in page1 with wrong postcode
 	Then I click the "nextStep" button
 	Then I should see a validation error with an id "stockportpostcode-error" with "Stockport postcode must be a valid postcode" text
-	Then I fill in page1 with wrong postcode
 	Then I fill in page1 with good postcode
 	Then I click the "nextStep" button
 	

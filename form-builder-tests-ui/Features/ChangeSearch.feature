@@ -3,7 +3,7 @@ Feature: ChangeSearch
 	In order to collect address information I have to navigate to Page1
 
 Scenario: Address element standard use
-	Given I navigate to "/address/page1"
+	Given I navigate to "/ui-address/page1"
 	Then I should see the header
 	And I should see the "address-postcode" input
 	Then I enter "sk11aa" in "address-postcode"
