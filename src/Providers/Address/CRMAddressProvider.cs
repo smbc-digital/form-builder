@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using StockportGovUK.NetStandard.Gateways.VerintServiceGateway;
 using StockportGovUK.NetStandard.Models.Addresses;
 
@@ -10,16 +11,21 @@ namespace form_builder.Providers.Address
         public string ProviderName => "CRM";
 
         private readonly IVerintServiceGateway _verintServiceGateway;
+        private readonly ILogger<IAddressProvider> _logger;
 
-        public CRMAddressProvider(IVerintServiceGateway verintServiceGateway)
+        public CRMAddressProvider(IVerintServiceGateway verintServiceGateway, ILogger<IAddressProvider> logger)
         {
             _verintServiceGateway = verintServiceGateway;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string streetOrPostcode)
         {
             var response = await _verintServiceGateway.SearchForPropertyByPostcode(streetOrPostcode);
-            return response.ResponseContent;
+
+            _logger.LogInformation(Newtonsoft.Json.JsonConvert.SerializeObject(response));
+
+            return response.ResponseContent ?? new List<AddressSearchResult>();
         }
     }
 }
