@@ -83,13 +83,14 @@ namespace form_builder
             app.UseMiddleware<HeaderConfiguration>();
             app.UseSession();
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-            app.UseStaticFiles();
+
         }
     }
 }
