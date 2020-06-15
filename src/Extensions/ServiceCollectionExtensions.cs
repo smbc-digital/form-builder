@@ -247,7 +247,8 @@ namespace form_builder.Extensions
                     services.AddDistributedMemoryCache();
                     break;
             }
-
+            
+            services.AddDataProtection().SetApplicationName("formbuilder");
             services.AddSingleton<IDistributedCacheWrapper, DistributedCacheWrapper>();
             return services;
         }
