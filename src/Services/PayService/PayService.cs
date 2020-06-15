@@ -151,7 +151,7 @@ namespace form_builder.Services.PayService
             var currentPage = formData.BaseForm.GetPage(formData.FormAnswers.Path);
             var postUrl = currentPage.GetSubmitFormEndpoint(formData.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
-            var response = await _gateway.PostAsync(postUrl.CalculateCostUrl, formData);
+            var response = await _gateway.PostAsync(postUrl.CalculateCostUrl, formData.Data);
             var reference = string.Empty;
             if (response.Content != null)
             {
