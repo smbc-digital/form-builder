@@ -23,6 +23,7 @@ namespace form_builder.Providers.Address
         {
             var response = await _addressServiceGateway.SearchAsync(new AddressSearch { AddressProvider = EAddressProvider.CRM, SearchTerm = streetOrPostcode });
 
+            _logger.LogDebug($"**ServiceAddressProvider:SearchAsync, Searchterm: {Newtonsoft.Json.JsonConvert.SerializeObject(streetOrPostcode)}");
             _logger.LogDebug($"**ServiceAddressProvider:SearchAsync, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
 
             return response.ResponseContent;
