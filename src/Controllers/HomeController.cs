@@ -48,8 +48,7 @@ namespace form_builder.Controllers
         [HttpGet]
         [Route("{form}")]
         [Route("{form}/{path}")]
-        [Route("{form}/{path}/manual")]
-        [Route("{form}/{path}/automatic")]
+        [Route("{form}/{path}/{subPath}")]
         public async Task<IActionResult> Index(
             string form,
             string path,
@@ -69,8 +68,7 @@ namespace form_builder.Controllers
         [HttpPost]
         [Route("{form}")]
         [Route("{form}/{path}")]
-        [Route("{form}/{path}/manual")]
-        [Route("{form}/{path}/automatic")]
+        [Route("{form}/{path}/{subPath}")]
         public async Task<IActionResult> Index(
             string form,
             string path,
