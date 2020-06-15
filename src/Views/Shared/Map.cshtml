@@ -1,13 +1,10 @@
 ﻿@model form_builder.Models.Elements.Map
 
-@{
-    var mainLatest = Model.Properties.Source + "/main-latest.js";
-    var vendorLatest = Model.Properties.Source + "/vendor-latest.js";
-}
-
 <div id='root' class='leaflet-map'></div>
-<script type='text/javascript' src='@mainLatest'></script>
-<script type='text/javascript' src='@vendorLatest'></script>
+<script type='text/javascript' src='@Model.MainJSFile'></script>
+<script type='text/javascript' src='@Model.VendorJSFIle'></script>
 <noscript>
-    Phone the contact centre
+    <p class="smbc-body">
+        @Model.Properties.NoMapContent
+    </p>
 </noscript>

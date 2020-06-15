@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using form_builder.Enum;
-using form_builder.Helpers;
-using form_builder.Helpers.ElementHelpers;
-using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
+﻿using form_builder.Enum;
 
 namespace form_builder.Models.Elements
 {
     public class Map : Element
     {
+        public string MainJSFile => $"{Properties.Source}/main-latest.js";
+        public string VendorJSFIle => $"{Properties.Source}/vendor-latest.js";
         public Map()
         {
             Type = EElementType.Map;
