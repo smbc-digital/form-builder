@@ -86,13 +86,13 @@ this.ScenarioInitialize(scenarioInfo);
 #line 10
  testRunner.Then("I should not see the h1 element with page title text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 11
- testRunner.Then("I should see a legend element within a h1 tag with text \"Do you like things?\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see a h1 element within a legend tag with text \"Do you like things?\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 12
  testRunner.When("I click the \"radButtonHideShoww-0\" radiobutton", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 13
  testRunner.When("I click the \"nextPage\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 14
- testRunner.Then("I should see a legend element within a h1 tag with text \"Select your favorite fru" +
+ testRunner.Then("I should see a h1 element within a legend tag with text \"Select your favorite fru" +
                     "its\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();

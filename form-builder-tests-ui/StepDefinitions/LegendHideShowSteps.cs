@@ -28,7 +28,7 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.NotEqual("Page 2", theTitle);
         }
 
-        [Then(@"I should see a legend element within a h1 tag with text ""(.*)""")]
+        [Then(@"I should see a h1 element within a legend tag with text ""(.*)""")]
         public void ThenIShouldSeeAStrongElement(string expectedText)
         {
             var webDriver = BrowserSession.Native as IWebDriver;
