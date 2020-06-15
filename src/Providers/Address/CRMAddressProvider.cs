@@ -11,19 +11,15 @@ namespace form_builder.Providers.Address
         public string ProviderName => "CRM";
 
         private readonly IVerintServiceGateway _verintServiceGateway;
-        private readonly ILogger<IAddressProvider> _logger;
 
-        public CRMAddressProvider(IVerintServiceGateway verintServiceGateway, ILogger<IAddressProvider> logger)
+        public CRMAddressProvider(IVerintServiceGateway verintServiceGateway)
         {
             _verintServiceGateway = verintServiceGateway;
-            _logger = logger;
         }
 
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string streetOrPostcode)
         {
             var response = await _verintServiceGateway.SearchForPropertyByPostcode(streetOrPostcode);
-
-            _logger.LogDebug($"**CRMAddressProvider:SearchAsync, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
 
             return response.ResponseContent ?? new List<AddressSearchResult>();
         }
