@@ -13,18 +13,14 @@ namespace form_builder.Providers.Organisation
         public string ProviderName => "CRM";
 
         private readonly IOrganisationServiceGateway _organisationServiceGateway;
-        private readonly ILogger<ServiceOrganisationProvider> _logger;
 
-        public ServiceOrganisationProvider(IOrganisationServiceGateway organisationServiceGateway, ILogger<ServiceOrganisationProvider> logger)
+        public ServiceOrganisationProvider(IOrganisationServiceGateway organisationServiceGateway)
         {
             _organisationServiceGateway = organisationServiceGateway;
-            _logger = logger;
         }
         public async Task<IEnumerable<OrganisationSearchResult>> SearchAsync(string organisation)
         {
             var result = await _organisationServiceGateway.SearchAsync(new OrganisationSearch { OrganisationProvider = EOrganisationProvider.CRM, SearchTerm = organisation });
-
-            _logger.LogDebug(Newtonsoft.Json.JsonConvert.SerializeObject(result));
 
             return result.ResponseContent;
         }
