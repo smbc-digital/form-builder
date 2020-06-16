@@ -26,9 +26,9 @@ namespace form_builder.Models.Elements
             var htmlContent = new HtmlContentBuilder();
             var pages = elementHelper.GenerateQuestionAndAnswersList(guid, formSchema);
 
+            htmlContent.AppendHtmlLine("<dl class=\"govuk-summary-list govuk-!-margin-bottom-9\">");
             foreach (var pageSummary in pages)
-            { 
-                htmlContent.AppendHtmlLine("<dl class=\"govuk-summary-list govuk-!-margin-bottom-9\">");
+            {                 
                foreach (var answer in pageSummary.Answers)
                 {
                     htmlContent.AppendHtmlLine("<div class=\"govuk-summary-list__row\">");
@@ -41,10 +41,9 @@ namespace form_builder.Models.Elements
                     }
                     htmlContent.AppendHtmlLine("</div>");
                 }
-                htmlContent.AppendHtmlLine("</dl>");
-
             }
-           
+            htmlContent.AppendHtmlLine("</dl>");
+
             using (var writer = new StringWriter())
             {
                 htmlContent.WriteTo(writer, HtmlEncoder.Default);
