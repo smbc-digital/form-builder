@@ -33,7 +33,8 @@ namespace form_builder.Models.Elements
                 {
                     htmlContent.AppendHtmlLine("<div class=\"govuk-summary-list__row\">");
                     htmlContent.AppendHtmlLine($"<dt class=\"govuk-summary-list__key\">{answer.Key}</dt>");
-                    htmlContent.AppendHtmlLine($"<dd class=\"govuk-summary-list__value\">{answer.Value}</dd>");                    
+                    htmlContent.AppendHtmlLine($"<dd class=\"govuk-summary-list__value\">{answer.Value}</dd>");
+                    htmlContent.AppendHtmlLine($"<dd class=\"govuk-summary-list__action\"><a href=\"{page.PageSlug}\">Change</dd>");
                     htmlContent.AppendHtmlLine("</div>");
                 }
                 htmlContent.AppendHtmlLine("</dl>");

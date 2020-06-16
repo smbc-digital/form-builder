@@ -1,4 +1,5 @@
 ﻿using form_builder.Builders;
+using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
@@ -220,13 +221,14 @@ namespace form_builder.Helpers.ElementHelpers
         public List<PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema)
         {
             var formAnswers = GetFormData(guid);
+            var reducedAnswers = FormAnswersExtensions.GetReducedAnswers(formAnswers, formSchema);
+
             var FormSummary = new List<PageSummary>();
 
            var pages = formSchema.Pages.ToList();
 
             foreach (var page in pages)
             {
-
                 var pSummary = new PageSummary();
                 pSummary.PageTitle = page.Title;
                 pSummary.PageSlug = page.PageSlug;
@@ -235,9 +237,10 @@ namespace form_builder.Helpers.ElementHelpers
 
                 var formSchemaQuestions = page.ValidatableElements
                     .Where(_ => _ != null)                    
-                    .ToList();
+                    .ToList();               
 
-                if(formSchemaQuestions.Count() ==  0)
+                if(formSchemaQuestions.Count() ==  0
+                   || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())                    
                 {
                     continue;
                 }

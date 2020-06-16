@@ -1,4 +1,4 @@
-﻿using Coypu;
+﻿using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 using Xunit;
 
@@ -25,6 +25,17 @@ namespace form_builder_tests_ui.StepDefinitions
             BrowserSession.FillIn("dob-day").With("01");
             BrowserSession.FillIn("dob-month").With("02");
             BrowserSession.FillIn("dob-year").With("1990");
+        }
+
+        [Then(@"I click the ""(.*)"" radiobutton")]
+        [When(@"I click the ""(.*)"" radiobutton")]
+        public void ThenIClickTheRadioButton(string inputId)
+        {
+            //Arrange
+            var webDriver = BrowserSession.Native as IWebDriver;
+
+            //Act
+            webDriver.FindElement(By.Id(inputId)).Click();
         }
     }
 }
