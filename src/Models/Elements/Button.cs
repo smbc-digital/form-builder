@@ -46,11 +46,9 @@ namespace form_builder.Models.Elements
         {
             var isStreetAddress = element.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.Street);
 
-            if (isStreetAddress && viewModel.IsInitial())
-            {
+            if (isStreetAddress && !viewModel.IsInitial())
                 return false;
-            }
-           
+                
             return isStreetAddress;
         }
 
