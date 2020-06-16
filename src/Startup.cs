@@ -91,7 +91,6 @@ namespace form_builder
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
         }
     }
 }
