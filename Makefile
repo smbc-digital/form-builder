@@ -1,5 +1,3 @@
-CUR_DIR = $(CURDIR)
-
 .PHONY: help
 help:
 	@cat ./MakefileHelp
@@ -12,4 +10,4 @@ ui-test:
 
 .PHONY: ui-test-feature
 ui-test-feature:
-	dotnet test form-builder-tests-ui/form-builder-tests-ui.csproj --filter $(FEATURE)
+	MSBUILDSINGLELOADCONTEXT=1 dotnet test form-builder-tests-ui/form-builder-tests-ui.csproj --filter $(FEATURE)

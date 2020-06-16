@@ -8,7 +8,7 @@ Scenario: Render information on the page correctly
 	When I click the "radButtonHideShow-0" radiobutton
 	When I click the "nextPage" button
 	Then I should not see the h1 element with page title text
-	Then I should see a legend element within a h1 tag with text "Do you like things?"
+	Then I should see a h1 element within a legend tag with text "Do you like things?"
 	When I click the "radButtonHideShoww-0" radiobutton
 	When I click the "nextPage" button
-	Then I should see a legend element within a h1 tag with text "Select your favorite fruits"
+	Then I should see a h1 element within a legend tag with text "Select your favorite fruits"
