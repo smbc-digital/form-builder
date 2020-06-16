@@ -78,25 +78,21 @@ this.ScenarioInitialize(scenarioInfo);
 #line 6
  testRunner.Given("I navigate to \"/button/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 7
- testRunner.Then("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see an element with ID of \"continue\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 8
- testRunner.Then("I should see an element with ID of \"nextStep1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see an element with ID of \"secondaryBtn\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 9
- testRunner.Then("I should see an element with ID of \"nextStep2\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 10
  testRunner.Then("I should find an element with class \".govuk-button--secondary\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 10
+ testRunner.Then("I should see an element with ID of \"warningBtn\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 11
- testRunner.Then("I should see an element with ID of \"nextStep3\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 12
  testRunner.Then("I should find an element with class \".govuk-button--warning\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 12
+ testRunner.Then("I should see an element with ID of \"disabledBtn\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 13
-    testRunner.Then("I should not see any \".govuk-back-link\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.When("I click the \"continue\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 14
- testRunner.When("I click the \"nextStep1\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line 15
  testRunner.Then("I should see a \".govuk-back-link\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 16
- testRunner.When("I click the \"nextStep1\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             this.ScenarioCleanup();
         }

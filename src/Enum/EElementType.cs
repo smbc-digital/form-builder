@@ -34,6 +34,8 @@
         DocumentDownload,
         Warning,
         Declaration,
-        Summary
+        Summary,
+        Map
+
     }
 }
