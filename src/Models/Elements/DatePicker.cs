@@ -13,6 +13,8 @@ namespace form_builder.Models.Elements
     public class DatePicker : Element
     {
 
+        public const string PLACEHOLDER_DATE_FORMAT = "dd/mm/yyyy";
+
         public DatePicker()
         {
             Type = EElementType.DatePicker;
@@ -44,7 +46,8 @@ namespace form_builder.Models.Elements
                 { "id", Properties.QuestionId },
                 { "name", Properties.QuestionId },
                 { "max", maxDate },
-                { "min", minDate }
+                { "min", minDate },
+                { "placeholder", PLACEHOLDER_DATE_FORMAT }
             };
 
             
