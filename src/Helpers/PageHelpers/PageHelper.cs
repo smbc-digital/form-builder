@@ -485,7 +485,7 @@ namespace form_builder.Helpers.PageHelpers
             return formData;
         }
 
-        private static Dictionary<string, dynamic> RecursiveCheckAndCreate(string targetMapping, string value, Dictionary<string, dynamic> obj)
+        private IDictionary<string, dynamic> RecursiveCheckAndCreate(string targetMapping, string value, IDictionary<string, dynamic> obj)
         {
             var splitTargets = targetMapping.Split(".");
 
@@ -499,7 +499,7 @@ namespace form_builder.Helpers.PageHelpers
             if (!obj.TryGetValue(splitTargets[0], out subObject))
                 subObject = new ExpandoObject();
 
-            subObject = RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), value, subObject as Dictionary<string, dynamic>);
+            subObject = RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), value, subObject as IDictionary<string, dynamic>);
 
             obj.Remove(splitTargets[0]);
             obj.Add(splitTargets[0], subObject);
