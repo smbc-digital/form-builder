@@ -3,7 +3,7 @@ Feature: Textarea
 	In order to fill in my details I have to navigate to Page1
 
 Scenario: Textarea standard use
-	Given I navigate to "/textarea/page1"
+	Given I navigate to "/ui-textarea/page1"
 	Then I should see the header
 	And I should see the "issueOne" input
 	And I should see a "span" element with "Please provide as much information about the issue you are reporting as possible" text

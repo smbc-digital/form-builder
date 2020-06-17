@@ -76,7 +76,7 @@ namespace form_builder_tests_ui.Features
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 6
- testRunner.Given("I navigate to \"/button/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("I navigate to \"/ui-button/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 7
  testRunner.Then("I should see an element with ID of \"continue\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 8

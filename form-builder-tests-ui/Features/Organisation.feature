@@ -3,7 +3,7 @@ Feature: Organisation
 	To allow the collection of an organisation information
 
 Scenario: Organisation standard use
-	Given I navigate to "/organisation/page-one"
+	Given I navigate to "/ui-organisation/page-one"
 	Then I should see the header
 	And I should see the "organisation" input
 	And I should see the "nextStep" button

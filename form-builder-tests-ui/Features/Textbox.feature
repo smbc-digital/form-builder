@@ -3,7 +3,7 @@ Feature: Textbox
 	In order to fill in my details I have to navigate to Page0
 
 Scenario: Textbox standard use
-	Given I navigate to "/textbox/page0"
+	Given I navigate to "/ui-textbox/page0"
 	Then I should see the header
 	And I should see the "firstQuestion" input
 	Then I enter "test" in "firstQuestion"

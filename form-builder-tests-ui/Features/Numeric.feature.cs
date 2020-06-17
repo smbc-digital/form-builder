@@ -18,8 +18,8 @@ namespace form_builder_tests_ui.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [TechTalk.SpecRun.FeatureAttribute("Numeric", new string[] {
-            "numeric"}, Description="\tIn order to enter numeric data\r\n\tAs a mobile device user\r\n\tI want to be have a n" +
-        "umber input", SourceFile="Features\\Numeric.feature", SourceLine=1)]
+            "numeric"}, Description="\tIn order to enter numeric data\r\n\tAs a mobile device user\r\n\tI want to have a numb" +
+        "er input", SourceFile="Features\\Numeric.feature", SourceLine=1)]
     public partial class NumericFeature
     {
         
@@ -32,8 +32,8 @@ namespace form_builder_tests_ui.Features
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Numeric", "\tIn order to enter numeric data\r\n\tAs a mobile device user\r\n\tI want to be have a n" +
-                    "umber input", ProgrammingLanguage.CSharp, new string[] {
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Numeric", "\tIn order to enter numeric data\r\n\tAs a mobile device user\r\n\tI want to have a numb" +
+                    "er input", ProgrammingLanguage.CSharp, new string[] {
                         "numeric"});
             testRunner.OnFeatureStart(featureInfo);
         }
@@ -78,7 +78,7 @@ namespace form_builder_tests_ui.Features
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 8
- testRunner.Given("I navigate to \"/numeric/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("I navigate to \"/ui-numeric/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 9
  testRunner.When("I fill in in page 1 with incorrect numeric values", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 10

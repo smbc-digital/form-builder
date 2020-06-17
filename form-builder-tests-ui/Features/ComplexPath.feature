@@ -3,7 +3,7 @@ Feature: ComplexPath
 	Checking the path looks at both questions for next page
 
 Scenario: Complex path different questions on different pages are referred to for behaviour
-	Given I navigate to "/complexpath/first-question"
+	Given I navigate to "/ui-complex-path/first-question"
 	When I click the "firstQuestion-0" radiobutton
 	Then The "firstQuestion-0" radiobutton should be checked
 	Then I click the "nextStep" button

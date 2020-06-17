@@ -5,7 +5,7 @@ Feature: SuccessPage
 	I should see a success page
 
 Scenario: Success page standard use
-	Given I navigate to "/successpage/page-one"
+	Given I navigate to "/ui-success-page/page-one"
 	Then I should see the "submit" button
 	When I click the "submit" button
 	Then I should see a ".smbc-panel" html element

@@ -76,7 +76,7 @@ namespace form_builder_tests_ui.Features
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 6
- testRunner.Given("I navigate to \"/declaration/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("I navigate to \"/ui-declaration/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 7
  testRunner.When("I click the \"Declaration\" checkbox", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 8
@@ -93,15 +93,15 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("User uses a  page next step and back.", SourceLine=13)]
+        [TechTalk.SpecRun.ScenarioAttribute("User uses a page next step and back.", SourceLine=13)]
         public virtual void UserUsesAPageNextStepAndBack_()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User uses a  page next step and back.", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User uses a page next step and back.", null, ((string[])(null)));
 #line 14
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 15
- testRunner.Given("I navigate to \"/declaration/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("I navigate to \"/ui-declaration/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 16
  testRunner.When("I click the \"Declaration\" checkbox", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 17
