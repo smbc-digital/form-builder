@@ -3,7 +3,7 @@ Feature: Button
 	In order to verify buttons are renderd correctly
 
 Scenario: Render buttons correctly and show and hide the previous button.
-	Given I navigate to "/button/page1"
+	Given I navigate to "/ui-button/page1"
 	Then I should see an element with ID of "continue"
 	Then I should see an element with ID of "secondaryBtn"
 	Then I should find an element with class ".govuk-button--secondary"

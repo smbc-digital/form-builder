@@ -3,7 +3,7 @@ Feature: Street
 	In order to collect street information I have to navigate to Page1
 
 Scenario: Street lookup standard use
-	Given I navigate to "/street/page1"
+	Given I navigate to "/ui-street/page1"
 	Then I should see the header
 	And I should see the "street" input
 	And I should see the "nextStep" button

@@ -3,7 +3,7 @@ Feature: AddressManual
 	In order to collect a user address via manual entry
 
 Scenario: Address Manual element standard use
-	Given I navigate to "/address/page1/manual"
+	Given I navigate to "/ui-address/page1/manual"
 	Then I should see the "address-AddressLine1" input
 	Then I should see the "address-AddressLine2" input
 	Then I should see the "address-AddressTown" input
