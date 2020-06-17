@@ -26,6 +26,8 @@ namespace form_builder.Models
 
         public List<Behaviour> Behaviours { get; set; }
 
+        public List<IncomingValue> IncomingValues { get;set; } = new List<IncomingValue>();
+
         public bool IsValidated { get; set; }
 
         public bool HideTitle { get; set; }
@@ -38,6 +40,8 @@ namespace form_builder.Models
 
         [JsonIgnore]
         public bool IsValid => !InvalidElements.Any();
+
+        public bool HasIncomingValues => IncomingValues.Any();
 
         [JsonIgnore]
         public IEnumerable<BaseProperty> InvalidElements

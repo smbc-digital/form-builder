@@ -24,5 +24,6 @@ namespace form_builder.Helpers.PageHelpers
         void CheckSubmitSlugsHaveAllProperties(List<Page> pages, string formName);
         void CheckForAcceptedFileUploadFileTypes(List<Page> pages, string formName);
         void SaveFormData(string key, object value, string guid);
+        Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, Dictionary<string, dynamic> formData);
     }
 }
