@@ -13,7 +13,6 @@ namespace form_builder_tests.Builders
         private List<Behaviour> _behaviours = new List<Behaviour>();
         private List<IncomingValue> _incomingValues = new List<IncomingValue>();
 
-
         public Page Build()
         {
             return new Page
@@ -62,10 +61,9 @@ namespace form_builder_tests.Builders
             return this;
         }
 
-        public PageBuilder WithIncomingValue(IncomingValue incomingValue)
+        public PageBuilder WithIncomingValue(IncomingValue value)
         {
-            _incomingValues.Add(incomingValue);
-
+            _incomingValues.Add(value);
             return this;
         }
     }
