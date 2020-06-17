@@ -33,6 +33,8 @@
         FileUpload,
         DocumentDownload,
         Warning,
-        Declaration
+        Declaration,
+        Reusable,
+        Map
     }
 }
