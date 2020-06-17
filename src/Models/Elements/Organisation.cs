@@ -55,7 +55,9 @@ namespace form_builder.Models.Elements
 
             Items = new List<SelectListItem>{ new SelectListItem($"{organisationResults.Count} organisations found", string.Empty)};
             organisationResults.ForEach((_) => { Items.Add(new SelectListItem(_.Name, $"{_.Reference}|{_.Name}")); });
-            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
+            ReturnURL = environment.EnvironmentName == "local" || environment.EnvironmentName == "uitest"
+                ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
+                : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
             return await viewRender.RenderAsync("OrganisationSelect", this);
         }
 
