@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
-using form_builder.Providers.TransformDataProvider;
 using Newtonsoft.Json;
 
-namespace form_builder.Providers.SchemaProvider
+namespace form_builder.Providers.Transforms.Lookups
 {
-    public class LocalTransformDataProvider : ITransformDataProvider
+    public class LocalLookupTransformDataProvider :  ILookupTransformDataProvider
+
     {
         public async Task<T> Get<T>(string name)
         {

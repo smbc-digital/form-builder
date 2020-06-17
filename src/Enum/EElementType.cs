@@ -34,6 +34,7 @@
         DocumentDownload,
         Warning,
         Declaration,
+        Reusable,
         Map
     }
 }
