@@ -22,6 +22,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Services.FileUploadService;
+using System.Dynamic;
 
 namespace form_builder.Helpers.PageHelpers
 {
@@ -464,6 +465,46 @@ namespace form_builder.Helpers.PageHelpers
                      throw new ApplicationException($"PageHelper::CheckForDocumentDownload, No document download type configured");
                 }
             }
+        }
+
+        public Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, Dictionary<string, dynamic> formData)
+        {
+             page.IncomingValues.ForEach(_ => {
+                var containsValue = formData.ContainsKey(_.Name);
+
+                if(!_.Optional && !containsValue)
+                    throw new Exception($"DictionaryExtensions::IncomingValue, FormData does not contains {_.Name} required value");
+
+                if(containsValue)
+                {
+                    formData = RecursiveCheckAndCreate(_.QuestionId, formData[_.Name], formData);
+                    formData.Remove(_.Name);
+                }
+            });
+            
+            return formData;
+        }
+
+        private static Dictionary<string, dynamic> RecursiveCheckAndCreate(string targetMapping, string value, Dictionary<string, dynamic> obj)
+        {
+            var splitTargets = targetMapping.Split(".");
+
+            if (splitTargets.Length == 1)
+            {
+                obj.Add(splitTargets[0], value);
+                return obj;
+            }
+
+            object subObject;
+            if (!obj.TryGetValue(splitTargets[0], out subObject))
+                subObject = new ExpandoObject();
+
+            subObject = RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), value, subObject as Dictionary<string, dynamic>);
+
+            obj.Remove(splitTargets[0]);
+            obj.Add(splitTargets[0], subObject);
+
+            return obj;
         }
     }
 }
