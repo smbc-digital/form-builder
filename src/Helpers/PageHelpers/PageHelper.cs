@@ -55,14 +55,14 @@ namespace form_builder.Helpers.PageHelpers
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null)
-        { 
+        {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
-            
+
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
             {
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
             }
-                                           
+
             formModel.FeedbackForm = baseForm.FeedbackForm;
             formModel.FeedbackPhase = baseForm.FeedbackPhase;
 
@@ -156,8 +156,10 @@ namespace form_builder.Helpers.PageHelpers
                 case "Search":
                     try
                     {
-                        if(!addressResults.Any()){
-                            return new ProcessRequestEntity {
+                        if (!addressResults.Any())
+                        {
+                            return new ProcessRequestEntity
+                            {
                                 RedirectToAction = true,
                                 RedirectAction = "AddressManual"
                             };
@@ -359,7 +361,7 @@ namespace form_builder.Helpers.PageHelpers
                 {
                     if (item.SubmitSlugs.Count > 0)
                     {
-                       var foundEnviromentSubmitSlug = false;
+                        var foundEnviromentSubmitSlug = false;
                         foreach (var subItem in item.SubmitSlugs)
                         {
                             if (subItem.Environment.ToLower() == _enviroment.EnvironmentName.ToS3EnvPrefix().ToLower())
@@ -457,31 +459,36 @@ namespace form_builder.Helpers.PageHelpers
 
         public void CheckForDocumentDownload(FormSchema formSchema)
         {
-            if(formSchema.DocumentDownload){
-                if(formSchema.DocumentType.Any()){
-                    if(formSchema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
+            if (formSchema.DocumentDownload)
+            {
+                if (formSchema.DocumentType.Any())
+                {
+                    if (formSchema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
                         throw new ApplicationException($"PageHelper::CheckForDocumentDownload, Unknown document download type configured");
-                } else {
-                     throw new ApplicationException($"PageHelper::CheckForDocumentDownload, No document download type configured");
+                }
+                else
+                {
+                    throw new ApplicationException($"PageHelper::CheckForDocumentDownload, No document download type configured");
                 }
             }
         }
 
         public Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, Dictionary<string, dynamic> formData)
         {
-             page.IncomingValues.ForEach(_ => {
+            page.IncomingValues.ForEach(_ =>
+            {
                 var containsValue = formData.ContainsKey(_.Name);
 
-                if(!_.Optional && !containsValue)
+                if (!_.Optional && !containsValue)
                     throw new Exception($"DictionaryExtensions::IncomingValue, FormData does not contains {_.Name} required value");
 
-                if(containsValue)
+                if (containsValue)
                 {
                     formData = RecursiveCheckAndCreate(_.QuestionId, formData[_.Name], formData);
                     formData.Remove(_.Name);
                 }
             });
-            
+
             return formData;
         }
 
