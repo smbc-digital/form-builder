@@ -4,22 +4,21 @@ using System.Threading.Tasks;
 using Amazon.S3;
 using form_builder.Extensions;
 using form_builder.Gateways;
-using form_builder.Providers.TransformDataProvider;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace form_builder.Providers.SchemaProvider
+namespace form_builder.Providers.Transforms.Lookups
 {
-    public class S3TransformDataProvider : ITransformDataProvider
+    public class S3LookupTransformDataProvider : ILookupTransformDataProvider
     {
         private readonly IS3Gateway _s3Gateway;
-        private readonly ILogger<S3TransformDataProvider> _logger;
+        private readonly ILogger<S3LookupTransformDataProvider> _logger;
         private readonly IHostingEnvironment _enviroment;
         private readonly IConfiguration _configuration;
 
-        public S3TransformDataProvider(IS3Gateway s3Service, ILogger<S3TransformDataProvider> logger, IHostingEnvironment enviroment, IConfiguration configuration)
+        public S3LookupTransformDataProvider(IS3Gateway s3Service, ILogger<S3LookupTransformDataProvider> logger, IHostingEnvironment enviroment, IConfiguration configuration)
         {
             _s3Gateway = s3Service;
             _logger = logger;
@@ -42,12 +41,12 @@ namespace form_builder.Providers.SchemaProvider
             }
             catch (AmazonS3Exception e)
             {
-                var ex = new Exception($"S3TransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_enviroment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName} ", e);
+                var ex = new Exception($"S3LookupTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_enviroment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName} ", e);
                 throw ex;
             }
             catch (Exception e)
             {
-                var ex = new Exception($"S3TransformDataProvider: An error has occured while attempting to deserialise object, Exception: {e.Message}", e);
+                var ex = new Exception($"S3LookupTransformDataProvider: An error has occured while attempting to deserialise object, Exception: {e.Message}", e);
                 throw ex;
             }
         }
