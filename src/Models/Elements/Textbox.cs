@@ -32,6 +32,7 @@ namespace form_builder.Models.Elements
                 { "id", Properties.QuestionId },
                 { "maxlength", Properties.MaxLength },
                 { "value", Properties.Value},
+                { "spellcheck", Properties.Spellcheck.ToString() }
             };
             
             if (Properties.Numeric)
@@ -39,7 +40,6 @@ namespace form_builder.Models.Elements
                 properties.Add("type", "number");
                 properties.Add("max", Properties.Max);
                 properties.Add("min", Properties.Min);
-                properties.Add("spellcheck", Properties.Spellcheck.ToString());
             }
 
             if (DisplayAriaDescribedby)

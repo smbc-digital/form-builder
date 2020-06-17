@@ -24,10 +24,10 @@ namespace form_builder.Models.Elements
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var allowedFileType = Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
-            var maxFileSize = Properties.MaxFileSize > 0 ? Properties.MaxFileSize*1024000 : SystemConstants.DefaultMaxFileSize;
-            maxFileSize = maxFileSize > SystemConstants.DefaultMaxFileSize
-                ? SystemConstants.DefaultMaxFileSize
-                : Properties.MaxFileSize * 1024000;
+            var convertedMaxFileSize = Properties.MaxFileSize * 1024000;
+            var appliedMaxFileSize = convertedMaxFileSize > 0 && convertedMaxFileSize < SystemConstants.DefaultMaxFileSize 
+                                ? convertedMaxFileSize 
+                                : SystemConstants.DefaultMaxFileSize;
 
             var properties = new Dictionary<string, dynamic>()
             {
@@ -35,7 +35,7 @@ namespace form_builder.Models.Elements
                 { "id", QuestionId },
                 { "type", "file" },
                 { "accept", allowedFileType.Join(",") },
-                { "max-file-size", maxFileSize },
+                { "max-file-size", appliedMaxFileSize },
                 { "onchange", "ValidateSize(this)" }
             };
 

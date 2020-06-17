@@ -25,26 +25,12 @@ namespace form_builder_tests_ui.StepDefinitions
         {
             Thread.Sleep(sleepTime);
         }
-        
-        [Given("I have signed in as UiTest")]
-        public static void IHaveSignedIn()
-        {
-            BrowserSession.Visit("/this-is-a-invalid-url-to-allow-adding-a-cookie");
-            var webDriver = BrowserSession.Native as IWebDriver;
-
-            webDriver.Manage().Cookies.AddCookie(new Cookie("jwtCookie", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVUkgVGVzdCIsImVtYWlsIjoic2NuLnVpdGVzdEBnbWFpbC5jb20ifQ.-LHnC83W_1jEC9PZALbQBYifzNLYwryUgi0GimD8SWY", "127.0.0.1", "/", DateTime.Now.AddDays(1)));
-        }
 
         [Then("I should see the header")]
         public void ThenIShouldSeeTheHeaderSection()
         { 
-            Assert.True(BrowserSession.FindAllCss("a[href*='https://www.stockport.gov.uk']").Any());
-        }
-
-        [Then("I should see the breadcrumbs")]
-        public void ThenIShouldSeeBreadcrumbs()
-        {
-            Assert.True(BrowserSession.FindCss(".breadcrumb-container").Exists());
+            Assert.True(BrowserSession.FindCss(".smbc-header").Exists());
+            Assert.True(BrowserSession.FindCss(".smbc-header__link--homepage").Exists());
         }
 
         [Then("I should see the form title in the header")]
@@ -62,9 +48,7 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then("I should see the footer")]
         public void ThenIShouldSeeTheFooterSection()
         {
-            Assert.True(BrowserSession.FindCss(".atoz").Exists());
-            Assert.True(BrowserSession.FindCss(".l-container-footer").Exists());
-            Assert.True(BrowserSession.FindCss(".cc_banner.cc_container.cc_container--open").Exists());
+            Assert.True(BrowserSession.FindCss(".smbc-footer").Exists());
         }
 
         [Then("I should see the pagination section")]
@@ -79,6 +63,18 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.True(BrowserSession.FindAllCss(string.Format("a[href*='{0}']", href)).Any());
         }
 
+        [Then(@"I wait one second")]
+        public void ThenIWaitOneSecond()
+        {
+            Thread.Sleep(1000);
+        }
+
+        [Then(@"I should see that ""(.*)"" input has value ""(.*)""")]
+        public void ThenIShouldSeeTheInput(string inputName, string value)
+        {
+            Assert.True(BrowserSession.FindField(inputName).HasValue(value));
+        }
+
         [When(@"I click the ""(.*)"" button")]
         [Then(@"I click the ""(.*)"" button")]
         public void WhenIClickTheButton(string name)
@@ -90,12 +86,6 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenIShouldSeeTheButton(string name)
         {
             Assert.True(BrowserSession.FindButton(name).Exists());
-        }
-
-        [When("I click the close alert button")]
-        public void WhenIClickTheCloseAlertButton()
-        {
-            BrowserSession.FindAllCss(".alert-close a").FirstOrDefault().Click();
         }
 
         [Then(@"I should see the ""(.*)"" input")]
@@ -141,6 +131,7 @@ namespace form_builder_tests_ui.StepDefinitions
         }
 
         [When(@"I enter ""(.*)"" in ""(.*)""")]
+        [Then(@"I enter ""(.*)"" in ""(.*)""")]
         public void WhenIEnter(string value, string fieldName)
         {
             BrowserSession.FillIn(fieldName).With(value);
@@ -158,7 +149,6 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenISelectDropdown(string value, string fieldName)
         {
             BrowserSession.FindId(fieldName).SelectOption(value);
-            
         }
 
         [Then(@"I should see a ""(.*)"" element with ""(.*)"" text")]

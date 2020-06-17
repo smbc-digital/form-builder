@@ -14,11 +14,5 @@ namespace form_builder_tests_ui.StepDefinitions
             var webDriver = BrowserSession.Native as IWebDriver;
             Assert.True(webDriver.FindElement(By.Id($"{elementType}")).Displayed);
         }
-
-        [Then(@"I wait one second")]
-        public void ThenIWaitOneSecond()
-        {
-            Thread.Sleep(1000);
-        }
     }
 }

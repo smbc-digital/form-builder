@@ -245,6 +245,7 @@ namespace form_builder.Helpers.PageHelpers
                         && element.Type != EElementType.UL
                         && element.Type != EElementType.OL
                         && element.Type != EElementType.Button
+                        && element.Type != EElementType.HR
                         )
                     {
                         qIds.Add(element.Properties.QuestionId);
