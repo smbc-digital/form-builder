@@ -222,10 +222,8 @@ namespace form_builder.Helpers.ElementHelpers
         {
             var formAnswers = GetFormData(guid);
             var reducedAnswers = FormAnswersExtensions.GetReducedAnswers(formAnswers, formSchema);
-
             var FormSummary = new List<PageSummary>();
-
-           var pages = formSchema.Pages.ToList();
+            var pages = formSchema.Pages.ToList();
 
             foreach (var page in pages)
             {
@@ -240,18 +238,17 @@ namespace form_builder.Helpers.ElementHelpers
                     .ToList();               
 
                 if(formSchemaQuestions.Count() ==  0
-                   || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())                    
+                   || 
+                   !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())                    
                 {
                     continue;
                 }
 
                 formSchemaQuestions.ForEach((question) => {
                     var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
-
                     summaryBuilder.Add(question.GetLabelText(), answer, question.Type);
                 });
                 pSummary.Answers = summaryBuilder.Build();
-
                 FormSummary.Add(pSummary);
             }
             return FormSummary;

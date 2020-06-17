@@ -39,6 +39,7 @@ namespace form_builder.Models.Elements
                     {
                         htmlContent.AppendHtmlLine($"<dd class=\"govuk-summary-list__actions\"><a class=\"govuk-link\" href=\"{pageSummary.PageSlug}\">Change</a><span class=\"govuk-visually-hidden\">{answer.Key}</span</dd>");
                     }
+
                     htmlContent.AppendHtmlLine("</div>");
                 }
             }
