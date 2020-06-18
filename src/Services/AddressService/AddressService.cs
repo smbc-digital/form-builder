@@ -78,7 +78,7 @@ namespace form_builder.Services.AddressService
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
-
+                
                 var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
                 model.Path = currentPage.PageSlug;
                 model.FormName = baseForm.FormName;

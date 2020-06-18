@@ -1,5 +1,4 @@
-﻿using System;
-using form_builder.Helpers;
+﻿using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Addresses;
@@ -10,7 +9,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using form_builder.Constants;
 using Newtonsoft.Json.Linq;
 using System.Linq;
-using form_builder.Builders;
 using form_builder.Enum;
 
 namespace form_builder.Models.Elements
@@ -60,23 +58,21 @@ namespace form_builder.Models.Elements
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
             switch (subPath as string) {
                 case LookUpConstants.Manual:
-
-                    var manualAddressElement = new AddressManual { Properties = Properties, Type = EElementType.AddressManual };
-                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
+                    var manualAddressElement = new AddressManual { Properties = Properties };
+                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
 
                     SetAddressProperties(viewModel, Properties.Value);
 
                     if (results != null && results.Count == 0)
-                        Properties.DisplayNoResultsIAG = true;
+                        manualAddressElement.Properties.DisplayNoResultsIAG = true;
 
-                    ManualAddressURL =
-                        $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
+                    manualAddressElement.ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
                     return await viewRender.RenderAsync("AddressManual", manualAddressElement);
 
                 case LookUpConstants.Automatic:
                     IsSelect = true;
-                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
+                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
 
                     ReturnURL = environment.EnvironmentName == "local" || environment.EnvironmentName == "uitest" 
                         ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}" 
@@ -86,7 +82,7 @@ namespace form_builder.Models.Elements
                         ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual"
                         : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
-                    var selectedAddress = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-address");
+                    var selectedAddress = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SELECT_SUFFIX);
                     Items = new List<SelectListItem> { new SelectListItem($"{results.Count} addresses found", string.Empty) };
                     results.ForEach((objectResult) => {
                         AddressSearchResult searchResult;
@@ -108,7 +104,7 @@ namespace form_builder.Models.Elements
                     return await viewRender.RenderAsync("AddressSelect", this);
 
                 default:
-                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
+                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
                     return await viewRender.RenderAsync("AddressSearch", this);
             }
         }
