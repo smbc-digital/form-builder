@@ -473,6 +473,21 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
+        public void CheckForIncomingFormDataValues(List<Page> Pages)
+        {
+            if (Pages.Any(_ => _.HasIncomingValues))
+            {
+                Pages.Where(_ => _.HasIncomingValues)
+                    .ToList()
+                    .ForEach(x => x.IncomingValues.ForEach(_ =>
+                        {
+                            if (string.IsNullOrEmpty(_.QuestionId) || string.IsNullOrEmpty(_.Name))
+                                throw new Exception("PageHelper::CheckForIncomingFormDataValues, QuestionId or Name cannot be empty");
+                        }
+                    ));
+            }
+        }
+
         public Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, Dictionary<string, dynamic> formData)
         {
             page.IncomingValues.ForEach(_ =>
