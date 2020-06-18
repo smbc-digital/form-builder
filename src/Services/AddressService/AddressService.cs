@@ -117,10 +117,10 @@ namespace form_builder.Services.AddressService
                         .Pages
                         .FirstOrDefault(_ => _.PageSlug == path)
                         .Answers
-                        .FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode")
+                        .FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}")
                         .Response;
 
-            var address = (string)viewModel[$"{addressElement.Properties.QuestionId}-address"];
+            var address = (string)viewModel[$"{addressElement.Properties.QuestionId}{AddressConstants.SELECT_SUFFIX}"];
 
             if (currentPage.IsValid && addressElement.Properties.Optional && string.IsNullOrEmpty(postcode))
             {
@@ -193,7 +193,7 @@ namespace form_builder.Services.AddressService
                 };
             }
 
-            var postcode = (string)viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
+            var postcode = (string)viewModel[$"{addressElement.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"];
 
             if (addressElement.Properties.Optional && string.IsNullOrEmpty(postcode))
             {
@@ -206,7 +206,7 @@ namespace form_builder.Services.AddressService
 
             var foundPostCode = convertedAnswers
                 .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
-                .Answers?.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode")?
+                .Answers?.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}")?
                 .Response;
 
             var addressResults = new List<object>();

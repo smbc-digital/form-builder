@@ -75,6 +75,7 @@ namespace form_builder.Models.Elements
                     return await viewRender.RenderAsync("AddressManual", manualAddressElement);
 
                 case LookUpConstants.Automatic:
+                    IsSelect = true;
                     Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
 
                     ReturnURL = environment.EnvironmentName == "local" || environment.EnvironmentName == "uitest" 
