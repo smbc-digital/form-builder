@@ -37,5 +37,12 @@ namespace form_builder_tests_ui.StepDefinitions
             //Act
             webDriver.FindElement(By.Id(inputId)).Click();
         }
+
+        [When(@"I click the ""(.*)"" link")]
+        [Then(@"I click the ""(.*)"" link")]
+        public void WhenIClickTheLink(string name)
+        {
+            BrowserSession.ClickLink(name);
+        }
     }
 }
