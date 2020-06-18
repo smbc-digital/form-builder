@@ -86,7 +86,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 12
  testRunner.Then("I should see a \".govuk-panel__title\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 13
- testRunner.Then("I should see a \".govuk-panel__body\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see a \".smbc-panel__body\" html element", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 14
     testRunner.And("I should see a \"h1\" element with \"Application complete\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 15

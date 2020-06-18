@@ -1,0 +1,19 @@
+﻿@model form_builder.ViewModels.SummaryViewModel;
+
+<h1 class="govuk-heading-l">Your answers</h1>
+@foreach (var currentPage in Model.FormAnswers.Pages)
+{
+    <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+        <h2 class="govuk-heading-m">@currentPage.PageSlug</h2>
+
+        @foreach (var question in currentPage.Answers)
+        {
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">@question.QuestionId</dt>
+                <dd class="govuk-summary-list__value">
+                    @question.Response
+                </dd>
+            </div>
+        }
+    </dl>
+}
