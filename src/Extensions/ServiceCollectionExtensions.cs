@@ -43,6 +43,7 @@ using form_builder.Providers.Transforms.Lookups;
 using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
+using form_builder.Models.Elements;
 
 namespace form_builder.Extensions
 {

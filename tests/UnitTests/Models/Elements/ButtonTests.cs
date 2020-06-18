@@ -24,9 +24,10 @@ namespace form_builder_tests.UnitTests.Models.Elements
         [Fact]
         public async Task RenderAsync_ShouldUseAddressSearchText_ForButton_WhenAddressSearch()
         {
-            var callback = new Button();
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Button>(), It.IsAny<Dictionary<string, dynamic>>()))
-                    .Callback<string, Button, Dictionary<string, dynamic>>((a,b,c) => callback = b);
+            var callback = new Dictionary<string, dynamic>();
+            _mockIViewRender
+                .Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Button>(), It.IsAny<Dictionary<string, dynamic>>()))
+                .Callback<string, Button, Dictionary<string, dynamic>>((a,b,c) => callback = c);
 
             //Arrange
             var element = new ElementBuilder()
@@ -50,7 +51,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var viewModel = new Dictionary<string, dynamic>();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "",viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             Assert.Equal(SystemConstants.AddressSearchButtonText, callback.Properties.Text);
@@ -86,42 +87,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var viewModel = new Dictionary<string, dynamic>();
 
             //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
-
-            //Assert
-            Assert.Equal(SystemConstants.NextStepButtonText, callback.Properties.Text);
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "Button"), It.IsAny<Button>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task RenderAsync_ShouldUseDefaultSubmitButtonText_WhenSubmitFormBehaviour()
-        {
-            var callback = new Button();
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Button>(), It.IsAny<Dictionary<string, dynamic>>()))
-                .Callback<string, Button, Dictionary<string, dynamic>>((a, b, c) => callback = b);
-
-            //Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.Button)
-                .Build();
-
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitForm)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithBehaviour(behaviour)
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithName("form-name")
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
-
-            //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             Assert.Equal(SystemConstants.SubmitButtonText, callback.Properties.Text);
@@ -192,7 +158,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var viewModel = new Dictionary<string, dynamic>();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             Assert.Equal("test text", callback.Properties.Text);

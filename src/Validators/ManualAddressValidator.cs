@@ -1,6 +1,7 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators
@@ -11,7 +12,7 @@ namespace form_builder.Validators
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
 
-            if (element.Type != EElementType.AddressManual)
+            if (!(element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
                 {
@@ -19,25 +20,28 @@ namespace form_builder.Validators
                 };
             }
 
-            // TODO: Should all these validation messages be editable in the DSL?
-            
-            var valueAddressLine1 = viewModel.ContainsKey(element.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1))
-                ? viewModel[element.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1)]
+            var valueAddressLine1 = viewModel.ContainsKey($"{element.Properties.QuestionId}-{AddressManualConstants.ADDRESS_LINE_1}")
+                ? viewModel[$"{element.Properties.QuestionId}-{AddressManualConstants.ADDRESS_LINE_1}"]
                 : null;
+
             var addressLine1Valid = !string.IsNullOrEmpty(valueAddressLine1);
+
             var addressLine1Message = addressLine1Valid ? string.Empty : "Please enter Address Line 1";
 
-            var valueAddressTown = viewModel.ContainsKey(element.GetCustomItemId(AddressManualConstants.TOWN))
-                ? viewModel[element.GetCustomItemId(AddressManualConstants.TOWN)]
+            var valueAddressTown = viewModel.ContainsKey($"{element.Properties.QuestionId}-{AddressManualConstants.TOWN}")
+                ? viewModel[$"{element.Properties.QuestionId}-{AddressManualConstants.TOWN}"]
                 : null;
+
             var addressTownValid = !string.IsNullOrEmpty(valueAddressTown);
             var addressTownMessage = addressTownValid ? string.Empty : "Please enter Town";
 
-            var valueAddressPostcode = viewModel.ContainsKey(element.GetCustomItemId(AddressManualConstants.POSTCODE))
-                ? viewModel[element.GetCustomItemId(AddressManualConstants.POSTCODE)]
+            var valueAddressPostcode = viewModel.ContainsKey($"{element.Properties.QuestionId}-{AddressManualConstants.POSTCODE}")
+                ? viewModel[$"{element.Properties.QuestionId}-{AddressManualConstants.POSTCODE}"]
                 : null;
+
             var addressPostcodeMessage = string.Empty;
             var addressPostcodeValid = true;
+
 
             if (string.IsNullOrEmpty(valueAddressPostcode))
             {
@@ -49,7 +53,7 @@ namespace form_builder.Validators
                 addressPostcodeMessage = "Please enter a valid Stockport Postcode";
                 addressPostcodeValid = false;
             }
-            else if(!AddressConstants.POSTCODE_REGEX.IsMatch(valueAddressPostcode))
+            else if (!AddressConstants.POSTCODE_REGEX.IsMatch(valueAddressPostcode))
             {
                 addressPostcodeMessage = "Please enter a valid Postcode";
                 addressPostcodeValid = false;

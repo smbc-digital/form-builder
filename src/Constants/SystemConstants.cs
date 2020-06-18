@@ -13,5 +13,9 @@ namespace form_builder.Constants
         public static readonly string SubmitButtonText = "Submit";
 
         public static readonly string AddressSearchButtonText = "Find address";
+
+        public static readonly string StreetSearchButtonText = "Find street";
+
+        public static readonly string OrganisationSearchButtonText = "Find organisation";
     }
 }

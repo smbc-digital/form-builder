@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using form_builder.Models.Elements;
 using form_builder.Enum;
-using form_builder.Constants;
+using form_builder.Extensions;
 
 namespace form_builder.Validators
 {
@@ -10,8 +10,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-
-            if (element.Type != EElementType.Address)
+            if (element.Type != EElementType.Address || (element.Type == EElementType.Address && !viewModel.IsInitial()))
             {
                 return new ValidationResult
                 {
@@ -28,7 +27,7 @@ namespace form_builder.Validators
             }
           
 
-            if ((!element.Properties.StockportPostcode.HasValue || !element.Properties.StockportPostcode.Value) || !viewModel.ContainsKey($"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"))
+            if ((!element.Properties.StockportPostcode.HasValue || !element.Properties.StockportPostcode.Value) || !viewModel.ContainsKey(element.Properties.QuestionId + "-postcode"))
             {
                 return new ValidationResult
                 {
@@ -36,7 +35,7 @@ namespace form_builder.Validators
                 };
             }
 
-            if (string.IsNullOrEmpty(viewModel[$"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"]) && element.Properties.Optional)
+            if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId + "-postcode"]) && element.Properties.Optional)
             {
                 return new ValidationResult
                 {
@@ -44,7 +43,7 @@ namespace form_builder.Validators
                 };
             }
 
-            var value = viewModel[$"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"];
+            var value = viewModel[element.Properties.QuestionId + "-postcode"];
 
             var isValid = true;
             var regex = new Regex(@"^(sK|Sk|SK|sk|M|m)[0-9][0-9A-Za-z]?\s?[0-9][A-Za-z]{2}");

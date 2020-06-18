@@ -61,6 +61,10 @@ namespace form_builder_tests.UnitTests.Services
                         },
                         PageSlug = "page-one"
                     }
+                },
+                FormData = new Dictionary<string, object>
+                {
+                    { "page-one-search-results" , new List<object>() }
                 }
             };
 

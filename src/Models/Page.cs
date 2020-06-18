@@ -12,7 +12,6 @@ namespace form_builder.Models
 {
     public class Page
     {
-
         public Page()
         {
             IsValidated = false;
@@ -93,11 +92,13 @@ namespace form_builder.Models
                     var checkBoxContainsConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.CheckboxContains));
                     var dateIsBeforeConditions = behaviour.Conditions.Where(x => x.IsBefore != null);
                     var dateIsAfterConditions = behaviour.Conditions.Where(x => x.IsAfter != null);
+                    var isNullOrEmpty = behaviour.Conditions.Where(x => x.IsNullOrEmpty != null);
 
                     var equalToValid = !equalToConditions.Any();
                     var checkBoxContainsValid = !checkBoxContainsConditions.Any();
                     var dateIsBeforeValid = !dateIsBeforeConditions.Any();
                     var dateIsAfterValid = !dateIsAfterConditions.Any();
+                    var isNullOrEmptyValid = !isNullOrEmpty.Any();
 
                     if(equalToConditions.Any())
                         equalToValid = equalToConditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
@@ -110,6 +111,9 @@ namespace form_builder.Models
                         
                     if(dateIsAfterConditions.Any())
                         dateIsAfterValid = dateIsAfterConditions.All(x => DateComparator.DateIsAfter(x, viewModel));  
+
+                    if (isNullOrEmpty.Any())
+                        isNullOrEmptyValid = isNullOrEmpty.All(x => string.IsNullOrEmpty(viewModel[x.QuestionId]) == x.IsNullOrEmpty);
 
                     if (equalToValid && checkBoxContainsValid && dateIsBeforeValid && dateIsAfterValid)
                         return behaviour;

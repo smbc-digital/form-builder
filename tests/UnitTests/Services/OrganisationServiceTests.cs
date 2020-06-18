@@ -18,6 +18,8 @@ using Xunit;
 using StockportGovUK.NetStandard.Models.Organisation;
 using form_builder.Builders;
 using form_builder.Providers.Organisation;
+using Amazon.S3.Model;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -49,7 +51,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcesssOrganisation_ShouldCallOrganisationProvider_WhenCorrectJourney()
+        public async Task ProcessOrganisation_ShouldCallOrganisationProvider_WhenCorrectJourney()
         {
             var questionId = "test-org";
 
@@ -70,6 +72,10 @@ namespace form_builder_tests.UnitTests.Services
                         },
                         PageSlug = "page-one"
                     }
+                },
+                FormData = new Dictionary<string, object>
+                {
+                    { "page-one-search-results" , new List<object>() } 
                 }
             };
 
@@ -98,13 +104,13 @@ namespace form_builder_tests.UnitTests.Services
                 { element.Properties.QuestionId, "searchTerm" },
             };
 
-            var result = await _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one");
+            var result = await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
 
-            _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public async Task ProcesssOrganisation_ShouldNotCallOrganisationProvider_WhenOrganisationIsOptional()
+        public async Task ProcessOrganisation_ShouldNotCallOrganisationProvider_WhenOrganisationIsOptional()
         {
             var questionId = "test-org";
 
@@ -154,13 +160,13 @@ namespace form_builder_tests.UnitTests.Services
                 { element.Properties.QuestionId, "" },
             };
 
-            var result = await _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one");
+            var result = await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
 
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public async Task ProcesssOrganisation_ShouldCall_PageHelper_ToProcessSearchResults()
+        public async Task ProcessOrganisation_ShouldCall_PageHelper_ToProcessSearchResults()
         {
             var element = new ElementBuilder()
                .WithType(EElementType.Organisation)
@@ -178,7 +184,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var viewModel = new Dictionary<string, dynamic>
@@ -188,14 +194,13 @@ namespace form_builder_tests.UnitTests.Services
                 { element.Properties.QuestionId, "searchTerm" },
             };
 
-            var result = await _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one");
+            var result = await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
 
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.ProcessOrganisationJourney("Search", It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Once);
         }
 
         [Fact]
-        public async Task ProcesssOrganisation_Application_ShouldThrowApplicationException_WhenOrganisationProvider_ThrowsException()
+        public async Task ProcessOrganisation_Application_ShouldThrowApplicationException_WhenOrganisationProvider_ThrowsException()
         {
             _organisationProvider.Setup(_ => _.SearchAsync(It.IsAny<string>())).Throws<Exception>();
 
@@ -222,10 +227,10 @@ namespace form_builder_tests.UnitTests.Services
                 { element.Properties.QuestionId, _searchModel.SearchTerm },
             };
 
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssOrganisation(viewModel, page, schema, "", "page-one"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessOrganisation(viewModel, page, schema, "", "page-one"));
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Never);
-            Assert.StartsWith($"OrganisationService.ProcesssOrganisation:: An exception has occured while attempting to perform organisation lookup, Exception: ", result.Message);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
+            Assert.StartsWith($"OrganisationService.ProccessInitialOrganisation:: An exception has occured while attempting to perform organisation lookup, Exception: ", result.Message);
         }
     }
 }

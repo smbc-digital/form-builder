@@ -10,6 +10,8 @@ namespace form_builder.Models.Properties
         public virtual bool StrongLabel { get; set; } = true;
         public bool Optional { get; set; } = false;
         public bool? Email { get; set; }
+
+        public bool? Telephone{ get; set; }
         public bool Numeric { get; set; } = false;
         public List<Option> Options { get; set; } = new List<Option>();
         public int MaxLength { get; set; } = 200;

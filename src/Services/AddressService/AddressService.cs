@@ -1,22 +1,27 @@
-﻿using form_builder.Enum;
+﻿using form_builder.Constants;
+using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Providers.Address;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Providers.Address;
-using form_builder.Extensions;
 
 namespace form_builder.Services.AddressService
 {
     public interface IAddressService
     {
-        Task<ProcessRequestEntity> ProcesssAddress(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path);
+        Task<ProcessRequestEntity> ProcessAddress(
+            Dictionary<string, dynamic> viewModel,
+            Page currentPage,
+            FormSchema baseForm,
+            string guid,
+            string path);
     }
 
     public class AddressService : IAddressService
@@ -25,86 +30,232 @@ namespace form_builder.Services.AddressService
         private readonly IPageHelper _pageHelper;
         private readonly IEnumerable<IAddressProvider> _addressProviders;
 
-        public AddressService(IDistributedCacheWrapper distributedCache, IPageHelper pageHelper, IEnumerable<IAddressProvider> addressProviders)
+        public AddressService(
+            IDistributedCacheWrapper distributedCache,
+            IPageHelper pageHelper,
+            IEnumerable<IAddressProvider> addressProviders)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
             _addressProviders = addressProviders;
         }
 
-        public async Task<ProcessRequestEntity> ProcesssAddress(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
+        public async Task<ProcessRequestEntity> ProcessAddress(
+            Dictionary<string, dynamic> viewModel,
+            Page currentPage,
+            FormSchema baseForm,
+            string guid,
+            string path)
         {
-            var journey = (string)viewModel["AddressStatus"];
-            var addressResults = new List<AddressSearchResult>();
-            var addressElement = (Models.Elements.Address)currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
+            viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
 
-            if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
+            switch (subPath)
+            {
+                case LookUpConstants.Manual:
+                    return await ProcesssManualAddress(viewModel, currentPage, baseForm, guid, path);
+                case LookUpConstants.Automatic:
+                    return await ProcesssAutomaticAddress(viewModel, currentPage, baseForm, guid, path);
+                default:
+                    return await ProcesssSearchAddress(viewModel, currentPage, baseForm, guid, path);
+            }
+        }
+
+        private async Task<ProcessRequestEntity> ProcesssManualAddress(
+            Dictionary<string, dynamic> viewModel,
+            Page currentPage,
+            FormSchema baseForm,
+            string guid,
+            string path)
+        {
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+
+            if (!currentPage.IsValid)
             {
                 var cachedAnswers = _distributedCache.GetString(guid);
+
                 var convertedAnswers = cachedAnswers == null
                     ? new FormAnswers { Pages = new List<PageAnswers>() }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-                var postcode = journey == "Select"
-                    ? (string) convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode").Response
-                    : (string) viewModel[addressElement.AddressSearchQuestionId];
+                var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
 
-                var address = journey != "Select"
-                    ? string.Empty
-                    : (string)viewModel[addressElement.AddressSelectQuestionId];
+                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
+                model.Path = currentPage.PageSlug;
+                model.FormName = baseForm.FormName;
+                model.PageTitle = currentPage.Title;
+                model.BaseURL = baseForm.BaseURL;
 
-                var emptyPostcode = string.IsNullOrEmpty(postcode);
-                var emptyAddress = string.IsNullOrEmpty(address);
-
-                if (currentPage.IsValid && addressElement.Properties.Optional && emptyPostcode)
+                return new ProcessRequestEntity
                 {
-                    _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-                    return new ProcessRequestEntity
-                    {
-                        Page = currentPage
-                    };
-                }
+                    Page = currentPage,
+                    ViewModel = model
+                };
+            }
 
-                if (currentPage.IsValid && addressElement.Properties.Optional && emptyAddress && !emptyPostcode && journey == "Select")
+            return new ProcessRequestEntity
+            {
+                Page = currentPage
+            };
+        }
+
+        private async Task<ProcessRequestEntity> ProcesssAutomaticAddress(
+            Dictionary<string, dynamic> viewModel,
+            Page currentPage,
+            FormSchema baseForm,
+            string guid,
+            string path)
+        {
+            var cachedAnswers = _distributedCache.GetString(guid);
+
+            var convertedAnswers = cachedAnswers == null
+                ? new FormAnswers { Pages = new List<PageAnswers>() }
+                : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+
+            var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
+
+            var postcode = (string)convertedAnswers
+                        .Pages
+                        .FirstOrDefault(_ => _.PageSlug == path)
+                        .Answers
+                        .FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode")
+                        .Response;
+
+            var address = (string)viewModel[$"{addressElement.Properties.QuestionId}-address"];
+
+            if (currentPage.IsValid && addressElement.Properties.Optional && string.IsNullOrEmpty(postcode))
+            {
+                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                return new ProcessRequestEntity
                 {
-                    _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-                    return new ProcessRequestEntity
-                    {
-                        Page = currentPage
-                    };
-                }
+                    Page = currentPage
+                };
+            }
 
+            if (currentPage.IsValid && addressElement.Properties.Optional && string.IsNullOrEmpty(address) && !string.IsNullOrEmpty(postcode))
+            {
+                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                return new ProcessRequestEntity
+                {
+                    Page = currentPage
+                };
+            }
+
+            if (!currentPage.IsValid)
+            {
+                var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
+                
+                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
+                model.Path = currentPage.PageSlug;
+                model.FormName = baseForm.FormName;
+                model.PageTitle = currentPage.Title;
+
+                return new ProcessRequestEntity
+                {
+                    Page = currentPage,
+                    ViewModel = model
+                };
+            }
+
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+
+            return new ProcessRequestEntity
+            {
+                Page = currentPage
+            };
+        }
+
+        private async Task<ProcessRequestEntity> ProcesssSearchAddress(
+            Dictionary<string, dynamic> viewModel,
+            Page currentPage,
+            FormSchema baseForm,
+            string guid,
+            string path)
+        {
+            var cachedAnswers = _distributedCache.GetString(guid);
+
+            var convertedAnswers = cachedAnswers == null
+                ? new FormAnswers { Pages = new List<PageAnswers>() }
+                : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+
+            var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
+
+            if (!currentPage.IsValid)
+            {
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid);
+                formModel.Path = currentPage.PageSlug;
+                formModel.FormName = baseForm.FormName;
+                formModel.PageTitle = currentPage.Title;
+
+                return new ProcessRequestEntity
+                {
+                    Page = currentPage,
+                    ViewModel = formModel
+                };
+            }
+
+            var postcode = (string)viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
+
+            if (addressElement.Properties.Optional && string.IsNullOrEmpty(postcode))
+            {
+                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                return new ProcessRequestEntity
+                {
+                    Page = currentPage
+                };
+            }
+
+            var foundPostCode = convertedAnswers
+                .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
+                .Answers?.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode")?
+                .Response;
+
+            var addressResults = new List<object>();
+            if (postcode.Equals(foundPostCode))
+            {
+                addressResults = (convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>).ToList();
+            }
+            else
+            {
                 try
                 {
                     var searchResult = await _addressProviders.Get(addressElement.Properties.AddressProvider).SearchAsync(postcode);
-                    addressResults = searchResult.ToList();
+                    addressResults = searchResult.ToList<object>();
                 }
                 catch (Exception e)
                 {
                     throw new ApplicationException($"AddressController: An exception has occured while attempting to perform postcode lookup", e);
                 }
+
+                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", addressResults, guid);
             }
 
-            if (!currentPage.IsValid)
+            if (!addressResults.Any())
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults);
-                formModel.Path = currentPage.PageSlug;
-                formModel.AddressStatus = journey;
-                formModel.FormName = baseForm.FormName;
-                formModel.PageTitle = currentPage.Title;
-                formModel.HideBackButton = currentPage.HideBackButton;
-
                 return new ProcessRequestEntity
                 {
-                    Page = currentPage,
-                    ViewModel = formModel,
-                    ViewName = "../Address/Index"
+                    RedirectToAction = true,
+                    RedirectAction = "Index",
+                    RouteValues = new
+                    {
+                        form = baseForm.BaseURL,
+                        path,
+                        subPath = LookUpConstants.Manual
+                    }
                 };
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-            _pageHelper.SaveFormData($"{addressElement.Properties.QuestionId}-srcount", addressResults.Count, guid);
-            return await _pageHelper.ProcessAddressJourney(journey, currentPage, viewModel, baseForm, guid, addressResults);
+            return new ProcessRequestEntity
+            {
+                RedirectToAction = true,
+                RedirectAction = "Index",
+                RouteValues = new
+                {
+                    form = baseForm.BaseURL,
+                    path,
+                    subPath = LookUpConstants.Automatic
+                }
+            };
         }
     }
 }
