@@ -1638,5 +1638,40 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.True(result.ContainsValue("-2.345"));
             Assert.False(result.ContainsKey("nameTest2"));
         }
+
+        [Fact]
+        public void CheckForIncomingFormDataValues_ShouldThrowException_WhenQuestionId_OR_Name_Empty()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var incomingValueWithNoQuestionId = new IncomingValuesBuilder()
+                .WithQuestionId("")
+                .WithName("testName")
+                .Build();
+
+            var incomingValueWithNoName = new IncomingValuesBuilder()
+                .WithQuestionId("testQuestionId")
+                .WithName("")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithIncomingValue(incomingValueWithNoQuestionId)
+                .WithIncomingValue(incomingValueWithNoName)
+                .Build();
+
+            var pages = new List<Page>
+            {
+                page
+            };
+
+            // Act & Assert
+            var result = Assert.Throws<Exception>(() => _pageHelper.CheckForIncomingFormDataValues(pages));
+            Assert.Equal("PageHelper::CheckForIncomingFormDataValues, QuestionId or Name cannot be empty", result.Message);
+        }
     }
 }
