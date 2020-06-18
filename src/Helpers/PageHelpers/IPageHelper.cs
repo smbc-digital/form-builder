@@ -11,7 +11,6 @@ namespace form_builder.Helpers.PageHelpers
     public interface IPageHelper
     {
         void HasDuplicateQuestionIDs(List<Page> pages, string formName);
-        
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null);
         void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid);
         Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults);
@@ -25,7 +24,6 @@ namespace form_builder.Helpers.PageHelpers
         void CheckSubmitSlugsHaveAllProperties(List<Page> pages, string formName);
         void CheckForAcceptedFileUploadFileTypes(List<Page> pages, string formName);
         void SaveFormData(string key, object value, string guid);
-
-       
+        Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, Dictionary<string, dynamic> formData);
     }
 }

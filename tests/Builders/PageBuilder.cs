@@ -11,7 +11,7 @@ namespace form_builder_tests.Builders
         private bool _isValidated = false;
         private List<IElement> _elements = new List<IElement>();
         private List<Behaviour> _behaviours = new List<Behaviour>();
-
+        private List<IncomingValue> _incomingValues = new List<IncomingValue>();
 
         public Page Build()
         {
@@ -21,7 +21,8 @@ namespace form_builder_tests.Builders
                 PageSlug = _PageSlug,
                 IsValidated = _isValidated,
                 Behaviours = _behaviours,
-                Elements = _elements
+                Elements = _elements,
+                IncomingValues = _incomingValues
             };
         }
 
@@ -57,6 +58,12 @@ namespace form_builder_tests.Builders
         {
             _behaviours.Add(behaviour);
 
+            return this;
+        }
+
+        public PageBuilder WithIncomingValue(IncomingValue value)
+        {
+            _incomingValues.Add(value);
             return this;
         }
     }

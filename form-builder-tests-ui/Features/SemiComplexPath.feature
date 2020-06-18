@@ -3,7 +3,7 @@ Feature: SemiComplexPath
 	Checking the path looks at both questions for next page
 
 Scenario: Standard use of behaviour when questions on same page
-	Given I navigate to "/semicomplexpath/first-question"
+	Given I navigate to "/ui-semi-complex-path/first-question"
 	When I click the "firstQuestion-0" radiobutton
 	Then The "firstQuestion-0" radiobutton should be checked
 	When I click the "secondQuestion-1" radiobutton

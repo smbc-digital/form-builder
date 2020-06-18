@@ -283,6 +283,13 @@ In some cases there maybe a need to emphasize a label (this is seen commonly on 
 ### **[Lookups](https://github.com/smbc-digital/form-builder/wiki/Lookup)** (*string*)
 For controls that have multiple options you can use the Lookup property to reference an existing list.
 
+### **[Reusable Elements](https://github.com/smbc-digital/form-builder/wiki/ReusableElements)**
+It's possible to build a library of consistent elements that can used in multiple forms. These use a special element called "Reusable".
+
+Similar to a lookup they allow to specify and reference element, this element will be substituted for the specified reusable elements when the form schema loaded.
+
+Reusable elements can contain references to lookups, so for example you could create a reusable element that specifies all the information surrounding a dropdown list (label, hint, validations etc.) but have the list content specified in the lookup.
+
 ## Available Elements
 
 * **Type** (*string*) (HTML element)
@@ -312,6 +319,7 @@ For controls that have multiple options you can use the Lookup property to refer
     * [DatePicker](https://github.com/smbc-digital/form-builder/wiki/DatePicker)
     * [Organisation](https://github.com/smbc-digital/form-builder/wiki/Organisation)
     * [FileUpload](https://github.com/smbc-digital/form-builder/wiki/FileUpload)
+    * [Reusable](https://github.com/smbc-digital/form-builder/wiki/ReusableElements)
     
 
 * **Properties** (*object*) (Prop types of an element - * = Mandatory)

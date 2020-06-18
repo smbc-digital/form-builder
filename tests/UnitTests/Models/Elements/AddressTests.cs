@@ -120,7 +120,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
-            Assert.Equal($"/v2/{baseUrl}/{pageSlug}", callback.ReturnURL);
+            Assert.Equal($"/{baseUrl}/{pageSlug}", callback.ReturnURL);
         }
     }
 }

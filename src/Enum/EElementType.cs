@@ -35,7 +35,7 @@
         Warning,
         Declaration,
         Summary,
+        Reusable,
         Map
-
     }
 }
