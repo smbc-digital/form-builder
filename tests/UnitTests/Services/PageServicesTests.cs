@@ -118,7 +118,6 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
@@ -191,7 +190,6 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
@@ -230,7 +228,6 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
@@ -269,7 +266,6 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
@@ -302,7 +298,6 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
@@ -520,7 +515,6 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "OrganisationStatus", "Search" },
                 { $"{element.Properties.QuestionId}-organisation-searchterm", "orgName" },
             };
 

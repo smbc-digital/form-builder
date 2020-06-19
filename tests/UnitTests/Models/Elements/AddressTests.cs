@@ -39,7 +39,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("AddressStatus", "Search");
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -125,7 +124,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("AddressStatus", "Select");
             viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
 
             var schema = new FormSchemaBuilder()
@@ -137,7 +135,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var result = await element.RenderAsync(_mockIViewRender.Object,
                 _mockElementHelper.Object,
                 "",
-                
                 viewModel,
                 page,
                 schema,

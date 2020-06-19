@@ -248,7 +248,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("AddressStatus", "Search");
+            viewModel.Add("subPath", "");
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -307,7 +307,6 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("StreetStatus", "Search");
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")

@@ -82,7 +82,6 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
@@ -92,9 +91,8 @@ namespace form_builder_tests.UnitTests.Services
         }
 
 
-        [Theory]
-        [InlineData(true, "Search")]
-        public async Task ProcessAddress_ShouldNotCallAddressProvider_WhenAddressIsOptional(bool isValid, string journey)
+        [Fact]
+        public async Task ProcessAddress_ShouldNotCallAddressProvider_WhenAddressIsOptional()
         {
             var questionId = "test-address";
 
@@ -128,7 +126,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithValidatedModel(isValid)
+                .WithValidatedModel(true)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -139,7 +137,6 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", journey },
                 { $"{element.Properties.QuestionId}-postcode", "" },
             };
 
@@ -173,7 +170,6 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
@@ -206,7 +202,6 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
@@ -242,7 +237,6 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 

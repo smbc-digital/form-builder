@@ -222,11 +222,10 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("AddressStatus", "Search")
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
-            var result = await _homeController.Index("form", "page-one", viewModel, null);
+            var result = await _homeController.Index("form", "page-one", viewModel, null, "automatic");
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Search", viewResult.ViewName);
         }
@@ -253,11 +252,10 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("AddressStatus", "Search")
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
-            var result = await _homeController.Index("testform", "page-one", viewModel, null);
+            var result = await _homeController.Index("testform", "page-one", viewModel, null, "automatic");
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.True(redirectResult.RouteValues.ContainsKey("form"));
             Assert.True(redirectResult.RouteValues.ContainsKey("path"));
@@ -291,7 +289,6 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("AddressStatus", "Select")
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
@@ -299,7 +296,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = behaviourType });
 
-            var result = await _homeController.Index("form", "page-one", viewModel, null);
+            var result = await _homeController.Index("form", "page-one", viewModel, null, "automatic");
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal(viewName, viewResult.ActionName);
@@ -328,7 +325,6 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry("AddressStatus", "Select")
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
@@ -336,7 +332,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.GoToExternalPage, PageSlug = "submit-url" });
 
-            var result = await _homeController.Index("form", "page-one", viewModel, null);
+            var result = await _homeController.Index("form", "page-one", viewModel, null, "automatic");
 
             var redirectResult = Assert.IsType<RedirectResult>(result);
             Assert.Equal("submit-url", redirectResult.Url);

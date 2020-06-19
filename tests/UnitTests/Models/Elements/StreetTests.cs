@@ -63,7 +63,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("StreetStatus", "Search");
 
             var schema = new FormSchemaBuilder()
                 .WithName("Street name")
