@@ -3,7 +3,7 @@ Feature: Summary
 In order to see summaryIhave to enter data;
 
 Scenario: I enterer details I should see them in the summary
-	Given I navigate to "summary-1860/page-one"
+	Given I navigate to "ui-summary/page-one"
 	When I fill in page1
 	And I click the "continue" button
 	Then I fill in page3
