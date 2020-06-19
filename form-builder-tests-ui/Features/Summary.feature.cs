@@ -90,7 +90,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 12
  testRunner.Then("I select \"address 2\" in \"address-address\" dropdown", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 13
- testRunner.And("I click the \"continue\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 14
  testRunner.Then("I fill in page3", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 15

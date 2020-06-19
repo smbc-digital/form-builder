@@ -63,7 +63,7 @@ namespace form_builder.Models.Elements
                     ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
                     var selectedStreet = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, StreetConstants.SELECT_SUFFIX);
-                    Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} addresses found", string.Empty) };
+                    Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} streets found", string.Empty) };
                     results?.ForEach((objectResult) => {
                         AddressSearchResult searchResult;
 
