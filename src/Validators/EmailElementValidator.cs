@@ -45,7 +45,7 @@ namespace form_builder.Validators
 
             return new ValidationResult{
                     IsValid = isValid,
-                    Message = isValid ? string.Empty : $"{ element.Properties.Label} must be a valid email address"
+                    Message = isValid ? string.Empty : "Enter an email address in the correct format, like name@example.com"
                 }; 
         }
     }
