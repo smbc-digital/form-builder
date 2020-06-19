@@ -10,7 +10,6 @@ namespace form_builder.Models.Elements
 {
     public class DatePicker : Element
     {
-
         public const string PLACEHOLDER_DATE_FORMAT = "dd/mm/yyyy";
 
         public DatePicker()
@@ -28,7 +27,8 @@ namespace form_builder.Models.Elements
             IHostingEnvironment environment,
             List<object> results = null)
         {
-            Properties.Date = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
+            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
+
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckAllDateRestrictionsAreNotEnabled(this);
