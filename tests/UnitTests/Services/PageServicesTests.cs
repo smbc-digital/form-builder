@@ -73,7 +73,8 @@ namespace form_builder_tests.UnitTests.Services
 
             var cacheData = new FormAnswers
             {
-                Path = "page-one"
+                Path = "page-one",
+                FormName = "form"
             };
 
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
