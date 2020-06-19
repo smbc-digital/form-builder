@@ -74,32 +74,6 @@ namespace form_builder_tests.UnitTests.Models
             Assert.Equal(PageSlug, result.URL);
         }
 
-        [Fact(Skip = "WIP, test mmight not be valid as its GoToPage within Submit, will verify")]
-        public void GetNextPage_ShouldGoToOther_WhenCheckboxContainsOther()
-        {
-            var PageSlug = "page-other";
-
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithPageSlug("page-continue")
-                .Build();
-
-            var behaviour2 = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithPageSlug(PageSlug)
-                .WithCondition(new Condition { CheckboxContains = "other", QuestionId = "test" })
-                .Build();
-
-            var page = new PageBuilder()
-                .WithBehaviour(behaviour)
-                .WithBehaviour(behaviour2)
-                .Build();
-
-            var result = page.GetSubmitFormEndpoint(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "test", Response = "test,other" } } } } }, null);
-
-            Assert.Equal(PageSlug, result.URL);
-        }
-
         #region GetNextPage Tests
 
         [Theory]

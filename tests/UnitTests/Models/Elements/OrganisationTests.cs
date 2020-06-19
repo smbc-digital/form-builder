@@ -53,10 +53,10 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
-            viewModel.Add($"{addressEleement.Properties.QuestionId}-organisation", "test org");
+            viewModel.Add($"{organisationElement.Properties.QuestionId}-organisation", "test org");
 
             //Act
-            var result = await addressEleement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"),It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -89,7 +89,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
-            viewModel.Add($"{addressEleement.Properties.QuestionId}-organisation", "test org");
+            viewModel.Add($"{organisationElement.Properties.QuestionId}-organisation", "test org");
 
             var searchResults = new List<object>
             {
@@ -97,7 +97,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             };
 
             //Act
-            var result = await addressEleement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object, searchResults);
+            var result = await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object, searchResults);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"),It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()), Times.Once);

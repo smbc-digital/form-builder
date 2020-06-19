@@ -121,7 +121,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcessRequest("form", "page-one", "", viewModel, null);
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null);
 
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Once);
             _mockSchemaFactory.Verify(_ => _.Build(It.IsAny<string>()), Times.Once);
@@ -158,7 +158,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
 
-            await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", "", viewModel, null));
+            await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null));
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcessRequest("form", "page-one", "", viewModel, null);
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null);
 
             _addressService.Verify(_ => _.ProcessAddress(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
@@ -233,7 +233,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcessRequest("form", "page-one", "", viewModel, null);
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null);
 
             _streetService.Verify(_ => _.ProcessStreet(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
@@ -272,7 +272,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", "", viewModel, null));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null));
 
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Once);
         }
@@ -305,7 +305,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessRequest("form", "page-one", "", viewModel, null));
+            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessRequest("form", "page-one", viewModel, null));
             Assert.Equal("Session guid null.", result.Message);
         }
 
@@ -523,7 +523,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-organisation-searchterm", "orgName" },
             };
 
-            var result = await _service.ProcessRequest("form", "page-one", "", viewModel, null);
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null);
 
             _organisationService.Verify(_ => _.ProcessOrganisation(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
@@ -600,7 +600,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns("guid");
 
             //Act
-            var result = await _service.ProcessRequest("form", "first-page", "", new Dictionary<string, dynamic>(), It.IsAny<IEnumerable<CustomFormFile>>());
+            var result = await _service.ProcessRequest("form", "first-page", new Dictionary<string, dynamic>(), It.IsAny<IEnumerable<CustomFormFile>>());
 
             //Assert
             Assert.Equal(viewModel.StartFormUrl, result.ViewModel.StartFormUrl);
@@ -717,7 +717,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessRequest_ShouldNot_CallPageHelper_WhenPageContains_NoInboundValues()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var page = new PageBuilder()
@@ -732,7 +732,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null, false);
+            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null);
 
             _pageHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>()), Times.Never);
         }
@@ -742,7 +742,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessRequest_Should_CallPageHelper_WhenPageContains_InboundValues()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var page = new PageBuilder()
@@ -758,7 +758,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null, false);
+            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null);
 
             _pageHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
         }

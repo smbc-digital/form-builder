@@ -7,7 +7,6 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,8 +52,6 @@ namespace form_builder.Services.StreetService
             string guid,
             string path)
         {
-            var streetResults = new List<AddressSearchResult>();
-
             var cachedAnswers = _distributedCache.GetString(guid);
             var streetElement = currentPage.Elements.Where(_ => _.Type == EElementType.Street).FirstOrDefault();
             var convertedAnswers = cachedAnswers == null
@@ -144,7 +141,7 @@ namespace form_builder.Services.StreetService
 
             var foundStreet = convertedAnswers
                 .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
-                .Answers?.FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}-street")?
+                .Answers?.FirstOrDefault(_ => _.QuestionId == streetElement.Properties.QuestionId)?
                 .Response;
 
             List<object> searchResults;
@@ -160,7 +157,7 @@ namespace form_builder.Services.StreetService
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException($"StreetService::ProcessStreet: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
+                    throw new ApplicationException($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
                 }
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
@@ -183,7 +180,7 @@ namespace form_builder.Services.StreetService
             }
             catch (Exception e)
             {
-                throw new ApplicationException($"PageHelper.ProcessStreetJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
+                throw new ApplicationException($"PageHelper.ProccessInitialStreet: An exception has occured while attempting to generate Html, Exception: {e.Message}");
             };
         }
     }

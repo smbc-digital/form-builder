@@ -21,9 +21,7 @@ namespace form_builder.Models.Elements
         public string AddressSearchQuestionId => $"{Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}";
         public string AddressSelectQuestionId => $"{Properties.QuestionId}{AddressConstants.SELECT_SUFFIX}";
         private bool IsSelect { get; set; } = false; 
-
         private bool IsSearch { get; set; } = false; 
-
         public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
         public override bool DisplayHint => !string.IsNullOrEmpty(Hint);
         public override string  QuestionId => IsSelect ? AddressSelectQuestionId : AddressSearchQuestionId;
@@ -58,18 +56,10 @@ namespace form_builder.Models.Elements
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
             switch (subPath as string) {
                 case LookUpConstants.Manual:
-                    var manualAddressElement = new AddressManual { Properties = Properties };
-                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
+                    var manualAddressElement = new AddressManual(validationResult);
+                    manualAddressElement.Properties = Properties;
 
-                    SetAddressProperties(viewModel, Properties.Value);
-
-                    if (results != null && results.Count == 0)
-                        manualAddressElement.Properties.DisplayNoResultsIAG = true;
-
-                    manualAddressElement.ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
-
-                    return await viewRender.RenderAsync("AddressManual", manualAddressElement);
-
+                    return await manualAddressElement.RenderAsync(viewRender,elementHelper, guid, viewModel, page,formSchema, environment, results);
                 case LookUpConstants.Automatic:
                     IsSelect = true;
                     Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);

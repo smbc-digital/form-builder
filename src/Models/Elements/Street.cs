@@ -4,12 +4,10 @@ using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Addresses;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using form_builder.Constants;
-using form_builder.ViewModels;
 using Newtonsoft.Json.Linq;
 
 namespace form_builder.Models.Elements
@@ -61,10 +59,10 @@ namespace form_builder.Models.Elements
             {
                 case LookUpConstants.Automatic:
                     IsSelect = true;
-                    Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, "-street");
+                    Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, string.Empty);
                     ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
-                    var selectedStreet = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, "-streetaddress");
+                    var selectedStreet = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, StreetConstants.SELECT_SUFFIX);
                     Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} addresses found", string.Empty) };
                     results?.ForEach((objectResult) => {
                         AddressSearchResult searchResult;
@@ -80,7 +78,7 @@ namespace form_builder.Models.Elements
                     return await viewRender.RenderAsync("StreetSelect", this);
                 default:
 
-                    Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, "-street");
+                    Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, string.Empty);
                     return await viewRender.RenderAsync("StreetSearch", this);
             }
         }

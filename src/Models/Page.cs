@@ -101,7 +101,7 @@ namespace form_builder.Models
                     var isNullOrEmptyValid = !isNullOrEmpty.Any();
 
                     if(equalToConditions.Any())
-                        equalToValid = equalToConditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
+                        equalToValid = equalToConditions.All(x => x.EqualTo.Equals(viewModel.ContainsKey(x.QuestionId) ? viewModel[x.QuestionId] : string.Empty));
 
                     if(checkBoxContainsConditions.Any())
                         checkBoxContainsValid = checkBoxContainsConditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
@@ -115,7 +115,7 @@ namespace form_builder.Models
                     if (isNullOrEmpty.Any())
                         isNullOrEmptyValid = isNullOrEmpty.All(x => string.IsNullOrEmpty(viewModel[x.QuestionId]) == x.IsNullOrEmpty);
 
-                    if (equalToValid && checkBoxContainsValid && dateIsBeforeValid && dateIsAfterValid)
+                    if (equalToValid && checkBoxContainsValid && dateIsBeforeValid && dateIsAfterValid && isNullOrEmptyValid)
                         return behaviour;
                 }
             }

@@ -3,25 +3,19 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.OrganisationService;
-using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Moq;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using StockportGovUK.NetStandard.Gateways.Response;
 using StockportGovUK.NetStandard.Models.Enums;
 using Xunit;
 using StockportGovUK.NetStandard.Models.Organisation;
 using form_builder.Builders;
 using form_builder.Providers.Organisation;
-using Amazon.S3.Model;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace form_builder_tests.UnitTests.Services
+namespace form_builder_tests.UnitTests.Services 
 {
     public class OrganisationServiceTests
     {
@@ -100,13 +94,14 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "OrganisationStatus", "Search" },
+                { "subPath", "automatic" },
                 { element.Properties.QuestionId, "searchTerm" },
             };
 
             var result = await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
 
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
         }
 
         [Fact]
@@ -156,22 +151,49 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                { "Guid", Guid.NewGuid().ToString() },
-                { "OrganisationStatus", "Search" },
+                { "subPath", "automatic" },
                 { element.Properties.QuestionId, "" },
             };
 
             var result = await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
 
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
         }
 
         [Fact]
-        public async Task ProcessOrganisation_ShouldCall_PageHelper_ToProcessSearchResults()
+        public async Task ProcessOrganisation_Should_NotCall_OrganisationProvider_When_SearchTerm_IsTheSame()
         {
+            var cacheData = new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>()
+                {
+                    new PageAnswers
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                QuestionId = "test-address",
+                                Response = _searchModel.SearchTerm
+                            }
+                        },
+                        PageSlug = "page-one"
+                    }
+                },
+                FormData = new Dictionary<string, object> 
+                {
+                    {"page-one-search-results", new List<object>{ }}
+                }
+            };
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+
             var element = new ElementBuilder()
                .WithType(EElementType.Organisation)
-               .WithQuestionId("test-org")
                .WithOrganisationProvider(EOrganisationProvider.Fake.ToString())
+               .WithQuestionId("test-address")
                .Build();
 
             var page = new PageBuilder()
@@ -184,19 +206,74 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
-                .ReturnsAsync(new FormBuilderViewModel());
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { "Guid", Guid.NewGuid().ToString() },
+                { "subPath", "" },
+                { element.Properties.QuestionId, _searchModel.SearchTerm },
+            };
+
+            var result = await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
+
+            _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
+            _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()), Times.Never);
+            _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>()), Times.Never);
+        }
+
+        
+        [Fact]
+        public async Task ProcessOrganisation_Should_Call_OrganisationProvider_When_SearchTerm_IsDifferent()
+        {
+            var cacheData = new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>()
+                {
+                    new PageAnswers
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                QuestionId = "test-address",
+                                Response = "old search term"
+                            }
+                        },
+                        PageSlug = "page-one"
+                    }
+                }
+            };
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+
+            var element = new ElementBuilder()
+               .WithType(EElementType.Organisation)
+               .WithOrganisationProvider(EOrganisationProvider.Fake.ToString())
+               .WithQuestionId("test-address")
+               .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithValidatedModel(true)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
 
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "OrganisationStatus", "Search" },
-                { element.Properties.QuestionId, "searchTerm" },
+                { "subPath", "" },
+                { element.Properties.QuestionId, _searchModel.SearchTerm },
             };
 
             var result = await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
 
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()), Times.Once);
+            _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -223,7 +300,7 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "OrganisationStatus", "Search" },
+                { "subPath", "" },
                 { element.Properties.QuestionId, _searchModel.SearchTerm },
             };
 

@@ -1,5 +1,4 @@
-﻿using System;
-using form_builder.Constants;
+﻿using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers;
@@ -9,7 +8,6 @@ using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using form_builder.ViewModels;
 using Newtonsoft.Json.Linq;
 
 namespace form_builder.Models.Elements
@@ -60,13 +58,13 @@ namespace form_builder.Models.Elements
             switch (subPath as string)
             {
                 case LookUpConstants.Automatic:
-                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-organisation-searchterm");
+                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
                     IsSelect = true;
                     ReturnURL = environment.EnvironmentName == "local" || environment.EnvironmentName == "uitest"
                                 ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
                                 : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
 
-                    var selectedOrganisation = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-organisation");
+                    var selectedOrganisation = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, OrganisationConstants.SELECT_SUFFIX);
                     Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} organisations found", string.Empty) };
                     results?.ForEach((objectResult) =>
                     {
@@ -82,7 +80,7 @@ namespace form_builder.Models.Elements
 
                     return await viewRender.RenderAsync("OrganisationSelect", this);
                 default:
-                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-organisation-searchterm");
+                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
                     var test = await viewRender.RenderAsync("OrganisationSearch", this);
                     return test;
             }

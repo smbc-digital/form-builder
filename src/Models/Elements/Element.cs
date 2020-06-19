@@ -6,14 +6,12 @@ using form_builder.Validators;
 using Microsoft.AspNetCore.Hosting;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 
 namespace form_builder.Models.Elements
 {
     public class Element : IElement
     {
-        private ValidationResult validationResult;
+        protected ValidationResult validationResult;
 
         public Element()
         {
@@ -33,11 +31,6 @@ namespace form_builder.Models.Elements
         public bool IsValid => validationResult.IsValid; 
         public string ValidationMessage => validationResult.Message;
         public string Lookup { get; set; }
-
-        public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
-        {
-            return viewRender.RenderAsync(Type.ToString(), this, null);
-        }
         
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators)
         {

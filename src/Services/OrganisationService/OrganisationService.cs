@@ -7,7 +7,6 @@ using form_builder.Providers.Organisation;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,8 +52,6 @@ namespace form_builder.Services.OrganisationService
             string guid,
             string path)
         {
-            var streetResults = new List<AddressSearchResult>();
-
             var cachedAnswers = _distributedCache.GetString(guid);
             var organisationElement = currentPage.Elements.Where(_ => _.Type == EElementType.Organisation).FirstOrDefault();
             var convertedAnswers = cachedAnswers == null
@@ -143,7 +140,7 @@ namespace form_builder.Services.OrganisationService
 
             var foundOrganisationSearchTerm = convertedAnswers
                 .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
-                .Answers?.FirstOrDefault(_ => _.QuestionId == $"{organisationElement.Properties.QuestionId}-organisation-searchterm")?
+                .Answers?.FirstOrDefault(_ => _.QuestionId == organisationElement.Properties.QuestionId)?
                 .Response;
 
             List<object> searchResults;

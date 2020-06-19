@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using form_builder.Models.Elements;
 using form_builder.Enum;
 using form_builder.Extensions;
+using form_builder.Constants;
 
 namespace form_builder.Validators
 {
@@ -27,7 +28,7 @@ namespace form_builder.Validators
             }
           
 
-            if ((!element.Properties.StockportPostcode.HasValue || !element.Properties.StockportPostcode.Value) || !viewModel.ContainsKey(element.Properties.QuestionId + "-postcode"))
+            if ((!element.Properties.StockportPostcode.HasValue || !element.Properties.StockportPostcode.Value) || !viewModel.ContainsKey($"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"))
             {
                 return new ValidationResult
                 {
@@ -35,7 +36,7 @@ namespace form_builder.Validators
                 };
             }
 
-            if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId + "-postcode"]) && element.Properties.Optional)
+            if (string.IsNullOrEmpty(viewModel[$"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"]) && element.Properties.Optional)
             {
                 return new ValidationResult
                 {
@@ -43,7 +44,7 @@ namespace form_builder.Validators
                 };
             }
 
-            var value = viewModel[element.Properties.QuestionId + "-postcode"];
+            var value = viewModel[$"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"];
 
             var isValid = true;
             var regex = new Regex(@"^(sK|Sk|SK|sk|M|m)[0-9][0-9A-Za-z]?\s?[0-9][A-Za-z]{2}");
