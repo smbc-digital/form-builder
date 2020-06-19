@@ -11,7 +11,6 @@ using System.Linq;
 using form_builder.Enum;
 using form_builder.Services.AddressService;
 using form_builder.Services.StreetService;
-using form_builder.Models.Elements;
 using form_builder.ViewModels;
 using form_builder.Providers.StorageProvider;
 using form_builder.Extensions;
@@ -19,11 +18,11 @@ using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
-using form_builder.Cache;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
 using form_builder.ContentFactory;
 using form_builder.Factories.Schema;
+using form_builder.Constants;
 
 namespace form_builder.Services.PageService
 {
@@ -72,7 +71,7 @@ namespace form_builder.Services.PageService
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
         }
         
-        public async Task<ProcessPageEntity> ProcessPage(string form, string path, bool isAddressManual = false)
+        public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -121,7 +120,6 @@ namespace form_builder.Services.PageService
                     _distributedCache.Remove(sessionGuid);
             }
 
-
             var page = baseForm.GetPage(path);
             if (page == null)
             {
@@ -130,54 +128,32 @@ namespace form_builder.Services.PageService
 
             await baseForm.ValidateFormSchema(_pageHelper, form, path);
 
-            if (isAddressManual)
+            List<object> searchResults = null;
+            if (subPath.Equals(LookUpConstants.Automatic) || subPath.Equals(LookUpConstants.Manual))
             {
-                var addressElement = page.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
-                var addressIndex = page.Elements.IndexOf(addressElement);
-                var manualAddressElement = new AddressManual { Properties = addressElement.Properties, Type = EElementType.AddressManual };
-                page.Elements[addressIndex] = manualAddressElement;
+                var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+
+                if (!string.IsNullOrEmpty(formData))
+                    convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+                if(convertedAnswers.FormData.ContainsKey($"{path}{LookUpConstants.SearchResultsKeyPostFix}"))
+                    searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
             }
 
-            var viewModel = await GetViewModel(page, baseForm, path, sessionGuid);
-            var startFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{viewModel.BaseURL}/{viewModel.StartPageSlug}";
-            viewModel.StartFormUrl = startFormUrl;
-
-            if (page.Elements.Any(_ => _.Type == EElementType.Street))
-            {
-                viewModel.StreetStatus = "Search";
-                return new ProcessPageEntity
-                {
-                    ViewModel = viewModel,
-                    ViewName = "../Street/Index"
-                };
-            }
-
-            if (page.Elements.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.AddressManual))
-            {
-                viewModel.AddressStatus = "Search";
-                return new ProcessPageEntity
-                {
-                    ViewModel = viewModel,
-                    ViewName = "../Address/Index"
-                };
-            }
-
-            if (page.Elements.Any(_ => _.Type == EElementType.Organisation))
-            {
-                viewModel.OrganisationStatus = "Search";
-                return new ProcessPageEntity
-                {
-                    ViewModel = viewModel,
-                    ViewName = "../Organisation/Index"
-                };
-            }
+            var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
+            viewModel.StartFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{viewModel.BaseURL}/{viewModel.StartPageSlug}";
 
             return new ProcessPageEntity
             {
                 ViewModel = viewModel
             };
         }
-        public async Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> files, bool processManual)
+
+        public async Task<ProcessRequestEntity> ProcessRequest(
+            string form,
+            string path,
+            Dictionary<string, dynamic> viewModel,
+            IEnumerable<CustomFormFile> files)
         {
             var baseForm = await _schemaFactory.Build(form);
 
@@ -197,24 +173,16 @@ namespace form_builder.Services.PageService
             if(currentPage.HasIncomingValues)
                 viewModel = _pageHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
-            if (processManual)
-            {
-                var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
-                var addressIndex = currentPage.Elements.IndexOf(addressElement);
-                var manualAddressElement = new AddressManual { Properties = addressElement.Properties, Type = EElementType.AddressManual };
-                currentPage.Elements[addressIndex] = manualAddressElement;
-            }
-
             currentPage.Validate(viewModel, _validators);
 
-            if (currentPage.Elements.Any(_ => _.Type == EElementType.Address) && !processManual)
-                return await _addressService.ProcesssAddress(viewModel, currentPage, baseForm, sessionGuid, path);
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
+                return await _addressService.ProcessAddress(viewModel, currentPage, baseForm, sessionGuid, path);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Street))
                 return await _streetService.ProcessStreet(viewModel, currentPage, baseForm, sessionGuid, path);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Organisation))
-                return await _organisationService.ProcesssOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
+                return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
@@ -244,9 +212,12 @@ namespace form_builder.Services.PageService
             };
         }
 
-        public async Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid)
+        public async Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid, string subPath, List<object> results)
         {
-            var viewModel = await _pageHelper.GenerateHtml(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid);
+            var viewModelData = new Dictionary<string, dynamic>();
+            viewModelData.Add(LookUpConstants.SubPathViewModelKey, subPath);
+
+            var viewModel = await _pageHelper.GenerateHtml(page, viewModelData, baseForm, sessionGuid, results);
             viewModel.FormName = baseForm.FormName;
             viewModel.PageTitle = page.Title;
             viewModel.HideBackButton = page.HideBackButton;
@@ -257,7 +228,6 @@ namespace form_builder.Services.PageService
             return viewModel;
         }
 
-       
         public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
             Dictionary<string, dynamic> answers = new Dictionary<string, dynamic>();

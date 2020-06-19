@@ -5,8 +5,12 @@ namespace form_builder.Models
 {
     public class Condition
     {
+        public bool? IsNullOrEmpty { get; set; }
+
         public string EqualTo { get; set; }
+        
         public string CheckboxContains { get; set; }
+        
         public string QuestionId { get; set; }
 
         public int? IsBefore { get; set; }
