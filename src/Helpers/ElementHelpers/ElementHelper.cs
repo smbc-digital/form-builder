@@ -14,7 +14,7 @@ namespace form_builder.Helpers.ElementHelpers
 {
     public interface IElementHelper
     {
-        string CurrentValue(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "");
+        T CurrentValue<T>(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "");
         bool CheckForQuestionId(Element element);
         bool CheckForLabel(Element element);
         bool CheckForMaxLength(Element element);
@@ -42,10 +42,10 @@ namespace form_builder.Helpers.ElementHelpers
 
         }
 
-        public string CurrentValue(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
+        public T CurrentValue<T>(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
         {
             if (element.Type == EElementType.FileUpload)
-                return string.Empty;
+                return (T) Convert.ChangeType(string.Empty, typeof(T));
 
             var currentValue = answers.ContainsKey($"{element.Properties.QuestionId}{suffix}");
 
@@ -61,10 +61,10 @@ namespace form_builder.Helpers.ElementHelpers
                     {
                         var value = storedValue.Answers.FirstOrDefault(_ => _.QuestionId == $"{element.Properties.QuestionId}{suffix}");
 
-                        return value != null ? value.Response : string.Empty;
+                        return value != null ? (T)value.Response : (T) Convert.ChangeType(string.Empty, typeof(T));
                     }
                 }
-                return string.Empty;
+                return (T) Convert.ChangeType(string.Empty, typeof(T));
             }
 
             return currentValue ? answers[$"{element.Properties.QuestionId}{suffix}"] : string.Empty;
