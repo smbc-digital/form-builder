@@ -116,7 +116,7 @@ namespace form_builder.Services.PageService
             if (formData != null && path == baseForm.StartPageSlug)
             {
                 var convertedFormData = JsonConvert.DeserializeObject<FormAnswers>(formData);
-                if (form != convertedFormData.FormName)
+                if (form.ToLower() != convertedFormData.FormName.ToLower())
                     _distributedCache.Remove(sessionGuid);
             }
 
