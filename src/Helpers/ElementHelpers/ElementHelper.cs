@@ -51,7 +51,7 @@ namespace form_builder.Helpers.ElementHelpers
 
             if (!currentValue)
             {
-                var cacheData = _distributedCache.GetString(guid);
+                var cacheData = _distributedCache.GetString(guid);  
                 if(cacheData != null)
                 {
                     var mappedCacheData = JsonConvert.DeserializeObject<FormAnswers>(cacheData);
@@ -197,12 +197,10 @@ namespace form_builder.Helpers.ElementHelpers
             if (!string.IsNullOrEmpty(formData))
             {
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
             }
 
             return convertedAnswers.FormData.ContainsKey(key) ? convertedAnswers.FormData.GetValueOrDefault(key) : string.Empty;
         }
-
 
         public FormAnswers GetFormData(string guid)
         {
@@ -212,7 +210,6 @@ namespace form_builder.Helpers.ElementHelpers
             if (!string.IsNullOrEmpty(formData))
             {
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
             }
 
             return convertedAnswers;
