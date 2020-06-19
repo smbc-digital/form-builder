@@ -135,7 +135,7 @@ namespace form_builder.Models.Elements
             IHostingEnvironment environment,
             List<object> results = null)
         {
-            SetAddressProperties(elementHelper, page.PageSlug, guid, viewModel)
+            SetAddressProperties(elementHelper, page.PageSlug, guid, viewModel);
 
             if (results != null && results.Count == 0)
                 Properties.DisplayNoResultsIAG = true;
