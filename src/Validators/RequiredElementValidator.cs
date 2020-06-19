@@ -40,7 +40,7 @@ namespace form_builder.Validators
                 if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-address";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
                 }
                 else
                 {
@@ -55,7 +55,7 @@ namespace form_builder.Validators
                 if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-street";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
 
                 }
                 else
@@ -70,7 +70,7 @@ namespace form_builder.Validators
                 if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-organisation";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
 
                 }
                 else
