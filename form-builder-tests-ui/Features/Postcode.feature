@@ -3,7 +3,7 @@ Feature: Postcode
 	In order to fill in my details I have to navigate to Page1
 
 Scenario: Postcode validation
-	Given I navigate to "/postcode/page1"
+	Given I navigate to "/ui-postcode/page1"
 	Then I should see the header
 	And I should see the "postcode" input
 	And I should see the "nextStep" button

@@ -5,7 +5,7 @@ Feature: Timeinput
 	I want to be enter time in am or pm
 
 Scenario: Time input standard use.
-	Given I navigate to "/time/page1"
+	Given I navigate to "/ui-time-input/page1"
 	Then I should see the header
 	And I should see the "timeid-hours" input
 	And I should see the "timeid-minutes" input

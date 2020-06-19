@@ -3,7 +3,7 @@ Feature: DatePicker
 	In order to collect a date users enter a date in the date picker
 
 Scenario: Datepicker standard use
-	Given I navigate to "/signoffgroup5datepicker/date-picker"
+	Given I navigate to "/ui-datepicker/date-picker"
 	When I click the "continue" button
 	Then I should see a validation message for "passportIssued-error" date picker
 	Then I should see a validation message for "dob-error" date picker

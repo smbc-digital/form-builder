@@ -1,6 +1,7 @@
 ﻿using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using Moq;
@@ -13,11 +14,12 @@ namespace form_builder_tests.UnitTests.Helpers
     public class ElementHelperTests
     {
         private readonly Mock<IDistributedCacheWrapper> _mockDistrbutedCacheWrapper = new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
         private readonly ElementHelper _elementHelper;
 
         public ElementHelperTests()
         {
-            _elementHelper = new ElementHelper(_mockDistrbutedCacheWrapper.Object);
+            _elementHelper = new ElementHelper(_mockDistrbutedCacheWrapper.Object, _mockElementMapper.Object);
         }
 
         [Theory]

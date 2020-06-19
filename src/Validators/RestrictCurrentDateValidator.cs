@@ -52,7 +52,7 @@ namespace form_builder.Validators
             var date = DateTime.Today;
             var dateOutput = DateTime.Parse($"{valueDay}/{valueMonth}/{valueYear}");
 
-            if (element.Properties.RestrictCurrentDate && dateOutput == date)
+            if (element.Properties.RestrictCurrentDate && dateOutput == date )
             {
                 return new ValidationResult
                 {

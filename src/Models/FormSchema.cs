@@ -60,6 +60,7 @@ namespace form_builder.Models
             await pageHelper.CheckForPaymentConfiguration(Pages, form);
             pageHelper.CheckForAcceptedFileUploadFileTypes(Pages, form);
             pageHelper.CheckForDocumentDownload(this);
+            pageHelper.CheckForIncomingFormDataValues(Pages);
         }
 
         public bool IsAvailable(string environment)

@@ -3,7 +3,7 @@ Feature: Select
 	In order to enter options I need to add option buttons
 
 Scenario: Renders Select on the page
-	Given I navigate to "/select/page1"
+	Given I navigate to "/ui-select/page1"
 	Then I should see the header
 	And I should see the "select" input
 	And I should see the "submit" button

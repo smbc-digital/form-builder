@@ -182,23 +182,20 @@ namespace form_builder.Services.PageService
             var baseForm = await _schemaFactory.Build(form);
 
             if(!baseForm.IsAvailable(_environment.EnvironmentName))
-            {
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
-            }
 
             var currentPage = baseForm.GetPage(path);
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (sessionGuid == null)
-            {
                 throw new NullReferenceException($"Session guid null.");
-            }
 
             if (currentPage == null)
-            {
                 throw new NullReferenceException($"Current page '{path}' object could not be found.");
-            }
+
+            if(currentPage.HasIncomingValues)
+                viewModel = _pageHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
             if (processManual)
             {
@@ -211,19 +208,13 @@ namespace form_builder.Services.PageService
             currentPage.Validate(viewModel, _validators);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address) && !processManual)
-            {
                 return await _addressService.ProcesssAddress(viewModel, currentPage, baseForm, sessionGuid, path);
-            }
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Street))
-            {
                 return await _streetService.ProcessStreet(viewModel, currentPage, baseForm, sessionGuid, path);
-            }
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Organisation))
-            {
                 return await _organisationService.ProcesssOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
-            }
 
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
@@ -266,6 +257,7 @@ namespace form_builder.Services.PageService
             return viewModel;
         }
 
+       
         public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
             Dictionary<string, dynamic> answers = new Dictionary<string, dynamic>();
