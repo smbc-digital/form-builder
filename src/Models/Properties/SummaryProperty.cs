@@ -2,6 +2,6 @@
 {
     public partial class BaseProperty
     {
-        public bool AllowEditing { get; set; } = false;
+        public bool AllowEditing { get; set; }
     }
 }

@@ -10,7 +10,6 @@ namespace form_builder.Models.Properties
         public virtual bool StrongLabel { get; set; } = true;
         public bool Optional { get; set; } = false;
         public bool? Email { get; set; }
-
         public bool? Telephone{ get; set; }
         public bool Numeric { get; set; } = false;
         public List<Option> Options { get; set; } = new List<Option>();
@@ -31,7 +30,6 @@ namespace form_builder.Models.Properties
         public bool LegendAsH1 { get; set; }
         public bool LabelAsH1 { get; set; }
         public string Purpose { get; set; }
-
         public bool Spellcheck { get; set; } = true;
     }
 }
