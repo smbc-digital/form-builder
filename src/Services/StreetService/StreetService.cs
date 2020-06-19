@@ -1,4 +1,5 @@
-﻿using form_builder.Enum;
+﻿using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
@@ -6,7 +7,6 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,17 +34,36 @@ namespace form_builder.Services.StreetService
 
         public async Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
-            var journey = (string)viewModel["StreetStatus"];
-            var streetResults = new List<AddressSearchResult>();
+            viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
 
+            switch(subPath as string)
+            {
+                case LookUpConstants.Automatic:
+                    return await ProccessAutomaticStreet(viewModel, currentPage, baseForm, guid, path);
+                default:
+                    return await ProccessInitialStreet(viewModel, currentPage, baseForm, guid, path);
+            }
+        }
+
+        private async Task<ProcessRequestEntity> ProccessAutomaticStreet(
+            Dictionary<string, dynamic> viewModel,
+            Page currentPage,
+            FormSchema baseForm,
+            string guid,
+            string path)
+        {
             var cachedAnswers = _distributedCache.GetString(guid);
             var streetElement = currentPage.Elements.Where(_ => _.Type == EElementType.Street).FirstOrDefault();
             var convertedAnswers = cachedAnswers == null
                         ? new FormAnswers { Pages = new List<PageAnswers>() }
                         : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-            var street = journey == "Select"
-                ? (string) convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug == path).Answers.FirstOrDefault(_ => _.QuestionId == streetElement.Properties.QuestionId).Response
-                : (string) viewModel[streetElement.Properties.QuestionId];
+
+            var street = (string)convertedAnswers
+                .Pages
+                .FirstOrDefault(_ => _.PageSlug == path)
+                .Answers
+                .FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}")
+                .Response;
 
             if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
             {
@@ -55,24 +74,59 @@ namespace form_builder.Services.StreetService
                 };
             }
 
-            if ((!currentPage.IsValid && journey == "Select") || (currentPage.IsValid && journey == "Search"))
+            if (!currentPage.IsValid)
             {
-                try
+                var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
+
+                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
+                model.Path = currentPage.PageSlug;
+                model.FormName = baseForm.FormName;
+                model.PageTitle = currentPage.Title;
+
+                return new ProcessRequestEntity
                 {
-                    var result = await _streetProviders.Get(streetElement.Properties.StreetProvider).SearchAsync(street);
-                    streetResults = result.ToList();
-                }
-                catch (Exception e)
+                    Page = currentPage,
+                    ViewModel = model
+                };
+            }
+
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+
+            return new ProcessRequestEntity
+            {
+                Page = currentPage
+            };
+        }
+
+        private async Task<ProcessRequestEntity> ProccessInitialStreet(
+            Dictionary<string, dynamic> viewModel,
+            Page currentPage,
+            FormSchema baseForm,
+            string guid,
+            string path)
+        {
+            var cachedAnswers = _distributedCache.GetString(guid);
+            var streetElement = currentPage.Elements.Where(_ => _.Type == EElementType.Street).FirstOrDefault();
+
+            var convertedAnswers = cachedAnswers == null
+                        ? new FormAnswers { Pages = new List<PageAnswers>() }
+                        : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+
+            var street = (string)viewModel[streetElement.Properties.QuestionId];
+
+            if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
+            {
+                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                return new ProcessRequestEntity
                 {
-                    throw new ApplicationException($"StreetService::ProcessStreet: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
-                }
+                    Page = currentPage
+                };
             }
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, streetResults);
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid);
                 formModel.Path = currentPage.PageSlug;
-                formModel.StreetStatus = journey;
                 formModel.FormName = baseForm.FormName;
                 formModel.HideBackButton = currentPage.HideBackButton;
 
@@ -81,13 +135,53 @@ namespace form_builder.Services.StreetService
                 return new ProcessRequestEntity
                 {
                     Page = currentPage,
-                    ViewModel = formModel,
-                    ViewName = "../Street/Index"
+                    ViewModel = formModel
                 };
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-            return await _pageHelper.ProcessStreetJourney(journey, currentPage, viewModel, baseForm, guid, streetResults);
+            var foundStreet = convertedAnswers
+                .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
+                .Answers?.FirstOrDefault(_ => _.QuestionId == streetElement.Properties.QuestionId)?
+                .Response;
+
+            List<object> searchResults;
+            if (street.Equals(foundStreet))
+            {
+                searchResults = (convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>).ToList();
+            }
+            else
+            { 
+                try
+                {
+                    searchResults = (await _streetProviders.Get(streetElement.Properties.StreetProvider).SearchAsync(street)).ToList<object>();
+                }
+                catch (Exception e)
+                {
+                    throw new ApplicationException($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
+                }
+
+                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, guid);
+            }
+
+            try
+            {
+                return new ProcessRequestEntity
+                {
+                    RedirectToAction = true,
+                    RedirectAction = "Index",
+                    RouteValues = new
+                    {
+                        form = baseForm.BaseURL,
+                        path,
+                        subPath = LookUpConstants.Automatic
+                    }
+                };
+            }
+            catch (Exception e)
+            {
+                throw new ApplicationException($"PageHelper.ProccessInitialStreet: An exception has occured while attempting to generate Html, Exception: {e.Message}");
+            };
         }
     }
 }

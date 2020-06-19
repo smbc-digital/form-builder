@@ -9,6 +9,9 @@ namespace form_builder.Providers.Organisation
         public string ProviderName => "Fake";
         public async Task<IEnumerable<OrganisationSearchResult>> SearchAsync(string organisation)
         {
+            if (organisation.ToLower().Replace(" ", "").Equals("nodata"))
+                return await Task.FromResult(new List<OrganisationSearchResult>());
+
             return await Task.FromResult(new List<OrganisationSearchResult> {
                 new OrganisationSearchResult {
                     Name = "Organisation 1",

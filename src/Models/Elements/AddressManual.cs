@@ -3,10 +3,9 @@ using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Validators;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -68,6 +67,12 @@ namespace form_builder.Models.Elements
             Type = EElementType.AddressManual;
         }
 
+        public AddressManual(ValidationResult validaiton)
+        {
+            Type = EElementType.AddressManual;
+            validationResult = validaiton;
+        }
+
         public override string GenerateFieldsetProperties(){
             if(!string.IsNullOrWhiteSpace(Properties.AddressManualHint)){
                 return $"aria-describedby = {Properties.QuestionId}-hint";
@@ -108,26 +113,24 @@ namespace form_builder.Models.Elements
             Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.POSTCODE)).Value ?? searchTerm;
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override async Task<string> RenderAsync(IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,
+            Dictionary<string, dynamic> viewModel,
+            Page page,
+            FormSchema formSchema,
+            IHostingEnvironment environment,
+            List<object> results = null)
         {
-            if (viewModel.ContainsKey("AddressStatus"))
-            {
-                viewModel.Remove("AddressStatus");
-            };
+           Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
 
-            viewModel.Add("AddressStatus", "Manual");
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
             SetAddressProperties(viewModel, Properties.Value);
-            var searchResultsCount =  elementHelper.GetFormDataValue(guid, $"{Properties.QuestionId}-srcount");
-            var isValid = int.TryParse(searchResultsCount.ToString(), out int output);
 
-            if (isValid && output == 0)
-            {
+            if (results != null && results.Count == 0)
                 Properties.DisplayNoResultsIAG = true;
-            }
-            
-            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
-            return await viewRender.RenderAsync(Type.ToString(), this);
+
+            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
+            return await viewRender.RenderAsync("AddressManual", this);
         }
     }
 }

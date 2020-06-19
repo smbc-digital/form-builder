@@ -1,6 +1,7 @@
 ﻿using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
+using form_builder.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -194,6 +195,9 @@ namespace form_builder.Mappers
             addressObject.PlaceRef = value.FirstOrDefault(_ => _.QuestionId == urpnKey)?.Response ?? string.Empty;
             addressObject.SelectedAddress = value.FirstOrDefault(_ => _.QuestionId == addressDescription)?.Response ?? null;
 
+            if (addressObject.IsEmpty())
+                return null;
+
             return addressObject;
         }
         
@@ -210,6 +214,9 @@ namespace form_builder.Mappers
 
             addressObject.PlaceRef = value.FirstOrDefault(_ => _.QuestionId == uspnKey)?.Response ?? string.Empty;
             addressObject.SelectedAddress = value.FirstOrDefault(_ => _.QuestionId == streetDescription)?.Response ?? null;
+
+            if (addressObject.IsEmpty())
+                return null;
 
             return addressObject;
         }

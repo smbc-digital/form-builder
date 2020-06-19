@@ -74,32 +74,6 @@ namespace form_builder_tests.UnitTests.Models
             Assert.Equal(PageSlug, result.URL);
         }
 
-        [Fact(Skip = "WIP, test mmight not be valid as its GoToPage within Submit, will verify")]
-        public void GetNextPage_ShouldGoToOther_WhenCheckboxContainsOther()
-        {
-            var PageSlug = "page-other";
-
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithPageSlug("page-continue")
-                .Build();
-
-            var behaviour2 = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithPageSlug(PageSlug)
-                .WithCondition(new Condition { CheckboxContains = "other", QuestionId = "test" })
-                .Build();
-
-            var page = new PageBuilder()
-                .WithBehaviour(behaviour)
-                .WithBehaviour(behaviour2)
-                .Build();
-
-            var result = page.GetSubmitFormEndpoint(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "test", Response = "test,other" } } } } }, null);
-
-            Assert.Equal(PageSlug, result.URL);
-        }
-
         #region GetNextPage Tests
 
         [Theory]
@@ -795,6 +769,56 @@ namespace form_builder_tests.UnitTests.Models
            new Dictionary<string, dynamic>() { { "testDate", futureDate.ToString() } });
 
             Assert.Equal(PageSlugGreaterThan, result.PageSlug);
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_Behaviour_WhenIsNullOrEmpty_Condition_True()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToExternalPage)
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition { IsNullOrEmpty = true, QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "value");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.GoToExternalPage, result.BehaviourType);
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldReturn_Behaviour_WhenIsNullOrEmpty_Condition_False()
+        {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToExternalPage)
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition { IsNullOrEmpty = false, QuestionId = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test", "value");
+
+            var result = page.GetNextPage(viewModel);
+
+            Assert.Equal(EBehaviourType.GoToPage, result.BehaviourType);
         }
 
         #endregion

@@ -4,11 +4,11 @@ using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json.Linq;
 
 namespace form_builder.Models.Elements
 {
@@ -41,27 +41,52 @@ namespace form_builder.Models.Elements
             Type = EElementType.Organisation;
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> searchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> answers, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override async Task<string> RenderAsync(
+            IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,Dictionary<string, dynamic> viewModel,
+            Page page,
+            FormSchema formSchema,
+            IHostingEnvironment environment,
+            List<object> results = null)
         {
-            IsSelect = answers.ContainsKey("OrganisationStatus") && answers["OrganisationStatus"] == "Select" || answers.ContainsKey(OrganisationSearchQuestionId) && !string.IsNullOrEmpty(answers[OrganisationSearchQuestionId]);
-            Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
 
-            if (!IsSelect)
-            {
-                return await viewRender.RenderAsync("OrganisationSearch", this);
-            }
+            viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
 
-            Items = new List<SelectListItem>{ new SelectListItem($"{organisationResults.Count} organisations found", string.Empty)};
-            organisationResults.ForEach((_) => { Items.Add(new SelectListItem(_.Name, $"{_.Reference}|{_.Name}")); });
-            ReturnURL = environment.EnvironmentName == "local" || environment.EnvironmentName == "uitest"
-                ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
-                : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
-            return await viewRender.RenderAsync("OrganisationSelect", this);
+            switch (subPath as string)
+            {
+                case LookUpConstants.Automatic:
+                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
+                    IsSelect = true;
+                    ReturnURL = environment.EnvironmentName == "local" || environment.EnvironmentName == "uitest"
+                                ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
+                                : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
+
+                    var selectedOrganisation = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, OrganisationConstants.SELECT_SUFFIX);
+                    Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} organisations found", string.Empty) };
+                    results?.ForEach((objectResult) =>
+                    {
+                        OrganisationSearchResult searchResult;
+
+                        if ((objectResult as JObject) != null)
+                            searchResult = (objectResult as JObject).ToObject<OrganisationSearchResult>();
+                        else
+                            searchResult = objectResult as OrganisationSearchResult;
+
+                        Items.Add(new SelectListItem(searchResult.Name, $"{searchResult.Reference}|{searchResult.Name}", searchResult.Reference.Equals(selectedOrganisation)));
+                    });
+
+                    return await viewRender.RenderAsync("OrganisationSelect", this);
+                default:
+                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
+                    var test = await viewRender.RenderAsync("OrganisationSearch", this);
+                    return test;
+            }
         }
 
-        public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
+        public override Dictionary<string, dynamic> GenerateElementProperties(string type="")
         {
             var elemnentProperties = new Dictionary<string, dynamic>();
             elemnentProperties.Add("id", $"{QuestionId}");

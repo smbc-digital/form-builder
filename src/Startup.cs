@@ -81,6 +81,7 @@ namespace form_builder
             }
 
             app.UseMiddleware<HeaderConfiguration>();
+
             app.UseSession();
             app.UseHttpsRedirection();
             app.UseStaticFiles();

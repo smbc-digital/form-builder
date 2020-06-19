@@ -30,10 +30,3 @@ Scenario: I enterer details I should see them in the summary
 	Then I should see a "dd" element with "01614451234" text
 	Then I should see a "dd" element with "01/02/1990" text
 	Then I should see a "dd" element with "shapely" text
-	
-	
-
-	
-
-
-

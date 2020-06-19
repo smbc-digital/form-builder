@@ -4,8 +4,6 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Models.Properties;
 using form_builder.Validators;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,7 +11,7 @@ namespace form_builder.Models.Elements
 {
     public class Element : IElement
     {
-        private ValidationResult validationResult;
+        protected ValidationResult validationResult;
 
         public Element()
         {
@@ -33,11 +31,6 @@ namespace form_builder.Models.Elements
         public bool IsValid => validationResult.IsValid; 
         public string ValidationMessage => validationResult.Message;
         public string Lookup { get; set; }
-
-        public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
-        {
-            return viewRender.RenderAsync(Type.ToString(), this, null);
-        }
         
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators)
         {
@@ -135,6 +128,30 @@ namespace form_builder.Models.Elements
             return data;
         }
 
+        public string WriteOptional(string prefix = "")
+        {
+            if (DisplayOptional)
+            {
+                return "class = optional";
+
+            }
+
+            return null;
+        }
+
+        public virtual Task<string> RenderAsync(
+            IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,
+            Dictionary<string, dynamic> viewModel,
+            Page page,
+            FormSchema formSchema,
+            IHostingEnvironment environment,
+            List<object> results = null)
+        {
+            return viewRender.RenderAsync(Type.ToString(), this, null);
+        }
+
         private bool DisplayOptional
         {
             get
@@ -142,8 +159,6 @@ namespace form_builder.Models.Elements
                 return Properties.Optional;
             }
         }
-
-        
 
         public virtual string GetLabelText(){
             var optionalLabelText = Properties.Optional ? " (optional)" : string.Empty;
