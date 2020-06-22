@@ -40,7 +40,7 @@ namespace form_builder_tests_ui.StepDefinitions
         }
 
         [Then(@"I should find an element with class ""(.*)""")]
-        public void ThenIShouldSeeBreadcrumbs(string className)
+        public void ThenIShouldSeeElementWithClass(string className)
         {
             Assert.True(BrowserSession.FindCss(className).Exists());
         }
