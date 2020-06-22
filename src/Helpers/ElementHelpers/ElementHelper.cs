@@ -44,8 +44,10 @@ namespace form_builder.Helpers.ElementHelpers
 
         public T CurrentValue<T>(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
         {
+            var defaultValue = (T) Convert.ChangeType(string.Empty, typeof(T));
+
             if (element.Type == EElementType.FileUpload)
-                return (T) Convert.ChangeType(string.Empty, typeof(T));
+                return defaultValue;
 
             var currentValue = answers.ContainsKey($"{element.Properties.QuestionId}{suffix}");
 
@@ -61,13 +63,13 @@ namespace form_builder.Helpers.ElementHelpers
                     {
                         var value = storedValue.Answers.FirstOrDefault(_ => _.QuestionId == $"{element.Properties.QuestionId}{suffix}");
 
-                        return value != null ? (T)value.Response : (T) Convert.ChangeType(string.Empty, typeof(T));
+                        return value != null ? (T)value.Response : defaultValue;
                     }
                 }
-                return (T) Convert.ChangeType(string.Empty, typeof(T));
+                return defaultValue;
             }
 
-            return currentValue ? answers[$"{element.Properties.QuestionId}{suffix}"] : string.Empty;
+            return currentValue ? answers[$"{element.Properties.QuestionId}{suffix}"] : defaultValue;
         }
 
         public bool CheckForLabel(Element element)
