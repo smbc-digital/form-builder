@@ -4,6 +4,7 @@ using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
+using Newtonsoft.Json;
 
 namespace form_builder.Models.Elements
 {
@@ -26,7 +27,7 @@ namespace form_builder.Models.Elements
             IHostingEnvironment environment,
             List<object> results = null)
         {
-            Properties.Value = Newtonsoft.Json.JsonConvert.SerializeObject(elementHelper.CurrentValue<object>(this, viewModel, page.PageSlug, guid));
+            Properties.Value = JsonConvert.SerializeObject(elementHelper.CurrentValue<object>(this, viewModel, page.PageSlug, guid));
             return viewRender.RenderAsync(Type.ToString(), this);
         }
     }
