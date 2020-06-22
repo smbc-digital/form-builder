@@ -28,7 +28,7 @@ namespace form_builder_tests.UnitTests.Validators
             //Assert
             var result = _emailElementValidator.Validate(element, viewModel);
             Assert.False(result.IsValid);
-            Assert.Equal("Check the enter your email and try again", result.Message);
+            Assert.Equal("Enter an email address in the correct format, like name@example.com", result.Message);
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace form_builder_tests.UnitTests.Validators
             //Assert
             var result = _requiredElementValidator.Validate(element, viewModel);
             Assert.False(result.IsValid);
-            Assert.Equal("Check the enter your email and try again", result.Message);
+            Assert.Equal("Enter an email address in the correct format, like name@example.com", result.Message);
         }
 
         [Fact]
