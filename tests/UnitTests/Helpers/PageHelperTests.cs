@@ -21,11 +21,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -162,7 +159,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenAddressSelect()
         {
             //Arrange
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
+            _mockElementHelper.Setup(_ => _.CurrentValue<string>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
                     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
@@ -206,7 +203,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Callback<string, form_builder.Models.Elements.Address, Dictionary<string, object>>((x, y, z) =>
                     callback = y);
 
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
+            _mockElementHelper.Setup(_ => _.CurrentValue<string>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
                     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 

@@ -23,7 +23,7 @@ namespace form_builder.Models.Elements
             IHostingEnvironment environment,
             List<object> results = null)
         {
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
+            Properties.Value = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckForRadioOptions(this);

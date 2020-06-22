@@ -25,9 +25,9 @@ namespace form_builder.Models.Elements
             IHostingEnvironment environment,
             List<object> results = null)
         {
-            Properties.Hours = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, TimeConstants.HOURS_SUFFIX);
-            Properties.Minutes = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, TimeConstants.MINUTES_SUFFIX);
-            Properties.AmPm = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, TimeConstants.AM_PM_SUFFIX);
+            Properties.Hours = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, TimeConstants.HOURS_SUFFIX);
+            Properties.Minutes = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, TimeConstants.MINUTES_SUFFIX);
+            Properties.AmPm = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, TimeConstants.AM_PM_SUFFIX);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             return viewRender.RenderAsync(Type.ToString(), this);

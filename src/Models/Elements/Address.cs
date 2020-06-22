@@ -62,7 +62,7 @@ namespace form_builder.Models.Elements
                     return await manualAddressElement.RenderAsync(viewRender,elementHelper, guid, viewModel, page,formSchema, environment, results);
                 case LookUpConstants.Automatic:
                     IsSelect = true;
-                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
+                    Properties.Value = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
 
                     ReturnURL = environment.EnvironmentName == "local" || environment.EnvironmentName == "uitest" 
                         ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}" 
@@ -72,7 +72,7 @@ namespace form_builder.Models.Elements
                         ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual"
                         : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
-                    var selectedAddress = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SELECT_SUFFIX);
+                    var selectedAddress = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, AddressConstants.SELECT_SUFFIX);
                     Items = new List<SelectListItem> { new SelectListItem($"{results.Count} addresses found", string.Empty) };
                     results.ForEach((objectResult) => {
                         AddressSearchResult searchResult;
@@ -94,7 +94,7 @@ namespace form_builder.Models.Elements
                     return await viewRender.RenderAsync("AddressSelect", this);
 
                 default:
-                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
+                    Properties.Value = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
                     return await viewRender.RenderAsync("AddressSearch", this);
             }
         }

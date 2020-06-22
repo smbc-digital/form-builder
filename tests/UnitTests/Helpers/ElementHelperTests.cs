@@ -39,7 +39,7 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add("test-id", "this is the value");
 
             // Act
-            var result = _elementHelper.CurrentValue(element, viewModel, "", "");
+            var result = _elementHelper.CurrentValue<string>(element, viewModel, "", "");
 
             // Assert
             Assert.Equal("this is the value", result);
@@ -60,7 +60,7 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add("test-id2", "this is the value");
 
             // Act
-            var result = _elementHelper.CurrentValue(element, viewModel, "", "");
+            var result = _elementHelper.CurrentValue<string>(element, viewModel, "", "");
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -84,7 +84,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue(element, viewModel, "", "");
+            var result = _elementHelper.CurrentValue<string>(element, viewModel, "", "");
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -121,7 +121,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue(element, viewModel, "test-slug", "");
+            var result = _elementHelper.CurrentValue<string>(element, viewModel, "test-slug", "");
 
             // Assert
             Assert.Equal("this is the value", result);
@@ -153,7 +153,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue(element, viewModel, "test-slug", "");
+            var result = _elementHelper.CurrentValue<string>(element, viewModel, "test-slug", "");
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -582,9 +582,9 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add(yearId, "2010");
 
             // Act
-            var dayResult = _elementHelper.CurrentValue(element, viewModel, "", "", "-day");
-            var monthResult = _elementHelper.CurrentValue(element, viewModel, "", "", "-month");
-            var yearResult = _elementHelper.CurrentValue(element, viewModel, "", "", "-year");
+            var dayResult = _elementHelper.CurrentValue<string>(element, viewModel, "", "", "-day");
+            var monthResult = _elementHelper.CurrentValue<string>(element, viewModel, "", "", "-month");
+            var yearResult = _elementHelper.CurrentValue<string>(element, viewModel, "", "", "-year");
 
             // Assert
             Assert.Equal("14", dayResult);
@@ -606,9 +606,9 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var dayResult = _elementHelper.CurrentValue(element, viewModel,"","", "-day");
-            var monthResult = _elementHelper.CurrentValue(element, viewModel,"","", "-month");
-            var yearResult = _elementHelper.CurrentValue(element, viewModel,"","", "-year");
+            var dayResult = _elementHelper.CurrentValue<string>(element, viewModel,"","", "-day");
+            var monthResult = _elementHelper.CurrentValue<string>(element, viewModel,"","", "-month");
+            var yearResult = _elementHelper.CurrentValue<string>(element, viewModel,"","", "-year");
 
             // Assert
             Assert.Equal("", dayResult);
@@ -629,13 +629,10 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2"} })
                 .Build();
 
-            //      var viewModel = new Dictionary<string, dynamic>();
-            //      viewModel.Add("questionId", "option1");
             // Act
             _elementHelper.ReSelectPreviousSelectedOptions(element);
 
             // Assert
-
             Assert.True(element.Properties.Options[0].Selected);
             Assert.False(element.Properties.Options[1].Selected);
         }
@@ -653,13 +650,10 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2"} })
                 .Build();
 
-            //      var viewModel = new Dictionary<string, dynamic>();
-            //      viewModel.Add("questionId", "option1");
             // Act
             _elementHelper.ReCheckPreviousRadioOptions(element);
 
             // Assert
-
             Assert.True(element.Properties.Options[0].Checked);
             Assert.False(element.Properties.Options[1].Checked);
         }
