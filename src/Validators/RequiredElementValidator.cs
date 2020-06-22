@@ -40,12 +40,13 @@ namespace form_builder.Validators
                 if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-address";
-                    validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
                 }
                 else
                 {
                     key = $"{element.Properties.QuestionId}-postcode";
-                    validationMessage = "Check the " + element.Properties.PostcodeLabel.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
+
                 }
             }
 
@@ -54,12 +55,13 @@ namespace form_builder.Validators
                 if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-street";
-                    validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+
                 }
                 else
                 {
                     key = $"{element.Properties.QuestionId}";
-                    validationMessage = "Check the " + element.Properties.Label.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
                 }
             }
 
@@ -68,12 +70,13 @@ namespace form_builder.Validators
                 if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-organisation";
-                    validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+
                 }
                 else
                 {
                     key = $"{element.Properties.QuestionId}";
-                    validationMessage = "Check the " + element.Properties.Label.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
                 }
             }
 

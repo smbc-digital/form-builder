@@ -45,8 +45,9 @@ namespace form_builder.Validators
 
             return new ValidationResult {
                 IsValid = isValid,
-                Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : $"Check the {element.Properties.Label.ToLower()} and try again"
+                Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter an email address in the correct format, like name@example.com"
         };          
+
         }
     }
 }
