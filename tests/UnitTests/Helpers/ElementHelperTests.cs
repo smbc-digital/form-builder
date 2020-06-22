@@ -156,7 +156,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = _elementHelper.CurrentValue<string>(element, viewModel, "test-slug", "");
 
             // Assert
-            Assert.Null(result);
+            Assert.Equal(string.Empty, result);
         }
 
         [Theory]
