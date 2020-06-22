@@ -99,7 +99,7 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var item in viewModel)
             {
-                if (!_disallowedKeys.DisallowedAnswerKeys.Contains(item.Key))
+                if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
                 {
                     answers.Add(new Answers { QuestionId = item.Key, Response = item.Value });
                 }
