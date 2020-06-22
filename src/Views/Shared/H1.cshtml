@@ -1,11 +1,11 @@
 ﻿@using form_builder.Enum
 @model form_builder.Models.Elements.Element
 @{
-    var cssClass = "govuk-heading-xl";
+    var cssClass = "govuk-heading-l";
     switch(Model.Properties.Size)
     {
-        case ESize.Large: 
-            cssClass = "govuk-heading-l";
+        case ESize.ExtraLarge: 
+            cssClass = "govuk-heading-xl";
             break;
         case ESize.Medium: 
             cssClass = "govuk-heading-m";

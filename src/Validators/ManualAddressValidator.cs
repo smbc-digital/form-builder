@@ -25,15 +25,14 @@ namespace form_builder.Validators
                 : null;
 
             var addressLine1Valid = !string.IsNullOrEmpty(valueAddressLine1);
-
-            var addressLine1Message = addressLine1Valid ? string.Empty : "Please enter Address Line 1";
+            var addressLine1Message = addressLine1Valid ? string.Empty : "Enter address line 1";
 
             var valueAddressTown = viewModel.ContainsKey($"{element.Properties.QuestionId}-{AddressManualConstants.TOWN}")
                 ? viewModel[$"{element.Properties.QuestionId}-{AddressManualConstants.TOWN}"]
                 : null;
 
             var addressTownValid = !string.IsNullOrEmpty(valueAddressTown);
-            var addressTownMessage = addressTownValid ? string.Empty : "Please enter Town";
+            var addressTownMessage = addressTownValid ? string.Empty : "Enter a town or city";
 
             var valueAddressPostcode = viewModel.ContainsKey($"{element.Properties.QuestionId}-{AddressManualConstants.POSTCODE}")
                 ? viewModel[$"{element.Properties.QuestionId}-{AddressManualConstants.POSTCODE}"]
@@ -45,17 +44,17 @@ namespace form_builder.Validators
 
             if (string.IsNullOrEmpty(valueAddressPostcode))
             {
-                addressPostcodeMessage = "Please enter a Postcode";
+                addressPostcodeMessage = "Enter a postcode";
                 addressPostcodeValid = false;
             }
             else if (!AddressConstants.STOCKPORT_POSTCODE_REGEX.IsMatch(valueAddressPostcode) && element.Properties.StockportPostcode == true)
             {
-                addressPostcodeMessage = "Please enter a valid Stockport Postcode";
+                addressPostcodeMessage = "Enter a valid Stockport postcode";
                 addressPostcodeValid = false;
             }
             else if (!AddressConstants.POSTCODE_REGEX.IsMatch(valueAddressPostcode))
             {
-                addressPostcodeMessage = "Please enter a valid Postcode";
+                addressPostcodeMessage = "Enter a valid Postcode";
                 addressPostcodeValid = false;
             }
 
