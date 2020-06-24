@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Hosting;
 using form_builder.Services.MappingService.Entities;
 using Amazon.S3.Model;
 using Newtonsoft.Json;
+using form_builder.Models;
 
 namespace form_builder.Services.PayService
 {
@@ -26,7 +27,7 @@ namespace form_builder.Services.PayService
         Task<string> ProcessPayment(MappingEntity mappingEntity, string form, string path, string reference, string sessionGuid);
         Task<string> ProcessPaymentResponse(string form, string responseCode, string reference);
         Task<PaymentInformation> GetFormPaymentInformation(string form);
-        Task<PaymentInformation> GetFormPaymentInformation(MappingEntity mappingEntity, string form);
+        Task<PaymentInformation> GetFormPaymentInformation(MappingEntity mappingEntity, string form, Page page);
     }
 
     public class PayService : IPayService
@@ -64,7 +65,8 @@ namespace form_builder.Services.PayService
         }
         public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string sessionGuid)
         {
-            var paymentInformation = await GetFormPaymentInformation(formData, form);
+            var page = new Page();
+            var paymentInformation = await GetFormPaymentInformation(formData, form, page);
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
             return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, paymentInformation);
@@ -128,7 +130,7 @@ namespace form_builder.Services.PayService
             return paymentInfo;
         }
 
-        public async Task<PaymentInformation> GetFormPaymentInformation(MappingEntity formData, string form)
+        public async Task<PaymentInformation> GetFormPaymentInformation(MappingEntity formData, string form, Page page)
         {
             var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_hostingEnvironment.EnvironmentName}", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
 
@@ -141,28 +143,35 @@ namespace form_builder.Services.PayService
                 throw new ApplicationException($"PayService:: No payment information found for {form}");
             }
 
-            paymentInfo.Settings.Amount = await CalculateAmountAsync(formData, paymentInfo);
+            if (paymentInfo.Settings.ComplexCalculationRequired)
+            {
+                paymentInfo.Settings.Amount = await CalculateAmountAsync(formData, paymentInfo, page);
+            }
 
             return paymentInfo;
         }
 
-        private async Task<string> CalculateAmountAsync(MappingEntity formData, PaymentInformation paymentInfo)
+        private async Task<string> CalculateAmountAsync(MappingEntity formData, PaymentInformation paymentInfo, Page page)
         {
             var currentPage = formData.BaseForm.GetPage(formData.FormAnswers.Path);
-            var postUrl = currentPage.GetSubmitFormEndpoint(formData.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
+            //var postUrl = currentPage.GetSubmitFormEndpoint(formData.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
+
+            var paymentSummary = page.Elements.FirstOrDefault(_ => _.Type == EElementType.PaymentSummary);
+            var postUrl = paymentSummary.Properties.CalculationSlugs.FirstOrDefault(_ =>
+                _.Environment == _hostingEnvironment.EnvironmentName);
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
-            var response = await _gateway.PostAsync(postUrl.CalculateCostUrl, formData.Data);
+            var response = await _gateway.PostAsync(postUrl.URL, formData.Data);
             var reference = string.Empty;
             if (response.Content != null)
             {
                 var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
                 reference = JsonConvert.DeserializeObject<string>(content);
-
             }
-            //return reference;
 
             return reference;
         }
+
+
 
         private IPaymentProvider GetFormPaymentProvider(PaymentInformation paymentInfo)
         {

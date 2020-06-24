@@ -23,6 +23,8 @@ using Microsoft.Extensions.Options;
 using form_builder.ContentFactory;
 using form_builder.Factories.Schema;
 using form_builder.Constants;
+using form_builder.Services.MappingService;
+using form_builder.Services.PayService;
 
 namespace form_builder.Services.PageService
 {
@@ -41,6 +43,8 @@ namespace form_builder.Services.PageService
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _environment;
         private readonly ISuccessPageContentFactory _successPageContentFactory;
+        private readonly IPayService _payService;
+        private readonly IMappingService _mappingService;
 
         public PageService(ILogger<PageService> logger, 
             IEnumerable<IElementValidator> validators, 
@@ -54,7 +58,9 @@ namespace form_builder.Services.PageService
             IHttpContextAccessor httpContextAccessor, 
             IHostingEnvironment environment, 
             ISuccessPageContentFactory successPageContentFactory, 
-            ISchemaFactory schemaFactory)
+            ISchemaFactory schemaFactory,
+            IPayService payService,
+            IMappingService mappingService)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -69,6 +75,8 @@ namespace form_builder.Services.PageService
             _httpContextAccessor = httpContextAccessor;
             _environment = environment;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _payService = payService;
+            _mappingService = mappingService;
         }
         
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath)
@@ -138,6 +146,27 @@ namespace form_builder.Services.PageService
 
                 if(convertedAnswers.FormData.ContainsKey($"{path}{LookUpConstants.SearchResultsKeyPostFix}"))
                     searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
+            }
+
+            if (page.PageSlug == "payment-summary")
+            {
+                var data = await _mappingService.Map(sessionGuid, form);
+                var paymentAmount = await _payService.GetFormPaymentInformation(data, form, page);
+                //var paymentAmount = new PaymentInformation
+                //{
+                //    Settings = new Settings
+                //    {
+                //        Amount = "165.00"
+                //    }
+                //};
+
+                foreach (var element in page.Elements)
+                {
+                    if (element.Type == EElementType.PaymentSummary)
+                    {
+                        element.Properties.PaymentAmount = paymentAmount.Settings.Amount;
+                    }
+                }
             }
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);

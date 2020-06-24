@@ -36,6 +36,7 @@
         Declaration,
         Summary,
         Reusable,
-        Map
+        Map,
+        PaymentSummary
     }
 }
