@@ -3,7 +3,7 @@ Feature: Address
 	In order to collect address information I have to navigate to Page1
 
 Scenario: Address element standard use
-	Given I navigate to "/address/page1"
+	Given I navigate to "/ui-address/page1"
 	Then I should see the header
 	And I should see the "address-postcode" input
 	And I should see the "nextStep" button
@@ -20,7 +20,7 @@ Scenario: Address element standard use
 	Then I should see "address 2" is selected in "address-address" dropdown with the value "098765432109|address 2"
 
 Scenario: Address element optional address selected
-	Given I navigate to "/address/page1"
+	Given I navigate to "/ui-address/page1"
 	Then I enter "sk11aa" in "address-postcode"
 	When I click the "nextStep" button
 	Then I should see the "address-address" input

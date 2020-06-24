@@ -1,10 +1,7 @@
-﻿using System;
-using form_builder.Enum;
+﻿using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -24,10 +21,10 @@ namespace form_builder.Models.Elements
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var allowedFileType = Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
-            var maxFileSize = Properties.MaxFileSize > 0 ? Properties.MaxFileSize*1024000 : SystemConstants.DefaultMaxFileSize;
-            maxFileSize = maxFileSize > SystemConstants.DefaultMaxFileSize
-                ? SystemConstants.DefaultMaxFileSize
-                : Properties.MaxFileSize * 1024000;
+            var convertedMaxFileSize = Properties.MaxFileSize * 1024000;
+            var appliedMaxFileSize = convertedMaxFileSize > 0 && convertedMaxFileSize < SystemConstants.DefaultMaxFileSize 
+                                ? convertedMaxFileSize 
+                                : SystemConstants.DefaultMaxFileSize;
 
             var properties = new Dictionary<string, dynamic>()
             {
@@ -35,7 +32,7 @@ namespace form_builder.Models.Elements
                 { "id", QuestionId },
                 { "type", "file" },
                 { "accept", allowedFileType.Join(",") },
-                { "max-file-size", maxFileSize },
+                { "max-file-size", appliedMaxFileSize },
                 { "onchange", "ValidateSize(this)" }
             };
 
@@ -47,9 +44,17 @@ namespace form_builder.Models.Elements
             return properties;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(
+            IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,
+            Dictionary<string, dynamic> viewModel,
+            Page page,
+            FormSchema formSchema,
+            IHostingEnvironment environment,
+            List<object> results = null)
         {
-            elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
+            elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, string.Empty);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             return viewRender.RenderAsync(Type.ToString(), this);

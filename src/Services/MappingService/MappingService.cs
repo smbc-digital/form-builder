@@ -1,5 +1,4 @@
-﻿using form_builder.Cache;
-using form_builder.Configuration;
+﻿using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Mappers;
 using form_builder.Models;
@@ -14,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using form_builder.Factories.Schema;
+using form_builder.Extensions;
 
 namespace form_builder.Services.MappingService
 {
@@ -46,7 +46,9 @@ namespace form_builder.Services.MappingService
 
             var formData = _distributedCache.GetString(sessionGuid);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
             convertedAnswers.FormName = form;
+            convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
 
             return new MappingEntity
             {
@@ -76,16 +78,18 @@ namespace form_builder.Services.MappingService
                 if (element.Type == EElementType.FileUpload)
                     return CheckAndCreateForFileUpload(splitTargets[0], element, formAnswers, obj);
 
-                object objectValue;
-                if (obj.TryGetValue(splitTargets[0], out objectValue))
+                object answerValue = _elementMapper.GetAnswerValue(element, formAnswers);
+                if (answerValue != null && obj.TryGetValue(splitTargets[0], out var objectValue))
                 {
-                    var combinedValue = $"{objectValue} {_elementMapper.GetAnswerValue(element, formAnswers)}";
+                    var combinedValue = $"{objectValue} {answerValue}";
                     obj.Remove(splitTargets[0]);
-                    obj.Add(splitTargets[0], combinedValue);
+                    obj.Add(splitTargets[0], combinedValue.Trim());
                     return obj;
                 }
 
-                obj.Add(splitTargets[0], _elementMapper.GetAnswerValue(element, formAnswers));
+                if(answerValue != null)
+                    obj.Add(splitTargets[0], answerValue);
+
                 return obj;
             }
 

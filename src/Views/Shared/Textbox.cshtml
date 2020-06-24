@@ -1,13 +1,35 @@
 ﻿@model form_builder.Models.Elements.Element
+@using form_builder.Enum;
 @{
     var elements = Model.GenerateElementProperties();
+    var baseCssClasses = "govuk-input";
+
+    switch(Model.Properties.Width)
+    {
+        case ESize.Small: 
+            baseCssClasses += " govuk-input--width-3";
+            break;
+            
+        case ESize.Medium: 
+            baseCssClasses += " govuk-input--width-5";
+            break;
+
+        case ESize.Large: 
+            baseCssClasses += " govuk-input--width-10";
+            break;
+        
+        case ESize.ExtraLarge: 
+            baseCssClasses += " govuk-input--width-20";
+            break;
+    }
+
     if (!Model.IsValid)
     {
-        elements.Add("class", "govuk-input govuk-input--error");
+        elements.Add("class", $"{baseCssClasses} govuk-input--error");
     }
     else
     {
-        elements.Add("class", "govuk-input");
+        elements.Add("class", baseCssClasses);
     }
 }
 

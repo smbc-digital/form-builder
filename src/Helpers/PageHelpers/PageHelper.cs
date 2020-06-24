@@ -1,4 +1,4 @@
-﻿using form_builder.Cache;
+using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -8,20 +8,18 @@ using form_builder.Models.Elements;
 using form_builder.Models.Properties;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
-using form_builder.Services.PageService.Entities;
+using form_builder.Services.FileUploadService;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using form_builder.Services.FileUploadService;
+using System.Dynamic;
 
 namespace form_builder.Helpers.PageHelpers
 {
@@ -53,22 +51,31 @@ namespace form_builder.Helpers.PageHelpers
             _fileUploadService = fileUploadService;
         }
 
-        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null)
-        { 
+        public async Task<FormBuilderViewModel> GenerateHtml(
+            Page page,
+            Dictionary<string, dynamic> viewModel,
+            FormSchema baseForm,
+            string guid,
+            List<object> results = null)
+        {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
-            
+
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
-            {
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
-            }
-                                           
+
             formModel.FeedbackForm = baseForm.FeedbackForm;
             formModel.FeedbackPhase = baseForm.FeedbackPhase;
 
             foreach (var element in page.Elements)
-            {
-                formModel.RawHTML += await element.RenderAsync(_viewRender, _elementHelper, guid, addressAndStreetSearchResults, organisationSearchResults, viewModel, page, baseForm, _enviroment);
-            }
+                formModel.RawHTML += await element.RenderAsync(
+                    _viewRender,
+                    _elementHelper,
+                    guid,
+                    viewModel,
+                    page,
+                    baseForm,
+                    _enviroment,
+                    results);
 
             return formModel;
         }
@@ -92,7 +99,7 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var item in viewModel)
             {
-                if (!_disallowedKeys.DisallowedAnswerKeys.Contains(item.Key))
+                if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
                 {
                     answers.Add(new Answers { QuestionId = item.Key, Response = item.Value });
                 }
@@ -111,118 +118,6 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.FormName = form;
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
-        }
-
-        public async Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
-        {
-            switch (journey)
-            {
-                case "Search":
-                    try
-                    {
-                        var streetViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, null);
-                        streetViewModel.StreetStatus = "Select";
-                        streetViewModel.FormName = baseForm.FormName;
-                        streetViewModel.PageTitle = currentPage.Title;
-                        streetViewModel.HideBackButton = currentPage.HideBackButton;
-
-                        return new ProcessRequestEntity
-                        {
-                            Page = currentPage,
-                            ViewModel = streetViewModel,
-                            UseGeneratedViewModel = true,
-                            ViewName = "../Street/Index"
-                        };
-                    }
-                    catch (Exception e)
-                    {
-                        throw new ApplicationException($"PageHelper.ProcessStreetJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
-                    };
-                case "Select":
-                    return new ProcessRequestEntity
-                    {
-                        Page = currentPage
-                    };
-                default:
-                    throw new ApplicationException($"PageHelper.ProcessStreetJourney: Unknown journey type");
-            }
-        }
-
-        public async Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
-        {
-            switch (journey)
-            {
-                case "Search":
-                    try
-                    {
-                        if(!addressResults.Any()){
-                            return new ProcessRequestEntity {
-                                RedirectToAction = true,
-                                RedirectAction = "AddressManual"
-                            };
-                        }
-
-                        var addressViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, null);
-                        addressViewModel.AddressStatus = "Select";
-                        addressViewModel.FormName = baseForm.FormName;
-                        addressViewModel.PageTitle = currentPage.Title;
-                        addressViewModel.HideBackButton = currentPage.HideBackButton;
-
-                        return new ProcessRequestEntity
-                        {
-                            Page = currentPage,
-                            ViewModel = addressViewModel,
-                            UseGeneratedViewModel = true,
-                            ViewName = "../Address/Index"
-                        };
-                    }
-                    catch (Exception e)
-                    {
-                        throw new ApplicationException($"PageHelper.ProcessAddressJourney: An exception has occurred while attempting to generate Html, Exception: {e.Message}", e);
-                    };
-                case "Select":
-                    return new ProcessRequestEntity
-                    {
-                        Page = currentPage
-                    };
-                default:
-                    throw new ApplicationException("PageHelper.ProcessAddressJourney: Unknown journey type");
-            }
-        }
-
-        public async Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults)
-        {
-            switch (journey)
-            {
-                case "Search":
-                    try
-                    {
-                        var organisationViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, null, organisationResults);
-                        organisationViewModel.OrganisationStatus = "Select";
-                        organisationViewModel.FormName = baseForm.FormName;
-                        organisationViewModel.PageTitle = currentPage.Title;
-                        organisationViewModel.HideBackButton = currentPage.HideBackButton;
-
-                        return new ProcessRequestEntity
-                        {
-                            Page = currentPage,
-                            ViewModel = organisationViewModel,
-                            UseGeneratedViewModel = true,
-                            ViewName = "../Organisation/Index"
-                        };
-                    }
-                    catch (Exception e)
-                    {
-                        throw new ApplicationException($"PageHelper.ProcessOrganisationJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
-                    };
-                case "Select":
-                    return new ProcessRequestEntity
-                    {
-                        Page = currentPage
-                    };
-                default:
-                    throw new ApplicationException($"PageHelper.ProcessOrganisationJourney: Unknown journey type");
-            }
         }
 
         public void HasDuplicateQuestionIDs(List<Page> pages, string formName)
@@ -358,7 +253,7 @@ namespace form_builder.Helpers.PageHelpers
                 {
                     if (item.SubmitSlugs.Count > 0)
                     {
-                       var foundEnviromentSubmitSlug = false;
+                        var foundEnviromentSubmitSlug = false;
                         foreach (var subItem in item.SubmitSlugs)
                         {
                             if (subItem.Environment.ToLower() == _enviroment.EnvironmentName.ToS3EnvPrefix().ToLower())
@@ -451,19 +346,78 @@ namespace form_builder.Helpers.PageHelpers
             }
             convertedAnswers.FormData.Add(key, value);
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
-
         }
 
         public void CheckForDocumentDownload(FormSchema formSchema)
         {
-            if(formSchema.DocumentDownload){
-                if(formSchema.DocumentType.Any()){
-                    if(formSchema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
+            if (formSchema.DocumentDownload)
+            {
+                if (formSchema.DocumentType.Any())
+                {
+                    if (formSchema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
                         throw new ApplicationException($"PageHelper::CheckForDocumentDownload, Unknown document download type configured");
-                } else {
-                     throw new ApplicationException($"PageHelper::CheckForDocumentDownload, No document download type configured");
+                }
+                else
+                {
+                    throw new ApplicationException($"PageHelper::CheckForDocumentDownload, No document download type configured");
                 }
             }
+        }
+
+        public void CheckForIncomingFormDataValues(List<Page> Pages)
+        {
+            if (Pages.Any(_ => _.HasIncomingValues))
+            {
+                Pages.Where(_ => _.HasIncomingValues)
+                    .ToList()
+                    .ForEach(x => x.IncomingValues.ForEach(_ =>
+                        {
+                            if (string.IsNullOrEmpty(_.QuestionId) || string.IsNullOrEmpty(_.Name))
+                                throw new Exception("PageHelper::CheckForIncomingFormDataValues, QuestionId or Name cannot be empty");
+                        }
+                    ));
+            }
+        }
+
+        public Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, Dictionary<string, dynamic> formData)
+        {
+            page.IncomingValues.ForEach(_ =>
+            {
+                var containsValue = formData.ContainsKey(_.Name);
+
+                if (!_.Optional && !containsValue)
+                    throw new Exception($"DictionaryExtensions::IncomingValue, FormData does not contains {_.Name} required value");
+
+                if (containsValue)
+                {
+                    formData = RecursiveCheckAndCreate(_.QuestionId, formData[_.Name], formData);
+                    formData.Remove(_.Name);
+                }
+            });
+
+            return formData;
+        }
+
+        private IDictionary<string, dynamic> RecursiveCheckAndCreate(string targetMapping, string value, IDictionary<string, dynamic> obj)
+        {
+            var splitTargets = targetMapping.Split(".");
+
+            if (splitTargets.Length == 1)
+            {
+                obj.Add(splitTargets[0], value);
+                return obj;
+            }
+
+            object subObject;
+            if (!obj.TryGetValue(splitTargets[0], out subObject))
+                subObject = new ExpandoObject();
+
+            subObject = RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), value, subObject as IDictionary<string, dynamic>);
+
+            obj.Remove(splitTargets[0]);
+            obj.Add(splitTargets[0], subObject);
+
+            return obj;
         }
     }
 }

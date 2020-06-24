@@ -76,48 +76,49 @@ namespace form_builder_tests_ui.Features
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 6
- testRunner.Given("I navigate to \"/address/page1/manual\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("I navigate to \"/ui-address/page1/\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 7
- testRunner.Then("I should see the \"address-AddressLine1\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I enter \"sk11zz\" in \"address-postcode\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 8
- testRunner.Then("I should see the \"address-AddressLine2\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 9
- testRunner.Then("I should see the \"address-AddressTown\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 10
- testRunner.Then("I should see the \"address-ManualPostcode\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 11
- testRunner.Then("I should see a \"label\" element with \"Address line 1\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 12
- testRunner.Then("I should see a \"label\" element with \"Town or city\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 13
- testRunner.Then("I should see a \"label\" element with \"Postcode\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 14
  testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 9
+ testRunner.Then("I should see the \"address-AddressLine1\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 10
+ testRunner.Then("I should see the \"address-AddressLine2\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 11
+ testRunner.Then("I should see the \"address-AddressTown\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 12
+ testRunner.Then("I should see the \"address-ManualPostcode\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 13
+ testRunner.Then("I should see a \"label\" element with \"Address line 1\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 14
+ testRunner.Then("I should see a \"label\" element with \"Town or city\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 15
+ testRunner.Then("I should see a \"label\" element with \"Postcode\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 16
+ testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 17
  testRunner.Then("I should see a validation error with an id \"address-AddressLine1-error\" with \"Ple" +
                     "ase enter Address Line 1\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 16
+#line 18
  testRunner.Then("I should see a validation error with an id \"address-AddressTown-error\" with \"Plea" +
                     "se enter Town\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 17
- testRunner.Then("I should see a validation error with an id \"address-ManualPostcode-error\" with \"P" +
-                    "lease enter a Postcode\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 18
- testRunner.Then("I enter \"testline1\" in \"address-AddressLine1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 19
- testRunner.Then("I enter \"town\" in \"address-AddressTown\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I enter \"testline1\" in \"address-AddressLine1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 20
- testRunner.Then("I enter \"INVALID POSTCODE\" in \"address-ManualPostcode\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I enter \"town\" in \"address-AddressTown\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 21
- testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.Then("I enter \"INVALID POSTCODE\" in \"address-ManualPostcode\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 22
- testRunner.Then("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.When("I click the \"nextStep\" button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 23
+ testRunner.Then("I wait one second", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 24
  testRunner.Then("I should see a validation error with an id \"address-ManualPostcode-error\" with \"P" +
                     "lease enter a valid Postcode\" text", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 24
- testRunner.And("I should see that \"address-AddressLine1\" input has value \"testline1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 25
+ testRunner.And("I should see that \"address-AddressLine1\" input has value \"testline1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 26
  testRunner.And("I should see that \"address-AddressTown\" input has value \"town\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             this.ScenarioCleanup();

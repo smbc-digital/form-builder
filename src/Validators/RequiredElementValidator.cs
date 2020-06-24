@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using form_builder.Enum;
 using form_builder.Models.Elements;
 using form_builder.Models;
+using form_builder.Extensions;
 
 namespace form_builder.Validators
 {
@@ -11,8 +12,8 @@ namespace form_builder.Validators
         {
 
             if (element.Type == EElementType.DateInput || element.Type == EElementType.TimeInput ||
-                element.Type == EElementType.AddressManual || element.Type == EElementType.DatePicker ||
-                element.Properties.Optional)
+                element.Type == EElementType.DatePicker || element.Properties.Optional 
+                || (element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
                 {
@@ -36,47 +37,46 @@ namespace form_builder.Validators
 
             if (element.Type == EElementType.Address)
             {
-                var addressElement = (Address)element;
-
-                if (viewModel.ContainsKey("AddressStatus") &&viewModel["AddressStatus"] == "Select")
+                if (viewModel.IsAutomatic())
                 {
-                    key = addressElement.AddressSelectQuestionId;
-                    validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+                    key = $"{element.Properties.QuestionId}-address";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
                 }
                 else
                 {
-                    key = addressElement.AddressSearchQuestionId;
-                    validationMessage = "Check the " + element.Properties.PostcodeLabel.ToLower() + " and try again";
+                    key = $"{element.Properties.QuestionId}-postcode";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
+
                 }
             }
 
             if (element.Type == EElementType.Street)
             {
-                var streetElement = (Street)element;
-                if (viewModel["StreetStatus"] == "Select")
+                if (viewModel.IsAutomatic())
                 {
-                    key = streetElement.StreetSelectQuestionId;
-                    validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+                    key = $"{element.Properties.QuestionId}-street";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+
                 }
                 else
                 {
-                    key = streetElement.StreetSearchQuestionId;
-                    validationMessage = "Check the " + element.Properties.Label.ToLower() + " and try again";
+                    key = $"{element.Properties.QuestionId}";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
                 }
             }
 
             if (element.Type == EElementType.Organisation)
             {
-                var organisationElement = (Organisation)element;
-                if (viewModel["OrganisationStatus"] == "Select")
+                if (viewModel.IsAutomatic())
                 {
-                    key = organisationElement.OrganisationSelectQuestionId;
-                    validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+                    key = $"{element.Properties.QuestionId}-organisation";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+
                 }
                 else
                 {
-                    key = organisationElement.OrganisationSearchQuestionId;
-                    validationMessage = "Check the " + element.Properties.Label.ToLower() + " and try again";
+                    key = $"{element.Properties.QuestionId}";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
                 }
             }
 

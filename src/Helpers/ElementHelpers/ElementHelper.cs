@@ -1,4 +1,6 @@
-﻿using form_builder.Models;
+﻿using form_builder.Builders;
+using form_builder.Extensions;
+using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using System;
@@ -6,12 +8,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using form_builder.Enum;
+using form_builder.Mappers;
 
 namespace form_builder.Helpers.ElementHelpers
 {
     public interface IElementHelper
     {
-        string CurrentValue(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "");
+        T CurrentValue<T>(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "");
         bool CheckForQuestionId(Element element);
         bool CheckForLabel(Element element);
         bool CheckForMaxLength(Element element);
@@ -24,26 +27,33 @@ namespace form_builder.Helpers.ElementHelpers
         void ReCheckPreviousRadioOptions(Element element);
         bool CheckForProvider(Element element);
         object GetFormDataValue(string guid, string key);
+        FormAnswers GetFormData(string guid);
+        List <PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema);
     }
 
     public class ElementHelper : IElementHelper
     {
         private readonly IDistributedCacheWrapper _distributedCache;
-        public ElementHelper(IDistributedCacheWrapper distributedCacheWrapper)
+        private readonly IElementMapper _elementMapper;
+        public ElementHelper(IDistributedCacheWrapper distributedCacheWrapper, IElementMapper elementMapper)
         {
             _distributedCache = distributedCacheWrapper;
+            _elementMapper = elementMapper;
+
         }
 
-        public string CurrentValue(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
+        public T CurrentValue<T>(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
         {
+            var defaultValue = (T) Convert.ChangeType(string.Empty, typeof(T));
+
             if (element.Type == EElementType.FileUpload)
-                return string.Empty;
+                return defaultValue;
 
             var currentValue = answers.ContainsKey($"{element.Properties.QuestionId}{suffix}");
 
             if (!currentValue)
             {
-                var cacheData = _distributedCache.GetString(guid);
+                var cacheData = _distributedCache.GetString(guid);  
                 if(cacheData != null)
                 {
                     var mappedCacheData = JsonConvert.DeserializeObject<FormAnswers>(cacheData);
@@ -53,13 +63,13 @@ namespace form_builder.Helpers.ElementHelpers
                     {
                         var value = storedValue.Answers.FirstOrDefault(_ => _.QuestionId == $"{element.Properties.QuestionId}{suffix}");
 
-                        return value != null ? value.Response : string.Empty;
+                        return value != null ? (T)value.Response : defaultValue;
                     }
                 }
-                return string.Empty;
+                return defaultValue;
             }
 
-            return currentValue ? answers[$"{element.Properties.QuestionId}{suffix}"] : string.Empty;
+            return currentValue ? answers[$"{element.Properties.QuestionId}{suffix}"] : defaultValue;
         }
 
         public bool CheckForLabel(Element element)
@@ -189,10 +199,58 @@ namespace form_builder.Helpers.ElementHelpers
             if (!string.IsNullOrEmpty(formData))
             {
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
             }
 
             return convertedAnswers.FormData.ContainsKey(key) ? convertedAnswers.FormData.GetValueOrDefault(key) : string.Empty;
+        }
+
+        public FormAnswers GetFormData(string guid)
+        {
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+
+            if (!string.IsNullOrEmpty(formData))
+            {
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+            }
+
+            return convertedAnswers;
+        }
+
+        public List<PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema)
+        {
+            var formAnswers = GetFormData(guid);
+            var reducedAnswers = FormAnswersExtensions.GetReducedAnswers(formAnswers, formSchema);
+            var FormSummary = new List<PageSummary>();
+            var pages = formSchema.Pages.ToList();
+
+            foreach (var page in pages)
+            {
+                var pSummary = new PageSummary();
+                pSummary.PageTitle = page.Title;
+                pSummary.PageSlug = page.PageSlug;
+
+                var summaryBuilder = new SummaryDictionaryBuilder();
+
+                var formSchemaQuestions = page.ValidatableElements
+                    .Where(_ => _ != null)                    
+                    .ToList();               
+
+                if(formSchemaQuestions.Count() ==  0
+                   || 
+                   !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())                    
+                {
+                    continue;
+                }
+
+                formSchemaQuestions.ForEach((question) => {
+                    var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
+                    summaryBuilder.Add(question.GetLabelText(), answer, question.Type);
+                });
+                pSummary.Answers = summaryBuilder.Build();
+                FormSummary.Add(pSummary);
+            }
+            return FormSummary;
         }
     }
 }

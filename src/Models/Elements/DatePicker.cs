@@ -2,8 +2,6 @@
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,15 +10,25 @@ namespace form_builder.Models.Elements
 {
     public class DatePicker : Element
     {
+        public const string PLACEHOLDER_DATE_FORMAT = "dd/mm/yyyy";
 
         public DatePicker()
         {
             Type = EElementType.DatePicker;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(
+            IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,
+            Dictionary<string, dynamic> viewModel,
+            Page page,
+            FormSchema formSchema,
+            IHostingEnvironment environment,
+            List<object> results = null)
         {
-            Properties.Date = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
+            Properties.Value = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, string.Empty);
+
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckAllDateRestrictionsAreNotEnabled(this);
@@ -44,7 +52,8 @@ namespace form_builder.Models.Elements
                 { "id", Properties.QuestionId },
                 { "name", Properties.QuestionId },
                 { "max", maxDate },
-                { "min", minDate }
+                { "min", minDate },
+                { "placeholder", PLACEHOLDER_DATE_FORMAT }
             };
 
             

@@ -4,11 +4,11 @@ using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using form_builder.Constants;
+using Newtonsoft.Json.Linq;
 
 namespace form_builder.Models.Elements
 {
@@ -41,22 +41,46 @@ namespace form_builder.Models.Elements
             Type = EElementType.Street;
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> searchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> answers, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override async Task<string> RenderAsync(
+            IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,
+            Dictionary<string, dynamic> answers,
+            Page page,
+            FormSchema formSchema,
+            IHostingEnvironment environment,
+            List<object> results = null)
         {
-            IsSelect = answers.ContainsKey("StreetStatus") && answers["StreetStatus"] == "Select" || answers.ContainsKey(StreetSearchQuestionId) && !string.IsNullOrEmpty(answers[StreetSearchQuestionId]);
-            Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
+            answers.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
 
-            if (!IsSelect)
+            switch (subPath as string)
             {
-                return await viewRender.RenderAsync("StreetSearch", this);
-            }
+                case LookUpConstants.Automatic:
+                    IsSelect = true;
+                    Properties.Value = elementHelper.CurrentValue<string>(this, answers, page.PageSlug, guid, string.Empty);
+                    ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
-            Items = new List<SelectListItem>{ new SelectListItem($"{searchResults.Count} streets found", string.Empty)};
-            searchResults.ForEach((_) => { Items.Add(new SelectListItem(_.Name, $"{_.UniqueId}|{_.Name}")); });
-            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
-            return await viewRender.RenderAsync("StreetSelect", this);
+                    var selectedStreet = elementHelper.CurrentValue<string>(this, answers, page.PageSlug, guid, StreetConstants.SELECT_SUFFIX);
+                    Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} streets found", string.Empty) };
+                    results?.ForEach((objectResult) => {
+                        AddressSearchResult searchResult;
+
+                        if ((objectResult as JObject) != null)
+                            searchResult = (objectResult as JObject).ToObject<AddressSearchResult>();
+                        else
+                            searchResult = objectResult as AddressSearchResult;
+
+                        Items.Add(new SelectListItem(searchResult.Name, $"{searchResult.UniqueId}|{searchResult.Name}", searchResult.UniqueId.Equals(selectedStreet)));
+                    });
+
+                    return await viewRender.RenderAsync("StreetSelect", this);
+                default:
+
+                    Properties.Value = elementHelper.CurrentValue<string>(this, answers, page.PageSlug, guid, string.Empty);
+                    return await viewRender.RenderAsync("StreetSearch", this);
+            }
         }
 
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")

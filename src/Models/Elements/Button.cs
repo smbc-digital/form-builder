@@ -2,12 +2,11 @@
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using form_builder.Constants;
+using form_builder.Extensions;
 
 namespace form_builder.Models.Elements
 {
@@ -18,7 +17,15 @@ namespace form_builder.Models.Elements
             Type = EElementType.Button;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(
+            IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,
+            Dictionary<string, dynamic> viewModel,
+            Page page,
+            FormSchema formSchema,
+            IHostingEnvironment environment,
+            List<object> results = null)
         {
             var viewData = new Dictionary<string, dynamic> { { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) } };
 
@@ -36,11 +43,9 @@ namespace form_builder.Models.Elements
         {
             var isStreetAddress = element.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.Street);
 
-            if (isStreetAddress && (viewModel.ContainsKey("AddressStatus") || viewModel.ContainsKey("StreetStatus")))
-            {
+            if (isStreetAddress && !viewModel.IsInitial())
                 return false;
-            }
-           
+                
             return isStreetAddress;
         }
 
@@ -51,13 +56,14 @@ namespace form_builder.Models.Elements
 
         private string GetButtonText(List<IElement> element, Dictionary<string, dynamic> viewModel, Page page)
         {
-            var containsAddressElement = element.Any(_ => _.Type == EElementType.Address);
-
-            if (containsAddressElement && 
-                (!viewModel.ContainsKey("AddressStatus") || !page.IsValid && viewModel.ContainsKey("AddressStatus") && viewModel["AddressStatus"] == "Search"))
-            {
+            if (element.Any(_ => _.Type == EElementType.Address) && viewModel.IsInitial())
                 return SystemConstants.AddressSearchButtonText;
-            }
+
+            if (element.Any(_ => _.Type == EElementType.Street) && viewModel.IsInitial())
+                return SystemConstants.StreetSearchButtonText;
+
+            if (element.Any(_ => _.Type == EElementType.Organisation) && viewModel.IsInitial())
+                return SystemConstants.OrganisationSearchButtonText;
 
             if(page.Behaviours.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay))
                 return string.IsNullOrEmpty(Properties.Text) ? SystemConstants.SubmitButtonText : Properties.Text;

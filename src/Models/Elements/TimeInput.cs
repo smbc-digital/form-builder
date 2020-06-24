@@ -3,8 +3,6 @@ using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,11 +15,19 @@ namespace form_builder.Models.Elements
             Type = EElementType.TimeInput;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(
+            IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,
+            Dictionary<string, dynamic> viewModel,
+            Page page,
+            FormSchema formSchema,
+            IHostingEnvironment environment,
+            List<object> results = null)
         {
-            Properties.Hours = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, TimeConstants.HOURS_SUFFIX);
-            Properties.Minutes = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, TimeConstants.MINUTES_SUFFIX);
-            Properties.AmPm = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, TimeConstants.AM_PM_SUFFIX);
+            Properties.Hours = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, TimeConstants.HOURS_SUFFIX);
+            Properties.Minutes = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, TimeConstants.MINUTES_SUFFIX);
+            Properties.AmPm = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, TimeConstants.AM_PM_SUFFIX);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             return viewRender.RenderAsync(Type.ToString(), this);

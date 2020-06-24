@@ -12,7 +12,6 @@ namespace form_builder.Models
 {
     public class Page
     {
-
         public Page()
         {
             IsValidated = false;
@@ -26,6 +25,8 @@ namespace form_builder.Models
 
         public List<Behaviour> Behaviours { get; set; }
 
+        public List<IncomingValue> IncomingValues { get;set; } = new List<IncomingValue>();
+
         public bool IsValidated { get; set; }
 
         public bool HideTitle { get; set; }
@@ -38,6 +39,8 @@ namespace form_builder.Models
 
         [JsonIgnore]
         public bool IsValid => !InvalidElements.Any();
+
+        public bool HasIncomingValues => IncomingValues.Any();
 
         [JsonIgnore]
         public IEnumerable<BaseProperty> InvalidElements
@@ -89,14 +92,16 @@ namespace form_builder.Models
                     var checkBoxContainsConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.CheckboxContains));
                     var dateIsBeforeConditions = behaviour.Conditions.Where(x => x.IsBefore != null);
                     var dateIsAfterConditions = behaviour.Conditions.Where(x => x.IsAfter != null);
+                    var isNullOrEmpty = behaviour.Conditions.Where(x => x.IsNullOrEmpty != null);
 
                     var equalToValid = !equalToConditions.Any();
                     var checkBoxContainsValid = !checkBoxContainsConditions.Any();
                     var dateIsBeforeValid = !dateIsBeforeConditions.Any();
                     var dateIsAfterValid = !dateIsAfterConditions.Any();
+                    var isNullOrEmptyValid = !isNullOrEmpty.Any();
 
                     if(equalToConditions.Any())
-                        equalToValid = equalToConditions.All(x => x.EqualTo == viewModel[x.QuestionId]);
+                        equalToValid = equalToConditions.All(x => x.EqualTo.Equals(viewModel.ContainsKey(x.QuestionId) ? viewModel[x.QuestionId] : string.Empty));
 
                     if(checkBoxContainsConditions.Any())
                         checkBoxContainsValid = checkBoxContainsConditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
@@ -107,7 +112,10 @@ namespace form_builder.Models
                     if(dateIsAfterConditions.Any())
                         dateIsAfterValid = dateIsAfterConditions.All(x => DateComparator.DateIsAfter(x, viewModel));  
 
-                    if (equalToValid && checkBoxContainsValid && dateIsBeforeValid && dateIsAfterValid)
+                    if (isNullOrEmpty.Any())
+                        isNullOrEmptyValid = isNullOrEmpty.All(x => string.IsNullOrEmpty(viewModel[x.QuestionId]) == x.IsNullOrEmpty);
+
+                    if (equalToValid && checkBoxContainsValid && dateIsBeforeValid && dateIsAfterValid && isNullOrEmptyValid)
                         return behaviour;
                 }
             }

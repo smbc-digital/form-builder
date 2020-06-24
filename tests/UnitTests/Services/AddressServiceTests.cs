@@ -38,7 +38,7 @@ namespace form_builder_tests.UnitTests.Services
         }
         
         [Fact]
-        public async Task ProcesssAddress_ShouldCallAddressProvider_WhenCorrectJourney()
+        public async Task ProcessAddress_ShouldCallAddressProvider_WhenCorrectJourney()
         {
             var questionId = "test-address";
 
@@ -82,19 +82,17 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcesssAddress(viewModel, page, schema, "", "page-one");
+            var result = await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
         }
 
 
-        [Theory]
-        [InlineData(true, "Search")]
-        public async Task ProcesssAddress_ShouldNotCallAddressProvider_WhenAddressIsOptional(bool isValid, string journey)
+        [Fact]
+        public async Task ProcessAddress_ShouldNotCallAddressProvider_WhenAddressIsOptional()
         {
             var questionId = "test-address";
 
@@ -128,7 +126,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithValidatedModel(isValid)
+                .WithValidatedModel(true)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -139,17 +137,16 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", journey },
                 { $"{element.Properties.QuestionId}-postcode", "" },
             };
 
-            var result = await _service.ProcesssAddress(viewModel, page, schema, "", "page-one");
+            var result = await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public async Task ProcesssAddress_ShouldCall_PageHelper_ToProcessSearchResults()
+        public async Task ProcessAddress_ShouldCall_PageHelper_ToProcessSearchResults()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.Address)
@@ -167,24 +164,22 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcesssAddress(viewModel, page, schema, "", "page-one");
+            var result = await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.ProcessAddressJourney("Search", It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
         }
 
         [Fact]
-        public async Task ProcesssAddress_Application_ShouldThrowApplicationException_WhenNoMatchingAddressProvider()
+        public async Task ProcessAddress_Application_ShouldThrowApplicationException_WhenNoMatchingAddressProvider()
         {
             var addressProvider = "NON-EXIST-PROVIDER";
             var searchResultsCallback = new List<AddressSearchResult>();
@@ -207,17 +202,16 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssAddress(viewModel, page, schema, "", "page-one"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
             Assert.Equal($"AddressController: An exception has occured while attempting to perform postcode lookup", result.Message);
         }
 
         [Fact]
-        public async Task ProcesssAddress_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
+        public async Task ProcessAddress_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
         {
 
             _addressProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
@@ -243,12 +237,13 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssAddress(viewModel, page, schema, "", "page-one"));
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Never);
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
+
+            _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
             Assert.StartsWith($"AddressController: An exception has occured while attempting to perform postcode lookup", result.Message);
         }
     }

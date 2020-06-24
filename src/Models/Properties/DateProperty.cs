@@ -2,7 +2,6 @@
 {
     public partial class BaseProperty
     {
-        public string Date { get; set; } = string.Empty;
         public bool RestrictFutureDate { get; set; } = false;
         public bool RestrictPastDate { get; set; } = false;
         public bool RestrictCurrentDate { get; set; } = false;

@@ -31,15 +31,16 @@ using System.Diagnostics.CodeAnalysis;
 using form_builder.Services.FileUploadService;
 using form_builder.Providers.DocumentCreation;
 using form_builder.Providers.DocumentCreation.Generic;
-using form_builder.Providers.DocumentCreation.Smbc;
 using form_builder.Services.DocumentService;
 using form_builder.Helpers.DocumentCreation;
 using form_builder.ContentFactory;
 using form_builder.Providers.Organisation;
 using form_builder.Providers.Street;
-using form_builder.Providers.TransformDataProvider;
 using form_builder.Factories.Schema;
-using form_builder.Factories.Transform;
+using form_builder.Providers.Transforms.Lookups;
+using form_builder.Providers.Transforms.ReusableElements;
+using form_builder.Factories.Transform.Lookups;
+using form_builder.Factories.Transform.ReusableElements;
 
 namespace form_builder.Extensions
 {
@@ -178,7 +179,8 @@ namespace form_builder.Extensions
             services.AddTransient<ISuccessPageContentFactory, SuccessPageContentFactory>();
             services.AddTransient<IPageContentFactory, PageContentFactory>();
             services.AddTransient<ISchemaFactory, SchemaFactory>();
-            services.AddTransient<ISchemaTransformFactory, LookupSchemaTransformFactory>();
+            services.AddTransient<ILookupSchemaTransformFactory, LookupSchemaTransformFactory>();
+            services.AddTransient<IReusableElementSchemaTransformFactory, ReusableElementSchemaTransformFactory>();
 
             return services;
         }
@@ -201,11 +203,14 @@ namespace form_builder.Extensions
         {
             if (HostingEnvironment.IsEnvironment("local") || HostingEnvironment.IsEnvironment("uitest"))
             {
-                services.AddSingleton<ITransformDataProvider, LocalTransformDataProvider>();
+                services.AddSingleton<ILookupTransformDataProvider, LocalLookupTransformDataProvider>();
+                services.AddSingleton<IReusableElementTransformDataProvider, LocalReusableElementTransformDataProvider>();
             }
             else
             {
-                services.AddSingleton<ITransformDataProvider, S3TransformDataProvider>();
+                services.AddSingleton<ILookupTransformDataProvider, S3LookupTransformDataProvider>();
+                services.AddSingleton<IReusableElementTransformDataProvider, S3ReusableElementTransformDataProvider>();
+
             }
 
             return services;
@@ -247,6 +252,7 @@ namespace form_builder.Extensions
                     break;
             }
 
+            services.AddDataProtection().SetApplicationName("formbuilder");
             services.AddSingleton<IDistributedCacheWrapper, DistributedCacheWrapper>();
             return services;
         }

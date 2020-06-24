@@ -6,7 +6,6 @@ namespace form_builder.Models.Properties
     public partial class BaseProperty
     {
         public List<string> AllowedFileTypes { get; set; }
-
         public int MaxFileSize { get; set; }
     }
 }

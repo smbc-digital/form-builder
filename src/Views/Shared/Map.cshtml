@@ -1,0 +1,12 @@
+﻿@model form_builder.Models.Elements.Map
+
+@Html.Hidden("map_current_value", Model.Properties.Value)
+
+<div id='root' class='leaflet-map'></div>
+<script type='text/javascript' src='@Model.MainJSFile'></script>
+<script type='text/javascript' src='@Model.VendorJSFIle'></script>
+<noscript>
+    <p class="smbc-body">
+        @Model.Properties.NoMapContent
+    </p>
+</noscript>

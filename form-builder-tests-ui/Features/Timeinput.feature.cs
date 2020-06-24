@@ -76,7 +76,7 @@ namespace form_builder_tests_ui.Features
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 8
- testRunner.Given("I navigate to \"/time/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("I navigate to \"/ui-time-input/page1\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 9
  testRunner.Then("I should see the header", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 10
@@ -91,7 +91,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 14
  testRunner.Then("I should see a validation message for \"timeid-error\" input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 15
- testRunner.Then("I should see time refilled in the time input with \"23\" value, minutes with \"23\" v" +
+ testRunner.Then("I should see time refilled in the time input with \"23\" value, minutes with \"34\" v" +
                     "alue in for \"timeid\" blah", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();

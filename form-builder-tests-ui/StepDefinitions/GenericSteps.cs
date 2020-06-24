@@ -29,13 +29,8 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then("I should see the header")]
         public void ThenIShouldSeeTheHeaderSection()
         { 
-            Assert.True(BrowserSession.FindAllCss("a[href*='https://www.stockport.gov.uk']").Any());
-        }
-
-        [Then("I should see the breadcrumbs")]
-        public void ThenIShouldSeeBreadcrumbs()
-        {
-            Assert.True(BrowserSession.FindCss(".breadcrumb-container").Exists());
+            Assert.True(BrowserSession.FindCss(".smbc-header").Exists());
+            Assert.True(BrowserSession.FindCss(".smbc-header__link--homepage").Exists());
         }
 
         [Then("I should see the form title in the header")]
@@ -45,7 +40,7 @@ namespace form_builder_tests_ui.StepDefinitions
         }
 
         [Then(@"I should find an element with class ""(.*)""")]
-        public void ThenIShouldSeeBreadcrumbs(string className)
+        public void ThenIShouldSeeElementWithClass(string className)
         {
             Assert.True(BrowserSession.FindCss(className).Exists());
         }
@@ -53,9 +48,7 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then("I should see the footer")]
         public void ThenIShouldSeeTheFooterSection()
         {
-            Assert.True(BrowserSession.FindCss(".atoz").Exists());
-            Assert.True(BrowserSession.FindCss(".l-container-footer").Exists());
-            Assert.True(BrowserSession.FindCss(".cc_banner.cc_container.cc_container--open").Exists());
+            Assert.True(BrowserSession.FindCss(".smbc-footer").Exists());
         }
 
         [Then("I should see the pagination section")]
@@ -93,12 +86,6 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenIShouldSeeTheButton(string name)
         {
             Assert.True(BrowserSession.FindButton(name).Exists());
-        }
-
-        [When("I click the close alert button")]
-        public void WhenIClickTheCloseAlertButton()
-        {
-            BrowserSession.FindAllCss(".alert-close a").FirstOrDefault().Click();
         }
 
         [Then(@"I should see the ""(.*)"" input")]
@@ -162,7 +149,6 @@ namespace form_builder_tests_ui.StepDefinitions
         public void ThenISelectDropdown(string value, string fieldName)
         {
             BrowserSession.FindId(fieldName).SelectOption(value);
-            
         }
 
         [Then(@"I should see a ""(.*)"" element with ""(.*)"" text")]

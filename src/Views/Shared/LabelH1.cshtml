@@ -3,7 +3,7 @@
         @if(Model.Properties.LabelAsH1 || Model.Properties.LegendAsH1)
         {
             <h1 class="govuk-label-wrapper">
-                <label class="govuk-label govuk-label--xl" for="@Model.QuestionId">
+                <label class="govuk-label govuk-label--l" for="@Model.QuestionId">
                     @Model.Label
                     @if (Model.Properties.Optional) { <span class="smbc-body">(optional)</span> }
                 </label>

@@ -66,17 +66,19 @@ namespace form_builder_tests.UnitTests.Validators
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
-                .WithRestrictCurrentDate(true)
+                .WithRestrictCurrentDate(true,"Current Date Validation Message")
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
             var today = DateTime.Today;
-            viewModel.Add("test-date", today.ToString("yyyy-MM-dd"));     
+            viewModel.Add("test-date-year", today.Year.ToString());
+            viewModel.Add("test-date-month", today.Month.ToString());
+            viewModel.Add("test-date-day", today.Day.ToString());
 
             //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
             Assert.False(result.IsValid);
-            Assert.Equal("Check the date and try again", result.Message);
+            Assert.Equal("Current Date Validation Message", result.Message);
         }
 
         [Fact]

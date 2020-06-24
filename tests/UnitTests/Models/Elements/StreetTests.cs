@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using form_builder.Constants;
 
 namespace form_builder_tests.UnitTests.Models.Elements
 {
@@ -37,16 +38,16 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("StreetStatus", "Select");
-            viewModel.Add(element.StreetSelectQuestionId, "");
-            viewModel.Add(element.StreetSearchQuestionId, "street");
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
+            viewModel.Add("street-streetaddress", "");
+            viewModel.Add("street-street", "street");
 
             var schema = new FormSchemaBuilder()
                 .WithName("Street name")
                 .Build();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object);
 
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<form_builder.Models.Elements.Street>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
@@ -62,18 +63,23 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("StreetStatus", "Search");
 
             var schema = new FormSchemaBuilder()
                 .WithName("Street name")
                 .Build();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", new List<AddressSearchResult>(), new List<OrganisationSearchResult>(), viewModel, page, schema, _mockHostingEnv.Object);
+            var result = await element.RenderAsync(
+                _mockIViewRender.Object,
+                _mockElementHelper.Object,
+                "",
+                viewModel,
+                page,
+                schema,
+                _mockHostingEnv.Object);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSearch"),It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
-
     }
 }

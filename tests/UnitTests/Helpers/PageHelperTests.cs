@@ -1,6 +1,7 @@
 ﻿using form_builder.Builders;
 using form_builder.Cache;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
@@ -20,8 +21,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -36,11 +35,19 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _mockDisallowedKeysOptions = new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
+
+        private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _mockDisallowedKeysOptions =
+            new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
+
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
-        private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider = new Mock<IEnumerable<IPaymentProvider>>();
+
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings
+            = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+
+        private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider =
+            new Mock<IEnumerable<IPaymentProvider>>();
+
         private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
         private readonly Mock<IFileUploadService> _mockFileUploadService = new Mock<IFileUploadService>();
 
@@ -54,30 +61,40 @@ namespace form_builder_tests.UnitTests.Helpers
                 }
             });
 
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
-                .ReturnsAsync(new List<PaymentInformation> {
-                    new PaymentInformation {
+            _mockCache.Setup(_ =>
+                    _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(),
+                        It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(new List<PaymentInformation>
+                {
+                    new PaymentInformation
+                    {
                         FormName = "test-form",
                         PaymentProvider = "testProvider"
                     },
-                    new PaymentInformation {
+                    new PaymentInformation
+                    {
                         FormName = "test-form-with-invorrect-provider",
                         PaymentProvider = "invalidProvider"
-                    } });
+                    }
+                });
 
-            _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
-            {
-                UserData = 30,
-                PaymentConfiguration = 5,
-                FileUpload = 60
-            });
+            _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(
+                new DistributedCacheExpirationConfiguration
+                {
+                    UserData = 30,
+                    PaymentConfiguration = 5,
+                    FileUpload = 60
+                });
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
 
             _paymentProvider.Setup(_ => _.ProviderName).Returns("testProvider");
             var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
             _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
-            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object, _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object, _mockCache.Object, _mockDistrbutedCacheExpirationSettings.Object, _mockPaymentProvider.Object, _mockFileUploadService.Object);
+            _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object,
+                _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
+                _mockCache.Object, _mockDistrbutedCacheExpirationSettings.Object, _mockPaymentProvider.Object,
+                _mockFileUploadService.Object);
         }
 
         [Fact]
@@ -93,7 +110,8 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "H1"), It.Is<Element>(x => x.Properties.Text == "Page title"), It.IsAny<Dictionary<string, object>>()));
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "H1"),
+                It.Is<Element>(x => x.Properties.Text == "Page title"), It.IsAny<Dictionary<string, object>>()));
         }
 
         [Theory]
@@ -132,14 +150,17 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(
+                _ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>(),
+                    It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenAddressSelect()
         {
             //Arrange
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
+            _mockElementHelper.Setup(_ => _.CurrentValue<string>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
             var element = (form_builder.Models.Elements.Address)new ElementBuilder()
@@ -154,18 +175,19 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("AddressStatus", "Select");
-            viewModel.Add(element.AddressSearchQuestionId, "SK1 3XE");
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, new List<object>());
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<form_builder.Models.Elements.Address>(), null), Times.Once);
+            _mockIViewRender.Verify(
+                _ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"),
+                    It.IsAny<form_builder.Models.Elements.Address>(), null), Times.Once);
         }
 
         [Fact]
@@ -176,16 +198,20 @@ namespace form_builder_tests.UnitTests.Helpers
             var addressList = new List<SelectListItem>();
             var callback = new form_builder.Models.Elements.Address();
 
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Address>(), null))
-                .Callback<string, form_builder.Models.Elements.Address, Dictionary<string, object>>((x, y, z) => callback = y);
+            _mockIViewRender.Setup(_ =>
+                    _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Address>(), null))
+                .Callback<string, form_builder.Models.Elements.Address, Dictionary<string, object>>((x, y, z) =>
+                    callback = y);
 
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
+            _mockElementHelper.Setup(_ => _.CurrentValue<string>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
             var pageSlug = "page-one";
             var baseUrl = "test";
 
-            var addressElement = new form_builder.Models.Elements.Address { Properties = new BaseProperty { Text = "text" } };
+            var addressElement = new form_builder.Models.Elements.Address
+            { Properties = new BaseProperty { Text = "text" } };
 
             var page = new PageBuilder()
                 .WithElement(addressElement)
@@ -193,8 +219,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("AddressStatus", "Select");
-            viewModel.Add(addressElement.AddressSearchQuestionId, "SK1");
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -202,24 +227,25 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, new List<object>());
 
             //Assert
-            Assert.Equal($"/v2/{baseUrl}/{pageSlug}", callback.ReturnURL);
+            Assert.Equal($"/{baseUrl}/{pageSlug}", callback.ReturnURL);
         }
 
         [Fact]
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenAddressSearch()
         {
             //Arrange
-            var addressElement = new form_builder.Models.Elements.Address { Properties = new BaseProperty { Text = "text" } };
+            var addressElement = new form_builder.Models.Elements.Address
+            { Properties = new BaseProperty { Text = "text" } };
 
             var page = new PageBuilder()
                 .WithElement(addressElement)
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("AddressStatus", "Search");
+            viewModel.Add("subPath", "");
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -229,34 +255,39 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<form_builder.Models.Elements.Address>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(
+                _ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"),
+                    It.IsAny<form_builder.Models.Elements.Address>(), It.IsAny<Dictionary<string, object>>()),
+                Times.Once);
         }
 
         [Fact]
         public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenStreetSelect()
         {
             //Arrange
-            var element = new form_builder.Models.Elements.Street { Properties = new BaseProperty { QuestionId = "street", StreetProvider = "test", Text = "test" } };
+            var element = new form_builder.Models.Elements.Street
+            { Properties = new BaseProperty { QuestionId = "street", StreetProvider = "test", Text = "test" } };
 
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("StreetStatus", "Select");
-            viewModel.Add(element.StreetSelectQuestionId, string.Empty);
-            viewModel.Add(element.StreetSearchQuestionId, "street");
-
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
+            viewModel.Add("street-streetaddress", string.Empty);
+            viewModel.Add("street-street", "street");
 
             var schema = new FormSchemaBuilder()
                 .WithName("Street name")
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"), It.IsAny<form_builder.Models.Elements.Street>(), null), Times.Once);
+            _mockIViewRender.Verify(
+                _ => _.RenderAsync(It.Is<string>(x => x == "StreetSelect"),
+                    It.IsAny<form_builder.Models.Elements.Street>(), null), Times.Once);
         }
 
         [Fact]
@@ -273,7 +304,6 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("StreetStatus", "Search");
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -283,7 +313,9 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "StreetSearch"), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(
+                _ => _.RenderAsync(It.Is<string>(x => x == "StreetSearch"), It.IsAny<Element>(),
+                    It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
@@ -295,8 +327,10 @@ namespace form_builder_tests.UnitTests.Helpers
             var streetList = new List<SelectListItem>();
             var callback = new form_builder.Models.Elements.Street();
 
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Street>(), null))
-                .Callback<string, form_builder.Models.Elements.Street, Dictionary<string, object>>((x, y, z) => callback = y);
+            _mockIViewRender.Setup(_ =>
+                    _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Street>(), null))
+                .Callback<string, form_builder.Models.Elements.Street, Dictionary<string, object>>((x, y, z) =>
+                    callback = y);
 
             var pageSlug = "page-one";
             var baseUrl = "test";
@@ -308,20 +342,19 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("StreetStatus", "Select");
-            viewModel.Add(element.StreetSelectQuestionId, string.Empty);
-            viewModel.Add(element.StreetSearchQuestionId, "street");
-
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
+            viewModel.Add("-streetaddress", string.Empty);
+            viewModel.Add("-street", "street");
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .WithBaseUrl(baseUrl)
                 .Build();
 
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "", new List<AddressSearchResult>());
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            Assert.Equal($"/v2/{baseUrl}/{pageSlug}", callback.ReturnURL);
+            Assert.Equal($"/{baseUrl}/{pageSlug}", callback.ReturnURL);
         }
 
         [Theory]
@@ -350,7 +383,9 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(
+                _ => _.RenderAsync(It.Is<string>(x => x == type.ToString()), It.IsAny<Element>(),
+                    It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
@@ -364,8 +399,8 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var page = new PageBuilder()
-               .WithElement(element)
-               .Build();
+                .WithElement(element)
+                .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
             var schema = new FormSchemaBuilder()
@@ -376,7 +411,9 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _pageHelper.GenerateHtml(page, viewModel, schema, "");
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == EElementType.Img.ToString()), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(
+                _ => _.RenderAsync(It.Is<string>(x => x == EElementType.Img.ToString()), It.IsAny<Element>(),
+                    It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
@@ -386,7 +423,8 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("Path", "path");
 
-            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+            var mockData = JsonConvert.SerializeObject(new FormAnswers
+            { Path = "page-one", Pages = new List<PageAnswers>() });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
@@ -394,7 +432,8 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.SaveAnswers(viewModel, guid.ToString(), "formName", null, true);
 
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x == guid.ToString())));
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == guid.ToString()), It.IsAny<string>(), It.IsAny<CancellationToken>()));
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == guid.ToString()),
+                It.IsAny<string>(), It.IsAny<CancellationToken>()));
         }
 
         [Fact]
@@ -414,8 +453,8 @@ namespace form_builder_tests.UnitTests.Helpers
                         PageSlug = "path",
                         Answers = new List<Answers>
                         {
-                             new Answers { QuestionId = "Item1", Response = "old-answer" },
-                             new Answers { QuestionId = "Item2", Response = "old-answer" }
+                            new Answers {QuestionId = "Item1", Response = "old-answer"},
+                            new Answers {QuestionId = "Item2", Response = "old-answer"}
                         }
                     }
                 }
@@ -426,7 +465,8 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
 
-            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            _mockDistributedCache.Setup(_ =>
+                    _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
             var viewModel = new Dictionary<string, dynamic>();
@@ -450,10 +490,12 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             var callbackCacheProvider = string.Empty;
 
-            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            _mockDistributedCache.Setup(_ =>
+                    _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
-            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+            var mockData = JsonConvert.SerializeObject(new FormAnswers
+            { Path = "page-one", Pages = new List<PageAnswers>() });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
@@ -474,12 +516,14 @@ namespace form_builder_tests.UnitTests.Helpers
             var callbackCacheProvider = string.Empty;
             var item1Data = "item1-data";
             var item2Data = "item2-data";
-            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+            var mockData = JsonConvert.SerializeObject(new FormAnswers
+            { Path = "page-one", Pages = new List<PageAnswers>() });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
 
-            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            _mockDistributedCache.Setup(_ =>
+                    _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
             var viewModel = new Dictionary<string, dynamic>();
@@ -521,7 +565,8 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection, true);
 
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), CancellationToken.None), Times.Once);
+            _mockDistributedCache.Verify(
+                _ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), CancellationToken.None), Times.Once);
         }
 
         [Fact]
@@ -539,7 +584,8 @@ namespace form_builder_tests.UnitTests.Helpers
             var allTheAnswers = new List<Answers>();
             allTheAnswers.Add(new Answers
             {
-                QuestionId = questionId, Response = new FileUploadModel
+                QuestionId = questionId,
+                Response = new FileUploadModel
                 {
                     Key = questionId,
                     TrustedOriginalFileName = $"file-{questionId}",
@@ -564,7 +610,8 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
 
-            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            _mockDistributedCache.Setup(_ =>
+                    _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
             var viewModel = new Dictionary<string, dynamic>();
@@ -576,12 +623,14 @@ namespace form_builder_tests.UnitTests.Helpers
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
             Assert.Equal(questionId, callbackModel.Pages[0].Answers[0].QuestionId);
-            var fileUploadModel = JsonConvert.DeserializeObject<FileUploadModel>(callbackModel.Pages[0].Answers[0].Response.ToString());
+            var fileUploadModel =
+                JsonConvert.DeserializeObject<FileUploadModel>(callbackModel.Pages[0].Answers[0].Response.ToString());
             Assert.Equal(questionId, fileUploadModel.Key);
         }
 
         [Fact]
-        public void SaveAnswers_ShouldReplaceFilUploadReference_WithinFormAnswers_IfAnswerAlreadyExists_InDistributedCache()
+        public void
+            SaveAnswers_ShouldReplaceFilUploadReference_WithinFormAnswers_IfAnswerAlreadyExists_InDistributedCache()
         {
             var callbackCacheProvider = string.Empty;
             var questionId = "fileUpload_testFileQuestionId";
@@ -595,7 +644,8 @@ namespace form_builder_tests.UnitTests.Helpers
             var allTheAnswers = new List<Answers>();
             allTheAnswers.Add(new Answers
             {
-                QuestionId = questionId, Response = new FileUploadModel
+                QuestionId = questionId,
+                Response = new FileUploadModel
                 {
                     Key = questionId,
                     TrustedOriginalFileName = $"file-{questionId}",
@@ -623,19 +673,21 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
 
-            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            _mockDistributedCache.Setup(_ =>
+                    _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("Path", "page-one");
-            viewModel.Add(questionId, new DocumentModel { Content = fileContent});
+            viewModel.Add(questionId, new DocumentModel { Content = fileContent });
 
             _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection, true);
 
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
             Assert.Equal(questionId, callbackModel.Pages[0].Answers[0].QuestionId);
-            FileUploadModel fileUploadModel = JsonConvert.DeserializeObject<FileUploadModel>(callbackModel.Pages[0].Answers[0].Response.ToString());
+            FileUploadModel fileUploadModel =
+                JsonConvert.DeserializeObject<FileUploadModel>(callbackModel.Pages[0].Answers[0].Response.ToString());
             Assert.Equal(fileName, fileUploadModel.UntrustedOriginalFileName);
         }
 
@@ -644,7 +696,8 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             var fileMock = new Mock<IFormFile>();
 
-            var mockData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+            var mockData = JsonConvert.SerializeObject(new FormAnswers
+            { Path = "page-one", Pages = new List<PageAnswers>() });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
@@ -654,8 +707,12 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true);
 
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(
+                _ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()), Times.Never);
+            _mockDistributedCache.Verify(
+                _ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+                Times.Once);
         }
 
         [Fact]
@@ -681,13 +738,13 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var page1 = new PageBuilder()
-              .WithElement(element1)
-              .WithElement(element2)
-              .Build();
+                .WithElement(element1)
+                .WithElement(element2)
+                .Build();
 
             var page2 = new PageBuilder()
-              .WithElement(element3)
-              .Build();
+                .WithElement(element3)
+                .Build();
 
             List<Page> pages = new List<Page>();
             pages.Add(page1);
@@ -720,13 +777,13 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var page1 = new PageBuilder()
-              .WithElement(element1)
-              .WithElement(element2)
-              .Build();
+                .WithElement(element1)
+                .WithElement(element2)
+                .Build();
 
             var page2 = new PageBuilder()
-              .WithElement(element3)
-              .Build();
+                .WithElement(element3)
+                .Build();
 
             List<Page> pages = new List<Page>();
             pages.Add(page1);
@@ -734,92 +791,6 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Act
             _pageHelper.HasDuplicateQuestionIDs(pages, "form");
-        }
-
-        [Fact]
-        public async Task ProcessOrganisationJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
-        {
-            var result = await _pageHelper.ProcessOrganisationJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
-
-            var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
-            Assert.Equal("../Organisation/Index", journeyResult.ViewName);
-            Assert.True(journeyResult.UseGeneratedViewModel);
-        }
-
-        [Fact]
-        public async Task ProcessOrganisationJourney_ShouldGenerteCorrectHtml_WhenSelectJourney()
-        {
-            var result = await _pageHelper.ProcessOrganisationJourney("Select", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>());
-
-            Assert.IsType<ProcessRequestEntity>(result);
-        }
-
-        [Fact]
-        public async Task ProcessOrganisationJourney_ShouldThrowException_WhenUnknownJourneyType()
-        {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessOrganisationJourney("UnknownType", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<OrganisationSearchResult>()));
-            Assert.Equal($"PageHelper.ProcessOrganisationJourney: Unknown journey type", result.Message);
-        }
-
-        [Fact]
-        public async Task ProcessAddressJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
-        {
-            var result = await _pageHelper.ProcessAddressJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult> { new AddressSearchResult() });
-
-            var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
-            Assert.Equal("../Address/Index", journeyResult.ViewName);
-            Assert.True(journeyResult.UseGeneratedViewModel);
-        }
-
-        [Fact]
-        public async Task ProcessAddressJourney_ReturnRedirectAction_True_WhenNoSearchResults_AndOnSearchJourney()
-        {
-            var result = await _pageHelper.ProcessAddressJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult> { });
-
-            var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
-            Assert.Equal("AddressManual", journeyResult.RedirectAction);
-            Assert.True(journeyResult.RedirectToAction);
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task ProcessAddressJourney_ShouldGenerteCorrectHtml_WhenSelectJourney()
-        {
-            var result = await _pageHelper.ProcessAddressJourney("Select", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
-
-            Assert.IsType<ProcessRequestEntity>(result);
-        }
-
-        [Fact]
-        public async Task ProcessAddressJourney_ShouldThrowException_WhenUnknownJourneyType()
-        {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessAddressJourney("UnknownType", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>()));
-            Assert.Equal($"PageHelper.ProcessAddressJourney: Unknown journey type", result.Message);
-        }
-
-        [Fact]
-        public async Task ProcessStreetJourney_ShouldGenerteCorrectHtml_WhenSearchJourney()
-        {
-            var result = await _pageHelper.ProcessStreetJourney("Search", new Page { PageSlug = "test-page", Elements = new List<IElement> { new H2 { Properties = new BaseProperty { QuestionId = "question-test", Text = "text" } } } }, new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
-
-            var journeyResult = Assert.IsType<ProcessRequestEntity>(result);
-            Assert.Equal("../Street/Index", journeyResult.ViewName);
-            Assert.True(journeyResult.UseGeneratedViewModel);
-        }
-
-        [Fact]
-        public async Task ProcessStreetJourney_ShouldGenerteCorrectHtml_WhenSelectJourney()
-        {
-            var result = await _pageHelper.ProcessStreetJourney("Select", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>());
-
-            Assert.IsType<ProcessRequestEntity>(result);
-        }
-
-        [Fact]
-        public async Task ProcessStreetJourney_ShouldThrowException_WhenUnknownJourneyType()
-        {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.ProcessStreetJourney("UnknownType", new Page(), new Dictionary<string, dynamic>(), new FormSchema { FormName = "test-form" }, "", new List<AddressSearchResult>()));
-            Assert.Equal($"PageHelper.ProcessStreetJourney: Unknown journey type", result.Message);
         }
 
         [Theory]
@@ -835,7 +806,9 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData("", "target$")]
         [InlineData("", "target.")]
         [InlineData("", ".target")]
-        public void CheckForInvalidQuestionOrTargetMappingValue_ShouldThrowExceptionWhen_InvalidQuestionId_OrTargetMapping(string questionId, string targetMapping)
+        public void
+            CheckForInvalidQuestionOrTargetMappingValue_ShouldThrowExceptionWhen_InvalidQuestionId_OrTargetMapping(
+                string questionId, string targetMapping)
         {
             var pages = new List<Page>();
 
@@ -862,8 +835,10 @@ namespace form_builder_tests.UnitTests.Helpers
 
             pages.Add(page);
 
-            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForInvalidQuestionOrTargetMappingValue(pages, "formName"));
-            Assert.StartsWith("The provided json 'formName' contains invalid QuestionIDs or TargetMapping, ", result.Message);
+            var result = Assert.Throws<ApplicationException>(() =>
+                _pageHelper.CheckForInvalidQuestionOrTargetMappingValue(pages, "formName"));
+            Assert.StartsWith("The provided json 'formName' contains invalid QuestionIDs or TargetMapping, ",
+                result.Message);
         }
 
         [Theory]
@@ -873,7 +848,9 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData("", "validtagretMapping")]
         [InlineData("", "valid.target")]
         [InlineData("", "valid.target.mapping")]
-        public void CheckForInvalidQuestionOrTargetMappingValue_ShouldNotThrowExceptionWhen_ValidQuestionId_OrTargetMapping(string questionId, string targetMapping)
+        public void
+            CheckForInvalidQuestionOrTargetMappingValue_ShouldNotThrowExceptionWhen_ValidQuestionId_OrTargetMapping(
+                string questionId, string targetMapping)
         {
             var pages = new List<Page>();
 
@@ -918,7 +895,8 @@ namespace form_builder_tests.UnitTests.Helpers
 
             pages.Add(page);
 
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.CheckForPaymentConfiguration(pages, "no-form-config"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() =>
+                _pageHelper.CheckForPaymentConfiguration(pages, "no-form-config"));
             Assert.Equal("No payment infomation configured for no-form-config form", result.Message);
         }
 
@@ -941,7 +919,8 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public async Task CheckForPaymentConfiguration_ShouldThrowException_WhenPaymentProvider_DoesNotExists_WhenConfig_IsFound()
+        public async Task
+            CheckForPaymentConfiguration_ShouldThrowException_WhenPaymentProvider_DoesNotExists_WhenConfig_IsFound()
         {
             var pages = new List<Page>();
 
@@ -955,7 +934,8 @@ namespace form_builder_tests.UnitTests.Helpers
 
             pages.Add(page);
 
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.CheckForPaymentConfiguration(pages, "test-form-with-invorrect-provider"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() =>
+                _pageHelper.CheckForPaymentConfiguration(pages, "test-form-with-invorrect-provider"));
             Assert.Equal("No payment provider configured for provider invalidProvider", result.Message);
         }
 
@@ -973,7 +953,8 @@ namespace form_builder_tests.UnitTests.Helpers
 
             pages.Add(page);
 
-            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForEmptyBehaviourSlugs(pages, "end-point"));
+            var result =
+                Assert.Throws<ApplicationException>(() => _pageHelper.CheckForEmptyBehaviourSlugs(pages, "end-point"));
             Assert.Equal($"Incorrectly configured behaviour slug was discovered in end-point form", result.Message);
         }
 
@@ -1045,12 +1026,14 @@ namespace form_builder_tests.UnitTests.Helpers
 
             pages.Add(page);
 
-            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForCurrentEnvironmentSubmitSlugs(pages, "end-point"));
+            var result = Assert.Throws<ApplicationException>(() =>
+                _pageHelper.CheckForCurrentEnvironmentSubmitSlugs(pages, "end-point"));
             Assert.Equal($"No SubmitSlug found for end-point form for local", result.Message);
         }
 
         [Fact]
-        public void CheckForAcceptedFileUploadFileTypes_ShouldThrowAnException_WhenAcceptedFleTypes_HasInvalidExtensionName()
+        public void
+            CheckForAcceptedFileUploadFileTypes_ShouldThrowAnException_WhenAcceptedFleTypes_HasInvalidExtensionName()
         {
             var pages = new List<Page>();
             var invalidElementQuestionId = "fileUpload2";
@@ -1074,8 +1057,11 @@ namespace form_builder_tests.UnitTests.Helpers
 
             pages.Add(page);
 
-            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForAcceptedFileUploadFileTypes(pages, "end-point"));
-            Assert.Equal($"PageHelper::CheckForAcceptedFileUploadFileTypes, Allowed file type in FileUpload element {invalidElementQuestionId} must have a valid extension which begins with a ., e.g. .png", result.Message);
+            var result = Assert.Throws<ApplicationException>(() =>
+                _pageHelper.CheckForAcceptedFileUploadFileTypes(pages, "end-point"));
+            Assert.Equal(
+                $"PageHelper::CheckForAcceptedFileUploadFileTypes, Allowed file type in FileUpload element {invalidElementQuestionId} must have a valid extension which begins with a ., e.g. .png",
+                result.Message);
         }
 
         [Fact]
@@ -1137,7 +1123,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithDocumentDownload(true)
                 .Build();
 
-                
+
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForDocumentDownload(formSchema));
 
             Assert.Equal("PageHelper::CheckForDocumentDownload, No document download type configured", result.Message);
@@ -1153,10 +1139,11 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithDocumentType(EDocumentType.Unknown)
                 .Build();
 
-                
+
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForDocumentDownload(formSchema));
 
-            Assert.Equal("PageHelper::CheckForDocumentDownload, Unknown document download type configured", result.Message);
+            Assert.Equal("PageHelper::CheckForDocumentDownload, Unknown document download type configured",
+                result.Message);
         }
 
         [Fact]
@@ -1170,10 +1157,11 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithDocumentType(EDocumentType.Unknown)
                 .Build();
 
-                
+
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForDocumentDownload(formSchema));
 
-            Assert.Equal("PageHelper::CheckForDocumentDownload, Unknown document download type configured", result.Message);
+            Assert.Equal("PageHelper::CheckForDocumentDownload, Unknown document download type configured",
+                result.Message);
         }
 
         [Fact]
@@ -1188,7 +1176,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithDocumentType(EDocumentType.Txt)
                 .Build();
 
-                
+
             _pageHelper.CheckForDocumentDownload(formSchema);
         }
 
@@ -1238,7 +1226,8 @@ namespace form_builder_tests.UnitTests.Helpers
 
             pages.Add(page);
 
-            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckSubmitSlugsHaveAllProperties(pages, "test-form"));
+            var result = Assert.Throws<ApplicationException>(() =>
+                _pageHelper.CheckSubmitSlugsHaveAllProperties(pages, "test-form"));
 
             Assert.Equal("No Auth Token found in the SubmitSlug for test-form form", result.Message);
         }
@@ -1264,7 +1253,8 @@ namespace form_builder_tests.UnitTests.Helpers
 
             pages.Add(page);
 
-            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckSubmitSlugsHaveAllProperties(pages, "test-form"));
+            var result = Assert.Throws<ApplicationException>(() =>
+                _pageHelper.CheckSubmitSlugsHaveAllProperties(pages, "test-form"));
 
             Assert.Equal("No URL found in the SubmitSlug for test-form form", result.Message);
         }
@@ -1291,7 +1281,8 @@ namespace form_builder_tests.UnitTests.Helpers
 
             pages.Add(page);
 
-            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckSubmitSlugsHaveAllProperties(pages, "test-form"));
+            var result = Assert.Throws<ApplicationException>(() =>
+                _pageHelper.CheckSubmitSlugsHaveAllProperties(pages, "test-form"));
 
             Assert.Equal("No URL found in the SubmitSlug for test-form form", result.Message);
         }
@@ -1321,6 +1312,227 @@ namespace form_builder_tests.UnitTests.Helpers
 
                 _pageHelper.CheckSubmitSlugsHaveAllProperties(pages, "test-form");
             }
+        }
+
+        [Fact]
+        public void AddIncomingFormDataValues_ShouldThrowException_WhenIncomingValueIsNull()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var incomingValue = new IncomingValuesBuilder()
+                .WithQuestionId("testQuestionId")
+                .WithName("testName")
+                .WithOptional(false)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithIncomingValue(incomingValue)
+                .Build();
+
+            var formData = new Dictionary<string, dynamic>();
+
+            // Act & Assert
+            var result = Assert.Throws<Exception>(() => _pageHelper.AddIncomingFormDataValues(page, formData));
+
+            Assert.Equal("DictionaryExtensions::IncomingValue, FormData does not contains testName required value",
+                result.Message);
+        }
+
+        [Fact]
+        public void AddIncomingFormDataValues_ShouldReturnSingleObject()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var incomingValue = new IncomingValuesBuilder()
+                .WithQuestionId("questionIdTest")
+                .WithName("nameTest")
+                .WithOptional(true)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithIncomingValue(incomingValue)
+                .Build();
+
+            var formData = new Dictionary<string, dynamic>
+            {
+                {"nameTest", "45.23645"}
+            };
+
+            // Act
+            var result = _pageHelper.AddIncomingFormDataValues(page, formData);
+
+            // Assert
+            Assert.Single(result);
+            Assert.True(result.ContainsKey("questionIdTest"));
+            Assert.True(result.ContainsValue("45.23645"));
+            Assert.False(result.ContainsKey("nameTest"));
+
+        }
+
+        [Fact]
+        public void AddIncomingFormDataValues_ShouldReturnSingleObject_WithOptionalTrue()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var incomingValue = new IncomingValuesBuilder()
+                .WithQuestionId("questionIdTest")
+                .WithName("nameTest")
+                .WithOptional(true)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithIncomingValue(incomingValue)
+                .Build();
+
+            var formData = new Dictionary<string, dynamic>();
+
+            // Act
+            var result = _pageHelper.AddIncomingFormDataValues(page, formData);
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void AddIncomingFormDataValues_ShouldReturnMultipleValuesObject()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var incomingValue = new IncomingValuesBuilder()
+                .WithQuestionId("questionIdTest")
+                .WithName("nameTest")
+                .WithOptional(true)
+                .Build();
+
+            var incomingValue2 = new IncomingValuesBuilder()
+                .WithQuestionId("questionIdTest2")
+                .WithName("nameTest2")
+                .WithOptional(true)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithIncomingValue(incomingValue)
+                .WithIncomingValue(incomingValue2)
+                .Build();
+
+            var formData = new Dictionary<string, dynamic>
+            {
+                {"nameTest", "45.23645"},
+                {"nameTest2", "-2.345"}
+            };
+
+            // Act
+            var result = _pageHelper.AddIncomingFormDataValues(page, formData);
+
+            // Assert
+            Assert.Equal(2, result.Count);
+            Assert.True(result.ContainsKey("questionIdTest"));
+            Assert.True(result.ContainsValue("45.23645"));
+            Assert.False(result.ContainsKey("nameTest"));
+            Assert.True(result.ContainsKey("questionIdTest2"));
+            Assert.True(result.ContainsValue("-2.345"));
+            Assert.False(result.ContainsKey("nameTest2"));
+        }
+
+        [Fact]
+        public void AddIncomingFormDataValues_ShouldCall_RecursiveCheckAndCreate_AndReturnCorrectObject()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var incomingValue = new IncomingValuesBuilder()
+                .WithQuestionId("questionIdTest")
+                .WithName("nameTest")
+                .WithOptional(true)
+                .Build();
+
+            var incomingValue2 = new IncomingValuesBuilder()
+                .WithQuestionId("questionIdTest2.nameTest2")
+                .WithName("nameTest2")
+                .WithOptional(true)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithIncomingValue(incomingValue)
+                .WithIncomingValue(incomingValue2)
+                .Build();
+
+            var formData = new Dictionary<string, dynamic>
+            {
+                {"nameTest", "45.23645"},
+                {"questionIdTest2.nameTest2", "-2.345"}
+            };
+
+            // Act
+            var result = _pageHelper.AddIncomingFormDataValues(page, formData);
+
+            // Assert
+            Assert.Equal(2, result.Count);
+            Assert.True(result.ContainsKey("questionIdTest"));
+            Assert.True(result.ContainsValue("45.23645"));
+            Assert.False(result.ContainsKey("nameTest"));
+            Assert.True(result.ContainsKey("questionIdTest2.nameTest2"));
+            Assert.True(result.ContainsValue("-2.345"));
+            Assert.False(result.ContainsKey("nameTest2"));
+        }
+
+        [Fact]
+        public void CheckForIncomingFormDataValues_ShouldThrowException_WhenQuestionId_OR_Name_Empty()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var incomingValueWithNoQuestionId = new IncomingValuesBuilder()
+                .WithQuestionId("")
+                .WithName("testName")
+                .Build();
+
+            var incomingValueWithNoName = new IncomingValuesBuilder()
+                .WithQuestionId("testQuestionId")
+                .WithName("")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithIncomingValue(incomingValueWithNoQuestionId)
+                .WithIncomingValue(incomingValueWithNoName)
+                .Build();
+
+            var pages = new List<Page>
+            {
+                page
+            };
+
+            // Act & Assert
+            var result = Assert.Throws<Exception>(() => _pageHelper.CheckForIncomingFormDataValues(pages));
+            Assert.Equal("PageHelper::CheckForIncomingFormDataValues, QuestionId or Name cannot be empty", result.Message);
         }
     }
 }
