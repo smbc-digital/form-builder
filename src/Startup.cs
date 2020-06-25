@@ -50,7 +50,10 @@ namespace form_builder
                 .AddServices()
                 .AddWorkflows()
                 .AddFactories()
-                .AddSession(_ => _.IdleTimeout = TimeSpan.FromMinutes(30));
+                .AddSession(_ => {
+                    _.IdleTimeout = TimeSpan.FromMinutes(30);
+                    _.Cookie.Path = "/";
+                });
 
             services.AddTransient<ICache, Cache.Cache>();
 
@@ -78,15 +81,16 @@ namespace form_builder
             }
 
             app.UseMiddleware<HeaderConfiguration>();
+
             app.UseSession();
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-            app.UseStaticFiles();
         }
     }
 }

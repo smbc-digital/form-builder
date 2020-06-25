@@ -83,13 +83,15 @@ namespace form_builder.Models
                     var checkBoxContainsConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.CheckboxContains));
                     var dateIsBeforeConditions = behaviour.Conditions.Where(x => x.IsBefore != null);
                     var dateIsAfterConditions = behaviour.Conditions.Where(x => x.IsAfter != null);
+                    var isNullOrEmpty = behaviour.Conditions.Where(x => x.IsNullOrEmpty != null);
 
                     var equalToValid = !equalToConditions.Any();
                     var checkBoxContainsValid = !checkBoxContainsConditions.Any();
                     var dateIsBeforeValid = !dateIsBeforeConditions.Any();
                     var dateIsAfterValid = !dateIsAfterConditions.Any();
+                    var isNullOrEmptyValid = !isNullOrEmpty.Any();
 
-                    if(equalToConditions.Any())
+                    if (equalToConditions.Any())
                         equalToValid = equalToConditions.All(x => x.EqualTo.Equals(viewModel.ContainsKey(x.QuestionId) ? viewModel[x.QuestionId] : string.Empty));
 
                     if(checkBoxContainsConditions.Any())
@@ -99,9 +101,12 @@ namespace form_builder.Models
                         dateIsBeforeValid = dateIsBeforeConditions.All(x => DateComparator.DateIsBefore(x, viewModel));
                         
                     if(dateIsAfterConditions.Any())
-                        dateIsAfterValid = dateIsAfterConditions.All(x => DateComparator.DateIsAfter(x, viewModel));  
+                        dateIsAfterValid = dateIsAfterConditions.All(x => DateComparator.DateIsAfter(x, viewModel));
 
-                    if (equalToValid && checkBoxContainsValid && dateIsBeforeValid && dateIsAfterValid)
+                    if (isNullOrEmpty.Any())
+                        isNullOrEmptyValid = isNullOrEmpty.All(x => string.IsNullOrEmpty(viewModel[x.QuestionId]) == x.IsNullOrEmpty);
+
+                    if (equalToValid && checkBoxContainsValid && dateIsBeforeValid && dateIsAfterValid && isNullOrEmptyValid)
                         return behaviour;
                 }
             }

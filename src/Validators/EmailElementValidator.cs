@@ -43,10 +43,10 @@ namespace form_builder.Validators
                 isValid = false;
             }
 
-            return new ValidationResult{
-                    IsValid = isValid,
-                    Message = isValid ? string.Empty : $"{ element.Properties.Label} must be a valid email address"
-                }; 
+            return new ValidationResult {
+                IsValid = isValid,
+                Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : $"Check the {element.Properties.Label.ToLower()} and try again"
+        };          
         }
     }
 }

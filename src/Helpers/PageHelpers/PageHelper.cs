@@ -8,31 +8,29 @@ using form_builder.Models.Elements;
 using form_builder.Models.Properties;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
-using form_builder.Services.PageService.Entities;
+using form_builder.Services.FileUploadService;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using form_builder.Services.FileUploadService;
 
 namespace form_builder.Helpers.PageHelpers
 {
     public interface IPageHelper
     {
         void HasDuplicateQuestionIDs(List<Page> pages, string formName);
-        Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null);
+        Task<FormBuilderViewModel> GenerateHtml(Page page,
+            Dictionary<string, dynamic> viewModel,
+            FormSchema baseForm,
+            string guid,
+            List<object> results = null);
         void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid);
-        Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults);
-        Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
-        Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults);
         void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName);
         Task CheckForPaymentConfiguration(List<Page> pages, string formName);
         void CheckForDocumentDownload(FormSchema formSchema);
@@ -71,21 +69,30 @@ namespace form_builder.Helpers.PageHelpers
             _fileUploadService = fileUploadService;
         }
 
-        public async Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressAndStreetSearchResults = null, List<OrganisationSearchResult> organisationSearchResults = null)
+        public async Task<FormBuilderViewModel> GenerateHtml(
+            Page page,
+            Dictionary<string, dynamic> viewModel,
+            FormSchema baseForm,
+            string guid,
+            List<object> results = null)
         {
             FormBuilderViewModel formModel = new FormBuilderViewModel();
             
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
-            {
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
-            }
 
             formModel.FeedbackForm = baseForm.FeedbackForm;
 
             foreach (var element in page.Elements)
-            {
-                formModel.RawHTML += await element.RenderAsync(_viewRender, _elementHelper, guid, addressAndStreetSearchResults, organisationSearchResults, viewModel, page, baseForm, _enviroment);
-            }
+                formModel.RawHTML += await element.RenderAsync(
+                    _viewRender,
+                    _elementHelper,
+                    guid,
+                    viewModel,
+                    page,
+                    baseForm,
+                    _enviroment,
+                    results);
 
             return formModel;
         }
@@ -128,115 +135,6 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.FormName = form;
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
-        }
-
-        public async Task<ProcessRequestEntity> ProcessStreetJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
-        {
-            switch (journey)
-            {
-                case "Search":
-                    try
-                    {
-                        var streetViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, null);
-                        streetViewModel.StreetStatus = "Select";
-                        streetViewModel.FormName = baseForm.FormName;
-                        streetViewModel.PageTitle = currentPage.Title;
-
-                        return new ProcessRequestEntity
-                        {
-                            Page = currentPage,
-                            ViewModel = streetViewModel,
-                            UseGeneratedViewModel = true,
-                            ViewName = "../Street/Index"
-                        };
-                    }
-                    catch (Exception e)
-                    {
-                        throw new ApplicationException($"PageHelper.ProcessStreetJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
-                    };
-                case "Select":
-                    return new ProcessRequestEntity
-                    {
-                        Page = currentPage
-                    };
-                default:
-                    throw new ApplicationException($"PageHelper.ProcessStreetJourney: Unknown journey type");
-            }
-        }
-
-        public async Task<ProcessRequestEntity> ProcessAddressJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<AddressSearchResult> addressResults)
-        {
-            switch (journey)
-            {
-                case "Search":
-                    try
-                    {
-                        if(!addressResults.Any()){
-                            return new ProcessRequestEntity {
-                                RedirectToAction = true,
-                                RedirectAction = "AddressManual"
-                            };
-                        }
-
-                        var adddressViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, addressResults, null);
-                        adddressViewModel.AddressStatus = "Select";
-                        adddressViewModel.FormName = baseForm.FormName;
-                        adddressViewModel.PageTitle = currentPage.Title;
-
-                        return new ProcessRequestEntity
-                        {
-                            Page = currentPage,
-                            ViewModel = adddressViewModel,
-                            UseGeneratedViewModel = true,
-                            ViewName = "../Address/Index"
-                        };
-                    }
-                    catch (Exception e)
-                    {
-                        throw new ApplicationException($"PageHelper.ProcessAddressJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
-                    };
-                case "Select":
-                    return new ProcessRequestEntity
-                    {
-                        Page = currentPage
-                    };
-                default:
-                    throw new ApplicationException("PageHelper.ProcessAddressJourney: Unknown journey type");
-            }
-        }
-
-        public async Task<ProcessRequestEntity> ProcessOrganisationJourney(string journey, Page currentPage, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<OrganisationSearchResult> organisationResults)
-        {
-            switch (journey)
-            {
-                case "Search":
-                    try
-                    {
-                        var organisationViewModel = await GenerateHtml(currentPage, viewModel, baseForm, guid, null, organisationResults);
-                        organisationViewModel.OrganisationStatus = "Select";
-                        organisationViewModel.FormName = baseForm.FormName;
-                        organisationViewModel.PageTitle = currentPage.Title;
-
-                        return new ProcessRequestEntity
-                        {
-                            Page = currentPage,
-                            ViewModel = organisationViewModel,
-                            UseGeneratedViewModel = true,
-                            ViewName = "../Organisation/Index"
-                        };
-                    }
-                    catch (Exception e)
-                    {
-                        throw new ApplicationException($"PageHelper.ProcessOrganisationJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
-                    };
-                case "Select":
-                    return new ProcessRequestEntity
-                    {
-                        Page = currentPage
-                    };
-                default:
-                    throw new ApplicationException($"PageHelper.ProcessOrganisationJourney: Unknown journey type");
-            }
         }
 
         public void HasDuplicateQuestionIDs(List<Page> pages, string formName)
@@ -464,7 +362,6 @@ namespace form_builder.Helpers.PageHelpers
             }
             convertedAnswers.FormData.Add(key, value);
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
-
         }
 
         public void CheckForDocumentDownload(FormSchema formSchema)
