@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Net;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
 using form_builder.Providers.PaymentProvider;
@@ -55,7 +56,7 @@ namespace form_builder.Services.PayService
 
         public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string sessionGuid)
         {
-            var page = new Page();
+            var page = formData.BaseForm.GetPage("payment-summary");
             var paymentInformation = await GetFormPaymentInformation(formData, form, page);
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
@@ -136,14 +137,18 @@ namespace form_builder.Services.PayService
 
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
                 var response = await _gateway.PostAsync(postUrl.URL, formData.Data);
-                var reference = string.Empty;
+                if (response.StatusCode == HttpStatusCode.InternalServerError)
+                {
+                    throw new Exception("PayService:: Gateway returned InternalServerError");
+                }
 
-                if (response.Content == null) return reference;
+                var amount = string.Empty;
+                if (response.Content == null) return amount;
 
                 var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
-                reference = JsonConvert.DeserializeObject<string>(content);
+                amount = JsonConvert.DeserializeObject<string>(content);
 
-                return reference;
+                return amount;
             }
             catch (Exception ex)
             {
