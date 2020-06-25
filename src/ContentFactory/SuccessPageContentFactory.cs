@@ -63,7 +63,7 @@ namespace form_builder.ContentFactory
                     baseForm.DocumentType.ForEach((docType) => {
                         var element = new ElementBuilder()
                             .WithType(EElementType.DocumentDownload)
-                            .WithLabel($"Download {docType} document")
+                            .WithLabel($"Download summary")
                             .WithSource($"/document/Summary/{docType}/{sessionGuid}")
                             .WithDocumentType(docType)
                             .Build();
