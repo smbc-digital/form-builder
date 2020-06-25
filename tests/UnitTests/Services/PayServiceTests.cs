@@ -15,6 +15,7 @@ using form_builder.Services.MappingService;
 using Microsoft.AspNetCore.Hosting;
 using Xunit;
 using form_builder.Models;
+using form_builder.Services.MappingService.Entities;
 using form_builder_tests.Builders;
 
 namespace form_builder_tests.UnitTests.Services
@@ -37,17 +38,24 @@ namespace form_builder_tests.UnitTests.Services
             _paymentProvider.Setup(_ => _.ProviderName).Returns("testPaymentProvider");
 
             _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
-
             .ReturnsAsync(new List<PaymentInformation> {
                 new PaymentInformation
                 {
                     FormName = "testForm",
-                    PaymentProvider = "testPaymentProvider"
+                    PaymentProvider = "testPaymentProvider",
+                    Settings = new Settings
+                    {
+                        ComplexCalculationRequired = false
+                    }
                 },
                 new PaymentInformation
                 {
                     FormName = "testFormwithnovalidpayment",
-                    PaymentProvider = "invalidPaymentPorvider"
+                    PaymentProvider = "invalidPaymentPorvider",
+                    Settings = new Settings
+                    {
+                        ComplexCalculationRequired = false
+                    }
                 }
             });
 
@@ -87,12 +95,15 @@ namespace form_builder_tests.UnitTests.Services
             var mappingEntity = new MappingEntityBuilder()
                 .WithBaseForm(formSchema)
                 .WithFormAnswers(formAnswers)
+                .WithData(new object())
                 .Build();
 
             var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
             _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
             _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
             _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testForm"))
+                .ReturnsAsync(mappingEntity);
+            _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "nonexistanceform"))
                 .ReturnsAsync(mappingEntity);
             _mockHostingEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
 
@@ -103,7 +114,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPayment_ShouldThrowApplicationException_WhenPaymentConfig_IsNull()
         {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPayment("nonexistanceform", "page-one", "12345", "guid"));
+            var result = await Assert.ThrowsAsync<Exception>(() => _service.ProcessPayment(It.IsAny<MappingEntity>(), "nonexistanceform", "page-one", "12345", "guid"));
 
             Assert.Equal("PayService:: No payment information found for nonexistanceform", result.Message);
         }
@@ -111,9 +122,9 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPayment_ShouldThrowApplicationException_WhenPaymentProvider_IsNull()
         {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPayment("testFormwithnovalidpayment", "page-one", "12345", "guid"));
+            var result = await Assert.ThrowsAsync<Exception>(() => _service.ProcessPayment(It.IsAny<MappingEntity>(), "testFormwithnovalidpayment", "page-one", "12345", "guid"));
 
-            Assert.Equal("PayService:: No payment provider configure for invalidPaymentPorvider", result.Message);
+            Assert.Equal("PayService:: No payment provider configured for invalidPaymentPorvider", result.Message);
         }
 
         [Fact]
@@ -122,7 +133,7 @@ namespace form_builder_tests.UnitTests.Services
             _paymentProvider.Setup(_ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<PaymentInformation>()))
                 .ReturnsAsync("url");
 
-            var result = await _service.ProcessPayment("testForm", "page-one", "12345", "guid");
+            var result = await _service.ProcessPayment(It.IsAny<MappingEntity>(), "testForm", "page-one", "12345", "guid");
 
             _paymentProvider.Verify(_ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<PaymentInformation>()), Times.Once);
             Assert.IsType<string>(result);
@@ -131,7 +142,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowApplicationException_WhenPaymentConfig_IsNull()
         {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345", "reference"));
+            var result = await Assert.ThrowsAsync<Exception>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345", "reference"));
 
             Assert.Equal("PayService:: No payment information found for nonexistanceform", result.Message);
         }
@@ -139,7 +150,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowApplicationException_WhenPaymentProvider_IsNull()
         {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345", "reference"));
+            var result = await Assert.ThrowsAsync<Exception>(() => _service.ProcessPaymentResponse("nonexistanceform", "12345", "reference"));
 
             Assert.Equal("PayService:: No payment information found for nonexistanceform", result.Message);
         }

@@ -6,7 +6,6 @@
         GoToPage,
         SubmitForm,
         GoToExternalPage,
-        SubmitAndPay,
-        CalculatePaymentAmount
+        SubmitAndPay
     }
 }

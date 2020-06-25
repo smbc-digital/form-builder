@@ -34,7 +34,6 @@ namespace form_builder.Services.PageService
         private readonly IEnumerable<IElementValidator> _validators;
         private readonly IPageHelper _pageHelper;
         private readonly ISessionHelper _sessionHelper;
-        private readonly ILogger<PageService> _logger;
         private readonly IStreetService _streetService;
         private readonly IAddressService _addressService;
         private readonly IOrganisationService _organisationService;
@@ -46,7 +45,7 @@ namespace form_builder.Services.PageService
         private readonly IPayService _payService;
         private readonly IMappingService _mappingService;
 
-        public PageService(ILogger<PageService> logger, 
+        public PageService(
             IEnumerable<IElementValidator> validators, 
             IPageHelper pageHelper, 
             ISessionHelper sessionHelper, 
@@ -65,7 +64,6 @@ namespace form_builder.Services.PageService
             _validators = validators;
             _pageHelper = pageHelper;
             _sessionHelper = sessionHelper;
-            _logger = logger;
             _streetService = streetService;
             _addressService = addressService;
             _organisationService = organisationService;
@@ -152,20 +150,10 @@ namespace form_builder.Services.PageService
             {
                 var data = await _mappingService.Map(sessionGuid, form);
                 var paymentAmount = await _payService.GetFormPaymentInformation(data, form, page);
-                //var paymentAmount = new PaymentInformation
-                //{
-                //    Settings = new Settings
-                //    {
-                //        Amount = "165.00"
-                //    }
-                //};
 
-                foreach (var element in page.Elements)
+                foreach (var element in page.Elements.Where(_ => _.Type == EElementType.PaymentSummary))
                 {
-                    if (element.Type == EElementType.PaymentSummary)
-                    {
-                        element.Properties.PaymentAmount = paymentAmount.Settings.Amount;
-                    }
+                    element.Properties.PaymentAmount = paymentAmount.Settings.Amount;
                 }
             }
 

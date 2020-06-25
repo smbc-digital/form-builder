@@ -31,6 +31,8 @@ using form_builder.Factories.Schema;
 using Amazon.S3.Model;
 using form_builder.Constants;
 using System.Linq;
+using form_builder.Services.MappingService;
+using form_builder.Services.PayService;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -42,7 +44,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISchemaProvider> _schemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
         private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<ILogger<PageService>> _logger = new Mock<ILogger<PageService>>();
         private readonly Mock<IStreetService> _streetService = new Mock<IStreetService>();
         private readonly Mock<IAddressService> _addressService = new Mock<IAddressService>();
         private readonly Mock<IOrganisationService> _organisationService = new Mock<IOrganisationService>();
@@ -52,6 +53,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
         private readonly Mock<IHostingEnvironment> _mockEnvironment = new Mock<IHostingEnvironment>();
         private readonly Mock<ISuccessPageContentFactory> _mockSuccessPageContentFactory = new Mock<ISuccessPageContentFactory>();
+        private readonly Mock<IPayService> _payService = new Mock<IPayService>();
+        private readonly Mock<IMappingService> _mappingService = new Mock<IMappingService>();
 
         public PageServicesTests()
         {
@@ -87,7 +90,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
                 .Returns(new HostString("www.test.com"));
 
-            _service = new PageService(_logger.Object, _validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockHttpContextAccessor.Object, _mockEnvironment.Object, _mockSuccessPageContentFactory.Object,  _mockSchemaFactory.Object);
+            _service = new PageService(_validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockHttpContextAccessor.Object, _mockEnvironment.Object, _mockSuccessPageContentFactory.Object,  _mockSchemaFactory.Object, _payService.Object, _mappingService.Object);
         }
 
         [Fact]

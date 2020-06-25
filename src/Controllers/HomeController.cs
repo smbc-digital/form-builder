@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace form_builder.Controllers
 {
@@ -99,17 +98,6 @@ namespace form_builder.Controllers
                     return Redirect(behaviour.PageSlug);
 
                 case EBehaviourType.GoToPage:
-                    return RedirectToAction("Index", new
-                    {
-                        path = behaviour.PageSlug
-                    });
-
-                case EBehaviourType.CalculatePaymentAmount:
-                    // call service to get the value
-                    // set the response value in the form data
-                    string[] t = {"50"};
-                    formData.Add("payAmt", t);
-                    //response.FormData.Add("paymentAmount", );
                     return RedirectToAction("Index", new
                     {
                         path = behaviour.PageSlug
