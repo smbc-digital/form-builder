@@ -11,12 +11,19 @@
     }
 }
 
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-    <partial name="LabelH1" />
+    <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+        @if (!string.IsNullOrEmpty(@Model.Properties.StreetIAG))
+        {
+            <section class="govuk-inset-text">
+                <p>@Model.Properties.StreetIAG</p>
+            </section>
+        }
 
-    <partial name="Hint" />
+        <partial name="LabelH1" />
 
-    <partial name="Error" />
+        <partial name="Hint" />
 
-    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elementProperties)
-</div>
+        <partial name="Error" />
+
+        @Html.TextBox(Model.QuestionId, Model.Properties.Value, elementProperties)
+    </div>
