@@ -160,10 +160,6 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public virtual string GetLabelText(){
-            var optionalLabelText = Properties.Optional ? " (optional)" : string.Empty;
-
-            return $"{Properties.Label}{optionalLabelText}";
-        }
+        public virtual string GetLabelText() => $"{Properties.Label}{(Properties.Optional ? " (optional)" : string.Empty)}";
     }
 }

@@ -21,7 +21,6 @@ namespace form_builder.Models.Elements
         public string AddressSearchQuestionId => $"{Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}";
         public string AddressSelectQuestionId => $"{Properties.QuestionId}{AddressConstants.SELECT_SUFFIX}";
         private bool IsSelect { get; set; } = false; 
-        private bool IsSearch { get; set; } = false; 
         public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
         public override bool DisplayHint => !string.IsNullOrEmpty(Hint);
         public override string  QuestionId => IsSelect ? AddressSelectQuestionId : AddressSearchQuestionId;
@@ -31,11 +30,9 @@ namespace form_builder.Models.Elements
             get
             {
                 if(IsSelect)
-                {
-                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Address" : Properties.SelectLabel;
-                }
+                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Select the address below" : Properties.SelectLabel;
 
-                return string.IsNullOrEmpty(Properties.AddressLabel) ? "Postcode " : Properties.AddressLabel;
+                return string.IsNullOrEmpty(Properties.AddressLabel) ? "Postcode" : Properties.AddressLabel;
             }
         }
         public Address()
@@ -116,19 +113,6 @@ namespace form_builder.Models.Elements
             }
 
             return elemnentProperties;
-        }
-        
-        public override string GetLabelText(){
-            var optionalLabelText = Properties.Optional ? " (optional)" : string.Empty;
-            return $"{Properties.AddressLabel}{optionalLabelText}";
-        }
-
-        private void SetAddressProperties(Dictionary<string, dynamic> viewModel, string searchTerm)
-        {
-            Properties.AddressManualAddressLine1 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine1")).Value;
-            Properties.AddressManualAddressLine2 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine2")).Value;
-            Properties.AddressManualAddressTown = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressTown")).Value;
-            Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressPostcode")).Value ?? searchTerm;
         }
 
         public override string GenerateFieldsetProperties()
