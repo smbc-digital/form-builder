@@ -132,27 +132,34 @@ namespace form_builder.Services.PayService
             try
             {
                 var paymentSummary = page.Elements.FirstOrDefault(_ => _.Type == EElementType.PaymentSummary);
+                if (paymentSummary == null)
+                    throw new Exception($"PayService::CalculateAmountAsync, No payment summary element found for {formData.BaseForm.FormName} within page {page.PageSlug}");
+                
                 var postUrl = paymentSummary.Properties.CalculationSlugs.FirstOrDefault(_ =>
                     _.Environment == _hostingEnvironment.EnvironmentName);
 
+                if (postUrl?.URL == null || postUrl.AuthToken == null)
+                    throw  new Exception("PayService:: Calculation slug for " + _hostingEnvironment.EnvironmentName + " not found or incomplete");
+
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
                 var response = await _gateway.PostAsync(postUrl.URL, formData.Data);
-                if (response.StatusCode == HttpStatusCode.InternalServerError)
-                {
-                    throw new Exception("PayService:: Gateway returned InternalServerError");
-                }
 
-                var amount = string.Empty;
-                if (response.Content == null) return amount;
+                if (!response.IsSuccessStatusCode)
+                    throw new Exception($"PayService::CalculateAmountAsync, Gateway returned unsuccessful status code {response.StatusCode}");
 
-                var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
-                amount = JsonConvert.DeserializeObject<string>(content);
+                if (response.Content == null)
+                    throw new ApplicationException($"PayService::CalculateAmountAsync, Gateway {postUrl.URL} responded with empty payment amount within content");
+                
+                var content = await response.Content.ReadAsStringAsync();
 
-                return amount;
+                if (string.IsNullOrWhiteSpace(content))
+                    throw new ApplicationException($"PayService::CalculateAmountAsync, Gateway {postUrl.URL} responded with empty content");
+
+                return JsonConvert.DeserializeObject<string>(content);
             }
             catch (Exception ex)
             {
-                throw new Exception($"PayService:: Payment information could not be calculated: {ex}");
+                throw new Exception(ex.Message);
             }
         }
 

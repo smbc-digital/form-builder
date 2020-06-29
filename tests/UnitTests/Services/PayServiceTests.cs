@@ -258,7 +258,9 @@ namespace form_builder_tests.UnitTests.Services
                     {
                         new SubmitSlug
                         {
-                            Environment = "local"
+                            Environment = "local",
+                            URL = "url",
+                            AuthToken = "auth"
                         }
                     }
                 }
@@ -342,7 +344,9 @@ namespace form_builder_tests.UnitTests.Services
                     {
                         new SubmitSlug
                         {
-                            Environment = "local"
+                            Environment = "local",
+                            URL = "url",
+                            AuthToken = "auth"
                         }
                     }
                 }
@@ -354,9 +358,38 @@ namespace form_builder_tests.UnitTests.Services
                     Content = null
                 });
 
-            var result = await _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page);
+            var result = await Assert.ThrowsAsync<Exception>(() => _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page));
+            Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty payment amount within content", result.Message);
+        }
 
-            Assert.Equal(string.Empty, result.Settings.Amount);
+        [Fact]
+        public async Task GetFormPaymentInformation_ShouldCallGatewayResponseIsWhitespace()
+        {
+            var page = new PageBuilder().WithElement(new Element
+            {
+                Type = EElementType.PaymentSummary,
+                Properties = new BaseProperty
+                {
+                    CalculationSlugs = new List<SubmitSlug>
+                    {
+                        new SubmitSlug
+                        {
+                            Environment = "local",
+                            URL = "url",
+                            AuthToken = "auth"
+                        }
+                    }
+                }
+            }).Build();
+
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    Content = new StringContent(string.Empty)
+                });
+
+            var result = await Assert.ThrowsAsync<Exception>(() => _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page));
+            Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty content", result.Message);
         }
     }
 }

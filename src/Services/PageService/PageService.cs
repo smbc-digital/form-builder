@@ -146,7 +146,7 @@ namespace form_builder.Services.PageService
                     searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
             }
 
-            if (page.PageSlug == "payment-summary")
+            if (page.Elements.Any(_ => _.Type == EElementType.PaymentSummary))
             {
                 var data = await _mappingService.Map(sessionGuid, form);
                 var paymentAmount = await _payService.GetFormPaymentInformation(data, form, page);
