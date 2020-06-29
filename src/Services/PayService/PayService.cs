@@ -136,7 +136,7 @@ namespace form_builder.Services.PayService
                     throw new Exception($"PayService::CalculateAmountAsync, No payment summary element found for {formData.BaseForm.FormName} within page {page.PageSlug}");
                 
                 var postUrl = paymentSummary.Properties.CalculationSlugs.FirstOrDefault(_ =>
-                    _.Environment == _hostingEnvironment.EnvironmentName);
+                    _.Environment.ToLower().Equals(_hostingEnvironment.EnvironmentName.ToLower()));
 
                 if (postUrl?.URL == null || postUrl.AuthToken == null)
                     throw  new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
