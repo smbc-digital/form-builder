@@ -38,7 +38,6 @@ namespace form_builder.Services.PageService
         private readonly IOrganisationService _organisationService;
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _environment;
         private readonly ISuccessPageFactory _successPageContentFactory;
         private readonly IPageFactory _pageContentFactory;
@@ -52,7 +51,6 @@ namespace form_builder.Services.PageService
             IOrganisationService organisationService, 
             IDistributedCacheWrapper distributedCache, 
             IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, 
-            IHttpContextAccessor httpContextAccessor, 
             IHostingEnvironment environment, 
             ISuccessPageFactory successPageFactory,
             IPageFactory pageFactory,
@@ -69,7 +67,6 @@ namespace form_builder.Services.PageService
             _schemaFactory = schemaFactory;
             _successPageContentFactory = successPageFactory;
             _pageContentFactory = pageFactory;
-            _httpContextAccessor = httpContextAccessor;
             _environment = environment;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
         }
@@ -144,7 +141,6 @@ namespace form_builder.Services.PageService
             }
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
-            viewModel.StartFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{viewModel.BaseURL}/{viewModel.StartPageSlug}";
 
             return new ProcessPageEntity
             {
