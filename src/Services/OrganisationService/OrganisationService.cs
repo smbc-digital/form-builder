@@ -1,4 +1,5 @@
 ﻿using form_builder.Constants;
+using form_builder.ContentFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
@@ -24,12 +25,14 @@ namespace form_builder.Services.OrganisationService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IPageHelper _pageHelper;
         private readonly IEnumerable<IOrganisationProvider> _organisationProviders;
+        private readonly IPageFactory _pageFactory;
 
-        public OrganisationService(IDistributedCacheWrapper distributedCache, IEnumerable<IOrganisationProvider> organisationProviders, IPageHelper pageHelper)
+        public OrganisationService(IDistributedCacheWrapper distributedCache, IEnumerable<IOrganisationProvider> organisationProviders, IPageHelper pageHelper, IPageFactory pageFactory)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
             _organisationProviders = organisationProviders;
+            _pageFactory = pageFactory;
         }
 
         public async Task<ProcessRequestEntity> ProcessOrganisation(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -78,10 +81,7 @@ namespace form_builder.Services.OrganisationService
             {
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
 
-                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
-                model.Path = currentPage.PageSlug;
-                model.FormName = baseForm.FormName;
-                model.PageTitle = currentPage.Title;
+                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
 
                 return new ProcessRequestEntity
                 {
@@ -125,7 +125,8 @@ namespace form_builder.Services.OrganisationService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid);
+                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid);
+
                 formModel.Path = currentPage.PageSlug;
                 formModel.FormName = baseForm.FormName;
                 formModel.PageTitle = currentPage.Title;

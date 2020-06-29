@@ -14,6 +14,7 @@ using Xunit;
 using StockportGovUK.NetStandard.Models.Organisation;
 using form_builder.Builders;
 using form_builder.Providers.Organisation;
+using form_builder.ContentFactory;
 
 namespace form_builder_tests.UnitTests.Services 
 {
@@ -25,6 +26,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
         private readonly Mock<IOrganisationProvider> _organisationProvider = new Mock<IOrganisationProvider>();
         private IEnumerable<IOrganisationProvider> _organisatioProviders;
+        private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
 
         public OrganisationServiceTests()
         {
@@ -35,7 +37,7 @@ namespace form_builder_tests.UnitTests.Services
             };
 
 
-            _service = new OrganisationService(_mockDistributedCache.Object, _organisatioProviders, _pageHelper.Object);
+            _service = new OrganisationService(_mockDistributedCache.Object, _organisatioProviders, _pageHelper.Object, _mockPageContentFactory.Object);
 
             _searchModel = new OrganisationSearch
             {
