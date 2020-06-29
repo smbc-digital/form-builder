@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.3.104.41" />
     <PackageReference Include="JsonSubTypes" Version="1.6.0" />
-    <PackageReference Include="Microsoft.AspNetCore.App"  Version="2.2.6" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.6" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="2.2.5" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="2.2.5" />
@@ -41,11 +41,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Update="wwwroot\assets\javascript\govuk-frontend-3.6.0.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties dsl_4access-protection-markings-request_1json__JsonSchema="       }," dsl_4dateinput_1json__JsonSchema="http://json.schemastore.org/band-manifest" /></VisualStudio></ProjectExtensions>
 </Project>
