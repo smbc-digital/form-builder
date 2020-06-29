@@ -1,4 +1,5 @@
 ﻿using form_builder.Constants;
+using form_builder.ContentFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
@@ -29,15 +30,18 @@ namespace form_builder.Services.AddressService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IPageHelper _pageHelper;
         private readonly IEnumerable<IAddressProvider> _addressProviders;
+        private readonly IPageFactory _pageFactory;
 
         public AddressService(
             IDistributedCacheWrapper distributedCache,
             IPageHelper pageHelper,
-            IEnumerable<IAddressProvider> addressProviders)
+            IEnumerable<IAddressProvider> addressProviders,
+            IPageFactory pageFactory)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
             _addressProviders = addressProviders;
+            _pageFactory = pageFactory;
         }
 
         public async Task<ProcessRequestEntity> ProcessAddress(
@@ -79,11 +83,7 @@ namespace form_builder.Services.AddressService
 
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
                 
-                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
-                model.Path = currentPage.PageSlug;
-                model.FormName = baseForm.FormName;
-                model.PageTitle = currentPage.Title;
-                model.BaseURL = baseForm.BaseURL;
+                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
 
                 return new ProcessRequestEntity
                 {
@@ -144,10 +144,7 @@ namespace form_builder.Services.AddressService
             {
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
                 
-                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
-                model.Path = currentPage.PageSlug;
-                model.FormName = baseForm.FormName;
-                model.PageTitle = currentPage.Title;
+                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
 
                 return new ProcessRequestEntity
                 {
@@ -181,10 +178,7 @@ namespace form_builder.Services.AddressService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid);
-                formModel.Path = currentPage.PageSlug;
-                formModel.FormName = baseForm.FormName;
-                formModel.PageTitle = currentPage.Title;
+                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null);
 
                 return new ProcessRequestEntity
                 {

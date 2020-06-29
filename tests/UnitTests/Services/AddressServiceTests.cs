@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 using form_builder.Builders;
+using form_builder.ContentFactory;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -24,6 +25,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
         private readonly Mock<IAddressProvider> _addressProvider = new Mock<IAddressProvider>();
+        private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
         private readonly IEnumerable<IAddressProvider> _addressProviders;
 
         public AddressServiceTests()
@@ -34,7 +36,7 @@ namespace form_builder_tests.UnitTests.Services
                 _addressProvider.Object
             };
 
-            _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders);
+            _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders, _mockPageContentFactory.Object);
         }
         
         [Fact]

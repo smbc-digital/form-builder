@@ -38,9 +38,9 @@ namespace form_builder.Services.PageService
         private readonly IOrganisationService _organisationService;
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _environment;
-        private readonly ISuccessPageContentFactory _successPageContentFactory;
+        private readonly ISuccessPageFactory _successPageContentFactory;
+        private readonly IPageFactory _pageContentFactory;
 
         public PageService(ILogger<PageService> logger, 
             IEnumerable<IElementValidator> validators, 
@@ -51,9 +51,9 @@ namespace form_builder.Services.PageService
             IOrganisationService organisationService, 
             IDistributedCacheWrapper distributedCache, 
             IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, 
-            IHttpContextAccessor httpContextAccessor, 
             IHostingEnvironment environment, 
-            ISuccessPageContentFactory successPageContentFactory, 
+            ISuccessPageFactory successPageFactory,
+            IPageFactory pageFactory,
             ISchemaFactory schemaFactory)
         {
             _validators = validators;
@@ -65,8 +65,8 @@ namespace form_builder.Services.PageService
             _organisationService = organisationService;
             _distributedCache = distributedCache;
             _schemaFactory = schemaFactory;
-            _successPageContentFactory = successPageContentFactory;
-            _httpContextAccessor = httpContextAccessor;
+            _successPageContentFactory = successPageFactory;
+            _pageContentFactory = pageFactory;
             _environment = environment;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
         }
@@ -141,7 +141,6 @@ namespace form_builder.Services.PageService
             }
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
-            viewModel.StartFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{viewModel.BaseURL}/{viewModel.StartPageSlug}";
 
             return new ProcessPageEntity
             {
@@ -188,16 +187,7 @@ namespace form_builder.Services.PageService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, sessionGuid);
-                formModel.Path = currentPage.PageSlug;
-                formModel.FormName = baseForm.FormName;
-                formModel.PageTitle = currentPage.Title;
-                formModel.HideBackButton = currentPage.HideBackButton;
-                formModel.BaseURL = baseForm.BaseURL;
-                formModel.StartPageSlug = baseForm.StartPageSlug;
-
-                var startFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{formModel.BaseURL}/{formModel.StartPageSlug}";
-                formModel.StartFormUrl = startFormUrl;
+                var formModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, sessionGuid);
 
                 return new ProcessRequestEntity
                 {
@@ -217,13 +207,7 @@ namespace form_builder.Services.PageService
             var viewModelData = new Dictionary<string, dynamic>();
             viewModelData.Add(LookUpConstants.SubPathViewModelKey, subPath);
 
-            var viewModel = await _pageHelper.GenerateHtml(page, viewModelData, baseForm, sessionGuid, results);
-            viewModel.FormName = baseForm.FormName;
-            viewModel.PageTitle = page.Title;
-            viewModel.HideBackButton = page.HideBackButton;
-            viewModel.Path = path;
-            viewModel.BaseURL = baseForm.BaseURL;
-            viewModel.StartPageSlug = baseForm.StartPageSlug;
+            var viewModel = await _pageContentFactory.Build(page, viewModelData, baseForm, sessionGuid, results);
 
             return viewModel;
         }
