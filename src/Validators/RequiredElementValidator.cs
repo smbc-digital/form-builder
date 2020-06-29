@@ -55,13 +55,13 @@ namespace form_builder.Validators
                 if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-street";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Select the street from the list";
 
                 }
                 else
                 {
                     key = $"{element.Properties.QuestionId}";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the street name";
                 }
             }
 
