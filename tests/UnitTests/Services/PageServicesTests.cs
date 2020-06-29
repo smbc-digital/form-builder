@@ -12,7 +12,6 @@ using form_builder.Services.StreetService;
 using form_builder.Validators;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
-using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -22,9 +21,7 @@ using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
-using form_builder.Builders;
 using form_builder.Factories.Schema;
 using form_builder.Constants;
 using System.Linq;
@@ -32,6 +29,7 @@ using form_builder.Services.MappingService;
 using form_builder.Services.PayService;
 using form_builder.ContentFactory;
 using System.Threading;
+using form_builder.Builders;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -86,10 +84,8 @@ namespace form_builder_tests.UnitTests.Services
                 FormJson = 1
             });
 
-            _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
-                .Returns(new HostString("www.test.com"));
-
-            _service = new PageService(_logger.Object, _validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _payService.Object, _mappingService.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _mockSchemaFactory.Object);
+            _service = new PageService(_validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, 
+            _distributedCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object);
         }
 
         [Fact]

@@ -55,11 +55,11 @@ namespace form_builder.Services.PageService
             IDistributedCacheWrapper distributedCache, 
             IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, 
             IHostingEnvironment environment, 
-            IPayService payService,
-            IMappingService mappingService)
             ISuccessPageFactory successPageFactory,
             IPageFactory pageFactory,
-            ISchemaFactory schemaFactory)
+            ISchemaFactory schemaFactory,
+            IMappingService mappingService,
+            IPayService payService)
         {
             _validators = validators;
             _pageHelper = pageHelper;
