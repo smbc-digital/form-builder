@@ -151,10 +151,7 @@ namespace form_builder.Services.PageService
                 var data = await _mappingService.Map(sessionGuid, form);
                 var paymentAmount = await _payService.GetFormPaymentInformation(data, form, page);
 
-                foreach (var element in page.Elements.Where(_ => _.Type == EElementType.PaymentSummary))
-                {
-                    element.Properties.Value = paymentAmount.Settings.Amount;
-                }
+                page.Elements.First(_ => _.Type == EElementType.PaymentSummary).Properties.Value = paymentAmount.Settings.Amount;
             }
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
