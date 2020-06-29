@@ -25,14 +25,14 @@ namespace form_builder.Validators
                 : null;
 
             var addressLine1Valid = !string.IsNullOrEmpty(valueAddressLine1);
-            var addressLine1Message = addressLine1Valid ? string.Empty : "Enter address line 1";
+            var addressLine1Message = addressLine1Valid ? string.Empty : "Enter the address";
 
             var valueAddressTown = viewModel.ContainsKey($"{element.Properties.QuestionId}-{AddressManualConstants.TOWN}")
                 ? viewModel[$"{element.Properties.QuestionId}-{AddressManualConstants.TOWN}"]
                 : null;
 
             var addressTownValid = !string.IsNullOrEmpty(valueAddressTown);
-            var addressTownMessage = addressTownValid ? string.Empty : "Enter a town or city";
+            var addressTownMessage = addressTownValid ? string.Empty : "Enter the town or city";
 
             var valueAddressPostcode = viewModel.ContainsKey($"{element.Properties.QuestionId}-{AddressManualConstants.POSTCODE}")
                 ? viewModel[$"{element.Properties.QuestionId}-{AddressManualConstants.POSTCODE}"]

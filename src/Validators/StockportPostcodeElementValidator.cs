@@ -51,7 +51,7 @@ namespace form_builder.Validators
             return new ValidationResult
             {
                 IsValid = isValid,
-                Message = isValid ? string.Empty : $"{ element.Properties.Label} must be a valid postcode"
+                Message = isValid ? string.Empty : "Enter a postcode in the correct format"
             };
         }
     }
