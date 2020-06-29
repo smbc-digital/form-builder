@@ -1,8 +1,7 @@
 ﻿@model form_builder.Models.Elements.Organisation
 @{
     var elementProperties = Model.GenerateElementProperties();
-
-    elementProperties.Add("class", Model.IsValid ? "govuk-input" : "govuk-input govuk-input--error");
+    elementProperties.Add("class", $"govuk-input govuk-input--width-10 {(Model.IsValid ? string.Empty : "govuk-input--error")}");
     elementProperties.Add("autocomplete", "organization");
 }
 
