@@ -139,21 +139,21 @@ namespace form_builder.Services.PayService
                     _.Environment.ToLower().Equals(_hostingEnvironment.EnvironmentName.ToLower()));
 
                 if (postUrl?.URL == null || postUrl.AuthToken == null)
-                    throw  new Exception("PayService:: Calculation slug for " + _hostingEnvironment.EnvironmentName + " not found or incomplete");
+                    throw  new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
 
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
                 var response = await _gateway.PostAsync(postUrl.URL, formData.Data);
 
                 if (!response.IsSuccessStatusCode)
-                    throw new Exception($"PayService::CalculateAmountAsync, Gateway returned unsuccessful status code {response.StatusCode}");
+                    throw new Exception($"PayService::CalculateAmountAsync, Gateway returned unsuccessful status code {response.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
 
                 if (response.Content == null)
-                    throw new ApplicationException($"PayService::CalculateAmountAsync, Gateway {postUrl.URL} responded with empty payment amount within content");
+                    throw new ApplicationException($"PayService::CalculateAmountAsync, Gateway {postUrl.URL} responded with null content");
                 
                 var content = await response.Content.ReadAsStringAsync();
 
                 if (string.IsNullOrWhiteSpace(content))
-                    throw new ApplicationException($"PayService::CalculateAmountAsync, Gateway {postUrl.URL} responded with empty content");
+                    throw new ApplicationException($"PayService::CalculateAmountAsync, Gateway {postUrl.URL} responded with empty payment amount within content");
 
                 return JsonConvert.DeserializeObject<string>(content);
             }
@@ -169,7 +169,11 @@ namespace form_builder.Services.PayService
 
             if (paymentProvider == null)
             {
+<<<<<<< HEAD
                 throw new Exception($"PayService:: No payment provider configured for {paymentInfo.PaymentProvider}");
+=======
+                throw new Exception($"PayService::GetFormPaymentProvider, No payment provider configured for {paymentInfo.PaymentProvider}");
+>>>>>>> design-system
             }
 
             return paymentProvider;

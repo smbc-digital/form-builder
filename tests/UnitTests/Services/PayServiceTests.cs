@@ -191,7 +191,11 @@ namespace form_builder_tests.UnitTests.Services
                 _service.ProcessPayment(GetMappingEntityData(), "testFormwithnovalidpayment", "page-one", "12345",
                     "guid"));
 
+<<<<<<< HEAD
             Assert.Equal("PayService:: No payment provider configured for invalidPaymentPorvider", result.Message);
+=======
+            Assert.Equal("PayService::GetFormPaymentProvider, No payment provider configured for invalidPaymentPorvider", result.Message);
+>>>>>>> design-system
         }
 
         [Fact]
@@ -359,7 +363,11 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             var result = await Assert.ThrowsAsync<Exception>(() => _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page));
+<<<<<<< HEAD
             Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty payment amount within content", result.Message);
+=======
+            Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with null content", result.Message);
+>>>>>>> design-system
         }
 
         [Fact]
@@ -389,7 +397,11 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             var result = await Assert.ThrowsAsync<Exception>(() => _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page));
+<<<<<<< HEAD
             Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty content", result.Message);
+=======
+            Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty payment amount within content", result.Message);
+>>>>>>> design-system
         }
     }
 }
