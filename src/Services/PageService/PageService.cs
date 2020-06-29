@@ -153,7 +153,7 @@ namespace form_builder.Services.PageService
 
                 foreach (var element in page.Elements.Where(_ => _.Type == EElementType.PaymentSummary))
                 {
-                    element.Properties.PaymentAmount = paymentAmount.Settings.Amount;
+                    element.Properties.Value = paymentAmount.Settings.Amount;
                 }
             }
 
