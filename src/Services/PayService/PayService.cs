@@ -169,11 +169,7 @@ namespace form_builder.Services.PayService
 
             if (paymentProvider == null)
             {
-<<<<<<< HEAD
-                throw new Exception($"PayService:: No payment provider configured for {paymentInfo.PaymentProvider}");
-=======
                 throw new Exception($"PayService::GetFormPaymentProvider, No payment provider configured for {paymentInfo.PaymentProvider}");
->>>>>>> design-system
             }
 
             return paymentProvider;
