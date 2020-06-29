@@ -176,8 +176,8 @@ namespace form_builder.Extensions
 
         public static IServiceCollection AddFactories(this IServiceCollection services)
         {
-            services.AddTransient<ISuccessPageContentFactory, SuccessPageContentFactory>();
-            services.AddTransient<IPageContentFactory, PageContentFactory>();
+            services.AddTransient<ISuccessPageFactory, SuccessPageFactory>();
+            services.AddTransient<IPageFactory, PageFactory>();
             services.AddTransient<ISchemaFactory, SchemaFactory>();
             services.AddTransient<ILookupSchemaTransformFactory, LookupSchemaTransformFactory>();
             services.AddTransient<IReusableElementSchemaTransformFactory, ReusableElementSchemaTransformFactory>();

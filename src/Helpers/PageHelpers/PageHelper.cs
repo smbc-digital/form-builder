@@ -63,9 +63,6 @@ namespace form_builder.Helpers.PageHelpers
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
 
-            formModel.FeedbackForm = baseForm.FeedbackForm;
-            formModel.FeedbackPhase = baseForm.FeedbackPhase;
-
             foreach (var element in page.Elements)
                 formModel.RawHTML += await element.RenderAsync(
                     _viewRender,
