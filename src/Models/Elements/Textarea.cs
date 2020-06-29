@@ -42,7 +42,6 @@ namespace form_builder.Models.Elements
                 { "spellcheck", Properties.Spellcheck.ToString().ToLower() }
             };
 
-            properties.Add("maxlength", Properties.MaxLength);
             if (Properties.MaxLength >= 200)
             {
                 properties.Add("rows", Properties.MaxLength > 500 ? "15" : "5");
