@@ -23,6 +23,8 @@ using Microsoft.Extensions.Options;
 using form_builder.ContentFactory;
 using form_builder.Factories.Schema;
 using form_builder.Constants;
+using form_builder.Services.MappingService;
+using form_builder.Services.PayService;
 
 namespace form_builder.Services.PageService
 {
@@ -32,17 +34,18 @@ namespace form_builder.Services.PageService
         private readonly IEnumerable<IElementValidator> _validators;
         private readonly IPageHelper _pageHelper;
         private readonly ISessionHelper _sessionHelper;
-        private readonly ILogger<PageService> _logger;
         private readonly IStreetService _streetService;
         private readonly IAddressService _addressService;
         private readonly IOrganisationService _organisationService;
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
         private readonly IHostingEnvironment _environment;
+        private readonly IPayService _payService;
+        private readonly IMappingService _mappingService;
         private readonly ISuccessPageFactory _successPageContentFactory;
         private readonly IPageFactory _pageContentFactory;
 
-        public PageService(ILogger<PageService> logger, 
+        public PageService(
             IEnumerable<IElementValidator> validators, 
             IPageHelper pageHelper, 
             ISessionHelper sessionHelper, 
@@ -54,12 +57,13 @@ namespace form_builder.Services.PageService
             IHostingEnvironment environment, 
             ISuccessPageFactory successPageFactory,
             IPageFactory pageFactory,
-            ISchemaFactory schemaFactory)
+            ISchemaFactory schemaFactory,
+            IMappingService mappingService,
+            IPayService payService)
         {
             _validators = validators;
             _pageHelper = pageHelper;
             _sessionHelper = sessionHelper;
-            _logger = logger;
             _streetService = streetService;
             _addressService = addressService;
             _organisationService = organisationService;
@@ -69,6 +73,8 @@ namespace form_builder.Services.PageService
             _pageContentFactory = pageFactory;
             _environment = environment;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _payService = payService;
+            _mappingService = mappingService;
         }
         
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath)
@@ -138,6 +144,14 @@ namespace form_builder.Services.PageService
 
                 if(convertedAnswers.FormData.ContainsKey($"{path}{LookUpConstants.SearchResultsKeyPostFix}"))
                     searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
+            }
+
+            if (page.Elements.Any(_ => _.Type == EElementType.PaymentSummary))
+            {
+                var data = await _mappingService.Map(sessionGuid, form);
+                var paymentAmount = await _payService.GetFormPaymentInformation(data, form, page);
+
+                page.Elements.First(_ => _.Type == EElementType.PaymentSummary).Properties.Value = paymentAmount.Settings.Amount;
             }
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);

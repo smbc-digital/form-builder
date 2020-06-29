@@ -12,7 +12,6 @@ using form_builder.Services.StreetService;
 using form_builder.Validators;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
-using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -22,13 +21,15 @@ using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
-using form_builder.Builders;
 using form_builder.Factories.Schema;
 using form_builder.Constants;
+using System.Linq;
+using form_builder.Services.MappingService;
+using form_builder.Services.PayService;
 using form_builder.ContentFactory;
 using System.Threading;
+using form_builder.Builders;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -40,7 +41,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISchemaProvider> _schemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
         private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<ILogger<PageService>> _logger = new Mock<ILogger<PageService>>();
         private readonly Mock<IStreetService> _streetService = new Mock<IStreetService>();
         private readonly Mock<IAddressService> _addressService = new Mock<IAddressService>();
         private readonly Mock<IOrganisationService> _organisationService = new Mock<IOrganisationService>();
@@ -48,6 +48,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
         private readonly Mock<IHostingEnvironment> _mockEnvironment = new Mock<IHostingEnvironment>();
+        private readonly Mock<IPayService> _payService = new Mock<IPayService>();
+        private readonly Mock<IMappingService> _mappingService = new Mock<IMappingService>();
         private readonly Mock<IPageFactory> _mockPageFactory = new Mock<IPageFactory>();
         private readonly Mock<ISuccessPageFactory> _mockSuccessPageFactory = new Mock<ISuccessPageFactory>();
 
@@ -82,7 +84,8 @@ namespace form_builder_tests.UnitTests.Services
                 FormJson = 1
             });
 
-            _service = new PageService(_logger.Object, _validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, _distributedCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _mockSchemaFactory.Object);
+            _service = new PageService(_validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, 
+            _distributedCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object);
         }
 
         [Fact]

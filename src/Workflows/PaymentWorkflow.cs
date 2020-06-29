@@ -33,14 +33,13 @@ namespace form_builder.Workflows
 
             if (string.IsNullOrEmpty(sessionGuid))
             {
-                throw new ApplicationException($"A Session GUID was not provided.");
+                throw new ApplicationException("A Session GUID was not provided.");
             }
 
             var data = await _mappingService.Map(sessionGuid, form);
-
             var paymentReference = await _submitService.PaymentSubmission(data, form, sessionGuid);
 
-            return await _payService.ProcessPayment(form, path, paymentReference, sessionGuid);
+            return await _payService.ProcessPayment(data, form, path, paymentReference, sessionGuid);
         }
     }
 }
