@@ -144,6 +144,8 @@ namespace form_builder.Services.PayService
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
                 var response = await _gateway.PostAsync(postUrl.URL, formData.Data);
 
+                _logger.LogWarning($"PayService:: CalculateAmountAsync, Request sent was: {response.RequestMessage}");
+
                 if (!response.IsSuccessStatusCode)
                     throw new Exception($"PayService::CalculateAmountAsync, Gateway returned unsuccessful status code {response.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
 

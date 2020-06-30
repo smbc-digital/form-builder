@@ -45,19 +45,41 @@ namespace form_builder_tests.UnitTests.Models
 
         [Theory]
         [InlineData(EElementType.Textarea)]
-        [InlineData(EElementType.Textbox)]
-        public void GenerateElementProperties_ShouldReturnCorrectPropertiesFor_Textbox_And_TextArea(EElementType type)
+        public void GenerateElementProperties_ShouldReturnCorrectPropertiesFor_TextArea(EElementType type)
         {
             var questionId = "test-question-id";
             var value = "test-value";
-            var length = 20;
 
             var element = new ElementBuilder()
                             .WithType(type)
                             .WithQuestionId(questionId)
                             .WithValue(value)
-                            .WithMaxLength(length)
                             .Build();
+
+            var result = element.GenerateElementProperties();
+
+            Assert.NotEmpty(result);
+            Assert.True(result.ContainsKey("name"));
+            Assert.True(result.ContainsKey("id"));
+            Assert.True(result.ContainsKey("value"));
+            Assert.True(result.ContainsValue(questionId));
+            Assert.True(result.ContainsValue(value));
+        }
+
+        [Theory]
+        [InlineData(EElementType.Textbox)]
+        public void GenerateElementProperties_ShouldReturnCorrectPropertiesFor_Textbox(EElementType type)
+        {
+            var questionId = "test-question-id";
+            var value = "test-value";
+            var length = 205;
+
+            var element = new ElementBuilder()
+                .WithType(type)
+                .WithQuestionId(questionId)
+                .WithValue(value)
+                .WithMaxLength(length)
+                .Build();
 
             var result = element.GenerateElementProperties();
 
