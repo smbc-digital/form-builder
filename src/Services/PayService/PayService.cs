@@ -87,19 +87,19 @@ namespace form_builder.Services.PayService
             {
                 paymentProvider.VerifyPaymentResponse(responseCode);
                 await _gateway.PostAsync(postUrl.CallbackUrl,
-                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString() });
+                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString() }, true);
                 return reference;
             }
             catch (PaymentDeclinedException)
             {
                 var response = await _gateway.PostAsync(postUrl.CallbackUrl,
-                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString() });
+                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString() }, true);
                 throw new PaymentDeclinedException("PayService::ProcessPaymentResponse, PaymentProvider declined payment");
             }
             catch (PaymentFailureException)
             {
                 var response = await _gateway.PostAsync(postUrl.CallbackUrl,
-                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString() });
+                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString() }, true);
                 throw new PaymentFailureException("PayService::ProcessPaymentResponse, PaymentProvider failed payment");
             }
             catch (Exception ex)
