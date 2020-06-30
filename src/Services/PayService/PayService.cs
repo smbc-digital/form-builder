@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Hosting;
 using form_builder.Services.MappingService.Entities;
 using Newtonsoft.Json;
 using form_builder.Models;
+using System.Net.Http;
+using System.Text;
 
 namespace form_builder.Services.PayService
 {
@@ -144,7 +146,7 @@ namespace form_builder.Services.PayService
                     throw  new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
 
                 _gatewayPaymentAmount.ChangeAuthenticationHeader(postUrl.AuthToken);
-                var response = await _gatewayPaymentAmount.PostAsync(postUrl.URL, formData.Data, true);
+                var response = await _gatewayPaymentAmount.PostAsync(postUrl.URL, new StringContent(JsonConvert.SerializeObject(new object{}), Encoding.UTF8, "application/json"));
 
                 _logger.LogWarning($"PayService:: CalculateAmountAsync, Request sent was: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
                 _logger.LogWarning($"PayService:: CalculateAmountAsync, Request data was: {Newtonsoft.Json.JsonConvert.SerializeObject(formData.Data)}");
