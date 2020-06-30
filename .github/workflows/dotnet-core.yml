@@ -2,9 +2,13 @@ name: .NET Core
 
 on:
   push:
-    branches: [ design-system ]
+    branches: 
+      - master
+      - design-system
   pull_request:
-    branches: [ design-system ]
+    branches:
+      - master
+      - design-system
 
 jobs:
   build:
