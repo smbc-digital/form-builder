@@ -142,7 +142,7 @@ namespace form_builder.Services.PayService
                     throw  new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
 
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
-                var response = await _gateway.PostAsync(postUrl.URL, formData.Data);
+                var response = await _gateway.PostAsync(postUrl.URL, formData.Data, true);
 
                 _logger.LogWarning($"PayService:: CalculateAmountAsync, Request sent was: {response.RequestMessage}");
 
