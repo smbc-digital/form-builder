@@ -266,7 +266,7 @@ namespace form_builder_tests.UnitTests.Services
                 }
             }).Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     Content = new StringContent("100.00")
@@ -352,7 +352,7 @@ namespace form_builder_tests.UnitTests.Services
                 }
             }).Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     Content = null
@@ -382,7 +382,7 @@ namespace form_builder_tests.UnitTests.Services
                 }
             }).Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     Content = new StringContent(string.Empty)
