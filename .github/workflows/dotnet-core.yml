@@ -24,6 +24,6 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build ./src/form-builder.csproj --configuration Release --no-restore
     - name: Test
       run: dotnet test ./tests/form-builder-tests-unit.csproj
