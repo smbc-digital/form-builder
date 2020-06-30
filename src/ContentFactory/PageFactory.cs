@@ -29,7 +29,6 @@ namespace form_builder.ContentFactory
             result.Path = page.PageSlug;
             result.FormName = baseForm.FormName;
             result.PageTitle = page.Title;
-            result.BaseURL = baseForm.BaseURL;
             result.FeedbackForm = baseForm.FeedbackForm;
             result.FeedbackPhase = baseForm.FeedbackPhase;
             result.HideBackButton = page.HideBackButton;

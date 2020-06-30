@@ -24,7 +24,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Hosting;
 using form_builder.Factories.Schema;
 using form_builder.Constants;
-using System.Linq;
 using form_builder.Services.MappingService;
 using form_builder.Services.PayService;
 using form_builder.ContentFactory;
@@ -544,8 +543,6 @@ namespace form_builder_tests.UnitTests.Services
 
             var viewModel = new FormBuilderViewModel
             {
-                BaseURL = schema.BaseURL,
-                StartPageSlug = schema.StartPageSlug,
                 StartFormUrl = "https://www.test.com/textbox/page-one"
             };
 
@@ -584,8 +581,6 @@ namespace form_builder_tests.UnitTests.Services
 
             var viewModel = new FormBuilderViewModel
             {
-                BaseURL = schema.BaseURL,
-                StartPageSlug = schema.StartPageSlug,
                 StartFormUrl = "https://www.test.com/textarea/first-page"
             };
 

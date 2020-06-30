@@ -85,7 +85,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
             Assert.Equal(pageUrl, result.Path);
             Assert.Equal("form name", result.FormName);
             Assert.Equal("page title", result.PageTitle);
-            Assert.Equal(baseUrl, result.BaseURL);
             Assert.Equal("feedbackurl", result.FeedbackForm);
             Assert.Equal("BETA", result.FeedbackPhase);
             Assert.Equal($"https://www.test.com/{baseUrl}/{pageUrl}", result.StartFormUrl);
