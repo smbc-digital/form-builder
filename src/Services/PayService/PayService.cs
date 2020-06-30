@@ -31,6 +31,7 @@ namespace form_builder.Services.PayService
     public class PayService : IPayService
     {
         private readonly IGateway _gateway;
+        private readonly IGateway _gatewayPaymentAmount;
         private readonly ILogger<PayService> _logger;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly ICache _cache;
@@ -40,11 +41,12 @@ namespace form_builder.Services.PayService
         private readonly IHostingEnvironment _hostingEnvironment;
 
         public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger,
-            IGateway gateway, ICache cache,
+            IGateway gateway, IGateway gatewayPaymentAmount, ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
             ISessionHelper sessionHelper, IMappingService mappingService, IHostingEnvironment hostingEnvironment)
         {
             _gateway = gateway;
+            _gatewayPaymentAmount = gatewayPaymentAmount;
             _logger = logger;
             _paymentProviders = paymentProviders;
             _cache = cache;
@@ -141,10 +143,11 @@ namespace form_builder.Services.PayService
                 if (postUrl?.URL == null || postUrl.AuthToken == null)
                     throw  new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
 
-                _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
-                var response = await _gateway.PostAsync(postUrl.URL, formData.Data, true);
+                _gatewayPaymentAmount.ChangeAuthenticationHeader(postUrl.AuthToken);
+                var response = await _gatewayPaymentAmount.PostAsync(postUrl.URL, formData.Data, true);
 
-                _logger.LogWarning($"PayService:: CalculateAmountAsync, Request sent was: {response.RequestMessage}");
+                _logger.LogWarning($"PayService:: CalculateAmountAsync, Request sent was: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
+                _logger.LogWarning($"PayService:: CalculateAmountAsync, Request data was: {Newtonsoft.Json.JsonConvert.SerializeObject(formData.Data)}");
 
                 if (!response.IsSuccessStatusCode)
                     throw new Exception($"PayService::CalculateAmountAsync, Gateway returned unsuccessful status code {response.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
