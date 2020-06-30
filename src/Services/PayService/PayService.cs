@@ -144,7 +144,9 @@ namespace form_builder.Services.PayService
                 if (postUrl?.URL == null || postUrl.AuthToken == null)
                     throw  new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
 
-                var client = new HttpClient();
+                var handler = new HttpClientHandler();
+                handler.AllowAutoRedirect = false;
+                var client = new HttpClient(handler);
                 var clientResponse = await client.PostAsync(postUrl.URL, new StringContent(JsonConvert.SerializeObject(new object{}), Encoding.UTF8, "application/json"));
 
                 _logger.LogWarning($"PayService:: CalculateAmountAsync, httpclient result: {Newtonsoft.Json.JsonConvert.SerializeObject(clientResponse)}");
