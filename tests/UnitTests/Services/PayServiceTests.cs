@@ -29,8 +29,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly PayService _service;
         private readonly Mock<ILogger<PayService>> _mockLogger = new Mock<ILogger<PayService>>();
         private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
-        private readonly Mock<IGateway> _mockPaymentGateway = new Mock<IGateway>();
-
         private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider =
             new Mock<IEnumerable<IPaymentProvider>>();
 
@@ -132,7 +130,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(mappingEntity);
             _mockHostingEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
 
-            _service = new PayService(_mockPaymentProvider.Object, _mockLogger.Object, _mockGateway.Object, _mockPaymentGateway.Object,
+            _service = new PayService(_mockPaymentProvider.Object, _mockLogger.Object, _mockGateway.Object,
                 _mockCache.Object,
                 _mockDistrbutedCacheExpirationSettings.Object, _mockSessionHelper.Object, _mockMappingService.Object,
                 _mockHostingEnvironment.Object);
@@ -247,7 +245,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.NotNull(result);
         }
 
-        [Fact(Skip = "Debugging")]
+        [Fact]
         public async Task GetFormPaymentInformation_ShouldCallGatewayIfComplexCalculationRequired()
         {
             var page = new PageBuilder().WithElement(new Element
@@ -267,7 +265,7 @@ namespace form_builder_tests.UnitTests.Services
                 }
             }).Build();
 
-            _mockPaymentGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     Content = new StringContent("100.00")
@@ -333,7 +331,7 @@ namespace form_builder_tests.UnitTests.Services
             await Assert.ThrowsAsync<Exception>( () => _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page));
         }
 
-        [Fact(Skip="debug")]
+        [Fact]
         public async Task GetFormPaymentInformation_ShouldCallGatewayResponseIsNull()
         {
             var page = new PageBuilder().WithElement(new Element
@@ -353,7 +351,7 @@ namespace form_builder_tests.UnitTests.Services
                 }
             }).Build();
 
-            _mockPaymentGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     Content = null
@@ -363,7 +361,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with null content", result.Message);
         }
 
-        [Fact(Skip="debug")]
+        [Fact]
         public async Task GetFormPaymentInformation_ShouldCallGatewayResponseIsWhitespace()
         {
             var page = new PageBuilder().WithElement(new Element
@@ -383,7 +381,7 @@ namespace form_builder_tests.UnitTests.Services
                 }
             }).Build();
 
-            _mockPaymentGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     Content = new StringContent(string.Empty)

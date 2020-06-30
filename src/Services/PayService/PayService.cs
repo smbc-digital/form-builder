@@ -33,7 +33,6 @@ namespace form_builder.Services.PayService
     public class PayService : IPayService
     {
         private readonly IGateway _gateway;
-        private readonly IGateway _gatewayPaymentAmount;
         private readonly ILogger<PayService> _logger;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly ICache _cache;
@@ -43,12 +42,12 @@ namespace form_builder.Services.PayService
         private readonly IHostingEnvironment _hostingEnvironment;
 
         public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger,
-            IGateway gateway, IGateway gatewayPaymentAmount, ICache cache,
+            IGateway gateway,
+            ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
             ISessionHelper sessionHelper, IMappingService mappingService, IHostingEnvironment hostingEnvironment)
         {
             _gateway = gateway;
-            _gatewayPaymentAmount = gatewayPaymentAmount;
             _logger = logger;
             _paymentProviders = paymentProviders;
             _cache = cache;
@@ -145,8 +144,8 @@ namespace form_builder.Services.PayService
                 if (postUrl?.URL == null || postUrl.AuthToken == null)
                     throw  new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
 
-                _gatewayPaymentAmount.ChangeAuthenticationHeader(postUrl.AuthToken);
-                var response = await _gatewayPaymentAmount.PostAsync(postUrl.URL, new StringContent(JsonConvert.SerializeObject(new object{}), Encoding.UTF8, "application/json"));
+                _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
+                var response = await _gateway.PostAsync(postUrl.URL, formData.Data, true);
 
                 _logger.LogWarning($"PayService:: CalculateAmountAsync, Request sent was: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
                 _logger.LogWarning($"PayService:: CalculateAmountAsync, Request data was: {Newtonsoft.Json.JsonConvert.SerializeObject(formData.Data)}");

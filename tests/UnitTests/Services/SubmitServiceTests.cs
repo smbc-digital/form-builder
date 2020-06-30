@@ -149,7 +149,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.StartsWith("error", result.Message);
         }
 
-        [Fact(Skip = "Debugging")]
+        [Fact]
         public async Task ProcessSubmission_ShouldCallGateway_WithFormData()
         {
             // Arrange
@@ -204,7 +204,7 @@ namespace form_builder_tests.UnitTests.Services
                 {
                     StatusCode = HttpStatusCode.OK
                 })
-                .Callback<string, object>((x, y) => callbackValue = (ExpandoObject)y);
+                .Callback<string, object, bool>((x, y, z) => callbackValue = (ExpandoObject)y);
             // Act
             await _service.ProcessSubmission(new MappingEntity { Data = new ExpandoObject(), BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "123454");
 
