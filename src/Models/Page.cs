@@ -80,7 +80,7 @@ namespace form_builder.Models
 
         public Behaviour GetNextPage(Dictionary<string, dynamic> viewModel)
         {
-            var conditionValidator = new Conditions.ConditionValidator();
+            var conditionValidator = new ConditionValidator();
             
             if (Behaviours.Count == 1)
             {
