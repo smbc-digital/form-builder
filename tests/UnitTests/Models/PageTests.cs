@@ -805,7 +805,7 @@ namespace form_builder_tests.UnitTests.Models
 
             var behaviour2 = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithCondition(new Condition { IsNullOrEmpty = false, QuestionId = "test" })
+                .WithCondition(new Condition { IsNullOrEmpty = false, QuestionId = "test" , ConditionType = ECondition.IsNullOrEmpty})
                 .Build();
 
             var page = new PageBuilder()

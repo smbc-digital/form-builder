@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using form_builder.Comparators;
 using form_builder.Enum;
 using form_builder.Models;
 
 
-namespace form_builder.Comparators
+namespace form_builder.Conditions
 {
     public static class DateComparator
     {
@@ -63,8 +62,6 @@ namespace form_builder.Comparators
             var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, condition.IsAfter);
 
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
-
-
 
             if (DateTime.Compare(dateValue, newComparisonDate) == 0)
             {
