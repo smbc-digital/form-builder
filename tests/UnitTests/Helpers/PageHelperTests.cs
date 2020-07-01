@@ -897,12 +897,15 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() =>
                 _pageHelper.CheckForPaymentConfiguration(pages, "no-form-config"));
-            Assert.Equal("No payment infomation configured for no-form-config form", result.Message);
+            Assert.Equal("No payment information configured for no-form-config form", result.Message);
         }
 
         [Fact]
         public async Task CheckForPaymentConfiguration_ShouldNot_ThrowException_WhenConfigFound_ForForm_WithProvider()
         {
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(),It.IsAny<int>(),It.IsAny<ESchemaType>()))
+                .ReturnsAsync(new List<PaymentInformation>{ new PaymentInformation{ FormName = "test-form", PaymentProvider = "testProvider", Settings = new Settings() }});
+
             var pages = new List<Page>();
 
             var behaviour = new BehaviourBuilder()
@@ -916,6 +919,67 @@ namespace form_builder_tests.UnitTests.Helpers
             pages.Add(page);
 
             await _pageHelper.CheckForPaymentConfiguration(pages, "test-form");
+        }
+
+        [Fact]
+        public async Task CheckForPaymentConfiguration_Should_VerifyCalculationSlugs_StartWithHttps()
+        {
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(),It.IsAny<int>(),It.IsAny<ESchemaType>()))
+                .ReturnsAsync(new List<PaymentInformation>{ new PaymentInformation{ FormName = "test-form", PaymentProvider = "testProvider", Settings = new Settings{ ComplexCalculationRequired = true } }});
+
+            _mockHostingEnv.Setup(_ => _.EnvironmentName)
+                .Returns("non-local");
+
+            var pages = new List<Page>();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .Build();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.PaymentSummary)
+                .WithCalculationSlugs(new SubmitSlug{ Environment = "non-local", URL = "https://www.test.com" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            await _pageHelper.CheckForPaymentConfiguration(pages, "test-form");
+        }
+
+        [Fact]
+        public async Task CheckForPaymentConfiguration_Should_ThrowException_WhenCalculateCostUrl_DoesNot_StartWithHttps()
+        {
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(),It.IsAny<int>(),It.IsAny<ESchemaType>()))
+                .ReturnsAsync(new List<PaymentInformation>{ new PaymentInformation{ FormName = "test-form", PaymentProvider = "testProvider", Settings = new Settings{ ComplexCalculationRequired = true } }});
+
+            _mockHostingEnv.Setup(_ => _.EnvironmentName)
+                .Returns("non-local");
+
+            var pages = new List<Page>();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .Build();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.PaymentSummary)
+                .WithCalculationSlugs(new SubmitSlug{ Environment = "non-local", URL = "http://www.test.com" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+            
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.CheckForPaymentConfiguration(pages, "test-form"));
+            Assert.Equal("PaymentSummary::CalculateCostUrl must start with https", result.Message);
         }
 
         [Fact]

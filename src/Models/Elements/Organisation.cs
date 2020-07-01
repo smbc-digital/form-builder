@@ -28,11 +28,9 @@ namespace form_builder.Models.Elements
             get
             {
                 if(IsSelect)
-                {
-                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Organisation" : Properties.SelectLabel;
-                }
+                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Select the organisation below" : Properties.SelectLabel;
 
-                return string.IsNullOrEmpty(Properties.Label) ? "Search for an organisation" : Properties.Label;
+                return string.IsNullOrEmpty(Properties.Label) ? "Organisation name" : Properties.Label;
             }
         }
 

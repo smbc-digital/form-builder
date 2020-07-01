@@ -16,7 +16,7 @@
     <partial name="Error" />
 
     <div class="govuk-date-input">
-        <div class="govuk-date-input__item">
+        <div class="smbc-time-input__item">
             <div class="govuk-form-group">
                 <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("hours")>
                     Hours
@@ -24,8 +24,8 @@
                 @Html.TextBox(Model.GetCustomItemId("hours"), Model.Properties.Hours, new { @class = inputClasses, maxLength = "2", type = "number", pattern = "[0-9]*", min = "1", max = "12", style = "width:3em" }):
             </div>
         </div>
-
-        <div class="govuk-date-input__item">
+        <div class="smbc-time-input__divider"></div>
+        <div class="smbc-time-input__item">
             <div class="govuk-form-group">
                 <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("minutes")>
                     Minutes

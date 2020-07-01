@@ -3,6 +3,7 @@ using form_builder.Enum;
 using form_builder.Models.Elements;
 using form_builder.Models;
 using form_builder.Extensions;
+using System;
 
 namespace form_builder.Validators
 {
@@ -40,12 +41,12 @@ namespace form_builder.Validators
                 if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-address";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Select an address from the list";
                 }
                 else
                 {
                     key = $"{element.Properties.QuestionId}-postcode";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the postcode";
 
                 }
             }
@@ -55,13 +56,13 @@ namespace form_builder.Validators
                 if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-street";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Select the street from the list";
 
                 }
                 else
                 {
                     key = $"{element.Properties.QuestionId}";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the street name";
                 }
             }
 
@@ -70,18 +71,17 @@ namespace form_builder.Validators
                 if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-organisation";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Select the organisation from the list";
 
                 }
                 else
                 {
                     key = $"{element.Properties.QuestionId}";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the organisation name";
                 }
             }
 
-            var isValid = false;
-
+            bool isValid;
             if (element.Type == EElementType.FileUpload)
             {
                 DocumentModel value = viewModel.ContainsKey(key)

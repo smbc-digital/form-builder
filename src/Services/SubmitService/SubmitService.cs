@@ -84,7 +84,6 @@ namespace form_builder.Services.SubmtiService
             {
                 var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
                 reference = JsonConvert.DeserializeObject<string>(content);
-
             }
             return reference;
         }
@@ -126,7 +125,7 @@ namespace form_builder.Services.SubmtiService
 
                 if (string.IsNullOrWhiteSpace(content))
                 {
-                    throw new ApplicationException($"SubmitService::PaymentSubmission, Gateway {postUrl} responded with empty reference");
+                    throw new ApplicationException($"SubmitService::PaymentSubmission, Gateway {postUrl.URL} responded with empty reference");
                 }
 
                 return JsonConvert.DeserializeObject<string>(content);

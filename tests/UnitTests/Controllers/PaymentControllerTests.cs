@@ -7,6 +7,7 @@ using form_builder.Services.PayService;
 using form_builder.Exceptions;
 using form_builder.Helpers.Session;
 using form_builder.Controllers.Payment;
+using form_builder.Services.MappingService;
 using form_builder.Services.PageService;
 
 namespace form_builder_tests.UnitTests.Controllers
@@ -17,10 +18,11 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<IPayService> _payService = new Mock<IPayService>();
         private readonly Mock<IPageService> _pageService = new Mock<IPageService>();
         private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
+        private readonly Mock<IMappingService> _mappingService = new Mock<IMappingService>();
 
         public PaymentControllerTests()
         {
-            _controller = new PaymentController(_payService.Object, _pageService.Object, _sessionHelper.Object);
+            _controller = new PaymentController(_payService.Object, _pageService.Object, _sessionHelper.Object, _mappingService.Object);
         }
 
         [Fact]

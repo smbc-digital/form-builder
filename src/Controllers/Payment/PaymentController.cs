@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Helpers.Session;
+using form_builder.Services.MappingService;
 using form_builder.Services.PageService;
 using form_builder.Services.PayService;
 using form_builder.ViewModels;
@@ -14,12 +15,14 @@ namespace form_builder.Controllers.Payment
         private readonly IPayService _payService;
         private readonly IPageService _pageService;
         private readonly ISessionHelper _sessionHelper;
+        private readonly IMappingService _mappingService;
 
-        public PaymentController(IPayService payService,IPageService pageService, ISessionHelper sessionHelper)
+        public PaymentController(IPayService payService,IPageService pageService, ISessionHelper sessionHelper, IMappingService mappingService)
         {
             _payService = payService;
             _pageService = pageService;
             _sessionHelper = sessionHelper;
+            _mappingService = mappingService;
         }
 
         [HttpGet]
@@ -78,8 +81,9 @@ namespace form_builder.Controllers.Payment
         public async Task<IActionResult> PaymentFailure(string form, [FromQuery] string reference)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
-            var path = "payment";
-            var url = await _payService.ProcessPayment(form, path, reference, sessionGuid);
+            var data = await _mappingService.Map(sessionGuid, form);
+            var url = await _payService.ProcessPayment(data, form, "payment", reference, sessionGuid);
+
             var paymentFailureViewModel = new PaymentFailureViewModel
             {
                 FormName = form,
@@ -97,14 +101,14 @@ namespace form_builder.Controllers.Payment
         public async Task<IActionResult> PaymentDeclined(string form, [FromQuery] string reference)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
-            var path = "payment";
-            var url = await _payService.ProcessPayment(form, path, reference, sessionGuid);
+            var data = await _mappingService.Map(sessionGuid, form);
+            var url = await _payService.ProcessPayment(data, form, "payment", reference, sessionGuid);
             var paymentDeclinedViewModel = new PaymentFailureViewModel
             {
                 FormName = form,
                 PageTitle = "Declined",
                 Reference = reference,
-                PaymentUrl = url.ToString(),
+                PaymentUrl = url,
                 StartFormUrl = $"https://{Request.Host}/{form}"
             };
 

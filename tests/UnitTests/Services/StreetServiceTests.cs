@@ -13,6 +13,7 @@ using form_builder.Builders;
 using form_builder.Providers.Street;
 using StockportGovUK.NetStandard.Models.Enums;
 using Newtonsoft.Json;
+using form_builder.ContentFactory;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -23,6 +24,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
         private readonly Mock<IStreetProvider> _streetProvider = new Mock<IStreetProvider>();
         private IEnumerable<IStreetProvider> _streetProviders;
+        private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
 
         private const string SearchResultsUniqueId = "123456";
         private const string SearchResultsReference = "Test street";
@@ -35,7 +37,7 @@ namespace form_builder_tests.UnitTests.Services
                 _streetProvider.Object
             };
 
-            _service = new StreetService(_distributedCache.Object, _streetProviders, _pageHelper.Object);
+            _service = new StreetService(_distributedCache.Object, _streetProviders, _pageHelper.Object, _mockPageContentFactory.Object);
         }
 
         [Fact]

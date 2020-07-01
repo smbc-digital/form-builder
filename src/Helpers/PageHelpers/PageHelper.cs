@@ -63,9 +63,6 @@ namespace form_builder.Helpers.PageHelpers
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
 
-            formModel.FeedbackForm = baseForm.FeedbackForm;
-            formModel.FeedbackPhase = baseForm.FeedbackPhase;
-
             foreach (var element in page.Elements)
                 formModel.RawHTML += await element.RenderAsync(
                     _viewRender,
@@ -193,20 +190,23 @@ namespace form_builder.Helpers.PageHelpers
 
             var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_enviroment.EnvironmentName}", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
 
-            var config = paymentInformation.Where(x => x.FormName == formName)
-                .FirstOrDefault();
+            var config = paymentInformation.FirstOrDefault(x => x.FormName == formName);
 
             if (config == null)
-            {
-                throw new ApplicationException($"No payment infomation configured for {formName} form");
-            }
+                throw new ApplicationException($"No payment information configured for {formName} form");
 
-            var paymentProvider = _paymentProviders.Where(_ => _.ProviderName == config.PaymentProvider)
-                .FirstOrDefault();
+            var paymentProvider = _paymentProviders.FirstOrDefault(_ => _.ProviderName == config.PaymentProvider);
 
             if (paymentProvider == null)
-            {
                 throw new ApplicationException($"No payment provider configured for provider {config.PaymentProvider}");
+
+            if (config.Settings.ComplexCalculationRequired)
+            {
+                var paymentSummaryElement = pages.SelectMany(_ => _.Elements)
+                    .First(_ => _.Type == EElementType.PaymentSummary);
+ 
+                if(!_enviroment.IsEnvironment("local") && !paymentSummaryElement.Properties.CalculationSlugs.Where(_ => !_.Environment.ToLower().Equals("local")).Any(_ => _.URL.StartsWith("https://")))
+                    throw new ApplicationException("PaymentSummary::CalculateCostUrl must start with https");
             }
         }
 
@@ -295,14 +295,13 @@ namespace form_builder.Helpers.PageHelpers
                         foreach (var subItem in item.SubmitSlugs)
                         {
                             if (string.IsNullOrEmpty(subItem.URL))
-                            {
                                 throw new ApplicationException($"No URL found in the SubmitSlug for {formName} form");
-                            }
 
                             if (string.IsNullOrEmpty(subItem.AuthToken))
-                            {
                                 throw new ApplicationException($"No Auth Token found in the SubmitSlug for {formName} form");
-                            }
+
+                            if(!_enviroment.IsEnvironment("local") && !subItem.Environment.ToLower().Equals("local") && !subItem.URL.StartsWith("https://"))
+                                throw new Exception("SubmitUrl must start with https");
                         }
                     }
                 }

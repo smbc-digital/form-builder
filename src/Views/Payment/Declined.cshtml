@@ -6,10 +6,11 @@
     ViewData["FeedbackPhase"] = Model.FeedbackPhase;   
 }
 
-<h1 class="govuk-heading-l">Your Payment was declined</h1>
+<h1 class="govuk-heading-l">Your payment was declined</h1>
 <p class="smbc-body">
     Contact your bank for more details. No money has been taken from your account.
 </p>
-<a className="govuk-button" href=@Model.PaymentUrl>Go back to try the payment again</a>
+
+<a class="govuk-link" href=@Model.PaymentUrl>Go back to try the payment again</a>
 <br>
-<a className="govuk-button govuk-button--secondary" href="https://www.stockport.gov.uk">Go to home page</a>
+<a class="govuk-link" href="https://www.stockport.gov.uk">Go to home page</a>

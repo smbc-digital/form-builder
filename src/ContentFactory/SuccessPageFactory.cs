@@ -12,22 +12,22 @@ using Microsoft.AspNetCore.Http;
 
 namespace form_builder.ContentFactory
 {
-    public interface ISuccessPageContentFactory
+    public interface ISuccessPageFactory
     {
         Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType);
     }
 
-    public class SuccessPageContentFactory : ISuccessPageContentFactory
+    public class SuccessPageFactory : ISuccessPageFactory
     {
         private readonly IPageHelper _pageHelper;
         private readonly IHostingEnvironment _enviroment;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IPageContentFactory _pageContentFactory;
-        public SuccessPageContentFactory(IHttpContextAccessor httpContextAccessor, IHostingEnvironment enviroment, IPageHelper pageHelper, IPageContentFactory pageContentFactory)
+        private readonly IPageFactory _pageFactory;
+        public SuccessPageFactory(IHttpContextAccessor httpContextAccessor, IHostingEnvironment enviroment, IPageHelper pageHelper, IPageFactory pageFactory)
         {
             _pageHelper = pageHelper;
             _enviroment = enviroment;
-            _pageContentFactory = pageContentFactory;
+            _pageFactory = pageFactory;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -74,16 +74,16 @@ namespace form_builder.ContentFactory
                     baseForm.Pages[successIndex] = page;
             }
 
-            var result = await _pageContentFactory.Build(page, baseForm, sessionGuid);
+            var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(),baseForm, sessionGuid);
 
             return new SuccessPageEntity
             {
-                HtmlContent = result,
-                FeedbackFormUrl = baseForm.FeedbackForm,
-                FeedbackPhase= baseForm.FeedbackPhase,
-                FormName = baseForm.FormName,
-                StartFormUrl = startFormUrl,
-                PageTitle = page.Title,
+                HtmlContent = result.RawHTML,
+                FeedbackFormUrl = result.FeedbackForm,
+                FeedbackPhase= result.FeedbackPhase,
+                FormName = result.FormName,
+                StartFormUrl = result.StartFormUrl,
+                PageTitle = result.PageTitle,
                 BannerTitle = page.BannerTitle,
                 LeadingParagraph = page.LeadingParagraph
             };

@@ -29,13 +29,12 @@ namespace form_builder.Models.Elements
             get
             {
                 if(IsSelect)
-                {
-                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Street" : Properties.SelectLabel;
-                }
+                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Select the street below" : Properties.SelectLabel;
 
-                return string.IsNullOrEmpty(Properties.Label) ? "Search for a street" : Properties.Label;
+                return string.IsNullOrEmpty(Properties.Label) ? "Street name" : Properties.Label;
             }
         }
+
         public Street()
         {
             Type = EElementType.Street;
@@ -100,14 +99,6 @@ namespace form_builder.Models.Elements
             }
  
             return elemnentProperties;
-        }
-
-        public override string GetLabelText(){
-            var optionalLabelText = Properties.Optional ? " (optional)" : string.Empty;
-            
-            return string.IsNullOrEmpty(Properties.Label)
-            ? $"Search for a street{optionalLabelText}"
-            : $"{Properties.Label}{optionalLabelText}";
         }
     }
 }

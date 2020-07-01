@@ -7,13 +7,15 @@ namespace form_builder_tests.Builders
     {
         private FormSchema _baseForm = new FormSchema();
         private FormAnswers _formAnswers = new FormAnswers();
+        private object _data = new object();
 
         public MappingEntity Build()
         {
             return new MappingEntity
             {
                 BaseForm = _baseForm,
-                FormAnswers = _formAnswers
+                FormAnswers = _formAnswers,
+                Data = _data
             };
         }
 
@@ -26,6 +28,12 @@ namespace form_builder_tests.Builders
         public MappingEntityBuilder WithFormAnswers(FormAnswers formAnswers)
         {
             _formAnswers = formAnswers;
+            return this;
+        }
+
+        public MappingEntityBuilder WithData(object data)
+        {
+            _data = data;
             return this;
         }
     }

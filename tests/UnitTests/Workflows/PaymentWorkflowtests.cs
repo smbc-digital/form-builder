@@ -34,7 +34,7 @@ namespace form_builder_tests.UnitTests.Workflows
             Assert.Equal("A Session GUID was not provided.", result.Message);
             _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             _submitService.Verify(_ => _.PaymentSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            _payService.Verify(_ => _.ProcessPayment(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _payService.Verify(_ => _.ProcessPayment(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.Workflows
             // Assert
             _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             _submitService.Verify(_ => _.PaymentSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            _payService.Verify(_ => _.ProcessPayment(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _payService.Verify(_ => _.ProcessPayment(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
     }
 }

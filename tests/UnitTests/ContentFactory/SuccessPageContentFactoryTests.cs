@@ -12,20 +12,21 @@ using System;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
 using form_builder.Builders;
+using form_builder.ViewModels;
 
 namespace form_builder_tests.UnitTests.ContentFactory
 {
     public class SuccessPageContentFactoryTests
     {
-        private readonly SuccessPageContentFactory _factory;
+        private readonly SuccessPageFactory _factory;
         private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
         private readonly Mock<IHttpContextAccessor> _mockHttpContext = new Mock<IHttpContextAccessor>();
-        private readonly Mock<IPageContentFactory> _mockPageContentFactory = new Mock<IPageContentFactory>();
+        private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
 
         public SuccessPageContentFactoryTests()
         {
-            _factory = new SuccessPageContentFactory(_mockHttpContext.Object, _mockHostingEnv.Object, _mockPageHelper.Object, _mockPageContentFactory.Object);
+            _factory = new SuccessPageFactory(_mockHttpContext.Object, _mockHostingEnv.Object, _mockPageHelper.Object, _mockPageContentFactory.Object);
         }
 
         [Theory]
@@ -42,7 +43,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             var result = await Assert.ThrowsAsync<Exception>(() => _factory.Build(formName, new FormSchema { BaseURL = "base-test", StartPageSlug = "page-one", Pages = new List<Page>() }, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm));
 
             Assert.Equal($"SuccessPageContentFactory::Build, No success page configured for form {formName}", result.Message);
-            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Never);
+            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
         }
 
         [Fact]
@@ -65,16 +66,16 @@ namespace form_builder_tests.UnitTests.ContentFactory
             var callBack = new Page();
             _mockHttpContext.Setup(_ => _.HttpContext.Request.Host).Returns(new HostString("test"));
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
-            _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>()))
-                .ReturnsAsync("123")
-                .Callback<Page, FormSchema, string>((a,b,c) => callBack = a);
+            _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel())
+                .Callback<Page, Dictionary<string,dynamic>, FormSchema, string, List<object>>((a,b,c,d,e) => callBack = a);
 
             // Act 
             var result = await _factory.Build(string.Empty, new FormSchema {BaseURL = "base-test", StartPageSlug = "page-one", Pages = new List<Page>() }, string.Empty, new FormAnswers(), EBehaviourType.SubmitAndPay);
 
             // Assert
             Assert.Equal("Success", result.ViewName);
-            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Once);
+            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Once);
             Assert.Equal(6, callBack.Elements.Count);
             Assert.Equal(EElementType.H2, callBack.Elements[0].Type);
             Assert.Equal("Thank you for your payment", callBack.Elements[0].Properties.Text);
@@ -94,16 +95,16 @@ namespace form_builder_tests.UnitTests.ContentFactory
             var callBack = new Page();
             _mockHttpContext.Setup(_ => _.HttpContext.Request.Host).Returns(new HostString("test"));
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
-            _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>()))
-                .ReturnsAsync("123")
-                .Callback<Page, FormSchema, string>((a,b,c) => callBack = a);
+            _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel())
+                .Callback<Page, Dictionary<string,dynamic>, FormSchema, string, List<object>>((a,b,c,d,e) => callBack = a);
 
             // Act 
             var result = await _factory.Build(string.Empty, new FormSchema {BaseURL = "base-test", StartPageSlug = "page-one", Pages = new List<Page>{ new Page{ PageSlug = "success", Elements = new List<IElement>{ new H2() } } } }, string.Empty, new FormAnswers(), behaviourType);
 
             // Assert
             Assert.Equal("Success", result.ViewName);
-            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Once);
+            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Once);
             Assert.Single(callBack.Elements);
             Assert.Equal(EElementType.H2, callBack.Elements[0].Type);
         }
@@ -135,16 +136,16 @@ namespace form_builder_tests.UnitTests.ContentFactory
 
             _mockHttpContext.Setup(_ => _.HttpContext.Request.Host).Returns(new HostString("test"));
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
-            _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>()))
-                .ReturnsAsync("123")
-                .Callback<Page, FormSchema, string>((a,b,c) => callBack = a);
+            _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel())
+                .Callback<Page, Dictionary<string,dynamic>, FormSchema, string, List<object>>((a,b,c,d,e) => callBack = a);
 
             // Act 
             var result = await _factory.Build(string.Empty, formSchema, string.Empty, new FormAnswers(), behaviourType);
 
             // Assert
             Assert.Equal("Success", result.ViewName);
-            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Once);
+            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Once);
             Assert.Equal(2, callBack.Elements.Count);
             Assert.Equal(EElementType.DocumentDownload, callBack.Elements[1].Type);
             Assert.Equal($"Download {EDocumentType.Txt} document", callBack.Elements[1].Properties.Label);
@@ -171,8 +172,8 @@ namespace form_builder_tests.UnitTests.ContentFactory
 
             _mockHttpContext.Setup(_ => _.HttpContext.Request.Host).Returns(new HostString("test"));
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
-            _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>()))
-                .ReturnsAsync("123");
+            _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel());
 
             // Act 
             var result = await _factory.Build(string.Empty, formSchema, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm);
