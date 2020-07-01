@@ -41,7 +41,7 @@ namespace form_builder.Providers.PaymentProvider
                 CallingAppIdentifier = "Basket",
                 CustomerID = _paymentConfig.CustomerId,
                 ApiPassword = _paymentConfig.ApiPassword,
-                ReturnURL = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{form}/{path}/payment-response",
+                ReturnURL = _environment.EnvironmentName.Equals("local") ? $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response" : $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{form}/{path}/payment-response",
                 NotifyURL = string.Empty,
                 CallingAppTranReference = reference,
                 PaymentItems = new List<PaymentItem>
@@ -75,12 +75,12 @@ namespace form_builder.Providers.PaymentProvider
         {
             if (responseCode == "00022" || responseCode == "00023" || responseCode == "00001")
             {
-                throw new PaymentDeclinedException("CivicaPayProvider::Declined payment");
+                throw new PaymentDeclinedException($"CivicaPayProvider::Declined payment with response code: {responseCode}");
             }
 
             if (responseCode != "00000")
             {
-                throw new PaymentFailureException("CivicaPayProvider::Payment failed");
+                throw new PaymentFailureException($"CivicaPayProvider::Payment failed with response code: {responseCode}");
             }
         }
     }
