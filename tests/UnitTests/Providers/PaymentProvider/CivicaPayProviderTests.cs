@@ -86,7 +86,7 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
         {
             var result = Assert.Throws<PaymentDeclinedException>(() => _civicaPayProvider.VerifyPaymentResponse(responseCode));
 
-            Assert.Equal("CivicaPayProvider::Declined payment", result.Message);
+            Assert.Equal($"CivicaPayProvider::Declined payment with response code: {responseCode}", result.Message);
         }
 
         [Theory]
@@ -97,7 +97,7 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
         {
             var result = Assert.Throws<PaymentFailureException>(() => _civicaPayProvider.VerifyPaymentResponse(responseCode));
 
-            Assert.Equal("CivicaPayProvider::Payment failed", result.Message);
+            Assert.Equal($"CivicaPayProvider::Payment failed with response code: {responseCode}", result.Message);
         }
     }
 }
