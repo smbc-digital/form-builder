@@ -41,6 +41,7 @@ using form_builder.Providers.Transforms.Lookups;
 using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
+using form_builder.Services.ActionsService;
 
 namespace form_builder.Extensions
 {
@@ -161,6 +162,7 @@ namespace form_builder.Extensions
             services.AddSingleton<IMappingService, MappingService>();
             services.AddSingleton<IFileUploadService, FileUploadService>();
             services.AddSingleton<IDocumentSummaryService, DocumentSummaryService>();
+            services.AddSingleton<IActionsService, ActionsService>();
 
             return services;
         }

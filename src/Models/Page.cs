@@ -42,6 +42,10 @@ namespace form_builder.Models
 
         public bool HasIncomingValues => IncomingValues.Any();
 
+        public List<PageAction> PageActions { get; set; } = new List<PageAction>();
+
+        public bool HasPageActions => PageActions.Any();
+
         [JsonIgnore]
         public IEnumerable<BaseProperty> InvalidElements
         {
