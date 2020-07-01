@@ -897,7 +897,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() =>
                 _pageHelper.CheckForPaymentConfiguration(pages, "no-form-config"));
-            Assert.Equal("No payment infomation configured for no-form-config form", result.Message);
+            Assert.Equal("No payment information configured for no-form-config form", result.Message);
         }
 
         [Fact]
@@ -938,7 +938,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var element = new ElementBuilder()
                 .WithType(EElementType.PaymentSummary)
-                .WithCalculationSlugs(new SubmitSlug{ Environment = "non-local", CalculateCostUrl = "https://www.test.com" })
+                .WithCalculationSlugs(new SubmitSlug{ Environment = "non-local", URL = "https://www.test.com" })
                 .Build();
 
             var page = new PageBuilder()
@@ -968,7 +968,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var element = new ElementBuilder()
                 .WithType(EElementType.PaymentSummary)
-                .WithCalculationSlugs(new SubmitSlug{ Environment = "non-local", CalculateCostUrl = "http://www.test.com" })
+                .WithCalculationSlugs(new SubmitSlug{ Environment = "non-local", URL = "http://www.test.com" })
                 .Build();
 
             var page = new PageBuilder()
