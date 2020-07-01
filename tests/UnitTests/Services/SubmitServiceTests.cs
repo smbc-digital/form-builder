@@ -149,7 +149,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.StartsWith("error", result.Message);
         }
 
-        [Fact(Skip = "Debugging")]
+        [Fact]
         public async Task ProcessSubmission_ShouldCallGateway_WithFormData()
         {
             // Arrange
