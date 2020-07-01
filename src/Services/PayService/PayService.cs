@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Hosting;
 using form_builder.Services.MappingService.Entities;
 using Newtonsoft.Json;
 using form_builder.Models;
+using System.Net.Http;
+using System.Text;
 
 namespace form_builder.Services.PayService
 {
@@ -40,7 +42,8 @@ namespace form_builder.Services.PayService
         private readonly IHostingEnvironment _hostingEnvironment;
 
         public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger,
-            IGateway gateway, ICache cache,
+            IGateway gateway,
+            ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
             ISessionHelper sessionHelper, IMappingService mappingService, IHostingEnvironment hostingEnvironment)
         {
@@ -143,8 +146,6 @@ namespace form_builder.Services.PayService
 
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
                 var response = await _gateway.PostAsync(postUrl.URL, formData.Data, true);
-
-                _logger.LogWarning($"PayService:: CalculateAmountAsync, Request sent was: {response.RequestMessage}");
 
                 if (!response.IsSuccessStatusCode)
                     throw new Exception($"PayService::CalculateAmountAsync, Gateway returned unsuccessful status code {response.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
