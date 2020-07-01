@@ -244,6 +244,16 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithCalculationSlugs(SubmitSlug submitSlug) 
+        {
+             if (_property.CalculationSlugs == null)
+              _property.CalculationSlugs = new List<SubmitSlug>();
+            
+            _property.CalculationSlugs.Add(submitSlug);
+                
+            return this;
+        }
+
         public ElementBuilder WithStockportPostcode(bool isStockportPostCode)
         {
             _property.StockportPostcode = isStockportPostCode;

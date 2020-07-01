@@ -205,6 +205,15 @@ namespace form_builder.Helpers.PageHelpers
             {
                 throw new ApplicationException($"No payment provider configured for provider {config.PaymentProvider}");
             }
+
+            if(config.Settings.ComplexCalculationRequired)
+            {
+                var paymentSummaryElement = pages.SelectMany(_ => _.Elements)
+                    .First(_ => _.Type == EElementType.PaymentSummary);
+ 
+                if(!_enviroment.IsEnvironment("local") && !paymentSummaryElement.Properties.CalculationSlugs.Where(_ => !_.Environment.ToLower().Equals("local")).Any(_ => _.CalculateCostUrl.StartsWith("https://")))
+                    throw new ApplicationException("PaymentSummary::CalculateCostUrl must start with https");
+            }
         }
 
         public void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName)
@@ -292,14 +301,13 @@ namespace form_builder.Helpers.PageHelpers
                         foreach (var subItem in item.SubmitSlugs)
                         {
                             if (string.IsNullOrEmpty(subItem.URL))
-                            {
                                 throw new ApplicationException($"No URL found in the SubmitSlug for {formName} form");
-                            }
 
                             if (string.IsNullOrEmpty(subItem.AuthToken))
-                            {
                                 throw new ApplicationException($"No Auth Token found in the SubmitSlug for {formName} form");
-                            }
+
+                            if(!_enviroment.IsEnvironment("local") && !subItem.Environment.ToLower().Equals("local") && !subItem.URL.StartsWith("https://"))
+                                throw new Exception("SubmitUrl must start with https");
                         }
                     }
                 }
