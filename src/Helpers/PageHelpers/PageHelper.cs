@@ -190,28 +190,22 @@ namespace form_builder.Helpers.PageHelpers
 
             var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_enviroment.EnvironmentName}", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
 
-            var config = paymentInformation.Where(x => x.FormName == formName)
-                .FirstOrDefault();
+            var config = paymentInformation.FirstOrDefault(x => x.FormName == formName);
 
             if (config == null)
-            {
-                throw new ApplicationException($"No payment infomation configured for {formName} form");
-            }
+                throw new ApplicationException($"No payment information configured for {formName} form");
 
-            var paymentProvider = _paymentProviders.Where(_ => _.ProviderName == config.PaymentProvider)
-                .FirstOrDefault();
+            var paymentProvider = _paymentProviders.FirstOrDefault(_ => _.ProviderName == config.PaymentProvider);
 
             if (paymentProvider == null)
-            {
                 throw new ApplicationException($"No payment provider configured for provider {config.PaymentProvider}");
-            }
 
-            if(config.Settings.ComplexCalculationRequired)
+            if (config.Settings.ComplexCalculationRequired)
             {
                 var paymentSummaryElement = pages.SelectMany(_ => _.Elements)
                     .First(_ => _.Type == EElementType.PaymentSummary);
  
-                if(!_enviroment.IsEnvironment("local") && !paymentSummaryElement.Properties.CalculationSlugs.Where(_ => !_.Environment.ToLower().Equals("local")).Any(_ => _.CalculateCostUrl.StartsWith("https://")))
+                if(!_enviroment.IsEnvironment("local") && !paymentSummaryElement.Properties.CalculationSlugs.Where(_ => !_.Environment.ToLower().Equals("local")).Any(_ => _.URL.StartsWith("https://")))
                     throw new ApplicationException("PaymentSummary::CalculateCostUrl must start with https");
             }
         }
