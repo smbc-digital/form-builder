@@ -139,7 +139,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ThrowsAsync(new Exception("error"));
 
             // Act & Assert
@@ -199,17 +199,17 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK
                 })
-                .Callback<string, object, bool>((x, y, z) => callbackValue = (ExpandoObject)y);
+                .Callback<string, object>((x, y) => callbackValue = (ExpandoObject)y);
             // Act
             await _service.ProcessSubmission(new MappingEntity { Data = new ExpandoObject(), BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "123454");
 
             // Assert
-            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true), Times.Once);
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
 
             Assert.NotNull(callbackValue);
         }
@@ -249,7 +249,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.InternalServerError
@@ -260,7 +260,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             Assert.StartsWith("SubmitService::ProcessSubmission, An exception has occurred while attempting to call ", result.Message);
-            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true), Times.Once);
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 
         [Fact]
@@ -286,7 +286,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                .ReturnsAsync(new HttpResponseMessage
                {
                    StatusCode = HttpStatusCode.OK,
@@ -299,7 +299,7 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             Assert.IsType<string>(result);
 
-            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true));
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()));
         }
 
         [Fact]
@@ -324,7 +324,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.InternalServerError
@@ -335,7 +335,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             Assert.StartsWith("SubmitService::PaymentSubmission, An exception has occured while attempting to call ", result.Message);
-            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true), Times.Once);
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 
         [Fact]
@@ -359,7 +359,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                .ReturnsAsync(new HttpResponseMessage
                {
                    StatusCode = HttpStatusCode.OK,
@@ -371,7 +371,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             Assert.StartsWith("SubmitService::PaymentSubmission, An exception has occured when response content from ", result.Message);
-            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true), Times.Once);
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 
         [Fact]
@@ -397,7 +397,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true))
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                .ReturnsAsync(new HttpResponseMessage
                {
                    StatusCode = HttpStatusCode.OK,
@@ -409,7 +409,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             Assert.StartsWith($"SubmitService::PaymentSubmission, Gateway", result.Message);
-            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), true), Times.Once);
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 
     }

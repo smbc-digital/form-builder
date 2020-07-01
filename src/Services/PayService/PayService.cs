@@ -90,19 +90,19 @@ namespace form_builder.Services.PayService
             {
                 paymentProvider.VerifyPaymentResponse(responseCode);
                 await _gateway.PostAsync(postUrl.CallbackUrl,
-                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString() }, true);
+                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString() });
                 return reference;
             }
             catch (PaymentDeclinedException)
             {
                 var response = await _gateway.PostAsync(postUrl.CallbackUrl,
-                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString() }, true);
+                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString() });
                 throw new PaymentDeclinedException("PayService::ProcessPaymentResponse, PaymentProvider declined payment");
             }
             catch (PaymentFailureException)
             {
                 var response = await _gateway.PostAsync(postUrl.CallbackUrl,
-                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString() }, true);
+                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString() });
                 throw new PaymentFailureException("PayService::ProcessPaymentResponse, PaymentProvider failed payment");
             }
             catch (Exception ex)
@@ -144,18 +144,8 @@ namespace form_builder.Services.PayService
                 if (postUrl?.URL == null || postUrl.AuthToken == null)
                     throw  new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
 
-                var handler = new HttpClientHandler();
-                handler.AllowAutoRedirect = false;
-                var client = new HttpClient(handler);
-                var clientResponse = await client.PostAsync(postUrl.URL, new StringContent(JsonConvert.SerializeObject(new object{}), Encoding.UTF8, "application/json"));
-
-                _logger.LogWarning($"PayService:: CalculateAmountAsync, httpclient result: {Newtonsoft.Json.JsonConvert.SerializeObject(clientResponse)}");
-
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
-                var response = await _gateway.PostAsync(postUrl.URL, formData.Data, true);
-
-                _logger.LogWarning($"PayService:: CalculateAmountAsync, Request sent was: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
-                _logger.LogWarning($"PayService:: CalculateAmountAsync, Request data was: {Newtonsoft.Json.JsonConvert.SerializeObject(formData.Data)}");
+                var response = await _gateway.PostAsync(postUrl.URL, formData.Data);
 
                 if (!response.IsSuccessStatusCode)
                     throw new Exception($"PayService::CalculateAmountAsync, Gateway returned unsuccessful status code {response.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
