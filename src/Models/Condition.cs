@@ -14,7 +14,7 @@ namespace form_builder.Models
                 }
 
                 //Backwards Compatability stuff
-                if(IsNullOrEmpty ==true)
+                if(IsNullOrEmpty != null)
                 {
                    return ECondition.IsNullOrEmpty;
                 }

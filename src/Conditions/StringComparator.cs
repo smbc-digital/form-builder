@@ -18,7 +18,7 @@ namespace form_builder.Conditions
 
         public static bool IsNullOrEmpty(Condition condition, Dictionary<string, dynamic> viewModel)
         {
-            if (viewModel.ContainsKey(condition.QuestionId) && string.IsNullOrEmpty((string)viewModel[condition.QuestionId]))
+            if (viewModel.ContainsKey(condition.QuestionId) && string.IsNullOrEmpty((string)viewModel[condition.QuestionId]) == condition.IsNullOrEmpty)
                 return true;
             return false;
         }
