@@ -25,7 +25,7 @@ namespace form_builder.Conditions
 
         public static bool CheckboxContains(Condition condition, Dictionary<string, dynamic> viewModel)
         {
-            if (viewModel.ContainsKey(condition.QuestionId) && viewModel[condition.QuestionId].Contains(condition.CheckboxContains))
+            if (viewModel.ContainsKey(condition.QuestionId) && viewModel[condition.QuestionId].ToLower().Contains(condition.CheckboxContains.ToLower()))
                 return true;            
             return false;
         }
