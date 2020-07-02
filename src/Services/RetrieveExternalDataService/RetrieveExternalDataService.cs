@@ -102,7 +102,7 @@ namespace form_builder.Services.RetrieveExternalDataService
             if (splitTargets.Length == 1)
                 return (dynamic)answer.Response;
 
-            var subObject = new Answers{ QuestionId = splitTargets[1], Response = (dynamic)answer.Response[splitTargets[1]] };
+            var subObject = new Answers{ Response = (dynamic)answer.Response[splitTargets[1]] };
             return RecursiveGetAnswerValue(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), subObject);
         }
     }
