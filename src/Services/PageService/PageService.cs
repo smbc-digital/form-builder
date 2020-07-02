@@ -23,7 +23,6 @@ using Microsoft.Extensions.Options;
 using form_builder.ContentFactory;
 using form_builder.Factories.Schema;
 using form_builder.Constants;
-using form_builder.Services.ActionsService;
 using form_builder.Services.MappingService;
 using form_builder.Services.PayService;
 
@@ -45,7 +44,6 @@ namespace form_builder.Services.PageService
         private readonly IMappingService _mappingService;
         private readonly ISuccessPageFactory _successPageContentFactory;
         private readonly IPageFactory _pageContentFactory;
-        private readonly IActionsService _actionsService;
 
         public PageService(
             IEnumerable<IElementValidator> validators, 
@@ -61,8 +59,7 @@ namespace form_builder.Services.PageService
             IPageFactory pageFactory,
             ISchemaFactory schemaFactory,
             IMappingService mappingService,
-            IPayService payService,
-            IActionsService actionsService)
+            IPayService payService)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -78,7 +75,6 @@ namespace form_builder.Services.PageService
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
             _payService = payService;
             _mappingService = mappingService;
-            _actionsService = actionsService;
         }
         
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath)
@@ -191,10 +187,6 @@ namespace form_builder.Services.PageService
                 viewModel = _pageHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
             currentPage.Validate(viewModel, _validators);
-
-            //you have to write stuff here for the actions
-            if (currentPage.HasPageActions)
-                _actionsService.Process();
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
                 return await _addressService.ProcessAddress(viewModel, currentPage, baseForm, sessionGuid, path);
