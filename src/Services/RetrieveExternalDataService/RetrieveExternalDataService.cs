@@ -11,6 +11,7 @@ using System.Net.Http;
 using System;
 using System.Threading;
 using form_builder.Services.MappingService;
+using form_builder.Services.RetrieveExternalDataService.Entities;
 
 namespace form_builder.Services.RetrieveExternalDataService
 {
@@ -20,7 +21,6 @@ namespace form_builder.Services.RetrieveExternalDataService
         private readonly ISessionHelper _sessionHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IMappingService _mappingService;
-
         private Regex _tagRegex => new Regex("(?<={{).*?(?=}})", RegexOptions.Compiled);
 
         public RetrieveExternalDataService(IGateway gateway, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache, IMappingService mappingService)
@@ -62,9 +62,7 @@ namespace form_builder.Services.RetrieveExternalDataService
 
                 var content = await response.Content.ReadAsStringAsync();
                 if (string.IsNullOrWhiteSpace(content))
-                {
                     throw new ApplicationException($"RetrieveExternalDataService::Process, Gateway {entity.Url} responded with empty reference");
-                }
 
                 answers.Add(new Answers
                 {
@@ -75,9 +73,7 @@ namespace form_builder.Services.RetrieveExternalDataService
 
             mappingData.FormAnswers.Pages.FirstOrDefault(_ => _.PageSlug.ToLower().Equals(mappingData.FormAnswers.Path.ToLower())).Answers.AddRange(answers);
 
-            _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
-
-            //return Task.CompletedTask;
+            await _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
         }
 
         private ExternalDataEntity GenerateUrl(string baseUrl, FormAnswers formAnswers)
@@ -89,24 +85,25 @@ namespace form_builder.Services.RetrieveExternalDataService
                 Url = newUrl,
                 IsPost = !matches.Any()
             };
-
-            //find {{}}
-            //get the value and replace with answer
         }
 
         private string Replace(Match match, string current, FormAnswers formAnswers)
         {
-            
-            var answer = formAnswers.Pages.SelectMany(_ => _.Answers).FirstOrDefault(a => a.QuestionId.Equals(match.Value));
+            var splitTargets = match.Value.Split(".");
+            var answer = RecursiveGetAnswerValue(match.Value, formAnswers.Pages.SelectMany(_ => _.Answers).First(a => a.QuestionId.Equals(splitTargets[0])));
 
-            return current.Replace(match.Groups[0].Value, answer.Response);
+            return current.Replace($"{{{{{match.Groups[0].Value}}}}}", answer);
         }
-    }
 
-    public class ExternalDataEntity
-    {
-        public bool IsPost { get; set; }
+        private string RecursiveGetAnswerValue(string targetMapping, Answers answer)
+        {
+            var splitTargets = targetMapping.Split(".");
 
-        public string Url { get; set; }
+            if (splitTargets.Length == 1)
+                return (dynamic)answer.Response;
+
+            var subObject = new Answers{ QuestionId = splitTargets[1], Response = (dynamic)answer.Response[splitTargets[1]] };
+            return RecursiveGetAnswerValue(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), subObject);
+        }
     }
 }

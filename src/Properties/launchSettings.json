@@ -16,7 +16,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "address-picker",
+      "launchUrl": "page-actions",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       }
