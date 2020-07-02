@@ -10,7 +10,7 @@ namespace form_builder.Workflows
 {
     public interface IActionsWorkflow
     {
-        Task Process(Page page);
+        Task Process(Page page, string formName);
     }
 
     public class ActionsWorkflow : IActionsWorkflow
@@ -21,10 +21,10 @@ namespace form_builder.Workflows
             _retrieveExternalDataService = retrieveExternalDataService;
         }
 
-        public async Task Process(Page page)
+        public async Task Process(Page page, string formName)
         {
             if (page.PageActions.Any(_ => _.Type.Equals(EPageActionType.RetrieveExternalData)))
-                await _retrieveExternalDataService.Process(page.PageActions.Where(_ => _.Type == EPageActionType.RetrieveExternalData).ToList());
+                await _retrieveExternalDataService.Process(page.PageActions.Where(_ => _.Type == EPageActionType.RetrieveExternalData).ToList(), formName);
         }
     }
 }

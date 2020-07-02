@@ -337,8 +337,8 @@ namespace form_builder.Helpers.PageHelpers
             if (!string.IsNullOrEmpty(formData))
             {
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
             }
+
             if (convertedAnswers.FormData.ContainsKey(key))
             {
                 convertedAnswers.FormData.Remove(key);

@@ -94,7 +94,7 @@ namespace form_builder.Controllers
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
 
             if (currentPageResult.Page.HasPageActions)
-                await _actionsWorkflow.Process(currentPageResult.Page);
+                await _actionsWorkflow.Process(currentPageResult.Page, form);
 
             var behaviour = _pageService.GetBehaviour(currentPageResult);
 

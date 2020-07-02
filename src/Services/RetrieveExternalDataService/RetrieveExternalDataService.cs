@@ -9,6 +9,8 @@ using form_builder.Providers.StorageProvider;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System;
+using System.Threading;
+using form_builder.Services.MappingService;
 
 namespace form_builder.Services.RetrieveExternalDataService
 {
@@ -17,45 +19,65 @@ namespace form_builder.Services.RetrieveExternalDataService
         private readonly IGateway _gateway;
         private readonly ISessionHelper _sessionHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IMappingService _mappingService;
+
         private Regex _tagRegex => new Regex("(?<={{).*?(?=}})", RegexOptions.Compiled);
 
-        public RetrieveExternalDataService(IGateway gateway, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
+        public RetrieveExternalDataService(IGateway gateway, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache, IMappingService mappingService)
         {
             _gateway = gateway;
             _sessionHelper = sessionHelper;
             _distributedCache = distributedCache;
+            _mappingService = mappingService;
         }
  
-        public Task Process(List<PageAction> actions)
+        public async Task Process(List<PageAction> actions, string formName)
         {
+            var answers = new List<Answers>();
             var sessionGuid = _sessionHelper.GetSessionGuid();
-            var formAnswers = _distributedCache.GetString(sessionGuid);
-            var convertedFormAnswers = JsonConvert.DeserializeObject<FormAnswers>(formAnswers);
+            var mappingData = await _mappingService.Map(sessionGuid, formName);
 
-            actions.ForEach(async (action) =>
+            foreach (var action in actions)
             {
                 var response = new HttpResponseMessage();
-                var entity = GenerateUrl(action.Properties.URL, convertedFormAnswers);
-                _gateway.ChangeAuthenticationHeader("GET-FROM-CONFIG");
+                var entity = GenerateUrl(action.Properties.URL, mappingData.FormAnswers);
+
+                if (!string.IsNullOrEmpty(action.Properties.AuthToken))
+                    _gateway.ChangeAuthenticationHeader(action.Properties.AuthToken);
 
                 if (entity.IsPost)
                 {
-                    response = await _gateway.PostAsync(entity.Url, new { } );
-                } else {
+                    response = await _gateway.PostAsync(entity.Url, mappingData.Data);
+                }
+                else
+                {
                     response = await _gateway.GetAsync(entity.Url);
                 }
 
-                if(response.IsSuccessStatusCode)
-                    throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
 
-            });
-            //loop over actions
-            //identity httpmethod
-            //sort out authToken
-            //genertae the url
-            //perform action
-            //save to answers
-            throw new System.NotImplementedException();
+                if (response.Content == null)
+                    throw new ApplicationException($"RetrieveExternalDataService::Process, response content from {entity.Url} is null.");
+
+                var content = await response.Content.ReadAsStringAsync();
+                if (string.IsNullOrWhiteSpace(content))
+                {
+                    throw new ApplicationException($"RetrieveExternalDataService::Process, Gateway {entity.Url} responded with empty reference");
+                }
+
+                answers.Add(new Answers
+                {
+                    QuestionId = action.Properties.TargetQuestionId,
+                    Response = content
+                });
+            }
+
+            mappingData.FormAnswers.Pages.FirstOrDefault(_ => _.PageSlug.ToLower().Equals(mappingData.FormAnswers.Path.ToLower())).Answers.AddRange(answers);
+
+            _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
+
+            //return Task.CompletedTask;
         }
 
         private ExternalDataEntity GenerateUrl(string baseUrl, FormAnswers formAnswers)

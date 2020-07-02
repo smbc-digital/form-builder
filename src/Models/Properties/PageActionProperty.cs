@@ -6,5 +6,6 @@
 
         public string TargetQuestionId { get; set; }
 
+        public string AuthToken { get; set; } = string.Empty;
     }
 }
