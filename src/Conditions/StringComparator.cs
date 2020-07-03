@@ -10,7 +10,7 @@ namespace form_builder.Conditions
         public static bool IsEqualTo(Condition condition, Dictionary<string, dynamic> viewModel)
         {
          
-            var val = !string.IsNullOrEmpty(condition.comparisonValue) ? condition.comparisonValue.ToLower() : condition.EqualTo.ToLower();
+            var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? condition.ComparisonValue.ToLower() : condition.EqualTo.ToLower();
 
             if (viewModel.ContainsKey(condition.QuestionId) &&
                 (string)viewModel[condition.QuestionId].ToLower() == val)
@@ -20,7 +20,7 @@ namespace form_builder.Conditions
 
         public static bool IsNullOrEmpty(Condition condition, Dictionary<string, dynamic> viewModel)
         {
-            var val = !string.IsNullOrEmpty(condition.comparisonValue) ? bool.Parse(condition.comparisonValue) : condition.IsNullOrEmpty;
+            var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? bool.Parse(condition.ComparisonValue) : condition.IsNullOrEmpty;
 
             if (viewModel.ContainsKey(condition.QuestionId) && string.IsNullOrEmpty((string)viewModel[condition.QuestionId]) == val)
                 return true;
@@ -30,7 +30,7 @@ namespace form_builder.Conditions
         public static bool CheckboxContains(Condition condition, Dictionary<string, dynamic> viewModel)
         {
 
-            var val = !string.IsNullOrEmpty(condition.comparisonValue) ? condition.comparisonValue.ToLower() : condition.CheckboxContains.ToLower();
+            var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? condition.ComparisonValue.ToLower() : condition.CheckboxContains.ToLower();
             
             if (viewModel.ContainsKey(condition.QuestionId) && viewModel[condition.QuestionId].ToLower().Contains(val))
                     return true;

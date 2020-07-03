@@ -16,7 +16,7 @@ namespace form_builder.Conditions
                 dateComparison = DateTime.Parse(condition.ComparisonDate);
             }
 
-            var isBefore = !string.IsNullOrEmpty(condition.comparisonValue) ? int.Parse(condition.comparisonValue) : condition.IsBefore.Value;
+            var isBefore = !string.IsNullOrEmpty(condition.ComparisonValue) ? int.Parse(condition.ComparisonValue) : condition.IsBefore.Value;
            
             var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isBefore);
         
@@ -38,7 +38,7 @@ namespace form_builder.Conditions
                 dateComparison = DateTime.Parse(condition.ComparisonDate);
             }
 
-            var isAfter = !string.IsNullOrEmpty(condition.comparisonValue) ? int.Parse(condition.comparisonValue) : condition.IsAfter.Value;
+            var isAfter = !string.IsNullOrEmpty(condition.ComparisonValue) ? int.Parse(condition.ComparisonValue) : condition.IsAfter.Value;
             
             var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isAfter);
             
@@ -60,7 +60,7 @@ namespace form_builder.Conditions
                 dateComparison = DateTime.Parse(condition.ComparisonDate);
             }
 
-            var isEqualTo = !string.IsNullOrEmpty(condition.comparisonValue) ? int.Parse(condition.comparisonValue) : condition.IsBefore.Value;
+            var isEqualTo = !string.IsNullOrEmpty(condition.ComparisonValue) ? int.Parse(condition.ComparisonValue) : condition.IsBefore.Value;
             var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isEqualTo);
 
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
