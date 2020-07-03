@@ -9,5 +9,7 @@ namespace form_builder.Enum
         IsNullOrEmpty,
         IsBefore,
         IsAfter,
+        MoreThan,
+        FewerThan
     }
 }

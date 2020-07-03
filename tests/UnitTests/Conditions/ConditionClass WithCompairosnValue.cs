@@ -9,7 +9,7 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.Conditions
 {
-    public class ConditionTests
+    public class ConditionTestsWithComparisonValue
     {
         [Fact]
         public void Equal_To_Should_Return_True_False()
@@ -19,8 +19,8 @@ namespace form_builder_tests.UnitTests.Conditions
             viewModel.Add("test2", "apple");
 
 
-            var condition1 = new Condition { EqualTo = "pear", QuestionId = "test", ConditionType = ECondition.EqualTo };
-            var condition2 = new Condition { EqualTo = "plum", QuestionId = "test2", ConditionType = ECondition.EqualTo };
+            var condition1 = new Condition { comparisonValue = "pear", QuestionId = "test", ConditionType = ECondition.EqualTo };
+            var condition2 = new Condition { comparisonValue = "plum", QuestionId = "test2", ConditionType = ECondition.EqualTo };
 
 
             var conditionValidator = new ConditionValidator();
@@ -37,8 +37,8 @@ namespace form_builder_tests.UnitTests.Conditions
             viewModel.Add("test2", "apple,mango");
 
 
-            var condition1 = new Condition { CheckboxContains = "pear", QuestionId = "test", ConditionType = ECondition.CheckboxContains };
-            var condition2 = new Condition { CheckboxContains = "plum", QuestionId = "test2", ConditionType = ECondition.CheckboxContains };
+            var condition1 = new Condition { comparisonValue = "pear", QuestionId = "test", ConditionType = ECondition.CheckboxContains };
+            var condition2 = new Condition { comparisonValue = "plum", QuestionId = "test2", ConditionType = ECondition.CheckboxContains };
 
 
             var conditionValidator = new ConditionValidator();
@@ -51,11 +51,11 @@ namespace form_builder_tests.UnitTests.Conditions
         {
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test", "");
-            viewModel.Add("test2", "apple");
+            viewModel.Add("test2", "apple,mango");
 
 
-            var condition1 = new Condition { IsNullOrEmpty = true, QuestionId = "test", ConditionType = ECondition.IsNullOrEmpty };
-            var condition2 = new Condition { IsNullOrEmpty = false, QuestionId = "test2", ConditionType = ECondition.IsNullOrEmpty };
+            var condition1 = new Condition { comparisonValue = "true", QuestionId = "test", ConditionType = ECondition.IsNullOrEmpty };
+            var condition2 = new Condition { comparisonValue = "false", QuestionId = "test2", ConditionType = ECondition.IsNullOrEmpty };
 
 
             var conditionValidator = new ConditionValidator();
@@ -73,7 +73,7 @@ namespace form_builder_tests.UnitTests.Conditions
             viewModel.Add("test-year", futureDate.Year.ToString());
 
 
-            var condition1 = new Condition { IsBefore = 10,Unit = EDateUnit.Day, ComparisonDate="Today", QuestionId = "test", ConditionType = ECondition.IsBefore };
+            var condition1 = new Condition { comparisonValue = "10", Unit = EDateUnit.Day, ComparisonDate="Today", QuestionId = "test", ConditionType = ECondition.IsBefore };
            
 
             var conditionValidator = new ConditionValidator();
@@ -91,7 +91,7 @@ namespace form_builder_tests.UnitTests.Conditions
             viewModel.Add("test-year", futureDate.Year.ToString());
 
 
-            var condition1 = new Condition { IsBefore = 10, Unit = EDateUnit.Day, ComparisonDate = "Today", QuestionId = "test", ConditionType = ECondition.IsBefore };
+            var condition1 = new Condition { comparisonValue = "10" , Unit = EDateUnit.Day, ComparisonDate = "Today", QuestionId = "test", ConditionType = ECondition.IsBefore };
 
 
             var conditionValidator = new ConditionValidator();
@@ -109,7 +109,7 @@ namespace form_builder_tests.UnitTests.Conditions
             viewModel.Add("test-year", futureDate.Year.ToString());
 
 
-            var condition1 = new Condition { IsAfter = 10, Unit = EDateUnit.Day, ComparisonDate = "Today", QuestionId = "test", ConditionType = ECondition.IsAfter };
+            var condition1 = new Condition { comparisonValue = "10", Unit = EDateUnit.Day, ComparisonDate = "Today", QuestionId = "test", ConditionType = ECondition.IsAfter };
 
 
             var conditionValidator = new ConditionValidator();
@@ -127,7 +127,7 @@ namespace form_builder_tests.UnitTests.Conditions
             viewModel.Add("test-year", futureDate.Year.ToString());
 
 
-            var condition1 = new Condition { IsAfter = 10, Unit = EDateUnit.Day, ComparisonDate = "Today", QuestionId = "test", ConditionType = ECondition.IsAfter };
+            var condition1 = new Condition { comparisonValue = "10", Unit = EDateUnit.Day, ComparisonDate = "Today", QuestionId = "test", ConditionType = ECondition.IsAfter };
 
 
             var conditionValidator = new ConditionValidator();

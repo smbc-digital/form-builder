@@ -8,7 +8,7 @@ namespace form_builder.Conditions
 {
     public class ConditionValidator
     {
-        public Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>> ConditionList =
+        private Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>> ConditionList =
 
         new Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>>()
         {
@@ -16,7 +16,9 @@ namespace form_builder.Conditions
             { ECondition.IsAfter, DateComparator.DateIsAfter },
             { ECondition.IsNullOrEmpty, StringComparator.IsNullOrEmpty },
             { ECondition.EqualTo, StringComparator.IsEqualTo },
-            { ECondition.CheckboxContains, StringComparator.CheckboxContains }
+            { ECondition.CheckboxContains, StringComparator.CheckboxContains },
+            { ECondition.MoreThan, IntegerComparator.IsMoreThan },
+            { ECondition.FewerThan, IntegerComparator.IsFewerThan }
         };
 
 

@@ -16,10 +16,11 @@ namespace form_builder.Conditions
                 dateComparison = DateTime.Parse(condition.ComparisonDate);
             }
 
-            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, condition.IsBefore);
+            var isBefore = !string.IsNullOrEmpty(condition.comparisonValue) ? int.Parse(condition.comparisonValue) : condition.IsBefore.Value;
+           
+            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isBefore);
+        
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
-
-
 
             if (DateTime.Compare(dateValue, newComparisonDate) <= 0)
             {
@@ -37,11 +38,11 @@ namespace form_builder.Conditions
                 dateComparison = DateTime.Parse(condition.ComparisonDate);
             }
 
-            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, condition.IsAfter);
-
+            var isAfter = !string.IsNullOrEmpty(condition.comparisonValue) ? int.Parse(condition.comparisonValue) : condition.IsAfter.Value;
+            
+            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isAfter);
+            
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
-
-
 
             if (DateTime.Compare(dateValue, newComparisonDate) > 0)
             {
@@ -59,7 +60,8 @@ namespace form_builder.Conditions
                 dateComparison = DateTime.Parse(condition.ComparisonDate);
             }
 
-            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, condition.IsAfter);
+            var isEqualTo = !string.IsNullOrEmpty(condition.comparisonValue) ? int.Parse(condition.comparisonValue) : condition.IsBefore.Value;
+            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isEqualTo);
 
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
 
@@ -71,21 +73,19 @@ namespace form_builder.Conditions
             return false;
         }
 
-        private static DateTime GetComparisonDate(DateTime dateComparison, EDateUnit unit, int? isAfter)
+        private static DateTime GetComparisonDate(DateTime dateComparison, EDateUnit unit, int isAfter)
         {
-            int isAfterInt = isAfter ?? 0;
-
             DateTime newComparisonDate;
             switch (unit)
             {
                 case (EDateUnit.Year):
-                    newComparisonDate = dateComparison.AddYears(isAfterInt);
+                    newComparisonDate = dateComparison.AddYears(isAfter);
                     break;
                 case (EDateUnit.Month):
-                    newComparisonDate = dateComparison.AddMonths(isAfterInt);
+                    newComparisonDate = dateComparison.AddMonths(isAfter);
                     break;
                 case (EDateUnit.Day):
-                    newComparisonDate = dateComparison.AddDays(isAfterInt);
+                    newComparisonDate = dateComparison.AddDays(isAfter);
                     break;
                 default:
                     throw new Exception("No unit specifed");

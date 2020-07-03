@@ -56,6 +56,8 @@ namespace form_builder.Models
             }
         }
 
+
+
         public IEnumerable<IElement> ValidatableElements => Elements.Where(element => element.Type == EElementType.Radio ||
                                                                 element.Type == EElementType.Textarea ||
                                                                 element.Type == EElementType.Select ||
@@ -72,6 +74,10 @@ namespace form_builder.Models
                                                                 element.Type == EElementType.FileUpload
         );
 
+
+        [JsonIgnore]
+        private ConditionValidator _conditionValidator = new ConditionValidator();
+
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
         {
             ValidatableElements.ToList().ForEach(element => element.Validate(viewModel, form_builder));
@@ -80,7 +86,7 @@ namespace form_builder.Models
 
         public Behaviour GetNextPage(Dictionary<string, dynamic> viewModel)
         {
-            var conditionValidator = new ConditionValidator();
+           
             
             if (Behaviours.Count == 1)
             {
@@ -94,7 +100,7 @@ namespace form_builder.Models
 
                     foreach (var condition in behaviour.Conditions)
                     {
-                        isConditionTrue = conditionValidator.IsValid(condition, viewModel);
+                        isConditionTrue = _conditionValidator.IsValid(condition, viewModel);
 
                         if (!isConditionTrue)
                             break;
