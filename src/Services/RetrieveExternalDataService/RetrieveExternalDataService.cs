@@ -67,7 +67,7 @@ namespace form_builder.Services.RetrieveExternalDataService
                 answers.Add(new Answers
                 {
                     QuestionId = action.Properties.TargetQuestionId,
-                    Response = content
+                    Response = JsonConvert.DeserializeObject<string>(content)
                 });
             }
 
