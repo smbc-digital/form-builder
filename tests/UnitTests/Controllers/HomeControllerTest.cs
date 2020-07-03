@@ -13,6 +13,7 @@ using form_builder.Models;
 using form_builder.Workflows;
 using form_builder.Services.FileUploadService;
 using form_builder.Builders;
+using form_builder.Models.Properties;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
@@ -27,13 +28,14 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new Mock<IPaymentWorkflow>();
         private readonly Mock<IFileUploadService> _mockFileUploadService = new Mock<IFileUploadService>();
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
+        private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new Mock<IActionsWorkflow>();
 
         public HomeControllerTest()
         {
             var httpContext = new DefaultHttpContext();
             var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
 
-            _homeController = new HomeController(_pageService.Object, _submitWorkflow.Object, _paymentWorkflow.Object, _mockFileUploadService.Object, _mockHostingEnv.Object);
+            _homeController = new HomeController(_pageService.Object, _submitWorkflow.Object, _paymentWorkflow.Object, _mockFileUploadService.Object, _mockHostingEnv.Object, _mockActionsWorkflow.Object);
             _homeController.TempData = tempData;
         }
 
@@ -468,6 +470,95 @@ namespace form_builder_tests.UnitTests.Controllers
             await _homeController.Index("form", "page-one", viewModel, collection);
 
             _pageService.Verify(service => service.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, object>>(), collection), Times.AtLeastOnce);
+        }
+
+        [Fact]
+        public async Task Index_ShouldCallActionsWorkflow_IfPageHasActions()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("test")
+                .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .WithPageSlug("url")
+                .Build();
+
+            var pageActions = new PageActionsBuilder()
+                .WithActionType(EPageActionType.RetrieveExternalData)
+                .WithProperties(new BaseProperty
+                {
+                    URL = string.Empty,
+                    TargetQuestionId = string.Empty,
+                    AuthToken = string.Empty
+                })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
+                .WithPageActions(pageActions)
+                .Build();
+
+            var viewModel = new ViewModelBuilder()
+                .WithEntry("Guid", Guid.NewGuid().ToString())
+                .WithEntry($"test", "test")
+                .Build();
+
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page });
+            _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.SubmitAndPay });
+            _paymentWorkflow.Setup(_ => _.Submit(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync("https://www.return.url");
+
+            // Act
+            await _homeController.Index("form", "page-one", viewModel, null);
+            
+            // Assert
+            _mockActionsWorkflow.Verify(_ => _.Process(page, It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Index_ShouldNotCallActionsWorkflow_IfPageHasNoActions()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("test")
+                .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .WithPageSlug("url")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
+                .Build();
+
+            var viewModel = new ViewModelBuilder()
+                .WithEntry("Guid", Guid.NewGuid().ToString())
+                .WithEntry($"test", "test")
+                .Build();
+
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page });
+            _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.SubmitAndPay });
+            _paymentWorkflow.Setup(_ => _.Submit(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync("https://www.return.url");
+
+            // Act
+            await _homeController.Index("form", "page-one", viewModel, null);
+
+            // Assert
+            _mockActionsWorkflow.Verify(_ => _.Process(page, It.IsAny<string>()), Times.Never);
         }
     }
 }
