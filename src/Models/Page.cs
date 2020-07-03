@@ -73,7 +73,8 @@ namespace form_builder.Models
                                                                 element.Type == EElementType.DatePicker ||
                                                                 element.Type == EElementType.Street ||
                                                                 element.Type == EElementType.Organisation ||
-                                                                element.Type == EElementType.FileUpload
+                                                                element.Type == EElementType.FileUpload ||
+                                                                element.Type == EElementType.Map
         );
 
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
