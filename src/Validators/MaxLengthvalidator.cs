@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using form_builder.Enum;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators
@@ -15,7 +16,7 @@ namespace form_builder.Validators
                 };
             }
 
-            if(element.Type == Enum.EElementType.FileUpload)
+            if(element.Type == EElementType.FileUpload || element.Type == EElementType.Map)
             {
                 return new ValidationResult
                 {

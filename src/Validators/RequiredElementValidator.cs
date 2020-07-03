@@ -3,7 +3,6 @@ using form_builder.Enum;
 using form_builder.Models.Elements;
 using form_builder.Models;
 using form_builder.Extensions;
-using System;
 
 namespace form_builder.Validators
 {
@@ -12,9 +11,9 @@ namespace form_builder.Validators
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
 
-            if (element.Type == EElementType.DateInput || element.Type == EElementType.TimeInput ||
-                element.Type == EElementType.DatePicker || element.Properties.Optional 
-                || (element.Type == EElementType.Address && viewModel.IsManual()))
+            if (element.Type == EElementType.DateInput || element.Type == EElementType.Map || 
+                element.Type == EElementType.TimeInput || element.Type == EElementType.DatePicker || 
+                element.Properties.Optional || (element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
                 {
