@@ -71,6 +71,10 @@ namespace form_builder.Services.SubmtiService
             _logger.LogInformation(JsonConvert.SerializeObject(mappingEntity.Data));
 
             var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
+
+            // log response from service   ---(investigating submission issues)
+            _logger.LogInformation(JsonConvert.SerializeObject(response));
+
             if (!response.IsSuccessStatusCode)
             {
                 throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occurred while attempting to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
