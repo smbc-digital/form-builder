@@ -1,6 +1,6 @@
-﻿namespace form_builder.Models.Properties
+﻿namespace form_builder.Models.Properties.ActionProperties
 {
-    public partial class BaseProperty
+    public partial class BaseActionProperty
     {
         public string URL { get; set; }
 

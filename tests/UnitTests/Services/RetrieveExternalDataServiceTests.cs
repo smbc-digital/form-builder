@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Helpers.Session;
 using form_builder.Models;
-using form_builder.Models.Properties;
+using form_builder.Models.Properties.ActionProperties;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
@@ -25,11 +26,11 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
-        
+
         private readonly List<PageAction> pageActions = new List<PageAction>
         {
             new PageActionsBuilder()
-                .WithProperties(new BaseProperty
+                .WithActionProperties(new BaseActionProperty
                 {
                     URL = "www.test.com",
                     TargetQuestionId = "targetId",
@@ -66,8 +67,8 @@ namespace form_builder_tests.UnitTests.Services
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent("\"test\"")
-        }; 
-            
+        };
+
 
         public RetrieveExternalDataServiceTests()
         {
@@ -82,7 +83,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task Process_Should_CallGateway_IfNoAuthTokenProvided()
+        public async Task Process_Should_NotCallGatewayToUpdateHeader_IfNoAuthTokenProvided()
         {
             // Act
             await _service.Process(pageActions, "test");
@@ -92,13 +93,13 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task Process_ShouldCallGateway_IfAuthTokenProvided()
+        public async Task Process_ShouldCallGatewayToUpdateHeader_IfAuthTokenProvided()
         {
             // Arrange
             var actions = new List<PageAction>
             {
                 new PageActionsBuilder()
-                    .WithProperties(new BaseProperty
+                    .WithActionProperties(new BaseActionProperty
                     {
                         URL = "www.test.com",
                         TargetQuestionId = "targetId",
@@ -131,7 +132,7 @@ namespace form_builder_tests.UnitTests.Services
             var actions = new List<PageAction>
             {
                 new PageActionsBuilder()
-                    .WithProperties(new BaseProperty
+                    .WithActionProperties(new BaseActionProperty
                     {
                         URL = "www.test.com/{{testQuestionId}}",
                         TargetQuestionId = "targetId"
@@ -156,7 +157,7 @@ namespace form_builder_tests.UnitTests.Services
             var actions = new List<PageAction>
             {
                 new PageActionsBuilder()
-                    .WithProperties(new BaseProperty
+                    .WithActionProperties(new BaseActionProperty
                     {
                         URL = "www.test.com/{{testQuestionId}}",
                         TargetQuestionId = "targetId",
@@ -168,12 +169,94 @@ namespace form_builder_tests.UnitTests.Services
             _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
-                     StatusCode = HttpStatusCode.BadGateway
+                    StatusCode = HttpStatusCode.BadGateway
                 });
 
             // Act & Assert
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.Process(actions, "test"));
-            Assert.Contains($"RetrieveExternalDataService::Process, http request to www.test.com/testResponse returned an unsuccessful status code, Response: ", result.Message);
+            Assert.Contains("RetrieveExternalDataService::Process, http request to www.test.com/testResponse returned an unsuccessful status code, Response: ", result.Message);
+        }
+
+        [Fact]
+        public async Task Process_ShouldThrowApplicationException_IfResponseContentNull()
+        {
+            // Arrange
+            var actions = new List<PageAction>
+            {
+                new PageActionsBuilder()
+                    .WithActionProperties(new BaseActionProperty
+                    {
+                        URL = "www.test.com/{{testQuestionId}}",
+                        TargetQuestionId = "targetId",
+                        AuthToken = ""
+                    })
+                    .Build()
+            };
+
+            _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = null
+                });
+
+            // Act & Assert
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.Process(actions, "test"));
+            Assert.Equal("RetrieveExternalDataService::Process, response content from www.test.com/testResponse is null.", result.Message);
+        }
+
+        [Fact]
+        public async Task Process_ShouldThrowApplicationException_IfResponseContentEmpty()
+        {
+            // Arrange
+            var actions = new List<PageAction>
+            {
+                new PageActionsBuilder()
+                    .WithActionProperties(new BaseActionProperty
+                    {
+                        URL = "www.test.com/{{testQuestionId}}",
+                        TargetQuestionId = "targetId",
+                        AuthToken = ""
+                    })
+                    .Build()
+            };
+
+            _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(string.Empty)
+                });
+
+            // Act & Assert
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.Process(actions, "test"));
+            Assert.Equal("RetrieveExternalDataService::Process, Gateway www.test.com/testResponse responded with empty reference", result.Message);
+        }
+
+        [Fact]
+        public async Task Process_ShouldCallDistributedCache_SetStringAsync()
+        {
+            // Arrange
+            var actions = new List<PageAction>
+            {
+                new PageActionsBuilder()
+                    .WithActionProperties(new BaseActionProperty
+                    {
+                        URL = "www.test.com/{{testQuestionId}}",
+                        TargetQuestionId = "targetId",
+                        AuthToken = ""
+                    })
+                    .Build()
+            };
+
+            _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(successResponse);
+
+            // Act
+            await _service.Process(actions, "test");
+
+            // Assert
+            _mockDistributedCacheWrapper.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

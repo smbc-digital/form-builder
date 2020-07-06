@@ -1,20 +1,20 @@
 ﻿using form_builder.Enum;
 using form_builder.Models;
-using form_builder.Models.Properties;
+using form_builder.Models.Properties.ActionProperties;
 
 namespace form_builder_tests.Builders
 {
     class PageActionsBuilder
     {
         private EPageActionType _type = EPageActionType.RetrieveExternalData;
-        private BaseProperty _properties = new BaseProperty();
+        private BaseActionProperty _actionProperties = new BaseActionProperty();
 
         public PageAction Build()
         {
             return new PageAction
             {
                 Type = _type,
-                Properties = _properties
+                Properties = _actionProperties
             };
         }
 
@@ -24,9 +24,9 @@ namespace form_builder_tests.Builders
             return this;
         }
 
-        public PageActionsBuilder WithProperties(BaseProperty properties)
+        public PageActionsBuilder WithActionProperties(BaseActionProperty actionProperties)
         {
-            _properties = properties;
+            _actionProperties = actionProperties;
             return this;
         }
     }

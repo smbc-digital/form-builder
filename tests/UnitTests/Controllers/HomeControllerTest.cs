@@ -13,7 +13,8 @@ using form_builder.Models;
 using form_builder.Workflows;
 using form_builder.Services.FileUploadService;
 using form_builder.Builders;
-using form_builder.Models.Properties;
+using form_builder.Models.Properties.ActionProperties;
+using form_builder.Models.Properties.ElementProperties;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
@@ -488,7 +489,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var pageActions = new PageActionsBuilder()
                 .WithActionType(EPageActionType.RetrieveExternalData)
-                .WithProperties(new BaseProperty
+                .WithActionProperties(new BaseActionProperty
                 {
                     URL = string.Empty,
                     TargetQuestionId = string.Empty,

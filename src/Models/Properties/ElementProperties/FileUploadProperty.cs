@@ -1,7 +1,6 @@
-﻿using form_builder.Constants;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace form_builder.Models.Properties
+namespace form_builder.Models.Properties.ElementProperties
 {
     public partial class BaseProperty
     {

@@ -1,5 +1,6 @@
 ﻿using form_builder.Enum;
-using form_builder.Models.Properties;
+using form_builder.Models.Properties.ActionProperties;
+using form_builder.Models.Properties.ElementProperties;
 
 namespace form_builder.Models
 {
@@ -7,6 +8,6 @@ namespace form_builder.Models
     {
         public EPageActionType Type { get; set; }
 
-        public BaseProperty Properties { get; set; }
+        public BaseActionProperty Properties { get; set; }
     }
 }

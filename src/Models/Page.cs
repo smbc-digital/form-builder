@@ -1,7 +1,7 @@
 using form_builder.Comparators;
 using form_builder.Enum;
 using form_builder.Models.Elements;
-using form_builder.Models.Properties;
+using form_builder.Models.Properties.ElementProperties;
 using form_builder.Validators;
 using Newtonsoft.Json;
 using System;
