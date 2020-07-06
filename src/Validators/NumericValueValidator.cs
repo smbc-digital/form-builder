@@ -33,7 +33,7 @@ namespace form_builder.Validators
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = $"{element.Properties.Label} must be a whole number"
+                    Message = !string.IsNullOrEmpty(element.Properties.NotAnIntegerValidationMessage) ? element.Properties.NotAnIntegerValidationMessage : $"{element.Properties.Label} must be a whole number"
                 };
             }
 
@@ -58,7 +58,6 @@ namespace form_builder.Validators
                     {
                         IsValid = false,
                         Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) ? element.Properties.UpperLimitValidationMessage : $"{ element.Properties.Label} must be between {min} and {max} inclusive"
-
                     };
                 }
 
