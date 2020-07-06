@@ -18,7 +18,9 @@ namespace form_builder.Conditions
             { ECondition.EqualTo, StringComparator.IsEqualTo },
             { ECondition.CheckboxContains, StringComparator.CheckboxContains },
             { ECondition.MoreThan, IntegerComparator.IsMoreThan },
-            { ECondition.FewerThan, IntegerComparator.IsFewerThan }
+            { ECondition.FewerThan, IntegerComparator.IsFewerThan },
+            { ECondition.MoreThanEqualTo, IntegerComparator.IsMoreThanEqualTo },
+            { ECondition.FewerThanEqualTo, IntegerComparator.IsFewerThanEqualTo }
         };
 
 

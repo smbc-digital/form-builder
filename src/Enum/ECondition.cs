@@ -10,6 +10,8 @@ namespace form_builder.Enum
         IsBefore,
         IsAfter,
         MoreThan,
-        FewerThan
+        FewerThan,
+        MoreThanEqualTo,
+        FewerThanEqualTo
     }
 }
