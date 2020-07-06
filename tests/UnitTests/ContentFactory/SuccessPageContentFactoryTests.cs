@@ -148,7 +148,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Once);
             Assert.Equal(2, callBack.Elements.Count);
             Assert.Equal(EElementType.DocumentDownload, callBack.Elements[1].Type);
-            Assert.Equal($"Download {EDocumentType.Txt} document", callBack.Elements[1].Properties.Label);
+            Assert.Equal($"Download report", callBack.Elements[1].Properties.Label);
         }
 
         
