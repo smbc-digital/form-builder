@@ -10,7 +10,7 @@ namespace form_builder.Conditions
         public static bool IsMoreThan(Condition condition, Dictionary<string, dynamic> viewModel)
         {
            if (viewModel.ContainsKey(condition.QuestionId) && 
-                int.Parse(viewModel[condition.QuestionId]) > GetIntValue(condition.comparisonValue))
+                int.Parse(viewModel[condition.QuestionId]) > GetIntValue(condition.ComparisonValue))
                 return true;
             return false;
         }
@@ -26,7 +26,7 @@ namespace form_builder.Conditions
         public static bool IsFewerThan(Condition condition, Dictionary<string, dynamic> viewModel)
         {
           if (viewModel.ContainsKey(condition.QuestionId) && 
-           int.Parse(viewModel[condition.QuestionId]) < GetIntValue(condition.comparisonValue))
+           int.Parse(viewModel[condition.QuestionId]) < GetIntValue(condition.ComparisonValue))
                 return true;
             return false;
         }
@@ -41,13 +41,10 @@ namespace form_builder.Conditions
 
         public static int GetIntValue(string comparisonValue)
         {
-            var success = int.TryParse(comparisonValue, out int intValue);
+            var success = int.TryParse(ComparisonValue, out int intValue);
             if (success)
                 return intValue;
             return 0;
         }
-
-
-
     }
 }

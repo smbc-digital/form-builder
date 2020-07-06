@@ -54,7 +54,7 @@ namespace form_builder.Models
 
         public int? IsAfter { get; set; }
 
-        public string comparisonValue { get; set; }
+        public string ComparisonValue { get; set; }
 
         public string ComparisonDate { get; set; }
 
