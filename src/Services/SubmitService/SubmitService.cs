@@ -67,6 +67,9 @@ namespace form_builder.Services.SubmtiService
                 _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
             }
 
+            // log data thats sent to services   ---(investigating submission issues)
+            _logger.LogInformation(JsonConvert.SerializeObject(mappingEntity.Data));
+
             var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
             if (!response.IsSuccessStatusCode)
             {
