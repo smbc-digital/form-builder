@@ -3,7 +3,7 @@ using form_builder.Enum;
 using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Models.Properties;
+using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.Transforms.ReusableElements;
 using Moq;
 using System;

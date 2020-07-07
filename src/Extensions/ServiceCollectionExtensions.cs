@@ -41,6 +41,8 @@ using form_builder.Providers.Transforms.Lookups;
 using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
+using form_builder.Helpers.ActionsHelpers;
+using form_builder.Services.RetrieveExternalDataService;
 
 namespace form_builder.Extensions
 {
@@ -96,6 +98,7 @@ namespace form_builder.Extensions
             services.AddSingleton<IElementHelper, ElementHelper>();
             services.AddSingleton<IElementMapper, ElementMapper>();
             services.AddSingleton<IDocumentCreationHelper, DocumentCreationHelper>();
+            services.AddSingleton<IPageActionsHelper, PageActionsHelper>();
 
             services.AddHttpContextAccessor();
             services.AddScoped<IViewRender, ViewRender>();
@@ -161,6 +164,7 @@ namespace form_builder.Extensions
             services.AddSingleton<IMappingService, MappingService>();
             services.AddSingleton<IFileUploadService, FileUploadService>();
             services.AddSingleton<IDocumentSummaryService, DocumentSummaryService>();
+            services.AddSingleton<IRetrieveExternalDataService, RetrieveExternalDataService>();
 
             return services;
         }
@@ -170,6 +174,7 @@ namespace form_builder.Extensions
             services.AddSingleton<ISubmitWorkflow, SubmitWorkflow>();
             services.AddSingleton<IPaymentWorkflow, PaymentWorkflow>();
             services.AddSingleton<IDocumentWorkflow, DocumentWorkflow>();
+            services.AddSingleton<IActionsWorkflow, ActionsWorkflow>();
 
             return services;
         }

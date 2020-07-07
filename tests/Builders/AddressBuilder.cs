@@ -1,5 +1,5 @@
 ﻿using form_builder.Models.Elements;
-using form_builder.Models.Properties;
+using form_builder.Models.Properties.ElementProperties;
 
 namespace form_builder_tests.Builders
 {

@@ -19,6 +19,7 @@ namespace form_builder.Controllers
         private readonly IPageService _pageService;
         private readonly ISubmitWorkflow _submitWorkflow;
         private readonly IPaymentWorkflow _paymentWorkflow;
+        private readonly IActionsWorkflow _actionsWorkflow;
         private readonly IFileUploadService _fileUploadService;
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -26,13 +27,15 @@ namespace form_builder.Controllers
             ISubmitWorkflow submitWorkflow,
             IPaymentWorkflow paymentWorkflow,
             IFileUploadService fileUploadService,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment, 
+            IActionsWorkflow actionsWorkflow)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
             _paymentWorkflow = paymentWorkflow;
             _fileUploadService = fileUploadService;
             _hostingEnvironment = hostingEnvironment;
+            _actionsWorkflow = actionsWorkflow;
         }
 
         [HttpGet]
@@ -89,6 +92,9 @@ namespace form_builder.Controllers
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
+
+            if (currentPageResult.Page.HasPageActions)
+                await _actionsWorkflow.Process(currentPageResult.Page, form);
 
             var behaviour = _pageService.GetBehaviour(currentPageResult);
 

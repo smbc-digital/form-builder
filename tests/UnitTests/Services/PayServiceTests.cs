@@ -18,7 +18,7 @@ using Microsoft.AspNetCore.Hosting;
 using Xunit;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Models.Properties;
+using form_builder.Models.Properties.ElementProperties;
 using form_builder.Services.MappingService.Entities;
 using form_builder_tests.Builders;
 

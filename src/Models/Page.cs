@@ -1,7 +1,7 @@
-using form_builder.Conditions;
+using form_builder.Comparators;
 using form_builder.Enum;
 using form_builder.Models.Elements;
-using form_builder.Models.Properties;
+using form_builder.Models.Properties.ElementProperties;
 using form_builder.Validators;
 using Newtonsoft.Json;
 using System;
@@ -42,6 +42,10 @@ namespace form_builder.Models
 
         public bool HasIncomingValues => IncomingValues.Any();
 
+        public List<PageAction> PageActions { get; set; } = new List<PageAction>();
+
+        public bool HasPageActions => PageActions.Any();
+
         [JsonIgnore]
         public IEnumerable<BaseProperty> InvalidElements
         {
@@ -69,11 +73,9 @@ namespace form_builder.Models
                                                                 element.Type == EElementType.DatePicker ||
                                                                 element.Type == EElementType.Street ||
                                                                 element.Type == EElementType.Organisation ||
-                                                                element.Type == EElementType.FileUpload
+                                                                element.Type == EElementType.FileUpload ||
+                                                                element.Type == EElementType.Map
         );
-
-        [JsonIgnore]
-        private ConditionValidator _conditionValidator = new ConditionValidator();
 
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
         {
@@ -91,17 +93,34 @@ namespace form_builder.Models
             {
                 foreach (var behaviour in Behaviours.OrderByDescending(_ => _.Conditions.Count))
                 {
-                    bool isConditionTrue = false;
+                    var equalToConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.EqualTo));
+                    var checkBoxContainsConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.CheckboxContains));
+                    var dateIsBeforeConditions = behaviour.Conditions.Where(x => x.IsBefore != null);
+                    var dateIsAfterConditions = behaviour.Conditions.Where(x => x.IsAfter != null);
+                    var isNullOrEmpty = behaviour.Conditions.Where(x => x.IsNullOrEmpty != null);
 
-                    foreach (var condition in behaviour.Conditions)
-                    {
-                        isConditionTrue = _conditionValidator.IsValid(condition, viewModel);
+                    var equalToValid = !equalToConditions.Any();
+                    var checkBoxContainsValid = !checkBoxContainsConditions.Any();
+                    var dateIsBeforeValid = !dateIsBeforeConditions.Any();
+                    var dateIsAfterValid = !dateIsAfterConditions.Any();
+                    var isNullOrEmptyValid = !isNullOrEmpty.Any();
 
-                        if (!isConditionTrue)
-                            break;
-                    }
+                    if(equalToConditions.Any())
+                        equalToValid = equalToConditions.All(x => x.EqualTo.Equals(viewModel.ContainsKey(x.QuestionId) ? viewModel[x.QuestionId] : string.Empty));
 
-                    if (isConditionTrue || !behaviour.Conditions.Any())
+                    if(checkBoxContainsConditions.Any())
+                        checkBoxContainsValid = checkBoxContainsConditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
+                        
+                    if(dateIsBeforeConditions.Any())
+                        dateIsBeforeValid = dateIsBeforeConditions.All(x => DateComparator.DateIsBefore(x, viewModel));
+                        
+                    if(dateIsAfterConditions.Any())
+                        dateIsAfterValid = dateIsAfterConditions.All(x => DateComparator.DateIsAfter(x, viewModel));  
+
+                    if (isNullOrEmpty.Any())
+                        isNullOrEmptyValid = isNullOrEmpty.All(x => string.IsNullOrEmpty(viewModel[x.QuestionId]) == x.IsNullOrEmpty);
+
+                    if (equalToValid && checkBoxContainsValid && dateIsBeforeValid && dateIsAfterValid && isNullOrEmptyValid)
                         return behaviour;
                 }
             }

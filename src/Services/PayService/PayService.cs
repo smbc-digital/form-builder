@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
-using System.Net;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
 using form_builder.Providers.PaymentProvider;
@@ -18,8 +17,6 @@ using Microsoft.AspNetCore.Hosting;
 using form_builder.Services.MappingService.Entities;
 using Newtonsoft.Json;
 using form_builder.Models;
-using System.Net.Http;
-using System.Text;
 
 namespace form_builder.Services.PayService
 {
