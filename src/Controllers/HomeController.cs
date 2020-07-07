@@ -20,6 +20,7 @@ namespace form_builder.Controllers
         private readonly ISubmitWorkflow _submitWorkflow;
         private readonly IPaymentWorkflow _paymentWorkflow;
         private readonly IActionsWorkflow _actionsWorkflow;
+        private readonly ISuccessWorkflow _successWorkflow;
         private readonly IFileUploadService _fileUploadService;
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -28,7 +29,8 @@ namespace form_builder.Controllers
             IPaymentWorkflow paymentWorkflow,
             IFileUploadService fileUploadService,
             IHostingEnvironment hostingEnvironment, 
-            IActionsWorkflow actionsWorkflow)
+            IActionsWorkflow actionsWorkflow, 
+            ISuccessWorkflow successWorkflow)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
@@ -36,6 +38,7 @@ namespace form_builder.Controllers
             _fileUploadService = fileUploadService;
             _hostingEnvironment = hostingEnvironment;
             _actionsWorkflow = actionsWorkflow;
+            _successWorkflow = successWorkflow;
         }
 
         [HttpGet]
@@ -141,7 +144,7 @@ namespace form_builder.Controllers
         [Route("{form}/success")]
         public async Task<IActionResult> Success(string form)
         {
-            var result = await _pageService.FinalisePageJourney(form, EBehaviourType.SubmitForm);
+            var result = await _successWorkflow.Process(form);
             
             var success = new SuccessViewModel {
                 Reference = (string)TempData["reference"],
