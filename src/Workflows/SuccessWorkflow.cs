@@ -35,7 +35,7 @@ namespace form_builder.Workflows
 
             if (baseForm.FormActions.Any())
             {
-                await _actionService.Process();
+                await _actionService.Process(baseForm);
             }
 
             var result = await _pageService.FinalisePageJourney(form, EBehaviourType.SubmitForm);
