@@ -29,5 +29,6 @@ namespace form_builder.Models.Properties
         public string UpperLimitValidationMessage { get; set; } = string.Empty;
         public bool LegendAsH1 { get; set; }
         public bool LabelAsH1 { get; set; }
+        public string NotAnIntegerValidationMessage { get; set; } = string.Empty;
     }
 }
