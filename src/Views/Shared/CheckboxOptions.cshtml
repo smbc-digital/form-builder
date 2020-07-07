@@ -8,7 +8,7 @@
                 value="@Model.Properties.Options[i].Value" 
                 name="@Model.Properties.QuestionId" 
                 id="@Model.GetListItemId(i)"
-                aria-describedby="@Model.GetListItemHintId(i)" 
+                @(Model.Properties.Options[i].HasHint ? $"aria-describedby={Model.GetListItemHintId(i)}" : string.Empty)
                 @(Model.Properties.Checked ||  Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty) />
 
             <label class="govuk-label govuk-checkboxes__label" 

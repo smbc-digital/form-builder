@@ -22,11 +22,13 @@
 
     <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
 
-    <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
+    <div role="navigation">
+        <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
+    </div>
 
     <partial name="Header" />
 
-    <div class="govuk-width-container">
+    <div class="govuk-width-container" role="main">
         @if (!string.IsNullOrEmpty(feedbackPhase))
         {
             <div class="govuk-phase-banner">
@@ -46,7 +48,7 @@
             <a href="javascript:history.back(-1)" class="govuk-back-link">Back</a>
         }
 
-        <main class="govuk-main-wrapper " id="main-content" role="main">
+        <main class="govuk-main-wrapper " id="main-content">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
                     @RenderBody()
