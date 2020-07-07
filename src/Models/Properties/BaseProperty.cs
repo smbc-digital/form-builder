@@ -31,5 +31,6 @@ namespace form_builder.Models.Properties
         public bool LabelAsH1 { get; set; }
         public string Purpose { get; set; }
         public bool Spellcheck { get; set; } = true;
+        public string NotAnIntegerValidationMessage { get; set; } = string.Empty;
     }
 }
