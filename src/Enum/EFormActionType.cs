@@ -3,6 +3,7 @@
     public enum EFormActionType
     {
         Unknown,
-        Email
+        UserEmail,
+        BackOfficeEmail
     }
 }
