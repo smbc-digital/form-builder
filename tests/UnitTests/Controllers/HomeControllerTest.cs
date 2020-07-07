@@ -584,8 +584,6 @@ namespace form_builder_tests.UnitTests.Controllers
 
             // Assert
             _mockSucessWorkflow.Verify(_ => _.Process("form"), Times.Once);
-            
-
         }
 
         [Fact]

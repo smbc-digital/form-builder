@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
@@ -30,10 +28,9 @@ namespace form_builder.Workflows
 
         public async Task<SuccessPageEntity> Process(string form)
         {
-            // call ActionsService
             var baseForm = await _schemaFactory.Build(form);
 
-            if (baseForm.FormActions.Any())
+            if (baseForm.FormActions != null && baseForm.FormActions.Any())
             {
                 await _actionService.Process();
             }
