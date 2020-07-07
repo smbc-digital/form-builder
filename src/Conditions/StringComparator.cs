@@ -6,7 +6,6 @@ namespace form_builder.Conditions
 {
     public static class StringComparator
     {
-
         public static bool IsEqualTo(Condition condition, Dictionary<string, dynamic> viewModel)
         {
          
@@ -46,7 +45,5 @@ namespace form_builder.Conditions
 
             return false;
         }
-
-
     }
 }

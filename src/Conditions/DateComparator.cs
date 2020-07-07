@@ -1,8 +1,7 @@
-﻿ using System;
+﻿using System;
 using System.Collections.Generic;
 using form_builder.Enum;
 using form_builder.Models;
-
 
 namespace form_builder.Conditions
 {
@@ -17,9 +16,7 @@ namespace form_builder.Conditions
             }
 
             var isBefore = !string.IsNullOrEmpty(condition.ComparisonValue) ? int.Parse(condition.ComparisonValue) : condition.IsBefore.Value;
-           
             var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isBefore);
-        
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
 
             if (DateTime.Compare(dateValue, newComparisonDate) <= 0)
@@ -39,9 +36,7 @@ namespace form_builder.Conditions
             }
 
             var isAfter = !string.IsNullOrEmpty(condition.ComparisonValue) ? int.Parse(condition.ComparisonValue) : condition.IsAfter.Value;
-            
             var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isAfter);
-            
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
 
             if (DateTime.Compare(dateValue, newComparisonDate) > 0)
@@ -62,7 +57,6 @@ namespace form_builder.Conditions
 
             var isEqualTo = !string.IsNullOrEmpty(condition.ComparisonValue) ? int.Parse(condition.ComparisonValue) : condition.IsBefore.Value;
             var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isEqualTo);
-
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
 
             if (DateTime.Compare(dateValue, newComparisonDate) == 0)
@@ -89,7 +83,6 @@ namespace form_builder.Conditions
                     break;
                 default:
                     throw new Exception("No unit specifed");
-
             }
 
             return newComparisonDate;
@@ -109,6 +102,5 @@ namespace form_builder.Conditions
 
             return new DateTime(years, months, days);
         }
-
     }
 }

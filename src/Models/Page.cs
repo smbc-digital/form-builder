@@ -56,8 +56,6 @@ namespace form_builder.Models
             }
         }
 
-
-
         public IEnumerable<IElement> ValidatableElements => Elements.Where(element => element.Type == EElementType.Radio ||
                                                                 element.Type == EElementType.Textarea ||
                                                                 element.Type == EElementType.Select ||
@@ -74,7 +72,6 @@ namespace form_builder.Models
                                                                 element.Type == EElementType.FileUpload
         );
 
-
         [JsonIgnore]
         private ConditionValidator _conditionValidator = new ConditionValidator();
 
@@ -86,8 +83,6 @@ namespace form_builder.Models
 
         public Behaviour GetNextPage(Dictionary<string, dynamic> viewModel)
         {
-           
-            
             if (Behaviours.Count == 1)
             {
                 return Behaviours.FirstOrDefault();
@@ -108,15 +103,11 @@ namespace form_builder.Models
 
                     if (isConditionTrue || !behaviour.Conditions.Any())
                         return behaviour;
-                    
                 }
             }
 
             throw new Exception("Page model, There was a problem whilst processing behaviors");
         }
-
-
-       
 
         public SubmitSlug GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)
         {

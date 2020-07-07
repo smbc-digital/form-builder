@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using form_builder.Enum;
 using form_builder.Models;
-using form_builder.Conditions;
 
 namespace form_builder.Conditions
 {
@@ -22,9 +21,7 @@ namespace form_builder.Conditions
             { ECondition.GreaterThanEqualTo, IntegerComparator.IsGreaterThanEqualTo },
             { ECondition.LessThanEqualTo, IntegerComparator.IsLessThanEqualTo },
             { ECondition.EndsWith, StringComparator.EndsWith }
-
         };
-
 
         public bool IsValid(Condition condition, Dictionary<string, dynamic> viewModel)
         {
