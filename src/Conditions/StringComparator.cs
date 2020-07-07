@@ -29,7 +29,6 @@ namespace form_builder.Conditions
 
         public static bool CheckboxContains(Condition condition, Dictionary<string, dynamic> viewModel)
         {
-
             var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? condition.ComparisonValue.ToLower() : condition.CheckboxContains.ToLower();
             
             if (viewModel.ContainsKey(condition.QuestionId) && viewModel[condition.QuestionId].ToLower().Contains(val))
@@ -37,6 +36,17 @@ namespace form_builder.Conditions
             
             return false;
         }
+
+        public static bool EndsWith(Condition condition, Dictionary<string, dynamic> viewModel)
+        {
+            var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? condition.ComparisonValue.ToLower() : condition.CheckboxContains.ToLower();
+
+            if (viewModel.ContainsKey(condition.QuestionId) && viewModel[condition.QuestionId].ToLower().EndsWith(val))
+                return true;
+
+            return false;
+        }
+
 
     }
 }

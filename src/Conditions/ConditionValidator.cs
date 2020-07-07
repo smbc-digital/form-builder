@@ -17,10 +17,12 @@ namespace form_builder.Conditions
             { ECondition.IsNullOrEmpty, StringComparator.IsNullOrEmpty },
             { ECondition.EqualTo, StringComparator.IsEqualTo },
             { ECondition.CheckboxContains, StringComparator.CheckboxContains },
-            { ECondition.MoreThan, IntegerComparator.IsMoreThan },
-            { ECondition.FewerThan, IntegerComparator.IsFewerThan },
-            { ECondition.MoreThanEqualTo, IntegerComparator.IsMoreThanEqualTo },
-            { ECondition.FewerThanEqualTo, IntegerComparator.IsFewerThanEqualTo }
+            { ECondition.GreaterThan, IntegerComparator.IsGreaterThan },
+            { ECondition.LessThan, IntegerComparator.IsLessThan },
+            { ECondition.GreaterThanEqualTo, IntegerComparator.IsGreaterThanEqualTo },
+            { ECondition.LessThanEqualTo, IntegerComparator.IsLessThanEqualTo },
+            { ECondition.EndsWith, StringComparator.EndsWith }
+
         };
 
 

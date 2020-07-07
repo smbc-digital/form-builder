@@ -7,7 +7,7 @@ namespace form_builder.Conditions
 {
     public static class IntegerComparator
     {
-        public static bool IsMoreThan(Condition condition, Dictionary<string, dynamic> viewModel)
+        public static bool IsGreaterThan(Condition condition, Dictionary<string, dynamic> viewModel)
         {
            if (viewModel.ContainsKey(condition.QuestionId) && 
                 int.Parse(viewModel[condition.QuestionId]) > GetIntValue(condition.ComparisonValue))
@@ -15,7 +15,7 @@ namespace form_builder.Conditions
             return false;
         }
 
-        public static bool IsMoreThanEqualTo(Condition condition, Dictionary<string, dynamic> viewModel)
+        public static bool IsGreaterThanEqualTo(Condition condition, Dictionary<string, dynamic> viewModel)
         {
             if (viewModel.ContainsKey(condition.QuestionId) &&
                  int.Parse(viewModel[condition.QuestionId]) >= GetIntValue(condition.ComparisonValue))
@@ -23,7 +23,7 @@ namespace form_builder.Conditions
             return false;
         }
 
-        public static bool IsFewerThan(Condition condition, Dictionary<string, dynamic> viewModel)
+        public static bool IsLessThan(Condition condition, Dictionary<string, dynamic> viewModel)
         {
           if (viewModel.ContainsKey(condition.QuestionId) && 
            int.Parse(viewModel[condition.QuestionId]) < GetIntValue(condition.ComparisonValue))
@@ -31,7 +31,7 @@ namespace form_builder.Conditions
             return false;
         }
 
-        public static bool IsFewerThanEqualTo(Condition condition, Dictionary<string, dynamic> viewModel)
+        public static bool IsLessThanEqualTo(Condition condition, Dictionary<string, dynamic> viewModel)
         {
             if (viewModel.ContainsKey(condition.QuestionId) &&
              int.Parse(viewModel[condition.QuestionId]) <= GetIntValue(condition.ComparisonValue))
