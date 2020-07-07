@@ -1,6 +1,6 @@
 ﻿using form_builder.Enum;
 
-namespace form_builder.Models.Properties
+namespace form_builder.Models.Properties.ElementProperties
 {
     public partial class BaseProperty
     {

@@ -1,7 +1,7 @@
 using form_builder.Comparators;
 using form_builder.Enum;
 using form_builder.Models.Elements;
-using form_builder.Models.Properties;
+using form_builder.Models.Properties.ElementProperties;
 using form_builder.Validators;
 using Newtonsoft.Json;
 using System;
@@ -42,6 +42,10 @@ namespace form_builder.Models
 
         public bool HasIncomingValues => IncomingValues.Any();
 
+        public List<PageAction> PageActions { get; set; } = new List<PageAction>();
+
+        public bool HasPageActions => PageActions.Any();
+
         [JsonIgnore]
         public IEnumerable<BaseProperty> InvalidElements
         {
@@ -69,7 +73,8 @@ namespace form_builder.Models
                                                                 element.Type == EElementType.DatePicker ||
                                                                 element.Type == EElementType.Street ||
                                                                 element.Type == EElementType.Organisation ||
-                                                                element.Type == EElementType.FileUpload
+                                                                element.Type == EElementType.FileUpload ||
+                                                                element.Type == EElementType.Map
         );
 
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)

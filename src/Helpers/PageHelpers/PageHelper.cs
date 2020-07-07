@@ -5,7 +5,7 @@ using form_builder.Extensions;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Models.Properties;
+using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.FileUploadService;
@@ -280,8 +280,8 @@ namespace form_builder.Helpers.PageHelpers
             if (!string.IsNullOrEmpty(formData))
             {
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
             }
+
             if (convertedAnswers.FormData.ContainsKey(key))
             {
                 convertedAnswers.FormData.Remove(key);

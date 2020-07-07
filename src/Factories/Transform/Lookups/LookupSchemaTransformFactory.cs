@@ -17,6 +17,7 @@ namespace form_builder.Factories.Transform.Lookups
             _lookupTransformDataProvider = lookupTransformDataProvider;
         }
 
+
         public async Task<FormSchema> Transform(FormSchema formSchema)
         {
             formSchema.Pages
