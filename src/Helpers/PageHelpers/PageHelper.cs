@@ -29,8 +29,8 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IElementHelper _elementHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
-        private readonly IHostingEnvironment _enviroment;
-        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly IHostingEnvironment _environment;
+        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly ICache _cache;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly IFileUploadService _fileUploadService;
@@ -44,9 +44,9 @@ namespace form_builder.Helpers.PageHelpers
             _elementHelper = elementHelper;
             _distributedCache = distributedCache;
             _disallowedKeys = disallowedKeys.Value;
-            _enviroment = enviroment;
+            _environment = enviroment;
             _cache = cache;
-            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _distributedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
             _paymentProviders = paymentProviders;
             _fileUploadService = fileUploadService;
         }
@@ -71,7 +71,7 @@ namespace form_builder.Helpers.PageHelpers
                     viewModel,
                     page,
                     baseForm,
-                    _enviroment,
+                    _environment,
                     results);
 
             return formModel;
@@ -83,23 +83,17 @@ namespace form_builder.Helpers.PageHelpers
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
             if (!string.IsNullOrEmpty(formData))
-            {
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-            }
 
             if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == viewModel["Path"].ToLower()))
-            {
                 convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageSlug != viewModel["Path"].ToLower()).ToList();
-            }
 
             var answers = new List<Answers>();
 
             foreach (var item in viewModel)
             {
                 if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
-                {
                     answers.Add(new Answers { QuestionId = item.Key, Response = item.Value });
-                }
             }
 
             if (files != null && files.Any() && isPageValid)
@@ -146,37 +140,21 @@ namespace form_builder.Helpers.PageHelpers
             }
 
             var hashSet = new HashSet<string>();
-            foreach (var id in qIds)
-            {
-                if (!hashSet.Add(id))
-                {
-                    throw new ApplicationException($"The provided json '{formName}' has duplicate QuestionIDs");
-                }
-            }
+            if (qIds.Any(id => !hashSet.Add(id)))
+                throw new ApplicationException($"The provided json '{formName}' has duplicate QuestionIDs");
         }
 
         public void CheckForEmptyBehaviourSlugs(List<Page> pages, string formName)
         {
-            List<Behaviour> behaviours = new List<Behaviour>();
+            var behaviours = new List<Behaviour>();
 
-            foreach (var page in pages)
+            foreach (var page in pages.Where(page => page.Behaviours != null))
             {
-                if (page.Behaviours != null)
-                {
-                    foreach (var behaviour in page.Behaviours)
-                    {
-                        behaviours.Add(behaviour);
-                    }
-                }
+                behaviours.AddRange(page.Behaviours);
             }
 
-            foreach (var item in behaviours)
-            {
-                if (string.IsNullOrEmpty(item.PageSlug) && (item.SubmitSlugs == null || item.SubmitSlugs.Count == 0))
-                {
-                    throw new ApplicationException($"Incorrectly configured behaviour slug was discovered in {formName} form");
-                }
-            }
+            if (behaviours.Any(item => string.IsNullOrEmpty(item.PageSlug) && (item.SubmitSlugs == null || item.SubmitSlugs.Count == 0)))
+                throw new ApplicationException($"Incorrectly configured behaviour slug was discovered in {formName} form");
         }
 
         public async Task CheckForPaymentConfiguration(List<Page> pages, string formName)
@@ -188,7 +166,7 @@ namespace form_builder.Helpers.PageHelpers
             if (!containsPayment)
                 return;
 
-            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_enviroment.EnvironmentName}", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
+            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_environment.EnvironmentName}", _distributedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
 
             var config = paymentInformation.FirstOrDefault(x => x.FormName == formName);
 
@@ -205,7 +183,7 @@ namespace form_builder.Helpers.PageHelpers
                 var paymentSummaryElement = pages.SelectMany(_ => _.Elements)
                     .First(_ => _.Type == EElementType.PaymentSummary);
  
-                if(!_enviroment.IsEnvironment("local") && !paymentSummaryElement.Properties.CalculationSlugs.Where(_ => !_.Environment.ToLower().Equals("local")).Any(_ => _.URL.StartsWith("https://")))
+                if(!_environment.IsEnvironment("local") && !paymentSummaryElement.Properties.CalculationSlugs.Where(_ => !_.Environment.ToLower().Equals("local")).Any(_ => _.URL.StartsWith("https://")))
                     throw new ApplicationException("PaymentSummary::CalculateCostUrl must start with https");
             }
         }
@@ -234,76 +212,44 @@ namespace form_builder.Helpers.PageHelpers
 
         public void CheckForCurrentEnvironmentSubmitSlugs(List<Page> pages, string formName)
         {
-            List<Behaviour> behaviours = new List<Behaviour>();
-
-            foreach (var page in pages)
-            {
-                if (page.Behaviours != null)
-                {
-                    foreach (var behaviour in page.Behaviours)
-                    {
-                        behaviours.Add(behaviour);
-                    }
-                }
-            }
+            var behaviours = pages.Where(page => page.Behaviours != null).SelectMany(page => page.Behaviours).ToList();
 
             foreach (var item in behaviours)
             {
-                if (item.BehaviourType == EBehaviourType.SubmitForm || item.BehaviourType == EBehaviourType.SubmitAndPay)
+                if (item.BehaviourType != EBehaviourType.SubmitForm && item.BehaviourType != EBehaviourType.SubmitAndPay) continue;
+                if (item.SubmitSlugs.Count <= 0) continue;
+                
+                var foundEnvironmentSubmitSlug = false;
+                foreach (var subItem in item.SubmitSlugs.Where(subItem => subItem.Environment.ToLower() == _environment.EnvironmentName.ToS3EnvPrefix().ToLower()))
                 {
-                    if (item.SubmitSlugs.Count > 0)
-                    {
-                        var foundEnviromentSubmitSlug = false;
-                        foreach (var subItem in item.SubmitSlugs)
-                        {
-                            if (subItem.Environment.ToLower() == _enviroment.EnvironmentName.ToS3EnvPrefix().ToLower())
-                            {
-                                foundEnviromentSubmitSlug = true;
-                            }
-                        }
-
-                        if (!foundEnviromentSubmitSlug)
-                        {
-                            throw new ApplicationException($"No SubmitSlug found for {formName} form for {_enviroment.EnvironmentName}");
-                        }
-                    }
+                    foundEnvironmentSubmitSlug = true;
                 }
+
+                if (!foundEnvironmentSubmitSlug)
+                    throw new ApplicationException($"No SubmitSlug found for {formName} form for {_environment.EnvironmentName}");
             }
         }
 
         public void CheckSubmitSlugsHaveAllProperties(List<Page> pages, string formName)
         {
-            List<Behaviour> behaviours = new List<Behaviour>();
-
-            foreach (var page in pages)
-            {
-                if (page.Behaviours != null)
-                {
-                    foreach (var behaviour in page.Behaviours)
-                    {
-                        behaviours.Add(behaviour);
-                    }
-                }
-            }
+            var behaviours = pages.Where(page => page.Behaviours != null).SelectMany(page => page.Behaviours).ToList();
 
             foreach (var item in behaviours)
             {
-                if (item.BehaviourType == EBehaviourType.SubmitForm || item.BehaviourType == EBehaviourType.SubmitAndPay)
+                if (item.BehaviourType != EBehaviourType.SubmitForm && item.BehaviourType != EBehaviourType.SubmitAndPay) continue;
+
+                if (item.SubmitSlugs.Count <= 0) continue;
+
+                foreach (var subItem in item.SubmitSlugs)
                 {
-                    if (item.SubmitSlugs.Count > 0)
-                    {
-                        foreach (var subItem in item.SubmitSlugs)
-                        {
-                            if (string.IsNullOrEmpty(subItem.URL))
-                                throw new ApplicationException($"No URL found in the SubmitSlug for {formName} form");
+                    if (string.IsNullOrEmpty(subItem.URL))
+                        throw new ApplicationException($"No URL found in the SubmitSlug for {formName} form");
 
-                            if (string.IsNullOrEmpty(subItem.AuthToken))
-                                throw new ApplicationException($"No Auth Token found in the SubmitSlug for {formName} form");
+                    if (string.IsNullOrEmpty(subItem.AuthToken))
+                        throw new ApplicationException($"No Auth Token found in the SubmitSlug for {formName} form");
 
-                            if(!_enviroment.IsEnvironment("local") && !subItem.Environment.ToLower().Equals("local") && !subItem.URL.StartsWith("https://"))
-                                throw new Exception("SubmitUrl must start with https");
-                        }
-                    }
+                    if(!_environment.IsEnvironment("local") && !subItem.Environment.ToLower().Equals("local") && !subItem.URL.StartsWith("https://"))
+                        throw new Exception("SubmitUrl must start with https");
                 }
             }
         }
@@ -316,17 +262,14 @@ namespace form_builder.Helpers.PageHelpers
                 .Where(_ => _.Properties.AllowedFileTypes != null)
                 .ToList();
 
-            if (documentUploadElements != null)
+            documentUploadElements.ForEach(_ =>
             {
-                documentUploadElements.ForEach(_ =>
+                _.Properties.AllowedFileTypes.ForEach(x =>
                 {
-                    _.Properties.AllowedFileTypes.ForEach(x =>
-                    {
-                        if (!x.StartsWith("."))
-                            throw new ApplicationException($"PageHelper::CheckForAcceptedFileUploadFileTypes, Allowed file type in FileUpload element {_.Properties.QuestionId} must have a valid extension which begins with a ., e.g. .png");
-                    });
+                    if (!x.StartsWith("."))
+                        throw new ApplicationException($"PageHelper::CheckForAcceptedFileUploadFileTypes, Allowed file type in FileUpload element {_.Properties.QuestionId} must have a valid extension which begins with a ., e.g. .png");
                 });
-            }
+            });
         }
 
         public void SaveFormData(string key, object value, string guid)
@@ -349,25 +292,24 @@ namespace form_builder.Helpers.PageHelpers
 
         public void CheckForDocumentDownload(FormSchema formSchema)
         {
-            if (formSchema.DocumentDownload)
+            if (!formSchema.DocumentDownload) return;
+
+            if (formSchema.DocumentType.Any())
             {
-                if (formSchema.DocumentType.Any())
-                {
-                    if (formSchema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
-                        throw new ApplicationException($"PageHelper::CheckForDocumentDownload, Unknown document download type configured");
-                }
-                else
-                {
-                    throw new ApplicationException($"PageHelper::CheckForDocumentDownload, No document download type configured");
-                }
+                if (formSchema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
+                    throw new ApplicationException($"PageHelper::CheckForDocumentDownload, Unknown document download type configured");
+            }
+            else
+            {
+                throw new ApplicationException($"PageHelper::CheckForDocumentDownload, No document download type configured");
             }
         }
 
-        public void CheckForIncomingFormDataValues(List<Page> Pages)
+        public void CheckForIncomingFormDataValues(List<Page> pages)
         {
-            if (Pages.Any(_ => _.HasIncomingValues))
+            if (pages.Any(_ => _.HasIncomingValues))
             {
-                Pages.Where(_ => _.HasIncomingValues)
+                pages.Where(_ => _.HasIncomingValues)
                     .ToList()
                     .ForEach(x => x.IncomingValues.ForEach(_ =>
                         {
@@ -387,11 +329,10 @@ namespace form_builder.Helpers.PageHelpers
                 if (!_.Optional && !containsValue)
                     throw new Exception($"DictionaryExtensions::IncomingValue, FormData does not contains {_.Name} required value");
 
-                if (containsValue)
-                {
-                    formData = RecursiveCheckAndCreate(_.QuestionId, formData[_.Name], formData);
-                    formData.Remove(_.Name);
-                }
+                if (!containsValue) return;
+
+                formData = RecursiveCheckAndCreate(_.QuestionId, formData[_.Name], formData);
+                formData.Remove(_.Name);
             });
 
             return formData;
