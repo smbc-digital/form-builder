@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using form_builder.Models;
 using form_builder.Services.RetrieveExternalDataService.Entities;
@@ -8,6 +9,8 @@ namespace form_builder.Helpers.ActionsHelpers
     public interface IPageActionsHelper
     {
         ExternalDataEntity GenerateUrl(string baseUrl, FormAnswers formAnswers);
+
+        string GetEmailToAddresses(FormAction action, FormAnswers formAnswers);
     }
 
     public class PageActionsHelper : IPageActionsHelper
@@ -23,6 +26,21 @@ namespace form_builder.Helpers.ActionsHelpers
                 Url = newUrl,
                 IsPost = !matches.Any()
             };
+        }
+
+        public string GetEmailToAddresses(FormAction action, FormAnswers formAnswers)
+        {
+            var matches = _tagRegex.Matches(action.Properties.To).ToList();
+
+            var emailList = matches
+                .Select(match => RecursiveGetAnswerValue(match.Value, formAnswers.Pages
+                    .SelectMany(_ => _.Answers)
+                    .FirstOrDefault(_ => _.QuestionId.Equals(match.Value))))
+                .ToList();
+
+            emailList.AddRange(action.Properties.To.Split(",").Where(_ => !_tagRegex.IsMatch(_)));
+
+            return emailList.Aggregate("", (current, email) => current + (email + ","));
         }
 
         private string Replace(Match match, string current, FormAnswers formAnswers)

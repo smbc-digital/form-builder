@@ -3,8 +3,10 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using form_builder.Enum;
+using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
+using form_builder.Providers.EmailProvider;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 
@@ -19,15 +21,18 @@ namespace form_builder.Services.ActionService
     {
         private readonly ISessionHelper _sessionHelper;
         private readonly IDistributedCache _distributedCache;
+        private readonly IEmailProvider _emailProvider;
+        private readonly IPageActionsHelper _pageActionsHelper;
 
-        public ActionService(ISessionHelper sessionHelper, IDistributedCache distributedCache)
+        public ActionService(ISessionHelper sessionHelper, IDistributedCache distributedCache, IEmailProvider emailProvider, IPageActionsHelper pageActionsHelper)
         {
             _sessionHelper = sessionHelper;
             _distributedCache = distributedCache;
+            _emailProvider = emailProvider;
+            _pageActionsHelper = pageActionsHelper;
         }
         public async Task Process(FormSchema baseForm)
         {
-            // Do stuff here
             try
             {
                 var sessionGuid = _sessionHelper.GetSessionGuid();
@@ -43,7 +48,17 @@ namespace form_builder.Services.ActionService
                 {
                     switch (action.Type)
                     {
-                        case EFormActionType.UserEmail: 
+                        case EFormActionType.UserEmail:
+                            var message = new EmailMessage(
+                                action.Properties.Subject,
+                                action.Properties.Content,
+                                action.Properties.From,
+                                _pageActionsHelper.GetEmailToAddresses(action, formAnswers));
+
+                            await _emailProvider.SendAwsSesEmail(message);
+                            break;
+
+                        case EFormActionType.BackOfficeEmail:
                             SendUserEmail(action, formAnswers);
                             break;
 
@@ -75,7 +90,13 @@ namespace form_builder.Services.ActionService
                 IsBodyHtml = true
             };
 
-            mailMessage.To.Add(action.Properties.To);
+            var toEmails = _pageActionsHelper.GetEmailToAddresses(action, formAnswers).Split(",");
+
+            foreach (var email in toEmails)
+            {
+                if (!string.IsNullOrEmpty(email))
+                    mailMessage.To.Add(email);
+            }
 
             try
             {

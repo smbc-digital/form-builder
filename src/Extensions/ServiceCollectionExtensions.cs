@@ -28,6 +28,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 using System.Diagnostics.CodeAnalysis;
+using Amazon.Runtime;
+using Amazon.SimpleEmail;
 using form_builder.Services.FileUploadService;
 using form_builder.Providers.DocumentCreation;
 using form_builder.Providers.DocumentCreation.Generic;
@@ -42,8 +44,10 @@ using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Helpers.ActionsHelpers;
+using form_builder.Providers.EmailProvider;
 using form_builder.Services.ActionService;
 using form_builder.Services.RetrieveExternalDataService;
+using Serilog;
 
 namespace form_builder.Extensions
 {
@@ -89,6 +93,17 @@ namespace form_builder.Extensions
         public static IServiceCollection AddAmazonS3Client(this IServiceCollection services, string accessKey, string secretKey)
         {
             services.AddSingleton<IAmazonS3, AmazonS3Client>(provider => new AmazonS3Client(accessKey, secretKey, RegionEndpoint.EUWest1));
+
+            return services;
+        }
+
+        public static IServiceCollection AddSesEmailConfiguration(this IServiceCollection services, string accessKey, string secretKey)
+        {
+            //var amazonSesKey = new AwsSesKeysConfiguration(accessKey, secretKey);
+            //services.AddSingleton(amazonSesKey);
+            var credentials = new BasicAWSCredentials(accessKey, secretKey);
+            services.AddTransient<IAmazonSimpleEmailService>(_ =>
+                new AmazonSimpleEmailServiceClient(credentials, RegionEndpoint.EUWest1));
 
             return services;
         }
@@ -151,6 +166,12 @@ namespace form_builder.Extensions
         {
             services.AddSingleton<IDocumentCreation, TextfileDocumentCreator>();
             //services.AddSingleton<IDocumentCreation, SmbcTextfileDocumentCreator>();
+            return services;
+        }
+
+        public static IServiceCollection ConfigureEmailProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IEmailProvider, AwsSesProvider>();
             return services;
         }
 
@@ -230,6 +251,7 @@ namespace form_builder.Extensions
             services.Configure<CivicaPaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
             services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection("DistrbutedCacheExpiration"));
             services.Configure<DistrbutedCacheConfiguration>(cacheOptions => cacheOptions.UseDistrbutedCache = configuration.GetValue<bool>("UseDistrbutedCache"));
+            services.Configure<AwsSesKeysConfiguration>(configuration.GetSection("Ses"));
 
             return services;
         }

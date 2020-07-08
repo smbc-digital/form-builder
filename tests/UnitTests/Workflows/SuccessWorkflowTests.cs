@@ -67,7 +67,7 @@ namespace form_builder_tests.UnitTests.Workflows
             await _workflow.Process("form");
 
             // Assert
-            _mockActionService.Verify(_ => _.Process(), Times.Never);
+            _mockActionService.Verify(_ => _.Process(It.IsAny<FormSchema>()), Times.Never);
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace form_builder_tests.UnitTests.Workflows
                 .WithFormActions(new FormAction
                 {
                     Properties = new BaseActionProperty(),
-                    Type = EFormActionType.Email
+                    Type = EFormActionType.UserEmail
                 })
                 .Build();
 
@@ -102,7 +102,7 @@ namespace form_builder_tests.UnitTests.Workflows
             await _workflow.Process("form");
 
             // Assert
-            _mockActionService.Verify(_ => _.Process(), Times.Once);
+            _mockActionService.Verify(_ => _.Process(It.IsAny<FormSchema>()), Times.Once);
         }
 
         [Fact]
