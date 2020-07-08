@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using form_builder.Comparators;
 using form_builder.Enum;
 using form_builder.Models;
 
-
-namespace form_builder.Comparators
+namespace form_builder.Conditions
 {
     public static class DateComparator
     {
@@ -17,10 +15,9 @@ namespace form_builder.Comparators
                 dateComparison = DateTime.Parse(condition.ComparisonDate);
             }
 
-            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, condition.IsBefore);
+            var isBefore = !string.IsNullOrEmpty(condition.ComparisonValue) ? int.Parse(condition.ComparisonValue) : condition.IsBefore.Value;
+            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isBefore);
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
-
-
 
             if (DateTime.Compare(dateValue, newComparisonDate) <= 0)
             {
@@ -38,11 +35,9 @@ namespace form_builder.Comparators
                 dateComparison = DateTime.Parse(condition.ComparisonDate);
             }
 
-            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, condition.IsAfter);
-
+            var isAfter = !string.IsNullOrEmpty(condition.ComparisonValue) ? int.Parse(condition.ComparisonValue) : condition.IsAfter.Value;
+            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isAfter);
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
-
-
 
             if (DateTime.Compare(dateValue, newComparisonDate) > 0)
             {
@@ -60,11 +55,9 @@ namespace form_builder.Comparators
                 dateComparison = DateTime.Parse(condition.ComparisonDate);
             }
 
-            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, condition.IsAfter);
-
+            var isEqualTo = !string.IsNullOrEmpty(condition.ComparisonValue) ? int.Parse(condition.ComparisonValue) : condition.IsBefore.Value;
+            var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isEqualTo);
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
-
-
 
             if (DateTime.Compare(dateValue, newComparisonDate) == 0)
             {
@@ -74,25 +67,22 @@ namespace form_builder.Comparators
             return false;
         }
 
-        private static DateTime GetComparisonDate(DateTime dateComparison, EDateUnit unit, int? isAfter)
+        private static DateTime GetComparisonDate(DateTime dateComparison, EDateUnit unit, int isAfter)
         {
-            int isAfterInt = isAfter ?? 0;
-
             DateTime newComparisonDate;
             switch (unit)
             {
                 case (EDateUnit.Year):
-                    newComparisonDate = dateComparison.AddYears(isAfterInt);
+                    newComparisonDate = dateComparison.AddYears(isAfter);
                     break;
                 case (EDateUnit.Month):
-                    newComparisonDate = dateComparison.AddMonths(isAfterInt);
+                    newComparisonDate = dateComparison.AddMonths(isAfter);
                     break;
                 case (EDateUnit.Day):
-                    newComparisonDate = dateComparison.AddDays(isAfterInt);
+                    newComparisonDate = dateComparison.AddDays(isAfter);
                     break;
                 default:
                     throw new Exception("No unit specifed");
-
             }
 
             return newComparisonDate;
@@ -112,6 +102,5 @@ namespace form_builder.Comparators
 
             return new DateTime(years, months, days);
         }
-
     }
 }

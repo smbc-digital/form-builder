@@ -1,4 +1,3 @@
-using form_builder.Comparators;
 using form_builder.Enum;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
@@ -7,6 +6,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using form_builder.Conditions;
 
 namespace form_builder.Models
 {

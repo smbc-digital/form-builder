@@ -140,7 +140,10 @@ namespace form_builder.Models.Elements
             if (results != null && results.Count == 0)
                 Properties.DisplayNoResultsIAG = true;
 
-            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
+            ReturnURL = environment.EnvironmentName == "local" || environment.EnvironmentName == "uitest"
+                ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
+                : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
+
             return await viewRender.RenderAsync("AddressManual", this);
         }
     }
