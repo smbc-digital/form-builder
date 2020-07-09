@@ -1,19 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
 using form_builder.Models;
 using form_builder.Services.RetrieveExternalDataService.Entities;
 
 namespace form_builder.Helpers.ActionsHelpers
 {
-    public interface IPageActionsHelper
+    public interface IActionsHelper
     {
         ExternalDataEntity GenerateUrl(string baseUrl, FormAnswers formAnswers);
 
         string GetEmailToAddresses(FormAction action, FormAnswers formAnswers);
     }
 
-    public class PageActionsHelper : IPageActionsHelper
+    public class ActionsHelper : IActionsHelper
     {
         private Regex _tagRegex => new Regex("(?<={{).*?(?=}})", RegexOptions.Compiled);
 

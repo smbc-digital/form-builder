@@ -7,9 +7,9 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.Helpers
 {
-    public class PageActionsHelperTests
+    public class ActionsHelperTests
     {
-        private readonly IPageActionsHelper _pageActionsHelper;
+        private readonly IActionsHelper _actionsHelper;
 
         private readonly MappingEntity _mappingEntity = new MappingEntityBuilder()
             .WithFormAnswers(new FormAnswers
@@ -32,16 +32,16 @@ namespace form_builder_tests.UnitTests.Helpers
                     }
                 })
                 .Build();
-        public PageActionsHelperTests()
+        public ActionsHelperTests()
         {
-            _pageActionsHelper = new PageActionsHelper();
+            _actionsHelper = new ActionsHelper();
         }
 
         [Fact]
         public void GenerateUrl_ShouldGenerateCorrectGetUrl_PathParameters()
         {
             // Act
-            var result = _pageActionsHelper.GenerateUrl("www.testurl.com/{{testQuestionId}}", _mappingEntity.FormAnswers);
+            var result = _actionsHelper.GenerateUrl("www.testurl.com/{{testQuestionId}}", _mappingEntity.FormAnswers);
 
             // Assert
             Assert.Equal("www.testurl.com/testResponse", result.Url);
@@ -52,7 +52,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void GenerateUrl_ShouldGenerateCorrectGetUrl_QueryStringParameters()
         {
             // Act
-            var result = _pageActionsHelper.GenerateUrl("www.testurl.com?id={{testQuestionId}}", _mappingEntity.FormAnswers);
+            var result = _actionsHelper.GenerateUrl("www.testurl.com?id={{testQuestionId}}", _mappingEntity.FormAnswers);
 
             // Assert
             Assert.Equal("www.testurl.com?id=testResponse", result.Url);
@@ -63,7 +63,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void GenerateUrl_ShouldGenerateCorrectPostUrl()
         {
             // Act
-            var result = _pageActionsHelper.GenerateUrl("www.testurl.com", _mappingEntity.FormAnswers);
+            var result = _actionsHelper.GenerateUrl("www.testurl.com", _mappingEntity.FormAnswers);
 
             // Assert
             Assert.Equal("www.testurl.com", result.Url);
