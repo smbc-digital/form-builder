@@ -28,7 +28,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
-        private readonly Mock<IActionsHelper> _mockActionsHelper = new Mock<IActionsHelper>();
+        private readonly Mock<IActionHelper> _mockActionHelper = new Mock<IActionHelper>();
 
         private readonly List<PageAction> pageActions = new List<PageAction>
         {
@@ -75,7 +75,7 @@ namespace form_builder_tests.UnitTests.Services
 
         public RetrieveExternalDataServiceTests()
         {
-            _service = new RetrieveExternalDataService(_mockGateway.Object, _mockSessionHelper.Object, _mockDistributedCacheWrapper.Object, _mockMappingService.Object, _mockActionsHelper.Object);
+            _service = new RetrieveExternalDataService(_mockGateway.Object, _mockSessionHelper.Object, _mockDistributedCacheWrapper.Object, _mockMappingService.Object, _mockActionHelper.Object);
 
             _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123456");
             _mockMappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(mappingEntity);
@@ -83,7 +83,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(successResponse);
             _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(successResponse);
-            _mockActionsHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new ExternalDataEntity
                 {
                     Url = "www.test.com/testResponse",
@@ -128,7 +128,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldCallGateway_PostAsync()
         {
             // Arrange
-            _mockActionsHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new ExternalDataEntity
                 {
                     Url = string.Empty,
@@ -266,7 +266,7 @@ namespace form_builder_tests.UnitTests.Services
                     .Build()
             };
 
-            _mockActionsHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new ExternalDataEntity
                 {
                     Url = string.Empty,

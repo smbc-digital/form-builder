@@ -22,14 +22,14 @@ namespace form_builder.Services.ActionService
         private readonly ISessionHelper _sessionHelper;
         private readonly IDistributedCache _distributedCache;
         private readonly IEmailProvider _emailProvider;
-        private readonly IActionsHelper _actionsHelper;
+        private readonly IActionHelper _actionHelper;
 
-        public ActionService(ISessionHelper sessionHelper, IDistributedCache distributedCache, IEmailProvider emailProvider, IActionsHelper actionsHelper)
+        public ActionService(ISessionHelper sessionHelper, IDistributedCache distributedCache, IEmailProvider emailProvider, IActionHelper actionHelper)
         {
             _sessionHelper = sessionHelper;
             _distributedCache = distributedCache;
             _emailProvider = emailProvider;
-            _actionsHelper = actionsHelper;
+            _actionHelper = actionHelper;
         }
         public async Task Process(FormSchema baseForm)
         {
@@ -53,7 +53,7 @@ namespace form_builder.Services.ActionService
                                 action.Properties.Subject,
                                 action.Properties.Content,
                                 action.Properties.From,
-                                _actionsHelper.GetEmailToAddresses(action, formAnswers));
+                                _actionHelper.GetEmailToAddresses(action, formAnswers));
 
                             await _emailProvider.SendAwsSesEmail(message);
                             break;
@@ -90,7 +90,7 @@ namespace form_builder.Services.ActionService
                 IsBodyHtml = true
             };
 
-            var toEmails = _actionsHelper.GetEmailToAddresses(action, formAnswers).Split(",");
+            var toEmails = _actionHelper.GetEmailToAddresses(action, formAnswers).Split(",");
 
             foreach (var email in toEmails)
             {

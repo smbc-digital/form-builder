@@ -7,9 +7,9 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.Helpers
 {
-    public class ActionsHelperTests
+    public class ActionHelperTests
     {
-        private readonly IActionsHelper _actionsHelper;
+        private readonly IActionHelper _actionHelper;
 
         private readonly MappingEntity _mappingEntity = new MappingEntityBuilder()
             .WithFormAnswers(new FormAnswers
@@ -32,16 +32,16 @@ namespace form_builder_tests.UnitTests.Helpers
                     }
                 })
                 .Build();
-        public ActionsHelperTests()
+        public ActionHelperTests()
         {
-            _actionsHelper = new ActionsHelper();
+            _actionHelper = new ActionHelper();
         }
 
         [Fact]
         public void GenerateUrl_ShouldGenerateCorrectGetUrl_PathParameters()
         {
             // Act
-            var result = _actionsHelper.GenerateUrl("www.testurl.com/{{testQuestionId}}", _mappingEntity.FormAnswers);
+            var result = _actionHelper.GenerateUrl("www.testurl.com/{{testQuestionId}}", _mappingEntity.FormAnswers);
 
             // Assert
             Assert.Equal("www.testurl.com/testResponse", result.Url);
@@ -52,7 +52,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void GenerateUrl_ShouldGenerateCorrectGetUrl_QueryStringParameters()
         {
             // Act
-            var result = _actionsHelper.GenerateUrl("www.testurl.com?id={{testQuestionId}}", _mappingEntity.FormAnswers);
+            var result = _actionHelper.GenerateUrl("www.testurl.com?id={{testQuestionId}}", _mappingEntity.FormAnswers);
 
             // Assert
             Assert.Equal("www.testurl.com?id=testResponse", result.Url);
@@ -63,11 +63,23 @@ namespace form_builder_tests.UnitTests.Helpers
         public void GenerateUrl_ShouldGenerateCorrectPostUrl()
         {
             // Act
-            var result = _actionsHelper.GenerateUrl("www.testurl.com", _mappingEntity.FormAnswers);
+            var result = _actionHelper.GenerateUrl("www.testurl.com", _mappingEntity.FormAnswers);
 
             // Assert
             Assert.Equal("www.testurl.com", result.Url);
             Assert.True(result.IsPost);
+        }
+
+        [Fact]
+        public void GetEmailToAddresses_ShouldReturnListOfToAddress()
+        {
+            // Arrange
+
+
+            // Act
+
+
+            // Assert
         }
     }
 }

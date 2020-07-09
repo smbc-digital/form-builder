@@ -5,14 +5,14 @@ using form_builder.Services.RetrieveExternalDataService.Entities;
 
 namespace form_builder.Helpers.ActionsHelpers
 {
-    public interface IActionsHelper
+    public interface IActionHelper
     {
         ExternalDataEntity GenerateUrl(string baseUrl, FormAnswers formAnswers);
 
         string GetEmailToAddresses(FormAction action, FormAnswers formAnswers);
     }
 
-    public class ActionsHelper : IActionsHelper
+    public class ActionHelper : IActionHelper
     {
         private Regex _tagRegex => new Regex("(?<={{).*?(?=}})", RegexOptions.Compiled);
 

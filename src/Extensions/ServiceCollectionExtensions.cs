@@ -114,7 +114,7 @@ namespace form_builder.Extensions
             services.AddSingleton<IElementHelper, ElementHelper>();
             services.AddSingleton<IElementMapper, ElementMapper>();
             services.AddSingleton<IDocumentCreationHelper, DocumentCreationHelper>();
-            services.AddSingleton<IActionsHelper, ActionsHelper>();
+            services.AddSingleton<IActionHelper, ActionHelper>();
 
             services.AddHttpContextAccessor();
             services.AddScoped<IViewRender, ViewRender>();
