@@ -99,8 +99,6 @@ namespace form_builder.Extensions
 
         public static IServiceCollection AddSesEmailConfiguration(this IServiceCollection services, string accessKey, string secretKey)
         {
-            //var amazonSesKey = new AwsSesKeysConfiguration(accessKey, secretKey);
-            //services.AddSingleton(amazonSesKey);
             var credentials = new BasicAWSCredentials(accessKey, secretKey);
             services.AddTransient<IAmazonSimpleEmailService>(_ =>
                 new AmazonSimpleEmailServiceClient(credentials, RegionEndpoint.EUWest1));

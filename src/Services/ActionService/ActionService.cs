@@ -7,6 +7,7 @@ using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.EmailProvider;
+using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 
@@ -20,11 +21,11 @@ namespace form_builder.Services.ActionService
     public class ActionService : IActionService
     {
         private readonly ISessionHelper _sessionHelper;
-        private readonly IDistributedCache _distributedCache;
+        private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IEmailProvider _emailProvider;
         private readonly IActionHelper _actionHelper;
 
-        public ActionService(ISessionHelper sessionHelper, IDistributedCache distributedCache, IEmailProvider emailProvider, IActionHelper actionHelper)
+        public ActionService(ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache, IEmailProvider emailProvider, IActionHelper actionHelper)
         {
             _sessionHelper = sessionHelper;
             _distributedCache = distributedCache;
