@@ -59,7 +59,10 @@ namespace form_builder.Models.Elements
                 case LookUpConstants.Automatic:
                     IsSelect = true;
                     Properties.Value = elementHelper.CurrentValue<string>(this, answers, page.PageSlug, guid, string.Empty);
-                    ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
+
+                    ReturnURL = environment.EnvironmentName == "local" || environment.EnvironmentName == "uitest"
+                        ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
+                        : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
 
                     var selectedStreet = elementHelper.CurrentValue<string>(this, answers, page.PageSlug, guid, StreetConstants.SELECT_SUFFIX);
                     Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} streets found", string.Empty) };
