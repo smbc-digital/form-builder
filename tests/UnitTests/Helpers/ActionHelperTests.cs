@@ -1,6 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using form_builder.Builders;
+using form_builder.Enum;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Models;
+using form_builder.Models.Properties.ActionProperties;
 using form_builder.Services.MappingService.Entities;
 using form_builder_tests.Builders;
 using Xunit;
@@ -13,9 +17,9 @@ namespace form_builder_tests.UnitTests.Helpers
 
         private readonly MappingEntity _mappingEntity = new MappingEntityBuilder()
             .WithFormAnswers(new FormAnswers
-                {
-                    Path = "page-one",
-                    Pages = new List<PageAnswers>
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>
                     {
                         new PageAnswers
                         {
@@ -28,10 +32,42 @@ namespace form_builder_tests.UnitTests.Helpers
                                 }
                             },
                             PageSlug = "page-one"
+                        },
+                        new PageAnswers
+                        {
+                            Answers = new List<Answers>
+                            {
+                                new Answers
+                                {
+                                    Response = "testResponse.email@test.com",
+                                    QuestionId = "emailQuestion"
+                                }
+                            },
+                            PageSlug = "page-one"
                         }
                     }
-                })
+            })
                 .Build();
+
+        private readonly FormSchema _formSchema = new FormSchemaBuilder()
+            .WithStartPageSlug("page-one")
+            .WithBaseUrl("base-test")
+            .WithPage(new PageBuilder()
+            .WithElement(new ElementBuilder()
+            .WithType(EElementType.H2)
+            .Build())
+            .WithPageSlug("success")
+            .Build())
+            .WithFormActions(new FormAction
+            {
+                Properties = new BaseActionProperty
+                {
+                    To = "email.test@test.com, {{emailQuestion}}",
+                },
+                Type = EFormActionType.UserEmail
+            })
+        .Build();
+
         public ActionHelperTests()
         {
             _actionHelper = new ActionHelper();
@@ -71,15 +107,13 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void GetEmailToAddresses_ShouldReturnListOfToAddress()
+        public void GetEmailToAddresses_ShouldReturnListOfToEmailAddress()
         {
-            // Arrange
-
-
             // Act
-
+            var result = _actionHelper.GetEmailToAddresses(_formSchema.FormActions.FirstOrDefault(), _mappingEntity.FormAnswers);
 
             // Assert
+            Assert.Equal("testResponse.email@test.com,email.test@test.com,", result);
         }
     }
 }
