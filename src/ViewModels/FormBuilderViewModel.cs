@@ -1,4 +1,7 @@
 
+using form_builder.Models;
+using System.Collections.Generic;
+
 namespace form_builder.ViewModels
 {
     public class FormBuilderViewModel
@@ -18,5 +21,8 @@ namespace form_builder.ViewModels
         public string StartFormUrl { get; set; }
 
         public bool HideBackButton { get; set; }
+
+        public bool DisplayBreadCrumbs { get; set; }
+        public List<Breadcrumb> BreadCrumbs { get; set; }
     }
 }

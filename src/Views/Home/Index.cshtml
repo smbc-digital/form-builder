@@ -4,6 +4,8 @@
     ViewData["PageTitle"] = Model.PageTitle;
     ViewData["FeedbackForm"] = Model.FeedbackForm;
     ViewData["FeedbackPhase"] = Model.FeedbackPhase;
+    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadCrumbs;
+    ViewData["Breadcrumbs"] = Model.BreadCrumbs;
 }
 
 @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { autocomplete = "on", novalidate="novalidate",enctype="multipart/form-data"}))

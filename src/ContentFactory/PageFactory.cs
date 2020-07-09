@@ -33,7 +33,8 @@ namespace form_builder.ContentFactory
             result.FeedbackPhase = baseForm.FeedbackPhase;
             result.HideBackButton = page.HideBackButton;
             result.StartFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{baseForm.BaseURL}/{baseForm.StartPageSlug}";
-            
+            result.BreadCrumbs = baseForm.BreadCrumbs;
+            result.DisplayBreadCrumbs = page.DisplayBreadCrumbs;
             return result;
         }
     }

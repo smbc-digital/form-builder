@@ -19,6 +19,8 @@ namespace form_builder.Models
 
         public string FeedbackPhase { get; set; }
 
+        public List<Breadcrumb> BreadCrumbs { get; set; }
+
         public List<Page> Pages { get; set; }
         
         public List<EnvironmentAvailability> EnvironmentAvailabilities { get; set; }

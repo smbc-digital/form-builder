@@ -1,4 +1,5 @@
 using form_builder.Models;
+using System.Collections.Generic;
 
 namespace form_builder.Services.PageService.Entities
 {
@@ -6,13 +7,17 @@ namespace form_builder.Services.PageService.Entities
     {
         public string ViewName { get; set; } = "Success";
         public FormAnswers FormAnswers { get; set; }
-        public string FeedbackFormUrl {get;set;}
-        public string FeedbackPhase {get;set;}
+        public string FeedbackFormUrl { get; set; }
+        public string FeedbackPhase { get; set; }
         public string HtmlContent { get; set; }
         public string FormName { get; set; }
         public string StartFormUrl { get; set; }
         public string PageTitle { get; set; }
         public string BannerTitle { get; set; }
         public string LeadingParagraph { get; set; }
+        public bool DisplayBreadcrumbs { get; set; }
+
+        public List<Breadcrumb> Breadcrumbs {get;set;}
+
     }
 }

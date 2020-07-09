@@ -153,7 +153,9 @@ namespace form_builder.Controllers
                 FeedbackFormUrl = result.FeedbackFormUrl,
                 PageTitle = result.PageTitle,
                 BannerTitle = result.BannerTitle,
-                LeadingParagraph = result.LeadingParagraph
+                LeadingParagraph = result.LeadingParagraph,
+                DisplayBreadcrumbs = result.DisplayBreadcrumbs,
+                Breadcrumbs = result.Breadcrumbs
             };
 
             return View(result.ViewName, success);

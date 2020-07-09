@@ -1,6 +1,9 @@
 ﻿@model form_builder.ViewModels.SummaryViewModel;
 @{
     ViewData["Title"] = "Summary";
+    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadCrumbs;
+    ViewData["Breadcrumbs"] = Model.BreadCrumbs;
+
 }
 
 <h1 class="govuk-heading-l">Your answers</h1>
