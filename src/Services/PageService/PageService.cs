@@ -3,7 +3,6 @@ using form_builder.Models;
 using form_builder.Validators;
 using System.Threading.Tasks;
 using form_builder.Helpers.PageHelpers;
-using Microsoft.Extensions.Logging;
 using form_builder.Helpers.Session;
 using System;
 using form_builder.Services.PageService.Entities;
@@ -16,7 +15,6 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Extensions;
 using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
@@ -25,6 +23,7 @@ using form_builder.Factories.Schema;
 using form_builder.Constants;
 using form_builder.Services.MappingService;
 using form_builder.Services.PayService;
+using Microsoft.Extensions.Logging;
 
 namespace form_builder.Services.PageService
 {
@@ -44,6 +43,7 @@ namespace form_builder.Services.PageService
         private readonly IMappingService _mappingService;
         private readonly ISuccessPageFactory _successPageContentFactory;
         private readonly IPageFactory _pageContentFactory;
+        private readonly ILogger<PageService> _logger;
 
         public PageService(
             IEnumerable<IElementValidator> validators, 
@@ -59,7 +59,8 @@ namespace form_builder.Services.PageService
             IPageFactory pageFactory,
             ISchemaFactory schemaFactory,
             IMappingService mappingService,
-            IPayService payService)
+            IPayService payService,
+            ILogger<PageService> logger)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -75,6 +76,7 @@ namespace form_builder.Services.PageService
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
             _payService = payService;
             _mappingService = mappingService;
+            _logger = logger;
         }
         
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath)
@@ -269,7 +271,10 @@ namespace form_builder.Services.PageService
             }
 
             if(baseForm.DocumentDownload)
+            {
                 await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(formAnswers), _distrbutedCacheExpirationConfiguration.Document);
+                _logger.LogInformation($"FinalisePageJourney:DocumentDownload, Previous answers stored in key document-{sessionGuid} for {_distrbutedCacheExpirationConfiguration.Document} minutes");
+            }
 
             _distributedCache.Remove(sessionGuid);
             _sessionHelper.RemoveSessionGuid();
