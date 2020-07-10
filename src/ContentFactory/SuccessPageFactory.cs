@@ -64,7 +64,7 @@ namespace form_builder.ContentFactory
                         var element = new ElementBuilder()
                             .WithType(EElementType.DocumentDownload)
                             .WithLabel($"Download {docType} document")
-                            .WithSource($"/document/Summary/{docType}/{sessionGuid}")
+                            .WithSource($"/v2/document/Summary/{docType}/{sessionGuid}")
                             .WithDocumentType(docType)
                             .Build();
 
