@@ -368,7 +368,7 @@ namespace form_builder_tests.UnitTests.Services
             {
                 Type = EElementType.PaymentSummary,
                 Properties = new BaseProperty
-                {A
+                {
                     CalculationSlugs = new List<SubmitSlug>
                     {
                         new SubmitSlug

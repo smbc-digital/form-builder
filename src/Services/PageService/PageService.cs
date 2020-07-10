@@ -59,8 +59,7 @@ namespace form_builder.Services.PageService
             IPageFactory pageFactory,
             ISchemaFactory schemaFactory,
             IMappingService mappingService,
-            IPayService payService,
-            ILogger<PageService> logger)
+            IPayService payService)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -76,7 +75,6 @@ namespace form_builder.Services.PageService
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
             _payService = payService;
             _mappingService = mappingService;
-            _logger = logger;
         }
         
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath)
@@ -271,10 +269,7 @@ namespace form_builder.Services.PageService
             }
 
             if(baseForm.DocumentDownload)
-            {
                 await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(formAnswers), _distrbutedCacheExpirationConfiguration.Document);
-                _logger.LogInformation($"FinalisePageJourney:DocumentDownload, Previous answers stored in key document-{sessionGuid} for {_distrbutedCacheExpirationConfiguration.Document} minutes");
-            }
 
             _distributedCache.Remove(sessionGuid);
             _sessionHelper.RemoveSessionGuid();

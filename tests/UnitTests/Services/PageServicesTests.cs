@@ -52,7 +52,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IMappingService> _mappingService = new Mock<IMappingService>();
         private readonly Mock<IPageFactory> _mockPageFactory = new Mock<IPageFactory>();
         private readonly Mock<ISuccessPageFactory> _mockSuccessPageFactory = new Mock<ISuccessPageFactory>();
-        private readonly Mock<ILogger<PageService>> _mockLogger = new Mock<ILogger<PageService>>();
 
         public PageServicesTests()
         {
@@ -86,7 +85,7 @@ namespace form_builder_tests.UnitTests.Services
             });
 
             _service = new PageService(_validators.Object, _pageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, 
-            _distributedCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object, _mockLogger.Object);
+            _distributedCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object);
         }
 
         [Fact]
