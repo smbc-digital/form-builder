@@ -5,6 +5,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -16,13 +17,14 @@ namespace form_builder_tests.UnitTests.ContentFactory
         private readonly PageFactory _factory;
         private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAcessor = new Mock<IHttpContextAccessor>();
+        private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
         
         public PageFactoryTests()
         {
             _mockHttpContextAcessor.Setup(_ => _.HttpContext.Request.Host)
                 .Returns(new HostString("www.test.com"));
 
-            _factory = new PageFactory(_mockPageHelper.Object, _mockHttpContextAcessor.Object);
+            _factory = new PageFactory(_mockPageHelper.Object, _mockHttpContextAcessor.Object, _mockHostingEnv.Object);
         }
 
         [Fact]
@@ -87,7 +89,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             Assert.Equal("page title", result.PageTitle);
             Assert.Equal("feedbackurl", result.FeedbackForm);
             Assert.Equal("BETA", result.FeedbackPhase);
-            Assert.Equal($"https://www.test.com/{baseUrl}/{pageUrl}", result.StartFormUrl);
+            Assert.Equal($"https://www.test.com/v2/{baseUrl}/{pageUrl}", result.StartFormUrl);
         }
     }
 }
