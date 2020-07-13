@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
-using form_builder.Services.ActionService;
 using form_builder.Services.PageService;
 using form_builder.Services.PageService.Entities;
 
@@ -10,33 +9,30 @@ namespace form_builder.Workflows
 {
     public interface ISuccessWorkflow
     {
-        Task<SuccessPageEntity> Process(string form);
+        Task<SuccessPageEntity> Process(EBehaviourType behaviourType, string form);
     }
 
     public class SuccessWorkflow : ISuccessWorkflow
     {
         private readonly IPageService _pageService;
         private readonly ISchemaFactory _schemaFactory;
-        private readonly IActionService _actionService;
+        private readonly IActionsWorkflow _actionsWorkflow;
 
-        public SuccessWorkflow(IPageService pageService, ISchemaFactory schemaFactory, IActionService actionService)
+        public SuccessWorkflow(IPageService pageService, ISchemaFactory schemaFactory, IActionsWorkflow actionsWorkflow)
         {
             _pageService = pageService;
             _schemaFactory = schemaFactory;
-            _actionService = actionService;
+            _actionsWorkflow = actionsWorkflow;
         }
 
-        public async Task<SuccessPageEntity> Process(string form)
+        public async Task<SuccessPageEntity> Process(EBehaviourType behaviourType, string form)
         {
             var baseForm = await _schemaFactory.Build(form);
 
-            if (baseForm.FormActions != null && baseForm.FormActions.Any())
-            {
-                await _actionService.Process(baseForm);
-            }
+            if (baseForm.FormActions.Any())
+                await _actionsWorkflow.Process(baseForm.FormActions, baseForm, form);
 
-            var result = await _pageService.FinalisePageJourney(form, EBehaviourType.SubmitForm);
-            return result;
+            return await _pageService.FinalisePageJourney(form, behaviourType, baseForm);
         }
     }
 }

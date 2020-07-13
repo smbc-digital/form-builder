@@ -58,13 +58,13 @@ namespace form_builder_tests.UnitTests.Helpers
             .Build())
             .WithPageSlug("success")
             .Build())
-            .WithFormActions(new FormAction
+            .WithFormActions(new UserEmail
             {
                 Properties = new BaseActionProperty
                 {
                     To = "email.test@test.com, {{emailQuestion}}",
                 },
-                Type = EFormActionType.UserEmail
+                Type = EActionType.UserEmail
             })
         .Build();
 

@@ -9,7 +9,7 @@ namespace form_builder.Helpers.ActionsHelpers
     {
         ExternalDataEntity GenerateUrl(string baseUrl, FormAnswers formAnswers);
 
-        string GetEmailToAddresses(FormAction action, FormAnswers formAnswers);
+        string GetEmailToAddresses(IAction action, FormAnswers formAnswers);
     }
 
     public class ActionHelper : IActionHelper
@@ -27,7 +27,7 @@ namespace form_builder.Helpers.ActionsHelpers
             };
         }
 
-        public string GetEmailToAddresses(FormAction action, FormAnswers formAnswers)
+        public string GetEmailToAddresses(IAction action, FormAnswers formAnswers)
         {
             var matches = _tagRegex.Matches(action.Properties.To).ToList();
 
@@ -39,7 +39,7 @@ namespace form_builder.Helpers.ActionsHelpers
 
             emailList.AddRange(action.Properties.To.Split(",").Where(_ => !_tagRegex.IsMatch(_)));
 
-            return emailList.Aggregate("", (current, email) => current + email + ",");
+            return emailList.Where(_ => _ != null).Aggregate("", (current, email) => current + email + ",");
         }
 
         private string Replace(Match match, string current, FormAnswers formAnswers)

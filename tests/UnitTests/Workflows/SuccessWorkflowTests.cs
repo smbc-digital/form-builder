@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Models;
 using form_builder.Models.Properties.ActionProperties;
-using form_builder.Services.ActionService;
 using form_builder.Services.PageService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Workflows;
@@ -19,11 +19,11 @@ namespace form_builder_tests.UnitTests.Workflows
         private readonly SuccessWorkflow _workflow;
         private readonly Mock<IPageService> _mockPageService = new Mock<IPageService>();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
-        private readonly Mock<IActionService> _mockActionService = new Mock<IActionService>();
+        private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new Mock<IActionsWorkflow>();
 
         public SuccessWorkflowTests()
         {
-            _workflow = new SuccessWorkflow(_mockPageService.Object, _mockSchemaFactory.Object, _mockActionService.Object);
+            _workflow = new SuccessWorkflow(_mockPageService.Object, _mockSchemaFactory.Object, _mockActionsWorkflow.Object);
 
             var element = new ElementBuilder()
                 .WithType(EElementType.H2)
@@ -43,7 +43,7 @@ namespace form_builder_tests.UnitTests.Workflows
                 .Build();
 
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>())).ReturnsAsync(formSchema);
-            _mockPageService.Setup(_ => _.FinalisePageJourney(It.IsAny<string>(), EBehaviourType.SubmitForm))
+            _mockPageService.Setup(_ => _.FinalisePageJourney(It.IsAny<string>(), EBehaviourType.SubmitForm, It.IsAny<FormSchema>()))
                 .ReturnsAsync(new SuccessPageEntity
                 {
                     FormAnswers = new FormAnswers()
@@ -54,7 +54,7 @@ namespace form_builder_tests.UnitTests.Workflows
         public async Task Process_ShouldCallSchemaFactory()
         {
             // Act
-            await _workflow.Process("form");
+            await _workflow.Process(EBehaviourType.SubmitForm, "form");
 
             // Assert
             _mockSchemaFactory.Verify(_ => _.Build("form"), Times.Once);
@@ -64,10 +64,10 @@ namespace form_builder_tests.UnitTests.Workflows
         public async Task Process_ShouldNotCallActionService()
         {
             // Act
-            await _workflow.Process("form");
+            await _workflow.Process(EBehaviourType.SubmitForm, "form");
 
             // Assert
-            _mockActionService.Verify(_ => _.Process(It.IsAny<FormSchema>()), Times.Never);
+            _mockActionsWorkflow.Verify(_ => _.Process(It.IsAny<List<IAction>>(), It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -89,30 +89,30 @@ namespace form_builder_tests.UnitTests.Workflows
                 .WithStartPageSlug("page-one")
                 .WithBaseUrl("base-test")
                 .WithPage(page)
-                .WithFormActions(new FormAction
+                .WithFormActions(new UserEmail
                 {
                     Properties = new BaseActionProperty(),
-                    Type = EFormActionType.UserEmail
+                    Type = EActionType.UserEmail
                 })
                 .Build();
 
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>())).ReturnsAsync(formSchema);
 
             // Act
-            await _workflow.Process("form");
+            await _workflow.Process(EBehaviourType.SubmitForm, "form");
 
             // Assert
-            _mockActionService.Verify(_ => _.Process(It.IsAny<FormSchema>()), Times.Once);
+            _mockActionsWorkflow.Verify(_ => _.Process(It.IsAny<List<IAction>>(), It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
         public async Task Process_ShouldCallPageService()
         {
             // Act
-            await _workflow.Process("form");
+            await _workflow.Process(EBehaviourType.SubmitForm, "form");
 
             // Assert
-            _mockPageService.Verify(_ => _.FinalisePageJourney("form", EBehaviourType.SubmitForm), Times.Once);
+            _mockPageService.Verify(_ => _.FinalisePageJourney("form", EBehaviourType.SubmitForm, It.IsAny<FormSchema>()), Times.Once);
         }
     }
 }

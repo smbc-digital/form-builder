@@ -31,7 +31,7 @@ namespace form_builder.Services.RetrieveExternalDataService
             _actionHelper = actionHelper;
         }
  
-        public async Task Process(List<PageAction> actions, string formName)
+        public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
         {
             var answers = new List<Answers>();
             var sessionGuid = _sessionHelper.GetSessionGuid();
@@ -75,5 +75,6 @@ namespace form_builder.Services.RetrieveExternalDataService
 
             await _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
         }
+
     }
 }

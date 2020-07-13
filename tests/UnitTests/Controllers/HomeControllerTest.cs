@@ -14,7 +14,6 @@ using form_builder.Workflows;
 using form_builder.Services.FileUploadService;
 using form_builder.Builders;
 using form_builder.Models.Properties.ActionProperties;
-using form_builder.Models.Properties.ElementProperties;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
@@ -46,7 +45,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockActionsWorkflow.Object,
                 _mockSucessWorkflow.Object) {TempData = tempData};
 
-            _mockSucessWorkflow.Setup(_ => _.Process(It.IsAny<string>())).ReturnsAsync(new SuccessPageEntity
+            _mockSucessWorkflow.Setup(_ => _.Process(It.IsAny<EBehaviourType>(), It.IsAny<string>())).ReturnsAsync(new SuccessPageEntity
             {
                 FormAnswers = new FormAnswers(),
                 FormName = "form",
@@ -502,7 +501,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .Build();
 
             var pageActions = new PageActionsBuilder()
-                .WithActionType(EPageActionType.RetrieveExternalData)
+                .WithActionType(EActionType.RetrieveExternalData)
                 .WithActionProperties(new BaseActionProperty
                 {
                     URL = string.Empty,
@@ -534,7 +533,7 @@ namespace form_builder_tests.UnitTests.Controllers
             await _homeController.Index("form", "page-one", viewModel, null);
             
             // Assert
-            _mockActionsWorkflow.Verify(_ => _.Process(page, It.IsAny<string>()), Times.Once);
+            _mockActionsWorkflow.Verify(_ => _.Process(page.PageActions, It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -573,7 +572,7 @@ namespace form_builder_tests.UnitTests.Controllers
             await _homeController.Index("form", "page-one", viewModel, null);
 
             // Assert
-            _mockActionsWorkflow.Verify(_ => _.Process(page, It.IsAny<string>()), Times.Never);
+            _mockActionsWorkflow.Verify(_ => _.Process(page.PageActions, It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -583,7 +582,7 @@ namespace form_builder_tests.UnitTests.Controllers
             await _homeController.Success("form");
 
             // Assert
-            _mockSucessWorkflow.Verify(_ => _.Process("form"), Times.Once);
+            _mockSucessWorkflow.Verify(_ => _.Process(EBehaviourType.SubmitForm, "form"), Times.Once);
         }
 
         [Fact]

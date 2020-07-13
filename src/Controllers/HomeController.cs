@@ -45,9 +45,8 @@ namespace form_builder.Controllers
         [Route("/")]
         public IActionResult Home()
         {
-            if(_hostingEnvironment.EnvironmentName.ToLower() == "prod"){
+            if(_hostingEnvironment.EnvironmentName.ToLower().Equals("prod"))
                 return Redirect("https://www.stockport.gov.uk");
-            }
 
             return View("../Error/Index");
         }
@@ -97,7 +96,7 @@ namespace form_builder.Controllers
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
 
             if (currentPageResult.Page.HasPageActions)
-                await _actionsWorkflow.Process(currentPageResult.Page, form);
+                await _actionsWorkflow.Process(currentPageResult.Page.PageActions, null, form);
 
             var behaviour = _pageService.GetBehaviour(currentPageResult);
 
@@ -144,7 +143,7 @@ namespace form_builder.Controllers
         [Route("{form}/success")]
         public async Task<IActionResult> Success(string form)
         {
-            var result = await _successWorkflow.Process(form);
+            var result = await _successWorkflow.Process(EBehaviourType.SubmitForm, form);
             
             var success = new SuccessViewModel {
                 Reference = (string)TempData["reference"],

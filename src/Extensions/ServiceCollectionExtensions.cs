@@ -45,9 +45,9 @@ using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Providers.EmailProvider;
-using form_builder.Services.ActionService;
 using form_builder.Services.RetrieveExternalDataService;
 using Serilog;
+using form_builder.Services.EmailService;
 
 namespace form_builder.Extensions
 {
@@ -185,7 +185,7 @@ namespace form_builder.Extensions
             services.AddSingleton<IFileUploadService, FileUploadService>();
             services.AddSingleton<IDocumentSummaryService, DocumentSummaryService>();
             services.AddSingleton<IRetrieveExternalDataService, RetrieveExternalDataService>();
-            services.AddSingleton<IActionService, ActionService>();
+            services.AddSingleton<IEmailService, EmailService>();
 
             return services;
         }

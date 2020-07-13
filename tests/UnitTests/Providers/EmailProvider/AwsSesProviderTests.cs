@@ -28,16 +28,13 @@ namespace form_builder_tests.UnitTests.Providers.EmailProvider
         }
 
         [Fact]
-        public async Task SendAwsSesEmail_ShouldReturnInternalServerError_If_ToEmailIsNull()
+        public async Task SendAwsSesEmail_Should_ThrowApplicationException_If_ToEmail_IsNull()
         {
             // Arrange
             var emailMessage = new EmailMessage("subject", "body", "from", "");
 
             // Act
-            var result = await _provider.SendAwsSesEmail(emailMessage);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.InternalServerError, result);
+            await Assert.ThrowsAsync<ApplicationException>(() => _provider.SendEmail(emailMessage));
         }
 
         [Fact]
@@ -47,14 +44,14 @@ namespace form_builder_tests.UnitTests.Providers.EmailProvider
             var emailMessage = new EmailMessage("subject", "body", "from@email.com", "to@email.com");
             
             // Act
-            var result = await _provider.SendAwsSesEmail(emailMessage);
+            var result = await _provider.SendEmail(emailMessage);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, result);
         }
 
         [Fact]
-        public async Task SendAwsSesEmail_ShouldReturnBadRequest_If_EmailServiceThrows()
+        public async Task SendAwsSesEmail_Should_ThrowException_If_Email_Throws()
         {
             // Arrange
             var emailMessage = new EmailMessage("subject", "body", "from@email.com", "to@email.com");
@@ -62,10 +59,7 @@ namespace form_builder_tests.UnitTests.Providers.EmailProvider
                 .ThrowsAsync(new Exception());
 
             // Act
-            var result = await _provider.SendAwsSesEmail(emailMessage);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, result);
+            await Assert.ThrowsAsync<Exception>(() => _provider.SendEmail(emailMessage));
         }
     }
 }

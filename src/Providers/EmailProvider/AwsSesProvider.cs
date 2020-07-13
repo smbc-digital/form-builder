@@ -20,20 +20,17 @@ namespace form_builder.Providers.EmailProvider
             _logger = logger;
         }
 
-        public async Task<HttpStatusCode> SendAwsSesEmail(EmailMessage emailMessage)
+        public async Task<HttpStatusCode> SendEmail(EmailMessage emailMessage)
         {
             if (string.IsNullOrEmpty(emailMessage.ToEmail))
-            {
-                _logger.LogError("AwsSesProvider:: SendAwsSesEmail, ToEmail cannot be null or empty. No email has been sent.");
-                return HttpStatusCode.InternalServerError;
-            }
+                throw new ApplicationException("AwsSesProvider:: SendEmail, ToEmail cannot be null or empty. No email has been sent.");
 
-            var result = await SendEmail(emailMessage);
+            var result = await SendAwsSesEmail(emailMessage);
 
             return result.HttpStatusCode;
         }
 
-        private async Task<SendRawEmailResponse> SendEmail(EmailMessage emailMessage)
+        private async Task<SendRawEmailResponse> SendAwsSesEmail(EmailMessage emailMessage)
         {
             var emailBuilder = new EmailBuilder();
 
@@ -48,13 +45,8 @@ namespace form_builder.Providers.EmailProvider
             }
             catch (Exception ex)
             {
-                _logger.LogError($"AwsSesProvider:: SendEmail, An error occured trying to send an email to Amazon Ses. \n{ex.Message}");
-                return new SendRawEmailResponse
-                {
-                    HttpStatusCode = HttpStatusCode.BadRequest
-                };
+                throw new Exception($"AwsSesProvider:: SendEmail, An error has occured while attempting to send an email to Amazon Ses. \n{ex.Message}");
             }
-
         }
     }
 }

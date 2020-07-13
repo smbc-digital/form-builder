@@ -615,11 +615,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
             // Act
-            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay);
+            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
             _sessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
@@ -655,11 +652,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
             // Act
-            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay);
+            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
             _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"file-{questionIDOne}-fileupload-{guid}")), Times.Once);
@@ -696,11 +690,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithDocumentDownload(true)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
             // Act
-            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay);
+            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
             _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"document-{guid.ToString()}"), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
