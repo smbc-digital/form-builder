@@ -6,6 +6,7 @@ using form_builder.Services.MappingService;
 using form_builder.Services.PageService;
 using form_builder.Services.PayService;
 using form_builder.ViewModels;
+using form_builder.Workflows;
 using Microsoft.AspNetCore.Mvc;
 
 namespace form_builder.Controllers.Payment
@@ -13,16 +14,16 @@ namespace form_builder.Controllers.Payment
     public class PaymentController : Controller
     {
         private readonly IPayService _payService;
-        private readonly IPageService _pageService;
         private readonly ISessionHelper _sessionHelper;
         private readonly IMappingService _mappingService;
+        private readonly ISuccessWorkflow _successWorkflow;
 
-        public PaymentController(IPayService payService,IPageService pageService, ISessionHelper sessionHelper, IMappingService mappingService)
+        public PaymentController(IPayService payService,ISessionHelper sessionHelper, IMappingService mappingService, ISuccessWorkflow successWorkflow)
         {
             _payService = payService;
-            _pageService = pageService;
             _sessionHelper = sessionHelper;
             _mappingService = mappingService;
+            _successWorkflow = successWorkflow;
         }
 
         [HttpGet]
@@ -61,7 +62,7 @@ namespace form_builder.Controllers.Payment
         [Route("{form}/payment-success")]
         public async Task<IActionResult> PaymentSuccess(string form, [FromQuery] string reference)
         {
-            var result = await _pageService.FinalisePageJourney(form, EBehaviourType.SubmitAndPay);
+            var result = await _successWorkflow.Process(EBehaviourType.SubmitAndPay, form);
 
             var success = new SuccessViewModel {
                 Reference = reference,
