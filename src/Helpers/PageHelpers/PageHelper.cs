@@ -362,15 +362,38 @@ namespace form_builder.Helpers.PageHelpers
 
         public void CheckForPageActions(FormSchema formSchema)
         {
-            var UserEmail = formSchema.FormActions.Where(_ => _.Type.Equals(EActionType.UserEmail))
+            var userEmail = formSchema.FormActions.Where(_ => _.Type.Equals(EActionType.UserEmail))
                 .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
                 .Where(_ => _.Type == EActionType.UserEmail));
 
-            var BackofficeEmail = "";
+            var backOfficeEmail = formSchema.FormActions.Where(_ => _.Type.Equals(EActionType.BackOfficeEmail))
+                .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
+                    .Where(_ => _.Type == EActionType.BackOfficeEmail));
 
-            var RetrieveData = "";
+            CheckEmailAction(userEmail.ToList());
+            CheckEmailAction(backOfficeEmail.ToList());
 
+        }
 
+        private static void CheckEmailAction(List<IAction> actions)
+        {
+            if (actions.Any())
+                return;
+
+            actions.ForEach((action) =>
+            {
+                if(string.IsNullOrEmpty(action.Properties.Content))
+                    throw new ApplicationException("PageHelper:: CheckEmailAction, Content doesn't have a value");
+
+                if(string.IsNullOrEmpty(action.Properties.To))
+                    throw new ApplicationException("PageHelper:: CheckEmailAction, To doesn't have a value");
+
+                if (string.IsNullOrEmpty(action.Properties.From))
+                    throw new ApplicationException("PageHelper:: CheckEmailAction, From doesn't have a value");
+
+                if (string.IsNullOrEmpty(action.Properties.Subject))
+                    throw new ApplicationException("PageHelper:: CheckEmailAction, Subject doesn't have a value");
+            });
         }
     }
 }
