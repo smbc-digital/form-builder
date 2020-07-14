@@ -35,9 +35,7 @@ namespace form_builder.ContentFactory
             result.FeedbackForm = baseForm.FeedbackForm;
             result.FeedbackPhase = baseForm.FeedbackPhase;
             result.HideBackButton = page.HideBackButton;
-            result.StartFormUrl = _environment.EnvironmentName == "local" || _environment.EnvironmentName == "uitest"
-                ? $"https://{_httpContextAccessor.HttpContext.Request.Host}/{baseForm.BaseURL}/{baseForm.StartPageSlug}"
-                : $"https://{_httpContextAccessor.HttpContext.Request.Host}/v2/{baseForm.BaseURL}/{baseForm.StartPageSlug}";
+            result.StartPageUrl = baseForm.StartPageUrl;
             
             return result;
         }

@@ -12,8 +12,10 @@ namespace form_builder.Models
         public string FormName { get; set; }
         
         public string BaseURL { get; set; }
+
+        public string StartPageUrl { get; set; }
         
-        public string StartPageSlug { get; set; }
+        public string FirstPageSlug { get; set; }
         
         public string FeedbackForm { get; set; }
 
@@ -49,7 +51,7 @@ namespace form_builder.Models
 
         public async Task ValidateFormSchema(IPageHelper pageHelper, string form, string path)
         {
-            if (path != StartPageSlug)
+            if (path != FirstPageSlug)
                 return;
 
             pageHelper.HasDuplicateQuestionIDs(Pages, form);

@@ -1,10 +1,10 @@
-@{
+﻿@{
     var displayHeading = (string)ViewData["Title"] != "Error";
-    var startFormUrl = string.Empty;
+    var startPageUrl = string.Empty;
 
-    if(!string.IsNullOrWhiteSpace(Model?.StartFormUrl))
+    if(!string.IsNullOrWhiteSpace(Model?.StartPageUrl))
     {
-        startFormUrl = Model.StartFormUrl;
+        startPageUrl = Model.StartPageUrl;
     }
 }
 <header class="smbc-header " role="banner" data-module="govuk-header">
@@ -15,7 +15,7 @@
         <div class="govuk-header__content">
         @if (displayHeading)
         {
-            <a href="@startFormUrl" class="govuk-header__link smbc-header__link--service-name">
+            <a href="@startPageUrl" class="govuk-header__link smbc-header__link--service-name">
                 @Model.FormName
             </a>
         }

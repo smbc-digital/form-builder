@@ -101,12 +101,12 @@ namespace form_builder.Services.PageService
 
             var formData = _distributedCache.GetString(sessionGuid);
 
-            if (formData == null && path != baseForm.StartPageSlug)
+            if (formData == null && path != baseForm.FirstPageSlug)
             {
                 return new ProcessPageEntity
                 {
                     ShouldRedirect = true,
-                    TargetPage = baseForm.StartPageSlug
+                    TargetPage = baseForm.FirstPageSlug
                 };
             }
 
@@ -115,11 +115,11 @@ namespace form_builder.Services.PageService
                 return new ProcessPageEntity
                 {
                     ShouldRedirect = true,
-                    TargetPage = baseForm.StartPageSlug
+                    TargetPage = baseForm.FirstPageSlug
                 };
             }
 
-            if (formData != null && path == baseForm.StartPageSlug)
+            if (formData != null && path == baseForm.FirstPageSlug)
             {
                 var convertedFormData = JsonConvert.DeserializeObject<FormAnswers>(formData);
                 if (form.ToLower() != convertedFormData.FormName.ToLower())
