@@ -179,7 +179,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             var result = await _factory.Build(string.Empty, formSchema, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm);
 
             // Assert
-            Assert.Equal($"https://test/{formSchema.BaseURL}/{formSchema.StartPageSlug}", result.StartFormUrl);
+            Assert.Equal($"https://test/v2/{formSchema.BaseURL}/{formSchema.StartPageSlug}", result.StartFormUrl);
         }
     }
 }

@@ -3,7 +3,6 @@ using form_builder.Models;
 using form_builder.Validators;
 using System.Threading.Tasks;
 using form_builder.Helpers.PageHelpers;
-using Microsoft.Extensions.Logging;
 using form_builder.Helpers.Session;
 using System;
 using form_builder.Services.PageService.Entities;
@@ -16,7 +15,6 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Extensions;
 using Newtonsoft.Json;
 using form_builder.Services.OrganisationService;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using form_builder.Configuration;
 using Microsoft.Extensions.Options;
@@ -25,6 +23,7 @@ using form_builder.Factories.Schema;
 using form_builder.Constants;
 using form_builder.Services.MappingService;
 using form_builder.Services.PayService;
+using Microsoft.Extensions.Logging;
 
 namespace form_builder.Services.PageService
 {
@@ -44,6 +43,7 @@ namespace form_builder.Services.PageService
         private readonly IMappingService _mappingService;
         private readonly ISuccessPageFactory _successPageContentFactory;
         private readonly IPageFactory _pageContentFactory;
+        private readonly ILogger<PageService> _logger;
 
         public PageService(
             IEnumerable<IElementValidator> validators, 

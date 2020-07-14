@@ -29,6 +29,7 @@ using form_builder.Services.PayService;
 using form_builder.ContentFactory;
 using System.Threading;
 using form_builder.Builders;
+using Microsoft.Extensions.Logging;
 
 namespace form_builder_tests.UnitTests.Services
 {
