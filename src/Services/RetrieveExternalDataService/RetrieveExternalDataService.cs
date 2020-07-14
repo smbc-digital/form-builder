@@ -20,18 +20,18 @@ namespace form_builder.Services.RetrieveExternalDataService
         private readonly ISessionHelper _sessionHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IMappingService _mappingService;
-        private readonly IPageActionsHelper _pageActionsHelper;
+        private readonly IActionHelper _actionHelper;
 
-        public RetrieveExternalDataService(IGateway gateway, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache, IMappingService mappingService, IPageActionsHelper pageActionsHelper)
+        public RetrieveExternalDataService(IGateway gateway, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache, IMappingService mappingService, IActionHelper actionHelper)
         {
             _gateway = gateway;
             _sessionHelper = sessionHelper;
             _distributedCache = distributedCache;
             _mappingService = mappingService;
-            _pageActionsHelper = pageActionsHelper;
+            _actionHelper = actionHelper;
         }
  
-        public async Task Process(List<PageAction> actions, string formName)
+        public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
         {
             var answers = new List<Answers>();
             var sessionGuid = _sessionHelper.GetSessionGuid();
@@ -40,7 +40,7 @@ namespace form_builder.Services.RetrieveExternalDataService
             foreach (var action in actions)
             {
                 var response = new HttpResponseMessage();
-                var entity = _pageActionsHelper.GenerateUrl(action.Properties.URL, mappingData.FormAnswers);
+                var entity = _actionHelper.GenerateUrl(action.Properties.URL, mappingData.FormAnswers);
 
                 if (!string.IsNullOrEmpty(action.Properties.AuthToken))
                     _gateway.ChangeAuthenticationHeader(action.Properties.AuthToken);

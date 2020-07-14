@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using form_builder.Conditions;
+using Action = form_builder.Models.Actions.Action;
 
 namespace form_builder.Models
 {
@@ -42,7 +43,7 @@ namespace form_builder.Models
 
         public bool HasIncomingValues => IncomingValues.Any();
 
-        public List<PageAction> PageActions { get; set; } = new List<PageAction>();
+        public List<IAction> PageActions { get; set; } = new List<IAction>();
 
         public bool HasPageActions => PageActions.Any();
 
