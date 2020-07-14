@@ -63,6 +63,7 @@ namespace form_builder.Models
             pageHelper.CheckForAcceptedFileUploadFileTypes(Pages, form);
             pageHelper.CheckForDocumentDownload(this);
             pageHelper.CheckForIncomingFormDataValues(Pages);
+            pageHelper.CheckForPageActions(this);
         }
 
         public bool IsAvailable(string environment)

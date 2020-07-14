@@ -359,5 +359,18 @@ namespace form_builder.Helpers.PageHelpers
 
             return obj;
         }
+
+        public void CheckForPageActions(FormSchema formSchema)
+        {
+            var UserEmail = formSchema.FormActions.Where(_ => _.Type.Equals(EActionType.UserEmail))
+                .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
+                .Where(_ => _.Type == EActionType.UserEmail));
+
+            var BackofficeEmail = "";
+
+            var RetrieveData = "";
+
+
+        }
     }
 }
