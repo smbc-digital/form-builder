@@ -75,6 +75,5 @@ namespace form_builder.Services.RetrieveExternalDataService
 
             await _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
         }
-
     }
 }

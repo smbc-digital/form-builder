@@ -7,7 +7,7 @@ using form_builder.Models;
 using form_builder.Services.EmailService;
 using form_builder.Services.RetrieveExternalDataService;
 
-namespace form_builder.Workflows
+namespace form_builder.Workflows.ActionsWorkflow
 {
     public interface IActionsWorkflow
     {
@@ -36,7 +36,7 @@ namespace form_builder.Workflows
                 await _retrieveExternalDataService.Process(actions.Where(_ => _.Type == EActionType.RetrieveExternalData).ToList(), formSchema, formName);
 
             if (actions.Any(_ => _.Type.Equals(EActionType.UserEmail) || _.Type.Equals(EActionType.BackOfficeEmail)))
-                await _emailService.Process(actions.Where(_ => _.Type == EActionType.UserEmail || _.Type == EActionType.BackOfficeEmail).ToList(), formSchema);
+                await _emailService.Process(actions.Where(_ => _.Type == EActionType.UserEmail || _.Type == EActionType.BackOfficeEmail).ToList());
         }
     }
 }

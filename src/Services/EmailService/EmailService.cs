@@ -13,7 +13,7 @@ namespace form_builder.Services.EmailService
 {
     public interface IEmailService
     {
-        Task Process(List<IAction> actions, FormSchema baseForm);
+        Task Process(List<IAction> actions);
     }
 
     public class EmailService : IEmailService
@@ -31,7 +31,7 @@ namespace form_builder.Services.EmailService
             _actionHelper = actionHelper;
         }
 
-        public async Task Process(List<IAction> actions, FormSchema baseForm)
+        public async Task Process(List<IAction> actions)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
 

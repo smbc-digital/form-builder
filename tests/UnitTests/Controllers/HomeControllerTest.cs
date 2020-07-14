@@ -17,6 +17,7 @@ using form_builder.Models.Properties.ActionProperties;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
+using form_builder.Workflows.ActionsWorkflow;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -500,14 +501,11 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithPageSlug("url")
                 .Build();
 
-            var pageActions = new PageActionsBuilder()
+            var pageActions = new ActionBuilder()
                 .WithActionType(EActionType.RetrieveExternalData)
-                .WithActionProperties(new BaseActionProperty
-                {
-                    URL = string.Empty,
-                    TargetQuestionId = string.Empty,
-                    AuthToken = string.Empty
-                })
+                .WithUrl(string.Empty)
+                .WithTargetQuestionId(string.Empty)
+                .WithAuthToken(string.Empty)
                 .Build();
 
             var page = new PageBuilder()

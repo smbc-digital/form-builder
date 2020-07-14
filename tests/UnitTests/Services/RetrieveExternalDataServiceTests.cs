@@ -33,14 +33,11 @@ namespace form_builder_tests.UnitTests.Services
 
         private readonly List<IAction> pageActions = new List<IAction>
         {
-            new PageActionsBuilder()
+            new ActionBuilder()
                 .WithActionType(EActionType.RetrieveExternalData)
-                .WithActionProperties(new BaseActionProperty
-                    {
-                        URL = "www.test.com",
-                        TargetQuestionId = "targetId",
-                        AuthToken = "authToken"
-                    })
+                .WithUrl("www.test.com")
+                .WithTargetQuestionId("targetId")
+                .WithAuthToken("authToken")
                 .Build()
         };
 
@@ -96,14 +93,11 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Process_Should_NotCallGatewayToUpdateHeader_IfNoAuthTokenProvided()
         {
-             var action = new PageActionsBuilder()
+             var action = new ActionBuilder()
                 .WithActionType(EActionType.RetrieveExternalData)
-                .WithActionProperties(new BaseActionProperty
-                    {
-                        URL = "www.test.com",
-                        TargetQuestionId = "targetId",
-                        AuthToken = string.Empty
-                    })
+                .WithUrl("www.test.com")
+                .WithTargetQuestionId("targetId")
+                .WithAuthToken(string.Empty)
                 .Build();
 
             var actions = new List<IAction>
@@ -152,12 +146,9 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var actions = new List<IAction>
             {
-                new PageActionsBuilder()
-                    .WithActionProperties(new BaseActionProperty
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        TargetQuestionId = "targetId"
-                    })
+                new ActionBuilder()
+                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithTargetQuestionId("targetId")
                     .Build()
             };
 
@@ -177,13 +168,10 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var actions = new List<IAction>
             {
-                new PageActionsBuilder()
-                    .WithActionProperties(new BaseActionProperty
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        TargetQuestionId = "targetId",
-                        AuthToken = ""
-                    })
+                new ActionBuilder()
+                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithTargetQuestionId("targetId")
+                    .WithAuthToken(string.Empty)
                     .Build()
             };
 
@@ -204,13 +192,10 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var actions = new List<IAction>
             {
-                new PageActionsBuilder()
-                    .WithActionProperties(new BaseActionProperty
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        TargetQuestionId = "targetId",
-                        AuthToken = ""
-                    })
+                new ActionBuilder()
+                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithTargetQuestionId("targetId")
+                    .WithAuthToken(string.Empty)
                     .Build()
             };
 
@@ -232,13 +217,10 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var actions = new List<IAction>
             {
-                new PageActionsBuilder()
-                    .WithActionProperties(new BaseActionProperty
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        TargetQuestionId = "targetId",
-                        AuthToken = ""
-                    })
+                new ActionBuilder()
+                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithTargetQuestionId("targetId")
+                    .WithAuthToken(string.Empty)
                     .Build()
             };
 
@@ -260,13 +242,10 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var actions = new List<IAction>
             {
-                new PageActionsBuilder()
-                    .WithActionProperties(new BaseActionProperty
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        TargetQuestionId = "targetId",
-                        AuthToken = ""
-                    })
+                new ActionBuilder()
+                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithTargetQuestionId("targetId")
+                    .WithAuthToken(string.Empty)
                     .Build()
             };
 
