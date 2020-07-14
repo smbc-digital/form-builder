@@ -10,7 +10,5 @@
             Accesskey = accesskey;
             Secretkey = secretkey;
         }
-
-        public bool IsValid() => !string.IsNullOrWhiteSpace(Accesskey) && !string.IsNullOrWhiteSpace(Secretkey);
     }
 }
