@@ -1597,5 +1597,26 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = Assert.Throws<Exception>(() => _pageHelper.CheckForIncomingFormDataValues(pages));
             Assert.Equal("PageHelper::CheckForIncomingFormDataValues, QuestionId or Name cannot be empty", result.Message);
         }
+
+        [Theory]
+        [InlineData("", "questionId", "PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url")]
+        [InlineData("www.url.com", "", "PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a TargetQuestionId")]
+        public void CheckRetrieveExternalDataAction_ShouldThrowException_WhenActionDoesNotContain_URL_or_TargetQuestionId(string url, string questionId, string message)
+        {
+            // Arrange
+            var action = new ActionBuilder()
+                .WithActionType(EActionType.RetrieveExternalData)
+                .WithUrl(url)
+                .WithTargetQuestionId(questionId)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithFormActions(action)
+                .Build();
+
+            // Act & Assert
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForPageActions(formSchema));
+            Assert.Equal(message, result.Message);
+        }
     }
 }
