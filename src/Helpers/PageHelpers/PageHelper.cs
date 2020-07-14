@@ -381,7 +381,7 @@ namespace form_builder.Helpers.PageHelpers
 
         private void CheckEmailAction(List<IAction> actions)
         {
-            if (actions.Any())
+            if (!actions.Any())
                 return;
 
             actions.ForEach(action =>

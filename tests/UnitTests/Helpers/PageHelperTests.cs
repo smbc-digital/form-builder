@@ -1599,15 +1599,45 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Theory]
-        [InlineData("", "questionId", "PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url")]
-        [InlineData("www.url.com", "", "PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a TargetQuestionId")]
-        public void CheckRetrieveExternalDataAction_ShouldThrowException_WhenActionDoesNotContain_URL_or_TargetQuestionId(string url, string questionId, string message)
+        [InlineData("", "questionId",
+            "PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url")]
+        [InlineData("www.url.com", "",
+            "PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a TargetQuestionId")]
+        public void
+            CheckRetrieveExternalDataAction_ShouldThrowException_WhenActionDoesNotContain_URL_or_TargetQuestionId(
+                string url, string questionId, string message)
         {
             // Arrange
             var action = new ActionBuilder()
                 .WithActionType(EActionType.RetrieveExternalData)
                 .WithUrl(url)
                 .WithTargetQuestionId(questionId)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithFormActions(action)
+                .Build();
+
+            // Act & Assert
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForPageActions(formSchema));
+            Assert.Equal(message, result.Message);
+
+        }
+
+        [Theory]
+        [InlineData("", "subject", "from", "to", "PageHelper:: CheckEmailAction, Content doesn't have a value")]
+        [InlineData("content", "", "from", "to", "PageHelper:: CheckEmailAction, Subject doesn't have a value")]
+        [InlineData("content", "subject", "", "to", "PageHelper:: CheckEmailAction, From doesn't have a value")]
+        [InlineData("content", "subject", "from", "", "PageHelper:: CheckEmailAction, To doesn't have a value")]
+        public void CheckEmailAction_ShouldThrowException_WhenActionDoesNotContain_Content_or_Subject_or_To_or_From(string content, string subject, string from, string to, string message)
+        {
+            // Arrange
+            var action = new ActionBuilder()
+                .WithActionType(EActionType.UserEmail)
+                .WithContent(content)
+                .WithSubject(subject)
+                .WithFrom(from)
+                .WithTo(to)
                 .Build();
 
             var formSchema = new FormSchemaBuilder()
