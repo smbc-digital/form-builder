@@ -69,12 +69,7 @@ namespace form_builder.Models
         public bool IsAvailable(string environment)
         {
             var environmentAvailability = EnvironmentAvailabilities.SingleOrDefault(_ => _.Environment.ToLower().Equals(environment.ToLower()));
-            if (environmentAvailability == null)
-            {
-                return true;
-            }
-
-            return environmentAvailability.IsAvailable;
+            return environmentAvailability == null || environmentAvailability.IsAvailable;
         }
     }
 }
