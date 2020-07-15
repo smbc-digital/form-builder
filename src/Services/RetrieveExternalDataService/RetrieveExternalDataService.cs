@@ -9,8 +9,10 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System;
 using System.Threading;
+using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Services.MappingService;
+using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Services.RetrieveExternalDataService
 {
@@ -21,14 +23,16 @@ namespace form_builder.Services.RetrieveExternalDataService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IMappingService _mappingService;
         private readonly IActionHelper _actionHelper;
+        private readonly IHostingEnvironment _environment;
 
-        public RetrieveExternalDataService(IGateway gateway, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache, IMappingService mappingService, IActionHelper actionHelper)
+        public RetrieveExternalDataService(IGateway gateway, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache, IMappingService mappingService, IActionHelper actionHelper, IHostingEnvironment environment)
         {
             _gateway = gateway;
             _sessionHelper = sessionHelper;
             _distributedCache = distributedCache;
             _mappingService = mappingService;
             _actionHelper = actionHelper;
+            _environment = environment;
         }
  
         public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
@@ -40,10 +44,16 @@ namespace form_builder.Services.RetrieveExternalDataService
             foreach (var action in actions)
             {
                 var response = new HttpResponseMessage();
-                var entity = _actionHelper.GenerateUrl(action.Properties.URL, mappingData.FormAnswers);
+                var submitSlug = action.Properties.PageActionSlugs.FirstOrDefault(_ =>
+                    _.Environment.Equals(_environment.EnvironmentName.ToS3EnvPrefix()));
 
-                if (!string.IsNullOrEmpty(action.Properties.AuthToken))
-                    _gateway.ChangeAuthenticationHeader(action.Properties.AuthToken);
+                if (submitSlug == null)
+                    throw new ApplicationException($"RetrieveExternalDataService::Process, there is no PageActionSlug defined for this environment");
+
+                var entity = _actionHelper.GenerateUrl(submitSlug.URL, mappingData.FormAnswers);
+
+                if (!string.IsNullOrEmpty(submitSlug.AuthToken))
+                    _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
 
                 if (entity.IsPost)
                 {

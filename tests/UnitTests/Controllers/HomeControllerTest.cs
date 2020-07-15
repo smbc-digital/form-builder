@@ -503,9 +503,13 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var pageActions = new ActionBuilder()
                 .WithActionType(EActionType.RetrieveExternalData)
-                .WithUrl(string.Empty)
+                .WithPageActionSlug(new PageActionSlug
+                {
+                    URL = "www.test.com",
+                    Environment = "local",
+                    AuthToken = string.Empty
+                })
                 .WithTargetQuestionId(string.Empty)
-                .WithAuthToken(string.Empty)
                 .Build();
 
             var page = new PageBuilder()

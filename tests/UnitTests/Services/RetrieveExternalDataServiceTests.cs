@@ -16,6 +16,7 @@ using form_builder.Services.MappingService.Entities;
 using form_builder.Services.RetrieveExternalDataService;
 using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
 using Xunit;
@@ -30,14 +31,19 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
         private readonly Mock<IActionHelper> _mockActionHelper = new Mock<IActionHelper>();
+        private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
 
         private readonly List<IAction> pageActions = new List<IAction>
         {
             new ActionBuilder()
                 .WithActionType(EActionType.RetrieveExternalData)
-                .WithUrl("www.test.com")
+                .WithPageActionSlug(new PageActionSlug
+                {
+                    URL = "www.test.com",
+                    AuthToken = "authToken",
+                    Environment = "local"
+                })
                 .WithTargetQuestionId("targetId")
-                .WithAuthToken("authToken")
                 .Build()
         };
 
@@ -74,7 +80,7 @@ namespace form_builder_tests.UnitTests.Services
 
         public RetrieveExternalDataServiceTests()
         {
-            _service = new RetrieveExternalDataService(_mockGateway.Object, _mockSessionHelper.Object, _mockDistributedCacheWrapper.Object, _mockMappingService.Object, _mockActionHelper.Object);
+            _service = new RetrieveExternalDataService(_mockGateway.Object, _mockSessionHelper.Object, _mockDistributedCacheWrapper.Object, _mockMappingService.Object, _mockActionHelper.Object, _mockHostingEnv.Object);
 
             _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123456");
             _mockMappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(mappingEntity);
@@ -88,6 +94,7 @@ namespace form_builder_tests.UnitTests.Services
                     Url = "www.test.com/testResponse",
                     IsPost = false
                 });
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
         }
 
         [Fact]
@@ -95,9 +102,13 @@ namespace form_builder_tests.UnitTests.Services
         {
              var action = new ActionBuilder()
                 .WithActionType(EActionType.RetrieveExternalData)
-                .WithUrl("www.test.com")
+                .WithPageActionSlug(new PageActionSlug
+                {
+                    URL = "www.test.com",
+                    AuthToken = string.Empty,
+                    Environment = "local"
+                })
                 .WithTargetQuestionId("targetId")
-                .WithAuthToken(string.Empty)
                 .Build();
 
             var actions = new List<IAction>
@@ -147,7 +158,11 @@ namespace form_builder_tests.UnitTests.Services
             var actions = new List<IAction>
             {
                 new ActionBuilder()
-                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithPageActionSlug(new PageActionSlug
+                    {
+                        URL = "www.test.com/{{testQuestionId}}",
+                        Environment = "local"
+                    })
                     .WithTargetQuestionId("targetId")
                     .Build()
             };
@@ -169,9 +184,13 @@ namespace form_builder_tests.UnitTests.Services
             var actions = new List<IAction>
             {
                 new ActionBuilder()
-                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithPageActionSlug(new PageActionSlug
+                    {
+                        URL = "www.test.com/{{testQuestionId}}",
+                        AuthToken = string.Empty,
+                        Environment = "local"
+                    })
                     .WithTargetQuestionId("targetId")
-                    .WithAuthToken(string.Empty)
                     .Build()
             };
 
@@ -193,9 +212,13 @@ namespace form_builder_tests.UnitTests.Services
             var actions = new List<IAction>
             {
                 new ActionBuilder()
-                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithPageActionSlug(new PageActionSlug
+                    {
+                        URL = "www.test.com/{{testQuestionId}}",
+                        AuthToken = string.Empty,
+                        Environment = "local"
+                    })
                     .WithTargetQuestionId("targetId")
-                    .WithAuthToken(string.Empty)
                     .Build()
             };
 
@@ -218,9 +241,13 @@ namespace form_builder_tests.UnitTests.Services
             var actions = new List<IAction>
             {
                 new ActionBuilder()
-                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithPageActionSlug(new PageActionSlug
+                    {
+                        URL = "www.test.com/{{testQuestionId}}",
+                        AuthToken = string.Empty,
+                        Environment = "local"
+                    })
                     .WithTargetQuestionId("targetId")
-                    .WithAuthToken(string.Empty)
                     .Build()
             };
 
@@ -243,9 +270,13 @@ namespace form_builder_tests.UnitTests.Services
             var actions = new List<IAction>
             {
                 new ActionBuilder()
-                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithPageActionSlug(new PageActionSlug
+                    {
+                        URL = "www.test.com/{{testQuestionId}}",
+                        AuthToken = string.Empty,
+                        Environment = "local"
+                    })
                     .WithTargetQuestionId("targetId")
-                    .WithAuthToken(string.Empty)
                     .Build()
             };
 

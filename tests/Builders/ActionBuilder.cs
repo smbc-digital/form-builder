@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using form_builder.Enum;
@@ -7,7 +8,7 @@ using Action = form_builder.Models.Actions.Action;
 
 namespace form_builder_tests.Builders
 {
-    class ActionBuilder
+    public class ActionBuilder
     {
         private EActionType _type = EActionType.RetrieveExternalData;
         private BaseActionProperty _actionProperties = new BaseActionProperty();
@@ -54,21 +55,16 @@ namespace form_builder_tests.Builders
             return this;
         }
 
-        public ActionBuilder WithAuthToken(string authToken)
-        {
-            _actionProperties.AuthToken = authToken;
-            return this;
-        }
-
         public ActionBuilder WithTargetQuestionId(string targetQuestionId)
         {
             _actionProperties.TargetQuestionId = targetQuestionId;
             return this;
         }
 
-        public ActionBuilder WithUrl(string url)
+        public ActionBuilder WithPageActionSlug(PageActionSlug pageActionSlug)
         {
-            _actionProperties.URL = url;
+            if (_actionProperties.PageActionSlugs == null) _actionProperties.PageActionSlugs = new List<PageActionSlug>();
+            _actionProperties.PageActionSlugs.Add(pageActionSlug);
             return this;
         }
     }
