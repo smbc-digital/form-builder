@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using form_builder.Models.Properties.ActionProperties;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Helpers
@@ -1599,18 +1600,24 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Theory]
-        [InlineData("", "questionId",
+        [InlineData("", "questionId", "local",
             "PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url")]
-        [InlineData("www.url.com", "",
+        [InlineData("www.url.com", "", "local",
             "PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a TargetQuestionId")]
+        [InlineData("www.url.com", "questionId", "test",
+            "PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url")]
         public void
             CheckRetrieveExternalDataAction_ShouldThrowException_WhenActionDoesNotContain_URL_or_TargetQuestionId(
-                string url, string questionId, string message)
+                string url, string questionId, string env, string message)
         {
             // Arrange
             var action = new ActionBuilder()
                 .WithActionType(EActionType.RetrieveExternalData)
-                .WithUrl(url)
+                .WithPageActionSlug(new PageActionSlug
+                {
+                    URL = url,
+                    Environment = env
+                })
                 .WithTargetQuestionId(questionId)
                 .Build();
 

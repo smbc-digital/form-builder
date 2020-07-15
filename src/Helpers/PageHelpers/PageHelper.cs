@@ -20,6 +20,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Dynamic;
+using form_builder.Models.Properties.ActionProperties;
 
 namespace form_builder.Helpers.PageHelpers
 {
@@ -407,7 +408,13 @@ namespace form_builder.Helpers.PageHelpers
 
             actions.ForEach(action =>
             {
-                if (string.IsNullOrEmpty(action.Properties.URL))
+                var foundSlug = new PageActionSlug();
+                foreach (var slug in action.Properties.PageActionSlugs.Where(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower())))
+                {
+                    foundSlug = slug;
+                }
+
+                if (string.IsNullOrEmpty(foundSlug.URL))
                     throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url");
 
                 if (string.IsNullOrEmpty(action.Properties.TargetQuestionId))
