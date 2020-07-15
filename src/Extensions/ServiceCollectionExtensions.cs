@@ -163,13 +163,16 @@ namespace form_builder.Extensions
         public static IServiceCollection ConfigureDocumentCreationProviders(this IServiceCollection services)
         {
             services.AddSingleton<IDocumentCreation, TextfileDocumentCreator>();
-            //services.AddSingleton<IDocumentCreation, SmbcTextfileDocumentCreator>();
             return services;
         }
 
-        public static IServiceCollection ConfigureEmailProviders(this IServiceCollection services)
+        public static IServiceCollection ConfigureEmailProviders(this IServiceCollection services, IHostingEnvironment HostingEnvironment)
         {
-            services.AddSingleton<IEmailProvider, AwsSesProvider>();
+            if(HostingEnvironment.IsEnvironment("local") || HostingEnvironment.IsEnvironment("uitest"))
+                services.AddSingleton<IEmailProvider, FakeEmailProvider>();
+            else
+                services.AddSingleton<IEmailProvider, AwsSesProvider>();
+
             return services;
         }
 

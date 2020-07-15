@@ -47,7 +47,7 @@ namespace form_builder
                 .ConfigureStreetProviders()
                 .ConfigurePaymentProviders()
                 .ConfigureDocumentCreationProviders()
-                .ConfigureEmailProviders()
+                .ConfigureEmailProviders(HostingEnvironment)
                 .AddHelpers()
                 .AddServices()
                 .AddWorkflows()
