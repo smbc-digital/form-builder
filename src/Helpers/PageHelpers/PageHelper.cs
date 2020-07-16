@@ -408,11 +408,10 @@ namespace form_builder.Helpers.PageHelpers
 
             actions.ForEach(action =>
             {
-                var foundSlug = new PageActionSlug();
-                foreach (var slug in action.Properties.PageActionSlugs.Where(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower())))
-                {
-                    foundSlug = slug;
-                }
+                var foundSlug = action.Properties.PageActionSlugs.FirstOrDefault(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+
+                if (foundSlug == null)
+                    throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction there is no PageActionSlug for {_environment.EnvironmentName}");
 
                 if (string.IsNullOrEmpty(foundSlug.URL))
                     throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url");
