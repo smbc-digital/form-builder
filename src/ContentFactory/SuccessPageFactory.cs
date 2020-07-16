@@ -79,12 +79,14 @@ namespace form_builder.ContentFactory
             {
                 HtmlContent = result.RawHTML,
                 FeedbackFormUrl = result.FeedbackForm,
-                FeedbackPhase= result.FeedbackPhase,
+                FeedbackPhase = result.FeedbackPhase,
                 FormName = result.FormName,
                 StartPageUrl = result.StartPageUrl,
                 PageTitle = result.PageTitle,
                 BannerTitle = page.BannerTitle,
-                LeadingParagraph = page.LeadingParagraph
+                LeadingParagraph = page.LeadingParagraph,
+                DisplayBreadcrumbs = page.DisplayBreadCrumbs,
+                Breadcrumbs = baseForm.BreadCrumbs
             };
         }
 

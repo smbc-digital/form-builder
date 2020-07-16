@@ -1,4 +1,5 @@
 using form_builder.Models;
+using System.Collections.Generic;
 
 namespace form_builder.ViewModels
 {
@@ -21,5 +22,9 @@ namespace form_builder.ViewModels
         public bool HideBackButton { get; set; }
 
         public string PageTitle { get; set; }
+      
+        public bool DisplayBreadcrumbs { get; set; }
+
+        public List<Breadcrumb> Breadcrumbs { get; set; }
     }
 }

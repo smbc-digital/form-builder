@@ -1,4 +1,6 @@
 using form_builder.Models;
+using System.Collections.Generic;
+using form_builder.Models;
 
 namespace form_builder.ViewModels
 {
@@ -25,5 +27,9 @@ namespace form_builder.ViewModels
         public string BannerTitle { get; set; }
 
         public string LeadingParagraph { get; set; }
+      
+        public bool DisplayBreadcrumbs { get; set; }
+
+        public List<Breadcrumb> Breadcrumbs{get; set;}
     }
 }

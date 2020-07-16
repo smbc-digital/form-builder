@@ -1,6 +1,9 @@
 ﻿@model form_builder.ViewModels.SuccessViewModel;
 @{
     ViewData["Title"] = "Submit";
+    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadcrumbs;
+    ViewData["Breadcrumbs"] = Model.Breadcrumbs;
+
 }
 
 <h1 class="govuk-heading-l">Your answers</h1>
@@ -15,7 +18,6 @@
                 <dt class="govuk-summary-list__key">@question.QuestionId</dt>
                 <dd class="govuk-summary-list__value">
                     @question.Response
-                </dd>
             </div>
         }
     </dl>

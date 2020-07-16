@@ -16,11 +16,12 @@ namespace form_builder_tests.UnitTests.Models
 
             Assert.True(result);
         }
-        
+
         [Fact]
         public void IsAvailable_ShouldReturn_True_WhenRequestedEnvironmentAvailabilitiesIsNotSpecified()
         {
-            var formSchema = new FormSchema{
+            var formSchema = new FormSchema
+            {
                 EnvironmentAvailabilities = new List<EnvironmentAvailability>
                 {
                     new EnvironmentAvailability {
@@ -38,7 +39,8 @@ namespace form_builder_tests.UnitTests.Models
         [Fact]
         public void IsAvailable_ShouldReturn_True_WhenRequestedEnvironmentAvailabilitiesIsSpecified_And_IsAvailableEqualsTrue()
         {
-            var formSchema = new FormSchema{
+            var formSchema = new FormSchema
+            {
                 EnvironmentAvailabilities = new List<EnvironmentAvailability>
                 {
                     new EnvironmentAvailability(){
@@ -53,11 +55,12 @@ namespace form_builder_tests.UnitTests.Models
             Assert.True(result);
         }
 
-        
+
         [Fact]
         public void IsAvailable_ShouldReturn_False_WhenRequestedEnvironmentAvailabilitiesIsSpecified_And_IsAvailableEqualsFalse()
         {
-            var formSchema = new FormSchema{
+            var formSchema = new FormSchema
+            {
                 EnvironmentAvailabilities = new List<EnvironmentAvailability>
                 {
                     new EnvironmentAvailability {

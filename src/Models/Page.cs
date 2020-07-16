@@ -21,6 +21,8 @@ namespace form_builder.Models
 
         public string PageSlug { get; set; }
 
+        public bool DisplayBreadCrumbs { get; set; }
+
         public List<IElement> Elements { get; set; }
 
         public List<Behaviour> Behaviours { get; set; }

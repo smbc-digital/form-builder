@@ -45,6 +45,14 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.True(BrowserSession.FindCss(className).Exists());
         }
 
+        [Then(@"I should not find an element with class ""(.*)""")]
+        public void ThenIShouldNotSeeElementWithClass(string className)
+        {
+            Assert.False(BrowserSession.FindCss(className).Exists());
+        }
+
+
+
         [Then("I should see the footer")]
         public void ThenIShouldSeeTheFooterSection()
         {
