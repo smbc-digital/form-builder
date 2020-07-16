@@ -22,6 +22,8 @@ namespace form_builder.Models
         public string FeedbackPhase { get; set; }
 
         public List<Page> Pages { get; set; }
+
+        public List<IAction> FormActions { get; set; } = new List<IAction>();
         
         public List<EnvironmentAvailability> EnvironmentAvailabilities { get; set; }
 
@@ -63,17 +65,13 @@ namespace form_builder.Models
             pageHelper.CheckForAcceptedFileUploadFileTypes(Pages, form);
             pageHelper.CheckForDocumentDownload(this);
             pageHelper.CheckForIncomingFormDataValues(Pages);
+            pageHelper.CheckForPageActions(this);
         }
 
         public bool IsAvailable(string environment)
         {
             var environmentAvailability = EnvironmentAvailabilities.SingleOrDefault(_ => _.Environment.ToLower().Equals(environment.ToLower()));
-            if (environmentAvailability == null)
-            {
-                return true;
-            }
-
-            return environmentAvailability.IsAvailable;
+            return environmentAvailability == null || environmentAvailability.IsAvailable;
         }
     }
 }

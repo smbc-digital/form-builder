@@ -12,7 +12,7 @@ namespace form_builder_tests.Builders
         private List<IElement> _elements = new List<IElement>();
         private List<Behaviour> _behaviours = new List<Behaviour>();
         private List<IncomingValue> _incomingValues = new List<IncomingValue>();
-        private List<PageAction> _pageActions = new List<PageAction>();
+        private List<IAction> _pageActions = new List<IAction>();
 
         public Page Build()
         {
@@ -70,7 +70,7 @@ namespace form_builder_tests.Builders
             return this;
         }
 
-        public PageBuilder WithPageActions(PageAction pageAction)
+        public PageBuilder WithPageActions(IAction pageAction)
         {
             _pageActions.Add(pageAction);
 

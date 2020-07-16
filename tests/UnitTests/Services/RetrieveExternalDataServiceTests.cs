@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using form_builder.Enum;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
@@ -28,17 +29,15 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
-        private readonly Mock<IPageActionsHelper> _mockPageActionsHelper = new Mock<IPageActionsHelper>();
+        private readonly Mock<IActionHelper> _mockActionHelper = new Mock<IActionHelper>();
 
-        private readonly List<PageAction> pageActions = new List<PageAction>
+        private readonly List<IAction> pageActions = new List<IAction>
         {
-            new PageActionsBuilder()
-                .WithActionProperties(new BaseActionProperty
-                {
-                    URL = "www.test.com",
-                    TargetQuestionId = "targetId",
-                    AuthToken = ""
-                })
+            new ActionBuilder()
+                .WithActionType(EActionType.RetrieveExternalData)
+                .WithUrl("www.test.com")
+                .WithTargetQuestionId("targetId")
+                .WithAuthToken("authToken")
                 .Build()
         };
 
@@ -75,7 +74,7 @@ namespace form_builder_tests.UnitTests.Services
 
         public RetrieveExternalDataServiceTests()
         {
-            _service = new RetrieveExternalDataService(_mockGateway.Object, _mockSessionHelper.Object, _mockDistributedCacheWrapper.Object, _mockMappingService.Object, _mockPageActionsHelper.Object);
+            _service = new RetrieveExternalDataService(_mockGateway.Object, _mockSessionHelper.Object, _mockDistributedCacheWrapper.Object, _mockMappingService.Object, _mockActionHelper.Object);
 
             _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123456");
             _mockMappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(mappingEntity);
@@ -83,7 +82,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(successResponse);
             _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(successResponse);
-            _mockPageActionsHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new ExternalDataEntity
                 {
                     Url = "www.test.com/testResponse",
@@ -94,8 +93,20 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Process_Should_NotCallGatewayToUpdateHeader_IfNoAuthTokenProvided()
         {
+             var action = new ActionBuilder()
+                .WithActionType(EActionType.RetrieveExternalData)
+                .WithUrl("www.test.com")
+                .WithTargetQuestionId("targetId")
+                .WithAuthToken(string.Empty)
+                .Build();
+
+            var actions = new List<IAction>
+            {
+                action
+            };
+
             // Act
-            await _service.Process(pageActions, "test");
+            await _service.Process(actions, new FormSchema(), "test");
 
             // Assert
             _mockGateway.Verify(_ => _.ChangeAuthenticationHeader(It.IsAny<string>()), Times.Never);
@@ -104,21 +115,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Process_ShouldCallGatewayToUpdateHeader_IfAuthTokenProvided()
         {
-            // Arrange
-            var actions = new List<PageAction>
-            {
-                new PageActionsBuilder()
-                    .WithActionProperties(new BaseActionProperty
-                    {
-                        URL = "www.test.com",
-                        TargetQuestionId = "targetId",
-                        AuthToken = "authToken"
-                    })
-                    .Build()
-            };
-
             // Act
-            await _service.Process(actions, "test");
+            await _service.Process(pageActions, new FormSchema(), "test");
 
             // Assert
             _mockGateway.Verify(_ => _.ChangeAuthenticationHeader(It.IsAny<string>()), Times.Once);
@@ -128,7 +126,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldCallGateway_PostAsync()
         {
             // Arrange
-            _mockPageActionsHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new ExternalDataEntity
                 {
                     Url = string.Empty,
@@ -136,7 +134,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             // Act
-            await _service.Process(pageActions, "test");
+            await _service.Process(pageActions, new FormSchema(), "test");
 
             // Assert
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
@@ -146,14 +144,11 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldCallGateway_GetAsync()
         {
             // Arrange
-            var actions = new List<PageAction>
+            var actions = new List<IAction>
             {
-                new PageActionsBuilder()
-                    .WithActionProperties(new BaseActionProperty
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        TargetQuestionId = "targetId"
-                    })
+                new ActionBuilder()
+                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithTargetQuestionId("targetId")
                     .Build()
             };
 
@@ -161,7 +156,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(successResponse);
 
             // Act
-            await _service.Process(actions, "test");
+            await _service.Process(pageActions, new FormSchema(), "test");
 
             // Assert
             _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
@@ -171,15 +166,12 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldThrowApplicationException_IfNoSuccessStatusCode()
         {
             // Arrange
-            var actions = new List<PageAction>
+            var actions = new List<IAction>
             {
-                new PageActionsBuilder()
-                    .WithActionProperties(new BaseActionProperty
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        TargetQuestionId = "targetId",
-                        AuthToken = ""
-                    })
+                new ActionBuilder()
+                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithTargetQuestionId("targetId")
+                    .WithAuthToken(string.Empty)
                     .Build()
             };
 
@@ -190,7 +182,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             // Act & Assert
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.Process(actions, "test"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.Process(actions, null, "test"));
             Assert.Contains("RetrieveExternalDataService::Process, http request to www.test.com/testResponse returned an unsuccessful status code, Response: ", result.Message);
         }
 
@@ -198,15 +190,12 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldThrowApplicationException_IfResponseContentNull()
         {
             // Arrange
-            var actions = new List<PageAction>
+            var actions = new List<IAction>
             {
-                new PageActionsBuilder()
-                    .WithActionProperties(new BaseActionProperty
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        TargetQuestionId = "targetId",
-                        AuthToken = ""
-                    })
+                new ActionBuilder()
+                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithTargetQuestionId("targetId")
+                    .WithAuthToken(string.Empty)
                     .Build()
             };
 
@@ -218,7 +207,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             // Act & Assert
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.Process(actions, "test"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.Process(actions, null, "test"));
             Assert.Equal("RetrieveExternalDataService::Process, response content from www.test.com/testResponse is null.", result.Message);
         }
 
@@ -226,15 +215,12 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldThrowApplicationException_IfResponseContentEmpty()
         {
             // Arrange
-            var actions = new List<PageAction>
+            var actions = new List<IAction>
             {
-                new PageActionsBuilder()
-                    .WithActionProperties(new BaseActionProperty
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        TargetQuestionId = "targetId",
-                        AuthToken = ""
-                    })
+                new ActionBuilder()
+                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithTargetQuestionId("targetId")
+                    .WithAuthToken(string.Empty)
                     .Build()
             };
 
@@ -246,7 +232,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             // Act & Assert
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.Process(actions, "test"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.Process(actions, null, "test"));
             Assert.Equal("RetrieveExternalDataService::Process, Gateway www.test.com/testResponse responded with empty reference", result.Message);
         }
 
@@ -254,19 +240,16 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldCallDistributedCache_SetStringAsync()
         {
             // Arrange
-            var actions = new List<PageAction>
+            var actions = new List<IAction>
             {
-                new PageActionsBuilder()
-                    .WithActionProperties(new BaseActionProperty
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        TargetQuestionId = "targetId",
-                        AuthToken = ""
-                    })
+                new ActionBuilder()
+                    .WithUrl("www.test.com/{{testQuestionId}}")
+                    .WithTargetQuestionId("targetId")
+                    .WithAuthToken(string.Empty)
                     .Build()
             };
 
-            _mockPageActionsHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new ExternalDataEntity
                 {
                     Url = string.Empty,
@@ -277,7 +260,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(successResponse);
 
             // Act
-            await _service.Process(actions, "test");
+            await _service.Process(pageActions, new FormSchema(), "test");
 
             // Assert
             _mockDistributedCacheWrapper.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using form_builder.Workflows.ActionsWorkflow;
 
 namespace form_builder.Controllers
 {
@@ -20,6 +21,7 @@ namespace form_builder.Controllers
         private readonly ISubmitWorkflow _submitWorkflow;
         private readonly IPaymentWorkflow _paymentWorkflow;
         private readonly IActionsWorkflow _actionsWorkflow;
+        private readonly ISuccessWorkflow _successWorkflow;
         private readonly IFileUploadService _fileUploadService;
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -28,7 +30,8 @@ namespace form_builder.Controllers
             IPaymentWorkflow paymentWorkflow,
             IFileUploadService fileUploadService,
             IHostingEnvironment hostingEnvironment, 
-            IActionsWorkflow actionsWorkflow)
+            IActionsWorkflow actionsWorkflow, 
+            ISuccessWorkflow successWorkflow)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
@@ -36,15 +39,15 @@ namespace form_builder.Controllers
             _fileUploadService = fileUploadService;
             _hostingEnvironment = hostingEnvironment;
             _actionsWorkflow = actionsWorkflow;
+            _successWorkflow = successWorkflow;
         }
 
         [HttpGet]
         [Route("/")]
         public IActionResult Home()
         {
-            if(_hostingEnvironment.EnvironmentName.ToLower() == "prod"){
+            if(_hostingEnvironment.EnvironmentName.ToLower().Equals("prod"))
                 return Redirect("https://www.stockport.gov.uk");
-            }
 
             return View("../Error/Index");
         }
@@ -94,7 +97,7 @@ namespace form_builder.Controllers
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
 
             if (currentPageResult.Page.HasPageActions)
-                await _actionsWorkflow.Process(currentPageResult.Page, form);
+                await _actionsWorkflow.Process(currentPageResult.Page.PageActions, null, form);
 
             var behaviour = _pageService.GetBehaviour(currentPageResult);
 
@@ -141,7 +144,7 @@ namespace form_builder.Controllers
         [Route("{form}/success")]
         public async Task<IActionResult> Success(string form)
         {
-            var result = await _pageService.FinalisePageJourney(form, EBehaviourType.SubmitForm);
+            var result = await _successWorkflow.Process(EBehaviourType.SubmitForm, form);
             
             var success = new SuccessViewModel {
                 Reference = (string)TempData["reference"],
