@@ -50,7 +50,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
         private readonly FormSchema _formSchema = new FormSchemaBuilder()
-            .WithStartPageSlug("page-one")
+            .WithStartPageUrl("page-one")
             .WithBaseUrl("base-test")
             .WithPage(new PageBuilder()
             .WithElement(new ElementBuilder()

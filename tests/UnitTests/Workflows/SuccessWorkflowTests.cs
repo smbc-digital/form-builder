@@ -38,7 +38,7 @@ namespace form_builder_tests.UnitTests.Workflows
             var formSchema = new FormSchemaBuilder()
                 .WithDocumentDownload(true)
                 .WithDocumentType(EDocumentType.Txt)
-                .WithStartPageSlug("page-one")
+                .WithStartPageUrl("page-one")
                 .WithBaseUrl("base-test")
                 .WithPage(page)
                 .Build();
@@ -87,7 +87,7 @@ namespace form_builder_tests.UnitTests.Workflows
             var formSchema = new FormSchemaBuilder()
                 .WithDocumentDownload(true)
                 .WithDocumentType(EDocumentType.Txt)
-                .WithStartPageSlug("page-one")
+                .WithStartPageUrl("page-one")
                 .WithBaseUrl("base-test")
                 .WithPage(page)
                 .WithFormActions(new UserEmail
