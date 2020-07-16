@@ -1605,7 +1605,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData("www.url.com", "", "local",
             "PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a TargetQuestionId")]
         [InlineData("www.url.com", "questionId", "test",
-            "PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url")]
+            "PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction there is no PageActionSlug for local")]
         public void
             CheckRetrieveExternalDataAction_ShouldThrowException_WhenActionDoesNotContain_URL_or_TargetQuestionId(
                 string url, string questionId, string env, string message)
