@@ -8,13 +8,14 @@ namespace form_builder_tests.Builders
     {
         private string _baseUrl = "base-url";
         private string _feedbackForm = "www.feedback.com";
-
         private string _feedbackPhase = "";
         private string _formName = "formname";
         private List<Page> _pages = new List<Page>();
-        private string _startPageSlug = "page-one";
+        private string _startPageUrl = "page-url";
+        private string _firstPageSlug = "page-one";
         private bool _documentDownload;
         private List<EDocumentType> _documentType = new List<EDocumentType>();
+        private List<IAction> _formActions = new List<IAction>(); 
 
         private List<EnvironmentAvailability> _environmentAvailability = new List<EnvironmentAvailability>();
 
@@ -27,10 +28,12 @@ namespace form_builder_tests.Builders
                 FeedbackPhase = _feedbackPhase,
                 FormName = _formName,
                 Pages = _pages,
-                StartPageSlug = _startPageSlug,
+                StartPageUrl = _startPageUrl,
+                FirstPageSlug = _firstPageSlug,
                 EnvironmentAvailabilities = _environmentAvailability,
                 DocumentDownload = _documentDownload,
-                DocumentType = _documentType
+                DocumentType = _documentType,
+                FormActions = _formActions
             };
         }
 
@@ -59,9 +62,15 @@ namespace form_builder_tests.Builders
             return this;
         }
 
-        public FormSchemaBuilder WithStartPageSlug(string slug)
+        public FormSchemaBuilder WithStartPageUrl(string url)
         {
-            _startPageSlug = slug;
+            _startPageUrl = url;
+            return this;
+        }
+
+        public FormSchemaBuilder WithFirstPageSlug(string slug)
+        {
+            _firstPageSlug = slug;
             return this;
         }
 
@@ -83,6 +92,13 @@ namespace form_builder_tests.Builders
                 Environment = environment,
                 IsAvailable = isAvailable
             });
+            return this;
+        }
+
+        public FormSchemaBuilder WithFormActions(IAction formAction)
+        {
+            _formActions.Add(formAction);
+
             return this;
         }
     }

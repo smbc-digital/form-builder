@@ -23,7 +23,8 @@
     {
         "FormName": "",
         "BaseURL": "",
-        "StartPageSlug": "",
+        "StartPageUrl": "",
+        "FirstPageSlug": "",
         "FeedbackForm": "https://stockportcouncil.typeform.com/to/yzIJEe",
         "EnvironmentAvailabilities": [
           {
@@ -56,9 +57,11 @@ The name of the form this will display in the browser tab/window title#
 ## **BaseURL** (*string*)
 The path of this form, this will come after the domain e.g. `test-form` would create `forms.yourdomain.gov.uk/test-form/`
 
-## **StartPageSlug** (*string*) 
-The first PageSlug users will visit
+## **StartPageUrl** (*string*) 
+The IAG start page for the form
 
+## **FirstPageSlug** (*string*) 
+The first PageSlug users will visit
 
 ## **DocumentDownload** (*bool*) 
 Enable Document download (optional)
@@ -79,8 +82,6 @@ If present this will be used to communicate to the user this form is still in a 
 List of environments and the current availability status
 ___### [**Pages** [*object*]](Creating-Pages)
 List of the pages in this form
-
-
 
 # Controlling Form Availaiblity #
 
@@ -128,7 +129,6 @@ List of HTML elements to display on page
 
 ## [Behaviours[*object*]](#pagebehaviours) 
 A List of conditionals and page actions, ie. what should happen next based on the information provided
-
 
 ```json
       "Title": "page1",

@@ -33,7 +33,7 @@ namespace form_builder.Models.Elements
                 { "type", "file" },
                 { "accept", allowedFileType.Join(",") },
                 { "max-file-size", appliedMaxFileSize },
-                { "onchange", "ValidateSize(this)" }
+                { "onchange", "window.SMBCFrontend.ValidateSize(this)" }
             };
 
             if (DisplayAriaDescribedby)

@@ -7,7 +7,6 @@ namespace form_builder.ViewModels
     {
         public string FormName { get; set; }
 
-
         public string FeedbackPhase { get; set; }
 
         public string FeedbackFormUrl { get; set; }
@@ -18,12 +17,12 @@ namespace form_builder.ViewModels
 
         public string PageContent { get; set; }
 
-        public string StartFormUrl { get; set; }
+        public string StartPageUrl { get; set; }
 
         public bool HideBackButton { get; set; }
 
         public string PageTitle { get; set; }
-
+      
         public bool DisplayBreadcrumbs { get; set; }
 
         public List<Breadcrumb> Breadcrumbs { get; set; }

@@ -20,13 +20,13 @@ namespace form_builder.ContentFactory
     public class SuccessPageFactory : ISuccessPageFactory
     {
         private readonly IPageHelper _pageHelper;
-        private readonly IHostingEnvironment _enviroment;
+        private readonly IHostingEnvironment _environment;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPageFactory _pageFactory;
-        public SuccessPageFactory(IHttpContextAccessor httpContextAccessor, IHostingEnvironment enviroment, IPageHelper pageHelper, IPageFactory pageFactory)
+        public SuccessPageFactory(IHttpContextAccessor httpContextAccessor, IHostingEnvironment environment, IPageHelper pageHelper, IPageFactory pageFactory)
         {
             _pageHelper = pageHelper;
-            _enviroment = enviroment;
+            _environment = environment;
             _pageFactory = pageFactory;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -34,7 +34,6 @@ namespace form_builder.ContentFactory
         public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType)
         {
             var page = baseForm.GetPage("success");
-            var startFormUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{baseForm.BaseURL}/{baseForm.StartPageSlug}";
             
             if(page == null && behaviourType == EBehaviourType.SubmitAndPay)
             {
@@ -42,7 +41,7 @@ namespace form_builder.ContentFactory
                 baseForm.Pages.Add(page);
             }   
 
-            if(page == null && (_enviroment.EnvironmentName == "prod" || _enviroment.EnvironmentName == "stage"))
+            if(page == null && (_environment.EnvironmentName == "prod" || _environment.EnvironmentName == "stage"))
                 throw new Exception($"SuccessPageContentFactory::Build, No success page configured for form {form}");
 
             if (page == null)
@@ -54,7 +53,7 @@ namespace form_builder.ContentFactory
                     FeedbackFormUrl = baseForm.FeedbackForm,
                     FeedbackPhase = baseForm.FeedbackPhase,
                     FormName = baseForm.FormName,
-                    StartFormUrl = startFormUrl
+                    StartPageUrl = baseForm.StartPageUrl
                 };
             }
 
@@ -82,7 +81,7 @@ namespace form_builder.ContentFactory
                 FeedbackFormUrl = result.FeedbackForm,
                 FeedbackPhase = result.FeedbackPhase,
                 FormName = result.FormName,
-                StartFormUrl = result.StartFormUrl,
+                StartPageUrl = result.StartPageUrl,
                 PageTitle = result.PageTitle,
                 BannerTitle = page.BannerTitle,
                 LeadingParagraph = page.LeadingParagraph,

@@ -13,7 +13,7 @@ namespace form_builder.Models
         public string FormName { get; set; }
         public string Path { get; set; }
         public string CaseReference {get;set;}
-        public string StartFormUrl { get; set; }
+        public string StartPageUrl { get; set; }
         public Dictionary<string, object> FormData { get; set; } = new Dictionary<string, object>();
         public List<PageAnswers> Pages { get; set; }
     }

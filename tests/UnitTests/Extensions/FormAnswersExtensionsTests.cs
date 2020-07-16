@@ -73,7 +73,7 @@ namespace form_builder_tests.UnitTests.Extensions
                         }
                     }
                 },
-                StartPageSlug = "page-1"
+                FirstPageSlug = "page-1"
             };
 
             var result = formAnswers.GetReducedAnswers(formSchema);
@@ -135,7 +135,7 @@ namespace form_builder_tests.UnitTests.Extensions
                         }
                     }
                 },
-                StartPageSlug = "page-1"
+                FirstPageSlug = "page-1"
             };
 
             var result = formAnswers.GetReducedAnswers(formSchema);
@@ -203,7 +203,7 @@ namespace form_builder_tests.UnitTests.Extensions
                         }
                     }
                 },
-                StartPageSlug = "page-1"
+                FirstPageSlug = "page-1"
             };
 
             var result = formAnswers.GetReducedAnswers(formSchema);
@@ -272,7 +272,7 @@ namespace form_builder_tests.UnitTests.Extensions
                         }
                     }
                 },
-                StartPageSlug = "page-1"
+                FirstPageSlug = "page-1"
             };
 
             var result = formAnswers.GetReducedAnswers(formSchema);

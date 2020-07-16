@@ -422,7 +422,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var schema = new FormSchemaBuilder()
                 .WithPage(page)
-                .WithStartPageSlug("page-one")
+                .WithFirstPageSlug("page-one")
                 .WithBaseUrl("new-form")
                 .Build();
 
@@ -452,7 +452,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var schema = new FormSchemaBuilder()
                 .WithPage(page)
-                .WithStartPageSlug("page-one")
+                .WithFirstPageSlug("page-one")
                 .WithBaseUrl("new-form")
                 .Build();
 
@@ -523,7 +523,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ShouldGetTheRighStartFormUrl()
+        public async Task ProcessPage_ShouldGetTheRighStartPageUrl()
         {
             //Arrange
             var element = new ElementBuilder()
@@ -539,12 +539,12 @@ namespace form_builder_tests.UnitTests.Services
             var schema = new FormSchemaBuilder()
                 .WithPage(page)
                 .WithBaseUrl("textbox")
-                .WithStartPageSlug("page-one")
+                .WithStartPageUrl("page-one")
                 .Build();
 
             var viewModel = new FormBuilderViewModel
             {
-                StartFormUrl = "https://www.test.com/textbox/page-one"
+                StartPageUrl = "https://www.test.com/textbox/page-one"
             };
 
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
@@ -557,11 +557,11 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.ProcessPage("form", "page-one", "");
 
             //Assert
-            Assert.Equal(viewModel.StartFormUrl, result.ViewModel.StartFormUrl);
+            Assert.Equal(viewModel.StartPageUrl, result.ViewModel.StartPageUrl);
         }
 
         [Fact]
-        public async Task ProcessRequest_ShouldGetTheRighStartFormUrl()
+        public async Task ProcessRequest_ShouldGetTheRighStartPageUrl()
         {
             //Arrange
             var element = new ElementBuilder()
@@ -577,12 +577,12 @@ namespace form_builder_tests.UnitTests.Services
             var schema = new FormSchemaBuilder()
                 .WithPage(page)
                 .WithBaseUrl("textarea")
-                .WithStartPageSlug("first-page")
+                .WithStartPageUrl("first-page")
                 .Build();
 
             var viewModel = new FormBuilderViewModel
             {
-                StartFormUrl = "https://www.test.com/textarea/first-page"
+                StartPageUrl = "https://www.test.com/textarea/first-page"
             };
 
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
@@ -598,7 +598,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.ProcessRequest("form", "first-page", new Dictionary<string, dynamic>(), It.IsAny<IEnumerable<CustomFormFile>>());
 
             //Assert
-            Assert.Equal(viewModel.StartFormUrl, result.ViewModel.StartFormUrl);
+            Assert.Equal(viewModel.StartPageUrl, result.ViewModel.StartPageUrl);
         }
 
         [Fact]
@@ -616,11 +616,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
             // Act
-            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay);
+            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
             _sessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
@@ -656,11 +653,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
             // Act
-            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay);
+            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
             _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"file-{questionIDOne}-fileupload-{guid}")), Times.Once);
@@ -697,11 +691,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithDocumentDownload(true)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
             // Act
-            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay);
+            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
             _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"document-{guid.ToString()}"), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);

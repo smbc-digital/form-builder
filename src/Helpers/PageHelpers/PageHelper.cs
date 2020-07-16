@@ -20,6 +20,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Dynamic;
+using form_builder.Models.Properties.ActionProperties;
 
 namespace form_builder.Helpers.PageHelpers
 {
@@ -182,8 +183,8 @@ namespace form_builder.Helpers.PageHelpers
             {
                 var paymentSummaryElement = pages.SelectMany(_ => _.Elements)
                     .First(_ => _.Type == EElementType.PaymentSummary);
- 
-                if(!_environment.IsEnvironment("local") && !paymentSummaryElement.Properties.CalculationSlugs.Where(_ => !_.Environment.ToLower().Equals("local")).Any(_ => _.URL.StartsWith("https://")))
+
+                if (!_environment.IsEnvironment("local") && !paymentSummaryElement.Properties.CalculationSlugs.Where(_ => !_.Environment.ToLower().Equals("local")).Any(_ => _.URL.StartsWith("https://")))
                     throw new ApplicationException("PaymentSummary::CalculateCostUrl must start with https");
             }
         }
@@ -218,7 +219,7 @@ namespace form_builder.Helpers.PageHelpers
             {
                 if (item.BehaviourType != EBehaviourType.SubmitForm && item.BehaviourType != EBehaviourType.SubmitAndPay) continue;
                 if (item.SubmitSlugs.Count <= 0) continue;
-                
+
                 var foundEnvironmentSubmitSlug = false;
                 foreach (var subItem in item.SubmitSlugs.Where(subItem => subItem.Environment.ToLower() == _environment.EnvironmentName.ToS3EnvPrefix().ToLower()))
                 {
@@ -248,7 +249,7 @@ namespace form_builder.Helpers.PageHelpers
                     if (string.IsNullOrEmpty(subItem.AuthToken))
                         throw new ApplicationException($"No Auth Token found in the SubmitSlug for {formName} form");
 
-                    if(!_environment.IsEnvironment("local") && !subItem.Environment.ToLower().Equals("local") && !subItem.URL.StartsWith("https://"))
+                    if (!_environment.IsEnvironment("local") && !subItem.Environment.ToLower().Equals("local") && !subItem.URL.StartsWith("https://"))
                         throw new Exception("SubmitUrl must start with https");
                 }
             }
@@ -358,6 +359,66 @@ namespace form_builder.Helpers.PageHelpers
             obj.Add(splitTargets[0], subObject);
 
             return obj;
+        }
+
+        public void CheckForPageActions(FormSchema formSchema)
+        {
+            var userEmail = formSchema.FormActions.Where(_ => _.Type.Equals(EActionType.UserEmail))
+                .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
+                .Where(_ => _.Type == EActionType.UserEmail)).ToList();
+
+            var backOfficeEmail = formSchema.FormActions.Where(_ => _.Type.Equals(EActionType.BackOfficeEmail))
+                .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
+                .Where(_ => _.Type == EActionType.BackOfficeEmail)).ToList();
+
+            var retrieveExternalDataActions = formSchema.FormActions.Where(_ => _.Type.Equals(EActionType.RetrieveExternalData))
+                .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
+                .Where(_ => _.Type == EActionType.RetrieveExternalData)).ToList();
+
+            CheckEmailAction(userEmail);
+            CheckEmailAction(backOfficeEmail);
+            CheckRetrieveExternalDataAction(retrieveExternalDataActions);
+        }
+
+        private void CheckEmailAction(List<IAction> actions)
+        {
+            if (!actions.Any())
+                return;
+
+            actions.ForEach(action =>
+            {
+                if (string.IsNullOrEmpty(action.Properties.Content))
+                    throw new ApplicationException("PageHelper:: CheckEmailAction, Content doesn't have a value");
+
+                if (string.IsNullOrEmpty(action.Properties.To))
+                    throw new ApplicationException("PageHelper:: CheckEmailAction, To doesn't have a value");
+
+                if (string.IsNullOrEmpty(action.Properties.From))
+                    throw new ApplicationException("PageHelper:: CheckEmailAction, From doesn't have a value");
+
+                if (string.IsNullOrEmpty(action.Properties.Subject))
+                    throw new ApplicationException("PageHelper:: CheckEmailAction, Subject doesn't have a value");
+            });
+        }
+
+        private void CheckRetrieveExternalDataAction(List<IAction> actions)
+        {
+            if (!actions.Any())
+                return;
+
+            actions.ForEach(action =>
+            {
+                var foundSlug = action.Properties.PageActionSlugs.FirstOrDefault(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+
+                if (foundSlug == null)
+                    throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction there is no PageActionSlug for {_environment.EnvironmentName}");
+
+                if (string.IsNullOrEmpty(foundSlug.URL))
+                    throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url");
+
+                if (string.IsNullOrEmpty(action.Properties.TargetQuestionId))
+                    throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a TargetQuestionId");
+            });
         }
     }
 }
