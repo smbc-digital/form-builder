@@ -12,7 +12,7 @@ namespace form_builder.Extensions
                 answer.Pages,
                 answer.Pages.SelectMany(_ => _.Answers).ToDictionary(x => x.QuestionId, x => x.Response),
                 schema.Pages,
-                schema.StartPageSlug,
+                schema.FirstPageSlug,
                 new List<PageAnswers>());
 
         private static List<PageAnswers> RecursivelyReduceAnswers(

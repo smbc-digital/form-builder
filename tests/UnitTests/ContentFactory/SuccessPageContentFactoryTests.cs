@@ -40,7 +40,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns(env);
 
             // Act & Assert
-            var result = await Assert.ThrowsAsync<Exception>(() => _factory.Build(formName, new FormSchema { BaseURL = "base-test", StartPageSlug = "page-one", Pages = new List<Page>() }, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm));
+            var result = await Assert.ThrowsAsync<Exception>(() => _factory.Build(formName, new FormSchema { BaseURL = "base-test", FirstPageSlug = "page-one", Pages = new List<Page>() }, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm));
 
             Assert.Equal($"SuccessPageContentFactory::Build, No success page configured for form {formName}", result.Message);
             _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
@@ -54,7 +54,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
 
             // Act 
-            var result = await _factory.Build(string.Empty, new FormSchema {BaseURL = "base-test", StartPageSlug = "page-one", Pages = new List<Page>() }, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm);
+            var result = await _factory.Build(string.Empty, new FormSchema {BaseURL = "base-test", FirstPageSlug = "page-one", Pages = new List<Page>() }, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm);
 
             // Assert
             Assert.Equal("Submit", result.ViewName);
@@ -71,7 +71,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .Callback<Page, Dictionary<string,dynamic>, FormSchema, string, List<object>>((a,b,c,d,e) => callBack = a);
 
             // Act 
-            var result = await _factory.Build(string.Empty, new FormSchema {BaseURL = "base-test", StartPageSlug = "page-one", Pages = new List<Page>() }, string.Empty, new FormAnswers(), EBehaviourType.SubmitAndPay);
+            var result = await _factory.Build(string.Empty, new FormSchema {BaseURL = "base-test", FirstPageSlug = "page-one", Pages = new List<Page>() }, string.Empty, new FormAnswers(), EBehaviourType.SubmitAndPay);
 
             // Assert
             Assert.Equal("Success", result.ViewName);
@@ -100,7 +100,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .Callback<Page, Dictionary<string,dynamic>, FormSchema, string, List<object>>((a,b,c,d,e) => callBack = a);
 
             // Act 
-            var result = await _factory.Build(string.Empty, new FormSchema {BaseURL = "base-test", StartPageSlug = "page-one", Pages = new List<Page>{ new Page{ PageSlug = "success", Elements = new List<IElement>{ new H2() } } } }, string.Empty, new FormAnswers(), behaviourType);
+            var result = await _factory.Build(string.Empty, new FormSchema {BaseURL = "base-test", FirstPageSlug = "page-one", Pages = new List<Page>{ new Page{ PageSlug = "success", Elements = new List<IElement>{ new H2() } } } }, string.Empty, new FormAnswers(), behaviourType);
 
             // Assert
             Assert.Equal("Success", result.ViewName);
@@ -129,7 +129,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             var formSchema = new FormSchemaBuilder()
                 .WithDocumentDownload(true)
                 .WithDocumentType(EDocumentType.Txt)
-                .WithStartPageSlug("page-one")
+                .WithFirstPageSlug("page-one")
                 .WithBaseUrl("base-test")
                 .WithPage(page)
                 .Build();
@@ -153,7 +153,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
 
         
         [Fact]
-        public async Task Build_ShouldReuturn_Correct_StartFormUrl()
+        public async Task Build_ShouldReuturn_Correct_StartPageUrl()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.H2)
@@ -165,7 +165,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .Build();
 
             var formSchema = new FormSchemaBuilder()
-                .WithStartPageSlug("page-one")
+                .WithStartPageUrl("page-one")
                 .WithBaseUrl("base-test")
                 .WithPage(page)
                 .Build();
@@ -179,7 +179,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             var result = await _factory.Build(string.Empty, formSchema, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm);
 
             // Assert
-            Assert.Equal($"https://test/v2/{formSchema.BaseURL}/{formSchema.StartPageSlug}", result.StartFormUrl);
+            Assert.Equal(formSchema.StartPageUrl, result.StartPageUrl);
         }
     }
 }

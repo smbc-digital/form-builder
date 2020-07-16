@@ -68,7 +68,7 @@ namespace form_builder.Controllers.Payment
                 Reference = reference,
                 PageContent = result.HtmlContent,
                 FormName = result.FormName,
-                StartFormUrl = result.StartFormUrl,
+                StartPageUrl = result.StartPageUrl,
                 PageTitle = result.PageTitle,
                 BannerTitle = result.BannerTitle,
                 LeadingParagraph = result.LeadingParagraph
@@ -91,7 +91,7 @@ namespace form_builder.Controllers.Payment
                 PageTitle = "Failure",
                 Reference = reference,
                 PaymentUrl = url,
-                StartFormUrl = $"https://{Request.Host}/{form}"
+                StartPageUrl = data.BaseForm.StartPageUrl
             };
 
             return View("./Failure", paymentFailureViewModel);
@@ -110,7 +110,7 @@ namespace form_builder.Controllers.Payment
                 PageTitle = "Declined",
                 Reference = reference,
                 PaymentUrl = url,
-                StartFormUrl = $"https://{Request.Host}/{form}"
+                StartPageUrl = data.BaseForm.StartPageUrl
             };
 
             return View("./Declined", paymentDeclinedViewModel);

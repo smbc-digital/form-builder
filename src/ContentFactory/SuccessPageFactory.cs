@@ -34,9 +34,6 @@ namespace form_builder.ContentFactory
         public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType)
         {
             var page = baseForm.GetPage("success");
-            var startFormUrl = _environment.EnvironmentName == "local" || _environment.EnvironmentName == "uitest"
-                ? $"https://{_httpContextAccessor.HttpContext.Request.Host}/{baseForm.BaseURL}/{baseForm.StartPageSlug}"
-                : $"https://{_httpContextAccessor.HttpContext.Request.Host}/v2/{baseForm.BaseURL}/{baseForm.StartPageSlug}";
             
             if(page == null && behaviourType == EBehaviourType.SubmitAndPay)
             {
@@ -56,7 +53,7 @@ namespace form_builder.ContentFactory
                     FeedbackFormUrl = baseForm.FeedbackForm,
                     FeedbackPhase = baseForm.FeedbackPhase,
                     FormName = baseForm.FormName,
-                    StartFormUrl = startFormUrl
+                    StartPageUrl = baseForm.StartPageUrl
                 };
             }
 
@@ -84,7 +81,7 @@ namespace form_builder.ContentFactory
                 FeedbackFormUrl = result.FeedbackForm,
                 FeedbackPhase= result.FeedbackPhase,
                 FormName = result.FormName,
-                StartFormUrl = result.StartFormUrl,
+                StartPageUrl = result.StartPageUrl,
                 PageTitle = result.PageTitle,
                 BannerTitle = page.BannerTitle,
                 LeadingParagraph = page.LeadingParagraph

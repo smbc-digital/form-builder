@@ -60,6 +60,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             var html = "testHtml";
             var baseUrl ="base";
             var pageUrl = "page-one";
+            var startPageUrl = "start-page-url";
             _mockPageHelper.Setup(_ => _.GenerateHtml(
                 It.IsAny<Page>(),
                 It.IsAny<Dictionary<string, dynamic>>(),
@@ -72,6 +73,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .WithBaseUrl(baseUrl)
                 .WithName("form name")
                 .WithFeedback("BETA", "feedbackurl")
+                .WithStartPageUrl(startPageUrl)
                 .Build();
 
             var page = new PageBuilder()
@@ -89,7 +91,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             Assert.Equal("page title", result.PageTitle);
             Assert.Equal("feedbackurl", result.FeedbackForm);
             Assert.Equal("BETA", result.FeedbackPhase);
-            Assert.Equal($"https://www.test.com/v2/{baseUrl}/{pageUrl}", result.StartFormUrl);
+            Assert.Equal(startPageUrl, result.StartPageUrl);
         }
     }
 }
