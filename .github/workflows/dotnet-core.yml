@@ -12,28 +12,33 @@ on:
 
 jobs:
   build:
-
     runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '2.2.207'
+
     - name: Setup culture
       run: Set-Culture -CultureInfo en-GB
+
     - name: Cache nuget modules
-    - uses: actions/cache@v2
+      uses: actions/cache@v2
       with:
         path: ~/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
         restore-keys: |
           ${{ runner.os }}-nuget-
       shell: powershell
+
     - name: Install dependencies
       run: dotnet restore
+
     - name: Build
       run: dotnet build ./src/form-builder.csproj --configuration Release --no-restore
+
     - name: Test
       run: dotnet test ./tests/form-builder-tests-unit.csproj
