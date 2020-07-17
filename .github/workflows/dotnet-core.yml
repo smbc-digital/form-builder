@@ -22,7 +22,7 @@ jobs:
       with:
         dotnet-version: '2.2.207'
     - name: Setup culture
-      run: export LANG="en_GB.utf8";export LANGUAGE="en_GB.utf8";export LC_ALL="en_GB.utf8"
+      run: export LANG="en_GB.utf8";export LANGUAGE="en_GB.utf8";export LC_ALL="en_GB.utf8";locale;locale -a
     - name: Install dependencies
       run: dotnet restore
     - name: Build
