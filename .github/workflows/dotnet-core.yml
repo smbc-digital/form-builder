@@ -13,7 +13,7 @@ on:
 jobs:
   build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -22,8 +22,7 @@ jobs:
       with:
         dotnet-version: '2.2.207'
     - name: Setup culture
-      run: Set-Culture -CultureInfo en-GB
-      shell: powershell
+      run: export LANG="en_GB.utf8";export LANGUAGE="en_GB.utf8";export LC_ALL="en_GB.utf8"
     - name: Install dependencies
       run: dotnet restore
     - name: Build
