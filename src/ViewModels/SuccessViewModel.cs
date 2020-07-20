@@ -12,13 +12,11 @@ namespace form_builder.ViewModels
         public string FeedbackFormUrl { get; set; }
 
         public FormAnswers FormAnswers {get; set;}
->
         public string Reference { get; set; }
 
         public string PageContent { get; set; }
 
         public string StartPageUrl { get; set; }
-
 
         public bool HideBackButton => true;
 
