@@ -14,10 +14,10 @@ using form_builder.Workflows;
 using form_builder.Services.FileUploadService;
 using form_builder.Builders;
 using form_builder.Models.Properties.ActionProperties;
-using form_builder.Models.Properties.ElementProperties;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
+using form_builder.Workflows.ActionsWorkflow;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -30,14 +30,28 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<IFileUploadService> _mockFileUploadService = new Mock<IFileUploadService>();
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new Mock<IActionsWorkflow>();
+        private readonly Mock<ISuccessWorkflow> _mockSucessWorkflow = new Mock<ISuccessWorkflow>();
 
         public HomeControllerTest()
         {
             var httpContext = new DefaultHttpContext();
             var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
 
-            _homeController = new HomeController(_pageService.Object, _submitWorkflow.Object, _paymentWorkflow.Object, _mockFileUploadService.Object, _mockHostingEnv.Object, _mockActionsWorkflow.Object);
-            _homeController.TempData = tempData;
+            _homeController = new HomeController(
+                _pageService.Object,
+                _submitWorkflow.Object,
+                _paymentWorkflow.Object,
+                _mockFileUploadService.Object,
+                _mockHostingEnv.Object,
+                _mockActionsWorkflow.Object,
+                _mockSucessWorkflow.Object) {TempData = tempData};
+
+            _mockSucessWorkflow.Setup(_ => _.Process(It.IsAny<EBehaviourType>(), It.IsAny<string>())).ReturnsAsync(new SuccessPageEntity
+            {
+                FormAnswers = new FormAnswers(),
+                FormName = "form",
+                ViewName = "Success"
+            });
         }
 
         [Fact]
@@ -233,7 +247,7 @@ namespace form_builder_tests.UnitTests.Controllers
             Assert.Equal("Search", viewResult.ViewName);
         }
 
-                [Fact]
+        [Fact]
         public async Task Index_Post_ShouldRedirectWhen_RedirectToAction_IsReturnedFrom_ProcessRequest()
         {
             var actionName = "AddressManual";
@@ -487,14 +501,15 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithPageSlug("url")
                 .Build();
 
-            var pageActions = new PageActionsBuilder()
-                .WithActionType(EPageActionType.RetrieveExternalData)
-                .WithActionProperties(new BaseActionProperty
+            var pageActions = new ActionBuilder()
+                .WithActionType(EActionType.RetrieveExternalData)
+                .WithPageActionSlug(new PageActionSlug
                 {
-                    URL = string.Empty,
-                    TargetQuestionId = string.Empty,
+                    URL = "www.test.com",
+                    Environment = "local",
                     AuthToken = string.Empty
                 })
+                .WithTargetQuestionId(string.Empty)
                 .Build();
 
             var page = new PageBuilder()
@@ -520,7 +535,7 @@ namespace form_builder_tests.UnitTests.Controllers
             await _homeController.Index("form", "page-one", viewModel, null);
             
             // Assert
-            _mockActionsWorkflow.Verify(_ => _.Process(page, It.IsAny<string>()), Times.Once);
+            _mockActionsWorkflow.Verify(_ => _.Process(page.PageActions, It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -559,7 +574,28 @@ namespace form_builder_tests.UnitTests.Controllers
             await _homeController.Index("form", "page-one", viewModel, null);
 
             // Assert
-            _mockActionsWorkflow.Verify(_ => _.Process(page, It.IsAny<string>()), Times.Never);
+            _mockActionsWorkflow.Verify(_ => _.Process(page.PageActions, It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Success_ShouldCallSuccessWorkflow()
+        {
+            // Act
+            await _homeController.Success("form");
+
+            // Assert
+            _mockSucessWorkflow.Verify(_ => _.Process(EBehaviourType.SubmitForm, "form"), Times.Once);
+        }
+
+        [Fact]
+        public async Task Success_ShouldReturnView()
+        {
+            // Act
+            var result = await _homeController.Success("form");
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Equal("Success", viewResult.ViewName);
         }
     }
 }

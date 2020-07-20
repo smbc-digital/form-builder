@@ -12,8 +12,10 @@ namespace form_builder.Models
         public string FormName { get; set; }
         
         public string BaseURL { get; set; }
+
+        public string StartPageUrl { get; set; }
         
-        public string StartPageSlug { get; set; }
+        public string FirstPageSlug { get; set; }
         
         public string FeedbackForm { get; set; }
 
@@ -22,6 +24,8 @@ namespace form_builder.Models
         public List<Breadcrumb> BreadCrumbs { get; set; }
 
         public List<Page> Pages { get; set; }
+
+        public List<IAction> FormActions { get; set; } = new List<IAction>();
         
         public List<EnvironmentAvailability> EnvironmentAvailabilities { get; set; }
 
@@ -51,7 +55,7 @@ namespace form_builder.Models
 
         public async Task ValidateFormSchema(IPageHelper pageHelper, string form, string path)
         {
-            if (path != StartPageSlug)
+            if (path != FirstPageSlug)
                 return;
 
             pageHelper.HasDuplicateQuestionIDs(Pages, form);
@@ -63,17 +67,13 @@ namespace form_builder.Models
             pageHelper.CheckForAcceptedFileUploadFileTypes(Pages, form);
             pageHelper.CheckForDocumentDownload(this);
             pageHelper.CheckForIncomingFormDataValues(Pages);
+            pageHelper.CheckForPageActions(this);
         }
 
         public bool IsAvailable(string environment)
         {
             var environmentAvailability = EnvironmentAvailabilities.SingleOrDefault(_ => _.Environment.ToLower().Equals(environment.ToLower()));
-            if (environmentAvailability == null)
-            {
-                return true;
-            }
-
-            return environmentAvailability.IsAvailable;
+            return environmentAvailability == null || environmentAvailability.IsAvailable;
         }
     }
 }

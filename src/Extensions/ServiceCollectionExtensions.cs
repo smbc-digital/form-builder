@@ -28,6 +28,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 using System.Diagnostics.CodeAnalysis;
+using Amazon.Runtime;
+using Amazon.SimpleEmail;
 using form_builder.Services.FileUploadService;
 using form_builder.Providers.DocumentCreation;
 using form_builder.Providers.DocumentCreation.Generic;
@@ -42,7 +44,10 @@ using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Helpers.ActionsHelpers;
+using form_builder.Providers.EmailProvider;
 using form_builder.Services.RetrieveExternalDataService;
+using form_builder.Services.EmailService;
+using form_builder.Workflows.ActionsWorkflow;
 
 namespace form_builder.Extensions
 {
@@ -92,13 +97,22 @@ namespace form_builder.Extensions
             return services;
         }
 
+        public static IServiceCollection AddSesEmailConfiguration(this IServiceCollection services, string accessKey, string secretKey)
+        {
+            var credentials = new BasicAWSCredentials(accessKey, secretKey);
+            services.AddTransient<IAmazonSimpleEmailService>(_ =>
+                new AmazonSimpleEmailServiceClient(credentials, RegionEndpoint.EUWest1));
+
+            return services;
+        }
+
         public static IServiceCollection AddHelpers(this IServiceCollection services)
         {
             services.AddSingleton<IPageHelper, PageHelper>();
             services.AddSingleton<IElementHelper, ElementHelper>();
             services.AddSingleton<IElementMapper, ElementMapper>();
             services.AddSingleton<IDocumentCreationHelper, DocumentCreationHelper>();
-            services.AddSingleton<IPageActionsHelper, PageActionsHelper>();
+            services.AddSingleton<IActionHelper, ActionHelper>();
 
             services.AddHttpContextAccessor();
             services.AddScoped<IViewRender, ViewRender>();
@@ -149,7 +163,16 @@ namespace form_builder.Extensions
         public static IServiceCollection ConfigureDocumentCreationProviders(this IServiceCollection services)
         {
             services.AddSingleton<IDocumentCreation, TextfileDocumentCreator>();
-            //services.AddSingleton<IDocumentCreation, SmbcTextfileDocumentCreator>();
+            return services;
+        }
+
+        public static IServiceCollection ConfigureEmailProviders(this IServiceCollection services, IHostingEnvironment HostingEnvironment)
+        {
+            if(HostingEnvironment.IsEnvironment("local") || HostingEnvironment.IsEnvironment("uitest"))
+                services.AddSingleton<IEmailProvider, FakeEmailProvider>();
+            else
+                services.AddSingleton<IEmailProvider, AwsSesProvider>();
+
             return services;
         }
 
@@ -165,6 +188,7 @@ namespace form_builder.Extensions
             services.AddSingleton<IFileUploadService, FileUploadService>();
             services.AddSingleton<IDocumentSummaryService, DocumentSummaryService>();
             services.AddSingleton<IRetrieveExternalDataService, RetrieveExternalDataService>();
+            services.AddSingleton<IEmailService, EmailService>();
 
             return services;
         }
@@ -175,6 +199,7 @@ namespace form_builder.Extensions
             services.AddSingleton<IPaymentWorkflow, PaymentWorkflow>();
             services.AddSingleton<IDocumentWorkflow, DocumentWorkflow>();
             services.AddSingleton<IActionsWorkflow, ActionsWorkflow>();
+            services.AddSingleton<ISuccessWorkflow, SuccessWorkflow>();
 
             return services;
         }
@@ -227,6 +252,7 @@ namespace form_builder.Extensions
             services.Configure<CivicaPaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
             services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection("DistrbutedCacheExpiration"));
             services.Configure<DistrbutedCacheConfiguration>(cacheOptions => cacheOptions.UseDistrbutedCache = configuration.GetValue<bool>("UseDistrbutedCache"));
+            services.Configure<AwsSesKeysConfiguration>(configuration.GetSection("Ses"));
 
             return services;
         }

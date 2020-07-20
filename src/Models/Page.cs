@@ -44,7 +44,7 @@ namespace form_builder.Models
 
         public bool HasIncomingValues => IncomingValues.Any();
 
-        public List<PageAction> PageActions { get; set; } = new List<PageAction>();
+        public List<IAction> PageActions { get; set; } = new List<IAction>();
 
         public bool HasPageActions => PageActions.Any();
 

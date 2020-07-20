@@ -101,12 +101,12 @@ namespace form_builder.Services.PageService
 
             var formData = _distributedCache.GetString(sessionGuid);
 
-            if (formData == null && path != baseForm.StartPageSlug)
+            if (formData == null && path != baseForm.FirstPageSlug)
             {
                 return new ProcessPageEntity
                 {
                     ShouldRedirect = true,
-                    TargetPage = baseForm.StartPageSlug
+                    TargetPage = baseForm.FirstPageSlug
                 };
             }
 
@@ -115,11 +115,11 @@ namespace form_builder.Services.PageService
                 return new ProcessPageEntity
                 {
                     ShouldRedirect = true,
-                    TargetPage = baseForm.StartPageSlug
+                    TargetPage = baseForm.FirstPageSlug
                 };
             }
 
-            if (formData != null && path == baseForm.StartPageSlug)
+            if (formData != null && path == baseForm.FirstPageSlug)
             {
                 var convertedFormData = JsonConvert.DeserializeObject<FormAnswers>(formData);
                 if (form.ToLower() != convertedFormData.FormName.ToLower())
@@ -242,7 +242,7 @@ namespace form_builder.Services.PageService
             return currentPageResult.Page.GetNextPage(answers);
         }
         
-        public async Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType)
+        public async Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType, FormSchema baseForm)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
@@ -253,8 +253,6 @@ namespace form_builder.Services.PageService
 
             var formData = _distributedCache.GetString(sessionGuid);
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
-            var baseForm = await _schemaFactory.Build(form);
 
             var formFileUploadElements = baseForm.Pages.SelectMany(_ => _.Elements)
                 .Where(_ => _.Type == EElementType.FileUpload)
