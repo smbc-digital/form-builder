@@ -38,7 +38,6 @@ namespace form_builder.ContentFactory
             result.BreadCrumbs = baseForm.BreadCrumbs;
             result.DisplayBreadCrumbs = page.DisplayBreadCrumbs;
             result.StartPageUrl = baseForm.StartPageUrl;
-
             return result;
         }
     }
