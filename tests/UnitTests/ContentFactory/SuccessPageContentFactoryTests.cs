@@ -12,7 +12,10 @@ using System;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
 using form_builder.Builders;
+using form_builder.Helpers.Session;
+using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace form_builder_tests.UnitTests.ContentFactory
 {
@@ -23,10 +26,12 @@ namespace form_builder_tests.UnitTests.ContentFactory
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
         private readonly Mock<IHttpContextAccessor> _mockHttpContext = new Mock<IHttpContextAccessor>();
         private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistribytedCache = new Mock<IDistributedCacheWrapper>();
 
         public SuccessPageContentFactoryTests()
         {
-            _factory = new SuccessPageFactory(_mockHttpContext.Object, _mockHostingEnv.Object, _mockPageHelper.Object, _mockPageContentFactory.Object);
+            _factory = new SuccessPageFactory(_mockHttpContext.Object, _mockHostingEnv.Object, _mockPageHelper.Object, _mockPageContentFactory.Object, _mockSessionHelper.Object, _mockDistribytedCache.Object);
         }
 
         [Theory]
