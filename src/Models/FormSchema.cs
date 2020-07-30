@@ -42,7 +42,7 @@ namespace form_builder.Models
         {
             try
             {
-                var pages = Pages.Where(_ => _.PageSlug.ToLower().Trim() == path.ToLower().Trim()).ToList();
+                var pages = Pages.Where(_ => _.PageSlug.ToLower().Trim() == path.ToLower().Trim()).OrderByDescending(_ => _.RenderConditions.Count).ToList();
 
                 var page = pageHelper.GetPageWithMatchingRenderConditions(pages);
 

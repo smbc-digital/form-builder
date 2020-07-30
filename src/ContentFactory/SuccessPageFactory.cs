@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Elements;
+using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -23,19 +25,26 @@ namespace form_builder.ContentFactory
         private readonly IHostingEnvironment _environment;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPageFactory _pageFactory;
-        public SuccessPageFactory(IHttpContextAccessor httpContextAccessor, IHostingEnvironment environment, IPageHelper pageHelper, IPageFactory pageFactory)
+        private readonly ISessionHelper _sessionHelper;
+        private readonly IDistributedCacheWrapper _distributedCache;
+        public SuccessPageFactory(IHttpContextAccessor httpContextAccessor, IHostingEnvironment environment, IPageHelper pageHelper, IPageFactory pageFactory, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
         {
             _pageHelper = pageHelper;
             _environment = environment;
             _pageFactory = pageFactory;
+            _sessionHelper = sessionHelper;
+            _distributedCache = distributedCache;
             _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType)
         {
             var page = baseForm.GetPage(_pageHelper, "success");
-            
-            if(page == null && behaviourType == EBehaviourType.SubmitAndPay)
+
+            _distributedCache.Remove(sessionGuid);
+            _sessionHelper.RemoveSessionGuid();
+
+            if (page == null && behaviourType == EBehaviourType.SubmitAndPay)
             {
                 page = GenerateGenericPaymentPage();
                 baseForm.Pages.Add(page);

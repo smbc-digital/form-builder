@@ -269,9 +269,6 @@ namespace form_builder.Services.PageService
             if(baseForm.DocumentDownload)
                 await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(formAnswers), _distrbutedCacheExpirationConfiguration.Document);
 
-            //_distributedCache.Remove(sessionGuid);
-            //_sessionHelper.RemoveSessionGuid();
-
             return await _successPageContentFactory.Build(form, baseForm, sessionGuid, formAnswers, behaviourType);
         }
     }

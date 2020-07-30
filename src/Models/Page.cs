@@ -40,8 +40,7 @@ namespace form_builder.Models
 
         public string LeadingParagraph { get; set; }
 
-        [JsonIgnore]
-        public bool IsValid => !InvalidElements.Any();
+        [JsonIgnore] public bool IsValid => !InvalidElements.Any();
 
         public bool HasIncomingValues => IncomingValues.Any();
 
@@ -49,7 +48,7 @@ namespace form_builder.Models
 
         public bool HasPageActions => PageActions.Any();
 
-        public List<Condition> RenderConditions { get; set;} = new List<Condition>();
+        public List<Condition> RenderConditions { get; set; } = new List<Condition>();
 
         public bool HasRenderConditions => RenderConditions.Any();
 
@@ -67,20 +66,21 @@ namespace form_builder.Models
             }
         }
 
-        public IEnumerable<IElement> ValidatableElements => Elements.Where(element => element.Type == EElementType.Radio ||
-                                                                element.Type == EElementType.Textarea ||
-                                                                element.Type == EElementType.Select ||
-                                                                element.Type == EElementType.Textbox ||
-                                                                element.Type == EElementType.Checkbox ||
-                                                                element.Type == EElementType.Declaration ||
-                                                                element.Type == EElementType.Address ||
-                                                                element.Type == EElementType.AddressManual ||
-                                                                element.Type == EElementType.DateInput ||
-                                                                element.Type == EElementType.TimeInput ||
-                                                                element.Type == EElementType.DatePicker ||
-                                                                element.Type == EElementType.Street ||
-                                                                element.Type == EElementType.Organisation ||
-                                                                element.Type == EElementType.FileUpload
+        public IEnumerable<IElement> ValidatableElements => Elements.Where(element =>
+            element.Type == EElementType.Radio ||
+            element.Type == EElementType.Textarea ||
+            element.Type == EElementType.Select ||
+            element.Type == EElementType.Textbox ||
+            element.Type == EElementType.Checkbox ||
+            element.Type == EElementType.Declaration ||
+            element.Type == EElementType.Address ||
+            element.Type == EElementType.AddressManual ||
+            element.Type == EElementType.DateInput ||
+            element.Type == EElementType.TimeInput ||
+            element.Type == EElementType.DatePicker ||
+            element.Type == EElementType.Street ||
+            element.Type == EElementType.Organisation ||
+            element.Type == EElementType.FileUpload
         );
 
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
@@ -119,7 +119,8 @@ namespace form_builder.Models
         {
             var conditionValidator = new ConditionValidator();
 
-            return RenderConditions.Count == 0 || RenderConditions.Any(condition => conditionValidator.IsValid(condition, answers));
+            return RenderConditions.Count == 0 ||
+                   RenderConditions.All(condition => conditionValidator.IsValid(condition, answers));
         }
 
 
@@ -144,8 +145,8 @@ namespace form_builder.Models
                 var foundSubmitBehaviour = GetNextPage(viewModel);
 
                 submitBehaviour = foundSubmitBehaviour.SubmitSlugs.ToList()
-                            .Where(x => x.Environment.ToLower() == environment.ToLower())
-                            .FirstOrDefault();
+                    .Where(x => x.Environment.ToLower() == environment.ToLower())
+                    .FirstOrDefault();
             }
             else
             {
@@ -156,8 +157,8 @@ namespace form_builder.Models
                 else
                 {
                     var behaviour = pageSubmitBehaviours.SelectMany(x => x.SubmitSlugs)
-                            .Where(x => x.Environment.ToLower() == environment.ToLower())
-                            .FirstOrDefault();
+                        .Where(x => x.Environment.ToLower() == environment.ToLower())
+                        .FirstOrDefault();
 
                     if (behaviour == null)
                     {
@@ -176,7 +177,8 @@ namespace form_builder.Models
             return submitBehaviour;
         }
 
-        private List<Behaviour> GetBehavioursByType(EBehaviourType type) => Behaviours.Where(_ => _.BehaviourType == type).ToList();
+        private List<Behaviour> GetBehavioursByType(EBehaviourType type) =>
+            Behaviours.Where(_ => _.BehaviourType == type).ToList();
 
         public string GetPageTitle()
         {
@@ -188,3 +190,4 @@ namespace form_builder.Models
             return Title;
         }
     }
+}
