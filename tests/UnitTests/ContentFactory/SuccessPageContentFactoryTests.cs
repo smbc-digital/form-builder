@@ -27,11 +27,17 @@ namespace form_builder_tests.UnitTests.ContentFactory
         private readonly Mock<IHttpContextAccessor> _mockHttpContext = new Mock<IHttpContextAccessor>();
         private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistribytedCache = new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
 
         public SuccessPageContentFactoryTests()
         {
-            _factory = new SuccessPageFactory(_mockHttpContext.Object, _mockHostingEnv.Object, _mockPageHelper.Object, _mockPageContentFactory.Object, _mockSessionHelper.Object, _mockDistribytedCache.Object);
+            _factory = new SuccessPageFactory(
+                _mockHttpContext.Object, 
+                _mockHostingEnv.Object, 
+                _mockPageHelper.Object, 
+                _mockPageContentFactory.Object,
+                _mockSessionHelper.Object,
+                _mockDistributedCache.Object);
         }
 
         [Theory]
