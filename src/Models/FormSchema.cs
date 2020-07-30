@@ -38,19 +38,20 @@ namespace form_builder.Models
             EnvironmentAvailabilities = new List<EnvironmentAvailability>();
         }
 
-        public Page GetPage(string path)
+        public Page GetPage(IPageHelper pageHelper, string path)
         {
-            Page page;
             try
             {
-                page = Pages.SingleOrDefault(_ => _.PageSlug.ToLower().Trim() == path.ToLower().Trim());
+                var pages = Pages.Where(_ => _.PageSlug.ToLower().Trim() == path.ToLower().Trim()).ToList();
+
+                var page = pageHelper.GetPageWithMatchingRenderConditions(pages);
+
+                return page ?? throw new ApplicationException($"FormSchema:: GetPage :: No {path} page matching the conditions was found");
             }
             catch(Exception ex)
             {
                 throw new ApplicationException($"Requested path '{path}' object could not be found or was not unique.", ex);
             }
-            
-            return page;
         }
 
         public async Task ValidateFormSchema(IPageHelper pageHelper, string form, string path)
@@ -68,6 +69,7 @@ namespace form_builder.Models
             pageHelper.CheckForDocumentDownload(this);
             pageHelper.CheckForIncomingFormDataValues(Pages);
             pageHelper.CheckForPageActions(this);
+            pageHelper.CheckRenderConditionsValid(Pages);
         }
 
         public bool IsAvailable(string environment)

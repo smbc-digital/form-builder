@@ -33,7 +33,7 @@ namespace form_builder.ContentFactory
 
         public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType)
         {
-            var page = baseForm.GetPage("success");
+            var page = baseForm.GetPage(_pageHelper, "success");
             
             if(page == null && behaviourType == EBehaviourType.SubmitAndPay)
             {

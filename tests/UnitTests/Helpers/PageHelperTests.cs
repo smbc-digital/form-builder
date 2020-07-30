@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using form_builder.Helpers.Session;
 using form_builder.Models.Properties.ActionProperties;
 using Xunit;
 
@@ -50,6 +51,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
         private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
         private readonly Mock<IFileUploadService> _mockFileUploadService = new Mock<IFileUploadService>();
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
 
         public PageHelperTests()
         {
@@ -94,7 +96,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object,
                 _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockCache.Object, _mockDistrbutedCacheExpirationSettings.Object, _mockPaymentProvider.Object,
-                _mockFileUploadService.Object);
+                _mockFileUploadService.Object, _mockSessionHelper.Object);
         }
 
         [Fact]

@@ -11,6 +11,7 @@ using form_builder.Cache;
 using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Extensions;
+using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Services.MappingService;
 using Microsoft.AspNetCore.Hosting;
@@ -37,12 +38,13 @@ namespace form_builder.Services.PayService
         private readonly ISessionHelper _sessionHelper;
         private readonly IMappingService _mappingService;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IPageHelper _pageHelper;
 
         public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger,
             IGateway gateway,
             ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
-            ISessionHelper sessionHelper, IMappingService mappingService, IHostingEnvironment hostingEnvironment)
+            ISessionHelper sessionHelper, IMappingService mappingService, IHostingEnvironment hostingEnvironment, IPageHelper pageHelper)
         {
             _gateway = gateway;
             _logger = logger;
@@ -52,11 +54,12 @@ namespace form_builder.Services.PayService
             _sessionHelper = sessionHelper;
             _mappingService = mappingService;
             _hostingEnvironment = hostingEnvironment;
+            _pageHelper = pageHelper;
         }
 
         public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string sessionGuid)
         {
-            var page = formData.BaseForm.GetPage("payment-summary");
+            var page = formData.BaseForm.GetPage(_pageHelper, "payment-summary");
             var paymentInformation = await GetFormPaymentInformation(formData, form, page);
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
@@ -72,7 +75,7 @@ namespace form_builder.Services.PayService
                 throw new Exception($"PayService:: No mapping entity found for {form}");
             }
 
-            var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
+            var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var paymentInformation = await GetFormPaymentInformation(mappingEntity, form, currentPage);
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
             var paymentProvider = GetFormPaymentProvider(paymentInformation);

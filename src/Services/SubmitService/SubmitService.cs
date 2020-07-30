@@ -62,7 +62,7 @@ namespace form_builder.Services.SubmtiService
             }
             var reference = string.Empty;
 
-            var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
+            var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
             if (string.IsNullOrWhiteSpace(submitSlug.AuthToken))
@@ -95,7 +95,7 @@ namespace form_builder.Services.SubmtiService
                 return "123456";
             }
 
-            var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
+            var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
 
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 

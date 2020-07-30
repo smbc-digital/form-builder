@@ -1,12 +1,13 @@
+using form_builder.Conditions;
 using form_builder.Enum;
 using form_builder.Models.Elements;
-using form_builder.Models.Properties.ElementProperties;
+using form_builder.Models.Properties;
 using form_builder.Validators;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using form_builder.Conditions;
+using form_builder.Models.Properties.ElementProperties;
 
 namespace form_builder.Models
 {
@@ -27,7 +28,7 @@ namespace form_builder.Models
 
         public List<Behaviour> Behaviours { get; set; }
 
-        public List<IncomingValue> IncomingValues { get;set; } = new List<IncomingValue>();
+        public List<IncomingValue> IncomingValues { get; set; } = new List<IncomingValue>();
 
         public bool IsValidated { get; set; }
 
@@ -47,6 +48,10 @@ namespace form_builder.Models
         public List<IAction> PageActions { get; set; } = new List<IAction>();
 
         public bool HasPageActions => PageActions.Any();
+
+        public List<Condition> RenderConditions { get; set;} = new List<Condition>();
+
+        public bool HasRenderConditions => RenderConditions.Any();
 
         [JsonIgnore]
         public IEnumerable<BaseProperty> InvalidElements
@@ -75,8 +80,7 @@ namespace form_builder.Models
                                                                 element.Type == EElementType.DatePicker ||
                                                                 element.Type == EElementType.Street ||
                                                                 element.Type == EElementType.Organisation ||
-                                                                element.Type == EElementType.FileUpload ||
-                                                                element.Type == EElementType.Map
+                                                                element.Type == EElementType.FileUpload
         );
 
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
@@ -87,48 +91,37 @@ namespace form_builder.Models
 
         public Behaviour GetNextPage(Dictionary<string, dynamic> viewModel)
         {
+            var conditionValidator = new ConditionValidator();
+
             if (Behaviours.Count == 1)
-            {
                 return Behaviours.FirstOrDefault();
-            }
-            else
+
+            foreach (var behaviour in Behaviours.OrderByDescending(_ => _.Conditions.Count))
             {
-                foreach (var behaviour in Behaviours.OrderByDescending(_ => _.Conditions.Count))
+                var isConditionTrue = false;
+
+                foreach (var condition in behaviour.Conditions)
                 {
-                    var equalToConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.EqualTo));
-                    var checkBoxContainsConditions = behaviour.Conditions.Where(x => !string.IsNullOrEmpty(x.CheckboxContains));
-                    var dateIsBeforeConditions = behaviour.Conditions.Where(x => x.IsBefore != null);
-                    var dateIsAfterConditions = behaviour.Conditions.Where(x => x.IsAfter != null);
-                    var isNullOrEmpty = behaviour.Conditions.Where(x => x.IsNullOrEmpty != null);
+                    isConditionTrue = conditionValidator.IsValid(condition, viewModel);
 
-                    var equalToValid = !equalToConditions.Any();
-                    var checkBoxContainsValid = !checkBoxContainsConditions.Any();
-                    var dateIsBeforeValid = !dateIsBeforeConditions.Any();
-                    var dateIsAfterValid = !dateIsAfterConditions.Any();
-                    var isNullOrEmptyValid = !isNullOrEmpty.Any();
-
-                    if(equalToConditions.Any())
-                        equalToValid = equalToConditions.All(x => x.EqualTo.Equals(viewModel.ContainsKey(x.QuestionId) ? viewModel[x.QuestionId] : string.Empty));
-
-                    if(checkBoxContainsConditions.Any())
-                        checkBoxContainsValid = checkBoxContainsConditions.All(x => viewModel[x.QuestionId].Contains(x.CheckboxContains));
-                        
-                    if(dateIsBeforeConditions.Any())
-                        dateIsBeforeValid = dateIsBeforeConditions.All(x => DateComparator.DateIsBefore(x, viewModel));
-                        
-                    if(dateIsAfterConditions.Any())
-                        dateIsAfterValid = dateIsAfterConditions.All(x => DateComparator.DateIsAfter(x, viewModel));  
-
-                    if (isNullOrEmpty.Any())
-                        isNullOrEmptyValid = isNullOrEmpty.All(x => string.IsNullOrEmpty(viewModel[x.QuestionId]) == x.IsNullOrEmpty);
-
-                    if (equalToValid && checkBoxContainsValid && dateIsBeforeValid && dateIsAfterValid && isNullOrEmptyValid)
-                        return behaviour;
+                    if (!isConditionTrue)
+                        break;
                 }
+
+                if (isConditionTrue || !behaviour.Conditions.Any())
+                    return behaviour;
             }
 
             throw new Exception("Page model, There was a problem whilst processing behaviors");
         }
+
+        public bool CheckPageMeetsConditions(Dictionary<string, dynamic> answers)
+        {
+            var conditionValidator = new ConditionValidator();
+
+            return RenderConditions.Count == 0 || RenderConditions.Any(condition => conditionValidator.IsValid(condition, answers));
+        }
+
 
         public SubmitSlug GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)
         {
@@ -195,4 +188,3 @@ namespace form_builder.Models
             return Title;
         }
     }
-}

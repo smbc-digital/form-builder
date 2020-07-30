@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Services.MappingService;
 using Microsoft.AspNetCore.Hosting;
@@ -41,6 +42,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
         private readonly Mock<IHostingEnvironment> _mockHostingEnvironment = new Mock<IHostingEnvironment>();
+        private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
 
         public PayServiceTests()
         {
@@ -133,7 +135,7 @@ namespace form_builder_tests.UnitTests.Services
             _service = new PayService(_mockPaymentProvider.Object, _mockLogger.Object, _mockGateway.Object,
                 _mockCache.Object,
                 _mockDistrbutedCacheExpirationSettings.Object, _mockSessionHelper.Object, _mockMappingService.Object,
-                _mockHostingEnvironment.Object);
+                _mockHostingEnvironment.Object, _mockPageHelper.Object);
         }
 
         private static MappingEntity GetMappingEntityData()
