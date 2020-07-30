@@ -241,6 +241,24 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldReturnPaymentReference_OnSuccessfull_PaymentProviderCall()
         {
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .WithPageSlug("test-test")
+                .WithSubmitSlug(new SubmitSlug
+                {
+                    URL = "test",
+                    AuthToken = "test",
+                    Environment = "local",
+                    CallbackUrl = "test"
+                })
+                .Build();
+
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(
+                new PageBuilder()
+                    .WithPageSlug("test")
+                    .WithBehaviour(behaviour)
+                    .Build
+                );
             var result = await _service.ProcessPaymentResponse("testForm", "12345", "reference");
 
             Assert.IsType<string>(result);
