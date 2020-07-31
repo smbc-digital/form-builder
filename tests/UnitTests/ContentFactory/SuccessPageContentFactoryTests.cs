@@ -189,5 +189,35 @@ namespace form_builder_tests.UnitTests.ContentFactory
             // Assert
             Assert.Equal(formSchema.StartPageUrl, result.StartPageUrl);
         }
+
+        [Fact]
+        public async Task Build_ShouldDeleteCacheEntry()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.H2)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithStartPageUrl("page-one")
+                .WithBaseUrl("base-test")
+                .WithPage(page)
+                .Build();
+
+            var guid = new Guid();
+
+            // Act
+            await _factory.Build(string.Empty, formSchema, guid.ToString(), new FormAnswers(),
+                EBehaviourType.SubmitForm);
+
+            // Assert
+            _mockSessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
+            _mockDistributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == guid.ToString())), Times.Once);
+        }
     }
 }

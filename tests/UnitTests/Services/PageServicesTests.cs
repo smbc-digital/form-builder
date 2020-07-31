@@ -29,7 +29,6 @@ using form_builder.Services.PayService;
 using form_builder.ContentFactory;
 using System.Threading;
 using form_builder.Builders;
-using Microsoft.Extensions.Logging;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -647,28 +646,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal(viewModel.StartPageUrl, result.ViewModel.StartPageUrl);
         }
 
-        [Fact(Skip = "To be moved to SuccessPageFactoryTests")]
-        public async Task FinalisePageJoueny_ShouldDeleteCacheEntry()
-        {
-            // Arrange
-            var guid = Guid.NewGuid();
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
-
-            var page = new PageBuilder()
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            // Act
-            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
-
-            // Assert
-            _sessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == guid.ToString())), Times.Once);
-        }
+        
 
         [Fact]
         public async Task FinalisePageJoueny_ShouldDeleteFileUpload_CacheEntries()
