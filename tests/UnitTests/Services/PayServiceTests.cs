@@ -176,9 +176,28 @@ namespace form_builder_tests.UnitTests.Services
             return mappingEntity;
         }
 
+        private static readonly Behaviour Behaviour = new BehaviourBuilder()
+            .WithBehaviourType(EBehaviourType.SubmitAndPay)
+            .WithPageSlug("test-test")
+            .WithSubmitSlug(new SubmitSlug
+            {
+                URL = "test",
+                AuthToken = "test",
+                Environment = "local",
+                CallbackUrl = "test"
+            })
+            .Build();
+
+        private static readonly Page Page = new PageBuilder()
+            .WithBehaviour(Behaviour)
+            .WithPageSlug("test")
+            .Build();
+
         [Fact]
         public async Task ProcessPayment_ShouldThrowException_WhenPaymentConfig_IsNull()
         {
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
+
             var result = await Assert.ThrowsAsync<Exception>(() =>
                 _service.ProcessPayment(GetMappingEntityData(), "nonexistanceform", "page-one", "12345", "guid"));
 
@@ -188,6 +207,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPayment_ShouldThrowException_WhenPaymentProvider_IsNull()
         {
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
+
             var result = await Assert.ThrowsAsync<Exception>(() =>
                 _service.ProcessPayment(GetMappingEntityData(), "testFormwithnovalidpayment", "page-one", "12345",
                     "guid"));
@@ -198,6 +219,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPayment_ShouldCallPaymentProvider_And_ReturnUrl()
         {
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
+
             _paymentProvider.Setup(_ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(), It.IsAny<PaymentInformation>()))
                 .ReturnsAsync("url");
@@ -213,6 +236,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowException_WhenPaymentConfig_IsNull()
         {
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
+
             var result = await Assert.ThrowsAsync<Exception>(() =>
                 _service.ProcessPaymentResponse("nonexistanceform", "12345", "reference"));
 
@@ -222,6 +247,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowException_WhenPaymentProvider_IsNull()
         {
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
+
             var result = await Assert.ThrowsAsync<Exception>(() =>
                 _service.ProcessPaymentResponse("nonexistanceform", "12345", "reference"));
 
@@ -231,6 +258,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowException_WhenPaymentProviderThrows()
         {
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
+
             _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
                 .Throws<Exception>();
 
@@ -241,24 +270,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldReturnPaymentReference_OnSuccessfull_PaymentProviderCall()
         {
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitAndPay)
-                .WithPageSlug("test-test")
-                .WithSubmitSlug(new SubmitSlug
-                {
-                    URL = "test",
-                    AuthToken = "test",
-                    Environment = "local",
-                    CallbackUrl = "test"
-                })
-                .Build();
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
 
-            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(
-                new PageBuilder()
-                    .WithPageSlug("test")
-                    .WithBehaviour(behaviour)
-                    .Build
-                );
             var result = await _service.ProcessPaymentResponse("testForm", "12345", "reference");
 
             Assert.IsType<string>(result);
