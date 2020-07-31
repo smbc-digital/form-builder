@@ -16,6 +16,7 @@ using form_builder.Builders;
 using form_builder.Helpers.Session;
 using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace form_builder_tests.UnitTests.ContentFactory
 {

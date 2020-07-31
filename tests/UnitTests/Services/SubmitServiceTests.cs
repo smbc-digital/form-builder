@@ -31,7 +31,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ILogger<SubmitService>> _mockLogger = new Mock<ILogger<SubmitService>>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistrubutedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
-        private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
+        private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
         private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IHostingEnvironment> _mockEnvironment = new Mock<IHostingEnvironment>();
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
@@ -78,11 +78,11 @@ namespace form_builder_tests.UnitTests.Services
                 FakePaymentSubmission = false
             });
 
-            _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockGateway.Object, _pageHelper.Object, _sessionHelper.Object, _mockEnvironment.Object, _mockHttpContextAccessor.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockIOptons.Object);
+            _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockGateway.Object, _mockPageHelper.Object, _sessionHelper.Object, _mockEnvironment.Object, _mockHttpContextAccessor.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockIOptons.Object);
         }
 
         [Fact]
-        public async Task ProcessSubmission_Application_ShoudlThrowApplicationException_WhenNoSubmitUrlSpecified()
+        public async Task ProcessSubmission_Application_ShouldThrowApplicationException_WhenNoSubmitUrlSpecified()
         {
             // Arrange
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
@@ -108,6 +108,10 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
             // Act
             var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
@@ -122,7 +126,7 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var guid = Guid.NewGuid();
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.Environment.com" };
+            var submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.Environment.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -141,6 +145,10 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ThrowsAsync(new Exception("error"));
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
 
             // Act & Assert
             //var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
@@ -181,7 +189,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Textarea)
                 .Build();
 
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+            var submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -199,12 +207,18 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK
                 })
                 .Callback<string, object>((x, y) => callbackValue = (ExpandoObject)y);
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
             // Act
             await _service.ProcessSubmission(new MappingEntity { Data = new ExpandoObject(), BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "123454");
 
@@ -255,6 +269,10 @@ namespace form_builder_tests.UnitTests.Services
                     StatusCode = HttpStatusCode.InternalServerError
                 });
 
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
@@ -293,6 +311,10 @@ namespace form_builder_tests.UnitTests.Services
                    Content = new StringContent("\"1234456\"")
                });
 
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
             // Act
             var result = await _service.PaymentSubmission((new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }), "form", guid.ToString());
 
@@ -330,6 +352,10 @@ namespace form_builder_tests.UnitTests.Services
                     StatusCode = HttpStatusCode.InternalServerError
                 });
 
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
@@ -365,6 +391,10 @@ namespace form_builder_tests.UnitTests.Services
                    StatusCode = HttpStatusCode.OK,
                    Content = null
                });
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
 
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
@@ -403,6 +433,10 @@ namespace form_builder_tests.UnitTests.Services
                    StatusCode = HttpStatusCode.OK,
                    Content = new StringContent("")
                });
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
 
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
