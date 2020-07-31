@@ -3,6 +3,7 @@ using form_builder.Models;
 using form_builder_tests.Builders;
 using System;
 using System.Collections.Generic;
+using Moq;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Models
@@ -821,6 +822,83 @@ namespace form_builder_tests.UnitTests.Models
             Assert.Equal(EBehaviourType.GoToPage, result.BehaviourType);
         }
 
+        [Fact]
+        public void CheckPageMeetsConditions_ShouldReturnTrue_If_RenderConditionsAreValid()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("page-continue")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithRenderConditions(new Condition
+                {
+                    QuestionId = "testRadio",
+                    ConditionType = ECondition.EqualTo,
+                    ComparisonValue = "yes"
+                })
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic> {{"testRadio", "yes"}};
+
+            // Act
+            var result = page.CheckPageMeetsConditions(viewModel);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void CheckPageMeetsConditions_ShouldReturnTrue_If_NoRenderConditionsExist()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("page-continue")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic> { { "testRadio", "yes" } };
+
+            // Act
+            var result = page.CheckPageMeetsConditions(viewModel);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void CheckPageMeetsConditions_ShouldReturnFalse_If_RenderConditionsAreNotValid()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("page-continue")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithRenderConditions(new Condition
+                {
+                    QuestionId = "testRadio",
+                    ConditionType = ECondition.EqualTo,
+                    ComparisonValue = "yes"
+                })
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+
+            // Act
+            var result = page.CheckPageMeetsConditions(viewModel);
+
+            // Assert
+            Assert.False(result);
+        }
         #endregion
     }
 }

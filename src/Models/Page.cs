@@ -123,7 +123,6 @@ namespace form_builder.Models
                    RenderConditions.All(condition => conditionValidator.IsValid(condition, answers));
         }
 
-
         public SubmitSlug GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)
         {
             var submitBehaviour = new SubmitSlug();

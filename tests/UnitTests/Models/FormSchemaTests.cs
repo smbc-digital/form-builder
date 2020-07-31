@@ -55,7 +55,6 @@ namespace form_builder_tests.UnitTests.Models
             Assert.True(result);
         }
 
-
         [Fact]
         public void IsAvailable_ShouldReturn_False_WhenRequestedEnvironmentAvailabilitiesIsSpecified_And_IsAvailableEqualsFalse()
         {
