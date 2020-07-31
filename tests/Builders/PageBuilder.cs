@@ -13,6 +13,7 @@ namespace form_builder_tests.Builders
         private List<Behaviour> _behaviours = new List<Behaviour>();
         private List<IncomingValue> _incomingValues = new List<IncomingValue>();
         private List<IAction> _pageActions = new List<IAction>();
+        private List<Condition> _renderConditions = new List<Condition>();
 
         public Page Build()
         {
@@ -24,7 +25,8 @@ namespace form_builder_tests.Builders
                 Behaviours = _behaviours,
                 Elements = _elements,
                 IncomingValues = _incomingValues,
-                PageActions = _pageActions
+                PageActions = _pageActions,
+                RenderConditions = _renderConditions
             };
         }
 
@@ -73,6 +75,13 @@ namespace form_builder_tests.Builders
         public PageBuilder WithPageActions(IAction pageAction)
         {
             _pageActions.Add(pageAction);
+
+            return this;
+        }
+
+        public PageBuilder WithRenderConditions(Condition renderCondition)
+        {
+            _renderConditions.Add(renderCondition);
 
             return this;
         }

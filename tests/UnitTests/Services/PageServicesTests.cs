@@ -45,7 +45,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IOrganisationService> _organisationService = new Mock<IOrganisationService>();
         private readonly Mock<IDistributedCacheWrapper> _distributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
         private readonly Mock<IHostingEnvironment> _mockEnvironment = new Mock<IHostingEnvironment>();
         private readonly Mock<IPayService> _payService = new Mock<IPayService>();
         private readonly Mock<IMappingService> _mappingService = new Mock<IMappingService>();
@@ -78,13 +78,13 @@ namespace form_builder_tests.UnitTests.Services
 
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            _mockDistrbutedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
+            _mockDistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
             {
                 FormJson = 1
             });
 
             _service = new PageService(_validators.Object, _mockPageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, 
-            _distributedCache.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object);
+            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object);
         }
 
         [Fact]
@@ -393,6 +393,10 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns((Page) null);
+
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPage("form", requestPath, ""));
             Assert.Equal($"Requested path '{requestPath}' object could not be found.", result.Message);
@@ -430,7 +434,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ShouldCallDistrbutedCache_ToDeleteSessionData_WhenNavigating_ToDifferentForm()
+        public async Task ProcessPage_ShouldCallDistributedCache_ToDeleteSessionData_WhenNavigating_ToDifferentForm()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { FormName = "other-form" }));
@@ -464,7 +468,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ShouldNotCallDistrbutedCache_ToDeleteSessionData_WhenNavigating_ToDifferentForm()
+        public async Task ProcessPage_ShouldNotCallDistributedCache_ToDeleteSessionData_WhenNavigating_ToDifferentForm()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { FormName = "new-form" }));
@@ -560,7 +564,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ShouldGetTheRighStartPageUrl()
+        public async Task ProcessPage_ShouldGetTheRightStartPageUrl()
         {
             //Arrange
             var element = new ElementBuilder()
@@ -602,7 +606,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessRequest_ShouldGetTheRighStartPageUrl()
+        public async Task ProcessRequest_ShouldGetTheRightStartPageUrl()
         {
             //Arrange
             var element = new ElementBuilder()
@@ -646,10 +650,8 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal(viewModel.StartPageUrl, result.ViewModel.StartPageUrl);
         }
 
-        
-
         [Fact]
-        public async Task FinalisePageJoueny_ShouldDeleteFileUpload_CacheEntries()
+        public async Task FinalisePageJourney_ShouldDeleteFileUpload_CacheEntries()
         {
             // Arrange
             var guid = Guid.NewGuid();
@@ -686,7 +688,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task FinalisePageJoueny_Should_SetCache_WhenDocumentDownload_True()
+        public async Task FinalisePageJourney_Should_SetCache_WhenDocumentDownload_True()
         {
             // Arrange
             var guid = Guid.NewGuid();
