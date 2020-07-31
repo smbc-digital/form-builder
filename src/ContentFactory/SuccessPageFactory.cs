@@ -48,10 +48,7 @@ namespace form_builder.ContentFactory
             {
                 page = GenerateGenericPaymentPage();
                 baseForm.Pages.Add(page);
-            }   
-
-            if(page == null && (_environment.EnvironmentName == "prod" || _environment.EnvironmentName == "stage"))
-                throw new Exception($"SuccessPageContentFactory::Build, No success page configured for form {form}");
+            }
 
             if (page == null)
             {
@@ -66,7 +63,7 @@ namespace form_builder.ContentFactory
                 };
             }
 
-            if(baseForm.DocumentDownload && page != null)
+            if (baseForm.DocumentDownload && page != null)
             {
                     baseForm.DocumentType.ForEach((docType) => {
                         var element = new ElementBuilder()

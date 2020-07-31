@@ -46,7 +46,7 @@ namespace form_builder.Models
 
                 var page = pageHelper.GetPageWithMatchingRenderConditions(pages);
 
-                return page ?? throw new ApplicationException($"FormSchema:: GetPage :: No {path} page matching the conditions was found");
+                return page;
             }
             catch(Exception ex)
             {
