@@ -20,7 +20,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Dynamic;
-using form_builder.Models.Properties.ActionProperties;
+using form_builder.Helpers.Session;
 
 namespace form_builder.Helpers.PageHelpers
 {
@@ -35,11 +35,12 @@ namespace form_builder.Helpers.PageHelpers
         private readonly ICache _cache;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly IFileUploadService _fileUploadService;
+        private readonly ISessionHelper _sessionHelper;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
             IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
-            IEnumerable<IPaymentProvider> paymentProviders, IFileUploadService fileUploadService)
+            IEnumerable<IPaymentProvider> paymentProviders, IFileUploadService fileUploadService, ISessionHelper sessionHelper)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -50,6 +51,7 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
             _paymentProviders = paymentProviders;
             _fileUploadService = fileUploadService;
+            _sessionHelper = sessionHelper;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(
@@ -419,6 +421,30 @@ namespace form_builder.Helpers.PageHelpers
                 if (string.IsNullOrEmpty(action.Properties.TargetQuestionId))
                     throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a TargetQuestionId");
             });
+        }
+
+        public void CheckRenderConditionsValid(List<Page> pages)
+        {
+            var groups = pages.GroupBy(_ => _.PageSlug, (key, g) => new { Slug = key, Pages = g.ToList() });
+
+            foreach (var group in groups)
+            {
+                if (group.Pages.Count(_ => !_.HasRenderConditions) > 1)
+                    throw new ApplicationException($"PageHelper:CheckRenderConditionsValid, More than one {@group.Slug} page has no render conditions");
+            }
+        }
+
+        public Page GetPageWithMatchingRenderConditions(List<Page> pages)
+        {
+            var guid = _sessionHelper.GetSessionGuid();
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = !string.IsNullOrEmpty(formData)
+                ? JsonConvert.DeserializeObject<FormAnswers>(formData)
+                : new FormAnswers {Pages = new List<PageAnswers>()};
+
+            var answers = convertedAnswers.Pages.SelectMany(_ => _.Answers).ToDictionary(_ => _.QuestionId, _ => _.Response);
+
+            return pages.FirstOrDefault(page => page.CheckPageMeetsConditions(answers));
         }
     }
 }

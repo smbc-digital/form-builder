@@ -126,7 +126,7 @@ namespace form_builder.Services.PageService
                     _distributedCache.Remove(sessionGuid);
             }
 
-            var page = baseForm.GetPage(path);
+            var page = baseForm.GetPage(_pageHelper, path);
             if (page == null)
             {
                 throw new ApplicationException($"Requested path '{path}' object could not be found.");
@@ -173,7 +173,7 @@ namespace form_builder.Services.PageService
             if(!baseForm.IsAvailable(_environment.EnvironmentName))
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
 
-            var currentPage = baseForm.GetPage(path);
+            var currentPage = baseForm.GetPage(_pageHelper, path);
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
@@ -268,9 +268,6 @@ namespace form_builder.Services.PageService
 
             if(baseForm.DocumentDownload)
                 await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(formAnswers), _distrbutedCacheExpirationConfiguration.Document);
-
-            _distributedCache.Remove(sessionGuid);
-            _sessionHelper.RemoveSessionGuid();
 
             return await _successPageContentFactory.Build(form, baseForm, sessionGuid, formAnswers, behaviourType);
         }

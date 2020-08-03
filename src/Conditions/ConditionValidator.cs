@@ -9,7 +9,7 @@ namespace form_builder.Conditions
     {
         private Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>> ConditionList =
 
-        new Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>>()
+        new Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>>
         {
             { ECondition.IsBefore, DateComparator.DateIsBefore },
             { ECondition.IsAfter, DateComparator.DateIsAfter },

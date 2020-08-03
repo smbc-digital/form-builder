@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using form_builder.Helpers.Session;
 using form_builder.Models.Properties.ActionProperties;
 using Xunit;
 
@@ -35,21 +36,17 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-
         private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _mockDisallowedKeysOptions =
             new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
-
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
-
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings
             = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
-
         private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider =
             new Mock<IEnumerable<IPaymentProvider>>();
-
         private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
         private readonly Mock<IFileUploadService> _mockFileUploadService = new Mock<IFileUploadService>();
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
 
         public PageHelperTests()
         {
@@ -94,7 +91,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object,
                 _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockCache.Object, _mockDistrbutedCacheExpirationSettings.Object, _mockPaymentProvider.Object,
-                _mockFileUploadService.Object);
+                _mockFileUploadService.Object, _mockSessionHelper.Object);
         }
 
         [Fact]
@@ -630,7 +627,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
         [Fact]
         public void
-            SaveAnswers_ShouldReplaceFilUploadReference_WithinFormAnswers_IfAnswerAlreadyExists_InDistributedCache()
+        SaveAnswers_ShouldReplaceFilUploadReference_WithinFormAnswers_IfAnswerAlreadyExists_InDistributedCache()
         {
             var callbackCacheProvider = string.Empty;
             var questionId = "fileUpload_testFileQuestionId";
@@ -807,7 +804,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData("", "target.")]
         [InlineData("", ".target")]
         public void
-            CheckForInvalidQuestionOrTargetMappingValue_ShouldThrowExceptionWhen_InvalidQuestionId_OrTargetMapping(
+        CheckForInvalidQuestionOrTargetMappingValue_ShouldThrowExceptionWhen_InvalidQuestionId_OrTargetMapping(
                 string questionId, string targetMapping)
         {
             var pages = new List<Page>();
@@ -849,7 +846,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData("", "valid.target")]
         [InlineData("", "valid.target.mapping")]
         public void
-            CheckForInvalidQuestionOrTargetMappingValue_ShouldNotThrowExceptionWhen_ValidQuestionId_OrTargetMapping(
+        CheckForInvalidQuestionOrTargetMappingValue_ShouldNotThrowExceptionWhen_ValidQuestionId_OrTargetMapping(
                 string questionId, string targetMapping)
         {
             var pages = new List<Page>();
@@ -903,8 +900,8 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task CheckForPaymentConfiguration_ShouldNot_ThrowException_WhenConfigFound_ForForm_WithProvider()
         {
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(),It.IsAny<int>(),It.IsAny<ESchemaType>()))
-                .ReturnsAsync(new List<PaymentInformation>{ new PaymentInformation{ FormName = "test-form", PaymentProvider = "testProvider", Settings = new Settings() }});
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(new List<PaymentInformation> { new PaymentInformation { FormName = "test-form", PaymentProvider = "testProvider", Settings = new Settings() } });
 
             var pages = new List<Page>();
 
@@ -924,8 +921,8 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task CheckForPaymentConfiguration_Should_VerifyCalculationSlugs_StartWithHttps()
         {
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(),It.IsAny<int>(),It.IsAny<ESchemaType>()))
-                .ReturnsAsync(new List<PaymentInformation>{ new PaymentInformation{ FormName = "test-form", PaymentProvider = "testProvider", Settings = new Settings{ ComplexCalculationRequired = true } }});
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(new List<PaymentInformation> { new PaymentInformation { FormName = "test-form", PaymentProvider = "testProvider", Settings = new Settings { ComplexCalculationRequired = true } } });
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName)
                 .Returns("non-local");
@@ -938,7 +935,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var element = new ElementBuilder()
                 .WithType(EElementType.PaymentSummary)
-                .WithCalculationSlugs(new SubmitSlug{ Environment = "non-local", URL = "https://www.test.com" })
+                .WithCalculationSlugs(new SubmitSlug { Environment = "non-local", URL = "https://www.test.com" })
                 .Build();
 
             var page = new PageBuilder()
@@ -954,8 +951,8 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task CheckForPaymentConfiguration_Should_ThrowException_WhenCalculateCostUrl_DoesNot_StartWithHttps()
         {
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(),It.IsAny<int>(),It.IsAny<ESchemaType>()))
-                .ReturnsAsync(new List<PaymentInformation>{ new PaymentInformation{ FormName = "test-form", PaymentProvider = "testProvider", Settings = new Settings{ ComplexCalculationRequired = true } }});
+            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+                .ReturnsAsync(new List<PaymentInformation> { new PaymentInformation { FormName = "test-form", PaymentProvider = "testProvider", Settings = new Settings { ComplexCalculationRequired = true } } });
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName)
                 .Returns("non-local");
@@ -968,7 +965,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var element = new ElementBuilder()
                 .WithType(EElementType.PaymentSummary)
-                .WithCalculationSlugs(new SubmitSlug{ Environment = "non-local", URL = "http://www.test.com" })
+                .WithCalculationSlugs(new SubmitSlug { Environment = "non-local", URL = "http://www.test.com" })
                 .Build();
 
             var page = new PageBuilder()
@@ -977,14 +974,14 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             pages.Add(page);
-            
+
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _pageHelper.CheckForPaymentConfiguration(pages, "test-form"));
             Assert.Equal("PaymentSummary::CalculateCostUrl must start with https", result.Message);
         }
 
         [Fact]
         public async Task
-            CheckForPaymentConfiguration_ShouldThrowException_WhenPaymentProvider_DoesNotExists_WhenConfig_IsFound()
+        CheckForPaymentConfiguration_ShouldThrowException_WhenPaymentProvider_DoesNotExists_WhenConfig_IsFound()
         {
             var pages = new List<Page>();
 
@@ -1097,7 +1094,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
         [Fact]
         public void
-            CheckForAcceptedFileUploadFileTypes_ShouldThrowAnException_WhenAcceptedFleTypes_HasInvalidExtensionName()
+        CheckForAcceptedFileUploadFileTypes_ShouldThrowAnException_WhenAcceptedFleTypes_HasInvalidExtensionName()
         {
             var pages = new List<Page>();
             var invalidElementQuestionId = "fileUpload2";
@@ -1607,7 +1604,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData("www.url.com", "questionId", "test",
             "PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction there is no PageActionSlug for local")]
         public void
-            CheckRetrieveExternalDataAction_ShouldThrowException_WhenActionDoesNotContain_URL_or_TargetQuestionId(
+        CheckRetrieveExternalDataAction_ShouldThrowException_WhenActionDoesNotContain_URL_or_TargetQuestionId(
                 string url, string questionId, string env, string message)
         {
             // Arrange
@@ -1654,6 +1651,384 @@ namespace form_builder_tests.UnitTests.Helpers
             // Act & Assert
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForPageActions(formSchema));
             Assert.Equal(message, result.Message);
+        }
+
+        [Fact]
+        public void CheckRenderConditionsValid_ShouldThrowException_If_TwoOrMorePagesWithTheSameSlug_HaveNoRenderConditions()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .Build();
+
+            var pages = new List<Page>
+            {
+                page,
+                page2
+            };
+
+            // Act & Assert
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckRenderConditionsValid(pages));
+            Assert.Equal($"PageHelper:CheckRenderConditionsValid, More than one {page.PageSlug} page has no render conditions", result.Message);
+        }
+
+        [Fact]
+        public void CheckRenderConditionsValid_ShouldThrowException_If_TwoOrMorePagesWithTheSameSlug_HaveEmptyRenderConditions()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .Build();
+
+            page.RenderConditions = new List<Condition>();
+            page2.RenderConditions = new List<Condition>();
+
+            var pages = new List<Page>
+            {
+                page,
+                page2
+            };
+
+            // Act & Assert
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckRenderConditionsValid(pages));
+            Assert.Equal($"PageHelper:CheckRenderConditionsValid, More than one {page.PageSlug} page has no render conditions", result.Message);
+        }
+
+        [Fact]
+        public void CheckRenderConditionsValid_ShouldThrowException_If_TwoOrMorePagesWithTheSameSlug_HaveEmptyRenderConditions_And_TheLastPageHasRenderConditions()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .Build();
+
+            var page3 = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .WithRenderConditions(new Condition
+                {
+                    QuestionId = "test",
+                    EqualTo = "yes"
+                })
+                .Build();
+
+            page.RenderConditions = new List<Condition>();
+            page2.RenderConditions = new List<Condition>();
+
+            var pages = new List<Page>
+            {
+                page,
+                page2,
+                page3
+            };
+
+            // Act & Assert
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckRenderConditionsValid(pages));
+            Assert.Equal($"PageHelper:CheckRenderConditionsValid, More than one {page.PageSlug} page has no render conditions", result.Message);
+        }
+
+        [Fact]
+        public void CheckRenderConditionsValid_ShouldNotThrowException_If_TwoPagesHaveTheSameSlug_And_TheFirstOneHasRenderConditions()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .WithRenderConditions(new Condition
+                {
+                    QuestionId = "test",
+                    EqualTo = "yes"
+                })
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .Build();
+
+            page2.RenderConditions = new List<Condition>();
+
+            var pages = new List<Page>
+            {
+                page,
+                page2
+            };
+
+            // Act & Assert
+            _pageHelper.CheckRenderConditionsValid(pages);
+        }
+
+        [Fact]
+        public void CheckRenderConditionsValid_ShouldNotThrowException_If_TwoPagesWithTheSameSlugHaveRenderConditions()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .WithRenderConditions(new Condition
+                {
+                    QuestionId = "test",
+                    EqualTo = "yes"
+                })
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .WithRenderConditions(new Condition
+                {
+                    QuestionId = "test",
+                    EqualTo = "no"
+                })
+                .Build();
+
+            var pages = new List<Page>
+            {
+                page,
+                page2
+            };
+
+            // Act & Assert
+            _pageHelper.CheckRenderConditionsValid(pages);
+        }
+
+        [Fact]
+        public void CheckRenderConditionsValid_ShouldNotThrowException_If_TwoOrMorePagesWithTheSameSlugHaveRenderConditions_AndTheLastPageHasNoRenderConditions()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .WithRenderConditions(new Condition
+                {
+                    QuestionId = "test",
+                    EqualTo = "yes"
+                })
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .WithRenderConditions(new Condition
+                {
+                    QuestionId = "test",
+                    EqualTo = "no"
+                })
+                .Build();
+
+            var page3 = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .Build();
+
+            page3.RenderConditions = new List<Condition>();
+
+            var pages = new List<Page>
+            {
+                page,
+                page2,
+                page3
+            };
+
+            // Act & Assert
+            _pageHelper.CheckRenderConditionsValid(pages);
+        }
+
+        [Fact]
+        public void GetPageWithMatchingRenderConditions_ShouldReturnPageWithNoConditions_If_ItDoesNotMeetTheConditions()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .WithRenderConditions(new Condition
+                {
+                    QuestionId = "test",
+                    EqualTo = "yes"
+                })
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .Build();
+
+            page2.RenderConditions = new List<Condition>();
+
+            var pages = new List<Page>
+            {
+                page,
+                page2
+            };
+
+            // Act
+            var result = _pageHelper.GetPageWithMatchingRenderConditions(pages);
+
+            // Assert
+            Assert.Equal(page2, result);
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void GetPageWithMatchingRenderConditions_ShouldReturnPageWithRenderConditions_If_ItMeetsTheConditions()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .WithRenderConditions(new Condition
+                {
+                    QuestionId = "testRadio",
+                    ConditionType = ECondition.EqualTo,
+                    ComparisonValue = "yes"
+                })
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .Build();
+
+            page2.RenderConditions = new List<Condition>();
+
+            var pages = new List<Page>
+            {
+                page,
+                page2
+            };
+
+            var mockData = JsonConvert.SerializeObject(new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                Response = "yes",
+                                QuestionId = "testRadio"
+                            }
+                        }
+                    }
+                }
+            });
+
+            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("guid");
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(mockData);
+
+            // Act
+            var result = _pageHelper.GetPageWithMatchingRenderConditions(pages);
+
+            // Assert
+            Assert.Equal(page, result);
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void GetPageWithMatchingRenderConditions_ShouldReturnPageWithNoConditions_IfFormDataIsNull()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .WithRenderConditions(new Condition
+                {
+                    QuestionId = "testRadio",
+                    ConditionType = ECondition.EqualTo,
+                    ComparisonValue = "yes"
+                })
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .Build();
+
+            page2.RenderConditions = new List<Condition>();
+
+            var pages = new List<Page>
+            {
+                page,
+                page2
+            };
+
+            var mockData = JsonConvert.SerializeObject(new FormAnswers());
+
+            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("guid");
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(It.IsAny<string>());
+
+            // Act
+            var result = _pageHelper.GetPageWithMatchingRenderConditions(pages);
+
+            // Assert
+            Assert.Equal(page2, result);
+            Assert.NotNull(result);
         }
     }
 }

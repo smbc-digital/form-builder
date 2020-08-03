@@ -9,10 +9,14 @@ using Microsoft.AspNetCore.Http;
 using form_builder.Helpers.PageHelpers;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
 using form_builder.Builders;
+using form_builder.Helpers.Session;
+using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace form_builder_tests.UnitTests.ContentFactory
 {
@@ -23,28 +27,27 @@ namespace form_builder_tests.UnitTests.ContentFactory
         private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
         private readonly Mock<IHttpContextAccessor> _mockHttpContext = new Mock<IHttpContextAccessor>();
         private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
 
         public SuccessPageContentFactoryTests()
         {
-            _factory = new SuccessPageFactory(_mockHttpContext.Object, _mockHostingEnv.Object, _mockPageHelper.Object, _mockPageContentFactory.Object);
+            _factory = new SuccessPageFactory(
+                _mockHttpContext.Object, 
+                _mockHostingEnv.Object, 
+                _mockPageHelper.Object, 
+                _mockPageContentFactory.Object,
+                _mockSessionHelper.Object,
+                _mockDistributedCache.Object);
         }
 
-        [Theory]
-        [InlineData("prod")]
-        [InlineData("stage")]
-        public async Task Build_ShouldThrowException_WhenPageIsNull_AndInvalidEnvironment(string env)
-        {
-            // Arrange
-            var formName = "form-name";
-            _mockHttpContext.Setup(_ => _.HttpContext.Request.Host).Returns(new HostString("test"));
-            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns(env);
-
-            // Act & Assert
-            var result = await Assert.ThrowsAsync<Exception>(() => _factory.Build(formName, new FormSchema { BaseURL = "base-test", FirstPageSlug = "page-one", Pages = new List<Page>() }, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm));
-
-            Assert.Equal($"SuccessPageContentFactory::Build, No success page configured for form {formName}", result.Message);
-            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
-        }
+        private static readonly Page Page = new PageBuilder()
+            .WithPageSlug("success")
+            .WithElement(new Element
+            {
+                Type = EElementType.H2
+            })
+            .Build();
 
         [Fact]
         public async Task Build_ShouldReturn_SuccessPageEntity_WithSubmitViewName_WhenNoSuccessPage_Configured()
@@ -52,6 +55,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             // Arrange
             _mockHttpContext.Setup(_ => _.HttpContext.Request.Host).Returns(new HostString("test"));
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns((Page)null);
 
             // Act 
             var result = await _factory.Build(string.Empty, new FormSchema {BaseURL = "base-test", FirstPageSlug = "page-one", Pages = new List<Page>() }, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm);
@@ -69,6 +73,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel())
                 .Callback<Page, Dictionary<string,dynamic>, FormSchema, string, List<object>>((a,b,c,d,e) => callBack = a);
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns((Page)null);
 
             // Act 
             var result = await _factory.Build(string.Empty, new FormSchema {BaseURL = "base-test", FirstPageSlug = "page-one", Pages = new List<Page>() }, string.Empty, new FormAnswers(), EBehaviourType.SubmitAndPay);
@@ -98,6 +103,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel())
                 .Callback<Page, Dictionary<string,dynamic>, FormSchema, string, List<object>>((a,b,c,d,e) => callBack = a);
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
 
             // Act 
             var result = await _factory.Build(string.Empty, new FormSchema {BaseURL = "base-test", FirstPageSlug = "page-one", Pages = new List<Page>{ new Page{ PageSlug = "success", Elements = new List<IElement>{ new H2() } } } }, string.Empty, new FormAnswers(), behaviourType);
@@ -139,6 +145,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel())
                 .Callback<Page, Dictionary<string,dynamic>, FormSchema, string, List<object>>((a,b,c,d,e) => callBack = a);
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(formSchema.Pages.FirstOrDefault());
 
             // Act 
             var result = await _factory.Build(string.Empty, formSchema, string.Empty, new FormAnswers(), behaviourType);
@@ -153,7 +160,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
 
         
         [Fact]
-        public async Task Build_ShouldReuturn_Correct_StartPageUrl()
+        public async Task Build_ShouldReturn_Correct_StartPageUrl()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.H2)
@@ -174,12 +181,43 @@ namespace form_builder_tests.UnitTests.ContentFactory
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
             _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns((Page) null);
 
             // Act 
             var result = await _factory.Build(string.Empty, formSchema, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm);
 
             // Assert
             Assert.Equal(formSchema.StartPageUrl, result.StartPageUrl);
+        }
+
+        [Fact]
+        public async Task Build_ShouldDeleteCacheEntry()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.H2)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithStartPageUrl("page-one")
+                .WithBaseUrl("base-test")
+                .WithPage(page)
+                .Build();
+
+            var guid = new Guid();
+
+            // Act
+            await _factory.Build(string.Empty, formSchema, guid.ToString(), new FormAnswers(),
+                EBehaviourType.SubmitForm);
+
+            // Assert
+            _mockSessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
+            _mockDistributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == guid.ToString())), Times.Once);
         }
     }
 }
