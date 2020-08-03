@@ -33,7 +33,7 @@ namespace form_builder.Services.SubmtiService
 
         private readonly ILogger<SubmitService> _logger;
 
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
 
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
@@ -41,7 +41,7 @@ namespace form_builder.Services.SubmtiService
         private readonly SubmissionServiceConfiguration _submissionServiceConfiguration;
 
 
-        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper, IHostingEnvironment environment, IHttpContextAccessor httpContextAccessor, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration)
+        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper, IWebHostEnvironment environment, IHttpContextAccessor httpContextAccessor, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration)
         {
             _distributedCache = distributedCache;
             _gateway = gateway;

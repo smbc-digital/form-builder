@@ -4,6 +4,7 @@ using System.IO;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using StockportGovUK.AspNetCore.Logging.Elasticsearch.Aws;
 
@@ -28,13 +29,16 @@ namespace form_builder
                 .WriteToElasticsearchAws(Configuration)
                 .CreateLogger();
 
-            BuildWebHost(args).Run();
+            BuildHost(args).Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseConfiguration(Configuration)
+        public static IHost BuildHost(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseConfiguration(Configuration);
+                })
                 .UseSerilog()
                 .Build();
     }

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using StockportGovUK.NetStandard.Gateways.Civica.Pay;
+using StockportGovUK.NetStandard.Gateways.CivicaPay;
 using StockportGovUK.NetStandard.Models.Civica.Pay.Request;
 
 namespace form_builder.Providers.PaymentProvider
@@ -20,10 +20,10 @@ namespace form_builder.Providers.PaymentProvider
         private readonly ICivicaPayGateway _civicaPayGateway;
         private readonly CivicaPaymentConfiguration _paymentConfig;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         private readonly ILogger<CivicaPayProvider> _logger;
 
-        public CivicaPayProvider(ICivicaPayGateway civicaPayGateway, IOptions<CivicaPaymentConfiguration> paymentConfiguration, IHttpContextAccessor httpContextAccessor, IHostingEnvironment environment, ILogger<CivicaPayProvider> logger)
+        public CivicaPayProvider(ICivicaPayGateway civicaPayGateway, IOptions<CivicaPaymentConfiguration> paymentConfiguration, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment environment, ILogger<CivicaPayProvider> logger)
         {
             _civicaPayGateway = civicaPayGateway;
             _httpContextAccessor = httpContextAccessor;

@@ -16,7 +16,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
     {
         private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
-        private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
 
         [Fact]
         public async Task RenderAsync_ShouldCall_PageHelper_ToGetCurrentValue()

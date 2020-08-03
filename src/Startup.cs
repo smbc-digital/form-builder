@@ -5,14 +5,21 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using form_builder.Extensions;
+using form_builder.Utils.ServiceCollectionExtensions;
 using form_builder.Configuration;
 using StockportGovUK.AspNetCore.Middleware.App;
 using StockportGovUK.NetStandard.Gateways;
+using StockportGovUK.NetStandard.Gateways.Extensions;
 using form_builder.Cache;
 using form_builder.ModelBinders.Providers;
 using System.Globalization;
 using form_builder.Middleware;
+using Microsoft.Extensions.Hosting;
+using StockportGovUK.NetStandard.Gateways.AddressService;
+using StockportGovUK.NetStandard.Gateways.CivicaPay;
+using StockportGovUK.NetStandard.Gateways.OrganisationService;
+using StockportGovUK.NetStandard.Gateways.StreetService;
+using StockportGovUK.NetStandard.Gateways.VerintService;
 
 namespace form_builder
 {
@@ -21,9 +28,9 @@ namespace form_builder
     {
         public IConfiguration Configuration { get; }
 
-        public IHostingEnvironment HostingEnvironment { get; }
+        public IWebHostEnvironment HostingEnvironment { get; }
 
-        public Startup(IConfiguration configuration, IHostingEnvironment env)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
             HostingEnvironment = env;
@@ -32,6 +39,9 @@ namespace form_builder
         public void ConfigureServices(IServiceCollection services)
         {
             CultureInfo.CurrentCulture = new CultureInfo("en-GB");
+            services.AddControllersWithViews();
+            services.AddRazorPages();
+
             services
                 .ConfigureCookiePolicy()
                 .AddValidators()
@@ -60,17 +70,17 @@ namespace form_builder
             services.AddTransient<ICache, Cache.Cache>();
             services.Configure<SubmissionServiceConfiguration>(Configuration.GetSection("SubmissionServiceConfiguration"));
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
-            services.AddMvc()
-                .AddMvcOptions(options => {
-                    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-                    options.ModelBinderProviders.Insert(0, new CustomFormFileModelBinderProvider());
-                })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
+            services.AddHttpClient<IGateway, Gateway>(Configuration);
+            services.AddHttpClient<ICivicaPayGateway, CivicaPayGateway>(Configuration);
+            services.AddHttpClient<ICivicaPayGateway, CivicaPayTestGateway>(Configuration);
+            services.AddHttpClient<IVerintServiceGateway, VerintServiceGateway>(Configuration);
+            services.AddHttpClient<IAddressServiceGateway, AddressServiceGateway>(Configuration);
+            services.AddHttpClient<IStreetServiceGateway, StreetServiceGateway>(Configuration);
+            services.AddHttpClient<IOrganisationServiceGateway, OrganisationServiceGateway>(Configuration);
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsEnvironment("local") || env.IsEnvironment("uitest"))
             {
@@ -87,12 +97,8 @@ namespace form_builder
             app.UseSession();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseRouting();
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
 }

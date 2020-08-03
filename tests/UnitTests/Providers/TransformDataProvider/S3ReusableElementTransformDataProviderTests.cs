@@ -17,7 +17,7 @@ namespace form_builder_tests.UnitTests.Providers.TransformDataProvider
         private readonly S3ReusableElementTransformDataProvider _s3TransformProvider;
         private readonly Mock<IS3Gateway> _mockS3gateway = new Mock<IS3Gateway>();
         private readonly Mock<ILogger<S3ReusableElementTransformDataProvider>> _mockLogger = new Mock<ILogger<S3ReusableElementTransformDataProvider>>();
-        private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
 
         private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
 

@@ -33,7 +33,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
         private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
         private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<IHostingEnvironment> _mockEnvironment = new Mock<IHostingEnvironment>();
+        private readonly Mock<IWebHostEnvironment> _mockEnvironment = new Mock<IWebHostEnvironment>();
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
         private readonly Mock<IOptions<SubmissionServiceConfiguration>> _mockIOptons = new Mock<IOptions<SubmissionServiceConfiguration>>();

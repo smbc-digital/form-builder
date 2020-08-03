@@ -21,6 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Dynamic;
 using form_builder.Helpers.Session;
+using Microsoft.Extensions.Hosting;
 
 namespace form_builder.Helpers.PageHelpers
 {
@@ -30,7 +31,7 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IElementHelper _elementHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly ICache _cache;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
@@ -38,7 +39,7 @@ namespace form_builder.Helpers.PageHelpers
         private readonly ISessionHelper _sessionHelper;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
-            IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache,
+            IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
             IEnumerable<IPaymentProvider> paymentProviders, IFileUploadService fileUploadService, ISessionHelper sessionHelper)
         {

@@ -1,6 +1,6 @@
-using StockportGovUK.NetStandard.Gateways.VerintServiceGateway;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using StockportGovUK.NetStandard.Gateways.VerintService;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
 
 namespace form_builder.Providers.Organisation

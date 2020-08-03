@@ -17,7 +17,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
         private readonly PageFactory _factory;
         private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAcessor = new Mock<IHttpContextAccessor>();
-        private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         
         public PageFactoryTests()
         {

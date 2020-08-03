@@ -38,7 +38,7 @@ namespace form_builder.Services.PageService
         private readonly IOrganisationService _organisationService;
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         private readonly IPayService _payService;
         private readonly IMappingService _mappingService;
         private readonly ISuccessPageFactory _successPageContentFactory;
@@ -54,7 +54,7 @@ namespace form_builder.Services.PageService
             IOrganisationService organisationService, 
             IDistributedCacheWrapper distributedCache, 
             IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, 
-            IHostingEnvironment environment, 
+            IWebHostEnvironment environment, 
             ISuccessPageFactory successPageFactory,
             IPageFactory pageFactory,
             ISchemaFactory schemaFactory,
