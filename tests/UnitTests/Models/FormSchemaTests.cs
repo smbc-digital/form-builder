@@ -141,12 +141,6 @@ namespace form_builder_tests.UnitTests.Models
                 })
                 .Build();
 
-            var pages = new List<Page>
-            {
-                page,
-                page2
-            };
-
             var formSchema = new FormSchemaBuilder()
                 .WithBaseUrl("baseUrl")
                 .WithName("form name")
@@ -189,12 +183,6 @@ namespace form_builder_tests.UnitTests.Models
                 })
                 .Build();
 
-            var pages = new List<Page>
-            {
-                page,
-                page2
-            };
-
             var formSchema = new FormSchemaBuilder()
                 .WithBaseUrl("baseUrl")
                 .WithName("form name")
@@ -210,6 +198,34 @@ namespace form_builder_tests.UnitTests.Models
 
             // Assert
             Assert.Equal(page, result);
+        }
+
+        [Fact]
+        public void GetPage_ShouldReturnPageImmediately_IfOnlyOnePageFound()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("baseUrl")
+                .WithName("form name")
+                .WithStartPageUrl("page1")
+                .WithPage(page)
+                .Build();
+
+            // Act
+            formSchema.GetPage(_mockPageHelper.Object, "success");
+
+            // Assert
+            _mockPageHelper.Verify(_ => _.CheckRenderConditionsValid(It.IsAny<List<Page>>()), Times.Never);
         }
     }
 }

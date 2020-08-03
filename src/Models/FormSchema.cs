@@ -44,6 +44,9 @@ namespace form_builder.Models
             {
                 var pages = Pages.Where(_ => _.PageSlug.ToLower().Trim() == path.ToLower().Trim()).OrderByDescending(_ => _.RenderConditions.Count).ToList();
 
+                if (pages.Count == 1)
+                    return pages.First();
+
                 var page = pageHelper.GetPageWithMatchingRenderConditions(pages);
 
                 return page;
