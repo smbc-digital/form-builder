@@ -72,8 +72,15 @@ namespace form_builder
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
 
             services.AddHttpClient<IGateway, Gateway>(Configuration);
-            services.AddHttpClient<ICivicaPayGateway, CivicaPayGateway>(Configuration);
-            services.AddHttpClient<ICivicaPayGateway, CivicaPayTestGateway>(Configuration);
+            if (HostingEnvironment.IsEnvironment("stage") || HostingEnvironment.IsEnvironment("prod"))
+            {
+                services.AddHttpClient<ICivicaPayGateway, CivicaPayGateway>(Configuration);
+            }
+            else
+            {
+                services.AddHttpClient<ICivicaPayGateway, CivicaPayTestGateway>(Configuration);
+            }
+            
             services.AddHttpClient<IVerintServiceGateway, VerintServiceGateway>(Configuration);
             services.AddHttpClient<IAddressServiceGateway, AddressServiceGateway>(Configuration);
             services.AddHttpClient<IStreetServiceGateway, StreetServiceGateway>(Configuration);
