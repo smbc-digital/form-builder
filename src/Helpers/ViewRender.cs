@@ -32,13 +32,11 @@ namespace form_builder.Helpers
         {
             var httpContext = new DefaultHttpContext { RequestServices = _serviceProvider };
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
-
             var viewEngineResult = _viewEngine.FindView(actionContext, viewName, false);
 
             if (!viewEngineResult.Success)
-            {
                 throw new InvalidOperationException($"Couldn't find view {viewName}");
-            }
+
             var view = viewEngineResult.View;
 
             using (var output = new StringWriter())
@@ -59,12 +57,8 @@ namespace form_builder.Helpers
                     new HtmlHelperOptions());
 
                 if (viewData != null)
-                {
                     foreach (var item in viewData)
-                    {
                         viewContext.ViewData.Add(item.Key, item.Value);
-                    }
-                }
 
                 await view.RenderAsync(viewContext);
 

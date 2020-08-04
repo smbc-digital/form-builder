@@ -14,11 +14,11 @@ namespace form_builder.Helpers.ActionsHelpers
 
     public class ActionHelper : IActionHelper
     {
-        private Regex _tagRegex => new Regex("(?<={{).*?(?=}})", RegexOptions.Compiled);
+        private static Regex TagRegex => new Regex("(?<={{).*?(?=}})", RegexOptions.Compiled);
 
         public ExternalDataEntity GenerateUrl(string baseUrl, FormAnswers formAnswers)
         {
-            var matches = _tagRegex.Matches(baseUrl);
+            var matches = TagRegex.Matches(baseUrl);
             var newUrl = matches.Aggregate(baseUrl, (current, match) => Replace(match, current, formAnswers));
             return new ExternalDataEntity
             {
@@ -29,7 +29,7 @@ namespace form_builder.Helpers.ActionsHelpers
 
         public string GetEmailToAddresses(IAction action, FormAnswers formAnswers)
         {
-            var matches = _tagRegex.Matches(action.Properties.To).ToList();
+            var matches = TagRegex.Matches(action.Properties.To).ToList();
 
             var emailList = matches
                 .Select(match => RecursiveGetAnswerValue(match.Value, formAnswers.Pages
@@ -37,7 +37,7 @@ namespace form_builder.Helpers.ActionsHelpers
                     .FirstOrDefault(_ => _.QuestionId.Equals(match.Value))))
                 .ToList();
 
-            emailList.AddRange(action.Properties.To.Split(",").Where(_ => !_tagRegex.IsMatch(_)));
+            emailList.AddRange(action.Properties.To.Split(",").Where(_ => !TagRegex.IsMatch(_)));
 
             return emailList.Where(_ => _ != null).Aggregate("", (current, email) => current + email + ",");
         }

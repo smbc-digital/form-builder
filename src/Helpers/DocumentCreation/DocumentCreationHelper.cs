@@ -28,7 +28,7 @@ namespace form_builder.Helpers.DocumentCreation
                 .SelectMany(_ => _.ValidatableElements)
                 .ToList();
 
-            formSchemaQuestions.ForEach((question) => {
+            formSchemaQuestions.ForEach(question => {
                 var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
 
                 summaryBuilder.Add(question.GetLabelText(), answer, question.Type);

@@ -39,7 +39,6 @@ namespace form_builder.Helpers.ElementHelpers
         {
             _distributedCache = distributedCacheWrapper;
             _elementMapper = elementMapper;
-
         }
 
         public T CurrentValue<T>(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
@@ -69,15 +68,13 @@ namespace form_builder.Helpers.ElementHelpers
                 return defaultValue;
             }
 
-            return currentValue ? answers[$"{element.Properties.QuestionId}{suffix}"] : defaultValue;
+            return answers[$"{element.Properties.QuestionId}{suffix}"];
         }
 
         public bool CheckForLabel(Element element)
         {
             if (string.IsNullOrEmpty(element.Properties.Label))
-            {
                 throw new Exception("No label found for element. Cannot render form.");
-            }
 
             return true;
         }
@@ -85,9 +82,7 @@ namespace form_builder.Helpers.ElementHelpers
         public bool CheckForQuestionId(Element element)
         {
             if (string.IsNullOrEmpty(element.Properties.QuestionId))
-            {
                 throw new Exception("No question id found for element. Cannot render form.");
-            }
 
             return true;
         }
@@ -95,9 +90,7 @@ namespace form_builder.Helpers.ElementHelpers
         public bool CheckForMaxLength(Element element)
         {
             if (element.Properties.MaxLength < 1)
-            {
                 throw new Exception("Max Length must be greater than zero. Cannot render form.");
-            }
 
             return true;
         }
@@ -105,9 +98,7 @@ namespace form_builder.Helpers.ElementHelpers
         public bool CheckIfLabelAndTextEmpty(Element element)
         {
             if (string.IsNullOrEmpty(element.Properties.Label) && string.IsNullOrEmpty(element.Properties.Text))
-            {
                 throw new Exception("An inline alert requires either a label or text or both to be present. Both can not be empty");
-            }
 
             return true;
         }
@@ -115,18 +106,15 @@ namespace form_builder.Helpers.ElementHelpers
         public bool CheckForRadioOptions(Element element)
         {
             if (element.Properties.Options == null || element.Properties.Options.Count <= 1)
-            {
                 throw new Exception("A radio element requires two or more options to be present.");
-            }
+
             return true;
         }
 
         public bool CheckForSelectOptions(Element element)
         {
             if (element.Properties.Options == null || element.Properties.Options.Count <= 1)
-            {
                 throw new Exception("A select element requires two or more options to be present.");
-            }
 
             return true;
         }
@@ -134,18 +122,16 @@ namespace form_builder.Helpers.ElementHelpers
         public bool CheckForCheckBoxListValues(Element element)
         {
             if (element.Properties.Options == null || element.Properties.Options.Count < 1)
-            {
                 throw new Exception("A checkbox list requires one or more options to be present.");
-            }
+
             return true;
         }
 
         public bool CheckAllDateRestrictionsAreNotEnabled(Element element)
         {
             if (element.Properties.RestrictCurrentDate && element.Properties.RestrictPastDate && element.Properties.RestrictFutureDate)
-            {
                 throw new Exception("Cannot set all date restrictions to true");
-            }
+
             return true;
         }
 
@@ -181,12 +167,10 @@ namespace form_builder.Helpers.ElementHelpers
 
         public bool CheckForProvider(Element element)
         {
-            if (string.IsNullOrEmpty(element.Properties.StreetProvider) && element.Type == Enum.EElementType.Street
-                  || string.IsNullOrEmpty(element.Properties.AddressProvider) && element.Type == Enum.EElementType.Address
-                  || string.IsNullOrEmpty(element.Properties.OrganisationProvider) && element.Type == Enum.EElementType.Organisation)
-            {
+            if (string.IsNullOrEmpty(element.Properties.StreetProvider) && element.Type == EElementType.Street
+                  || string.IsNullOrEmpty(element.Properties.AddressProvider) && element.Type == EElementType.Address
+                  || string.IsNullOrEmpty(element.Properties.OrganisationProvider) && element.Type == EElementType.Organisation)
                 throw new Exception($"A {element.Type} Provider must be present.");
-            }
 
             return true;
         }
@@ -197,9 +181,7 @@ namespace form_builder.Helpers.ElementHelpers
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
             if (!string.IsNullOrEmpty(formData))
-            {
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-            }
 
             return convertedAnswers.FormData.ContainsKey(key) ? convertedAnswers.FormData.GetValueOrDefault(key) : string.Empty;
         }
@@ -210,9 +192,7 @@ namespace form_builder.Helpers.ElementHelpers
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
             if (!string.IsNullOrEmpty(formData))
-            {
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-            }
 
             return convertedAnswers;
         }
@@ -221,36 +201,35 @@ namespace form_builder.Helpers.ElementHelpers
         {
             var formAnswers = GetFormData(guid);
             var reducedAnswers = FormAnswersExtensions.GetReducedAnswers(formAnswers, formSchema);
-            var FormSummary = new List<PageSummary>();
+            var formSummary = new List<PageSummary>();
             var pages = formSchema.Pages.ToList();
 
             foreach (var page in pages)
             {
-                var pSummary = new PageSummary();
-                pSummary.PageTitle = page.Title;
-                pSummary.PageSlug = page.PageSlug;
+                var pageSummary = new PageSummary
+                {
+                    PageTitle = page.Title, 
+                    PageSlug = page.PageSlug
+                };
 
                 var summaryBuilder = new SummaryDictionaryBuilder();
-
                 var formSchemaQuestions = page.ValidatableElements
                     .Where(_ => _ != null)                    
                     .ToList();               
 
-                if(formSchemaQuestions.Count() ==  0
-                   || 
-                   !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())                    
-                {
+                if(formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())                    
                     continue;
-                }
 
-                formSchemaQuestions.ForEach((question) => {
+                formSchemaQuestions.ForEach(question => {
                     var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
                     summaryBuilder.Add(question.GetLabelText(), answer, question.Type);
                 });
-                pSummary.Answers = summaryBuilder.Build();
-                FormSummary.Add(pSummary);
+
+                pageSummary.Answers = summaryBuilder.Build();
+                formSummary.Add(pageSummary);
             }
-            return FormSummary;
+
+            return formSummary;
         }
     }
 }

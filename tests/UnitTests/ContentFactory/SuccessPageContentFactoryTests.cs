@@ -16,7 +16,6 @@ using form_builder.Builders;
 using form_builder.Helpers.Session;
 using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace form_builder_tests.UnitTests.ContentFactory
 {
@@ -24,8 +23,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
     {
         private readonly SuccessPageFactory _factory;
         private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContext = new Mock<IHttpContextAccessor>();
         private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
@@ -33,8 +30,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
         public SuccessPageContentFactoryTests()
         {
             _factory = new SuccessPageFactory(
-                _mockHttpContext.Object, 
-                _mockHostingEnv.Object, 
                 _mockPageHelper.Object, 
                 _mockPageContentFactory.Object,
                 _mockSessionHelper.Object,
@@ -53,8 +48,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
         public async Task Build_ShouldReturn_SuccessPageEntity_WithSubmitViewName_WhenNoSuccessPage_Configured()
         {
             // Arrange
-            _mockHttpContext.Setup(_ => _.HttpContext.Request.Host).Returns(new HostString("test"));
-            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
             _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns((Page)null);
 
             // Act 
@@ -68,8 +61,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
         public async Task Build_ShouldUseGenericPaymentPage_WhenPaymentJourney_And_NoSuccessPageSpecified()
         {
             var callBack = new Page();
-            _mockHttpContext.Setup(_ => _.HttpContext.Request.Host).Returns(new HostString("test"));
-            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
             _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel())
                 .Callback<Page, Dictionary<string,dynamic>, FormSchema, string, List<object>>((a,b,c,d,e) => callBack = a);
@@ -98,8 +89,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
         public async Task Build_ShouldUseSpecifiedSuccessPage(EBehaviourType behaviourType)
         {
             var callBack = new Page();
-            _mockHttpContext.Setup(_ => _.HttpContext.Request.Host).Returns(new HostString("test"));
-            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
             _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel())
                 .Callback<Page, Dictionary<string,dynamic>, FormSchema, string, List<object>>((a,b,c,d,e) => callBack = a);
@@ -140,8 +129,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .WithPage(page)
                 .Build();
 
-            _mockHttpContext.Setup(_ => _.HttpContext.Request.Host).Returns(new HostString("test"));
-            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
             _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel())
                 .Callback<Page, Dictionary<string,dynamic>, FormSchema, string, List<object>>((a,b,c,d,e) => callBack = a);
@@ -177,8 +164,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .WithPage(page)
                 .Build();
 
-            _mockHttpContext.Setup(_ => _.HttpContext.Request.Host).Returns(new HostString("test"));
-            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
             _mockPageContentFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
             _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns((Page) null);

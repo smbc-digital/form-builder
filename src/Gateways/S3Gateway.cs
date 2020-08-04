@@ -20,6 +20,7 @@ namespace form_builder.Gateways
                 BucketName = bucketName,
                 Key = key
             };
+
             return await _s3client.GetObjectAsync(getRequest);
         }
     }

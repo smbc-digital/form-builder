@@ -16,15 +16,10 @@ namespace form_builder_tests.UnitTests.ContentFactory
     {
         private readonly PageFactory _factory;
         private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContextAcessor = new Mock<IHttpContextAccessor>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         
         public PageFactoryTests()
         {
-            _mockHttpContextAcessor.Setup(_ => _.HttpContext.Request.Host)
-                .Returns(new HostString("www.test.com"));
-
-            _factory = new PageFactory(_mockPageHelper.Object, _mockHttpContextAcessor.Object, _mockHostingEnv.Object);
+            _factory = new PageFactory(_mockPageHelper.Object);
         }
 
         [Fact]

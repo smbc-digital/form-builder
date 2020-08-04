@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
@@ -9,8 +8,6 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 
 namespace form_builder.ContentFactory
 {
@@ -22,19 +19,15 @@ namespace form_builder.ContentFactory
     public class SuccessPageFactory : ISuccessPageFactory
     {
         private readonly IPageHelper _pageHelper;
-        private readonly IWebHostEnvironment _environment;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPageFactory _pageFactory;
         private readonly ISessionHelper _sessionHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
-        public SuccessPageFactory(IHttpContextAccessor httpContextAccessor, IWebHostEnvironment environment, IPageHelper pageHelper, IPageFactory pageFactory, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
+        public SuccessPageFactory(IPageHelper pageHelper, IPageFactory pageFactory, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
         {
             _pageHelper = pageHelper;
-            _environment = environment;
             _pageFactory = pageFactory;
             _sessionHelper = sessionHelper;
             _distributedCache = distributedCache;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType)
@@ -63,7 +56,7 @@ namespace form_builder.ContentFactory
                 };
             }
 
-            if (baseForm.DocumentDownload && page != null)
+            if (baseForm.DocumentDownload)
             {
                     baseForm.DocumentType.ForEach((docType) => {
                         var element = new ElementBuilder()
