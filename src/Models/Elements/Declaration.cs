@@ -27,6 +27,7 @@ namespace form_builder.Models.Elements
             Properties.Value = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
     }

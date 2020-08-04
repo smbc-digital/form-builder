@@ -46,7 +46,8 @@ namespace form_builder_tests.UnitTests.Factories.Schema
 
             element.ElementRef = "test";
 
-            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema(){
+            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            {
                 Pages = new List<Page>{
                     new Page()
                     {
@@ -67,7 +68,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
         public async Task Transform_ShouldThrowException_If_SubstituteNotFound()
         {
             _TransformDataProvider.Setup(_ => _.Get(It.IsAny<string>()))
-                .ReturnsAsync((IElement) null);
+                .ReturnsAsync((IElement)null);
 
             ReusableElementSchemaTransformFactory = new ReusableElementSchemaTransformFactory(_TransformDataProvider.Object);
             var element = (Reusable)new ElementBuilder()
@@ -77,7 +78,8 @@ namespace form_builder_tests.UnitTests.Factories.Schema
 
             element.ElementRef = "test";
 
-            var result = await Assert.ThrowsAsync<Exception>(() => ReusableElementSchemaTransformFactory.Transform(new FormSchema(){
+            var result = await Assert.ThrowsAsync<Exception>(() => ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            {
                 Pages = new List<Page>{
                     new Page()
                     {
@@ -89,14 +91,14 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 }
             }));
 
-            Assert.Equal("ReusableElementSchemaTransformFactory::CreateSubstituteRecord, No subsitute element could be created for question ReusableTest", result.Message);
+            Assert.Equal("ReusableElementSchemaTransformFactory::CreateSubstituteRecord, No substitute element could be created for question ReusableTest", result.Message);
         }
 
         [Fact]
         public async Task Transform_ShouldThrowException_If_ElementReference_NotFound()
         {
             _TransformDataProvider.Setup(_ => _.Get(It.IsAny<string>()))
-                .ReturnsAsync((IElement) null);
+                .ReturnsAsync((IElement)null);
 
             ReusableElementSchemaTransformFactory = new ReusableElementSchemaTransformFactory(_TransformDataProvider.Object);
             var element = (Reusable)new ElementBuilder()
@@ -104,7 +106,8 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .WithQuestionId("ReusableTest")
                 .Build();
 
-            var result = await Assert.ThrowsAsync<Exception>(() => ReusableElementSchemaTransformFactory.Transform(new FormSchema(){
+            var result = await Assert.ThrowsAsync<Exception>(() => ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            {
                 Pages = new List<Page>{
                     new Page()
                     {
@@ -116,14 +119,14 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 }
             }));
 
-            Assert.Equal("ReusableElementSchemaTransformFactory::CreateSubstituteRecord, no resusable element reference ID was specified", result.Message);
+            Assert.Equal("ReusableElementSchemaTransformFactory::CreateSubstituteRecord, no reusable element reference ID was specified", result.Message);
         }
 
         [Fact]
         public async Task Transform_ShouldThrowException_If_QuestionIdNotFound()
         {
             _TransformDataProvider.Setup(_ => _.Get(It.IsAny<string>()))
-                .ReturnsAsync((IElement) null);
+                .ReturnsAsync((IElement)null);
 
             ReusableElementSchemaTransformFactory = new ReusableElementSchemaTransformFactory(_TransformDataProvider.Object);
             var element = (Reusable)new ElementBuilder()
@@ -132,7 +135,8 @@ namespace form_builder_tests.UnitTests.Factories.Schema
 
             element.ElementRef = "test";
 
-            var result = await Assert.ThrowsAsync<Exception>(() => ReusableElementSchemaTransformFactory.Transform(new FormSchema(){
+            var result = await Assert.ThrowsAsync<Exception>(() => ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            {
                 Pages = new List<Page>{
                     new Page()
                     {
@@ -147,7 +151,6 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             Assert.Equal("ReusableElementSchemaTransformFactory::CreateSubstituteRecord, no question ID was specified", result.Message);
         }
 
-        
         [Fact]
         public async Task Transform_ShouldCall_TransformDataProvider_And_ShouldUpdate_TargetMapping_And_Optional_Properties()
         {
@@ -171,7 +174,8 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             element.Properties.Optional = true;
             element.Properties.TargetMapping = "target.mapping";
 
-            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema(){
+            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            {
                 Pages = new List<Page>{
                     new Page()
                     {
@@ -184,7 +188,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             });
 
             Assert.IsType<FormSchema>(result);
-            Assert.Equal(result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.TargetMapping, "target.mapping");
+            Assert.Equal("target.mapping", result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.TargetMapping);
             Assert.True(result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.Optional);
         }
     }

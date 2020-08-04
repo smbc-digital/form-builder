@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
 using form_builder.Models;
+using form_builder.Models.Actions;
 using form_builder.Services.RetrieveExternalDataService.Entities;
 
 namespace form_builder.Helpers.ActionsHelpers

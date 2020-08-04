@@ -38,7 +38,7 @@ namespace form_builder_tests.UnitTests.Services
 
         private readonly Mock<IOptions<SubmissionServiceConfiguration>> _mockIOptons = new Mock<IOptions<SubmissionServiceConfiguration>>();
 
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
         public SubmitServiceTests()
         {
             _mockEnvironment.Setup(_ => _.EnvironmentName)
@@ -64,7 +64,7 @@ namespace form_builder_tests.UnitTests.Services
                 }
             };
 
-            _mockDistrbutedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
+            _mockDistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
             {
                 Document = 1
             });
@@ -78,7 +78,7 @@ namespace form_builder_tests.UnitTests.Services
                 FakePaymentSubmission = false
             });
 
-            _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockGateway.Object, _mockPageHelper.Object, _sessionHelper.Object, _mockEnvironment.Object, _mockHttpContextAccessor.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockIOptons.Object);
+            _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockGateway.Object, _mockPageHelper.Object, _sessionHelper.Object, _mockEnvironment.Object, _mockHttpContextAccessor.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockIOptons.Object);
         }
 
         [Fact]

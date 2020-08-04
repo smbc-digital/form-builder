@@ -15,12 +15,12 @@ namespace form_builder.Providers.StorageProvider
     public class DistributedCacheWrapper : IDistributedCacheWrapper
     {
         private readonly IDistributedCache _distributedCache;
-        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
-        public DistributedCacheWrapper(IDistributedCache distributedCache, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
+        public DistributedCacheWrapper(IDistributedCache distributedCache, IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
             _distributedCache = distributedCache;
-            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
         public string GetString(string key)
@@ -65,20 +65,20 @@ namespace form_builder.Providers.StorageProvider
 
         public Task SetStringAsync(string key, string value, CancellationToken token = default)
         {
-            var distrbutedCacheOptions = new DistributedCacheEntryOptions {
-                AbsoluteExpiration = DateTime.Now.AddMinutes(_distrbutedCacheExpirationConfiguration.UserData)
+            var distributedCacheOptions = new DistributedCacheEntryOptions {
+                AbsoluteExpiration = DateTime.Now.AddMinutes(_distributedCacheExpirationConfiguration.UserData)
             };
 
-            return _distributedCache.SetStringAsync(key, value, distrbutedCacheOptions, token);
+            return _distributedCache.SetStringAsync(key, value, distributedCacheOptions, token);
         }
 
         public Task SetStringAsync(string key, string value, int expiration, CancellationToken token = default)
         {
-            var distrbutedCacheOptions = new DistributedCacheEntryOptions {
+            var distributedCacheOptions = new DistributedCacheEntryOptions {
                 AbsoluteExpiration = DateTime.Now.AddMinutes(expiration)
             };
 
-            return _distributedCache.SetStringAsync(key, value, distrbutedCacheOptions, token);
+            return _distributedCache.SetStringAsync(key, value, distributedCacheOptions, token);
         }
 
         public byte[] Get(string key)

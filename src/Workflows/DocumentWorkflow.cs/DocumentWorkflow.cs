@@ -22,14 +22,14 @@ namespace form_builder.Services.DocumentService
     {
         private IDocumentSummaryService _documentSummaryService;
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly ISchemaFactory _schemaFactory;
 
-        public DocumentWorkflow(IDocumentSummaryService documentSummaryService, IDistributedCacheWrapper distributedCache, ISchemaFactory schemaFactory, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
+        public DocumentWorkflow(IDocumentSummaryService documentSummaryService, IDistributedCacheWrapper distributedCache, ISchemaFactory schemaFactory, IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
             _documentSummaryService = documentSummaryService;
             _distributedCache = distributedCache;
-            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _schemaFactory = schemaFactory;
         }
 

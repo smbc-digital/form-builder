@@ -1,7 +1,6 @@
 ﻿using form_builder.Mappers;
 using form_builder.Models;
 using form_builder_tests.Builders;
-using Microsoft.Extensions.Logging;
 using Moq;
 using StockportGovUK.NetStandard.Models.Addresses;
 using System;
@@ -19,12 +18,11 @@ namespace form_builder_tests.UnitTests.Mappers
     public class ElementMapperTests
     {
         private readonly ElementMapper _elementMapper;
-        private readonly Mock<ILogger<ElementMapper>> _logger = new Mock<ILogger<ElementMapper>>();
         private readonly Mock<IDistributedCacheWrapper> _wrapper = new Mock<IDistributedCacheWrapper>();
 
         public ElementMapperTests()
         {
-            _elementMapper = new ElementMapper(_logger.Object, _wrapper.Object);
+            _elementMapper = new ElementMapper(_wrapper.Object);
         }
 
         [Fact]

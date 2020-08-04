@@ -16,24 +16,24 @@ namespace form_builder_tests.UnitTests.Cache
         private readonly form_builder.Cache.Cache _cache;
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<ISchemaProvider> _mockSchemaProvider = new Mock<ISchemaProvider>();
-        private readonly Mock<IOptions<DistrbutedCacheConfiguration>> _mockDistrbutedCacheSettings = new Mock<IOptions<DistrbutedCacheConfiguration>>();
+        private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheSettings = new Mock<IOptions<DistributedCacheConfiguration>>();
 
         public CacheTests()
         {
-            _mockDistrbutedCacheSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheConfiguration
+            _mockDistributedCacheSettings.Setup(_ => _.Value).Returns(new DistributedCacheConfiguration
             {
-                UseDistrbutedCache = true
+                UseDistributedCache = true
             });
 
-            _cache = new form_builder.Cache.Cache(_mockDistributedCacheWrapper.Object, _mockSchemaProvider.Object, _mockDistrbutedCacheSettings.Object);
+            _cache = new form_builder.Cache.Cache(_mockDistributedCacheWrapper.Object, _mockSchemaProvider.Object, _mockDistributedCacheSettings.Object);
         }
 
         [Fact]
-        public async Task GetFromCacheOrDirectlyFromSchemaAsync_ShouldCallSchemaProvider_WhenUseDistrbutedCache_IsFalse()
+        public async Task GetFromCacheOrDirectlyFromSchemaAsync_ShouldCallSchemaProvider_WhenUseDistributedCache_IsFalse()
         {
-            _mockDistrbutedCacheSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheConfiguration
+            _mockDistributedCacheSettings.Setup(_ => _.Value).Returns(new DistributedCacheConfiguration
             {
-                UseDistrbutedCache = false
+                UseDistributedCache = false
             });
 
             await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>("form", 10, ESchemaType.FormJson);

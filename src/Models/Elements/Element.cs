@@ -40,73 +40,40 @@ namespace form_builder.Models.Elements
                 if (!result.IsValid)
                 {
                     validationResult = result;
+
                     return;
                 }
             }
         }
 
-        public virtual string GenerateFieldsetProperties()
-        {
-            return string.Empty;
-        }
+        public virtual string GenerateFieldsetProperties() => string.Empty;
 
-        public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "")
-        {
-            return new Dictionary<string, dynamic>();
-        }
+        public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "") => new Dictionary<string, dynamic>();
 
-        public string GetListItemId(int index)
-        {
-            return $"{QuestionId}-{index}";
-        }
+        public string GetListItemId(int index) =>  $"{QuestionId}-{index}";
 
-        public string GetCustomItemId(string key)
-        {
-            return $"{QuestionId}-{key}";
-        }
+        public string GetCustomItemId(string key) => $"{QuestionId}-{key}";
 
-        public string GetCustomHintId(string key)
-        {
-            return $"{GetCustomItemId(key)}-hint";
-        }
+        public string GetCustomHintId(string key) => $"{GetCustomItemId(key)}-hint";
 
-        public string GetCustomErrorId(string key)
-        {
-            return $"{GetCustomItemId(key)}-error";
-        }
+        public string GetCustomErrorId(string key) =>  $"{GetCustomItemId(key)}-error";
 
-        public string GetListItemHintId(int index)
-        {
-            return $"{GetListItemId(index)}-hint";
-        }
+        public string GetListItemHintId(int index) => $"{GetListItemId(index)}-hint";
 
-        public string DescribedByAttribute()
-        {
-            return DisplayAriaDescribedby ? $"aria-describedby=\"{GetDescribedByAttributeValue()}\"" : string.Empty;
-        }
+        public string DescribedByAttribute() => DisplayAriaDescribedby ? $"aria-describedby=\"{GetDescribedByAttributeValue()}\"" : string.Empty;
 
-        public string GetDescribedByAttributeValue()
-        {
-            return CreateDescribedByAttributeValue($"{QuestionId}");
-        }
+        public string GetDescribedByAttributeValue() => CreateDescribedByAttributeValue($"{QuestionId}");
 
-        public string GetDescribedByAttributeValue(string prefix)
-        {
-            return CreateDescribedByAttributeValue($"{QuestionId}{prefix}");
-        }
+        public string GetDescribedByAttributeValue(string prefix) => CreateDescribedByAttributeValue($"{QuestionId}{prefix}");
 
         private string CreateDescribedByAttributeValue(string key)
         {
             var describedBy = new List<string>();
             if (DisplayHint)
-            {
                 describedBy.Add(HintId);
-            }
 
             if (!IsValid)
-            {
                 describedBy.Add(ErrorId);
-            }
 
             return string.Join(" ", describedBy);
         }
@@ -116,28 +83,12 @@ namespace form_builder.Models.Elements
             var data = string.Empty;
 
             if (DisplayOptional)
-            {
                 data = "class = smbc-body";
-            }
 
-            if (!Properties.LegendAsH1)
-            {
-                return $"{data} for = {QuestionId}{prefix}";
-            }
-
-            return data;
+            return !Properties.LegendAsH1 ? $"{data} for = {QuestionId}{prefix}" : data;
         }
 
-        public string WriteOptional(string prefix = "")
-        {
-            if (DisplayOptional)
-            {
-                return "class = optional";
-
-            }
-
-            return null;
-        }
+        public string WriteOptional(string prefix = "") => DisplayOptional ? "class = optional" : null;
 
         public virtual Task<string> RenderAsync(
             IViewRender viewRender,
@@ -147,18 +98,9 @@ namespace form_builder.Models.Elements
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
-            List<object> results = null)
-        {
-            return viewRender.RenderAsync(Type.ToString(), this, null);
-        }
+            List<object> results = null) => viewRender.RenderAsync(Type.ToString(), this, null);
 
-        private bool DisplayOptional
-        {
-            get
-            {
-                return Properties.Optional;
-            }
-        }
+        private bool DisplayOptional => Properties.Optional;
 
         public virtual string GetLabelText() => $"{Properties.Label}{(Properties.Optional ? " (optional)" : string.Empty)}";
     }

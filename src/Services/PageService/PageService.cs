@@ -37,7 +37,7 @@ namespace form_builder.Services.PageService
         private readonly IAddressService _addressService;
         private readonly IOrganisationService _organisationService;
         private readonly ISchemaFactory _schemaFactory;
-        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IWebHostEnvironment _environment;
         private readonly IPayService _payService;
         private readonly IMappingService _mappingService;
@@ -53,7 +53,7 @@ namespace form_builder.Services.PageService
             IStreetService streetService, 
             IOrganisationService organisationService, 
             IDistributedCacheWrapper distributedCache, 
-            IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, 
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration, 
             IWebHostEnvironment environment, 
             ISuccessPageFactory successPageFactory,
             IPageFactory pageFactory,
@@ -72,7 +72,7 @@ namespace form_builder.Services.PageService
             _successPageContentFactory = successPageFactory;
             _pageContentFactory = pageFactory;
             _environment = environment;
-            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _payService = payService;
             _mappingService = mappingService;
         }
@@ -267,7 +267,7 @@ namespace form_builder.Services.PageService
             }
 
             if(baseForm.DocumentDownload)
-                await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(formAnswers), _distrbutedCacheExpirationConfiguration.Document);
+                await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(formAnswers), _distributedCacheExpirationConfiguration.Document);
 
             return await _successPageContentFactory.Build(form, baseForm, sessionGuid, formAnswers, behaviourType);
         }
