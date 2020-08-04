@@ -31,7 +31,7 @@ namespace form_builder.Models.Elements
                 { "name", QuestionId },
                 { "id", QuestionId },
                 { "type", "file" },
-                { "accept", allowedFileType.Aggregate((a, b) => a + "," + b) },
+                { "accept", string.Join(',', allowedFileType)},
                 { "max-file-size", appliedMaxFileSize },
                 { "onchange", "window.SMBCFrontend.ValidateSize(this)" }
             };

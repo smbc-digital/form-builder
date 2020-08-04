@@ -71,6 +71,13 @@ namespace form_builder
             services.Configure<SubmissionServiceConfiguration>(Configuration.GetSection("SubmissionServiceConfiguration"));
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
 
+            services.AddMvc()
+                .AddMvcOptions(options => {
+                    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+                    options.ModelBinderProviders.Insert(0, new CustomFormFileModelBinderProvider());
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
             services.AddHttpClient<IGateway, Gateway>(Configuration);
             if (HostingEnvironment.IsEnvironment("stage") || HostingEnvironment.IsEnvironment("prod"))
             {
