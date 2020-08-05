@@ -23,9 +23,9 @@ namespace form_builder.Services.RetrieveExternalDataService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IMappingService _mappingService;
         private readonly IActionHelper _actionHelper;
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
 
-        public RetrieveExternalDataService(IGateway gateway, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache, IMappingService mappingService, IActionHelper actionHelper, IHostingEnvironment environment)
+        public RetrieveExternalDataService(IGateway gateway, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache, IMappingService mappingService, IActionHelper actionHelper, IWebHostEnvironment environment)
         {
             _gateway = gateway;
             _sessionHelper = sessionHelper;

@@ -3,8 +3,8 @@ using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Internal;
 using form_builder.Constants;
 
 namespace form_builder.Models.Elements
@@ -31,7 +31,7 @@ namespace form_builder.Models.Elements
                 { "name", QuestionId },
                 { "id", QuestionId },
                 { "type", "file" },
-                { "accept", allowedFileType.Join(",") },
+                { "accept", string.Join(',', allowedFileType)},
                 { "max-file-size", appliedMaxFileSize },
                 { "onchange", "window.SMBCFrontend.ValidateSize(this)" }
             };
@@ -51,7 +51,7 @@ namespace form_builder.Models.Elements
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
-            IHostingEnvironment environment,
+            IWebHostEnvironment environment,
             List<object> results = null)
         {
             elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, string.Empty);

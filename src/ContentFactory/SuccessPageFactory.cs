@@ -22,12 +22,12 @@ namespace form_builder.ContentFactory
     public class SuccessPageFactory : ISuccessPageFactory
     {
         private readonly IPageHelper _pageHelper;
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPageFactory _pageFactory;
         private readonly ISessionHelper _sessionHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
-        public SuccessPageFactory(IHttpContextAccessor httpContextAccessor, IHostingEnvironment environment, IPageHelper pageHelper, IPageFactory pageFactory, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
+        public SuccessPageFactory(IHttpContextAccessor httpContextAccessor, IWebHostEnvironment environment, IPageHelper pageHelper, IPageFactory pageFactory, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
         {
             _pageHelper = pageHelper;
             _environment = environment;

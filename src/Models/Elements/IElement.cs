@@ -30,7 +30,7 @@ namespace form_builder.Models.Elements
                 Dictionary<string, dynamic> viewModel,
                 Page page,
                 FormSchema formSchema,
-                IHostingEnvironment environment,
+                IWebHostEnvironment environment,
                 List<object> results = null);
             Dictionary<string, dynamic> GenerateElementProperties(string type = "");
             string GenerateFieldsetProperties();

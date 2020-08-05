@@ -4,12 +4,12 @@ using form_builder.Models;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
 using form_builder.Workflows;
-using Microsoft.EntityFrameworkCore.Internal;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Workflows.ActionsWorkflow;
 
@@ -23,13 +23,13 @@ namespace form_builder.Controllers
         private readonly IActionsWorkflow _actionsWorkflow;
         private readonly ISuccessWorkflow _successWorkflow;
         private readonly IFileUploadService _fileUploadService;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
         public HomeController(IPageService pageService,
             ISubmitWorkflow submitWorkflow,
             IPaymentWorkflow paymentWorkflow,
             IFileUploadService fileUploadService,
-            IHostingEnvironment hostingEnvironment, 
+            IWebHostEnvironment hostingEnvironment, 
             IActionsWorkflow actionsWorkflow, 
             ISuccessWorkflow successWorkflow)
         {

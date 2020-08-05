@@ -15,10 +15,10 @@ namespace form_builder.Providers.Transforms.Lookups
     {
         private readonly IS3Gateway _s3Gateway;
         private readonly ILogger<S3LookupTransformDataProvider> _logger;
-        private readonly IHostingEnvironment _enviroment;
+        private readonly IWebHostEnvironment _enviroment;
         private readonly IConfiguration _configuration;
 
-        public S3LookupTransformDataProvider(IS3Gateway s3Service, ILogger<S3LookupTransformDataProvider> logger, IHostingEnvironment enviroment, IConfiguration configuration)
+        public S3LookupTransformDataProvider(IS3Gateway s3Service, ILogger<S3LookupTransformDataProvider> logger, IWebHostEnvironment enviroment, IConfiguration configuration)
         {
             _s3Gateway = s3Service;
             _logger = logger;

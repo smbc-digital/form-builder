@@ -16,10 +16,10 @@ namespace form_builder.Providers.SchemaProvider
     {
         private readonly IS3Gateway _s3Gateway;
         private readonly ILogger<S3FileSchemaProvider> _logger;
-        private readonly IHostingEnvironment _enviroment;
+        private readonly IWebHostEnvironment _enviroment;
         private readonly IConfiguration _configuration;
 
-        public S3FileSchemaProvider(IS3Gateway s3Service, ILogger<S3FileSchemaProvider> logger, IHostingEnvironment enviroment, IConfiguration configuration)
+        public S3FileSchemaProvider(IS3Gateway s3Service, ILogger<S3FileSchemaProvider> logger, IWebHostEnvironment enviroment, IConfiguration configuration)
         {
             _s3Gateway = s3Service;
             _logger = logger;

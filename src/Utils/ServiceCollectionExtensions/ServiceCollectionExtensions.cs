@@ -1,55 +1,56 @@
-﻿using Amazon;
+﻿using System.Diagnostics.CodeAnalysis;
+using Amazon;
+using Amazon.Runtime;
 using Amazon.S3;
+using Amazon.SimpleEmail;
 using form_builder.Configuration;
+using form_builder.ContentFactory;
+using form_builder.Factories.Schema;
+using form_builder.Factories.Transform.Lookups;
+using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Gateways;
 using form_builder.Helpers;
+using form_builder.Helpers.ActionsHelpers;
+using form_builder.Helpers.DocumentCreation;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Mappers;
 using form_builder.Providers.Address;
+using form_builder.Providers.DocumentCreation;
+using form_builder.Providers.DocumentCreation.Generic;
+using form_builder.Providers.EmailProvider;
+using form_builder.Providers.Organisation;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
+using form_builder.Providers.Street;
+using form_builder.Providers.Transforms.Lookups;
+using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Services.AddressService;
+using form_builder.Services.DocumentService;
+using form_builder.Services.EmailService;
+using form_builder.Services.FileUploadService;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService;
 using form_builder.Services.PayService;
+using form_builder.Services.RetrieveExternalDataService;
 using form_builder.Services.StreetService;
 using form_builder.Services.SubmtiService;
 using form_builder.Validators;
 using form_builder.Workflows;
+using form_builder.Workflows.ActionsWorkflow;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
-using System.Diagnostics.CodeAnalysis;
-using Amazon.Runtime;
-using Amazon.SimpleEmail;
-using form_builder.Services.FileUploadService;
-using form_builder.Providers.DocumentCreation;
-using form_builder.Providers.DocumentCreation.Generic;
-using form_builder.Services.DocumentService;
-using form_builder.Helpers.DocumentCreation;
-using form_builder.ContentFactory;
-using form_builder.Providers.Organisation;
-using form_builder.Providers.Street;
-using form_builder.Factories.Schema;
-using form_builder.Providers.Transforms.Lookups;
-using form_builder.Providers.Transforms.ReusableElements;
-using form_builder.Factories.Transform.Lookups;
-using form_builder.Factories.Transform.ReusableElements;
-using form_builder.Helpers.ActionsHelpers;
-using form_builder.Providers.EmailProvider;
-using form_builder.Services.RetrieveExternalDataService;
-using form_builder.Services.EmailService;
-using form_builder.Workflows.ActionsWorkflow;
 
-namespace form_builder.Extensions
+namespace form_builder.Utils.ServiceCollectionExtensions
 {
     [ExcludeFromCodeCoverage]
     public static class ServiceCollectionExtensions
@@ -142,7 +143,7 @@ namespace form_builder.Extensions
         {
             services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
             services.AddSingleton<IOrganisationProvider, ServiceOrganisationProvider>();
-            
+
             return services;
         }
 
@@ -150,7 +151,7 @@ namespace form_builder.Extensions
         {
             services.AddSingleton<IStreetProvider, FakeStreetProvider>();
             services.AddSingleton<IStreetProvider, ServiceStreetProvider>();
-            
+
             return services;
         }
 
@@ -166,9 +167,9 @@ namespace form_builder.Extensions
             return services;
         }
 
-        public static IServiceCollection ConfigureEmailProviders(this IServiceCollection services, IHostingEnvironment HostingEnvironment)
+        public static IServiceCollection ConfigureEmailProviders(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
-            if(HostingEnvironment.IsEnvironment("local") || HostingEnvironment.IsEnvironment("uitest"))
+            if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
                 services.AddSingleton<IEmailProvider, FakeEmailProvider>();
             else
                 services.AddSingleton<IEmailProvider, AwsSesProvider>();
@@ -215,9 +216,9 @@ namespace form_builder.Extensions
             return services;
         }
 
-        public static IServiceCollection AddSchemaProvider(this IServiceCollection services, IHostingEnvironment HostingEnvironment)
+        public static IServiceCollection AddSchemaProvider(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
-            if (HostingEnvironment.IsEnvironment("local") || HostingEnvironment.IsEnvironment("uitest"))
+            if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
             {
                 services.AddSingleton<ISchemaProvider, LocalFileSchemaProvider>();
             }
@@ -229,9 +230,9 @@ namespace form_builder.Extensions
             return services;
         }
 
-        public static IServiceCollection AddTransformDataProvider(this IServiceCollection services, IHostingEnvironment HostingEnvironment)
+        public static IServiceCollection AddTransformDataProvider(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
-            if (HostingEnvironment.IsEnvironment("local") || HostingEnvironment.IsEnvironment("uitest"))
+            if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
             {
                 services.AddSingleton<ILookupTransformDataProvider, LocalLookupTransformDataProvider>();
                 services.AddSingleton<IReusableElementTransformDataProvider, LocalReusableElementTransformDataProvider>();
@@ -245,7 +246,7 @@ namespace form_builder.Extensions
 
             return services;
         }
-        
+
         public static IServiceCollection AddIOptionsConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<DisallowedAnswerKeysConfiguration>(configuration.GetSection("FormConfig"));

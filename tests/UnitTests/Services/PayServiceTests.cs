@@ -41,7 +41,7 @@ namespace form_builder_tests.UnitTests.Services
 
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
-        private readonly Mock<IHostingEnvironment> _mockHostingEnvironment = new Mock<IHostingEnvironment>();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnvironment = new Mock<IWebHostEnvironment>();
         private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
 
         public PayServiceTests()

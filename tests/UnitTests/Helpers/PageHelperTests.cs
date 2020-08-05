@@ -38,7 +38,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _mockDisallowedKeysOptions =
             new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
-        private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings
             = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();

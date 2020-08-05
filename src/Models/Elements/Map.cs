@@ -24,7 +24,7 @@ namespace form_builder.Models.Elements
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
-            IHostingEnvironment environment,
+            IWebHostEnvironment environment,
             List<object> results = null)
         {
             Properties.Value = JsonConvert.SerializeObject(elementHelper.CurrentValue<object>(this, viewModel, page.PageSlug, guid));

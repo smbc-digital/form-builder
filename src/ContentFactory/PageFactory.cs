@@ -17,9 +17,9 @@ namespace form_builder.ContentFactory
     {
         private readonly IPageHelper _pageHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
 
-        public PageFactory(IPageHelper pageHelper, IHttpContextAccessor httpContextAccessor, IHostingEnvironment environment)
+        public PageFactory(IPageHelper pageHelper, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment environment)
         {
             _pageHelper = pageHelper;
             _httpContextAccessor = httpContextAccessor;
