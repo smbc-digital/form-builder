@@ -1,14 +1,14 @@
-﻿using form_builder.Models;
-using form_builder.Models.Elements;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using form_builder.Models;
 using form_builder.Models.Actions;
+using form_builder.Models.Elements;
 
 namespace form_builder_tests.Builders
 {
     public class PageBuilder
     {
         private string _title = "TestTitle";
-        private string _PageSlug = "test-url";
+        private string _pageSlug = "test-url";
         private bool _isValidated = false;
         private List<IElement> _elements = new List<IElement>();
         private List<Behaviour> _behaviours = new List<Behaviour>();
@@ -21,7 +21,7 @@ namespace form_builder_tests.Builders
             return new Page
             {
                 Title = _title,
-                PageSlug = _PageSlug,
+                PageSlug = _pageSlug,
                 IsValidated = _isValidated,
                 Behaviours = _behaviours,
                 Elements = _elements,
@@ -47,7 +47,7 @@ namespace form_builder_tests.Builders
 
         public PageBuilder WithPageSlug(string url)
         {
-            _PageSlug = url;
+            _pageSlug = url;
 
             return this;
         }

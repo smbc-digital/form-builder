@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -7,8 +9,6 @@ using form_builder.Models.Elements;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Models.Elements
@@ -36,8 +36,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithElement(element)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add(AddressManualConstants.POSTCODE, "sk11aa");
+            var viewModel = new Dictionary<string, dynamic> {{AddressManualConstants.POSTCODE, "sk11aa"}};
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")

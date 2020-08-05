@@ -1,12 +1,12 @@
-﻿using form_builder.Builders;
+﻿using System;
+using System.Collections.Generic;
+using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using Moq;
-using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Helpers
@@ -56,11 +56,13 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithValue("this is the value")
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("test-id2", "this is the value");
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {"test-id2", "this is the value"}
+            };
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, "", "");
+            var result = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty);
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -84,7 +86,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, "", "");
+            var result = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty);
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -121,7 +123,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, "test-slug", "");
+            var result = _elementHelper.CurrentValue<string>(element, viewModel, "test-slug", string.Empty);
 
             // Assert
             Assert.Equal("this is the value", result);
@@ -153,7 +155,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, "test-slug", "");
+            var result = _elementHelper.CurrentValue<string>(element, viewModel, "test-slug", string.Empty);
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -170,8 +172,6 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithQuestionId("test-id")
                .WithLabel("test-text")
                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _elementHelper.CheckForLabel(element);
@@ -191,9 +191,7 @@ namespace form_builder_tests.UnitTests.Helpers
               .WithQuestionId("test-id")
               .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
-            // Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
         }
 
@@ -227,7 +225,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithType(elementType)
                 .Build();
 
-            // Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForQuestionId(element));
         }
 
@@ -258,7 +256,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithRestrictPastDate(true)
                 .Build();
 
-            //Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element));
         }
 
@@ -274,9 +272,7 @@ namespace form_builder_tests.UnitTests.Helpers
               .WithLabel(string.Empty)
               .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
-            // Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
         }
 
@@ -289,8 +285,6 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithQuestionId("issueOne")
                .WithMaxLength(2000)
                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _elementHelper.CheckForMaxLength(element);
@@ -309,8 +303,6 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithMaxLength(1)
                .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
             // Act
             var result = _elementHelper.CheckForMaxLength(element);
 
@@ -328,9 +320,7 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithMaxLength(0)
                .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
-            // Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element));
         }
 
@@ -343,8 +333,6 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithLabel("test-text")
                .WithPropertyText("Test")
                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _elementHelper.CheckIfLabelAndTextEmpty(element);
@@ -361,23 +349,20 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithType(EElementType.InlineAlert)
                .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
-            // Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckIfLabelAndTextEmpty(element));
         }
-
 
         [Fact]
         public void CheckForRadioOptions_ShouldThrowException_IfNoOptionsAreGiven()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                .WithType(EElementType.Radio)
                .WithQuestionId("questionId")
                .WithLabel("Label").Build();
 
-            //Assert
+            // Act & Assert
             var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
         }
 
@@ -392,10 +377,8 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithOptions(new List<Option>())
                .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
-            //Assert
-            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
+            // Act & Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
         }
 
         [Theory]
@@ -414,24 +397,24 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithPropertyText(text)
                 .Build();
 
-            // Assert
+            // Act & Assert
             Assert.Equal(text, element.Properties.Text);
         }
 
         [Theory]
         [InlineData(EElementType.OL)]
         [InlineData(EElementType.UL)]
-        public void ElemenetBuilder_ShouldCreateListsWithListItems(EElementType eElementType)
+        public void ElementBuilder_ShouldCreateListsWithListItems(EElementType eElementType)
         {
             // Arrange
-            List<string> listItems = new List<string> { "item 1", "item 2", "item 3" };
+            var listItems = new List<string> { "item 1", "item 2", "item 3" };
 
             var element = new ElementBuilder()
                 .WithType(eElementType)
                 .WithListItems(listItems)
                 .Build();
 
-            // Assert
+            // Act & Assert
             Assert.Equal(3, element.Properties.ListItems.Count);
             Assert.Equal("item 1", element.Properties.ListItems[0]);
         }
@@ -446,7 +429,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithSource("source")
                 .Build();
 
-            // Assert
+            // Act & Assert
             Assert.Equal("alt text", element.Properties.AltText);
             Assert.Equal("source", element.Properties.Source);
         }
@@ -464,16 +447,13 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2", Hint = "Option 2 Hint" } })
                 .Build();
 
-            //Assert
+            // Act & Assert
             Assert.True(_elementHelper.CheckForRadioOptions(element));
-
             Assert.Equal("questionId", element.Properties.QuestionId);
             Assert.Equal("Label", element.Properties.Label);
-
             Assert.Equal("option1", element.Properties.Options[0].Value);
             Assert.Equal("Option 1", element.Properties.Options[0].Text);
             Assert.Equal("Option 1 Hint", element.Properties.Options[0].Hint);
-
             Assert.Equal("option2", element.Properties.Options[1].Value);
             Assert.Equal("Option 2", element.Properties.Options[1].Text);
             Assert.Equal("Option 2 Hint", element.Properties.Options[1].Hint);
@@ -492,15 +472,12 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2"} })
                 .Build();
 
-            //Assert
+            // Act & Assert
             Assert.True(_elementHelper.CheckForSelectOptions(element));
-
             Assert.Equal("questionId", element.Properties.QuestionId);
             Assert.Equal("Label", element.Properties.Label);
-
             Assert.Equal("option1", element.Properties.Options[0].Value);
             Assert.Equal("Option 1", element.Properties.Options[0].Text);
-
             Assert.Equal("option2", element.Properties.Options[1].Value);
             Assert.Equal("Option 2", element.Properties.Options[1].Text);
         }
@@ -508,6 +485,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public void ElementBuilder_ShouldCreateCheckBoxList()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Checkbox)
                 .WithQuestionId("questionId")
@@ -516,11 +494,11 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2"} })
                 .Build();
 
+            // Act & Assert
             Assert.Equal("questionId", element.Properties.QuestionId);
             Assert.Equal("Label", element.Properties.Label);
             Assert.Equal("option1", element.Properties.Options[0].Value);
             Assert.Equal("Option 1", element.Properties.Options[0].Text);
-
             Assert.Equal("option2", element.Properties.Options[1].Value);
             Assert.Equal("Option 2", element.Properties.Options[1].Text);
         }
@@ -537,7 +515,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 { new Option { Value = "option1", Text = "Option 1"}})
                 .Build();
 
-            //Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForSelectOptions(element));
         }
 
@@ -553,10 +531,8 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2"} })
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
-            // Assert
-            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
+            // Act & Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
         }
 
         [Fact]
@@ -582,9 +558,9 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add(yearId, "2010");
 
             // Act
-            var dayResult = _elementHelper.CurrentValue<string>(element, viewModel, "", "", "-day");
-            var monthResult = _elementHelper.CurrentValue<string>(element, viewModel, "", "", "-month");
-            var yearResult = _elementHelper.CurrentValue<string>(element, viewModel, "", "", "-year");
+            var dayResult = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty, "-day");
+            var monthResult = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty, "-month");
+            var yearResult = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty, "-year");
 
             // Assert
             Assert.Equal("14", dayResult);
@@ -606,9 +582,9 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var dayResult = _elementHelper.CurrentValue<string>(element, viewModel,"","", "-day");
-            var monthResult = _elementHelper.CurrentValue<string>(element, viewModel,"","", "-month");
-            var yearResult = _elementHelper.CurrentValue<string>(element, viewModel,"","", "-year");
+            var dayResult = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty, "-day");
+            var monthResult = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty, "-month");
+            var yearResult = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty, "-year");
 
             // Assert
             Assert.Equal("", dayResult);
@@ -670,7 +646,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Assert
-            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForProvider(element));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForProvider(element));
         }
 
         [Theory]

@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.Helpers
                         }
                     }
             })
-                .Build();
+            .Build();
 
         private readonly FormSchema _formSchema = new FormSchemaBuilder()
             .WithStartPageUrl("page-one")
@@ -67,7 +67,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 },
                 Type = EActionType.UserEmail
             })
-        .Build();
+            .Build();
 
         public ActionHelperTests()
         {
