@@ -29,9 +29,9 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var element = new ElementBuilder()
-            .WithNumeric(true)
-            .WithQuestionId("testNumber")
-            .Build();
+                .WithNumeric(true)
+                .WithQuestionId("testNumber")
+                .Build();
 
             var formAnswers = new FormAnswers
             {
@@ -61,9 +61,9 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var element = new ElementBuilder()
-            .WithType(EElementType.DatePicker)
-            .WithQuestionId("testDate")
-            .Build();
+                .WithType(EElementType.DatePicker)
+                .WithQuestionId("testDate")
+                .Build();
 
             var formAnswers = new FormAnswers
             {
@@ -93,23 +93,23 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var element = new ElementBuilder()
-            .WithType(EElementType.DatePicker)
-            .WithQuestionId("testNumber")
-            .Build();
+                .WithType(EElementType.DatePicker)
+                .WithQuestionId("testNumber")
+                .Build();
 
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
-                    {
-                        new PageAnswers {
-                            Answers = new List<Answers> {
-                                new Answers
-                                {
-                                    QuestionId = "testNumber"
-                                }
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers
+                            {
+                                QuestionId = "testNumber"
                             }
                         }
                     }
+                }
             };
 
             // Act
@@ -124,9 +124,9 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var element = new ElementBuilder()
-            .WithQuestionId("testNumber")
-            .WithNumeric(true)
-            .Build();
+                .WithQuestionId("testNumber")
+                .WithNumeric(true)
+                .Build();
 
             var formAnswers = new FormAnswers
             {
@@ -155,24 +155,24 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var element = new ElementBuilder()
-           .WithQuestionId("testCheckbox")
-           .WithType(EElementType.Checkbox)
-           .Build();
+               .WithQuestionId("testCheckbox")
+               .WithType(EElementType.Checkbox)
+               .Build();
 
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
-                    {
-                        new PageAnswers {
-                            Answers = new List<Answers> {
-                                new Answers
-                                {
-                                    QuestionId = "testCheckbox",
-                                    Response = "option1,option2,option3"
-                                }
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers
+                            {
+                                QuestionId = "testCheckbox",
+                                Response = "option1,option2,option3"
                             }
                         }
                     }
+                }
             };
 
             // Act
@@ -191,23 +191,23 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var element = new ElementBuilder()
-            .WithQuestionId("testCheckbox")
-            .WithType(EElementType.Checkbox)
-            .Build();
+                .WithQuestionId("testCheckbox")
+                .WithType(EElementType.Checkbox)
+                .Build();
 
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
-                    {
-                        new PageAnswers {
-                            Answers = new List<Answers> {
-                                new Answers
-                                {
-                                    QuestionId = "testCheckbox"
-                                }
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers
+                            {
+                                QuestionId = "testCheckbox"
                             }
                         }
                     }
+                }
             };
 
             // Act
@@ -223,9 +223,9 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var element = new ElementBuilder()
-            .WithQuestionId("testDate")
-            .WithType(EElementType.DateInput)
-            .Build();
+                .WithQuestionId("testDate")
+                .WithType(EElementType.DateInput)
+                .Build();
 
             var dayKey = "testDate-day";
             var monthKey = "testDate-month";
@@ -234,32 +234,32 @@ namespace form_builder_tests.UnitTests.Mappers
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
-                    {
-                        new PageAnswers {
-                            Answers = new List<Answers> {
-                                new Answers
-                                {
-                                    QuestionId = dayKey,
-                                    Response = "20"
-                                },
-                                new Answers
-                                {
-                                    QuestionId = monthKey,
-                                    Response = "05"
-                                },
-                                new Answers
-                                {
-                                    QuestionId = yearKey,
-                                    Response = "2020"
-                                }
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers
+                            {
+                                QuestionId = dayKey,
+                                Response = "20"
+                            },
+                            new Answers
+                            {
+                                QuestionId = monthKey,
+                                Response = "05"
+                            },
+                            new Answers
+                            {
+                                QuestionId = yearKey,
+                                Response = "2020"
                             }
                         }
+                    }
                 }
             };
 
             // Act
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
-            
+
             // Assert
             Assert.IsType<DateTime>(result);
         }
@@ -268,9 +268,9 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var element = new ElementBuilder()
-            .WithQuestionId("testDate")
-            .WithType(EElementType.DateInput)
-            .Build();
+                .WithQuestionId("testDate")
+                .WithType(EElementType.DateInput)
+                .Build();
 
             var dayKey = "testDate-day";
             var monthKey = "testDate-month";
@@ -303,7 +303,7 @@ namespace form_builder_tests.UnitTests.Mappers
 
             // Act
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
-            
+
             // Assert
             Assert.Null(result);
         }
@@ -349,7 +349,7 @@ namespace form_builder_tests.UnitTests.Mappers
 
             // Act
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
-            
+
             // Assert
             Assert.Null(result);
         }
@@ -442,6 +442,7 @@ namespace form_builder_tests.UnitTests.Mappers
             Assert.Equal("1001254222", type.PlaceRef);
             Assert.Equal(description, type.SelectedAddress);
         }
+
         [Fact]
         public void GetAnswerValue_ShouldReturnAddress_WhenElementIsAddress_Manual()
         {
@@ -489,7 +490,7 @@ namespace form_builder_tests.UnitTests.Mappers
 
             // Act
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
-            
+
             // Assert
             var type = Assert.IsType<Address>(result);
             Assert.Equal("line1", type.AddressLine1);
@@ -533,7 +534,7 @@ namespace form_builder_tests.UnitTests.Mappers
 
             // Act
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
-            
+
             // Assert
             var type = Assert.IsType<Address>(result);
             Assert.Equal("0101010101", type.PlaceRef);
@@ -576,12 +577,13 @@ namespace form_builder_tests.UnitTests.Mappers
 
             // Act
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
-            
+
             // Assert
             var type = Assert.IsType<StockportGovUK.NetStandard.Models.Verint.Organisation>(result);
             Assert.Equal("0101010101", type.Reference);
             Assert.Equal("im an organisation", type.Name);
         }
+
         [Fact]
         public void GetAnswerValue_ShouldReturnValue()
         {
@@ -608,7 +610,7 @@ namespace form_builder_tests.UnitTests.Mappers
 
             // Act
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
-            
+
             // Assert
             Assert.IsType<string>(result);
         }
@@ -757,10 +759,9 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
             };
 
-            // Act
+
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
-            // Assert
             var resultData = Assert.IsType<TimeSpan>(result);
             Assert.Equal("3", resultData.Hours.ToString());
             Assert.Equal(elementMinutes, resultData.Minutes.ToString());
@@ -793,14 +794,11 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
             };
 
-            // Act
             var result = _elementMapper.GetAnswerValue(element3, formAnswers);
 
-            // Assert
             var resultData = Assert.IsType<DateTime>(result);
             Assert.Equal($"{elementOneAnswer} 00:00:00", resultData.ToString());
         }
-
 
         [Theory]
         [InlineData(EElementType.Textbox, "test")]
@@ -812,9 +810,9 @@ namespace form_builder_tests.UnitTests.Mappers
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = questionId, Response = value } } } } };
 
             var element = new ElementBuilder()
-                            .WithType(type)
-                            .WithQuestionId(questionId)
-                            .Build();
+                .WithType(type)
+                .WithQuestionId(questionId)
+                .Build();
 
             // Act
             var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
@@ -833,10 +831,10 @@ namespace form_builder_tests.UnitTests.Mappers
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = questionId, Response = value.ToString() } } } } };
 
             var element = new ElementBuilder()
-                            .WithType(EElementType.DatePicker)
-                            .WithQuestionId(questionId)
-                            .WithLabel(labelText)
-                            .Build();
+                .WithType(EElementType.DatePicker)
+                .WithQuestionId(questionId)
+                .WithLabel(labelText)
+                .Build();
 
             // Act
             var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
@@ -874,16 +872,16 @@ namespace form_builder_tests.UnitTests.Mappers
             // Arrange
             var labelText = "Radio radio";
             var labelValue = "No Text";
-
             var questionId = "test-questionID";
+
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = questionId, Response = "n" } } } } };
 
             var element = new ElementBuilder()
-                            .WithType(EElementType.Radio)
-                            .WithQuestionId(questionId)
-                            .WithLabel(labelText)
-                            .WithOptions(new List<Option> { new Option { Text = "Yes Text", Value = "yes" }, new Option { Text = labelValue, Value = "n" } })
-                            .Build();
+                .WithType(EElementType.Radio)
+                .WithQuestionId(questionId)
+                .WithLabel(labelText)
+                .WithOptions(new List<Option> { new Option { Text = "Yes Text", Value = "yes" }, new Option { Text = labelValue, Value = "n" } })
+                .Build();
 
             // Act
             var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
@@ -895,10 +893,9 @@ namespace form_builder_tests.UnitTests.Mappers
         [Fact]
         public void GetAnswerStringValue_ShouldReturnCorrectValue_ForStreetElement()
         {
-            // Arrange
             var questionId = "test-questionID";
             var labelText = "Enter the Street";
-            var uspn = $"{questionId}{StreetConstants.SELECT_SUFFIX}";
+            var usrn = $"{questionId}{StreetConstants.SELECT_SUFFIX}";
             var addressDescription = $"{questionId}{StreetConstants.DESCRIPTION_SUFFIX}";
 
             var formAnswers = new FormAnswers
@@ -909,7 +906,7 @@ namespace form_builder_tests.UnitTests.Mappers
                         Answers = new List<Answers> {
                             new Answers
                             {
-                                QuestionId = uspn,
+                                QuestionId = usrn,
                                 Response = "1001254222"
                             },
                             new Answers
@@ -922,10 +919,10 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
             };
             var element = new ElementBuilder()
-                            .WithType(EElementType.Street)
-                            .WithQuestionId(questionId)
-                            .WithLabel(labelText)
-                            .Build();
+                .WithType(EElementType.Street)
+                .WithQuestionId(questionId)
+                .WithLabel(labelText)
+                .Build();
 
             // Act
             var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
@@ -966,10 +963,10 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             var element = new ElementBuilder()
-                            .WithType(EElementType.Address)
-                            .WithQuestionId(questionId)
-                            .WithAddressLabel(labelText)
-                            .Build();
+                .WithType(EElementType.Address)
+                .WithQuestionId(questionId)
+                .WithAddressLabel(labelText)
+                .Build();
 
             // Act
             var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
@@ -988,10 +985,10 @@ namespace form_builder_tests.UnitTests.Mappers
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-fileupload", Response = Newtonsoft.Json.JsonConvert.SerializeObject(value) } } } } };
 
             var element = new ElementBuilder()
-                            .WithType(EElementType.FileUpload)
-                            .WithQuestionId(questionId)
-                            .WithLabel(labelText)
-                            .Build();
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId(questionId)
+                .WithLabel(labelText)
+                .Build();
 
             // Act
             var result = _elementMapper.GetAnswerStringValue(element, formAnswers);

@@ -23,14 +23,14 @@ namespace form_builder_tests.UnitTests.Controllers
 {
     public class HomeControllerTest
     {
-        private HomeController _homeController;
+        private readonly HomeController _homeController;
         private readonly Mock<IPageService> _pageService = new Mock<IPageService>();
         private readonly Mock<ISubmitWorkflow> _submitWorkflow = new Mock<ISubmitWorkflow>();
         private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new Mock<IPaymentWorkflow>();
         private readonly Mock<IFileUploadService> _mockFileUploadService = new Mock<IFileUploadService>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new Mock<IActionsWorkflow>();
-        private readonly Mock<ISuccessWorkflow> _mockSucessWorkflow = new Mock<ISuccessWorkflow>();
+        private readonly Mock<ISuccessWorkflow> _mockSuccessWorkflow = new Mock<ISuccessWorkflow>();
 
         public HomeControllerTest()
         {
@@ -44,9 +44,9 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockFileUploadService.Object,
                 _mockHostingEnv.Object,
                 _mockActionsWorkflow.Object,
-                _mockSucessWorkflow.Object) {TempData = tempData};
+                _mockSuccessWorkflow.Object) {TempData = tempData};
 
-            _mockSucessWorkflow.Setup(_ => _.Process(It.IsAny<EBehaviourType>(), It.IsAny<string>())).ReturnsAsync(new SuccessPageEntity
+            _mockSuccessWorkflow.Setup(_ => _.Process(It.IsAny<EBehaviourType>(), It.IsAny<string>())).ReturnsAsync(new SuccessPageEntity
             {
                 FormAnswers = new FormAnswers(),
                 FormName = "form",
@@ -57,7 +57,10 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public void Home_ShouldRedirectTo_www_When_Prod_Env_ForHomeRoute()
         {
+            // Arrange
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("prod");
+            
+            // Act
             var result = _homeController.Home();
 
             // Assert
@@ -68,7 +71,10 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public void Home_ShouldReturnErrorView_WhenNonProdEnv_ForHomeRoute()
         {
+            // Arrange
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
+
+            // Act
             var result = _homeController.Home();
 
             // Assert
@@ -115,6 +121,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Index_ShouldRunBehaviourForRedirect_GoToPage()
         {
+            // Arrange
             var element = new ElementBuilder()
               .WithType(EElementType.H1)
               .WithQuestionId("test-id")
@@ -133,8 +140,6 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithBehaviour(behaviour)
                 .Build();
 
-
-            // Arrange
             _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.GoToPage, PageSlug = "page-two" });
@@ -222,6 +227,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Index_Post_ShouldReturnView_WhenPageIsInvalid()
         {
+            // Arrange
             var element = new ElementBuilder()
                .WithType(EElementType.Address)
                .WithAddressProvider("testAddressProvider")
@@ -242,7 +248,10 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
+            // Act
             var result = await _homeController.Index("form", "page-one", viewModel, null, "automatic");
+
+            // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Search", viewResult.ViewName);
         }
@@ -250,6 +259,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Index_Post_ShouldRedirectWhen_RedirectToAction_IsReturnedFrom_ProcessRequest()
         {
+            // Arrange
             var actionName = "AddressManual";
 
             var element = new ElementBuilder()
@@ -257,12 +267,6 @@ namespace form_builder_tests.UnitTests.Controllers
                .WithAddressProvider("testAddressProvider")
                .WithQuestionId("test-address")
                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .WithValidatedModel(true)
-                .Build();
 
             _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
                 .ReturnsAsync(new ProcessRequestEntity { RedirectAction = actionName, RedirectToAction = true });
@@ -272,7 +276,10 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
+            // Act
             var result = await _homeController.Index("testform", "page-one", viewModel, null, "automatic");
+
+            // Assert
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.True(redirectResult.RouteValues.ContainsKey("form"));
             Assert.True(redirectResult.RouteValues.ContainsKey("path"));
@@ -286,6 +293,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [InlineData("Index", EBehaviourType.GoToPage)]
         public async Task Index_Post_Should_PerformRedirectToAction_WhenPageIsValid_And_SelectJourney_OnBehaviour(string viewName, EBehaviourType behaviourType)
         {
+            // Arrange
             var element = new ElementBuilder()
                .WithType(EElementType.Address)
                .WithQuestionId("test-address")
@@ -313,8 +321,10 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = behaviourType });
 
+            // Act
             var result = await _homeController.Index("form", "page-one", viewModel, null, "automatic");
 
+            // Assert
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal(viewName, viewResult.ActionName);
         }
@@ -322,6 +332,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Index_Post_Should_PerformGoToExternalPageBehaviour_WhenPageIsValid_And_SelectJourney()
         {
+            // Arrange
             var element = new ElementBuilder()
                .WithType(EElementType.Address)
                .WithQuestionId("test-address")
@@ -349,8 +360,10 @@ namespace form_builder_tests.UnitTests.Controllers
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.GoToExternalPage, PageSlug = "submit-url" });
 
+            // Act
             var result = await _homeController.Index("form", "page-one", viewModel, null, "automatic");
 
+            // Assert
             var redirectResult = Assert.IsType<RedirectResult>(result);
             Assert.Equal("submit-url", redirectResult.Url);
         }
@@ -358,43 +371,43 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Index_ShouldCallPageService()
         {
-            //Arrange
+            // Arrange
             _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessPageEntity());
 
-            //Act
-            var result = await _homeController.Index("form", "path");
+            // Act
+            await _homeController.Index("form", "path");
 
 
-            //Assert
+            // Assert
             _pageService.Verify(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
         public async Task Index_ShouldReturnViewResult()
         {
-            //Arrange
+            // Arrange
             _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessPageEntity());
 
-            //Act
+            // Act
             var result = await _homeController.Index("form", "path");
 
-            //Assert
+            // Assert
             Assert.IsType<ViewResult>(result);
         }
 
         [Fact]
         public async Task Index_ShouldRedirect_WhenOnRedirectIsTrue()
         {
-            //Arrange
+            // Arrange
             _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessPageEntity {  ShouldRedirect = true });
 
-            //Act
+            // Act
             var result = await _homeController.Index("form", "path");
 
-            //Assert
+            // Assert
             Assert.IsType<RedirectToActionResult>(result);
         }
 
@@ -415,6 +428,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Index_ShouldRedirectToUrlWhen_SubmitAndPay()
         {
+            // Arrange
             var element = new ElementBuilder()
                .WithType(EElementType.Textbox)
                .WithQuestionId("test")
@@ -443,14 +457,17 @@ namespace form_builder_tests.UnitTests.Controllers
             _paymentWorkflow.Setup(_ => _.Submit(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync("https://www.return.url");
 
+            // Act
             var result = await _homeController.Index("form", "page-one", viewModel, null);
 
+            // Assert
             Assert.IsType<RedirectResult>(result);
         }
 
         [Fact]
         public async Task Index_ShouldAddFileUploadToViewModel_WhenSupplied()
         {
+            // Arrange
             var element = new ElementBuilder()
               .WithType(EElementType.FileUpload)
               .WithQuestionId("test")
@@ -482,8 +499,10 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry("Guid", Guid.NewGuid().ToString())
                 .Build();
 
+            // Act
             await _homeController.Index("form", "page-one", viewModel, collection);
 
+            // Assert
             _pageService.Verify(service => service.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, object>>(), collection), Times.AtLeastOnce);
         }
 
@@ -561,7 +580,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry($"test", "test")
+                .WithEntry("test", "test")
                 .Build();
 
             _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
@@ -584,7 +603,7 @@ namespace form_builder_tests.UnitTests.Controllers
             await _homeController.Success("form");
 
             // Assert
-            _mockSucessWorkflow.Verify(_ => _.Process(EBehaviourType.SubmitForm, "form"), Times.Once);
+            _mockSuccessWorkflow.Verify(_ => _.Process(EBehaviourType.SubmitForm, "form"), Times.Once);
         }
 
         [Fact]

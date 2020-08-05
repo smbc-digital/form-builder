@@ -6,7 +6,9 @@ namespace form_builder.Services.PayService.Entities
     public class PageEntity
     {
         public string ViewName { get; set; } = "Index";
+
         public Page Page { get; set; }
+
         public FormBuilderViewModel ViewModel { get; set; }
     }
 

@@ -37,7 +37,7 @@ using form_builder.Services.PageService;
 using form_builder.Services.PayService;
 using form_builder.Services.RetrieveExternalDataService;
 using form_builder.Services.StreetService;
-using form_builder.Services.SubmtiService;
+using form_builder.Services.SubmitService;
 using form_builder.Validators;
 using form_builder.Workflows;
 using form_builder.Workflows.ActionsWorkflow;

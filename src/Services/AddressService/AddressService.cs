@@ -56,15 +56,15 @@ namespace form_builder.Services.AddressService
             switch (subPath)
             {
                 case LookUpConstants.Manual:
-                    return await ProcesssManualAddress(viewModel, currentPage, baseForm, guid, path);
+                    return await ProcessManualAddress(viewModel, currentPage, baseForm, guid, path);
                 case LookUpConstants.Automatic:
-                    return await ProcesssAutomaticAddress(viewModel, currentPage, baseForm, guid, path);
+                    return await ProcessAutomaticAddress(viewModel, currentPage, baseForm, guid, path);
                 default:
-                    return await ProcesssSearchAddress(viewModel, currentPage, baseForm, guid, path);
+                    return await ProcessSearchAddress(viewModel, currentPage, baseForm, guid, path);
             }
         }
 
-        private async Task<ProcessRequestEntity> ProcesssManualAddress(
+        private async Task<ProcessRequestEntity> ProcessManualAddress(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,
@@ -98,7 +98,7 @@ namespace form_builder.Services.AddressService
             };
         }
 
-        private async Task<ProcessRequestEntity> ProcesssAutomaticAddress(
+        private async Task<ProcessRequestEntity> ProcessAutomaticAddress(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,
@@ -111,7 +111,7 @@ namespace form_builder.Services.AddressService
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-            var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
+            var addressElement = currentPage.Elements.FirstOrDefault(_ => _.Type == EElementType.Address);
 
             var postcode = (string)convertedAnswers
                         .Pages
@@ -161,7 +161,7 @@ namespace form_builder.Services.AddressService
             };
         }
 
-        private async Task<ProcessRequestEntity> ProcesssSearchAddress(
+        private async Task<ProcessRequestEntity> ProcessSearchAddress(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,

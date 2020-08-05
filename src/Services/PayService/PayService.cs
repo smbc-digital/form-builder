@@ -40,11 +40,16 @@ namespace form_builder.Services.PayService
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IPageHelper _pageHelper;
 
-        public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger,
+        public PayService(
+            IEnumerable<IPaymentProvider> paymentProviders, 
+            ILogger<PayService> logger,
             IGateway gateway,
             ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            ISessionHelper sessionHelper, IMappingService mappingService, IWebHostEnvironment hostingEnvironment, IPageHelper pageHelper)
+            ISessionHelper sessionHelper, 
+            IMappingService mappingService, 
+            IWebHostEnvironment hostingEnvironment, 
+            IPageHelper pageHelper)
         {
             _gateway = gateway;
             _logger = logger;
@@ -71,9 +76,7 @@ namespace form_builder.Services.PayService
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
             if (mappingEntity == null)
-            {
                 throw new Exception($"PayService:: No mapping entity found for {form}");
-            }
 
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var paymentInformation = await GetFormPaymentInformation(mappingEntity, form, currentPage);
@@ -81,9 +84,7 @@ namespace form_builder.Services.PayService
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
             if (string.IsNullOrWhiteSpace(postUrl.CallbackUrl))
-            {
                 throw new ArgumentException("PayService::ProcessPaymentResponse, Callback url has not been specified");
-            }
 
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
             try
@@ -95,20 +96,20 @@ namespace form_builder.Services.PayService
             }
             catch (PaymentDeclinedException)
             {
-                var response = await _gateway.PostAsync(postUrl.CallbackUrl,
+                await _gateway.PostAsync(postUrl.CallbackUrl,
                     new { CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString() });
                 throw new PaymentDeclinedException("PayService::ProcessPaymentResponse, PaymentProvider declined payment");
             }
             catch (PaymentFailureException)
             {
-                var response = await _gateway.PostAsync(postUrl.CallbackUrl,
+                await _gateway.PostAsync(postUrl.CallbackUrl,
                     new { CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString() });
                 throw new PaymentFailureException("PayService::ProcessPaymentResponse, PaymentProvider failed payment");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "The payment callback failed");
-                throw ex;
+                throw new Exception(ex.Message);
             }
         }
 
@@ -118,14 +119,10 @@ namespace form_builder.Services.PayService
             var formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName == form);
 
             if (formPaymentConfig == null)
-            {
                 throw new Exception($"PayService:: No payment information found for {form}");
-            }
 
             if (formPaymentConfig.Settings.ComplexCalculationRequired)
-            {
                 formPaymentConfig.Settings.Amount = await CalculateAmountAsync(formData, page);
-            }
 
             return formPaymentConfig;
         }
@@ -171,9 +168,7 @@ namespace form_builder.Services.PayService
             var paymentProvider = _paymentProviders.FirstOrDefault(_ => _.ProviderName == paymentInfo.PaymentProvider);
 
             if (paymentProvider == null)
-            {
                 throw new Exception($"PayService::GetFormPaymentProvider, No payment provider configured for {paymentInfo.PaymentProvider}");
-            }
 
             return paymentProvider;
         }

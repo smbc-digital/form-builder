@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 
-namespace form_builder.Services.SubmtiService
+namespace form_builder.Services.SubmitService
 {
     public interface ISubmitService
     {
@@ -23,34 +23,24 @@ namespace form_builder.Services.SubmtiService
     }
     public class SubmitService : ISubmitService
     {
-        private readonly IDistributedCacheWrapper _distributedCache;
-
         private readonly IGateway _gateway;
 
         private readonly IPageHelper _pageHelper;
 
-        private readonly ISessionHelper _sessionHelper;
-
-        private readonly ILogger<SubmitService> _logger;
-
         private readonly IWebHostEnvironment _environment;
-
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
         private readonly SubmissionServiceConfiguration _submissionServiceConfiguration;
 
 
-        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper, IWebHostEnvironment environment, IHttpContextAccessor httpContextAccessor, IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration, IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration)
+        public SubmitService(
+            IGateway gateway, 
+            IPageHelper pageHelper, 
+            IWebHostEnvironment environment, 
+            IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration)
         {
-            _distributedCache = distributedCache;
             _gateway = gateway;
             _pageHelper = pageHelper;
-            _sessionHelper = sessionHelper;
-            _logger = logger;
             _environment = environment;
-            _httpContextAccessor = httpContextAccessor;
-            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _submissionServiceConfiguration = submissionServiceConfiguration.Value;
         }
 
