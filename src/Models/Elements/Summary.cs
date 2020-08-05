@@ -1,13 +1,12 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
+using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
-using System.Text.Encodings.Web;
-
 
 namespace form_builder.Models.Elements
 {
@@ -33,17 +32,15 @@ namespace form_builder.Models.Elements
 
             htmlContent.AppendHtmlLine("<dl class=\"govuk-summary-list govuk-!-margin-bottom-9\">");
             foreach (var pageSummary in pages)
-            {                 
-               foreach (var answer in pageSummary.Answers)
+            {
+                foreach (var answer in pageSummary.Answers)
                 {
                     htmlContent.AppendHtmlLine("<div class=\"govuk-summary-list__row\">");
                     htmlContent.AppendHtmlLine($"<dt class=\"govuk-summary-list__key\">{answer.Key}</dt>");
                     htmlContent.AppendHtmlLine($"<dd class=\"govuk-summary-list__value\">{answer.Value}</dd>");
 
                     if (Properties != null && Properties.AllowEditing)
-                    {
                         htmlContent.AppendHtmlLine($"<dd class=\"govuk-summary-list__actions\"><a class=\"govuk-link\" href=\"{pageSummary.PageSlug}\">Change</a><span class=\"govuk-visually-hidden\">{answer.Key}</span</dd>");
-                    }
 
                     htmlContent.AppendHtmlLine("</div>");
                 }
@@ -53,10 +50,9 @@ namespace form_builder.Models.Elements
             using (var writer = new StringWriter())
             {
                 htmlContent.WriteTo(writer, HtmlEncoder.Default);
+
                 return Task.FromResult(writer.ToString());
             }
-            
         }
     }
 }
-

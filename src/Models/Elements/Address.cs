@@ -1,39 +1,50 @@
-﻿using form_builder.Helpers;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Constants;
+using form_builder.Enum;
+using form_builder.Extensions;
+using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using form_builder.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using form_builder.Constants;
 using Newtonsoft.Json.Linq;
-using form_builder.Enum;
+using StockportGovUK.NetStandard.Models.Addresses;
 
 namespace form_builder.Models.Elements
 {
     public class Address : Element
     {
         public List<SelectListItem> Items { get; set; }
+
         public string ReturnURL { get; set; }
+
         public string ManualAddressURL { get; set; }
+
         public string AddressSearchQuestionId => $"{Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}";
+
         public string AddressSelectQuestionId => $"{Properties.QuestionId}{AddressConstants.SELECT_SUFFIX}";
-        private bool IsSelect { get; set; } = false; 
-        public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
+
+        private bool IsSelect { get; set; } = false;
+
+        public override string Hint => IsSelect ? Properties.SelectHint : base.Hint;
+
         public override bool DisplayHint => !string.IsNullOrEmpty(Hint);
-        public override string  QuestionId => IsSelect ? AddressSelectQuestionId : AddressSearchQuestionId;
+
+        public override string QuestionId => IsSelect ? AddressSelectQuestionId : AddressSearchQuestionId;
+
         public string ChangeHeader => "Postcode:";
+
         public override string Label
         {
             get
             {
-                if(IsSelect)
+                if (IsSelect)
                     return string.IsNullOrEmpty(Properties.SelectLabel) ? "Select the address below" : Properties.SelectLabel;
 
                 return string.IsNullOrEmpty(Properties.AddressLabel) ? "Postcode" : Properties.AddressLabel;
             }
         }
+
         public Address()
         {
             Type = EElementType.Address;
@@ -50,29 +61,31 @@ namespace form_builder.Models.Elements
             List<object> results = null)
         {
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
-            switch (subPath as string) {
+            switch (subPath as string)
+            {
                 case LookUpConstants.Manual:
                     var manualAddressElement = new AddressManual(validationResult)
                     {
                         Properties = Properties
                     };
-                    return await manualAddressElement.RenderAsync(viewRender,elementHelper, guid, viewModel, page,formSchema, environment, results);
-                
+                    return await manualAddressElement.RenderAsync(viewRender, elementHelper, guid, viewModel, page, formSchema, environment, results);
+
                 case LookUpConstants.Automatic:
                     IsSelect = true;
                     Properties.Value = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
 
-                    ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest") 
-                        ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}" 
+                    ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
+                        ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
                         : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
-                    
+
                     ManualAddressURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
                         ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual"
                         : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
                     var selectedAddress = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, AddressConstants.SELECT_SUFFIX);
                     Items = new List<SelectListItem> { new SelectListItem($"{results.Count} addresses found", string.Empty) };
-                    results.ForEach((objectResult) => {
+                    results.ForEach((objectResult) =>
+                    {
                         AddressSearchResult searchResult;
 
                         if ((objectResult as JObject) != null)
@@ -93,7 +106,7 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public override Dictionary<string, dynamic> GenerateElementProperties(string type="")
+        public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var elementProperties = new Dictionary<string, dynamic>
             {
@@ -104,7 +117,7 @@ namespace form_builder.Models.Elements
             if (DisplayAriaDescribedby)
                 elementProperties.Add("aria-describedby", GetDescribedByAttributeValue());
 
-            if(string.IsNullOrEmpty(type))
+            if (string.IsNullOrEmpty(type))
                 elementProperties.Add("maxlength", Properties.MaxLength);
 
             return elementProperties;
@@ -112,8 +125,8 @@ namespace form_builder.Models.Elements
 
         public override string GenerateFieldsetProperties()
         {
-            return !string.IsNullOrWhiteSpace(Properties.AddressManualHint) 
-                ? $"aria-describedby = {Properties.QuestionId}-hint" 
+            return !string.IsNullOrWhiteSpace(Properties.AddressManualHint)
+                ? $"aria-describedby = {Properties.QuestionId}-hint"
                 : string.Empty;
         }
     }

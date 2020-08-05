@@ -1,17 +1,17 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using form_builder.Constants;
+using form_builder.Enum;
+using form_builder.Extensions;
+using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
 using Organisation = StockportGovUK.NetStandard.Models.Verint.Organisation;
-using form_builder.Constants;
 
 namespace form_builder.Mappers
 {
@@ -43,22 +43,31 @@ namespace form_builder.Mappers
             {
                 case EElementType.DateInput:
                     return GetDateInputElementValue(key, formAnswers);
+
                 case EElementType.DatePicker:
                     return GetDatePickerElementValue(key, formAnswers);
+
                 case EElementType.Checkbox:
                     return GetCheckboxElementValue(key, formAnswers);
+
                 case EElementType.Declaration:
                     return GetDeclarationElementValue(key, formAnswers);
+
                 case EElementType.TimeInput:
                     return GetTimeElementValue(key, formAnswers);
+
                 case EElementType.Address:
                     return GetAddressElementValue(key, formAnswers);
+
                 case EElementType.Street:
                     return GetStreetElementValue(key, formAnswers);
+
                 case EElementType.Organisation:
                     return GetOrganisationElementValue(key, formAnswers);
+
                 case EElementType.FileUpload:
                     return GetFileUploadElementValue(key, formAnswers);
+
                 default:
                     if (element.Properties.Numeric)
                         return GetNumericElementValue(key, formAnswers);

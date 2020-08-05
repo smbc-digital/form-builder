@@ -2,7 +2,6 @@ namespace form_builder.Models
 {
     public class EnvironmentAvailability
     {
-
         public EnvironmentAvailability()
         {
             IsAvailable = true;

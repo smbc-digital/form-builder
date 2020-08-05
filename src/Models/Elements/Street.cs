@@ -1,34 +1,42 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using form_builder.Constants;
 using Newtonsoft.Json.Linq;
+using StockportGovUK.NetStandard.Models.Addresses;
 
 namespace form_builder.Models.Elements
 {
     public class Street : Element
     {
         public List<SelectListItem> Items { get; set; }
+
         public string ReturnURL { get; set; }
+
         public string StreetSearchQuestionId => $"{Properties.QuestionId}";
+
         public string StreetSelectQuestionId => $"{Properties.QuestionId}{StreetConstants.SELECT_SUFFIX}";
+
         private bool IsSelect { get; set; } = false; 
+
         public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
+
         public override bool DisplayHint => !string.IsNullOrEmpty(Hint);
+
         public override string  QuestionId => IsSelect ? StreetSelectQuestionId : StreetSearchQuestionId;
+
         public string ChangeHeader => "Street:";
         
         public override string Label
         {
             get
             {
-                if(IsSelect)
+                if (IsSelect)
                     return string.IsNullOrEmpty(Properties.SelectLabel) ? "Select the street below" : Properties.SelectLabel;
 
                 return string.IsNullOrEmpty(Properties.Label) ? "Street name" : Properties.Label;
@@ -60,7 +68,7 @@ namespace form_builder.Models.Elements
                     IsSelect = true;
                     Properties.Value = elementHelper.CurrentValue<string>(this, answers, page.PageSlug, guid, string.Empty);
 
-                    ReturnURL = environment.EnvironmentName == "local" || environment.EnvironmentName == "uitest"
+                    ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
                         ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
                         : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
 
@@ -69,7 +77,7 @@ namespace form_builder.Models.Elements
                     results?.ForEach((objectResult) => {
                         AddressSearchResult searchResult;
 
-                        if ((objectResult as JObject) != null)
+                        if (objectResult as JObject != null)
                             searchResult = (objectResult as JObject).ToObject<AddressSearchResult>();
                         else
                             searchResult = objectResult as AddressSearchResult;
@@ -78,6 +86,7 @@ namespace form_builder.Models.Elements
                     });
 
                     return await viewRender.RenderAsync("StreetSelect", this);
+
                 default:
 
                     Properties.Value = elementHelper.CurrentValue<string>(this, answers, page.PageSlug, guid, string.Empty);
@@ -87,21 +96,19 @@ namespace form_builder.Models.Elements
 
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
-            var elemnentProperties = new Dictionary<string, dynamic>();
-            elemnentProperties.Add("id", $"{QuestionId}");
-            elemnentProperties.Add("name", $"{QuestionId}");
+            var elementProperties = new Dictionary<string, dynamic>
+            {
+                {"id", $"{QuestionId}"},
+                {"name", $"{QuestionId}"}
+            };
 
             if (DisplayAriaDescribedby)
-            {
-                elemnentProperties.Add("aria-describedby", GetDescribedByAttributeValue());
-            }
+                elementProperties.Add("aria-describedby", GetDescribedByAttributeValue());
 
             if(string.IsNullOrEmpty(type))
-            {
-                elemnentProperties.Add("maxlength", Properties.MaxLength);
-            }
+                elementProperties.Add("maxlength", Properties.MaxLength);
  
-            return elemnentProperties;
+            return elementProperties;
         }
     }
 }

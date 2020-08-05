@@ -1,9 +1,18 @@
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.Session;
 using form_builder.Models;
+using form_builder.Models.Actions;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.PaymentProvider;
@@ -11,18 +20,9 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.FileUploadService;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Dynamic;
-using form_builder.Helpers.Session;
-using form_builder.Models.Actions;
-using Microsoft.Extensions.Hosting;
 
 namespace form_builder.Helpers.PageHelpers
 {

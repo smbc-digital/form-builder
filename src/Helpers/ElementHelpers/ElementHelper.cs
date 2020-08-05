@@ -1,33 +1,47 @@
-﻿using form_builder.Builders;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using form_builder.Builders;
+using form_builder.Enum;
 using form_builder.Extensions;
+using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
-using form_builder.Enum;
-using form_builder.Mappers;
 
 namespace form_builder.Helpers.ElementHelpers
 {
     public interface IElementHelper
     {
         T CurrentValue<T>(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "");
+        
         bool CheckForQuestionId(Element element);
+        
         bool CheckForLabel(Element element);
+        
         bool CheckForMaxLength(Element element);
+        
         bool CheckIfLabelAndTextEmpty(Element element);
+        
         bool CheckForRadioOptions(Element element);
+        
         bool CheckForSelectOptions(Element element);
+        
         bool CheckForCheckBoxListValues(Element element);
+        
         bool CheckAllDateRestrictionsAreNotEnabled(Element element);
+        
         void ReSelectPreviousSelectedOptions(Element element);
+        
         void ReCheckPreviousRadioOptions(Element element);
+        
         bool CheckForProvider(Element element);
+        
         object GetFormDataValue(string guid, string key);
+        
         FormAnswers GetFormData(string guid);
+        
         List <PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema);
     }
 
