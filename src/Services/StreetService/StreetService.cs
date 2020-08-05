@@ -27,7 +27,11 @@ namespace form_builder.Services.StreetService
         private readonly IEnumerable<IStreetProvider> _streetProviders;
         private readonly IPageFactory _pageFactory;
 
-        public StreetService(IDistributedCacheWrapper distributedCache, IEnumerable<IStreetProvider> streetProviders, IPageHelper pageHelper, IPageFactory pageFactory)
+        public StreetService(
+            IDistributedCacheWrapper distributedCache, 
+            IEnumerable<IStreetProvider> streetProviders, 
+            IPageHelper pageHelper, 
+            IPageFactory pageFactory)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
@@ -176,7 +180,7 @@ namespace form_builder.Services.StreetService
             catch (Exception e)
             {
                 throw new ApplicationException($"PageHelper.ProccessInitialStreet: An exception has occured while attempting to generate Html, Exception: {e.Message}");
-            };
+            }
         }
     }
 }

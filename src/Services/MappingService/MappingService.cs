@@ -43,10 +43,8 @@ namespace form_builder.Services.MappingService
         public async Task<MappingEntity> Map(string sessionGuid, string form)
         {
             var baseForm = await _schemaFactory.Build(form);
-
             var formData = _distributedCache.GetString(sessionGuid);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
             convertedAnswers.FormName = form;
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
 
@@ -113,13 +111,13 @@ namespace form_builder.Services.MappingService
             if (obj.TryGetValue(target, out objectValue))
             {
                 var files = (List<File>) objectValue;
-
                 if (value != null)
                 {
                     obj.Remove(target);
                     files.Add((File) value);
                     obj.Add(target, files);
                 }
+
                 return obj;
             }
             else

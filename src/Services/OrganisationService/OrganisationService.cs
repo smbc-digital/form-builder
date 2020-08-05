@@ -71,6 +71,7 @@ namespace form_builder.Services.OrganisationService
             if (currentPage.IsValid && organisationElement.Properties.Optional && string.IsNullOrEmpty(organisation))
             {
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+
                 return new ProcessRequestEntity
                 {
                     Page = currentPage
@@ -80,7 +81,6 @@ namespace form_builder.Services.OrganisationService
             if (!currentPage.IsValid)
             {
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
-
                 var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
 
                 return new ProcessRequestEntity
@@ -117,6 +117,7 @@ namespace form_builder.Services.OrganisationService
             if (currentPage.IsValid && organisationElement.Properties.Optional && string.IsNullOrEmpty(organisation))
             {
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+
                 return new ProcessRequestEntity
                 {
                     Page = currentPage

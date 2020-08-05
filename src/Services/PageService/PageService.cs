@@ -80,9 +80,7 @@ namespace form_builder.Services.PageService
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath)
         {
             if (string.IsNullOrEmpty(path))
-            {
                 _sessionHelper.RemoveSessionGuid();
-            }
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
@@ -95,29 +93,23 @@ namespace form_builder.Services.PageService
             var baseForm = await _schemaFactory.Build(form);
 
             if(!baseForm.IsAvailable(_environment.EnvironmentName))
-            {
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
-            }
 
             var formData = _distributedCache.GetString(sessionGuid);
 
             if (formData == null && path != baseForm.FirstPageSlug)
-            {
                 return new ProcessPageEntity
                 {
                     ShouldRedirect = true,
                     TargetPage = baseForm.FirstPageSlug
                 };
-            }
 
             if (string.IsNullOrEmpty(path))
-            {
                 return new ProcessPageEntity
                 {
                     ShouldRedirect = true,
                     TargetPage = baseForm.FirstPageSlug
                 };
-            }
 
             if (formData != null && path == baseForm.FirstPageSlug)
             {
@@ -128,9 +120,7 @@ namespace form_builder.Services.PageService
 
             var page = baseForm.GetPage(_pageHelper, path);
             if (page == null)
-            {
                 throw new ApplicationException($"Requested path '{path}' object could not be found.");
-            }
 
             await baseForm.ValidateFormSchema(_pageHelper, form, path);
 
@@ -228,7 +218,7 @@ namespace form_builder.Services.PageService
 
         public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
-            Dictionary<string, dynamic> answers = new Dictionary<string, dynamic>();
+            var answers = new Dictionary<string, dynamic>();
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var cachedAnswers = _distributedCache.GetString(sessionGuid);
@@ -247,9 +237,7 @@ namespace form_builder.Services.PageService
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (string.IsNullOrEmpty(sessionGuid))
-            {
                 throw new Exception("PageService::FinalisePageJourney: Session has expired");
-            }
 
             var formData = _distributedCache.GetString(sessionGuid);
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
@@ -259,12 +247,10 @@ namespace form_builder.Services.PageService
                 .ToList();
 
             if (formFileUploadElements.Count > 0)
-            {
                 formFileUploadElements.ForEach(_ =>
                 {
                     _distributedCache.Remove($"file-{_.Properties.QuestionId}-fileupload-{sessionGuid}");
                 });
-            }
 
             if(baseForm.DocumentDownload)
                 await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(formAnswers), _distributedCacheExpirationConfiguration.Document);

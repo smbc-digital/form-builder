@@ -39,11 +39,11 @@ namespace form_builder.Services.FileUploadService
 
         public List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files)
         {
-            files.ToList().ForEach((file) =>
+            files.ToList().ForEach(file =>
             {
                 var key = $"{ file.QuestionId}-{_sessionHelper.GetSessionGuid()}";
                 _distributedCache.SetStringAsync($"file-{key}", file.Base64EncodedContent, _distributedCacheExpirationConfiguration.FileUpload);
-                FileUploadModel model = new FileUploadModel
+                var model = new FileUploadModel
                 {
                     Key = $"file-{key}",
                     TrustedOriginalFileName = WebUtility.HtmlEncode(file.UntrustedOriginalFileName),
@@ -55,7 +55,8 @@ namespace form_builder.Services.FileUploadService
                     var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId == file.QuestionId);
                     if (fileUploadAnswer != null)
                         fileUploadAnswer.Response = model;
-                } else
+                } 
+                else
                 {
                     answers.Add(new Answers { QuestionId = file.QuestionId, Response = JsonConvert.SerializeObject(model) });
                 }
