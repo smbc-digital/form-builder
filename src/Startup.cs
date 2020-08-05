@@ -62,6 +62,7 @@ namespace form_builder
                 .AddServices()
                 .AddWorkflows()
                 .AddFactories()
+                .AddAntiforgery(_ => _.Cookie.Name = ".formbuilder.antiforgery.v2")
                 .AddSession(_ => {
                     _.IdleTimeout = TimeSpan.FromMinutes(30);
                     _.Cookie.Path = "/";
