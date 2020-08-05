@@ -30,6 +30,7 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckAllDateRestrictionsAreNotEnabled(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
     }

@@ -37,9 +37,9 @@ namespace form_builder.Builders.Email
         }
 
         private static BodyBuilder BuildMessageBody(string bodyContent) => new BodyBuilder
-            {
-                HtmlBody = bodyContent,
-                TextBody = bodyContent
-            };
+        {
+            HtmlBody = bodyContent,
+            TextBody = bodyContent
+        };
     }
 }

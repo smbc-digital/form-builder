@@ -12,6 +12,7 @@ using form_builder.Extensions;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
+using form_builder.Models.Actions;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.PaymentProvider;
@@ -40,7 +41,7 @@ namespace form_builder.Helpers.PageHelpers
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
             IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
-            IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             IEnumerable<IPaymentProvider> paymentProviders, IFileUploadService fileUploadService, ISessionHelper sessionHelper)
         {
             _viewRender = viewRender;
@@ -49,7 +50,7 @@ namespace form_builder.Helpers.PageHelpers
             _disallowedKeys = disallowedKeys.Value;
             _environment = enviroment;
             _cache = cache;
-            _distributedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _paymentProviders = paymentProviders;
             _fileUploadService = fileUploadService;
             _sessionHelper = sessionHelper;

@@ -40,7 +40,7 @@ namespace form_builder_tests.UnitTests.Helpers
             new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings
             = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
         private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider =
             new Mock<IEnumerable<IPaymentProvider>>();
@@ -75,7 +75,7 @@ namespace form_builder_tests.UnitTests.Helpers
                     }
                 });
 
-            _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(
+            _mockDistributedCacheExpirationSettings.Setup(_ => _.Value).Returns(
                 new DistributedCacheExpirationConfiguration
                 {
                     UserData = 30,
@@ -90,7 +90,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
             _pageHelper = new PageHelper(_mockIViewRender.Object, _mockElementHelper.Object,
                 _mockDistributedCache.Object, _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
-                _mockCache.Object, _mockDistrbutedCacheExpirationSettings.Object, _mockPaymentProvider.Object,
+                _mockCache.Object, _mockDistributedCacheExpirationSettings.Object, _mockPaymentProvider.Object,
                 _mockFileUploadService.Object, _mockSessionHelper.Object);
         }
 
@@ -540,7 +540,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveAnswers_ShouldSaveFileUpload_WithinDistrbutedCache_OnSeperateKey()
+        public void SaveAnswers_ShouldSaveFileUpload_WithinDistributedCache_OnSeperateKey()
         {
             var questionId = "fileUpload_testFileQuestionId";
             var fileContent = "abc";
@@ -689,7 +689,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveAnswers_ShouldNotCallDistrbutedCache_ForFileUpload_WhenNoFile()
+        public void SaveAnswers_ShouldNotCallDistributedCache_ForFileUpload_WhenNoFile()
         {
             var fileMock = new Mock<IFormFile>();
 

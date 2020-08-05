@@ -52,19 +52,21 @@ namespace form_builder.Models.Elements
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
             switch (subPath as string) {
                 case LookUpConstants.Manual:
-                    var manualAddressElement = new AddressManual(validationResult);
-                    manualAddressElement.Properties = Properties;
-
+                    var manualAddressElement = new AddressManual(validationResult)
+                    {
+                        Properties = Properties
+                    };
                     return await manualAddressElement.RenderAsync(viewRender,elementHelper, guid, viewModel, page,formSchema, environment, results);
+                
                 case LookUpConstants.Automatic:
                     IsSelect = true;
                     Properties.Value = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, AddressConstants.SEARCH_SUFFIX);
 
-                    ReturnURL = environment.EnvironmentName == "local" || environment.EnvironmentName == "uitest" 
+                    ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest") 
                         ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}" 
                         : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
                     
-                    ManualAddressURL = environment.EnvironmentName == "local" || environment.EnvironmentName == "uitest"
+                    ManualAddressURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
                         ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual"
                         : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
@@ -74,13 +76,9 @@ namespace form_builder.Models.Elements
                         AddressSearchResult searchResult;
 
                         if ((objectResult as JObject) != null)
-                        {
                             searchResult = (objectResult as JObject).ToObject<AddressSearchResult>();
-                        }
                         else
-                        {
                             searchResult = objectResult as AddressSearchResult;
-                        }
 
                         Items.Add(new SelectListItem(
                             searchResult.Name,
@@ -97,31 +95,26 @@ namespace form_builder.Models.Elements
 
         public override Dictionary<string, dynamic> GenerateElementProperties(string type="")
         {
-            var elemnentProperties = new Dictionary<string, dynamic>();
-            elemnentProperties.Add("id", $"{QuestionId}");
-            elemnentProperties.Add("name", $"{QuestionId}");
-            
-            if (DisplayAriaDescribedby)
+            var elementProperties = new Dictionary<string, dynamic>
             {
-                elemnentProperties.Add("aria-describedby", GetDescribedByAttributeValue());
-            }
+                {"id", $"{QuestionId}"},
+                {"name", $"{QuestionId}"}
+            };
+
+            if (DisplayAriaDescribedby)
+                elementProperties.Add("aria-describedby", GetDescribedByAttributeValue());
 
             if(string.IsNullOrEmpty(type))
-            {
-                elemnentProperties.Add("maxlength", Properties.MaxLength);
-            }
+                elementProperties.Add("maxlength", Properties.MaxLength);
 
-            return elemnentProperties;
+            return elementProperties;
         }
 
         public override string GenerateFieldsetProperties()
         {
-            if (!string.IsNullOrWhiteSpace(Properties.AddressManualHint))
-            {
-                return $"aria-describedby = {Properties.QuestionId}-hint";
-            }
-
-            return string.Empty;
+            return !string.IsNullOrWhiteSpace(Properties.AddressManualHint) 
+                ? $"aria-describedby = {Properties.QuestionId}-hint" 
+                : string.Empty;
         }
     }
 }

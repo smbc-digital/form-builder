@@ -34,7 +34,7 @@ namespace form_builder.Services.PayService
         private readonly ILogger<PayService> _logger;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly ICache _cache;
-        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly ISessionHelper _sessionHelper;
         private readonly IMappingService _mappingService;
         private readonly IWebHostEnvironment _hostingEnvironment;
@@ -43,14 +43,14 @@ namespace form_builder.Services.PayService
         public PayService(IEnumerable<IPaymentProvider> paymentProviders, ILogger<PayService> logger,
             IGateway gateway,
             ICache cache,
-            IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ISessionHelper sessionHelper, IMappingService mappingService, IWebHostEnvironment hostingEnvironment, IPageHelper pageHelper)
         {
             _gateway = gateway;
             _logger = logger;
             _paymentProviders = paymentProviders;
             _cache = cache;
-            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _sessionHelper = sessionHelper;
             _mappingService = mappingService;
             _hostingEnvironment = hostingEnvironment;
@@ -114,7 +114,7 @@ namespace form_builder.Services.PayService
 
         public async Task<PaymentInformation> GetFormPaymentInformation(MappingEntity formData, string form, Page page)
         {
-            var paymentConfig = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_hostingEnvironment.EnvironmentName}", _distrbutedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
+            var paymentConfig = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_hostingEnvironment.EnvironmentName}", _distributedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
             var formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName == form);
 
             if (formPaymentConfig == null)

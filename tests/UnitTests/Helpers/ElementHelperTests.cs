@@ -13,13 +13,13 @@ namespace form_builder_tests.UnitTests.Helpers
 {
     public class ElementHelperTests
     {
-        private readonly Mock<IDistributedCacheWrapper> _mockDistrbutedCacheWrapper = new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
         private readonly ElementHelper _elementHelper;
 
         public ElementHelperTests()
         {
-            _elementHelper = new ElementHelper(_mockDistrbutedCacheWrapper.Object, _mockElementMapper.Object);
+            _elementHelper = new ElementHelper(_mockDistributedCacheWrapper.Object, _mockElementMapper.Object);
         }
 
         [Theory]
@@ -71,7 +71,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void CurrentValue_ShouldReturnEmpty_WhenCacheDoesNotContainPageData()
         {
             // Arrange
-            _mockDistrbutedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
 
             var element = new ElementBuilder()
@@ -94,7 +94,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void CurrentValue_ShouldReturnStoredValueOfElement_WhenCacheDataContainsElementValue()
         {
             // Arrange
-            _mockDistrbutedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers
                 {
                     Pages = new List<PageAnswers>
@@ -131,7 +131,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void CurrentValue_ShouldReturnEmpty_WhenCacheDataDoesNotContainElementValue()
         {
             // Arrange
-            _mockDistrbutedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers
                 {
                     Pages = new List<PageAnswers>

@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
 
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings
             = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
 
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
@@ -83,7 +83,7 @@ namespace form_builder_tests.UnitTests.Services
                     }
                 });
 
-            _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(
+            _mockDistributedCacheExpirationSettings.Setup(_ => _.Value).Returns(
                 new DistributedCacheExpirationConfiguration
                 {
                     UserData = 30,
@@ -134,7 +134,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _service = new PayService(_mockPaymentProvider.Object, _mockLogger.Object, _mockGateway.Object,
                 _mockCache.Object,
-                _mockDistrbutedCacheExpirationSettings.Object, _mockSessionHelper.Object, _mockMappingService.Object,
+                _mockDistributedCacheExpirationSettings.Object, _mockSessionHelper.Object, _mockMappingService.Object,
                 _mockHostingEnvironment.Object, _mockPageHelper.Object);
         }
 

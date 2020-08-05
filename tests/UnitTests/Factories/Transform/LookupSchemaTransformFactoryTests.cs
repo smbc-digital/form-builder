@@ -37,7 +37,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .WithLookup("lookup")
                 .Build();
 
-            var result = await LookupSchemaTransformFactory.Transform(new FormSchema(){
+            var result = LookupSchemaTransformFactory.Transform(new FormSchema(){
                 Pages = new List<Page>{
                     new Page()
                     {
@@ -65,7 +65,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .WithQuestionId("testid")
                 .Build();
 
-            var result = await Assert.ThrowsAsync<AggregateException>(() => LookupSchemaTransformFactory.Transform(new FormSchema(){
+            var result = Assert.Throws<AggregateException>(() => LookupSchemaTransformFactory.Transform(new FormSchema(){
                 Pages = new List<Page>{
                     new Page()
                     {
@@ -89,7 +89,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .WithOptions(new List<Option>{ new Option { Value = "anotheroption" } })
                 .Build();
 
-            var result = await LookupSchemaTransformFactory.Transform(new FormSchema(){
+            var result = LookupSchemaTransformFactory.Transform(new FormSchema(){
                 Pages = new List<Page>{
                     new Page()
                     {

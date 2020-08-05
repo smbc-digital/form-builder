@@ -5,6 +5,6 @@ namespace form_builder.Factories.Transform.Lookups
 {
     public interface ILookupSchemaTransformFactory
     {
-        Task<FormSchema> Transform(FormSchema formSchema);
+        FormSchema Transform(FormSchema formSchema);
     }
 }

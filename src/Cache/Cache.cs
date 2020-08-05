@@ -17,9 +17,9 @@ namespace form_builder.Cache
     {
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly ISchemaProvider _schemaProvider;
-        private readonly IOptions<DistrbutedCacheConfiguration> _distributedCacheConfiguration;
+        private readonly IOptions<DistributedCacheConfiguration> _distributedCacheConfiguration;
 
-        public Cache(IDistributedCacheWrapper distributedCache, ISchemaProvider schemaProvider, IOptions<DistrbutedCacheConfiguration> distributedCacheConfiguration)
+        public Cache(IDistributedCacheWrapper distributedCache, ISchemaProvider schemaProvider, IOptions<DistributedCacheConfiguration> distributedCacheConfiguration)
         {
             _distributedCache = distributedCache;
             _schemaProvider = schemaProvider;
@@ -31,7 +31,7 @@ namespace form_builder.Cache
             T result;
             var prefix = type == ESchemaType.PaymentConfiguration ? "payment-config/" : string.Empty;
 
-            if (_distributedCacheConfiguration.Value.UseDistrbutedCache && minutes > 0)
+            if (_distributedCacheConfiguration.Value.UseDistributedCache && minutes > 0)
             {
                 var data = _distributedCache.GetString($"{type.ToESchemaTypePrefix()}{cacheKey}");
 
@@ -40,9 +40,7 @@ namespace form_builder.Cache
                     result = await _schemaProvider.Get<T>($"{prefix}{cacheKey}");
 
                     if (result != null)
-                    {
                         await _distributedCache.SetStringAsync($"{type.ToESchemaTypePrefix()}{cacheKey}", JsonConvert.SerializeObject(result), minutes);
-                    };
 
                     return result;
                 }

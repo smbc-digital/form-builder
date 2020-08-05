@@ -23,8 +23,8 @@ namespace form_builder.Factories.Transform.ReusableElements
             // I haven't found a reasonable way to both calculate then changes required and apply them concurrently, 
             // this might be a possible solution; https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8
             // however updating as you enumerate is problematic 
-            // so this is split into to parts 
-            // The first part traverses the lists builds and returns a list of reusable element references that require substiuting into the schema (async)
+            // so this is split into two parts 
+            // The first part traverses the lists builds and returns a list of reusable element references that require substituting into the schema (async)
             // The second part applies the substitutions (sync)
             // TODO: Check the performance of this with larger schemas
             var elementSubstitutions = await GetReusableElementSubstitutions(formSchema);
@@ -35,70 +35,56 @@ namespace form_builder.Factories.Transform.ReusableElements
         {
             var substitutions = new List<Task<ElementSubstitutionRecord>>();
 
-            foreach(var page in formSchema.Pages)
+            foreach (var page in formSchema.Pages)
             {
                 page.Elements
                     .Where(_ => _.Type == EElementType.Reusable)
                     .ToList()
                     .ForEach(_ => substitutions.Add(CreateSubstitutionRecord(page.PageSlug, page.Elements.IndexOf(_), _)));
             }
-            
+
             return await Task.WhenAll<ElementSubstitutionRecord>(substitutions);
         }
 
-        private async Task<ElementSubstitutionRecord> CreateSubstitutionRecord(string slug, int elementIndex, IElement element)
-        {
-            return new ElementSubstitutionRecord
-                        {
-                            PageSlug = slug,
-                            OriginalElementIndex = elementIndex,
-                            SubstituteElement = await CreateSubstituteRecord(element)
-                        };
-        }
+        private async Task<ElementSubstitutionRecord> CreateSubstitutionRecord(string slug, int elementIndex, IElement element) =>
+            new ElementSubstitutionRecord
+            {
+                PageSlug = slug,
+                OriginalElementIndex = elementIndex,
+                SubstituteElement = await CreateSubstituteRecord(element)
+            };
 
         private async Task<IElement> CreateSubstituteRecord(IElement entry)
         {
-            var resuableElement = (Reusable)entry;
+            var reusableElement = (Reusable)entry;
 
-            if(string.IsNullOrEmpty(resuableElement.Properties.QuestionId))
-            {
+            if (string.IsNullOrEmpty(reusableElement.Properties.QuestionId))
                 throw new Exception($"ReusableElementSchemaTransformFactory::CreateSubstituteRecord, no question ID was specified");
-            }
-            
-            if(string.IsNullOrEmpty(resuableElement.ElementRef))
-            {
-                throw new Exception($"ReusableElementSchemaTransformFactory::CreateSubstituteRecord, no resusable element reference ID was specified");
-            }
-            
-            var substituteElement = await _reusableElementTransformDataProvider.Get(resuableElement.ElementRef);
 
-            if(substituteElement == null)
-            {
-                throw new Exception($"ReusableElementSchemaTransformFactory::CreateSubstituteRecord, No subsitute element could be created for question {resuableElement.Properties.QuestionId}");
-            }   
+            if (string.IsNullOrEmpty(reusableElement.ElementRef))
+                throw new Exception($"ReusableElementSchemaTransformFactory::CreateSubstituteRecord, no reusable element reference ID was specified");
 
-            substituteElement.Properties.QuestionId = resuableElement.Properties.QuestionId;
+            var substituteElement = await _reusableElementTransformDataProvider.Get(reusableElement.ElementRef);
 
-            if(!string.IsNullOrEmpty(entry.Properties.TargetMapping))
-            {
-                substituteElement.Properties.TargetMapping = resuableElement.Properties.TargetMapping;
-            }
-            
-            if(resuableElement.Properties.Optional)
-            {
-                substituteElement.Properties.Optional = true;            
-            }
+            if (substituteElement == null)
+                throw new Exception($"ReusableElementSchemaTransformFactory::CreateSubstituteRecord, No substitute element could be created for question {reusableElement.Properties.QuestionId}");
+
+            substituteElement.Properties.QuestionId = reusableElement.Properties.QuestionId;
+
+            if (!string.IsNullOrEmpty(entry.Properties.TargetMapping))
+                substituteElement.Properties.TargetMapping = reusableElement.Properties.TargetMapping;
+
+            if (reusableElement.Properties.Optional)
+                substituteElement.Properties.Optional = true;
 
             return substituteElement;
         }
 
         public FormSchema ApplyReusableElementSubstitutions(FormSchema formSchema, IEnumerable<ElementSubstitutionRecord> substitutions)
         {
-            if(!substitutions.Any())
-            {
+            if (!substitutions.Any())
                 return formSchema;
-            }
-            
+
             substitutions
                 .ToList()
                 .ForEach(substitution => formSchema
@@ -108,7 +94,6 @@ namespace form_builder.Factories.Transform.ReusableElements
             return formSchema;
         }
     }
-
 
     public class ElementSubstitutionRecord
     {
