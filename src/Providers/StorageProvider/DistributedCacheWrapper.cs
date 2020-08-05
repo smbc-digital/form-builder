@@ -1,9 +1,9 @@
-﻿using form_builder.Configuration;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using form_builder.Configuration;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 
 namespace form_builder.Providers.StorageProvider
 {
@@ -23,45 +23,35 @@ namespace form_builder.Providers.StorageProvider
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
-        public string GetString(string key)
-        {
-            return _distributedCache.GetString(key);
-        }
+        public string GetString(string key) =>
+            _distributedCache.GetString(key);
 
-        public Task<byte[]> GetAsync(string key, CancellationToken token = default)
-        {
-            return _distributedCache.GetAsync(key, token);
-        }
+        public Task<byte[]> GetAsync(string key, CancellationToken token = default) =>
+            _distributedCache.GetAsync(key, token);
 
         public void Refresh(string key)
         {
             _distributedCache.Refresh(key);
         }
 
-        public Task RefreshAsync(string key, CancellationToken token = default)
-        {
-            return _distributedCache.RefreshAsync(key, token);
-        }
+        public Task RefreshAsync(string key, CancellationToken token = default) =>
+            _distributedCache.RefreshAsync(key, token);
 
         public void Remove(string key)
         {
             _distributedCache.Remove(key);
         }
 
-        public Task RemoveAsync(string key, CancellationToken token = default)
-        {
-            return _distributedCache.RemoveAsync(key, token);
-        }
+        public Task RemoveAsync(string key, CancellationToken token = default) =>
+            _distributedCache.RemoveAsync(key, token);
 
         public void Set(string key, byte[] value, DistributedCacheEntryOptions options)
         {
             _distributedCache.Set(key, value, options);
         }
 
-        public Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options, CancellationToken token = default)
-        {
-            return _distributedCache.SetAsync(key, value, options, token);
-        }
+        public Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options, CancellationToken token = default) =>
+            _distributedCache.SetAsync(key, value, options, token);
 
         public Task SetStringAsync(string key, string value, CancellationToken token = default)
         {
@@ -81,9 +71,7 @@ namespace form_builder.Providers.StorageProvider
             return _distributedCache.SetStringAsync(key, value, distributedCacheOptions, token);
         }
 
-        public byte[] Get(string key)
-        {
-            return _distributedCache.Get(key);
-        }
+        public byte[] Get(string key) =>
+            _distributedCache.Get(key);
     }
 }

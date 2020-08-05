@@ -1,10 +1,10 @@
-﻿using form_builder.Constants;
+﻿using System.Collections.Generic;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models.Elements;
-using System.Collections.Generic;
 
 namespace form_builder.Validators
-{ 
+{
     public class TimeInputValidator : IElementValidator
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)

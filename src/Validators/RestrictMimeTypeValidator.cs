@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using MimeDetective;
-using Newtonsoft.Json;
-using System.Text;
-using form_builder.Constants;
-using System;
-using System.Linq;
 
 namespace form_builder.Validators
 {
