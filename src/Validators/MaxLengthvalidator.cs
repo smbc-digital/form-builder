@@ -26,7 +26,7 @@ namespace form_builder.Validators
 
             var value = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId] : "";
             
-            if(!string.IsNullOrEmpty(value) && value.Length > element.Properties.MaxLength)
+            if (!string.IsNullOrEmpty(value) && value.Length > element.Properties.MaxLength)
             {
                 return new ValidationResult
                 {

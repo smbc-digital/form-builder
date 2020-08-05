@@ -29,6 +29,7 @@ namespace form_builder.Models.Elements
             elementHelper.ReSelectPreviousSelectedOptions(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckForSelectOptions(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
     }

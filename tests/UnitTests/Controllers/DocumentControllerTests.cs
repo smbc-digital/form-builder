@@ -1,13 +1,13 @@
-using Xunit;
-using form_builder.Controllers.Document;
-using Moq;
-using Microsoft.Extensions.Logging;
-using form_builder.Services.DocumentService;
-using form_builder.Enum;
 using System;
-using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using form_builder.Controllers.Document;
+using form_builder.Enum;
 using form_builder.Exceptions;
+using form_builder.Workflows.DocumentWorkflow;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Moq;
+using Xunit;
 
 namespace form_builder_tests.UnitTests.Controllers
 {

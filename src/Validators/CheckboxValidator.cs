@@ -17,7 +17,6 @@ namespace form_builder.Validators
             }
 
             var containsValue = viewModel.ContainsKey(element.Properties.QuestionId);
-
             if(!containsValue && element.Properties.Optional) {
                 return new ValidationResult
                 {
@@ -26,7 +25,6 @@ namespace form_builder.Validators
             }
 
             dynamic value = viewModel[element.Properties.QuestionId] as List<string> ?? viewModel[element.Properties.QuestionId];
-
             if (value == null)
             {
                 return new ValidationResult

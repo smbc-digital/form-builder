@@ -97,7 +97,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
             // Assert
-            Assert.Equal("Page model, Submit: No postUrl supplied for submit form", result.Message);
+            Assert.Equal("Page model::GetSubmitFormEndpoint, No postUrl supplied for submit form", result.Message);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
         }
 

@@ -12,7 +12,9 @@ namespace form_builder.Models.Actions
     public interface IAction
     {
         EActionType Type { get; set; }
+
         BaseActionProperty Properties { get; set; }
+
         Task Process(IActionHelper actionHelper, IEmailProvider emailProvider, FormAnswers formAnswers);
     }
 }

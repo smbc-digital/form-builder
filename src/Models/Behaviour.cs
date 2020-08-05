@@ -20,8 +20,11 @@ namespace form_builder.Models
     public class SubmitSlug
     {
         public string Environment { get; set; }
+
         public string URL { get; set; }
+
         public string AuthToken { get; set; }
+
         public string CallbackUrl { get; set; }
     }
 }

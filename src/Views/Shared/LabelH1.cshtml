@@ -1,21 +1,23 @@
-    @if(!string.IsNullOrEmpty(Model.Label))
+@if (!string.IsNullOrEmpty(Model.Label))
+{
+    @if (Model.Properties.LabelAsH1 || Model.Properties.LegendAsH1)
     {
-        @if(Model.Properties.LabelAsH1 || Model.Properties.LegendAsH1)
-        {
-            <h1 class="govuk-label-wrapper">
-                <label class="govuk-label govuk-label--l" for="@Model.QuestionId">
-                    @Model.Label
-                    @if (Model.Properties.Optional) { <span class="smbc-body">(optional)</span> }
-                </label>
-            </h1>
-        } 
-        else 
-        {
-            <label class="govuk-label @(Model.Properties.StrongLabel ? "govuk-label--m" : string.Empty)" for="@Model.QuestionId">@Model.Label
+        <h1 class="govuk-label-wrapper">
+            <label class="govuk-label govuk-label--l" for="@Model.QuestionId">
+                @Model.Label
+                @if (Model.Properties.Optional)
+                {<span class="smbc-body">(optional)</span>}
+            </label>
+        </h1>
+    }
+    else
+    {
+        <label class="govuk-label @(Model.Properties.StrongLabel ? "govuk-label--m" : string.Empty)" for="@Model.QuestionId">
+            @Model.Label
             @if (Model.Properties.Optional)
             {
                 <span class="smbc-body">(optional)</span>
-            }    
-            </label>
-        }
+            }
+        </label>
     }
+}

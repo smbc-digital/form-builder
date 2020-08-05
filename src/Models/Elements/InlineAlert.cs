@@ -25,6 +25,7 @@ namespace form_builder.Models.Elements
             List<object> results = null)
         {
             elementHelper.CheckIfLabelAndTextEmpty(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
     }

@@ -43,22 +43,31 @@ namespace form_builder.Mappers
             {
                 case EElementType.DateInput:
                     return GetDateInputElementValue(key, formAnswers);
+
                 case EElementType.DatePicker:
                     return GetDatePickerElementValue(key, formAnswers);
+
                 case EElementType.Checkbox:
                     return GetCheckboxElementValue(key, formAnswers);
+
                 case EElementType.Declaration:
                     return GetDeclarationElementValue(key, formAnswers);
+
                 case EElementType.TimeInput:
                     return GetTimeElementValue(key, formAnswers);
+
                 case EElementType.Address:
                     return GetAddressElementValue(key, formAnswers);
+
                 case EElementType.Street:
                     return GetStreetElementValue(key, formAnswers);
+
                 case EElementType.Organisation:
                     return GetOrganisationElementValue(key, formAnswers);
+
                 case EElementType.FileUpload:
                     return GetFileUploadElementValue(key, formAnswers);
+
                 default:
                     if (element.Properties.Numeric)
                         return GetNumericElementValue(key, formAnswers);

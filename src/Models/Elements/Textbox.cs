@@ -27,6 +27,7 @@ namespace form_builder.Models.Elements
             Properties.Value = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
@@ -49,19 +50,13 @@ namespace form_builder.Models.Elements
             }
 
             if(Properties.Telephone == true)
-            {
                 properties["autocomplete"] = "tel";
-            }
 
             if (DisplayAriaDescribedby)
-            {
                 properties.Add("aria-describedby", GetDescribedByAttributeValue());
-            }
 
             if (!string.IsNullOrEmpty(Properties.Purpose))
-            {
                 properties.Add("autocomplete", Properties.Purpose);
-            }
 
             return properties;
         }

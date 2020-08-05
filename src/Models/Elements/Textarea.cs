@@ -29,6 +29,7 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckForMaxLength(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
@@ -43,9 +44,7 @@ namespace form_builder.Models.Elements
             };
 
             if (Properties.MaxLength >= 200)
-            {
                 properties.Add("rows", Properties.MaxLength > 500 ? "15" : "5");
-            }
 
             if (!DisplayAriaDescribedby)
                 return properties;

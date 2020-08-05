@@ -7,7 +7,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            if(string.IsNullOrEmpty(element.Properties.RequiredIf))
+            if (string.IsNullOrEmpty(element.Properties.RequiredIf))
             {
                 return new ValidationResult
                 {
@@ -16,11 +16,10 @@ namespace form_builder.Validators
             }
 
             var isValid = true;
-
-            string[] requiredIf = element.Properties.RequiredIf.Split(':');
+            var requiredIf = element.Properties.RequiredIf.Split(':');
             var requiredKey = requiredIf[0];
 
-            dynamic answeredValue = "";
+            dynamic answeredValue = string.Empty;
             if (!viewModel.TryGetValue(requiredKey, out answeredValue))
             {
                 return new ValidationResult
@@ -28,7 +27,7 @@ namespace form_builder.Validators
                     IsValid = true
                 };
             }
-            
+
             answeredValue = viewModel[requiredKey];
 
             if (answeredValue == requiredIf[1])
@@ -39,11 +38,11 @@ namespace form_builder.Validators
                 }
                 else
                 {
-                    dynamic value = "";
+                    dynamic value = string.Empty;
                     if (viewModel.TryGetValue(element.Properties.QuestionId, out value))
                     {
                         isValid = true;
-                        if (value == string.Empty) isValid = false; 
+                        if (value == string.Empty) isValid = false;
                     }
                     else
                     {
@@ -52,10 +51,13 @@ namespace form_builder.Validators
                 }
             }
 
-            return new ValidationResult{
-                    IsValid = isValid,
-                    Message = isValid ? string.Empty : !string.IsNullOrEmpty(element.Properties.RequiredIfValidationMessage) ? element.Properties.RequiredIfValidationMessage : $"Check the { element.Properties.Label} and try again."
-                }; 
+            return new ValidationResult
+            {
+                IsValid = isValid,
+                Message = isValid ? string.Empty
+                    : !string.IsNullOrEmpty(element.Properties.RequiredIfValidationMessage)
+                    ? element.Properties.RequiredIfValidationMessage : $"Check the { element.Properties.Label} and try again."
+            };
         }
     }
 }

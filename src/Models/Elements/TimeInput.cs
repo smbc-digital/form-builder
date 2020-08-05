@@ -30,6 +30,7 @@ namespace form_builder.Models.Elements
             Properties.AmPm = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, TimeConstants.AM_PM_SUFFIX);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
     }

@@ -62,17 +62,19 @@ namespace form_builder
                 .AddServices()
                 .AddWorkflows()
                 .AddFactories()
-                .AddSession(_ => {
+                .AddSession(_ =>
+                {
                     _.IdleTimeout = TimeSpan.FromMinutes(30);
                     _.Cookie.Path = "/";
                 });
-                
+
             services.AddTransient<ICache, Cache.Cache>();
             services.Configure<SubmissionServiceConfiguration>(Configuration.GetSection("SubmissionServiceConfiguration"));
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
 
             services.AddMvc()
-                .AddMvcOptions(options => {
+                .AddMvcOptions(options =>
+                {
                     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                     options.ModelBinderProviders.Insert(0, new CustomFormFileModelBinderProvider());
                 })
@@ -87,7 +89,7 @@ namespace form_builder
             {
                 services.AddHttpClient<ICivicaPayGateway, CivicaPayTestGateway>(Configuration);
             }
-            
+
             services.AddHttpClient<IVerintServiceGateway, VerintServiceGateway>(Configuration);
             services.AddHttpClient<IAddressServiceGateway, AddressServiceGateway>(Configuration);
             services.AddHttpClient<IStreetServiceGateway, StreetServiceGateway>(Configuration);

@@ -10,9 +10,8 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-
-            if (element.Type == EElementType.DateInput || element.Type == EElementType.Map || 
-                element.Type == EElementType.TimeInput || element.Type == EElementType.DatePicker || 
+            if (element.Type == EElementType.DateInput || element.Type == EElementType.Map ||
+                element.Type == EElementType.TimeInput || element.Type == EElementType.DatePicker ||
                 element.Properties.Optional || (element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
@@ -22,7 +21,6 @@ namespace form_builder.Validators
             }
 
             var key = element.Properties.QuestionId;
-
             var validationMessage = string.Empty;
 
             if (element.Type != EElementType.Address && element.Type != EElementType.Street && element.Type != EElementType.Organisation)
@@ -56,7 +54,6 @@ namespace form_builder.Validators
                 {
                     key = $"{element.Properties.QuestionId}-street";
                     validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Select the street from the list";
-
                 }
                 else
                 {
@@ -71,7 +68,6 @@ namespace form_builder.Validators
                 {
                     key = $"{element.Properties.QuestionId}-organisation";
                     validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Select the organisation from the list";
-
                 }
                 else
                 {
@@ -94,10 +90,10 @@ namespace form_builder.Validators
                 var value = viewModel.ContainsKey(key)
                 ? viewModel[key]
                 : null;
-                
+
                 isValid = !string.IsNullOrEmpty(value);
             }
-            
+
             return new ValidationResult
             {
                 IsValid = isValid,

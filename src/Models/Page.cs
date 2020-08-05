@@ -62,7 +62,7 @@ namespace form_builder.Models
                     return ValidatableElements.Where(element => !element.IsValid).Select(element => element.Properties);
                 }
 
-                throw new System.Exception("Model is not validated, please call Validate()");
+                throw new Exception("Model is not validated, please call Validate()");
             }
         }
 
@@ -112,7 +112,7 @@ namespace form_builder.Models
                     return behaviour;
             }
 
-            throw new Exception("Page model, There was a problem whilst processing behaviors");
+            throw new Exception("Page::GetNextPage, There was a problem whilst processing behaviors");
         }
 
         public bool CheckPageMeetsConditions(Dictionary<string, dynamic> answers)
@@ -129,9 +129,7 @@ namespace form_builder.Models
 
             var pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitForm);
             if (pageSubmitBehaviours.Count == 0)
-            {
                 pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitAndPay);
-            }
 
             if (Behaviours.Count > 1)
             {
@@ -143,9 +141,9 @@ namespace form_builder.Models
                 previousPage.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
                 var foundSubmitBehaviour = GetNextPage(viewModel);
 
-                submitBehaviour = foundSubmitBehaviour.SubmitSlugs.ToList()
-                    .Where(x => x.Environment.ToLower() == environment.ToLower())
-                    .FirstOrDefault();
+                submitBehaviour = foundSubmitBehaviour.SubmitSlugs
+                    .ToList()
+                    .FirstOrDefault(x => x.Environment.ToLower().Equals(environment.ToLower()));
             }
             else
             {
@@ -155,38 +153,22 @@ namespace form_builder.Models
                 }
                 else
                 {
-                    var behaviour = pageSubmitBehaviours.SelectMany(x => x.SubmitSlugs)
-                        .Where(x => x.Environment.ToLower() == environment.ToLower())
-                        .FirstOrDefault();
+                    var behaviour = pageSubmitBehaviours
+                        .SelectMany(x => x.SubmitSlugs)
+                        .FirstOrDefault(x => x.Environment.ToLower().Equals(environment.ToLower()));
 
-                    if (behaviour == null)
-                    {
-                        throw new NullReferenceException("Page model, Submit: No Url supplied for submit form");
-                    }
-
-                    submitBehaviour = behaviour;
+                    submitBehaviour = behaviour ?? throw new NullReferenceException("Page model::GetSubmitFormEndpoint, No Url supplied for submit form");
                 }
             }
 
-            if (string.IsNullOrEmpty(submitBehaviour.URL))
-            {
-                throw new NullReferenceException("Page model, Submit: No postUrl supplied for submit form");
-            }
-
-            return submitBehaviour;
+            return string.IsNullOrEmpty(submitBehaviour.URL)
+                ? throw new NullReferenceException(
+                    "Page model::GetSubmitFormEndpoint, No postUrl supplied for submit form")
+                : submitBehaviour;
         }
 
-        private List<Behaviour> GetBehavioursByType(EBehaviourType type) =>
-            Behaviours.Where(_ => _.BehaviourType == type).ToList();
+        private List<Behaviour> GetBehavioursByType(EBehaviourType type) => Behaviours.Where(_ => _.BehaviourType == type).ToList();
 
-        public string GetPageTitle()
-        {
-            if (Elements.Any() && HideTitle)
-            {
-                return Elements.First().Properties.Label;
-            }
-
-            return Title;
-        }
+        public string GetPageTitle() => Elements.Any() && HideTitle ? Elements.First().Properties.Label : Title;
     }
 }

@@ -21,7 +21,6 @@ namespace form_builder.Validators
             var date = viewModel[element.Properties.QuestionId];
 
             var isValid = !string.IsNullOrEmpty(date);
-
             if (!isValid && element.Properties.Optional)
             {
                 return new ValidationResult

@@ -19,17 +19,29 @@ namespace form_builder.Models.Elements
         }
 
         public EElementType Type { get; set; }
+
         public BaseProperty Properties { get; set; }
+
         public virtual bool DisplayHint => !string.IsNullOrEmpty(Properties.Hint.Trim());
+
         public bool HadCustomClasses => !string.IsNullOrEmpty(Properties.ClassName);
+
         public virtual string QuestionId => Properties.QuestionId;
+
         public virtual string Label => Properties.Label;        
+
         public virtual string Hint => Properties.Hint;
+
         public virtual string HintId => $"{QuestionId}-hint"; 
+
         public virtual string ErrorId => $"{QuestionId}-error"; 
+
         public bool DisplayAriaDescribedby => DisplayHint || !IsValid; 
+
         public bool IsValid => validationResult.IsValid; 
+
         public string ValidationMessage => validationResult.Message;
+
         public string Lookup { get; set; }
         
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators)

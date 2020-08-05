@@ -30,7 +30,6 @@ namespace form_builder.Validators
                 : null;
 
             var isOptional = string.IsNullOrEmpty(valueDay) && string.IsNullOrEmpty(valueMonth) && string.IsNullOrEmpty(valueYear) && element.Properties.Optional;
-
             if (isOptional)
             {
                 return new ValidationResult
@@ -40,18 +39,18 @@ namespace form_builder.Validators
             }
 
             var isValid = !string.IsNullOrEmpty(valueDay) || !string.IsNullOrEmpty(valueMonth) || !string.IsNullOrEmpty(valueYear);
-
             if (!isValid)
             {
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the date and try again"
+                    Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage)
+                        ? element.Properties.CustomValidationMessage
+                        : "Check the date and try again"
                 };
             }
 
             var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out DateTime date);
-
             if (isValidDate)
             {
                 var maxYear = DateTime.Now.Year + 100;
@@ -60,7 +59,9 @@ namespace form_builder.Validators
                     return new ValidationResult
                     {
                         IsValid = false,
-                        Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) ? element.Properties.UpperLimitValidationMessage : $"Year must be less than or equal to {maxYear}"
+                        Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) 
+                            ? element.Properties.UpperLimitValidationMessage 
+                            : $"Year must be less than or equal to {maxYear}"
                     };
                 }
             }
@@ -68,7 +69,9 @@ namespace form_builder.Validators
             return new ValidationResult
             {
                 IsValid = isValidDate,
-                Message = isValidDate ? string.Empty : !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidDate) ? element.Properties.ValidationMessageInvalidDate : "Check the date and try again"
+                Message = isValidDate
+                    ? string.Empty 
+                    : !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidDate) ? element.Properties.ValidationMessageInvalidDate : "Check the date and try again"
             };
         }
     }

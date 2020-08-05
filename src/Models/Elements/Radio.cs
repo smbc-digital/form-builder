@@ -28,6 +28,7 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForLabel(this);
             elementHelper.CheckForRadioOptions(this);
             elementHelper.ReCheckPreviousRadioOptions(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
     }
