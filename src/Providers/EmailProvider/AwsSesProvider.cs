@@ -5,19 +5,16 @@ using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
 using form_builder.Builders.Email;
 using form_builder.Models;
-using Microsoft.Extensions.Logging;
 
 namespace form_builder.Providers.EmailProvider
 {
     public class AwsSesProvider : IEmailProvider
     {
         private readonly IAmazonSimpleEmailService _emailService;
-        private readonly ILogger<AwsSesProvider> _logger;
 
-        public AwsSesProvider(IAmazonSimpleEmailService emailService, ILogger<AwsSesProvider> logger)
+        public AwsSesProvider(IAmazonSimpleEmailService emailService)
         {
             _emailService = emailService;
-            _logger = logger;
         }
 
         public async Task<HttpStatusCode> SendEmail(EmailMessage emailMessage)

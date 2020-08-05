@@ -17,6 +17,7 @@ namespace form_builder.Providers.Organisation
         {
             _organisationServiceGateway = organisationServiceGateway;
         }
+
         public async Task<IEnumerable<OrganisationSearchResult>> SearchAsync(string organisation)
         {
             var result = await _organisationServiceGateway.SearchAsync(new OrganisationSearch { OrganisationProvider = EOrganisationProvider.CRM, SearchTerm = organisation });

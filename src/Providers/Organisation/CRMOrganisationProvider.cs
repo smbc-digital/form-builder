@@ -15,6 +15,7 @@ namespace form_builder.Providers.Organisation
         {
             _verintServiceGateway = verintServiceGateway;
         }
+
         public async Task<IEnumerable<OrganisationSearchResult>> SearchAsync(string organisation)
         {
             var result = await _verintServiceGateway.SearchForOrganisationByName(organisation);

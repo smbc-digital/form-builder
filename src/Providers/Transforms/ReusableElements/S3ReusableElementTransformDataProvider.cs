@@ -15,15 +15,13 @@ namespace form_builder.Providers.Transforms.ReusableElements
     public class S3ReusableElementTransformDataProvider : IReusableElementTransformDataProvider
     {
         private readonly IS3Gateway _s3Gateway;
-        private readonly ILogger<S3ReusableElementTransformDataProvider> _logger;
-        private readonly IWebHostEnvironment _enviroment;
+        private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
 
-        public S3ReusableElementTransformDataProvider(IS3Gateway s3Service, ILogger<S3ReusableElementTransformDataProvider> logger, IWebHostEnvironment enviroment, IConfiguration configuration)
+        public S3ReusableElementTransformDataProvider(IS3Gateway s3Service, ILogger<S3ReusableElementTransformDataProvider> logger, IWebHostEnvironment environment, IConfiguration configuration)
         {
             _s3Gateway = s3Service;
-            _logger = logger;
-            _enviroment = enviroment;
+            _environment = environment;
             _configuration = configuration;
         }
 
@@ -31,7 +29,7 @@ namespace form_builder.Providers.Transforms.ReusableElements
         {
             try
             {
-                var s3Result = await _s3Gateway.GetObject(_configuration["S3BucketKey"], $"{_enviroment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName}.json");
+                var s3Result = await _s3Gateway.GetObject(_configuration["S3BucketKey"], $"{_environment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName}.json");
 
                 using (Stream responseStream = s3Result.ResponseStream)
                 using (StreamReader reader = new StreamReader(responseStream))
@@ -42,7 +40,7 @@ namespace form_builder.Providers.Transforms.ReusableElements
             }
             catch (AmazonS3Exception e)
             {
-                var ex = new Exception($"S3ReusableElementTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_enviroment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName} ", e);
+                var ex = new Exception($"S3ReusableElementTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_environment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName} ", e);
                 throw ex;
             }
             catch (Exception e)

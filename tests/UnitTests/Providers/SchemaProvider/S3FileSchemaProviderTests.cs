@@ -15,7 +15,6 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
     {
         private readonly S3FileSchemaProvider _s3Schema;
         private readonly Mock<IS3Gateway> _mockS3gateway = new Mock<IS3Gateway>();
-        private readonly Mock<ILogger<S3FileSchemaProvider>> _mockLogger = new Mock<ILogger<S3FileSchemaProvider>>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
 
@@ -23,7 +22,7 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("uitest");
             _mockConfiguration.Setup(_ => _["S3BucketKey"]).Returns("forms-storage");
-            _s3Schema = new S3FileSchemaProvider(_mockS3gateway.Object, _mockLogger.Object, _mockHostingEnv.Object, _mockConfiguration.Object);
+            _s3Schema = new S3FileSchemaProvider(_mockS3gateway.Object, _mockHostingEnv.Object, _mockConfiguration.Object);
         }
 
         [Fact]

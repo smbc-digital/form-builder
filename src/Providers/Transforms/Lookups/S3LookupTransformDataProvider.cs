@@ -14,15 +14,13 @@ namespace form_builder.Providers.Transforms.Lookups
     public class S3LookupTransformDataProvider : ILookupTransformDataProvider
     {
         private readonly IS3Gateway _s3Gateway;
-        private readonly ILogger<S3LookupTransformDataProvider> _logger;
-        private readonly IWebHostEnvironment _enviroment;
+        private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
 
-        public S3LookupTransformDataProvider(IS3Gateway s3Service, ILogger<S3LookupTransformDataProvider> logger, IWebHostEnvironment enviroment, IConfiguration configuration)
+        public S3LookupTransformDataProvider(IS3Gateway s3Service, IWebHostEnvironment environment, IConfiguration configuration)
         {
             _s3Gateway = s3Service;
-            _logger = logger;
-            _enviroment = enviroment;
+            _environment = environment;
             _configuration = configuration;
         }
 
@@ -30,7 +28,7 @@ namespace form_builder.Providers.Transforms.Lookups
         {
             try
             {
-                var s3Result = await _s3Gateway.GetObject(_configuration["S3BucketKey"], $"{_enviroment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName}.json");
+                var s3Result = await _s3Gateway.GetObject(_configuration["S3BucketKey"], $"{_environment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName}.json");
 
                 using (Stream responseStream = s3Result.ResponseStream)
                 using (StreamReader reader = new StreamReader(responseStream))
@@ -41,7 +39,7 @@ namespace form_builder.Providers.Transforms.Lookups
             }
             catch (AmazonS3Exception e)
             {
-                var ex = new Exception($"S3LookupTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_enviroment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName} ", e);
+                var ex = new Exception($"S3LookupTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_environment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName} ", e);
                 throw ex;
             }
             catch (Exception e)

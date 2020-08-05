@@ -17,14 +17,13 @@ namespace form_builder_tests.UnitTests.Providers.EmailProvider
     {
         private readonly IEmailProvider _provider;
         private readonly Mock<IAmazonSimpleEmailService> _mockEmailService = new Mock<IAmazonSimpleEmailService>();
-        private readonly Mock<ILogger<AwsSesProvider>> _mockLogger = new Mock<ILogger<AwsSesProvider>>();
 
         public AwsSesProviderTests()
         {
             _mockEmailService.Setup(_ => _.SendRawEmailAsync(It.IsAny<SendRawEmailRequest>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new SendRawEmailResponse { HttpStatusCode = HttpStatusCode.OK, MessageId = "test", ResponseMetadata = new ResponseMetadata { RequestId = "test" } });
 
-            _provider = new AwsSesProvider(_mockEmailService.Object, _mockLogger.Object);
+            _provider = new AwsSesProvider(_mockEmailService.Object);
         }
 
         [Fact]

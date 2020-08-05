@@ -12,12 +12,12 @@ namespace form_builder.Providers.DocumentCreation.Generic
         {
             using (var stream = new MemoryStream())
             {
-                var objstreamwriter = new StreamWriter(stream);
+                var objStreamWriter = new StreamWriter(stream);
                 fileContent.ForEach((line) => {
-                    objstreamwriter.WriteLine(line);
+                    objStreamWriter.WriteLine(line);
                 });
-                objstreamwriter.Flush();
-                objstreamwriter.Close(); 
+                objStreamWriter.Flush();
+                objStreamWriter.Close(); 
                 return stream.ToArray();
             }
         }
