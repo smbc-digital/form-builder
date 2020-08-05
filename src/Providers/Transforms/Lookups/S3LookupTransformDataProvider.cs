@@ -6,7 +6,6 @@ using form_builder.Extensions;
 using form_builder.Gateways;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace form_builder.Providers.Transforms.Lookups

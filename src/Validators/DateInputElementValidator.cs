@@ -1,7 +1,7 @@
-﻿using form_builder.Enum;
-using form_builder.Models.Elements;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using form_builder.Enum;
+using form_builder.Models.Elements;
 
 namespace form_builder.Validators
 {

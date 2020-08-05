@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
-using StockportGovUK.NetStandard.Models.Organisation;
-using StockportGovUK.NetStandard.Models.Enums;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
+using StockportGovUK.NetStandard.Models.Enums;
+using StockportGovUK.NetStandard.Models.Organisation;
+using StockportGovUK.NetStandard.Models.Verint.Lookup;
 
 namespace form_builder.Providers.Organisation
 {

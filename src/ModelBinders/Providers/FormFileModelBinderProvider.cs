@@ -1,8 +1,8 @@
-﻿using form_builder.Models;
+﻿using System;
+using System.Collections.Generic;
+using form_builder.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using System;
-using System.Collections.Generic;
 
 namespace form_builder.ModelBinders.Providers
 {

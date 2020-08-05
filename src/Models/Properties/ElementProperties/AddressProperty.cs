@@ -1,6 +1,6 @@
 ﻿namespace form_builder.Models.Properties.ElementProperties
 {
-        public partial class BaseProperty
+    public partial class BaseProperty
         {
                 public string AddressManualAddressLine1 { get; set; } = string.Empty;
                 public string AddressManualAddressLine2 { get; set; } = string.Empty;

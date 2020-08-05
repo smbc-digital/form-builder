@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using System.IO;
 using form_builder.Enum;
-using System.Collections.Generic;
 
 namespace form_builder.Providers.DocumentCreation.Generic
 {

@@ -1,13 +1,12 @@
-using form_builder.Conditions;
-using form_builder.Enum;
-using form_builder.Models.Elements;
-using form_builder.Models.Properties;
-using form_builder.Validators;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using form_builder.Conditions;
+using form_builder.Enum;
+using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
+using form_builder.Validators;
+using Newtonsoft.Json;
 
 namespace form_builder.Models
 {

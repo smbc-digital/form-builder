@@ -1,4 +1,6 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models.Properties.ElementProperties;
@@ -7,9 +9,6 @@ using JsonSubTypes;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using form_builder.Models.Properties.ElementProperties;
 
 namespace form_builder.Models.Elements
 {

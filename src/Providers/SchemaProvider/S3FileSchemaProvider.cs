@@ -1,13 +1,13 @@
-﻿using form_builder.Models;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 using Amazon.S3;
-using Microsoft.AspNetCore.Hosting;
 using form_builder.Extensions;
 using form_builder.Gateways;
+using form_builder.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace form_builder.Providers.SchemaProvider
 {

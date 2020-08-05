@@ -1,4 +1,7 @@
-﻿using form_builder.Constants;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers;
@@ -6,9 +9,6 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Validators;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
 {

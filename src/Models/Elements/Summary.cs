@@ -1,12 +1,12 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
+using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
-using System.Text.Encodings.Web;
 
 
 namespace form_builder.Models.Elements
