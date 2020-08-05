@@ -1,11 +1,11 @@
-    @if (!Model.IsValid)
-    {        
-        var viewModel = new form_builder.ViewModels.ErrorViewModel
-        {
-            IsValid = Model.IsValid,
-            Message = Model.ValidationMessage,
-            Id = Model.ErrorId
-        };
+@if (!Model.IsValid)
+{
+    var viewModel = new form_builder.ViewModels.ErrorViewModel
+    {
+        IsValid = Model.IsValid,
+        Message = Model.ValidationMessage,
+        Id = Model.ErrorId
+    };
 
-        <partial model=viewModel name="ErrorBase" />
-    }
+    <partial model=viewModel name="ErrorBase" />
+}

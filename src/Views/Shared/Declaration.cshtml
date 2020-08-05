@@ -8,64 +8,64 @@
     var hint = Model.Properties.Hint;
 }
 
-    <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-        @Html.BeginFieldSet(Model)
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    @Html.BeginFieldSet(Model)
 
 
-        @if (Model.Properties.LegendAsH1)
-        {
-            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                <h1 class="govuk-fieldset__heading">
-                    @Model.Properties.Label
-                    @if (Model.Properties.Optional)
-                    {
-                        <span class="smbc-body">(optional)</span>
-                    }
-
-                </h1>
-            </legend>
-        }
-        else
-        {
-            <legend class="govuk-fieldset__legend">
+    @if (Model.Properties.LegendAsH1)
+    {
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h1 class="govuk-fieldset__heading">
                 @Model.Properties.Label
                 @if (Model.Properties.Optional)
                 {
                     <span class="smbc-body">(optional)</span>
                 }
-            </legend>
-        }
 
-        <partial name="Hint" />
+            </h1>
+        </legend>
+    }
+    else
+    {
+        <legend class="govuk-fieldset__legend">
+            @Model.Properties.Label
+            @if (Model.Properties.Optional)
+            {
+                <span class="smbc-body">(optional)</span>
+            }
+        </legend>
+    }
 
-        <partial name="Error" />
+    <partial name="Hint" />
 
-        <div class="govuk-checkboxes">
-            <div class="govuk-checkboxes__item">
-                @if (Model.Properties.Checked)
-                {
-                    <input class="govuk-checkboxes__input" type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
-                }
-                else if (!string.IsNullOrEmpty(Model.Properties.Value))
+    <partial name="Error" />
 
-                {
-                    <input class="govuk-checkboxes__input" type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
-                }
-                else
-                {
-                    <input class="govuk-checkboxes__input" type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" />
-                }
+    <div class="govuk-checkboxes">
+        <div class="govuk-checkboxes__item">
+            @if (Model.Properties.Checked)
+            {
+                <input class="govuk-checkboxes__input" type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
+            }
+            else if (!string.IsNullOrEmpty(Model.Properties.Value))
 
-                @if (Model.Properties.Optional)
-                {
-                    <label class="govuk-label govuk-checkboxes__label" for="@itemId">@Model.Properties.Text</label>
-                }
-                else
-                {
-                    <label class="govuk-label govuk-checkboxes__label" for="@itemId">@Model.Properties.Text</label>
-                }
-            </div>
+            {
+                <input class="govuk-checkboxes__input" type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
+            }
+            else
+            {
+                <input class="govuk-checkboxes__input" type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" />
+            }
+
+            @if (Model.Properties.Optional)
+            {
+                <label class="govuk-label govuk-checkboxes__label" for="@itemId">@Model.Properties.Text</label>
+            }
+            else
+            {
+                <label class="govuk-label govuk-checkboxes__label" for="@itemId">@Model.Properties.Text</label>
+            }
         </div>
-
-        @Html.EndFieldSet()
     </div>
+
+    @Html.EndFieldSet()
+</div>

@@ -16,7 +16,6 @@ namespace form_builder.Validators
             }
 
             var value = viewModel[element.Properties.QuestionId];
-
             if(string.IsNullOrEmpty(value) && element.Properties.Optional)
             {
                 return new ValidationResult
@@ -26,7 +25,6 @@ namespace form_builder.Validators
             }
 
             var isValid = int.TryParse(value, out int output);
-
             if (!isValid)
             {
                 return new ValidationResult
@@ -36,7 +34,7 @@ namespace form_builder.Validators
                 };
             }
 
-            if(value.Length > element.Properties.MaxLength)
+            if (value.Length > element.Properties.MaxLength)
             {
                 return new ValidationResult
                 {
@@ -55,7 +53,9 @@ namespace form_builder.Validators
                     return new ValidationResult
                     {
                         IsValid = false,
-                        Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) ? element.Properties.UpperLimitValidationMessage : $"{ element.Properties.Label} must be between {min} and {max} inclusive"
+                        Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage)
+                            ? element.Properties.UpperLimitValidationMessage
+                            : $"{ element.Properties.Label} must be between {min} and {max} inclusive"
                     };
                 }
             }
@@ -77,7 +77,6 @@ namespace form_builder.Validators
             if (!string.IsNullOrEmpty(element.Properties.Min))
             {
                 var min = int.Parse(element.Properties.Min);
-
                 if (output < min)
                 {
                     return new ValidationResult

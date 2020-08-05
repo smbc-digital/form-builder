@@ -33,16 +33,16 @@
     <div class="govuk-width-container" role="main">
         @if (!string.IsNullOrEmpty(feedbackPhase))
         {
-    <div class="govuk-phase-banner">
-        <p class="govuk-phase-banner__content">
-            <strong class="smbc-tag govuk-phase-banner__content__tag">
-                @feedbackPhase
-            </strong>
-            <span class="govuk-phase-banner__text">
-                This is a new service - your <a class="govuk-link" href="@feedbackFormUrl" rel="noreferrer noopener" target="_blank">feedback</a> will help us to improve it.
-            </span>
-        </p>
-    </div>}
+            <div class="govuk-phase-banner">
+                <p class="govuk-phase-banner__content">
+                    <strong class="smbc-tag govuk-phase-banner__content__tag">
+                        @feedbackPhase
+                    </strong>
+                    <span class="govuk-phase-banner__text">
+                        This is a new service - your <a class="govuk-link" href="@feedbackFormUrl" rel="noreferrer noopener" target="_blank">feedback</a> will help us to improve it.
+                    </span>
+                </p>
+            </div>}
         @if (displayBreadcrumbs)
         {
             <partial name="Breadcrumbs" model="@breadcrumbs" />
@@ -50,7 +50,7 @@
 
         @if (!Model.HideBackButton)
         {
-    <a href="javascript:history.back(-1)" class="govuk-back-link">Back</a>}
+            <a href="javascript:history.back(-1)" class="govuk-back-link">Back</a>}
 
         <main class="govuk-main-wrapper " id="main-content">
             <div class="govuk-grid-row">
@@ -65,5 +65,4 @@
     <script type="text/javascript" src="https://design-system.stockport.gov.uk/int/1.0.0/smbc-frontend.min.js"></script>
     <script>window.GOVUKFrontend.initAll()</script>
 </body>
-
 </html>

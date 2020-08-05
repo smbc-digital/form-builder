@@ -17,7 +17,6 @@ namespace form_builder.Validators
             }
 
             var addressElement = (Address)element;
-
             if (!viewModel.ContainsKey(addressElement.AddressSelectQuestionId))
             {
                 return new ValidationResult{
@@ -35,6 +34,7 @@ namespace form_builder.Validators
             }
 
             var isValid = AddressConstants.UPRN_REGEX.IsMatch(value); 
+
             return new ValidationResult{
                 IsValid = isValid,
                 Message = isValid ? string.Empty : $"please select an address"

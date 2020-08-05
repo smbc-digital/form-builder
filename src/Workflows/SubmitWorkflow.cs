@@ -29,9 +29,7 @@ namespace form_builder.Workflows
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (string.IsNullOrEmpty(sessionGuid))
-            {
                 throw new ApplicationException($"A Session GUID was not provided.");
-            }
 
             var data = await _mappingService.Map(sessionGuid, form);
 

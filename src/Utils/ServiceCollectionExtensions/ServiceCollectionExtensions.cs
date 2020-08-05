@@ -41,6 +41,7 @@ using form_builder.Services.SubmtiService;
 using form_builder.Validators;
 using form_builder.Workflows;
 using form_builder.Workflows.ActionsWorkflow;
+using form_builder.Workflows.DocumentWorkflow;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -136,6 +137,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
             services.AddSingleton<IAddressProvider, ServiceAddressProvider>();
+
             return services;
         }
 
@@ -158,12 +160,14 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         public static IServiceCollection ConfigurePaymentProviders(this IServiceCollection services)
         {
             services.AddSingleton<IPaymentProvider, CivicaPayProvider>();
+
             return services;
         }
 
         public static IServiceCollection ConfigureDocumentCreationProviders(this IServiceCollection services)
         {
             services.AddSingleton<IDocumentCreation, TextfileDocumentCreator>();
+
             return services;
         }
 
@@ -286,6 +290,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
             services.AddDataProtection().SetApplicationName("formbuilder");
             services.AddSingleton<IDistributedCacheWrapper, DistributedCacheWrapper>();
+
             return services;
         }
     }

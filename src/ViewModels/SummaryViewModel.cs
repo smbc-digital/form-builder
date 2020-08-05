@@ -11,7 +11,7 @@ namespace form_builder.ViewModels
 
         public string FeedbackFormUrl { get; set; }
 
-        public FormAnswers FormAnswers {get; set;}
+        public FormAnswers FormAnswers { get; set; }
 
         public string Reference { get; set; }
 
