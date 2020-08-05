@@ -13,9 +13,9 @@ namespace form_builder_tests.UnitTests.Controllers
 {
     public class DocumentControllerTests
     {
-        private DocumentController _controller;
-        private Mock<ILogger<DocumentController>> _mockLogger = new Mock<ILogger<DocumentController>>();
-        private Mock<IDocumentWorkflow> _mockDocumentWorkflow = new Mock<IDocumentWorkflow>();
+        private readonly DocumentController _controller;
+        private readonly Mock<ILogger<DocumentController>> _mockLogger = new Mock<ILogger<DocumentController>>();
+        private readonly Mock<IDocumentWorkflow> _mockDocumentWorkflow = new Mock<IDocumentWorkflow>();
 
         public DocumentControllerTests()
         {
@@ -25,7 +25,6 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Summary_ShouldRedirect_ToError_WhenInvalidIdProvider()
         {
-            
             var result = await _controller.Summary(EDocumentType.Txt, Guid.Empty);
 
             Assert.IsType<RedirectToActionResult>(result);

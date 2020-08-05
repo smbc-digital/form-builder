@@ -1,17 +1,17 @@
-﻿using form_builder.Mappers;
-using form_builder.Models;
-using form_builder_tests.Builders;
-using Moq;
-using StockportGovUK.NetStandard.Models.Addresses;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Xunit;
-using form_builder.Providers.StorageProvider;
-using form_builder.Enum;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.FileManagement;
 using form_builder.Builders;
 using form_builder.Constants;
+using form_builder.Enum;
+using form_builder.Mappers;
+using form_builder.Models;
+using form_builder.Providers.StorageProvider;
+using form_builder_tests.Builders;
+using Moq;
+using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.Addresses;
+using StockportGovUK.NetStandard.Models.FileManagement;
+using Xunit;
 
 namespace form_builder_tests.UnitTests.Mappers
 {
@@ -360,6 +360,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
 
             };
+
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
             Assert.IsType<TimeSpan>(result);
         }
@@ -395,12 +396,14 @@ namespace form_builder_tests.UnitTests.Mappers
                     }
                 }
             };
+
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             var type = Assert.IsType<Address>(result);
             Assert.Equal("1001254222", type.PlaceRef);
             Assert.Equal(description, type.SelectedAddress);
         }
+
         [Fact]
         public void GetAnswerValue_ShouldReturnAddress_WhenElementIsAddress_Manual()
         {
@@ -444,6 +447,7 @@ namespace form_builder_tests.UnitTests.Mappers
                     }
                 }
             };
+
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
             var type = Assert.IsType<Address>(result);
 
@@ -485,6 +489,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
 
             };
+
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
             var type = Assert.IsType<Address>(result);
 
@@ -523,12 +528,14 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
 
             };
+
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
             var type = Assert.IsType<StockportGovUK.NetStandard.Models.Verint.Organisation>(result);
 
             Assert.Equal("0101010101", type.Reference);
             Assert.Equal("im an organisation", type.Name);
         }
+
         [Fact]
         public void GetAnswerValue_ShouldReturnValue()
         {
@@ -648,7 +655,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 .WithQuestionId(key)
                 .Build();
 
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            _elementMapper.GetAnswerValue(element, formAnswers);
 
             _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
         }
@@ -692,10 +699,9 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
             };
 
-            // Act
+
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
-            // Assert
             var resultData = Assert.IsType<TimeSpan>(result);
             Assert.Equal("3", resultData.Hours.ToString());
             Assert.Equal(elementMinutes, resultData.Minutes.ToString());
@@ -719,10 +725,6 @@ namespace form_builder_tests.UnitTests.Mappers
                 .WithPageSlug("page-one")
                 .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
@@ -739,14 +741,11 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
             };
 
-            // Act
             var result = _elementMapper.GetAnswerValue(element3, formAnswers);
 
-            // Assert
             var resultData = Assert.IsType<DateTime>(result);
             Assert.Equal($"{elementOneAnswer} 00:00:00", resultData.ToString());
         }
-        
         
         [Theory]
         [InlineData(EElementType.Textbox, "test")]
@@ -808,10 +807,10 @@ namespace form_builder_tests.UnitTests.Mappers
         [Fact]
         public void GetAnswerStringValue_ShouldReturnCorrectValue_ForRadioElement()
         {
-             var labelText = "Radio radio";
-             var labelValue = "No Text";
-            
+            var labelText = "Radio radio";
+            var labelValue = "No Text";
             var questionId = "test-questionID";
+
             var formAnswers = new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = questionId, Response = "n" } } } }};
 
             var element = new ElementBuilder()
@@ -829,12 +828,9 @@ namespace form_builder_tests.UnitTests.Mappers
         [Fact]
         public void GetAnswerStringValue_ShouldReturnCorrectValue_ForStreetElement()
         {
-             var value = new StockportGovUK.NetStandard.Models.Addresses.Address{ SelectedAddress = "street, city, postcode, uk", PlaceRef = "1234" };
-
             var questionId = "test-questionID";
             var labelText = "Enter the Street";
-
-            var uspn = $"{questionId}{StreetConstants.SELECT_SUFFIX}";
+            var usrn = $"{questionId}{StreetConstants.SELECT_SUFFIX}";
             var addressDescription = $"{questionId}{StreetConstants.DESCRIPTION_SUFFIX}";
 
             var formAnswers = new FormAnswers
@@ -845,7 +841,7 @@ namespace form_builder_tests.UnitTests.Mappers
                         Answers = new List<Answers> {
                             new Answers
                             {
-                                QuestionId = uspn,
+                                QuestionId = usrn,
                                 Response = "1001254222"
                             },
                             new Answers
