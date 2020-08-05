@@ -64,7 +64,8 @@ namespace form_builder
                 .AddFactories()
                 .AddSession(_ => {
                     _.IdleTimeout = TimeSpan.FromMinutes(30);
-                    _.Cookie.Path = "/";
+                    _.Cookie.Path = "/V2";
+                    _.Cookie.Name = ".formbuilder.v2";
                 });
                 
             services.AddTransient<ICache, Cache.Cache>();
