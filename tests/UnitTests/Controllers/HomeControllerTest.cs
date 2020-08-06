@@ -1,25 +1,23 @@
-﻿using System.Collections.Generic;
-using form_builder.Controllers;
-using Xunit;
-using Moq;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
-using Microsoft.AspNetCore.Mvc;
+using form_builder.Builders;
+using form_builder.Controllers;
 using form_builder.Enum;
-using form_builder_tests.Builders;
+using form_builder.Models;
+using form_builder.Models.Properties.ActionProperties;
+using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
 using form_builder.Services.PageService.Entities;
-using form_builder.Models;
 using form_builder.Workflows;
-using form_builder.Services.FileUploadService;
-using form_builder.Builders;
-using form_builder.Models.Properties.ActionProperties;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting;
 using form_builder.Workflows.ActionsWorkflow;
-using Microsoft.Extensions.Logging;
-using ILogger = Serilog.ILogger;
+using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Moq;
+using Xunit;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -32,12 +30,7 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<IFileUploadService> _mockFileUploadService = new Mock<IFileUploadService>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new Mock<IActionsWorkflow>();
-<<<<<<< HEAD
-        private readonly Mock<ISuccessWorkflow> _mockSucessWorkflow = new Mock<ISuccessWorkflow>();
-        private readonly Mock<ILogger<HomeController>> _mockLogger = new Mock<ILogger<HomeController>>();
-=======
         private readonly Mock<ISuccessWorkflow> _mockSuccessWorkflow = new Mock<ISuccessWorkflow>();
->>>>>>> design-system
 
         public HomeControllerTest()
         {
@@ -51,12 +44,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockFileUploadService.Object,
                 _mockHostingEnv.Object,
                 _mockActionsWorkflow.Object,
-<<<<<<< HEAD
-                _mockSucessWorkflow.Object,
-                _mockLogger.Object) {TempData = tempData};
-=======
                 _mockSuccessWorkflow.Object) {TempData = tempData};
->>>>>>> design-system
 
             _mockSuccessWorkflow.Setup(_ => _.Process(It.IsAny<EBehaviourType>(), It.IsAny<string>())).ReturnsAsync(new SuccessPageEntity
             {
