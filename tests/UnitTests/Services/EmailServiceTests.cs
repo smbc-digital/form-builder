@@ -28,15 +28,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IEnumerable<IEmailProvider>> _mockEmailProviders = new Mock<IEnumerable<IEmailProvider>>();
         private readonly Mock<IActionHelper> _mockActionHelper = new Mock<IActionHelper>();
 
-        private static readonly Element Element = new ElementBuilder()
-            .WithType(EElementType.H2)
-            .Build();
-
-        private static readonly Page Page = new PageBuilder()
-            .WithElement(Element)
-            .WithPageSlug("success")
-            .Build();
-
         public EmailServiceTests()
         {
 
@@ -60,11 +51,11 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Process_ShouldCall_SessionHelper()
         {
-             var action = new ActionBuilder()
+            // Arrange
+            var action = new ActionBuilder()
                 .WithActionType(EActionType.UserEmail)
                 .Build();
-
-            // Arrange
+            
             _mockActionHelper.Setup(_ => _.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()))
                 .Returns("test@testemail.com");
 
@@ -91,6 +82,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Process_ShouldCall_DistributedCache()
         {
+            // Arrange
             var action = new ActionBuilder()
                 .WithActionType(EActionType.UserEmail)
                 .Build();
@@ -108,6 +100,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Process_ShouldCall_ActionHelper_IfTypeIsUserEmail()
         {
+            // Arrange
               var action = new ActionBuilder()
                 .WithActionType(EActionType.UserEmail)
                 .Build();
@@ -122,6 +115,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Process_ShouldCall_EmailProvider_IfTypeIsUserEmail()
         {
+            // Arrange
              var action = new ActionBuilder()
                 .WithActionType(EActionType.UserEmail)
                 .Build();

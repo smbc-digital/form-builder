@@ -34,7 +34,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IActionHelper> _mockActionHelper = new Mock<IActionHelper>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
 
-        private readonly List<IAction> pageActions = new List<IAction>
+        private readonly List<IAction> _pageActions = new List<IAction>
         {
             new ActionBuilder()
                 .WithActionType(EActionType.RetrieveExternalData)
@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build()
         };
 
-        private readonly MappingEntity mappingEntity =
+        private readonly MappingEntity _mappingEntity =
             new MappingEntityBuilder()
                 .WithFormAnswers(new FormAnswers
                 {
@@ -72,23 +72,22 @@ namespace form_builder_tests.UnitTests.Services
                 .WithData(new ExpandoObject())
                 .Build();
 
-        private readonly HttpResponseMessage successResponse = new HttpResponseMessage
+        private readonly HttpResponseMessage _successResponse = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent("\"test\"")
         };
-
 
         public RetrieveExternalDataServiceTests()
         {
             _service = new RetrieveExternalDataService(_mockGateway.Object, _mockSessionHelper.Object, _mockDistributedCacheWrapper.Object, _mockMappingService.Object, _mockActionHelper.Object, _mockHostingEnv.Object);
 
             _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123456");
-            _mockMappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(mappingEntity);
+            _mockMappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(_mappingEntity);
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
-                .ReturnsAsync(successResponse);
+                .ReturnsAsync(_successResponse);
             _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(successResponse);
+                .ReturnsAsync(_successResponse);
             _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new ExternalDataEntity
                 {
@@ -101,6 +100,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Process_Should_NotCallGatewayToUpdateHeader_IfNoAuthTokenProvided()
         {
+            // Arrange
              var action = new ActionBuilder()
                 .WithActionType(EActionType.RetrieveExternalData)
                 .WithPageActionSlug(new PageActionSlug
@@ -128,7 +128,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldCallGatewayToUpdateHeader_IfAuthTokenProvided()
         {
             // Act
-            await _service.Process(pageActions, new FormSchema(), "test");
+            await _service.Process(_pageActions, new FormSchema(), "test");
 
             // Assert
             _mockGateway.Verify(_ => _.ChangeAuthenticationHeader(It.IsAny<string>()), Times.Once);
@@ -146,7 +146,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             // Act
-            await _service.Process(pageActions, new FormSchema(), "test");
+            await _service.Process(_pageActions, new FormSchema(), "test");
 
             // Assert
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
@@ -156,23 +156,11 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldCallGateway_GetAsync()
         {
             // Arrange
-            var actions = new List<IAction>
-            {
-                new ActionBuilder()
-                    .WithPageActionSlug(new PageActionSlug
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        Environment = "local"
-                    })
-                    .WithTargetQuestionId("targetId")
-                    .Build()
-            };
-
             _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(successResponse);
+                .ReturnsAsync(_successResponse);
 
             // Act
-            await _service.Process(pageActions, new FormSchema(), "test");
+            await _service.Process(_pageActions, new FormSchema(), "test");
 
             // Assert
             _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
@@ -268,19 +256,6 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldCallDistributedCache_SetStringAsync()
         {
             // Arrange
-            var actions = new List<IAction>
-            {
-                new ActionBuilder()
-                    .WithPageActionSlug(new PageActionSlug
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        AuthToken = string.Empty,
-                        Environment = "local"
-                    })
-                    .WithTargetQuestionId("targetId")
-                    .Build()
-            };
-
             _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new ExternalDataEntity
                 {
@@ -289,10 +264,10 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(successResponse);
+                .ReturnsAsync(_successResponse);
 
             // Act
-            await _service.Process(pageActions, new FormSchema(), "test");
+            await _service.Process(_pageActions, new FormSchema(), "test");
 
             // Assert
             _mockDistributedCacheWrapper.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);

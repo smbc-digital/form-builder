@@ -1,34 +1,33 @@
-﻿using form_builder.Enum;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using form_builder.Builders;
+using form_builder.Configuration;
+using form_builder.Constants;
+using form_builder.ContentFactory;
+using form_builder.Enum;
+using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
+using form_builder.Services.MappingService;
+using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService;
 using form_builder.Services.PageService.Entities;
+using form_builder.Services.PayService;
 using form_builder.Services.StreetService;
 using form_builder.Validators;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Xunit;
-using Newtonsoft.Json;
-using form_builder.Services.OrganisationService;
-using form_builder.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Hosting;
-using form_builder.Factories.Schema;
-using form_builder.Constants;
-using form_builder.Services.MappingService;
-using form_builder.Services.PayService;
-using form_builder.ContentFactory;
-using System.Threading;
-using form_builder.Builders;
+using Microsoft.Extensions.Options;
+using Moq;
+using Newtonsoft.Json;
+using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -37,7 +36,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly PageService _service;
         private readonly Mock<IEnumerable<IElementValidator>> _validators = new Mock<IEnumerable<IElementValidator>>();
         private readonly Mock<IElementValidator> _validator = new Mock<IElementValidator>();
-        private readonly Mock<ISchemaProvider> _schemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
         private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IStreetService> _streetService = new Mock<IStreetService>();
@@ -140,7 +138,6 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-
             await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPage("form", "page-one", ""));
         }
 
@@ -157,7 +154,6 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
-
 
             await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null));
         }
@@ -280,7 +276,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null));
+            await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null));
 
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Once);
         }
@@ -321,7 +317,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ShouldCallCache_ToGetFormSchema()
+        public async Task ProcessPage_ShouldCallSchemaFactory_ToGetFormSchema()
         {
             // Act
             await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessPage("form", "page-one", ""));
@@ -334,7 +330,6 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessPage_ShouldGenerateGuidWhenGuidIsEmpty()
         {
             // Arrange
-            var guid = Guid.NewGuid().ToString();
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
 
             var element = new ElementBuilder()
@@ -363,7 +358,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.ProcessPage("form", "page-one", "");
 
             // Assert
-            var viewResult = Assert.IsType<ProcessPageEntity>(result);
+            Assert.IsType<ProcessPageEntity>(result);
 
             _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
             _sessionHelper.Verify(_ => _.SetSessionGuid(It.IsAny<string>()), Times.Once);
@@ -462,7 +457,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
 
-            var result = await _service.ProcessPage("new-form", "page-one", "");
+            await _service.ProcessPage("new-form", "page-one", "");
 
             _distributedCache.Verify(_ => _.Remove(It.IsAny<string>()), Times.Once);
         }
@@ -496,7 +491,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
 
-            var result = await _service.ProcessPage("new-form", "page-one", "");
+            await _service.ProcessPage("new-form", "page-one", "");
 
             _distributedCache.Verify(_ => _.Remove(It.IsAny<string>()), Times.Never);
         }
@@ -680,7 +675,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             // Act
-            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
+            await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
             _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"file-{questionIDOne}-fileupload-{guid}")), Times.Once);
@@ -718,7 +713,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             // Act
-            var result = await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
+            await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
             _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"document-{guid.ToString()}"), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);

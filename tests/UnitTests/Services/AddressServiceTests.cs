@@ -1,4 +1,9 @@
-﻿using form_builder.Enum;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Builders;
+using form_builder.ContentFactory;
+using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.Address;
@@ -8,14 +13,7 @@ using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Moq;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
-using form_builder.Builders;
-using form_builder.ContentFactory;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -63,6 +61,7 @@ namespace form_builder_tests.UnitTests.Services
                     }
                 }
             };
+
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
             var element = new ElementBuilder()
@@ -87,7 +86,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
+            await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
         }
@@ -117,6 +116,7 @@ namespace form_builder_tests.UnitTests.Services
                     }
                 }
             };
+
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
             var element = new ElementBuilder()
@@ -142,7 +142,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "" },
             };
 
-            var result = await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
+            await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
         }
@@ -175,7 +175,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
+            await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
         }
@@ -184,7 +184,6 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessAddress_Application_ShouldThrowApplicationException_WhenNoMatchingAddressProvider()
         {
             var addressProvider = "NON-EXIST-PROVIDER";
-            var searchResultsCallback = new List<AddressSearchResult>();
             var element = new ElementBuilder()
                 .WithType(EElementType.Address)
                 .WithAddressProvider(addressProvider)
@@ -215,11 +214,9 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessAddress_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
         {
-
             _addressProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
                 .Throws<Exception>();
 
-            var searchResultsCallback = new List<AddressSearchResult>();
             var element = new ElementBuilder()
                 .WithType(EElementType.Address)
                 .WithAddressProvider("testAddressProvider")
