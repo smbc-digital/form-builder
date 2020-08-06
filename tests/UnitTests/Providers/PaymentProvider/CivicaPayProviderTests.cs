@@ -1,3 +1,6 @@
+using System;
+using System.Net;
+using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Exceptions;
 using form_builder.Providers.PaymentProvider;
@@ -6,13 +9,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using StockportGovUK.NetStandard.Gateways.CivicaPay;
 using StockportGovUK.NetStandard.Gateways.Response;
 using StockportGovUK.NetStandard.Models.Civica.Pay.Request;
 using StockportGovUK.NetStandard.Models.Civica.Pay.Response;
-using System;
-using System.Net;
-using System.Threading.Tasks;
-using StockportGovUK.NetStandard.Gateways.CivicaPay;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Providers.PaymentProvider
@@ -82,7 +82,7 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
         [Theory]
         [InlineData("00022")]
         [InlineData("00023")]
-        public void VerifyPaymentResponse_ShouldThrowPaymentDeclinedException_OnInvalidResposneCode(string responseCode)
+        public void VerifyPaymentResponse_ShouldThrowPaymentDeclinedException_OnInvalidResponseCode(string responseCode)
         {
             var result = Assert.Throws<PaymentDeclinedException>(() => _civicaPayProvider.VerifyPaymentResponse(responseCode));
 
@@ -93,7 +93,7 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
         [InlineData("11111")]
         [InlineData("22222")]
         [InlineData("01010")]
-        public void VerifyPaymentResponse_ShouldThrowPaymentFailureExceptionException_OnNonSuccessfulResposneCode(string responseCode)
+        public void VerifyPaymentResponse_ShouldThrowPaymentFailureExceptionException_OnNonSuccessfulResponseCode(string responseCode)
         {
             var result = Assert.Throws<PaymentFailureException>(() => _civicaPayProvider.VerifyPaymentResponse(responseCode));
 

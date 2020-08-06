@@ -10,19 +10,16 @@
     @if (Model.Properties.LabelAsH1)
     {
         <partial name="LabelH1" />
-
         <partial name="ChangeSearch" />
     }
     else
     {
         <partial name="ChangeSearch" />
-
         <partial name="LabelH1" />
     }
 
 
     <partial name="Hint" />
-
     <partial name="Error" />
 
     @Html.DropDownList(@Model.QuestionId, @Model.Items, elementProperties)

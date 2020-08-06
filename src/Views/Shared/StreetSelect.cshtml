@@ -1,20 +1,21 @@
 ﻿@model form_builder.Models.Elements.Street
-@{    
+@{
     var elementProperties = Model.GenerateElementProperties("Select");
-    
+
     elementProperties.Add("class", Model.IsValid ? "govuk-select" : "govuk-select govuk-select--error");
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
     @Html.Hidden(@Model.StreetSearchQuestionId, @Model.Properties.Value)
-    
-    @if(Model.Properties.LabelAsH1)
+
+    @if (Model.Properties.LabelAsH1)
     {
         <partial name="LabelH1" />
-    
+
         <partial name="ChangeSearch" />
     }
-    else{
+    else
+    {
         <partial name="ChangeSearch" />
 
         <partial name="LabelH1" />

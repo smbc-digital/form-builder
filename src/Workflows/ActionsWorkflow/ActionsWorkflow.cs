@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Models;
+using form_builder.Models.Actions;
 using form_builder.Services.EmailService;
 using form_builder.Services.RetrieveExternalDataService;
 
@@ -20,7 +21,9 @@ namespace form_builder.Workflows.ActionsWorkflow
         private readonly IEmailService _emailService;
         private readonly ISchemaFactory _schemaFactory;
 
-        public ActionsWorkflow(IRetrieveExternalDataService retrieveExternalDataService, IEmailService emailService, ISchemaFactory schemaFactory)
+        public ActionsWorkflow(IRetrieveExternalDataService retrieveExternalDataService,
+            IEmailService emailService,
+            ISchemaFactory schemaFactory)
         {
             _retrieveExternalDataService = retrieveExternalDataService;
             _emailService = emailService;
@@ -29,7 +32,7 @@ namespace form_builder.Workflows.ActionsWorkflow
 
         public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
         {
-            if(formSchema == null)
+            if (formSchema == null)
                 formSchema = await _schemaFactory.Build(formName);
 
             if (actions.Any(_ => _.Type.Equals(EActionType.RetrieveExternalData)))

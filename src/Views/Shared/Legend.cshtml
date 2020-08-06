@@ -1,5 +1,4 @@
 ﻿@model form_builder.Models.Elements.Element
-
 @{
     var tag = Model.Properties.LegendAsH1 ? "h1" : "label";
     var text = ViewData["Label"] ?? @Model.Properties.Label;
@@ -8,6 +7,7 @@
 
 <legend>
     <@Html.Raw(tag) @Model.WriteHtmlForAndClassAttribute(questionIdPrefix)>@text</@Html.Raw(tag)>
+
     @if (@Model.Properties.Optional)
     {
         <span class="smbc-body">(optional)</span>

@@ -7,6 +7,5 @@ namespace form_builder.ViewModels
         public string Message { get; set; }
 
         public string Id { get; set; }
-
     }
 }

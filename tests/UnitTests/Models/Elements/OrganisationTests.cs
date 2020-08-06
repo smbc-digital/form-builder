@@ -1,18 +1,14 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
-using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Moq;
-using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Models.Elements
@@ -30,14 +26,12 @@ namespace form_builder_tests.UnitTests.Models.Elements
         [Fact]
         public async Task RenderAsync_ShouldCall_ViewRender_WithListOf_SelectListItem_FromOrgSearchResults()
         {
-            var elementView = new ElementViewModel();
-            var orgSearchList = new List<SelectListItem>();
+            //Arrange
             var callback = new form_builder.Models.Elements.Organisation();
 
             _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()))
                 .Callback<string, form_builder.Models.Elements.Organisation, Dictionary<string, object>>((x, y, z) => callback = y);
 
-            //Arrange
             var organisationElement = (form_builder.Models.Elements.Organisation)new ElementBuilder()
                 .WithType(EElementType.Organisation)
                 .WithStreetProvider("Fake")
@@ -56,7 +50,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             viewModel.Add($"{organisationElement.Properties.QuestionId}-organisation", "test org");
 
             //Act
-            var result = await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object);
+            await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"),It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -66,14 +60,12 @@ namespace form_builder_tests.UnitTests.Models.Elements
         [Fact]
         public async Task RenderAsync_ShouldCall_ViewRender_WithListOf_SelectListItem_GeneratedFromOrgSearchResults()
         {
-            var elementView = new ElementViewModel();
-            var orgSearchList = new List<SelectListItem>();
+            //Arrange
             var callback = new form_builder.Models.Elements.Organisation();
-
+            
             _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()))
                 .Callback<string, form_builder.Models.Elements.Organisation, Dictionary<string, object>>((x, y, z) => callback = y);
 
-            //Arrange
             var organisationElement = (form_builder.Models.Elements.Organisation)new ElementBuilder()
                 .WithType(EElementType.Organisation)
                 .WithStreetProvider("Fake")
@@ -97,7 +89,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             };
 
             //Act
-            var result = await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object, searchResults);
+            await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, searchResults);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"),It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()), Times.Once);

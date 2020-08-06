@@ -1,12 +1,12 @@
-﻿using Xunit;
-using form_builder.Controllers;
+﻿using form_builder.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Xunit;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
     public class HealthCheckControllerTests
     {
-        private HealthCheckController _healthCheckController;
+        private readonly HealthCheckController _healthCheckController;
 
         public HealthCheckControllerTests()
         {
@@ -17,13 +17,12 @@ namespace form_builder_tests.UnitTests.Controllers
         public void HealthCheckShouldReturnHealthCheck()
         {
             // Act
-            var response = _healthCheckController.Get();
-            var result = response as OkObjectResult;
+            var response = _healthCheckController.Get() as OkObjectResult;
 
             // Assert
-            Assert.Equal(200, result.StatusCode);
+            Assert.Equal(200, response.StatusCode);
             Assert.NotNull(response);
-            Assert.NotNull(result.Value);
+            Assert.NotNull(response.Value);
         }
     }
 }

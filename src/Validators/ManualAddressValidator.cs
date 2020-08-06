@@ -8,10 +8,8 @@ namespace form_builder.Validators
 {
     public class ManualAddressValidator : IElementValidator
     {
-
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-
             if (!(element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
@@ -40,7 +38,6 @@ namespace form_builder.Validators
 
             var addressPostcodeMessage = string.Empty;
             var addressPostcodeValid = true;
-
 
             if (string.IsNullOrEmpty(valueAddressPostcode))
             {

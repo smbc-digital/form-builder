@@ -1,11 +1,10 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using form_builder.Constants;
 
 namespace form_builder.Models.Elements
 {
@@ -26,7 +25,7 @@ namespace form_builder.Models.Elements
                                 ? convertedMaxFileSize 
                                 : SystemConstants.DefaultMaxFileSize;
 
-            var properties = new Dictionary<string, dynamic>()
+            var properties = new Dictionary<string, dynamic>
             {
                 { "name", QuestionId },
                 { "id", QuestionId },
@@ -37,9 +36,7 @@ namespace form_builder.Models.Elements
             };
 
             if (DisplayAriaDescribedby)
-            {
                 properties.Add("aria-describedby", GetDescribedByAttributeValue());
-            }
 
             return properties;
         }
@@ -57,6 +54,7 @@ namespace form_builder.Models.Elements
             elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, string.Empty);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
     }

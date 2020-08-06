@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using form_builder.Models.Elements;
 using form_builder.Enum;
+using form_builder.Models.Elements;
 
 namespace form_builder.Validators
 {
@@ -44,12 +44,13 @@ namespace form_builder.Validators
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the date and try again"
+                    Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage)
+                        ? element.Properties.CustomValidationMessage
+                        : "Check the date and try again"
                 };
             }
 
             var date = DateTime.Today;
-
             var dateOutput = DateTime.Parse($"{valueDay}/{valueMonth}/{valueYear}");
 
             if (dateOutput < date)
@@ -57,7 +58,9 @@ namespace form_builder.Validators
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageRestrictPastDate) ? element.Properties.ValidationMessageRestrictPastDate : "Check the date and try again"
+                    Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageRestrictPastDate)
+                        ? element.Properties.ValidationMessageRestrictPastDate
+                        : "Check the date and try again"
                 };
             }
 

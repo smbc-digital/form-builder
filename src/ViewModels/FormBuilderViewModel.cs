@@ -1,6 +1,5 @@
-
-using form_builder.Models;
 using System.Collections.Generic;
+using form_builder.Models;
 
 namespace form_builder.ViewModels
 {
@@ -23,6 +22,7 @@ namespace form_builder.ViewModels
         public bool HideBackButton { get; set; }
 
         public bool DisplayBreadCrumbs { get; set; }
+
         public List<Breadcrumb> BreadCrumbs { get; set; }
     }
 }

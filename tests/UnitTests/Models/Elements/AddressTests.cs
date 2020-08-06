@@ -1,14 +1,12 @@
-﻿using form_builder.Constants;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models.Elements;
-using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Moq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Models.Elements
@@ -68,8 +66,11 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithElement(element)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {LookUpConstants.SubPathViewModelKey,
+                    LookUpConstants.Automatic}
+            };
 
             _mockElementHelper.Setup(_ => _.CurrentValue<string>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
                 .Returns("SK1 3XE");
@@ -79,11 +80,10 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             //Act
-            var result = await element.RenderAsync(
+           await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
-                "",
-                
+                string.Empty,
                 viewModel,
                 page,
                 schema,
@@ -98,9 +98,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         public async Task Address_ShouldGenerateValidUrl_ForAddressSelect()
         {
             //Arrange
-            var elementView = new ElementViewModel();
-            var addressList = new List<SelectListItem>();
-            var callback = new form_builder.Models.Elements.Address();
+            var callback = new Address();
 
             _mockElementHelper.Setup(_ => _.CurrentValue<string>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
                 .Returns("SK1 3XE");
@@ -111,7 +109,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var pageSlug = "page-one";
             var baseUrl = "test";
 
-            var element = (form_builder.Models.Elements.Address)new AddressBuilder()
+            var element = new AddressBuilder()
                 .WithPropertyText("test")
                 .WithQuestionId("address-test")
                 .Build();
@@ -121,8 +119,11 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithPageSlug(pageSlug)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {LookUpConstants.SubPathViewModelKey,
+                    LookUpConstants.Automatic}
+            };
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -132,7 +133,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             //Act
             var result = await element.RenderAsync(_mockIViewRender.Object,
                 _mockElementHelper.Object,
-                "",
+                string.Empty,
                 viewModel,
                 page,
                 schema,

@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.ViewModels;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 
 namespace form_builder.ContentFactory
 {
@@ -16,14 +14,10 @@ namespace form_builder.ContentFactory
     public class PageFactory : IPageFactory
     {
         private readonly IPageHelper _pageHelper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IWebHostEnvironment _environment;
 
-        public PageFactory(IPageHelper pageHelper, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment environment)
+        public PageFactory(IPageHelper pageHelper)
         {
             _pageHelper = pageHelper;
-            _httpContextAccessor = httpContextAccessor;
-            _environment = environment;
         }
 
         public async Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, List<object> results = null)

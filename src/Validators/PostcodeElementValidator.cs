@@ -33,7 +33,6 @@ namespace form_builder.Validators
             }
 
             var value = viewModel[element.Properties.QuestionId];
-
             var isValid = true;
             if (!AddressConstants.POSTCODE_REGEX.Match(value).Success)
             {

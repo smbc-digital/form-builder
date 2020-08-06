@@ -19,12 +19,7 @@ namespace form_builder.Conditions
             var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isBefore);
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
 
-            if (DateTime.Compare(dateValue, newComparisonDate) <= 0)
-            {
-                return true;
-            }
-
-            return false;
+            return DateTime.Compare(dateValue, newComparisonDate) <= 0;
         }
 
         public static bool DateIsAfter(Condition condition, Dictionary<string, dynamic> viewModel)
@@ -39,12 +34,7 @@ namespace form_builder.Conditions
             var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isAfter);
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
 
-            if (DateTime.Compare(dateValue, newComparisonDate) > 0)
-            {
-                return true;
-            }
-
-            return false;
+            return DateTime.Compare(dateValue, newComparisonDate) > 0;
         }
 
         public static bool DateIsEqual(Condition condition, Dictionary<string, dynamic> viewModel)
@@ -59,12 +49,7 @@ namespace form_builder.Conditions
             var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isEqualTo);
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
 
-            if (DateTime.Compare(dateValue, newComparisonDate) == 0)
-            {
-                return true;
-            }
-
-            return false;
+            return DateTime.Compare(dateValue, newComparisonDate) == 0;
         }
 
         private static DateTime GetComparisonDate(DateTime dateComparison, EDateUnit unit, int isAfter)

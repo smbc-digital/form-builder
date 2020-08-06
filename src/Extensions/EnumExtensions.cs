@@ -1,8 +1,8 @@
-﻿using form_builder.Enum;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using form_builder.Enum;
 
 namespace form_builder.Extensions
 {

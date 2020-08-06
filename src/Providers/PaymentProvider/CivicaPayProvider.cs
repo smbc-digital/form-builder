@@ -33,7 +33,7 @@ namespace form_builder.Providers.PaymentProvider
         }
         public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation)
         {
-            if (String.IsNullOrEmpty(reference))
+            if (string.IsNullOrEmpty(reference))
                 throw new PaymentFailureException("CivicaPayProvider::No valid reference");
 
             var basket = new CreateImmediateBasketRequest
@@ -74,14 +74,10 @@ namespace form_builder.Providers.PaymentProvider
         public void VerifyPaymentResponse(string responseCode)
         {
             if (responseCode == "00022" || responseCode == "00023" || responseCode == "00001")
-            {
                 throw new PaymentDeclinedException($"CivicaPayProvider::Declined payment with response code: {responseCode}");
-            }
 
             if (responseCode != "00000")
-            {
                 throw new PaymentFailureException($"CivicaPayProvider::Payment failed with response code: {responseCode}");
-            }
         }
     }
 }

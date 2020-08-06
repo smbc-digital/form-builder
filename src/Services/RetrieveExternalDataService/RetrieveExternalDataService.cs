@@ -1,18 +1,19 @@
-﻿using form_builder.Models;
-using StockportGovUK.NetStandard.Gateways;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using form_builder.Helpers.Session;
-using form_builder.Providers.StorageProvider;
-using Newtonsoft.Json;
 using System.Net.Http;
-using System;
 using System.Threading;
+using System.Threading.Tasks;
 using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
+using form_builder.Helpers.Session;
+using form_builder.Models;
+using form_builder.Models.Actions;
+using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService;
 using Microsoft.AspNetCore.Hosting;
+using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Services.RetrieveExternalDataService
 {
@@ -25,7 +26,13 @@ namespace form_builder.Services.RetrieveExternalDataService
         private readonly IActionHelper _actionHelper;
         private readonly IWebHostEnvironment _environment;
 
-        public RetrieveExternalDataService(IGateway gateway, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache, IMappingService mappingService, IActionHelper actionHelper, IWebHostEnvironment environment)
+        public RetrieveExternalDataService(
+            IGateway gateway, 
+            ISessionHelper sessionHelper, 
+            IDistributedCacheWrapper distributedCache, 
+            IMappingService mappingService, 
+            IActionHelper actionHelper, 
+            IWebHostEnvironment environment)
         {
             _gateway = gateway;
             _sessionHelper = sessionHelper;
