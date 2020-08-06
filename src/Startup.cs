@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using StockportGovUK.AspNetCore.Middleware.App;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Gateways.AddressService;
@@ -42,11 +43,12 @@ namespace form_builder
             services.Configure<RequestLocalizationOptions>(options =>
             {
                 options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-GB", "en-GB");
-                options.SupportedCultures = new List<CultureInfo> { new CultureInfo("en-GB", false) };
-                options.SupportedUICultures = new List<CultureInfo> { new CultureInfo("en-GB", false) };
+                options.SupportedCultures = new List<CultureInfo> { new CultureInfo("en-GB") };
+                options.SupportedUICultures = new List<CultureInfo> { new CultureInfo("en-GB") };
             });
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options => { options.SerializerSettings.Culture = new CultureInfo("en-GB"); });
             services.AddRazorPages();
 
             services
@@ -86,7 +88,7 @@ namespace form_builder
                     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                     options.ModelBinderProviders.Insert(0, new CustomFormFileModelBinderProvider());
                 });
-
+                
             services.AddHttpClient<IGateway, Gateway>(Configuration);
             if (HostingEnvironment.IsEnvironment("stage") || HostingEnvironment.IsEnvironment("prod"))
             {
