@@ -24,6 +24,7 @@ namespace form_builder.Controllers
         private readonly ISuccessWorkflow _successWorkflow;
         private readonly IFileUploadService _fileUploadService;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly ILogger<HomeController> _logger;
 
         public HomeController(IPageService pageService,
             ISubmitWorkflow submitWorkflow,
@@ -31,7 +32,8 @@ namespace form_builder.Controllers
             IFileUploadService fileUploadService,
             IWebHostEnvironment hostingEnvironment, 
             IActionsWorkflow actionsWorkflow, 
-            ISuccessWorkflow successWorkflow)
+            ISuccessWorkflow successWorkflow, 
+            ILogger<HomeController> logger)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
@@ -40,6 +42,7 @@ namespace form_builder.Controllers
             _hostingEnvironment = hostingEnvironment;
             _actionsWorkflow = actionsWorkflow;
             _successWorkflow = successWorkflow;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -84,6 +87,7 @@ namespace form_builder.Controllers
             string subPath = "")
         {
             var viewModel = formData.ToNormaliseDictionary(subPath);
+            _logger.LogWarning($"Home Controller:: IndexPost:: View model is {viewModel}");
 
             if(fileUpload != null && fileUpload.Any())
                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
