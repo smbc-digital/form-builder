@@ -1,9 +1,8 @@
 ﻿using System;
-using form_builder.Models;
 using System.Collections.Generic;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
-using form_builder.Services.MappingService.Entities;
+using form_builder.Models;
 using form_builder_tests.Builders;
 using Moq;
 using Xunit;
@@ -17,67 +16,58 @@ namespace form_builder_tests.UnitTests.Models
         [Fact]
         public void IsAvailable_ShouldReturn_True_WhenNoEnvironmentAvailabilitiesAreSpecified()
         {
+            // Arrange
             var formSchema = new FormSchema();
 
+            // Act
             var result = formSchema.IsAvailable("Int");
 
+            // Assert
             Assert.True(result);
         }
 
         [Fact]
         public void IsAvailable_ShouldReturn_True_WhenRequestedEnvironmentAvailabilitiesIsNotSpecified()
         {
-            var formSchema = new FormSchema
-            {
-                EnvironmentAvailabilities = new List<EnvironmentAvailability>
-                {
-                    new EnvironmentAvailability {
-                        Environment = "Prod",
-                        IsAvailable = false
-                    }
-                }
-            };
+            // Arrange
+            var formSchema = new FormSchemaBuilder()
+                .WithEnvironmentAvailability("prod", false)
+                .Build();
 
+            // Act
             var result = formSchema.IsAvailable("Int");
 
+            // Assert
             Assert.True(result);
         }
 
         [Fact]
         public void IsAvailable_ShouldReturn_True_WhenRequestedEnvironmentAvailabilitiesIsSpecified_And_IsAvailableEqualsTrue()
         {
-            var formSchema = new FormSchema
-            {
-                EnvironmentAvailabilities = new List<EnvironmentAvailability>
-                {
-                    new EnvironmentAvailability(){
-                        Environment = "Int",
-                        IsAvailable = true
-                    }
-                }
-            };
+            // Arrange
+            var formSchema = new FormSchemaBuilder()
+                .WithEnvironmentAvailability("Int", true)
+                .Build();
 
+            // Act
             var result = formSchema.IsAvailable("Int");
 
+            // Assert
             Assert.True(result);
         }
 
         [Fact]
         public void IsAvailable_ShouldReturn_False_WhenRequestedEnvironmentAvailabilitiesIsSpecified_And_IsAvailableEqualsFalse()
         {
-            var formSchema = new FormSchema
-            {
-                EnvironmentAvailabilities = new List<EnvironmentAvailability>
-                {
-                    new EnvironmentAvailability {
-                        Environment = "Int",
-                        IsAvailable = false
-                    }
-                }
-            };
+            // Arrange
+            var formSchema = new FormSchemaBuilder()
+                .WithEnvironmentAvailability("Int", false)
+                .Build();
 
+            // Act
             var result = formSchema.IsAvailable("Int");
 
+            // Assert
             Assert.False(result);
         }
 
@@ -101,7 +91,6 @@ namespace form_builder_tests.UnitTests.Models
             // Act & Assert
             var result = Assert.Throws<ApplicationException>(() => formSchema.GetPage(_mockPageHelper.Object, "path"));
             Assert.Contains("Requested path 'path' object could not be found or was not unique", result.Message);
-
         }
 
         [Fact]

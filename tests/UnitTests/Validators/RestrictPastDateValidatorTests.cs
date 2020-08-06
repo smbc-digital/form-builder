@@ -1,32 +1,34 @@
-﻿using form_builder.Builders;
+﻿using System.Collections.Generic;
+using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Validators;
-using System.Collections.Generic;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
 {
     public class RestrictPastDateValidatorTests
     {
-        
         private readonly RestrictPastDateValidator _restrictPastDateValidator = new RestrictPastDateValidator();
 
         [Fact]
         public void Validate_ShouldCheckRestrictPastDatePropertyIsNotSet()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .Build();
 
-            //Assert
+            // Act
             var result = _restrictPastDateValidator.Validate(element, null);
+
+            // Assert
             Assert.True(result.IsValid);
         }
+
         [Fact]
         public void Validate_ReturnsTrueWhenOptionalFieldsAreEmpty()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithRestrictPastDate(true)
@@ -35,15 +37,17 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>();
 
-            //Assert
+            // Act
             var result = _restrictPastDateValidator.Validate(element, viewModel);
+
+            // Assert
             Assert.True(result.IsValid);
         }
 
         [Fact]
         public void Validate_ShouldShowValidationMessageWhenFieldsAreEmpty()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
@@ -53,8 +57,10 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>();
 
-            //Assert
+            // Act
             var result = _restrictPastDateValidator.Validate(element, viewModel);
+
+            // Assert
             Assert.False(result.IsValid);
             Assert.Equal("Check the date and try again", result.Message);
         }
@@ -62,43 +68,50 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldShowValidationMessageWhenPastDateEntered()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
-                .WithRestrictPastDate(true, "Past date vaidation message")
+                .WithRestrictPastDate(true, "Past date validation message")
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("test-date-day", "01");
-            viewModel.Add("test-date-month", "01");
-            viewModel.Add("test-date-year", "2010");
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {"test-date-day", "01"},
+                {"test-date-month", "01"},
+                {"test-date-year", "2010"}
+            };
 
-            //Assert
+            // Act
             var result = _restrictPastDateValidator.Validate(element, viewModel);
+
+            // Assert
             Assert.False(result.IsValid);
-            Assert.Equal("Past date vaidation message", result.Message);
+            Assert.Equal("Past date validation message", result.Message);
         }
 
         [Fact]
         public void Validate_ShouldReturnTrueWhenPastDateIsNotEntered()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
                 .WithRestrictPastDate(true) 
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("test-date-day", "10");
-            viewModel.Add("test-date-month", "10");
-            viewModel.Add("test-date-year", "2030");
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {"test-date-day", "10"},
+                {"test-date-month", "10"},
+                {"test-date-year", "2030"}
+            };
 
-            //Assert
+            // Act
             var result = _restrictPastDateValidator.Validate(element, viewModel);
+
+            // Assert
             Assert.True(result.IsValid);
         }
     }
 }
-
