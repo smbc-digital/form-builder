@@ -1,25 +1,23 @@
-﻿using System.Collections.Generic;
-using form_builder.Controllers;
-using Xunit;
-using Moq;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
-using Microsoft.AspNetCore.Mvc;
+using form_builder.Builders;
+using form_builder.Controllers;
 using form_builder.Enum;
-using form_builder_tests.Builders;
+using form_builder.Models;
+using form_builder.Models.Properties.ActionProperties;
+using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
 using form_builder.Services.PageService.Entities;
-using form_builder.Models;
 using form_builder.Workflows;
-using form_builder.Services.FileUploadService;
-using form_builder.Builders;
-using form_builder.Models.Properties.ActionProperties;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting;
 using form_builder.Workflows.ActionsWorkflow;
-using Microsoft.Extensions.Logging;
-using ILogger = Serilog.ILogger;
+using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Moq;
+using Xunit;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
