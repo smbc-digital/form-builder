@@ -117,7 +117,6 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             var questionId = "testQuestion";
-            var questionResponse = "testResponse";
             var callbackValue = new ExpandoObject() as IDictionary<string, object>;
 
             var element = new ElementBuilder()
