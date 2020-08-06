@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using form_builder.Workflows.ActionsWorkflow;
+using Microsoft.Extensions.Logging;
+using ILogger = Serilog.ILogger;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -31,6 +33,7 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new Mock<IActionsWorkflow>();
         private readonly Mock<ISuccessWorkflow> _mockSucessWorkflow = new Mock<ISuccessWorkflow>();
+        private readonly Mock<ILogger<HomeController>> _mockLogger = new Mock<ILogger<HomeController>>();
 
         public HomeControllerTest()
         {
@@ -44,7 +47,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockFileUploadService.Object,
                 _mockHostingEnv.Object,
                 _mockActionsWorkflow.Object,
-                _mockSucessWorkflow.Object) {TempData = tempData};
+                _mockSucessWorkflow.Object,
+                _mockLogger.Object) {TempData = tempData};
 
             _mockSucessWorkflow.Setup(_ => _.Process(It.IsAny<EBehaviourType>(), It.IsAny<string>())).ReturnsAsync(new SuccessPageEntity
             {
