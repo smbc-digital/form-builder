@@ -45,6 +45,5 @@ namespace form_builder_tests.UnitTests.Workflows
             // Assert
             _mockRetrieveExternalDataService.Verify(_ => _.Process(page.PageActions, It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Once);
         }
-
     }
 }

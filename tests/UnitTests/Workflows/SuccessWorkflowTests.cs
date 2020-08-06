@@ -44,8 +44,12 @@ namespace form_builder_tests.UnitTests.Workflows
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>())).ReturnsAsync(formSchema);
-            _mockPageService.Setup(_ => _.FinalisePageJourney(It.IsAny<string>(), EBehaviourType.SubmitForm, It.IsAny<FormSchema>()))
+            _mockSchemaFactory
+                .Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(formSchema);
+
+            _mockPageService
+                .Setup(_ => _.FinalisePageJourney(It.IsAny<string>(), EBehaviourType.SubmitForm, It.IsAny<FormSchema>()))
                 .ReturnsAsync(new SuccessPageEntity
                 {
                     FormAnswers = new FormAnswers()
