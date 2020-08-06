@@ -1,5 +1,7 @@
-﻿using form_builder.Builders;
-using form_builder.Cache;
+﻿using System.Collections.Generic;
+using System.Dynamic;
+using System.Threading.Tasks;
+using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
@@ -14,9 +16,6 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
@@ -70,7 +69,6 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldCallCacheProvider_ToGetFormData()
         {
-
             // Act
             await _service.Map("form", "guid");
 
@@ -81,7 +79,6 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldCallCache_ToGetFormSchema()
         {
-
             // Act
             await _service.Map("form", "guid");
 
@@ -92,6 +89,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldReturnEmptyExpandoObject_WhenFormContains_NoValidatableElements()
         {
+            // Arrange
             var element = new ElementBuilder()
                  .WithType(EElementType.H1)
                  .WithQuestionId("test-question")
@@ -133,6 +131,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldReturnExpandoObject_WhenFormContains_SingleValidatableElement()
         {
+            // Arrange
             var element = new ElementBuilder()
                  .WithType(EElementType.H1)
                  .WithQuestionId("test-question")
@@ -174,6 +173,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldReturnExpandoObject_WhenFormContains_MultipleValidatableElementsWithTargetMapping()
         {
+            // Arrange
             var element = new ElementBuilder()
                  .WithType(EElementType.H1)
                  .WithQuestionId("test-question")
@@ -225,6 +225,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldReturnExpandoObject_WhenFormContains_ValidatableElementWithComplexTargetMapping()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithTargetMapping("one.two.three.four.five.six")
@@ -276,6 +277,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldReturnExpandoObject_WhenFormContains_MutipleValidatableElementsWithComplexTargetMapping()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithTargetMapping("one.two.three.four.five.six")
@@ -336,6 +338,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldReturnEmptyExpandoObject_WhenNullResponse_ForFile()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.FileUpload)
                 .WithQuestionId("file")
@@ -377,6 +380,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldReturnExpandoObject_WithSingleFile()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.FileUpload)
                 .WithQuestionId("file")
@@ -426,6 +430,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldReturnExpandoObject_WithTwoFiles_WithSameMapping()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.FileUpload)
                 .WithQuestionId("file")
