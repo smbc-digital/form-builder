@@ -1,29 +1,29 @@
-﻿using System.Collections.Generic;
-using form_builder.Models;
-using form_builder.Validators;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Configuration;
+using form_builder.Constants;
+using form_builder.ContentFactory;
+using form_builder.Enum;
+using form_builder.Extensions;
+using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
-using System;
-using form_builder.Services.PageService.Entities;
-using System.Linq;
-using form_builder.Enum;
-using form_builder.Services.AddressService;
-using form_builder.Services.StreetService;
-using form_builder.ViewModels;
+using form_builder.Models;
 using form_builder.Providers.StorageProvider;
-using form_builder.Extensions;
-using Newtonsoft.Json;
-using form_builder.Services.OrganisationService;
-using Microsoft.AspNetCore.Hosting;
-using form_builder.Configuration;
-using Microsoft.Extensions.Options;
-using form_builder.ContentFactory;
-using form_builder.Factories.Schema;
-using form_builder.Constants;
+using form_builder.Services.AddressService;
 using form_builder.Services.MappingService;
+using form_builder.Services.OrganisationService;
+using form_builder.Services.PageService.Entities;
 using form_builder.Services.PayService;
+using form_builder.Services.StreetService;
+using form_builder.Validators;
+using form_builder.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace form_builder.Services.PageService
 {
@@ -37,7 +37,7 @@ namespace form_builder.Services.PageService
         private readonly IAddressService _addressService;
         private readonly IOrganisationService _organisationService;
         private readonly ISchemaFactory _schemaFactory;
-        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IWebHostEnvironment _environment;
         private readonly IPayService _payService;
         private readonly IMappingService _mappingService;
@@ -53,7 +53,7 @@ namespace form_builder.Services.PageService
             IStreetService streetService, 
             IOrganisationService organisationService, 
             IDistributedCacheWrapper distributedCache, 
-            IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, 
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration, 
             IWebHostEnvironment environment, 
             ISuccessPageFactory successPageFactory,
             IPageFactory pageFactory,
@@ -72,7 +72,7 @@ namespace form_builder.Services.PageService
             _successPageContentFactory = successPageFactory;
             _pageContentFactory = pageFactory;
             _environment = environment;
-            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _payService = payService;
             _mappingService = mappingService;
         }
@@ -80,9 +80,7 @@ namespace form_builder.Services.PageService
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath)
         {
             if (string.IsNullOrEmpty(path))
-            {
                 _sessionHelper.RemoveSessionGuid();
-            }
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
@@ -95,29 +93,23 @@ namespace form_builder.Services.PageService
             var baseForm = await _schemaFactory.Build(form);
 
             if(!baseForm.IsAvailable(_environment.EnvironmentName))
-            {
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
-            }
 
             var formData = _distributedCache.GetString(sessionGuid);
 
             if (formData == null && path != baseForm.FirstPageSlug)
-            {
                 return new ProcessPageEntity
                 {
                     ShouldRedirect = true,
                     TargetPage = baseForm.FirstPageSlug
                 };
-            }
 
             if (string.IsNullOrEmpty(path))
-            {
                 return new ProcessPageEntity
                 {
                     ShouldRedirect = true,
                     TargetPage = baseForm.FirstPageSlug
                 };
-            }
 
             if (formData != null && path == baseForm.FirstPageSlug)
             {
@@ -128,9 +120,7 @@ namespace form_builder.Services.PageService
 
             var page = baseForm.GetPage(_pageHelper, path);
             if (page == null)
-            {
                 throw new ApplicationException($"Requested path '{path}' object could not be found.");
-            }
 
             await baseForm.ValidateFormSchema(_pageHelper, form, path);
 
@@ -228,7 +218,7 @@ namespace form_builder.Services.PageService
 
         public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
-            Dictionary<string, dynamic> answers = new Dictionary<string, dynamic>();
+            var answers = new Dictionary<string, dynamic>();
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var cachedAnswers = _distributedCache.GetString(sessionGuid);
@@ -247,9 +237,7 @@ namespace form_builder.Services.PageService
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (string.IsNullOrEmpty(sessionGuid))
-            {
                 throw new Exception("PageService::FinalisePageJourney: Session has expired");
-            }
 
             var formData = _distributedCache.GetString(sessionGuid);
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
@@ -259,15 +247,13 @@ namespace form_builder.Services.PageService
                 .ToList();
 
             if (formFileUploadElements.Count > 0)
-            {
                 formFileUploadElements.ForEach(_ =>
                 {
                     _distributedCache.Remove($"file-{_.Properties.QuestionId}-fileupload-{sessionGuid}");
                 });
-            }
 
             if(baseForm.DocumentDownload)
-                await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(formAnswers), _distrbutedCacheExpirationConfiguration.Document);
+                await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(formAnswers), _distributedCacheExpirationConfiguration.Document);
 
             return await _successPageContentFactory.Build(form, baseForm, sessionGuid, formAnswers, behaviourType);
         }

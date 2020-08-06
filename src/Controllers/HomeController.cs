@@ -1,19 +1,17 @@
-﻿using form_builder.Enum;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
-using form_builder.Workflows;
 using form_builder.ViewModels;
+using form_builder.Workflows;
+using form_builder.Workflows.ActionsWorkflow;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using form_builder.Workflows.ActionsWorkflow;
-using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace form_builder.Controllers
 {
@@ -26,7 +24,6 @@ namespace form_builder.Controllers
         private readonly ISuccessWorkflow _successWorkflow;
         private readonly IFileUploadService _fileUploadService;
         private readonly IWebHostEnvironment _hostingEnvironment;
-        private readonly ILogger<HomeController> _logger;
 
         public HomeController(IPageService pageService,
             ISubmitWorkflow submitWorkflow,
@@ -34,8 +31,7 @@ namespace form_builder.Controllers
             IFileUploadService fileUploadService,
             IWebHostEnvironment hostingEnvironment, 
             IActionsWorkflow actionsWorkflow, 
-            ISuccessWorkflow successWorkflow, 
-            ILogger<HomeController> logger)
+            ISuccessWorkflow successWorkflow)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
@@ -44,7 +40,6 @@ namespace form_builder.Controllers
             _hostingEnvironment = hostingEnvironment;
             _actionsWorkflow = actionsWorkflow;
             _successWorkflow = successWorkflow;
-            _logger = logger;
         }
 
         [HttpGet]
@@ -89,7 +84,6 @@ namespace form_builder.Controllers
             string subPath = "")
         {
             var viewModel = formData.ToNormaliseDictionary(subPath);
-            _logger.LogWarning($"Home Controller:: IndexPost:: View model is {viewModel}");
 
             if(fileUpload != null && fileUpload.Any())
                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
@@ -97,7 +91,7 @@ namespace form_builder.Controllers
             var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload);
 
             if (currentPageResult.RedirectToAction && !string.IsNullOrWhiteSpace(currentPageResult.RedirectAction))
-                return RedirectToAction(currentPageResult.RedirectAction, currentPageResult.RouteValues != null ? currentPageResult.RouteValues : new { form, path });
+                return RedirectToAction(currentPageResult.RedirectAction, currentPageResult.RouteValues ?? new { form, path });
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);

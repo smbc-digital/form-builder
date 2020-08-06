@@ -37,10 +37,11 @@ using form_builder.Services.PageService;
 using form_builder.Services.PayService;
 using form_builder.Services.RetrieveExternalDataService;
 using form_builder.Services.StreetService;
-using form_builder.Services.SubmtiService;
+using form_builder.Services.SubmitService;
 using form_builder.Validators;
 using form_builder.Workflows;
 using form_builder.Workflows.ActionsWorkflow;
+using form_builder.Workflows.DocumentWorkflow;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -136,6 +137,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
             services.AddSingleton<IAddressProvider, ServiceAddressProvider>();
+
             return services;
         }
 
@@ -158,12 +160,14 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         public static IServiceCollection ConfigurePaymentProviders(this IServiceCollection services)
         {
             services.AddSingleton<IPaymentProvider, CivicaPayProvider>();
+
             return services;
         }
 
         public static IServiceCollection ConfigureDocumentCreationProviders(this IServiceCollection services)
         {
             services.AddSingleton<IDocumentCreation, TextfileDocumentCreator>();
+
             return services;
         }
 
@@ -251,8 +255,8 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         {
             services.Configure<DisallowedAnswerKeysConfiguration>(configuration.GetSection("FormConfig"));
             services.Configure<CivicaPaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
-            services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection("DistrbutedCacheExpiration"));
-            services.Configure<DistrbutedCacheConfiguration>(cacheOptions => cacheOptions.UseDistrbutedCache = configuration.GetValue<bool>("UseDistrbutedCache"));
+            services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection("DistributedCacheExpiration"));
+            services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>("UseDistributedCache"));
             services.Configure<AwsSesKeysConfiguration>(configuration.GetSection("Ses"));
 
             return services;
@@ -286,6 +290,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
             services.AddDataProtection().SetApplicationName("formbuilder");
             services.AddSingleton<IDistributedCacheWrapper, DistributedCacheWrapper>();
+
             return services;
         }
     }

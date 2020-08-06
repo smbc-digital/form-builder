@@ -1,9 +1,9 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
 {
@@ -30,6 +30,7 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckAllDateRestrictionsAreNotEnabled(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
     }

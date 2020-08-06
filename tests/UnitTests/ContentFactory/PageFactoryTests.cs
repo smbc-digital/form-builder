@@ -5,8 +5,6 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
@@ -16,15 +14,10 @@ namespace form_builder_tests.UnitTests.ContentFactory
     {
         private readonly PageFactory _factory;
         private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContextAcessor = new Mock<IHttpContextAccessor>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        
+
         public PageFactoryTests()
         {
-            _mockHttpContextAcessor.Setup(_ => _.HttpContext.Request.Host)
-                .Returns(new HostString("www.test.com"));
-
-            _factory = new PageFactory(_mockPageHelper.Object, _mockHttpContextAcessor.Object, _mockHostingEnv.Object);
+            _factory = new PageFactory(_mockPageHelper.Object);
         }
 
         [Fact]
@@ -38,7 +31,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 It.IsAny<FormSchema>(),
                 It.IsAny<string>(),
                 It.IsAny<List<object>>()))
-                .ReturnsAsync(new form_builder.ViewModels.FormBuilderViewModel{ RawHTML = html });
+                .ReturnsAsync(new FormBuilderViewModel { RawHTML = html });
 
             // Act
             var result = await _factory.Build(new Page(), new Dictionary<string, dynamic>(), new FormSchema(), string.Empty);
@@ -58,19 +51,19 @@ namespace form_builder_tests.UnitTests.ContentFactory
         {
             // Arrange
             var html = "testHtml";
-            var baseUrl ="base";
             var pageUrl = "page-one";
             var startPageUrl = "start-page-url";
+
             _mockPageHelper.Setup(_ => _.GenerateHtml(
                 It.IsAny<Page>(),
                 It.IsAny<Dictionary<string, dynamic>>(),
                 It.IsAny<FormSchema>(),
                 It.IsAny<string>(),
                 It.IsAny<List<object>>()))
-                .ReturnsAsync(new FormBuilderViewModel{ RawHTML = html });
+                .ReturnsAsync(new FormBuilderViewModel { RawHTML = html });
 
             var formSchema = new FormSchemaBuilder()
-                .WithBaseUrl(baseUrl)
+                .WithBaseUrl("base")
                 .WithName("form name")
                 .WithFeedback("BETA", "feedbackurl")
                 .WithStartPageUrl(startPageUrl)

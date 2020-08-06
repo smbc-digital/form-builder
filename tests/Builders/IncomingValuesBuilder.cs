@@ -8,15 +8,12 @@ namespace form_builder_tests.Builders
         private string _name;
         private bool _optional;
 
-        public IncomingValue Build()
+        public IncomingValue Build() => new IncomingValue
         {
-            return new IncomingValue
-            {
-                QuestionId = _questionId,
-                Name = _name,
-                Optional = _optional
-            };
-        }
+            QuestionId = _questionId,
+            Name = _name,
+            Optional = _optional
+        };
 
         public IncomingValuesBuilder WithQuestionId(string questionId)
         {

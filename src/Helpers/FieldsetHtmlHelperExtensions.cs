@@ -11,9 +11,8 @@ namespace form_builder.Helpers
             var fieldsetBuilder = new TagBuilder("fieldset");
 
             if (element.DisplayAriaDescribedby)
-            {
                 fieldsetBuilder.Attributes.Add("aria-describedby", element.GetDescribedByAttributeValue());
-            }
+
             fieldsetBuilder.AddCssClass("govuk-fieldset");
 
             return fieldsetBuilder.RenderStartTag();
@@ -24,14 +23,10 @@ namespace form_builder.Helpers
             var fieldsetBuilder = new TagBuilder("fieldset");
 
             if (element.DisplayAriaDescribedby)
-            {
                 fieldsetBuilder.Attributes.Add("aria-describedby", element.GetDescribedByAttributeValue());
-            }
 
             foreach (var className in classNames)
-            {
                 fieldsetBuilder.AddCssClass(className);
-            }
 
             return fieldsetBuilder.RenderStartTag();
         }
@@ -41,9 +36,7 @@ namespace form_builder.Helpers
             var fieldsetBuilder = new TagBuilder("fieldset");
 
             if (element.DisplayAriaDescribedby)
-            {
                 fieldsetBuilder.Attributes.Add("aria-describedby", element.GetDescribedByAttributeValue(prefix));
-            }
             
             fieldsetBuilder.AddCssClass("govuk-fieldset");
 

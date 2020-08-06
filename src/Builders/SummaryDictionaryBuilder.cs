@@ -16,21 +16,15 @@ namespace form_builder.Builders
                 return;
 
             if (type == EElementType.FileUpload)
-            {
                 _filesData.Add($"{question}: {answer}");
-            }
             else
-            {
                 _data.Add(question, answer);
-            }
         }
 
         public Dictionary<string, string> Build()
         {
             if (_filesData.Any())
-            {
                 _data.Add("Files:", string.Join(", ",_filesData.ToArray()));  
-            }
 
             return _data;
         }

@@ -11,8 +11,11 @@ namespace form_builder.Models
         }
 
         public string Base64EncodedContent { get; }
+
         public string UntrustedOriginalFileName { get; }
+
         public string QuestionId { get; }
+
         public long Length { get; }
     }
 }

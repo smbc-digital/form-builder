@@ -23,10 +23,7 @@ namespace form_builder.Conditions
             { ECondition.EndsWith, StringComparator.EndsWith }
         };
 
-        public bool IsValid(Condition condition, Dictionary<string, dynamic> viewModel)
-        {
-            return ConditionList[condition.ConditionType](condition, viewModel);
-        }
-
+        public bool IsValid(Condition condition, Dictionary<string, dynamic> viewModel) =>
+            ConditionList[condition.ConditionType](condition, viewModel);
     }
 }

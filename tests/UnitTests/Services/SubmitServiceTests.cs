@@ -1,92 +1,50 @@
-﻿using form_builder.Enum;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.SubmtiService;
-using form_builder_tests.Builders;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Xunit;
-using System.Dynamic;
-using form_builder.Services.MappingService.Entities;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using form_builder.Configuration;
 using form_builder.Builders;
+using form_builder.Configuration;
+using form_builder.Enum;
+using form_builder.Helpers.PageHelpers;
+using form_builder.Models;
+using form_builder.Services.MappingService.Entities;
+using form_builder.Services.SubmitService;
+using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
+using Moq;
+using StockportGovUK.NetStandard.Gateways;
+using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
 {
     public class SubmitServiceTests
     {
         private readonly SubmitService _service;
-        private readonly Mock<ILogger<SubmitService>> _mockLogger = new Mock<ILogger<SubmitService>>();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistrubutedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
         private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
-        private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IWebHostEnvironment> _mockEnvironment = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-
-        private readonly Mock<IOptions<SubmissionServiceConfiguration>> _mockIOptons = new Mock<IOptions<SubmissionServiceConfiguration>>();
-
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+        private readonly Mock<IOptions<SubmissionServiceConfiguration>> _mockIOptions = new Mock<IOptions<SubmissionServiceConfiguration>>();
         public SubmitServiceTests()
         {
             _mockEnvironment.Setup(_ => _.EnvironmentName)
                 .Returns("local");
 
-            var cacheData = new FormAnswers
-            {
-                Path = "page-one",
-                Pages = new List<PageAnswers>()
+            _mockIOptions.Setup(_ => _.Value)
+                .Returns(new SubmissionServiceConfiguration 
                 {
-                    new PageAnswers
-                    {
-                        Answers = new List<Answers>
-                        {
-                            new Answers
-                            {
-                                QuestionId = $"test",
-                                Response = "test street"
-                            }
-                        },
-                        PageSlug = "page-one"
-                    }
-                }
-            };
+                    FakePaymentSubmission = false
+                });
 
-            _mockDistrbutedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
-            {
-                Document = 1
-            });
-
-            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(Newtonsoft.Json.JsonConvert.SerializeObject(cacheData));
-
-            _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
-                .Returns(new HostString("www.test.com"));
-
-            _mockIOptons.Setup(_ => _.Value).Returns(new SubmissionServiceConfiguration {
-                FakePaymentSubmission = false
-            });
-
-            _service = new SubmitService(_mockLogger.Object, _mockDistrubutedCache.Object, _mockGateway.Object, _mockPageHelper.Object, _sessionHelper.Object, _mockEnvironment.Object, _mockHttpContextAccessor.Object, _mockDistrbutedCacheExpirationConfiguration.Object, _mockIOptons.Object);
+            _service = new SubmitService(_mockGateway.Object, _mockPageHelper.Object, _mockEnvironment.Object, _mockIOptions.Object);
         }
 
         [Fact]
         public async Task ProcessSubmission_Application_ShouldThrowApplicationException_WhenNoSubmitUrlSpecified()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
-
             var element = new ElementBuilder()
                 .WithType(EElementType.H1)
                 .WithQuestionId("test-id")
@@ -116,7 +74,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
             // Assert
-            Assert.Equal("Page model, Submit: No postUrl supplied for submit form", result.Message);
+            Assert.Equal("Page model::GetSubmitFormEndpoint, No postUrl supplied for submit form", result.Message);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Never);
         }
 
@@ -124,8 +82,6 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessSubmission_Applicaton_ShouldCatchException_WhenGatewayCallThrowsException()
         {
             // Arrange
-            var guid = Guid.NewGuid();
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
             var submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.Environment.com" };
 
             var formData = new BehaviourBuilder()
@@ -151,7 +107,6 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(page);
 
             // Act & Assert
-            //var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
             var result = await Assert.ThrowsAsync<Exception>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
             Assert.StartsWith("error", result.Message);
@@ -162,27 +117,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             var questionId = "testQuestion";
-            var questionResponse = "testResponse";
             var callbackValue = new ExpandoObject() as IDictionary<string, object>;
-            var cacheData = new FormAnswers
-            {
-                Pages = new List<PageAnswers>
-                {
-                    new PageAnswers
-                    {
-                        PageSlug = "page-one",
-                        Answers = new List<Answers>
-                        {
-                            new Answers
-                            {
-                                    QuestionId = questionId,
-                                    Response = questionResponse
-                            }
-                        }
-                    }
-                },
-                Path = "page-one"
-            };
 
             var element = new ElementBuilder()
                 .WithQuestionId(questionId)
@@ -205,8 +140,6 @@ namespace form_builder_tests.UnitTests.Services
             var schema = new FormSchemaBuilder()
                 .WithPage(page)
                 .Build();
-
-            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
@@ -232,7 +165,6 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessSubmission__Application_ShoudlThrowApplicationException_WhenGatewayResponse_IsNotOk()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
             var element = new ElementBuilder()
                  .WithType(EElementType.H1)
                  .WithQuestionId("test-id")
@@ -255,13 +187,6 @@ namespace form_builder_tests.UnitTests.Services
             var schema = new FormSchemaBuilder()
                 .WithPage(page)
                 .Build();
-
-            var cacheData = new FormAnswers
-            {
-                Path = "page-one"
-            };
-
-            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
@@ -287,7 +212,7 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var guid = Guid.NewGuid();
 
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -328,8 +253,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task PaymentSubmission_ShouldThrowApplicationException_WhenNotOkResponse()
         {
             // Arrange
-            var guid = Guid.NewGuid();
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -368,8 +292,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task PaymentSubmission_ShouldThrowApplicationException_WhenNoContentFromGateway()
         {
             // Arrange
-            var guid = Guid.NewGuid();
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
                 .WithPageSlug("testUrl")
@@ -408,9 +331,8 @@ namespace form_builder_tests.UnitTests.Services
         public async Task PaymentSubmission_ShouldThrowApplicationException_WhenGatewayResponseContent_IsEmpty()
         {
             // Arrange
-            var guid = Guid.NewGuid();
             var postUrl = "www.post.url";
-            SubmitSlug submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)

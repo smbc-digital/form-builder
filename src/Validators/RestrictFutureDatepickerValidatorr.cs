@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using form_builder.Models.Elements;
 using form_builder.Enum;
-
+using form_builder.Models.Elements;
 
 namespace form_builder.Validators
 {
-    public class RestrictFutureDatepickerValidator :IElementValidator
+    public class RestrictFutureDatepickerValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string,dynamic> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
             if (!element.Properties.RestrictFutureDate || element.Type != EElementType.DatePicker || element.Properties.Optional)
             {
@@ -18,10 +17,8 @@ namespace form_builder.Validators
                 };
             }
 
-            var value = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId]:null;
-
+            var value = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId] : null;
             var outDate = DateTime.Now;
-
             var isValidDate = DateTime.TryParse(value, out outDate);
 
             if (!isValidDate)
@@ -34,7 +31,6 @@ namespace form_builder.Validators
             }
 
             var date = DateTime.Today;
-
             var dateOutput = DateTime.Parse(value);
 
             if (dateOutput > date)
@@ -52,7 +48,5 @@ namespace form_builder.Validators
                 Message = string.Empty
             };
         }
-
-
     }
 }

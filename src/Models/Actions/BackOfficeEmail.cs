@@ -1,25 +1,26 @@
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Helpers.ActionsHelpers;
-using form_builder.Models;
 using form_builder.Providers.EmailProvider;
-using Action = form_builder.Models.Actions.Action;
 
-public class BackOfficeEmail : Action
+namespace form_builder.Models.Actions
 {
-    public BackOfficeEmail()
+    public class BackOfficeEmail : Action
     {
-        Type = EActionType.RetrieveExternalData;
-    }
+        public BackOfficeEmail()
+        {
+            Type = EActionType.RetrieveExternalData;
+        }
 
-    public override async Task Process(IActionHelper actionHelper, IEmailProvider emailProvider, FormAnswers formAnswers)
-    {
-        var message = new EmailMessage(
-                          this.Properties.Subject,
-                          this.Properties.Content,
-                          this.Properties.From,
-                          actionHelper.GetEmailToAddresses(this, formAnswers));
+        public override async Task Process(IActionHelper actionHelper, IEmailProvider emailProvider, FormAnswers formAnswers)
+        {
+            var message = new EmailMessage(
+                              this.Properties.Subject,
+                              this.Properties.Content,
+                              this.Properties.From,
+                              actionHelper.GetEmailToAddresses(this, formAnswers));
 
-        await emailProvider.SendEmail(message);
+            await emailProvider.SendEmail(message);
+        }
     }
 }

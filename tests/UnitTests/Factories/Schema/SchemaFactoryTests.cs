@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Enum;
@@ -5,17 +7,12 @@ using form_builder.Factories.Schema;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Models;
-using form_builder.Models.Elements;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
-using form_builder.Providers.Transforms.Lookups;
-using form_builder.Providers.Transforms.ReusableElements;
 using form_builder_tests.Builders;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Factories.Schema
@@ -23,64 +20,74 @@ namespace form_builder_tests.UnitTests.Factories.Schema
     public class SchemaFactoryTests
     {
         private readonly SchemaFactory _schemaFactory;
-        private readonly Mock<IDistributedCacheWrapper> _mockDistrbutedCache =new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<ISchemaProvider> _mockSchemaProvider = new Mock<ISchemaProvider>();
-        private readonly Mock<ILookupSchemaTransformFactory> _mockLookupSchemaFactory  = new Mock<ILookupSchemaTransformFactory>();
-        private readonly Mock<IReusableElementTransformDataProvider> _mockReusableElementSchemaProvider = new Mock<IReusableElementTransformDataProvider>();
-        private readonly Mock<IReusableElementSchemaTransformFactory> _mockReusableElementSchemaFactory  = new Mock<IReusableElementSchemaTransformFactory>();
-        private readonly Mock<IOptions<DistrbutedCacheConfiguration>> _mockDistrbutedCacheConfiguration = new Mock<IOptions<DistrbutedCacheConfiguration>>();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+        private readonly Mock<ILookupSchemaTransformFactory> _mockLookupSchemaFactory = new Mock<ILookupSchemaTransformFactory>();
+        private readonly Mock<IReusableElementSchemaTransformFactory> _mockReusableElementSchemaFactory = new Mock<IReusableElementSchemaTransformFactory>();
+        private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new Mock<IOptions<DistributedCacheConfiguration>>();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
 
         public SchemaFactoryTests()
         {
-            _mockDistrbutedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
-            {
-                FormJson = 1
-            });
+            _mockDistributedCacheExpirationConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new DistributedCacheExpirationConfiguration
+                {
+                    FormJson = 1
+                });
 
-            _mockDistrbutedCacheConfiguration.Setup(_ => _.Value).Returns(new DistrbutedCacheConfiguration
-            {
-                UseDistrbutedCache = true
-            });
+            _mockDistributedCacheConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new DistributedCacheConfiguration
+                {
+                    UseDistributedCache = true
+                });
 
             var formSchema = new FormSchemaBuilder()
                 .Build();
 
-            _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockSchemaProvider
+                .Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
-            _schemaFactory = new SchemaFactory(_mockDistrbutedCache.Object, _mockSchemaProvider.Object, _mockLookupSchemaFactory.Object, _mockReusableElementSchemaFactory.Object, _mockDistrbutedCacheConfiguration.Object,_mockDistrbutedCacheExpirationConfiguration.Object);
+            _schemaFactory = new SchemaFactory(_mockDistributedCache.Object, _mockSchemaProvider.Object, _mockLookupSchemaFactory.Object, _mockReusableElementSchemaFactory.Object, _mockDistributedCacheConfiguration.Object, _mockDistributedCacheExpirationConfiguration.Object);
         }
 
         [Fact]
         public async Task Build_ShouldCallDistributedCache_When_CacheEnabled()
         {
-            var result = await _schemaFactory.Build("form");
+            // Act
+            await _schemaFactory.Build("form");
 
-            _mockDistrbutedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+            // Assert
+            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
         }
-
 
         [Fact]
         public async Task Build_ShouldReturnFormJson_WhenFoundInCache()
         {
+            // Arrange
             var formSchema = new FormSchemaBuilder()
                 .Build();
 
-            _mockDistrbutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCache
+                .Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(JsonConvert.SerializeObject(formSchema));
 
+            // Act
             var result = await _schemaFactory.Build("form");
 
+            // Assert
             Assert.IsType<FormSchema>(result);
-            _mockDistrbutedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             _mockLookupSchemaFactory.Verify(_ => _.Transform(It.IsAny<FormSchema>()), Times.Never);
-            _mockDistrbutedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
         public async Task Build_ShouldCallLookupFactory_WhenElementContains_Lookup()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
                 .Build();
@@ -120,23 +127,27 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .WithPage(page2)
                 .Build();
 
-            _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockSchemaProvider
+                .Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
-            _mockReusableElementSchemaFactory.Setup(_ => _.Transform(It.IsAny<FormSchema>()))
-                        .ReturnsAsync(formSchema);
+            _mockReusableElementSchemaFactory
+                .Setup(_ => _.Transform(It.IsAny<FormSchema>()))
+                .ReturnsAsync(formSchema);
 
-            var result = await _schemaFactory.Build("form");
-            _mockDistrbutedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+            // Act
+            await _schemaFactory.Build("form");
+            
+            // Assert
+            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             _mockLookupSchemaFactory.Verify(_ => _.Transform(It.IsAny<FormSchema>()), Times.Once);
             _mockReusableElementSchemaFactory.Verify(_ => _.Transform(It.IsAny<FormSchema>()), Times.Once);
         }
 
-
-
         [Fact]
-        public async Task Build_Should_SaveFormScheam_()
+        public async Task Build_Should_SaveFormSchema_()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
                 .Build();
@@ -173,20 +184,25 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .WithPage(page2)
                 .Build();
 
-            _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+            _mockSchemaProvider
+                .Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
-            _mockLookupSchemaFactory.Setup(_ => _.Transform(It.IsAny<FormSchema>()))
-                .ReturnsAsync(formSchema);
-                
-            _mockReusableElementSchemaFactory.Setup(_ => _.Transform(It.IsAny<FormSchema>()))
+            _mockLookupSchemaFactory
+                .Setup(_ => _.Transform(It.IsAny<FormSchema>()))
+                .Returns(formSchema);
+
+            _mockReusableElementSchemaFactory
+                .Setup(_ => _.Transform(It.IsAny<FormSchema>()))
                 .ReturnsAsync(formSchema);
 
+            // Act
             var result = await _schemaFactory.Build("form");
 
+            // Assert
             Assert.IsType<FormSchema>(result);
-            _mockDistrbutedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
-            _mockDistrbutedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }
