@@ -9,10 +9,12 @@ using form_builder.ModelBinders.Providers;
 using form_builder.Utils.ServiceCollectionExtensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using StockportGovUK.AspNetCore.Middleware.App;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Gateways.AddressService;
@@ -41,12 +43,13 @@ namespace form_builder
         {
             services.Configure<RequestLocalizationOptions>(options =>
             {
-                options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-GB", "en-GB");
-                options.SupportedCultures = new List<CultureInfo> { new CultureInfo("en-GB", false) };
-                options.SupportedUICultures = new List<CultureInfo> { new CultureInfo("en-GB", false) };
+                options.DefaultRequestCulture = new RequestCulture("en-GB", "en-GB");
+                options.SupportedCultures = new List<CultureInfo> { new CultureInfo("en-GB") };
+                options.SupportedUICultures = new List<CultureInfo> { new CultureInfo("en-GB") };
             });
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options => { options.SerializerSettings.Culture = new CultureInfo("en-GB"); });
             services.AddRazorPages();
 
             services
@@ -70,7 +73,8 @@ namespace form_builder
                 .AddWorkflows()
                 .AddFactories()
                 .AddAntiforgery(_ => _.Cookie.Name = ".formbuilder.antiforgery.v2")
-                .AddSession(_ => {
+                .AddSession(_ =>
+                {
                     _.IdleTimeout = TimeSpan.FromMinutes(30);
                     _.Cookie.Path = "/";
                     _.Cookie.Name = ".formbuilder.v2";
@@ -105,6 +109,19 @@ namespace form_builder
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var supportedCultures = new[]
+            {
+                new CultureInfo("en-GB"),
+                new CultureInfo("en")
+            };
+
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("en-GB"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures
+            });
+
             if (env.IsEnvironment("local") || env.IsEnvironment("uitest"))
             {
                 app.UseDeveloperExceptionPage();
@@ -121,7 +138,11 @@ namespace form_builder
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
+            app.UseEndpoints(endpoints =>
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}")
+            );
         }
     }
 }
