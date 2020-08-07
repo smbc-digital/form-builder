@@ -73,7 +73,8 @@ namespace form_builder
                 .AddWorkflows()
                 .AddFactories()
                 .AddAntiforgery(_ => _.Cookie.Name = ".formbuilder.antiforgery.v2")
-                .AddSession(_ => {
+                .AddSession(_ =>
+                {
                     _.IdleTimeout = TimeSpan.FromMinutes(30);
                     _.Cookie.Path = "/";
                     _.Cookie.Name = ".formbuilder.v2";
@@ -89,7 +90,7 @@ namespace form_builder
                     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                     options.ModelBinderProviders.Insert(0, new CustomFormFileModelBinderProvider());
                 });
-                
+
             services.AddHttpClient<IGateway, Gateway>(Configuration);
             if (HostingEnvironment.IsEnvironment("stage") || HostingEnvironment.IsEnvironment("prod"))
             {
@@ -137,7 +138,11 @@ namespace form_builder
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
+            app.UseEndpoints(endpoints =>
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}")
+            );
         }
     }
 }
