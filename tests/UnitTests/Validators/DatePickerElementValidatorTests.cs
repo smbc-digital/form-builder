@@ -10,13 +10,7 @@ namespace form_builder_tests.UnitTests.Validators
 {
     public class DatePickerElementValidatorTests
     {
-        private readonly Mock<ILogger<DatePickerElementValidator>> _mockLogger = new Mock<ILogger<DatePickerElementValidator>>();
-        private readonly DatePickerElementValidator _dateInputElementValidator;
-
-        public DatePickerElementValidatorTests()
-        {
-            _dateInputElementValidator = new DatePickerElementValidator(_mockLogger.Object);
-        }
+        private readonly DatePickerElementValidator _dateInputElementValidator = new DatePickerElementValidator();
 
         [Fact]
         public void Validate_ShouldCheckTheElementTypeIsNotDateInput()

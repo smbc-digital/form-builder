@@ -10,12 +10,6 @@ namespace form_builder.Validators
 {
     public class DatePickerElementValidator : IElementValidator
     {
-        private readonly ILogger<DatePickerElementValidator> _logger;
-        public DatePickerElementValidator(ILogger<DatePickerElementValidator> logger)
-        {
-            _logger = logger;   
-        }
-
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
             if (element.Type != EElementType.DatePicker || !viewModel.ContainsKey(element.Properties.QuestionId))
