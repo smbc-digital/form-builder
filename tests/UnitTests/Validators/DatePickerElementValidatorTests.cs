@@ -2,13 +2,21 @@
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Validators;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
 {
     public class DatePickerElementValidatorTests
     {
-        private readonly DatePickerElementValidator _dateInputElementValidator = new DatePickerElementValidator();
+        private readonly Mock<ILogger<DatePickerElementValidator>> _mockLogger = new Mock<ILogger<DatePickerElementValidator>>();
+        private readonly DatePickerElementValidator _dateInputElementValidator;
+
+        public DatePickerElementValidatorTests()
+        {
+            _dateInputElementValidator = new DatePickerElementValidator(_mockLogger.Object);
+        }
 
         [Fact]
         public void Validate_ShouldCheckTheElementTypeIsNotDateInput()

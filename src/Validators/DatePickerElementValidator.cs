@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models.Elements;
+using Microsoft.Extensions.Logging;
 
 namespace form_builder.Validators
 {
     public class DatePickerElementValidator : IElementValidator
     {
+        private readonly ILogger<DatePickerElementValidator> _logger;
+        public DatePickerElementValidator(ILogger<DatePickerElementValidator> logger)
+        {
+            _logger = logger;   
+        }
+
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
             if (element.Type != EElementType.DatePicker || !viewModel.ContainsKey(element.Properties.QuestionId))
@@ -37,7 +45,8 @@ namespace form_builder.Validators
                     Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : ValidationConstants.DatePickerDefault
                 };
             }
-
+            _logger.LogDebug($"**DEBUG: thread culture {Thread.CurrentThread.CurrentCulture}");
+            _logger.LogDebug($"**DEBUG: thread ui culture {Thread.CurrentThread.CurrentUICulture}");
             var isValidDate = DateTime.TryParse(date, out DateTime  dateValue);
             var todaysDate = DateTime.Now;
             var maxDate = string.IsNullOrEmpty(element.Properties.Max) ? todaysDate.AddYears(100) : new DateTime(int.Parse(element.Properties.Max), todaysDate.Month, todaysDate.Day);
