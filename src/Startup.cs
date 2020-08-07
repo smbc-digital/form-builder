@@ -42,6 +42,7 @@ namespace form_builder
         public void ConfigureServices(IServiceCollection services)
         {
             CultureInfo.CurrentCulture = new CultureInfo("en-GB");
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-GB");
             services.AddControllersWithViews();
             services.AddRazorPages();
 
