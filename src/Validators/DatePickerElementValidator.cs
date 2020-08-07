@@ -45,8 +45,7 @@ namespace form_builder.Validators
                     Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : ValidationConstants.DatePickerDefault
                 };
             }
-            _logger.LogDebug($"**DEBUG: thread culture {Thread.CurrentThread.CurrentCulture}");
-            _logger.LogDebug($"**DEBUG: thread ui culture {Thread.CurrentThread.CurrentUICulture}");
+            
             var isValidDate = DateTime.TryParse(date, out DateTime  dateValue);
             var todaysDate = DateTime.Now;
             var maxDate = string.IsNullOrEmpty(element.Properties.Max) ? todaysDate.AddYears(100) : new DateTime(int.Parse(element.Properties.Max), todaysDate.Month, todaysDate.Day);
