@@ -1,64 +1,52 @@
 ﻿@using form_builder.Helpers
 @model form_builder.Models.Elements.Element
 @{
-    var hintId = $"{Model.Properties.QuestionId}-hint";
-
-    var hoursid = $"{Model.Properties.QuestionId}-hours";
-    var minutesid = $"{Model.Properties.QuestionId}-minutes";
-
-    var amid =  $"{Model.Properties.QuestionId}-am";
-    var pmid =  $"{Model.Properties.QuestionId}-pm";
-    var amPmName = $"{Model.Properties.QuestionId}-ampm";
-    
-    var errorId = $"{Model.Properties.QuestionId}-error";
-    var classes = new string[] { "input-time" };
-}
-
-@await Html.BeginFieldSet(Model, classes)
-    <partial name="Legend" model="@Model"/>
-    <p id="@hintId">@Model.Properties.Hint</p>
-    <div>
-        <label for="@hoursid">
-            Hours
-        </label>
-
-        @Html.TextBox(hoursid, Model.Properties.Hours, new { @class = "timeinput", maxLength = "2", type = "number", pattern = "[0-9]*", min = "1", max = "12", style = "width:3em" })
-    </div>
-    <div class="colon-divider">:</div>
-    <div>
-        <label for="@minutesid">
-            Minutes
-        </label>
-
-        @Html.TextBox(minutesid, Model.Properties.Minutes, new { @class = "timeinput", maxLength = "2", type = "number", pattern = "[0-9]*", min = "0", max = "59", style = "width:3em" })
-    </div>
-    <div class="ampm">
-        <div class="input-radio-container horizontal">
-            @if (Model.Properties.AmPm.ToLower() == "am")
-            {
-                <input type="radio" name="@amPmName" id="@amid" value="am" checked />
-            }
-            else
-            {
-                <input type="radio" name="@amPmName" id="@amid" value="am" />
-            }
-            <label for="@amid">am</label>
-        </div>
-        <div class="input-radio-container horizontal">
-            @if (Model.Properties.AmPm.ToLower() == "pm")
-            {
-                <input type="radio" name="@amPmName" id="@pmid" value="pm" checked />
-            }
-            else
-            {
-                <input type="radio" name="@amPmName" id="@pmid" value="pm" />
-            }
-
-            <label for="@pmid">pm</label>
-        </div>
-    </div>
-    @if (!Model.IsValid)
+    var inputClasses = "govuk-input govuk-date-input__input govuk-input--width-2";
+    if (!Model.IsValid)
     {
-        <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
+        inputClasses += " govuk-input--error";
     }
-@await Html.EndFieldSet()
+}
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
+    <partial name="LegendH1" />
+
+    <partial name="Hint" />
+
+    <partial name="Error" />
+
+    <div class="govuk-date-input">
+        <div class="smbc-time-input__item">
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("hours")>
+                    Hours
+                </label>
+                @Html.TextBox(Model.GetCustomItemId("hours"), Model.Properties.Hours, new { @class = inputClasses, maxLength = "2", type = "number", pattern = "[0-9]*", min = "1", max = "12", style = "width:3em" }):
+            </div>
+        </div>
+        <div class="smbc-time-input__divider"></div>
+        <div class="smbc-time-input__item">
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-date-input__label" for=@Model.GetCustomItemId("minutes")>
+                    Minutes
+                </label>
+                @Html.TextBox(Model.GetCustomItemId("minutes"), Model.Properties.Minutes, new { @class = inputClasses, maxLength = "2", type = "number", pattern = "[0-9]*", min = "1", max = "12", style = "width:3em" })
+            </div>
+        </div>
+
+        <div class="govuk-form-group govuk-!-margin-top-2">
+            <div class="govuk-radios govuk-radios--inline govuk-radios--small">
+                <div class="govuk-radios__item govuk-!-margin-right-2">
+                    <input type="radio" class="govuk-radios__input" name=@Model.GetCustomItemId("ampm") id=@Model.GetCustomItemId("am") value="am" @(Model.Properties.AmPm.ToLower() == "am" ? "checked" : string.Empty) />
+                    <label class="govuk-label govuk-radios__label" for=@Model.GetCustomItemId("am")>am</label>
+                </div>
+                <div class="govuk-radios__item">
+                    <input type="radio" class="govuk-radios__input" name=@Model.GetCustomItemId("ampm") id=@Model.GetCustomItemId("pm") value="pm" @(Model.Properties.AmPm.ToLower() == "pm" ? "checked" : string.Empty) />
+                    <label class="govuk-label govuk-radios__label" for=@Model.GetCustomItemId("pm")>pm</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Html.EndFieldSet()
+</div>

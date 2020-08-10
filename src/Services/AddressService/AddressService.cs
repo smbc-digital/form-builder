@@ -1,4 +1,9 @@
-﻿using form_builder.Constants;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using form_builder.Constants;
+using form_builder.ContentFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
@@ -7,10 +12,6 @@ using form_builder.Providers.Address;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace form_builder.Services.AddressService
 {
@@ -29,15 +30,18 @@ namespace form_builder.Services.AddressService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IPageHelper _pageHelper;
         private readonly IEnumerable<IAddressProvider> _addressProviders;
+        private readonly IPageFactory _pageFactory;
 
         public AddressService(
             IDistributedCacheWrapper distributedCache,
             IPageHelper pageHelper,
-            IEnumerable<IAddressProvider> addressProviders)
+            IEnumerable<IAddressProvider> addressProviders,
+            IPageFactory pageFactory)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
             _addressProviders = addressProviders;
+            _pageFactory = pageFactory;
         }
 
         public async Task<ProcessRequestEntity> ProcessAddress(
@@ -52,15 +56,15 @@ namespace form_builder.Services.AddressService
             switch (subPath)
             {
                 case LookUpConstants.Manual:
-                    return await ProcesssManualAddress(viewModel, currentPage, baseForm, guid, path);
+                    return await ProcessManualAddress(viewModel, currentPage, baseForm, guid, path);
                 case LookUpConstants.Automatic:
-                    return await ProcesssAutomaticAddress(viewModel, currentPage, baseForm, guid, path);
+                    return await ProcessAutomaticAddress(viewModel, currentPage, baseForm, guid, path);
                 default:
-                    return await ProcesssSearchAddress(viewModel, currentPage, baseForm, guid, path);
+                    return await ProcessSearchAddress(viewModel, currentPage, baseForm, guid, path);
             }
         }
 
-        private async Task<ProcessRequestEntity> ProcesssManualAddress(
+        private async Task<ProcessRequestEntity> ProcessManualAddress(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,
@@ -78,12 +82,8 @@ namespace form_builder.Services.AddressService
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
-
-                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
-                model.Path = currentPage.PageSlug;
-                model.FormName = baseForm.FormName;
-                model.PageTitle = currentPage.Title;
-                model.BaseURL = baseForm.BaseURL;
+                
+                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
 
                 return new ProcessRequestEntity
                 {
@@ -98,7 +98,7 @@ namespace form_builder.Services.AddressService
             };
         }
 
-        private async Task<ProcessRequestEntity> ProcesssAutomaticAddress(
+        private async Task<ProcessRequestEntity> ProcessAutomaticAddress(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,
@@ -111,16 +111,16 @@ namespace form_builder.Services.AddressService
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-            var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
+            var addressElement = currentPage.Elements.FirstOrDefault(_ => _.Type == EElementType.Address);
 
             var postcode = (string)convertedAnswers
                         .Pages
                         .FirstOrDefault(_ => _.PageSlug == path)
                         .Answers
-                        .FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode")
+                        .FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}")
                         .Response;
 
-            var address = (string)viewModel[$"{addressElement.Properties.QuestionId}-address"];
+            var address = (string)viewModel[$"{addressElement.Properties.QuestionId}{AddressConstants.SELECT_SUFFIX}"];
 
             if (currentPage.IsValid && addressElement.Properties.Optional && string.IsNullOrEmpty(postcode))
             {
@@ -144,10 +144,7 @@ namespace form_builder.Services.AddressService
             {
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
                 
-                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
-                model.Path = currentPage.PageSlug;
-                model.FormName = baseForm.FormName;
-                model.PageTitle = currentPage.Title;
+                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
 
                 return new ProcessRequestEntity
                 {
@@ -164,7 +161,7 @@ namespace form_builder.Services.AddressService
             };
         }
 
-        private async Task<ProcessRequestEntity> ProcesssSearchAddress(
+        private async Task<ProcessRequestEntity> ProcessSearchAddress(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,
@@ -181,10 +178,7 @@ namespace form_builder.Services.AddressService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid);
-                formModel.Path = currentPage.PageSlug;
-                formModel.FormName = baseForm.FormName;
-                formModel.PageTitle = currentPage.Title;
+                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null);
 
                 return new ProcessRequestEntity
                 {
@@ -193,7 +187,7 @@ namespace form_builder.Services.AddressService
                 };
             }
 
-            var postcode = (string)viewModel[$"{addressElement.Properties.QuestionId}-postcode"];
+            var postcode = (string)viewModel[$"{addressElement.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"];
 
             if (addressElement.Properties.Optional && string.IsNullOrEmpty(postcode))
             {
@@ -206,7 +200,7 @@ namespace form_builder.Services.AddressService
 
             var foundPostCode = convertedAnswers
                 .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
-                .Answers?.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}-postcode")?
+                .Answers?.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}")?
                 .Response;
 
             var addressResults = new List<object>();

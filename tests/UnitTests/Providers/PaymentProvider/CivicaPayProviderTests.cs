@@ -1,3 +1,6 @@
+using System;
+using System.Net;
+using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Exceptions;
 using form_builder.Providers.PaymentProvider;
@@ -6,13 +9,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using StockportGovUK.NetStandard.Gateways.Civica.Pay;
+using StockportGovUK.NetStandard.Gateways.CivicaPay;
 using StockportGovUK.NetStandard.Gateways.Response;
 using StockportGovUK.NetStandard.Models.Civica.Pay.Request;
 using StockportGovUK.NetStandard.Models.Civica.Pay.Response;
-using System;
-using System.Net;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Providers.PaymentProvider
@@ -23,7 +23,7 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
         private readonly Mock<ICivicaPayGateway> _mockCivicaPayGateway = new Mock<ICivicaPayGateway>();
         private readonly Mock<IOptions<CivicaPaymentConfiguration>> _civicaPayConfig = new Mock<IOptions<CivicaPaymentConfiguration>>();
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-        private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly Mock<ILogger<CivicaPayProvider>> _logger = new Mock<ILogger<CivicaPayProvider>>();
 
         public CivicaPayProviderTests()
@@ -82,22 +82,22 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
         [Theory]
         [InlineData("00022")]
         [InlineData("00023")]
-        public void VerifyPaymentResponse_ShouldThrowPaymentDeclinedException_OnInvalidResposneCode(string responseCode)
+        public void VerifyPaymentResponse_ShouldThrowPaymentDeclinedException_OnInvalidResponseCode(string responseCode)
         {
             var result = Assert.Throws<PaymentDeclinedException>(() => _civicaPayProvider.VerifyPaymentResponse(responseCode));
 
-            Assert.Equal("CivicaPayProvider::Declined payment", result.Message);
+            Assert.Equal($"CivicaPayProvider::Declined payment with response code: {responseCode}", result.Message);
         }
 
         [Theory]
         [InlineData("11111")]
         [InlineData("22222")]
         [InlineData("01010")]
-        public void VerifyPaymentResponse_ShouldThrowPaymentFailureExceptionException_OnNonSuccessfulResposneCode(string responseCode)
+        public void VerifyPaymentResponse_ShouldThrowPaymentFailureExceptionException_OnNonSuccessfulResponseCode(string responseCode)
         {
             var result = Assert.Throws<PaymentFailureException>(() => _civicaPayProvider.VerifyPaymentResponse(responseCode));
 
-            Assert.Equal("CivicaPayProvider::Payment failed", result.Message);
+            Assert.Equal($"CivicaPayProvider::Payment failed with response code: {responseCode}", result.Message);
         }
     }
 }

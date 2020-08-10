@@ -1,8 +1,7 @@
-﻿using form_builder.Enum;
-using form_builder.Models.Elements;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using form_builder.Enum;
+using form_builder.Models.Elements;
 
 namespace form_builder.Validators
 {
@@ -31,7 +30,6 @@ namespace form_builder.Validators
                 : null;
 
             var isOptional = string.IsNullOrEmpty(valueDay) && string.IsNullOrEmpty(valueMonth) && string.IsNullOrEmpty(valueYear) && element.Properties.Optional;
-
             if (isOptional)
             {
                 return new ValidationResult
@@ -41,35 +39,39 @@ namespace form_builder.Validators
             }
 
             var isValid = !string.IsNullOrEmpty(valueDay) || !string.IsNullOrEmpty(valueMonth) || !string.IsNullOrEmpty(valueYear);
-
             if (!isValid)
             {
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the date and try again"
+                    Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage)
+                        ? element.Properties.CustomValidationMessage
+                        : "Check the date and try again"
                 };
             }
 
             var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out DateTime date);
-
             if (isValidDate)
             {
                 var maxYear = DateTime.Now.Year + 100;
                 if (date.Year > maxYear)
                 {
-                        return new ValidationResult
-                        {
-                            IsValid = false,
-                            Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) ? element.Properties.UpperLimitValidationMessage : $"Year must be less than or equal to {maxYear}"
-                        };
+                    return new ValidationResult
+                    {
+                        IsValid = false,
+                        Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) 
+                            ? element.Properties.UpperLimitValidationMessage 
+                            : $"Year must be less than or equal to {maxYear}"
+                    };
                 }
             }
 
             return new ValidationResult
             {
                 IsValid = isValidDate,
-                Message = isValidDate ? string.Empty : !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidDate) ? element.Properties.ValidationMessageInvalidDate : "Check the date and try again"
+                Message = isValidDate
+                    ? string.Empty 
+                    : !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidDate) ? element.Properties.ValidationMessageInvalidDate : "Check the date and try again"
             };
         }
     }

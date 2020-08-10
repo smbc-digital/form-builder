@@ -1,21 +1,48 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
-using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using form_builder.Constants;
 using Newtonsoft.Json.Linq;
+using StockportGovUK.NetStandard.Models.Addresses;
 
 namespace form_builder.Models.Elements
 {
     public class Street : Element
     {
+        public List<SelectListItem> Items { get; set; }
+
+        public string ReturnURL { get; set; }
+
+        public string StreetSearchQuestionId => $"{Properties.QuestionId}";
+
+        public string StreetSelectQuestionId => $"{Properties.QuestionId}{StreetConstants.SELECT_SUFFIX}";
+
+        private bool IsSelect { get; set; } = false; 
+
+        public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
+
+        public override bool DisplayHint => !string.IsNullOrEmpty(Hint);
+
+        public override string  QuestionId => IsSelect ? StreetSelectQuestionId : StreetSearchQuestionId;
+
+        public string ChangeHeader => "Street:";
+        
+        public override string Label
+        {
+            get
+            {
+                if (IsSelect)
+                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Select the street below" : Properties.SelectLabel;
+
+                return string.IsNullOrEmpty(Properties.Label) ? "Street name" : Properties.Label;
+            }
+        }
+
         public Street()
         {
             Type = EElementType.Street;
@@ -25,103 +52,63 @@ namespace form_builder.Models.Elements
             IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
-            Dictionary<string, dynamic> viewModel,
+            Dictionary<string, dynamic> answers,
             Page page,
             FormSchema formSchema,
-            IHostingEnvironment environment,
+            IWebHostEnvironment environment,
             List<object> results = null)
         {
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
-
-            viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
+            answers.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
 
             switch (subPath as string)
             {
                 case LookUpConstants.Automatic:
-                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-street");
+                    IsSelect = true;
+                    Properties.Value = elementHelper.CurrentValue<string>(this, answers, page.PageSlug, guid, string.Empty);
 
-                    var url = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
+                    ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
+                        ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
+                        : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
 
-                    var viewElement = new ElementViewModel
-                    {
-                        Element = this,
-                        ReturnURL = url
-                    };
-
-                    var selectedStreet = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-streetaddress");
-                    var optionsList = new List<SelectListItem> { new SelectListItem($"{results?.Count} addresses found", string.Empty) };
+                    var selectedStreet = elementHelper.CurrentValue<string>(this, answers, page.PageSlug, guid, StreetConstants.SELECT_SUFFIX);
+                    Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} streets found", string.Empty) };
                     results?.ForEach((objectResult) => {
                         AddressSearchResult searchResult;
 
-                        if ((objectResult as JObject) != null)
+                        if (objectResult as JObject != null)
                             searchResult = (objectResult as JObject).ToObject<AddressSearchResult>();
                         else
                             searchResult = objectResult as AddressSearchResult;
 
-                        optionsList.Add(new SelectListItem(searchResult.Name, $"{searchResult.UniqueId}|{searchResult.Name}", searchResult.UniqueId.Equals(selectedStreet)));
+                        Items.Add(new SelectListItem(searchResult.Name, $"{searchResult.UniqueId}|{searchResult.Name}", searchResult.UniqueId.Equals(selectedStreet)));
                     });
 
-                    return await viewRender.RenderAsync("StreetSelect", new Tuple<ElementViewModel, List<SelectListItem>>(viewElement, optionsList));
+                    return await viewRender.RenderAsync("StreetSelect", this);
+
                 default:
 
-                    Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-street");
+                    Properties.Value = elementHelper.CurrentValue<string>(this, answers, page.PageSlug, guid, string.Empty);
                     return await viewRender.RenderAsync("StreetSearch", this);
             }
         }
 
-        private string StreetSelectDescribeByValue(){
-            var describedByValue = string.Empty;
-
-            if (!string.IsNullOrEmpty(Properties.SelectHint))
-            {
-                describedByValue += $"{Properties.QuestionId}-streetaddress-hint ";
-            }
-
-            if (!IsValid)
-            {
-                describedByValue += $"{Properties.QuestionId}-streetaddress-error";
-            }
-
-            return describedByValue.Trim();
-        }
-
-
-        public override Dictionary<string, dynamic> GenerateElementProperties(string type)
+        public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
-            var properties = new Dictionary<string, dynamic>();
+            var elementProperties = new Dictionary<string, dynamic>
+            {
+                {"id", $"{QuestionId}"},
+                {"name", $"{QuestionId}"}
+            };
 
-            switch(type){
-                case "Select":
-                    properties.Add("id", $"{Properties.QuestionId}-streetaddress");
-                    properties.Add("name", $"{Properties.QuestionId}-streetaddress");
+            if (DisplayAriaDescribedby)
+                elementProperties.Add("aria-describedby", GetDescribedByAttributeValue());
 
-                    if (!string.IsNullOrWhiteSpace(Properties.SelectHint) || !IsValid)
-                    {
-                        properties.Add("aria-describedby", StreetSelectDescribeByValue());
-                    }
-
-                    return properties;
-
-                default:
-                    properties.Add("id", $"{Properties.QuestionId}-street");
-                    properties.Add("maxlength", Properties.MaxLength);
-
-                    if (DisplayAriaDescribedby)
-                    {
-                        properties.Add("aria-describedby", DescribedByValue("-street"));
-                    }
-
-                    return properties;
-            }
-        }
-
-        public override string GetLabelText(){
-            var optionalLabelText = Properties.Optional ? " (optional)" : string.Empty;
-            
-            return string.IsNullOrEmpty(Properties.StreetLabel)
-            ? $"Search for a street{optionalLabelText}"
-            : $"{Properties.StreetLabel}{optionalLabelText}";
+            if(string.IsNullOrEmpty(type))
+                elementProperties.Add("maxlength", Properties.MaxLength);
+ 
+            return elementProperties;
         }
     }
 }

@@ -1,0 +1,36 @@
+﻿<!doctype html>
+<html lang="en" class="govuk-template flexbox no-flexboxtweener">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#006666">
+    <link rel="shortcut icon" type="image/png" href="~/assets/images/favicon-sg.png" media="print" />
+    <title>@ViewData["PageTitle"] @ViewData["Title"] - Stockport Council</title>
+    <link href="https://design-system.stockport.gov.uk/int/1.0.0/smbc-frontend.min.css" rel="stylesheet" />
+    <partial name="TagManagerHead" />
+</head>
+
+<body class="govuk-template__body js-enabled">
+    <partial name="TagManagerBody" />
+
+    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+
+    <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
+
+    <partial name="Header" />
+
+    <div class="govuk-width-container">
+        <main class="govuk-main-wrapper" id="main-content" role="main">
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                    @RenderBody()
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <partial name="Footer" />
+    <script type="text/javascript" src="https://design-system.stockport.gov.uk/int/1.0.0/smbc-frontend.min.js"></script>
+</body>
+</html>

@@ -1,18 +1,15 @@
 ﻿@model form_builder.Models.Elements.Element
 @{
-    var showSpinner = (bool)ViewData["showSpinner"];
-    var displayAnchor = (bool)ViewData["displayAnchor"];
-    var text = (string)ViewData["buttonText"];
-    var className = string.IsNullOrEmpty(Model.Properties.ClassName) ? "button-primary" : Model.Properties.ClassName;
-    var spinnerButton = showSpinner ? $"onclick=spinnerButton('{@Model.Properties.ButtonId}');" : null;
+    @* TODO: Not sure what to do about spinners - have included double click protection from gds (Probably still needs js file refs for this to work) *@
+    @* TODO: Remove id once UX confirmed we don't need the spinner*@
+    @* var showSpinner = (bool)ViewData["showSpinner"]; *@
+    @* var displayAnchor = (bool)ViewData["displayAnchor"]; *@
+    @* var spinnerButton = showSpinner ? $"onclick=spinnerButton('{@Model.Properties.ButtonId}');" : null; *@
 }
 
-<button class="@className" @spinnerButton type="submit" id="@Model.Properties.ButtonId">@text</button>
-
-@if (@displayAnchor)
-{
-    if (!Model.Properties.HidePreviousLink)
-    {
-        <a class="back-button" href="javascript:history.back(-1)">Previous</a>
-    }
-}
+<button data-prevent-double-click="true"
+        class="govuk-button @Model.Properties.ClassName"
+        id="@Model.Properties.ButtonId"
+        @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)>
+    @Model.Properties.Text
+</button>

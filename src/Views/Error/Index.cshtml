@@ -1,14 +1,11 @@
-﻿@{
-    ViewData["Title"] = "Error";  
-    Layout = "_LayoutError";
+@{
+    ViewData["Title"] = "Error";
+    Layout = "_ErrorLayout";
 }
 
-<div id="root"  style="margin:auto">
-    <div class="error-page" id="stock-alert">
-        <div class="error-content">
-            <h1 class="h2">Something went wrong</h1>
-            <p class="error-page-message">We're sorry, something went wrong with the page you're looking for.  It may have been removed, had its name changed, or is temporarily unavailable.</p>
-            <a href="https://www.stockport.gov.uk">Go back to the homepage</a>
-        </div>
-    </div>
-</div>
+<h1 class="govuk-heading-l">Sorry, there is a problem with the service</h1>
+<p class="smbc-body">Please try again later.</p>
+
+<p class="smbc-body">
+    <a class="govuk-link" href="https://www.stockport.gov.uk">Go back to the homepage</a>
+</p>

@@ -1,47 +1,16 @@
 ﻿@using form_builder.Helpers
 @model form_builder.Models.Elements.Element
-@{
-    var hintId = $"{Model.Properties.QuestionId}-hint";
-    var errorId = $"{Model.Properties.QuestionId}-error";
-}
 
-@await Html.BeginFieldSet(Model)
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
 
-    <legend>
-        @if (Model.Properties.LegendAsH1)
-        {
-            <h1>
-                @Model.Properties.Label
-            </h1>
-            @if (Model.Properties.Optional)
-            {
-                <p class="optional">(optional)</p>
-            }
-        }
-        else
-        {
-            @Model.Properties.Label
-            @if (Model.Properties.Optional)
-            {
-                <p class="optional">(optional)</p>
-            }
-        }
-    </legend>
+    <partial name="LegendH1" />
 
-    @if (!string.IsNullOrEmpty(Model.Properties.Hint))
-    {
-        <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
-    }
+    <partial name="Hint" />
+
+    <partial name="Error" />
 
     <partial name="CheckboxOptions" />
 
-    @if (!Model.IsValid)
-    {
-        {
-            var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
-
-            <p class="input-error-content" id="@errorId">@validationMessage</p>
-        }
-    }
-
-@await Html.EndFieldSet()
+    @Html.EndFieldSet()
+</div>
