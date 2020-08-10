@@ -41,15 +41,9 @@ namespace form_builder
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<RequestLocalizationOptions>(options =>
-            {
-                options.DefaultRequestCulture = new RequestCulture("en-GB", "en-GB");
-                options.SupportedCultures = new List<CultureInfo> { new CultureInfo("en-GB") };
-                options.SupportedUICultures = new List<CultureInfo> { new CultureInfo("en-GB") };
-            });
-
-            services.AddControllersWithViews()
-                .AddNewtonsoftJson(options => { options.SerializerSettings.Culture = new CultureInfo("en-GB"); });
+            CultureInfo.CurrentCulture = new CultureInfo("en-GB");
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-GB");
+            services.AddControllersWithViews();
             services.AddRazorPages();
 
             services
@@ -109,19 +103,6 @@ namespace form_builder
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var supportedCultures = new[]
-            {
-                new CultureInfo("en-GB"),
-                new CultureInfo("en")
-            };
-
-            app.UseRequestLocalization(new RequestLocalizationOptions
-            {
-                DefaultRequestCulture = new RequestCulture("en-GB"),
-                SupportedCultures = supportedCultures,
-                SupportedUICultures = supportedCultures
-            });
-
             if (env.IsEnvironment("local") || env.IsEnvironment("uitest"))
             {
                 app.UseDeveloperExceptionPage();
