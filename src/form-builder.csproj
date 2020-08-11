@@ -24,7 +24,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Polly" Version="7.2.1" />
     <PackageReference Include="StockportGovUK.AspNetCore.Middleware.ExceptionHandling" Version="2.0.2" />
-    <PackageReference Include="StockportGovUK.NetStandard.Gateways" Version="4.0.7" />
+    <PackageReference Include="StockportGovUK.NetStandard.Gateways" Version="5.0.0" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="3.1.6" />
@@ -46,5 +46,6 @@
   <ItemGroup>
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
+
   <ProjectExtensions><VisualStudio><UserProperties dsl_4access-protection-markings-request_1json__JsonSchema="       }," dsl_4dateinput_1json__JsonSchema="http://json.schemastore.org/band-manifest" /></VisualStudio></ProjectExtensions>
 </Project>
