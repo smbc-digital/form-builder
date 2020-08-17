@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Models;
 using form_builder.Models.Elements;
+using form_builder.Models;
+using form_builder.Constants;
+using form_builder.Extensions;
 
 namespace form_builder.Validators
 {
@@ -10,9 +11,10 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            if (element.Type == EElementType.DateInput || element.Type == EElementType.Map ||
-                element.Type == EElementType.TimeInput || element.Type == EElementType.DatePicker ||
-                element.Properties.Optional || (element.Type == EElementType.Address && viewModel.IsManual()))
+
+            if (element.Type == EElementType.DateInput || element.Type == EElementType.TimeInput ||
+                element.Type == EElementType.DatePicker || element.Properties.Optional 
+                || (element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
                 {
@@ -21,6 +23,7 @@ namespace form_builder.Validators
             }
 
             var key = element.Properties.QuestionId;
+
             var validationMessage = string.Empty;
 
             if (element.Type != EElementType.Address && element.Type != EElementType.Street && element.Type != EElementType.Organisation)
@@ -38,13 +41,12 @@ namespace form_builder.Validators
                 if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-address";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Select an address from the list";
+                    validationMessage = "Check the " + element.Properties.AddressLabel.ToLower() + " and try again";
                 }
                 else
                 {
                     key = $"{element.Properties.QuestionId}-postcode";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the postcode";
-
+                    validationMessage = "Check the " + element.Properties.PostcodeLabel.ToLower() + " and try again";
                 }
             }
 
@@ -52,13 +54,13 @@ namespace form_builder.Validators
             {
                 if (viewModel.IsAutomatic())
                 {
-                    key = $"{element.Properties.QuestionId}-street";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Select the street from the list";
+                    key = $"{element.Properties.QuestionId}-streetaddress";
+                    validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
                 }
                 else
                 {
-                    key = $"{element.Properties.QuestionId}";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the street name";
+                    key = $"{element.Properties.QuestionId}-street";
+                    validationMessage = "Check the " + element.Properties.StreetLabel.ToLower() + " and try again";
                 }
             }
 
@@ -67,16 +69,17 @@ namespace form_builder.Validators
                 if (viewModel.IsAutomatic())
                 {
                     key = $"{element.Properties.QuestionId}-organisation";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Select the organisation from the list";
+                    validationMessage = "Check the " + element.Properties.SelectLabel.ToLower() + " and try again";
                 }
                 else
                 {
-                    key = $"{element.Properties.QuestionId}";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the organisation name";
+                    key = $"{element.Properties.QuestionId}-organisation-searchterm";
+                    validationMessage = "Check the " + element.Properties.Label.ToLower() + " and try again";
                 }
             }
 
-            bool isValid;
+            var isValid = false;
+
             if (element.Type == EElementType.FileUpload)
             {
                 DocumentModel value = viewModel.ContainsKey(key)
@@ -90,10 +93,8 @@ namespace form_builder.Validators
                 var value = viewModel.ContainsKey(key)
                 ? viewModel[key]
                 : null;
-
                 isValid = !string.IsNullOrEmpty(value);
             }
-
             return new ValidationResult
             {
                 IsValid = isValid,

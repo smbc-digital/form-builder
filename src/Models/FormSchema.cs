@@ -1,10 +1,9 @@
-﻿using System;
+﻿using form_builder.Enum;
+using form_builder.Helpers.PageHelpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Enum;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Models.Actions;
 
 namespace form_builder.Models
 {
@@ -13,20 +12,12 @@ namespace form_builder.Models
         public string FormName { get; set; }
         
         public string BaseURL { get; set; }
-
-        public string StartPageUrl { get; set; }
         
-        public string FirstPageSlug { get; set; }
+        public string StartPageSlug { get; set; }
         
         public string FeedbackForm { get; set; }
-
-        public string FeedbackPhase { get; set; }
-
-        public List<Breadcrumb> BreadCrumbs { get; set; }
-
+        
         public List<Page> Pages { get; set; }
-
-        public List<IAction> FormActions { get; set; } = new List<IAction>();
         
         public List<EnvironmentAvailability> EnvironmentAvailabilities { get; set; }
 
@@ -39,28 +30,24 @@ namespace form_builder.Models
             EnvironmentAvailabilities = new List<EnvironmentAvailability>();
         }
 
-        public Page GetPage(IPageHelper pageHelper, string path)
+        public Page GetPage(string path)
         {
+            Page page;
             try
             {
-                var pages = Pages.Where(_ => _.PageSlug.ToLower().Trim() == path.ToLower().Trim()).OrderByDescending(_ => _.RenderConditions.Count).ToList();
-
-                if (pages.Count == 1)
-                    return pages.First();
-
-                var page = pageHelper.GetPageWithMatchingRenderConditions(pages);
-
-                return page;
+                page = Pages.SingleOrDefault(_ => _.PageSlug.ToLower().Trim() == path.ToLower().Trim());
             }
             catch(Exception ex)
             {
                 throw new ApplicationException($"Requested path '{path}' object could not be found or was not unique.", ex);
             }
+            
+            return page;
         }
 
         public async Task ValidateFormSchema(IPageHelper pageHelper, string form, string path)
         {
-            if (path != FirstPageSlug)
+            if (path != StartPageSlug)
                 return;
 
             pageHelper.HasDuplicateQuestionIDs(Pages, form);
@@ -71,15 +58,17 @@ namespace form_builder.Models
             await pageHelper.CheckForPaymentConfiguration(Pages, form);
             pageHelper.CheckForAcceptedFileUploadFileTypes(Pages, form);
             pageHelper.CheckForDocumentDownload(this);
-            pageHelper.CheckForIncomingFormDataValues(Pages);
-            pageHelper.CheckForPageActions(this);
-            pageHelper.CheckRenderConditionsValid(Pages);
         }
 
         public bool IsAvailable(string environment)
         {
             var environmentAvailability = EnvironmentAvailabilities.SingleOrDefault(_ => _.Environment.ToLower().Equals(environment.ToLower()));
-            return environmentAvailability == null || environmentAvailability.IsAvailable;
+            if (environmentAvailability == null)
+            {
+                return true;
+            }
+
+            return environmentAvailability.IsAvailable;
         }
     }
 }

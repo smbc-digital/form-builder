@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using System.IO;
 using form_builder.Enum;
+using System.Collections.Generic;
 
 namespace form_builder.Providers.DocumentCreation.Generic
 {
@@ -12,12 +12,12 @@ namespace form_builder.Providers.DocumentCreation.Generic
         {
             using (var stream = new MemoryStream())
             {
-                var objStreamWriter = new StreamWriter(stream);
+                var objstreamwriter = new StreamWriter(stream);
                 fileContent.ForEach((line) => {
-                    objStreamWriter.WriteLine(line);
+                    objstreamwriter.WriteLine(line);
                 });
-                objStreamWriter.Flush();
-                objStreamWriter.Close(); 
+                objstreamwriter.Flush();
+                objstreamwriter.Close(); 
                 return stream.ToArray();
             }
         }

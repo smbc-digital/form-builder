@@ -1,12 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using form_builder.Helpers.Session;
+﻿using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
-using form_builder.Services.SubmitService;
+using form_builder.Services.SubmtiService;
 using form_builder.Workflows;
 using Moq;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Workflows
@@ -38,16 +38,12 @@ namespace form_builder_tests.UnitTests.Workflows
         [Fact]
         public async Task Submit_ShouldCallMapping_And_SubmitService()
         {
-            // Arrange
-            _sessionHelper
-                .Setup(_ => _.GetSessionGuid())
-                .Returns("123454");
-            _mappingService
-                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new MappingEntity { BaseForm = new FormSchema() });
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
+
+            _mappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new MappingEntity{ BaseForm = new FormSchema() });
 
             // Act
-            await _workflow.Submit("form");
+            var result = await _workflow.Submit("form");
 
             // Assert
             _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Once);

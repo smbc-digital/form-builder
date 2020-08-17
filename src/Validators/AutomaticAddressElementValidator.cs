@@ -1,31 +1,23 @@
 using System.Collections.Generic;
-using form_builder.Constants;
+using System.Text.RegularExpressions;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators
 {
-    public class    AutomaticAddressElementValidator : IElementValidator
+    public class AutomaticAddressElementValidator : IElementValidator
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            if (element.Type != Enum.EElementType.Address)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
-
-            var addressElement = (Address)element;
-            if (!viewModel.ContainsKey(addressElement.AddressSelectQuestionId))
+            if (!viewModel.ContainsKey($"{element.Properties.QuestionId}-address"))
             {
                 return new ValidationResult{
                     IsValid = true
                 };
             }
 
-            var value = viewModel[addressElement.AddressSelectQuestionId];
-            if (addressElement.Properties.Optional && string.IsNullOrEmpty(value))
+            var value = viewModel[$"{element.Properties.QuestionId}-address"];
+
+            if (element.Properties.Optional && string.IsNullOrEmpty(value))
             {
                 return new ValidationResult
                 {
@@ -33,12 +25,13 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValid = AddressConstants.UPRN_REGEX.IsMatch(value); 
+
+            var isValid = Regex.IsMatch(value, "^[0-9]{12}$"); 
 
             return new ValidationResult{
-                IsValid = isValid,
-                Message = isValid ? string.Empty : $"please select an address"
-            }; 
+                    IsValid = isValid,
+                    Message = isValid ? string.Empty : $"please select an address"
+                }; 
         }
     }
 }

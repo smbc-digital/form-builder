@@ -1,12 +1,26 @@
+﻿@using form_builder.Helpers
 @model form_builder.Models.Elements.Element
+@{
+    var hintId = $"{Model.Properties.QuestionId}-hint";
+    var errorId = $"{Model.Properties.QuestionId}-error";
+}
+@await Html.BeginFieldSet(Model)
+    <partial name="Legend" model="@Model"/>
 
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    @if (!string.IsNullOrEmpty(Model.Properties.Hint))
+    {
+        <p id=@hintId>@Html.Raw(Model.Properties.Hint)</p>
+    }
 
-    <partial name="LabelH1" />
+    <select id="@Model.Properties.QuestionId" name="@Model.Properties.QuestionId">
+        <partial name="SelectOptions" />
+    </select>
 
-    <partial name="Hint" />
-
-    <partial name="Error" />
-
-    <partial name="SelectOptions" />
-</div>
+    @if (!Model.IsValid)
+    {
+        {
+            var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
+            <p class="input-error-content" id="@errorId">@validationMessage</p>
+        }
+    }
+@await Html.EndFieldSet()

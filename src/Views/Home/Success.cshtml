@@ -1,27 +1,19 @@
-@model form_builder.ViewModels.SuccessViewModel
+﻿@model SuccessViewModel
 @{
     ViewData["Title"] = Model.FormName;
     ViewData["PageTitle"] = Model.PageTitle;
-    ViewData["FeedbackPhase"] = Model.FeedbackPhase;
-    ViewData["BannerTitle"] = Model.BannerTitle;
-    ViewData["LeadingParagraph"] = Model.LeadingParagraph;
-    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadcrumbs;
-    ViewData["Breadcrumbs"] = Model.Breadcrumbs;
-
 }
+<div class="success-page">
+    <section class="header-container">
+        <h1>@Model.PageTitle</h1>
+    </section>
 
-<div class="smbc-panel smbc-panel--confirmation">
-    <h1 class="govuk-panel__title">@Model.BannerTitle</h1>
-
-    @if (!string.IsNullOrEmpty(Model.LeadingParagraph))
-    {
-        <div class="govuk-body-l">@Model.LeadingParagraph</div>
-    }
-
-    @if (!string.IsNullOrWhiteSpace(Model.Reference))
-    {
-        <div class="smbc-panel__body">Your reference number is: <strong>@Html.Raw(Model.Reference)</strong></div>
-    }
+    <section class="body-container">
+        @if (!string.IsNullOrWhiteSpace(Model.Reference))
+        {
+            <p><strong>Your reference number is:</strong> @Html.Raw(Model.Reference)</p>
+        }
+        @Html.Raw(Model.PageContent)
+    </section>
 </div>
 
-@Html.Raw(Model.PageContent)

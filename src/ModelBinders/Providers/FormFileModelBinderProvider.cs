@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using form_builder.Models;
+﻿using form_builder.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using System;
+using System.Collections.Generic;
 
 namespace form_builder.ModelBinders.Providers
 {
@@ -11,12 +11,21 @@ namespace form_builder.ModelBinders.Providers
         public IModelBinder GetBinder(ModelBinderProviderContext context)
         {
             if (context == null)
+            {
                 throw new ArgumentNullException(nameof(context));
+            }
 
             if (context.Metadata.ModelType == typeof(CustomFormFile))
+            {
                 return new BinderTypeModelBinder(typeof(CustomFormFileModelBinder));
+            }
 
-            return typeof(IEnumerable<CustomFormFile>).IsAssignableFrom(context.Metadata.ModelType) ? new BinderTypeModelBinder(typeof(CustomFormFileModelBinder)) : null;
+            if (typeof(IEnumerable<CustomFormFile>).IsAssignableFrom(context.Metadata.ModelType))
+            {
+                return new BinderTypeModelBinder(typeof(CustomFormFileModelBinder));
+            }
+
+            return null;
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using form_builder.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Models;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace form_builder.ModelBinders
 {
@@ -17,8 +17,10 @@ namespace form_builder.ModelBinders
             var formFiles = bindingContext.ActionContext?.HttpContext?.Request?.Form?.Files;
 
             if (formFiles == null || !formFiles.Any())
+            {
                 return;
-            
+            }
+
             var list = new List<CustomFormFile>();
             foreach (var formFile in formFiles)
             {

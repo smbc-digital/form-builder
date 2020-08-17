@@ -1,29 +1,41 @@
-﻿@model form_builder.Models.Elements.Organisation
+﻿@model Tuple<form_builder.ViewModels.ElementViewModel, List<SelectListItem>>
 @{
-    var elementProperties = Model.GenerateElementProperties("Select");
-
-    elementProperties.Add("class", Model.IsValid ? "govuk-select" : "govuk-select govuk-select--error");
+    var questionId = $"{Model.Item1.Element.Properties.QuestionId}-organisation";
+    var hiddenId = $"{Model.Item1.Element.Properties.QuestionId}-organisation-searchterm";
+    var hintId = $"{questionId}-hint";
+    var errorId = $"{questionId}-error";
 }
 
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-    @Html.Hidden(@Model.OrganisationSearchQuestionId, @Model.Properties.Value)
+@Html.Hidden(hiddenId, @Model.Item1.Element.Properties.Value)
 
-    @if (Model.Properties.LabelAsH1)
-    {
-        <partial name="LabelH1" />
+@if(Model.Item1.Element.Properties.LegendAsH1) {
+    <h1>@Model.Item1.Element.Properties.Label</h1>
+} else {
+    <label class="h2">@Model.Item1.Element.Properties.Label</label>
+}
 
-        <partial name="ChangeSearch" />
-    }
-    else
-    {
-        <partial name="ChangeSearch" />
-
-        <partial name="LabelH1" />
-    }
-
-    <partial name="Hint" />
-
-    <partial name="Error" />
-
-    @Html.DropDownList(@Model.QuestionId, @Model.Items, elementProperties)
+<div class="user-search-term">
+    <p><strong>Search term: </strong>@Model.Item1.Element.Properties.Value </p>
+    <a class="back-button" href="@Model.Item1.ReturnURL">Change</a>
 </div>
+
+@if (!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectHint))
+{
+    <p id=@hintId>@Html.Raw(Model.Item1.Element.Properties.SelectHint)</p>
+}
+
+<label for="@questionId" @Model.Item1.Element.WriteOptional()>@Model.Item1.Element.Properties.SelectLabel</label>
+@if (Model.Item1.Element.Properties.Optional)
+{
+    <span class="optional">(optional)</span>
+}
+
+@Html.DropDownList(@questionId, @Model.Item2, @Model.Item1.Element.GenerateElementProperties("Select"))
+
+@if (!Model.Item1.Element.IsValid)
+{
+    {
+        var validationMessage = string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectCustomValidationMessage) ? Model.Item1.Element.ValidationMessage : Model.Item1.Element.Properties.SelectCustomValidationMessage;
+        <p class="input-error-content" id="@errorId">@validationMessage</p>
+    }
+}

@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using form_builder.Builders;
+﻿using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Validators;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
@@ -14,21 +14,19 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldCheckTheElementTypeIsNotDateInput()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .Build();
 
-            // Act
+            //Assert
             var result = _dateInputElementValidator.Validate(element, null);
-
-            // Assert
             Assert.True(result.IsValid);
         }
         [Fact]
         public void Validate_ShouldShowValidationMessageWhenFieldsAreEmpty()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
@@ -37,10 +35,8 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>();
 
-            // Act
+            //Assert
             var result = _dateInputElementValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.False(result.IsValid);
             Assert.Equal("Check the date and try again", result.Message);
         }
@@ -48,7 +44,7 @@ namespace form_builder_tests.UnitTests.Validators
        [Fact]
        public void Validate_ShouldCheckDateIsNotValid()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
@@ -59,10 +55,8 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date-month", "aa");
             viewModel.Add("test-date-year", "aaaa");
 
-            // Act
+            //Assert
             var result = _dateInputElementValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.False(result.IsValid);
             Assert.Equal("Check the date and try again", result.Message);
         }
@@ -70,7 +64,6 @@ namespace form_builder_tests.UnitTests.Validators
        [Fact]
        public void Validate_ShouldReturnFalse_WhenYearIsGreaterThanMax()
         {
-            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test")
@@ -82,10 +75,8 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-month", "12");
             viewModel.Add("test-year", "2920");
 
-            // Act
             var result = _dateInputElementValidator.Validate(element, viewModel);
 
-            // Assert
             Assert.False(result.IsValid);
             Assert.Equal($"Year must be less than or equal to { maxYear}", result.Message);
         }
@@ -93,7 +84,6 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldReturnFalse_WhenYearIsGreaterThanMax_AndIsOptional()
         {
-            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithOptional(true)
@@ -106,10 +96,8 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-month", "12");
             viewModel.Add("test-year", "2920");
 
-            // Act
             var result = _dateInputElementValidator.Validate(element, viewModel);
 
-            // Assert
             Assert.False(result.IsValid);
             Assert.Equal($"Year must be less than or equal to { maxYear}", result.Message);
         }

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using form_builder.Enum;
+using System.Globalization;
 using form_builder.Models.Elements;
+using form_builder.Enum;
 
 namespace form_builder.Validators
 {
@@ -48,6 +49,7 @@ namespace form_builder.Validators
             }
 
             var date = DateTime.Today;
+
             var dateOutput = DateTime.Parse($"{valueDay}/{valueMonth}/{valueYear}");
 
             if (dateOutput > date)
@@ -55,9 +57,7 @@ namespace form_builder.Validators
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageRestrictFutureDate)
-                        ? element.Properties.ValidationMessageRestrictFutureDate
-                        : "Check the date and try again"
+                    Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageRestrictFutureDate) ? element.Properties.ValidationMessageRestrictFutureDate : "Check the date and try again"
                 };
             }
 

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
-using form_builder.Constants;
+using System.Text.RegularExpressions;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models.Elements;
+
 
 namespace form_builder.Validators
 {
@@ -18,9 +19,7 @@ namespace form_builder.Validators
                 };
             }
 
-            var addressElement = (Address)element;
-
-            if (!viewModel.ContainsKey(addressElement.AddressSearchQuestionId))
+            if (!viewModel.ContainsKey(element.Properties.QuestionId + "-postcode"))
             {
                 return new ValidationResult
                 {
@@ -28,7 +27,7 @@ namespace form_builder.Validators
                 };
             }
 
-            if (string.IsNullOrEmpty(viewModel[addressElement.AddressSearchQuestionId]) && element.Properties.Optional)
+            if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId + "-postcode"]) && element.Properties.Optional)
             {
                 return new ValidationResult
                 {
@@ -36,9 +35,15 @@ namespace form_builder.Validators
                 };
             }
 
-            var value = viewModel[addressElement.AddressSearchQuestionId];
+           
+            var value = viewModel[element.Properties.QuestionId + "-postcode"];
+
             var isValid = true;
-            if (!AddressConstants.POSTCODE_REGEX.Match(value).Success)
+            var regex = new Regex(@"^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})$");
+
+            Match match = regex.Match(value);
+
+            if (!match.Success)
             {
                 isValid = false;
             }

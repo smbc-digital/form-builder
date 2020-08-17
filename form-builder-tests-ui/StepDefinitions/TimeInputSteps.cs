@@ -23,16 +23,19 @@ namespace form_builder_tests_ui.StepDefinitions
 
       
 
-        [Then(@"I should see time refilled in the time input with ""(.*)"" value, minutes with ""(.*)"" value in for ""(.*)"" blah")]
-        public void ThenIShouldSeeTimeRefilledInTheTimeInput(string hours, string minutes, string questionId)
+        [Then(@"I should see time refilled in the time input with ""(.*)"" value, minutes with ""(.*)"" value and ampm with ""(.*)""  in for ""(.*)"" blah")]
+        public void ThenIShouldSeeTimeRefilledInTheTimeInput(string hours, string minutes, string amPm, string questionId)
         {
-            // Arrange
+                       // Arrange
+          
+
             var hoursValue = BrowserSession.FindId(questionId + "-hours").Value;
             var minutesValue = BrowserSession.FindId(questionId + "-minutes").Value;
+            //var ampmChecked = BrowserSession.FindId(questionId + $"-{amPm}").Selected;
 
-            // Assert
             Assert.Equal(hours, hoursValue);
             Assert.Equal(minutes, minutesValue);
+            //Assert.True(ampmChecked);
         }
 
         [Then(@"I should not see a validation message for ""(.*)"" input")]

@@ -1,13 +1,13 @@
 ﻿@model form_builder.Models.Elements.Element
 
-<section class="govuk-inset-text">
+<section class="alert-inline">
     @if (!string.IsNullOrEmpty(Model.Properties.Label))
     {
-        <h2 class="govuk-heading-l">@Model.Properties.Label</h2>
+        <h2>@Model.Properties.Label</h2>
     }
 
     @if (!string.IsNullOrEmpty(Model.Properties.Text))
     {
-        <p class="smbc-body">@Html.Raw(@Model.Properties.Text)</p>
+        <p>@Html.Raw(@Model.Properties.Text)</p>
     }
 </section>

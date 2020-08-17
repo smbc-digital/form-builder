@@ -9,7 +9,6 @@
         H4,
         H5,
         H6,
-        HR,
         Img,
         P,
         OL,
@@ -32,11 +31,6 @@
         Numeric,
         FileUpload,
         DocumentDownload,
-        Warning,
-        Declaration,
-        Summary,
-        Reusable,
-        Map,
-        PaymentSummary
+        Declaration
     }
 }

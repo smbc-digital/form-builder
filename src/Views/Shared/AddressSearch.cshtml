@@ -1,23 +1,46 @@
-@model form_builder.Models.Elements.Address
+﻿@model form_builder.ViewModels.ElementViewModel
 @{
-    var elementProperties = Model.GenerateElementProperties();
-    elementProperties.Add("class", $"govuk-input govuk-input--width-10 {(Model.IsValid ? string.Empty : "govuk-input--error")}");
-    elementProperties.Add("autocomplete", "postal-code");
+    var questionId = $"{Model.Element.Properties.QuestionId}-postcode";
+    var hintId = $"{questionId}-hint";
+    var errorId = $"{questionId}-error";
 }
 
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-    @if (@Model.Properties.StockportPostcode == true)
-    {
-        <section class="govuk-inset-text">
-            <p>@Model.Properties.AddressIAG</p>
-        </section>
-    }
+@if (Model.Element.Properties.LegendAsH1)
+{
+    <h1>@Model.Element.Properties.AddressLabel</h1>
+}
+else
+{
+    <label class="h2">@Model.Element.Properties.AddressLabel</label>
+}
 
-    <partial name="LabelH1" />
+@if (@Model.Element.Properties.StockportPostcode == true)
+{
+    <section class="alert-information-form">
+        <span class="fa fa-info-circle"></span>
+        <p>@Model.Element.Properties.AddressIAG</p>
+    </section>
+}
 
-    <partial name="Hint" />
 
-    <partial name="Error" />
+<label @Model.Element.WriteOptional() for="@questionId">@Model.Element.Properties.PostcodeLabel</label>
 
-    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elementProperties)
-</div>
+@if (Model.Element.Properties.Optional)
+{
+    <span class="optional">(optional)</span>
+}
+
+@if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
+{
+    <p class="description" id=@hintId>@Model.Element.Properties.Hint</p>
+}
+
+@Html.TextBox(questionId, Model.Element.Properties.Value, Model.Element.GenerateElementProperties())
+
+@if (!Model.Element.IsValid)
+{
+    var validationMessage = string.IsNullOrEmpty(Model.Element.Properties.CustomValidationMessage) ? Model.Element.ValidationMessage : Model.Element.Properties.CustomValidationMessage;
+    <p class="input-error-content" id="@errorId">@validationMessage</p>
+}
+
+

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using form_builder.Enum;
+using form_builder_tests.Builders;
 using System.Collections.Generic;
-using form_builder.Builders;
-using form_builder.Enum;
 using form_builder.Validators;
 using Xunit;
+using System;
+using form_builder.Builders;
 
 namespace form_builder_tests.UnitTests.Validators
 {
@@ -14,21 +15,19 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldCheckRestrictCurrentDatePropertyIsNotSet()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .Build();
 
-            // Act
+            //Assert
             var result = _restrictCurrentDateValidator.Validate(element, null);
-
-            // Assert
             Assert.True(result.IsValid);
         }
         [Fact]
         public void Validate_ReturnsTrueWhenOptionalFieldsAreEmpty()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
                 .WithRestrictCurrentDate(true)
@@ -37,17 +36,15 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>();
 
-            // Act
+            //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.True(result.IsValid);
         }
 
         [Fact]
         public void Validate_ShouldShowValidationMessageWhenFieldsAreEmpty()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
@@ -58,10 +55,8 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
              viewModel.Add("test-date", string.Empty);
 
-            // Act
+            //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.False(result.IsValid);
             Assert.Equal("Check the date and try again", result.Message);
         }
@@ -69,7 +64,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldShowValidationMessageWhenCurrentDateEntered()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
@@ -80,10 +75,8 @@ namespace form_builder_tests.UnitTests.Validators
             var today = DateTime.Today;
             viewModel.Add("test-date", today.Day.ToString());
 
-            // Act
+            //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.False(result.IsValid);
             Assert.Equal("Check the date and try again", result.Message);
         }
@@ -91,7 +84,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldReturnTrueWhenCurrentDateIsNotEntered()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
@@ -101,10 +94,8 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-date", DateTime.Today.AddDays(2).ToString("yyyy-MM-dd"));
            
-            // Act
+            //Assert
             var result = _restrictCurrentDateValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.True(result.IsValid);
         }
     }

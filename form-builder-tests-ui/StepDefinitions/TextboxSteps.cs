@@ -6,12 +6,6 @@ namespace form_builder_tests_ui.StepDefinitions
     [Binding, Scope(Tag = "textbox")]
     public class Textbox : UiTestBase
     {
-        [Then(@"I fill in page0")]
-        public void ThenIFillInPage0()
-        {
-            BrowserSession.FillIn("firstQuestion").With("test");
-        }
-
         [Then(@"I fill in page1")]
         public void ThenIFillInPage1()
         {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using form_builder.Constants;
-using form_builder.ContentFactory;
+﻿using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
@@ -12,6 +7,11 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.Addresses;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace form_builder.Services.StreetService
 {
@@ -25,18 +25,12 @@ namespace form_builder.Services.StreetService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IPageHelper _pageHelper;
         private readonly IEnumerable<IStreetProvider> _streetProviders;
-        private readonly IPageFactory _pageFactory;
 
-        public StreetService(
-            IDistributedCacheWrapper distributedCache, 
-            IEnumerable<IStreetProvider> streetProviders, 
-            IPageHelper pageHelper, 
-            IPageFactory pageFactory)
+        public StreetService(IDistributedCacheWrapper distributedCache, IEnumerable<IStreetProvider> streetProviders, IPageHelper pageHelper)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
             _streetProviders = streetProviders;
-            _pageFactory = pageFactory;
         }
 
         public async Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -59,6 +53,8 @@ namespace form_builder.Services.StreetService
             string guid,
             string path)
         {
+            var streetResults = new List<AddressSearchResult>();
+
             var cachedAnswers = _distributedCache.GetString(guid);
             var streetElement = currentPage.Elements.Where(_ => _.Type == EElementType.Street).FirstOrDefault();
             var convertedAnswers = cachedAnswers == null
@@ -69,7 +65,7 @@ namespace form_builder.Services.StreetService
                 .Pages
                 .FirstOrDefault(_ => _.PageSlug == path)
                 .Answers
-                .FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}")
+                .FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}-street")
                 .Response;
 
             if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
@@ -85,7 +81,10 @@ namespace form_builder.Services.StreetService
             {
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
 
-                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
+                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
+                model.Path = currentPage.PageSlug;
+                model.FormName = baseForm.FormName;
+                model.PageTitle = currentPage.Title;
 
                 return new ProcessRequestEntity
                 {
@@ -116,7 +115,7 @@ namespace form_builder.Services.StreetService
                         ? new FormAnswers { Pages = new List<PageAnswers>() }
                         : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-            var street = (string)viewModel[streetElement.Properties.QuestionId];
+            var street = (string)viewModel[$"{streetElement.Properties.QuestionId}-street"];
 
             if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
             {
@@ -129,7 +128,10 @@ namespace form_builder.Services.StreetService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid);
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid);
+                formModel.Path = currentPage.PageSlug;
+                formModel.FormName = baseForm.FormName;
+                formModel.PageTitle = currentPage.Title;
 
                 return new ProcessRequestEntity
                 {
@@ -140,7 +142,7 @@ namespace form_builder.Services.StreetService
 
             var foundStreet = convertedAnswers
                 .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
-                .Answers?.FirstOrDefault(_ => _.QuestionId == streetElement.Properties.QuestionId)?
+                .Answers?.FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}-street")?
                 .Response;
 
             List<object> searchResults;
@@ -156,7 +158,7 @@ namespace form_builder.Services.StreetService
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
+                    throw new ApplicationException($"StreetService::ProcessStreet: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
                 }
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
@@ -179,8 +181,8 @@ namespace form_builder.Services.StreetService
             }
             catch (Exception e)
             {
-                throw new ApplicationException($"PageHelper.ProccessInitialStreet: An exception has occured while attempting to generate Html, Exception: {e.Message}");
-            }
+                throw new ApplicationException($"PageHelper.ProcessStreetJourney: An exception has occured while attempting to generate Html, Exception: {e.Message}");
+            };
         }
     }
 }
