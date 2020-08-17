@@ -1,16 +1,24 @@
-﻿@model form_builder.Models.Elements.Element
+﻿@using form_builder.Helpers
+@model form_builder.Models.Elements.Element
 @{
-    var elements = Model.GenerateElementProperties();
-    elements.Add("class", !Model.IsValid ? "govuk-input govuk-input--width-10 govuk-input--error" : "govuk-input govuk-input--width-10");
+    var hintId = $"{Model.Properties.QuestionId}-hint";
+    var errorId = $"{Model.Properties.QuestionId}-error";
+    var classes = new string[] { "input-memorable-date" };
 }
 
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+@await Html.BeginFieldSet(Model, classes)
+    <partial name="Legend" model="@Model"/>
 
-    <partial name="LabelH1" />
+    @if(!string.IsNullOrEmpty(Model.Properties.Hint)){
+        <p id="@hintId">@Model.Properties.Hint</p>
+    }
 
-    <partial name="Hint" />
+    <div>
+        @Html.TextBox(Model.Properties.QuestionId, Model.Properties.Date, Model.GenerateElementProperties())
+    </div>
 
-    <partial name="Error" />
-
-    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
-</div>
+    @if (!Model.IsValid)
+    {
+        <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
+    }
+@await Html.EndFieldSet()

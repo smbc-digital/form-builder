@@ -4,16 +4,13 @@
     {
         public string FeedbackForm { get; set; }
 
-        public string FeedbackPhase { get; set; }
-
         public string FormName { get; set; }
 
         public string PageTitle { get; set; }
 
         public string Reference { get; set; }
 
-        public string StartPageUrl { get; set; }
-
-        public bool HideBackButton { get; set; } = true;
+        public string StartFormUrl { get; set; }
+        
     }
 }

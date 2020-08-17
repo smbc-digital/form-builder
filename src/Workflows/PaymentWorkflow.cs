@@ -1,9 +1,9 @@
-using System;
-using System.Threading.Tasks;
 using form_builder.Helpers.Session;
 using form_builder.Services.MappingService;
 using form_builder.Services.PayService;
-using form_builder.Services.SubmitService;
+using form_builder.Services.SubmtiService;
+using System;
+using System.Threading.Tasks;
 
 namespace form_builder.Workflows
 {
@@ -32,12 +32,15 @@ namespace form_builder.Workflows
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (string.IsNullOrEmpty(sessionGuid))
-                throw new ApplicationException("A Session GUID was not provided.");
+            {
+                throw new ApplicationException($"A Session GUID was not provided.");
+            }
 
             var data = await _mappingService.Map(sessionGuid, form);
+
             var paymentReference = await _submitService.PaymentSubmission(data, form, sessionGuid);
 
-            return await _payService.ProcessPayment(data, form, path, paymentReference, sessionGuid);
+            return await _payService.ProcessPayment(form, path, paymentReference, sessionGuid);
         }
     }
 }

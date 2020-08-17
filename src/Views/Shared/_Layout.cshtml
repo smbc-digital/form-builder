@@ -1,68 +1,50 @@
 ﻿@{
-    var feedbackFormUrl = (string)ViewData["FeedbackForm"];
-    var feedbackPhase = (string)ViewData["FeedbackPhase"];
-    var displayBreadcrumbs = (bool)ViewData["DisplayBreadcrumbs"];
-    var breadcrumbs = ViewData["Breadcrumbs"];
+    var bannerTypeformUrl = ViewData["BannerTypeformUrl"];
 }
 
-<!doctype html>
-<html lang="en" class="govuk-template flexbox no-flexboxtweener">
-
+<!DOCTYPE html>
+<html lang="en-GB">
 <head>
+    <partial name="TagManagerHead" />
+    
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#006666">
     <link rel="shortcut icon" type="image/png" href="~/assets/images/favicon-sg.png" media="print" />
     <title>@ViewData["PageTitle"] - @ViewData["Title"] - Stockport Council</title>
-    <link href="https://design-system.stockport.gov.uk/int/1.0.0/smbc-frontend.min.css" rel="stylesheet" />
-    <partial name="TagManagerHead" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Noto+Sans|Source+Sans+Pro">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://www.stockport.gov.uk/assets/stylesheets/vendor/jquery-ui-1.12.1.custom/jquery-ui.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://s3-eu-west-1.amazonaws.com/smbc-react-assets/int/styleguide/v2/styles.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/assets/css/form-builder.css" />
+    <script type="text/javascript" src="~/assets/javascript/buttonBehaviour.js"></script>
+    <script type="text/javascript" src="~/assets/javascript/fileSizeCheck.js"></script>
+
+    <partial name="CookieBanner" />
 </head>
 
-<body class="govuk-template__body  js-enabled">
+<body>
     <partial name="TagManagerBody" />
+    <header>
+        <div class="skip-to-main-content">
+            <a href="#content">Skip to main content</a>
+        </div>
+        <partial name="Header" />
+        @RenderSection("Breadcrumb", false)
 
-    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
-
-    <div role="navigation">
-        <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
-    </div>
-
-    <partial name="Header" />
-
-    <div class="govuk-width-container" role="main">
-        @if (!string.IsNullOrEmpty(feedbackPhase))
+        @if (bannerTypeformUrl != null)
         {
-            <div class="govuk-phase-banner">
-                <p class="govuk-phase-banner__content">
-                    <strong class="smbc-tag govuk-phase-banner__content__tag">
-                        @feedbackPhase
-                    </strong>
-                    <span class="govuk-phase-banner__text">
-                        This is a new service - your <a class="govuk-link" href="@feedbackFormUrl" rel="noreferrer noopener" target="_blank">feedback</a> will help us to improve it.
-                    </span>
-                </p>
-            </div>}
-        @if (displayBreadcrumbs)
-        {
-            <partial name="Breadcrumbs" model="@breadcrumbs" />
-        }
-
-        @if (!Model.HideBackButton)
-        {
-            <a href="javascript:history.back(-1)" class="govuk-back-link">Back</a>}
-
-        <main class="govuk-main-wrapper " id="main-content">
-            <div class="govuk-grid-row">
-                <div class="govuk-grid-column-two-thirds">
-                    @RenderBody()
+            <div class="banner-header">
+                <div class="center-wrapper">
+                    <span>NEW</span><strong>This part of our website is brand new. </strong><a href="@bannerTypeformUrl" target="_blank" data-mode="1" class="typeform-share link">Give us your feedback</a> to help us improve it.
                 </div>
             </div>
-        </main>
-    </div>
-
+        }
+    </header>
+    @RenderSection("DashboardBanner", false)
+<main id="content">
+    @RenderBody()
+</main>
     <partial name="Footer" />
-    <script type="text/javascript" src="https://design-system.stockport.gov.uk/int/1.0.0/smbc-frontend.min.js"></script>
-    <script>window.GOVUKFrontend.initAll()</script>
 </body>
 </html>

@@ -1,11 +1,11 @@
-using System;
-using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Extensions;
-using form_builder.Workflows.DocumentWorkflow;
+using form_builder.Services.DocumentService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 
 namespace form_builder.Controllers.Document
 {
@@ -25,25 +25,23 @@ namespace form_builder.Controllers.Document
         [Route("Summary/{documentType}/{id}")]
         public async Task<IActionResult> Summary(EDocumentType documentType, Guid id)
         {
-            if (id.Equals(Guid.Empty))
+            if(id.Equals(Guid.Empty))
                 return RedirectToAction("Index", "Error");
-
-            try
-            {
+            
+            try {
                 var result = await _documentWorkflow.GenerateSummaryDocumentAsync(documentType, id);
-
                 return File(result, documentType.ToContentType(), "summary.txt");
-            }
-            catch (DocumentExpiredException ex)
-            {
+            } catch(DocumentExpiredException ex) {
                 _logger.LogWarning(ex, ex.Message);
-
                 return RedirectToAction("Expired");
             }
         }
-
+        
         [HttpGet]
         [Route("expired")]
-        public IActionResult Expired() => View();
+        public IActionResult Expired()
+        {
+            return View();
+        }
     }
 }

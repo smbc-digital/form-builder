@@ -16,8 +16,8 @@ namespace form_builder.Services.DocumentService
 
     public class DocumentSummaryService : IDocumentSummaryService
     {
-        private readonly IDocumentCreation _textfileProvider;
-        private readonly IDocumentCreationHelper _documentCreationHelper;
+        private IDocumentCreation _textfileProvider;
+        private IDocumentCreationHelper _documentCreationHelper;
 
         public DocumentSummaryService(IDocumentCreationHelper documentCreationHelper, IEnumerable<IDocumentCreation> providers)
         {

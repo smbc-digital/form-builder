@@ -22,9 +22,9 @@ namespace form_builder_tests_ui
             var sessionConfiguration = new SessionConfiguration
             {
                 Driver = typeof(CustomChromeProfileSeleniumWebDriver),
-                AppHost = "https://localhost",
+                AppHost = "http://localhost",
                 Browser = Browser.Chrome,
-                Port = 5000,
+                Port = 5001,
                 Timeout = TimeSpan.FromSeconds(4),
                 RetryInterval = TimeSpan.FromSeconds(0.5)
             };

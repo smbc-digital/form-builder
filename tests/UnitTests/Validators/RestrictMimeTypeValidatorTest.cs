@@ -15,7 +15,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ReturnsTrueWhenViewModelDoesntContainFileUpload()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.FileUpload)
                 .WithQuestionId("fileUpload")
@@ -23,56 +23,54 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>();
 
-            // Act
+            //Assert
             var result = _restrictMimeTypeValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.True(result.IsValid);
         }
 
         [Fact]
         public void Validate_ReturnsTrueWhenDocumentModel_IsNull()
         {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
-                .WithQuestionId("fileUpload")
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic> {{"fileUpload", null}};
-
-            // Act
-            var result = _restrictMimeTypeValidator.Validate(element, viewModel);
-
-            // Assert
-            Assert.True(result.IsValid);
-        }
-
-        [Fact]
-        public void Validate_ReturnsFalseWhenDocumentType_IsNull()
-        {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.FileUpload)
                 .WithQuestionId("fileUpload")
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            var documentModel = new DocumentModel { FileSize = 16, Content = "VGhpcyBpcyBhIHRlc3Q=" };
+            viewModel.Add("fileUpload", null);
+
+            //Assert
+            var result = _restrictMimeTypeValidator.Validate(element, viewModel);
+            Assert.True(result.IsValid);
+        }
+
+        [Fact]
+        public void Validate_ReturnsFalseWhenDocumentType_IsNull()
+        {
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId("fileUpload")
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+
+            DocumentModel documentModel = new DocumentModel { FileSize = 16, Content = "VGhpcyBpcyBhIHRlc3Q=" };
+
             viewModel.Add("fileUpload-fileupload", documentModel);
 
-            // Act
+            //Assert
             var result = _restrictMimeTypeValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.False(result.IsValid);
             Assert.StartsWith("The selected file must be a", result.Message);
         }
 
+
         [Fact]
         public void Validate_ReturnsTrueWhenFileIs_AllowedExtension()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.FileUpload)
                 .WithQuestionId("fileUpload")
@@ -80,20 +78,20 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            var documentModel = new DocumentModel { FileSize = 16, Content = base64EncodedImage };
+
+            DocumentModel documentModel = new DocumentModel { FileSize = 16, Content = base64EncodedImage };
+
             viewModel.Add("fileUpload", documentModel);
 
-            // Act
+            //Assert
             var result = _restrictMimeTypeValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.True(result.IsValid);
         }
 
         [Fact]
         public void Validate_ReturnsFalseWhenFileIsNot_AllowedExtension()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.FileUpload)
                 .WithQuestionId("fileUpload")
@@ -101,13 +99,13 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            var documentModel = new DocumentModel { FileSize = 16, Content = base64EncodedImage };
+
+            DocumentModel documentModel = new DocumentModel { FileSize = 16, Content = base64EncodedImage };
+
             viewModel.Add("fileUpload-fileupload", documentModel);
 
-            // Act
+            //Assert
             var result = _restrictMimeTypeValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.False(result.IsValid);
             Assert.StartsWith("The selected file must be a png", result.Message);
         }

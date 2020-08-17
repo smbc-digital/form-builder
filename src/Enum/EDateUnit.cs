@@ -1,4 +1,5 @@
-﻿namespace form_builder.Enum
+﻿
+namespace form_builder.Enum
 {
     public enum EDateUnit
     {

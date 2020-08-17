@@ -15,15 +15,15 @@ namespace form_builder.Cache
     }
     public class Cache : ICache
     {
-        private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IDistributedCacheWrapper _distrbutedCache;
         private readonly ISchemaProvider _schemaProvider;
-        private readonly IOptions<DistributedCacheConfiguration> _distributedCacheConfiguration;
+        private readonly IOptions<DistrbutedCacheConfiguration> _distrbutedCacheConfiguration;
 
-        public Cache(IDistributedCacheWrapper distributedCache, ISchemaProvider schemaProvider, IOptions<DistributedCacheConfiguration> distributedCacheConfiguration)
+        public Cache(IDistributedCacheWrapper distrbutedCache, ISchemaProvider schemaProvider, IOptions<DistrbutedCacheConfiguration> distrbutedCacheConfiguration)
         {
-            _distributedCache = distributedCache;
+            _distrbutedCache = distrbutedCache;
             _schemaProvider = schemaProvider;
-            _distributedCacheConfiguration = distributedCacheConfiguration;
+            _distrbutedCacheConfiguration = distrbutedCacheConfiguration;
         }
 
         public async Task<T> GetFromCacheOrDirectlyFromSchemaAsync<T>(string cacheKey, int minutes, ESchemaType type)
@@ -31,16 +31,18 @@ namespace form_builder.Cache
             T result;
             var prefix = type == ESchemaType.PaymentConfiguration ? "payment-config/" : string.Empty;
 
-            if (_distributedCacheConfiguration.Value.UseDistributedCache && minutes > 0)
+            if (_distrbutedCacheConfiguration.Value.UseDistrbutedCache && minutes > 0)
             {
-                var data = _distributedCache.GetString($"{type.ToESchemaTypePrefix()}{cacheKey}");
+                var data = _distrbutedCache.GetString($"{type.ToESchemaTypePrefix()}{cacheKey}");
 
                 if(data == null)
                 {
                     result = await _schemaProvider.Get<T>($"{prefix}{cacheKey}");
 
                     if (result != null)
-                        await _distributedCache.SetStringAsync($"{type.ToESchemaTypePrefix()}{cacheKey}", JsonConvert.SerializeObject(result), minutes);
+                    {
+                        await _distrbutedCache.SetStringAsync($"{type.ToESchemaTypePrefix()}{cacheKey}", JsonConvert.SerializeObject(result), minutes);
+                    };
 
                     return result;
                 }

@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using StockportGovUK.NetStandard.Gateways.StreetService;
+using form_builder.Providers.Street;
+using StockportGovUK.NetStandard.Gateways.StreetServiceGateway;
 using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Enums;
 using StockportGovUK.NetStandard.Models.Street;
 
-namespace form_builder.Providers.Street
+namespace form_builder.Providers.Address
 {
     public class ServiceStreetProvider : IStreetProvider
     {

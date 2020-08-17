@@ -13,18 +13,19 @@ namespace form_builder.Builders.Document
             if(string.IsNullOrWhiteSpace(answer))
                 return;
 
-            if (type == EElementType.FileUpload)
+            if(type == EElementType.FileUpload){
                 _filesData.Add($"{question}: {answer}");
-            else
+            } else {
                 _data.Add($"{question}: {answer}");
+            }
         }
 
         public List<string> Build(){
-            if (!_filesData.Any()) return _data;
-
-            _data.Add(string.Empty);
-            _data.Add("Files:");
-            _data.AddRange(_filesData);
+            if(_filesData.Any()){
+                _data.Add(string.Empty);
+                _data.Add("Files:");
+                _data.AddRange(_filesData);
+            }
 
             return _data;
         }

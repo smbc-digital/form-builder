@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using form_builder.Configuration;
-using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
+using form_builder.Helpers.Session;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -39,11 +40,11 @@ namespace form_builder.Services.FileUploadService
 
         public List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files)
         {
-            files.ToList().ForEach(file =>
+            files.ToList().ForEach((file) =>
             {
                 var key = $"{ file.QuestionId}-{_sessionHelper.GetSessionGuid()}";
                 _distributedCache.SetStringAsync($"file-{key}", file.Base64EncodedContent, _distributedCacheExpirationConfiguration.FileUpload);
-                var model = new FileUploadModel
+                FileUploadModel model = new FileUploadModel
                 {
                     Key = $"file-{key}",
                     TrustedOriginalFileName = WebUtility.HtmlEncode(file.UntrustedOriginalFileName),
@@ -55,8 +56,7 @@ namespace form_builder.Services.FileUploadService
                     var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId == file.QuestionId);
                     if (fileUploadAnswer != null)
                         fileUploadAnswer.Response = model;
-                } 
-                else
+                } else
                 {
                     answers.Add(new Answers { QuestionId = file.QuestionId, Response = JsonConvert.SerializeObject(model) });
                 }

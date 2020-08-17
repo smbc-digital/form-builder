@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using form_builder.Constants;
-using form_builder.ContentFactory;
+﻿using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
@@ -12,6 +7,11 @@ using form_builder.Providers.Organisation;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.Addresses;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace form_builder.Services.OrganisationService
 {
@@ -25,14 +25,12 @@ namespace form_builder.Services.OrganisationService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IPageHelper _pageHelper;
         private readonly IEnumerable<IOrganisationProvider> _organisationProviders;
-        private readonly IPageFactory _pageFactory;
 
-        public OrganisationService(IDistributedCacheWrapper distributedCache, IEnumerable<IOrganisationProvider> organisationProviders, IPageHelper pageHelper, IPageFactory pageFactory)
+        public OrganisationService(IDistributedCacheWrapper distributedCache, IEnumerable<IOrganisationProvider> organisationProviders, IPageHelper pageHelper)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
             _organisationProviders = organisationProviders;
-            _pageFactory = pageFactory;
         }
 
         public async Task<ProcessRequestEntity> ProcessOrganisation(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -55,6 +53,8 @@ namespace form_builder.Services.OrganisationService
             string guid,
             string path)
         {
+            var streetResults = new List<AddressSearchResult>();
+
             var cachedAnswers = _distributedCache.GetString(guid);
             var organisationElement = currentPage.Elements.Where(_ => _.Type == EElementType.Organisation).FirstOrDefault();
             var convertedAnswers = cachedAnswers == null
@@ -65,13 +65,12 @@ namespace form_builder.Services.OrganisationService
                 .Pages
                 .FirstOrDefault(_ => _.PageSlug == path)
                 .Answers
-                .FirstOrDefault(_ => _.QuestionId == $"{organisationElement.Properties.QuestionId}")
+                .FirstOrDefault(_ => _.QuestionId == $"{organisationElement.Properties.QuestionId}-organisation-searchterm")
                 .Response;
 
             if (currentPage.IsValid && organisationElement.Properties.Optional && string.IsNullOrEmpty(organisation))
             {
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-
                 return new ProcessRequestEntity
                 {
                     Page = currentPage
@@ -81,7 +80,11 @@ namespace form_builder.Services.OrganisationService
             if (!currentPage.IsValid)
             {
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
-                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
+
+                var model = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
+                model.Path = currentPage.PageSlug;
+                model.FormName = baseForm.FormName;
+                model.PageTitle = currentPage.Title;
 
                 return new ProcessRequestEntity
                 {
@@ -112,12 +115,11 @@ namespace form_builder.Services.OrganisationService
                         ? new FormAnswers { Pages = new List<PageAnswers>() }
                         : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-            var organisation = (string)viewModel[$"{organisationElement.Properties.QuestionId}"];
+            var organisation = (string)viewModel[$"{organisationElement.Properties.QuestionId}-organisation-searchterm"];
 
             if (currentPage.IsValid && organisationElement.Properties.Optional && string.IsNullOrEmpty(organisation))
             {
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-
                 return new ProcessRequestEntity
                 {
                     Page = currentPage
@@ -126,12 +128,10 @@ namespace form_builder.Services.OrganisationService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid);
-
+                var formModel = await _pageHelper.GenerateHtml(currentPage, viewModel, baseForm, guid);
                 formModel.Path = currentPage.PageSlug;
                 formModel.FormName = baseForm.FormName;
                 formModel.PageTitle = currentPage.Title;
-                formModel.HideBackButton = currentPage.HideBackButton;
 
                 return new ProcessRequestEntity
                 {
@@ -142,7 +142,7 @@ namespace form_builder.Services.OrganisationService
 
             var foundOrganisationSearchTerm = convertedAnswers
                 .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
-                .Answers?.FirstOrDefault(_ => _.QuestionId == organisationElement.Properties.QuestionId)?
+                .Answers?.FirstOrDefault(_ => _.QuestionId == $"{organisationElement.Properties.QuestionId}-organisation-searchterm")?
                 .Response;
 
             List<object> searchResults;

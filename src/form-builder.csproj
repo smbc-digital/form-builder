@@ -1,51 +1,46 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AspNetCoreHostingModelV2>InProcess</AspNetCoreHostingModelV2>
     <RootNamespace>form_builder</RootNamespace>
-    <PackageLicenseFile>License.txt</PackageLicenseFile>
-    <LangVersion>8.0</LangVersion>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.3.111.34" />
-    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.3.101.186" />
-    <PackageReference Include="JsonSubTypes" Version="1.7.0" />
-    <PackageReference Include="MailKit" Version="2.8.0" />
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="3.1.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="3.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="3.1.6" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.104.41" />
+    <PackageReference Include="JsonSubTypes" Version="1.6.0" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.6" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="2.2.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="2.2.5" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="2.2.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" />
     <PackageReference Include="Mime-Detective" Version="0.0.6-beta5" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Polly" Version="7.2.1" />
-    <PackageReference Include="StockportGovUK.AspNetCore.Middleware.ExceptionHandling" Version="2.0.2" />
-    <PackageReference Include="StockportGovUK.NetStandard.Gateways" Version="5.0.0" />
+    <PackageReference Include="Polly" Version="7.2.0" />
+    <PackageReference Include="StockportGovUK.AspNetCore.Middleware.ExceptionHandling" Version="1.0.1" />
+    <PackageReference Include="StockportGovUK.NetStandard.Gateways" Version="1.1.2" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
-    <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="3.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="3.1.6" />
-    <PackageReference Include="Serilog" Version="2.9.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="2.2.3" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="2.2.5" />
+    <PackageReference Include="Serilog" Version="2.8.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-    <PackageReference Include="StockportGovUK.AspNetCore.Logging.Elasticsearch.Aws" Version="1.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
+    <PackageReference Include="StockportGovUK.AspNetCore.Logging.Elasticsearch.Aws" Version="0.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Update="wwwroot\assets\javascript\govuk-frontend-3.7.0.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+  <PropertyGroup>
+    <PackageLicenseFile>License.txt</PackageLicenseFile>
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
-
   <ProjectExtensions><VisualStudio><UserProperties dsl_4access-protection-markings-request_1json__JsonSchema="       }," dsl_4dateinput_1json__JsonSchema="http://json.schemastore.org/band-manifest" /></VisualStudio></ProjectExtensions>
 </Project>

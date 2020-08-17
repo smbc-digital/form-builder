@@ -1,9 +1,9 @@
-﻿using System;
+﻿using form_builder.Enum;
 using System.Collections.Generic;
-using form_builder.Builders;
-using form_builder.Enum;
 using form_builder.Validators;
 using Xunit;
+using System;
+using form_builder.Builders;
 
 namespace form_builder_tests.UnitTests.Validators
 {
@@ -14,22 +14,20 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldCheckRestrictCurrentDatePropertyIsNotSet()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
                 .Build();
 
-            // Act
+            //Assert
             var result = _restrictPastDatepickerValidator.Validate(element, null);
-
-            // Assert
             Assert.True(result.IsValid);
         }
 
         [Fact]
         public void Validate_ReturnsTrueWhenOptionalFieldsAreEmpty()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
                 .WithRestrictPastDate(true)
@@ -38,17 +36,15 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>();
 
-            // Act
+            //Assert
             var result = _restrictPastDatepickerValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.True(result.IsValid);
         }
 
         [Fact]
         public void Validate_ShouldShowValidationMessageWhenFieldsAreEmpty()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
@@ -56,12 +52,11 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithLabel("Date")
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test-date", string.Empty}};
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test-date", string.Empty);
 
-            // Act
+            //Assert
             var result = _restrictPastDatepickerValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.False(result.IsValid);
             Assert.Equal("Check the date and try again", result.Message);
         }
@@ -69,7 +64,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldShowValidationMessageWhenPastDateEntered()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
@@ -81,10 +76,8 @@ namespace form_builder_tests.UnitTests.Validators
             
             viewModel.Add("test-date", yesterday.ToString("yyyy-MM-dd"));
           
-            // Act
+            //Assert
             var result = _restrictPastDatepickerValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.False(result.IsValid);
             Assert.Equal("Check the date and try again", result.Message);
         }
@@ -92,7 +85,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldReturnTrueWhenPastDateIsNotEntered()
         {
-            // Arrange
+            //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DatePicker)
                 .WithQuestionId("test-date")
@@ -104,10 +97,8 @@ namespace form_builder_tests.UnitTests.Validators
 
             viewModel.Add("test-date", tomorrow.ToString("yyyy-MM-dd"));
 
-            // Act
+            //Assert
             var result = _restrictPastDatepickerValidator.Validate(element, viewModel);
-
-            // Assert
             Assert.True(result.IsValid);
         }
     }

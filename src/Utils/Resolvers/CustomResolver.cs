@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Web;
 using form_builder.Extensions;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -13,15 +15,17 @@ namespace form_builder.Utils.Resolvers
     {
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
         {
-            var props = base.CreateProperties(type, memberSerialization);
+            IList<JsonProperty> props = base.CreateProperties(type, memberSerialization);
 
             // Find all string properties that do not have an [AllowHtml] attribute applied
             // and attach an HtmlEncodingValueProvider instance to them
-            foreach (var prop in props.Where(p => p.PropertyType == typeof(string)))
+            foreach (JsonProperty prop in props.Where(p => p.PropertyType == typeof(string)))
             {
-                var pi = type.GetProperty(prop.UnderlyingName);
+                PropertyInfo pi = type.GetProperty(prop.UnderlyingName);
                 if (pi != null && pi.GetCustomAttribute(typeof(AllowEncodingAttribute), true) == null)
+                {
                     prop.ValueProvider = new HtmlEncodingValueProvider(pi);
+                }
             }
 
             return props;
@@ -41,7 +45,7 @@ namespace form_builder.Utils.Resolvers
             // target is the object on which to set the value.
             public void SetValue(object target, object value)
             {
-                var encoded = HttpUtility.HtmlEncode((string)value);
+                var encoded = HttpUtility.HtmlEncode((string) value);
                 targetProperty.SetValue(target, encoded);
             }
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -10,6 +6,10 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace form_builder.Helpers
 {
@@ -32,11 +32,13 @@ namespace form_builder.Helpers
         {
             var httpContext = new DefaultHttpContext { RequestServices = _serviceProvider };
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+
             var viewEngineResult = _viewEngine.FindView(actionContext, viewName, false);
 
             if (!viewEngineResult.Success)
+            {
                 throw new InvalidOperationException($"Couldn't find view {viewName}");
-
+            }
             var view = viewEngineResult.View;
 
             using (var output = new StringWriter())
@@ -57,8 +59,12 @@ namespace form_builder.Helpers
                     new HtmlHelperOptions());
 
                 if (viewData != null)
+                {
                     foreach (var item in viewData)
+                    {
                         viewContext.ViewData.Add(item.Key, item.Value);
+                    }
+                }
 
                 await view.RenderAsync(viewContext);
 

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using form_builder.Models;
 
 namespace form_builder.ViewModels
 {
@@ -11,18 +9,14 @@ namespace form_builder.ViewModels
 
         public string FeedbackForm { get; set; }
 
-        public string FeedbackPhase { get; set; }
-
         public string FormName { get; set; }
+
+        public string BaseURL { get; set; }
+
+        public string StartPageSlug { get; set; }
 
         public string PageTitle { get; set; }
 
-        public string StartPageUrl { get; set; }
-
-        public bool HideBackButton { get; set; }
-
-        public bool DisplayBreadCrumbs { get; set; }
-
-        public List<Breadcrumb> BreadCrumbs { get; set; }
+        public string StartFormUrl { get; set; }
     }
 }

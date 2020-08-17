@@ -8,13 +8,19 @@ namespace form_builder.Extensions
 {
     public static class EnumerableExtensions
     {
-        public static IAddressProvider Get(this IEnumerable<IAddressProvider> value, string providerName) => 
-            value.Single(_ => _.ProviderName == providerName);
+        public static IAddressProvider Get(this IEnumerable<IAddressProvider> value, string providerName)
+        {
+            return value.Single(_ => _.ProviderName == providerName);
+        }
 
-        public static IOrganisationProvider Get(this IEnumerable<IOrganisationProvider> value, string providerName) =>
-            value.Single(_ => _.ProviderName == providerName);
+        public static IOrganisationProvider Get(this IEnumerable<IOrganisationProvider> value, string providerName)
+        {
+            return value.Single(_ => _.ProviderName == providerName);
+        }
 
-        public static IStreetProvider Get(this IEnumerable<IStreetProvider> value, string providerName) =>
-            value.Single(_ => _.ProviderName == providerName);
+        public static IStreetProvider Get(this IEnumerable<IStreetProvider> value, string providerName)
+        {
+            return value.Single(_ => _.ProviderName == providerName);
+        }
     }
 }

@@ -1,34 +1,18 @@
 ﻿@model form_builder.Models.Elements.Element
 
-<div class="govuk-radios">
-    @for (var i = 0; i < Model.Properties.Options.Count; i++)
-    {
+@for (var i = 0; i < Model.Properties.Options.Count; i++)
+{
+    var item = Model.Properties.Options[i];
+    var itemHint = $"{Model.Properties.QuestionId}-{i}-hint";
+    var itemId = $"{Model.Properties.QuestionId}-{i}";
 
-        var strongLabel = Model.Properties.Options[i].HasHint ? "govuk-label--s" : null;
+    <div class="input-radio-container">
+        @Html.RadioButton(Model.Properties.QuestionId, Model.Properties.Options[i].Value, Model.Properties.Options[i].Checked, @Model.GenerateElementProperties(i))
+        <label for="@itemId">@item.Text</label>
 
-        @if (Model.Properties.Options[i].HasDivider)
+        @if (!string.IsNullOrEmpty(item.Hint))
         {
-            <div class="govuk-radios__divider">@Model.Properties.Options[i].Divider</div>
+            <p><span class="radio-sub-label" id=@itemHint>@Html.Raw(item.Hint)</span></p>
         }
-
-        <div class="govuk-radios__item">
-            <input class="govuk-radios__input"
-                   type="radio"
-                   value="@Model.Properties.Options[i].Value"
-                   name="@Model.QuestionId"
-                   id="@Model.GetListItemId(i)"
-                   @(Model.Properties.Options[i].HasHint ? $"aria-describedby={Model.GetListItemHintId(i)}" : string.Empty)
-                   @(Model.Properties.Checked || Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty) />
-
-            <label class="govuk-label govuk-radios__label @strongLabel"
-                   for="@Model.GetListItemId(i)">
-                @Model.Properties.Options[i].Text
-            </label>
-
-            @if (Model.Properties.Options[i].HasHint)
-            {
-                <span class="govuk-hint govuk-radios__hint" id="@Model.GetListItemHintId(i)">@Html.Raw(Model.Properties.Options[i].Hint)</span>
-            }
-        </div>
-    }
-</div>
+    </div>
+}

@@ -5,7 +5,7 @@ namespace form_builder_tests_ui
 {
     public class MockConfiguration
     {
-        public static WireMockServer Server;
+        public static FluentMockServer Server;
         public static bool IsRecordMode;
 
         public MockConfiguration(bool isRecordMode)
@@ -21,7 +21,7 @@ namespace form_builder_tests_ui
         {
             if (IsRecordMode)
             {
-                Server = WireMockServer.Start(new WireMockServerSettings()
+                Server = FluentMockServer.Start(new FluentMockServerSettings
                 {
                     StartAdminInterface = true,
                     ProxyAndRecordSettings = new ProxyAndRecordSettings

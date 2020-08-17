@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 using StockportGovUK.AspNetCore.Logging.Elasticsearch.Aws;
 
@@ -28,16 +28,13 @@ namespace form_builder
                 .WriteToElasticsearchAws(Configuration)
                 .CreateLogger();
 
-            BuildHost(args).Run();
+            BuildWebHost(args).Run();
         }
 
-        public static IHost BuildHost(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                    webBuilder.UseConfiguration(Configuration);
-                })
+        public static IWebHost BuildWebHost(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .UseConfiguration(Configuration)
                 .UseSerilog()
                 .Build();
     }

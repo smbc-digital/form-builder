@@ -1,11 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Threading.Tasks;
-using form_builder.Configuration;
+﻿using form_builder.Configuration;
 using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Factories.Schema;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -13,7 +7,13 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Models.FileManagement;
+using form_builder.Factories.Schema;
+using form_builder.Extensions;
 
 namespace form_builder.Services.MappingService
 {
@@ -43,8 +43,10 @@ namespace form_builder.Services.MappingService
         public async Task<MappingEntity> Map(string sessionGuid, string form)
         {
             var baseForm = await _schemaFactory.Build(form);
+
             var formData = _distributedCache.GetString(sessionGuid);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
             convertedAnswers.FormName = form;
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
 
@@ -111,13 +113,13 @@ namespace form_builder.Services.MappingService
             if (obj.TryGetValue(target, out objectValue))
             {
                 var files = (List<File>) objectValue;
+
                 if (value != null)
                 {
                     obj.Remove(target);
                     files.Add((File) value);
                     obj.Add(target, files);
                 }
-
                 return obj;
             }
             else

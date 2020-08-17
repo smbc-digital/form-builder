@@ -2,7 +2,6 @@
 using form_builder.Extensions;
 using form_builder.Models;
 using System.Collections.Generic;
-using form_builder_tests.Builders;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Extensions
@@ -12,7 +11,6 @@ namespace form_builder_tests.UnitTests.Extensions
         [Fact]
         public void GetReducedAnswers_ShouldRemoveUnusedPage()
         {
-            // Arrange
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
@@ -75,20 +73,17 @@ namespace form_builder_tests.UnitTests.Extensions
                         }
                     }
                 },
-                FirstPageSlug = "page-1"
+                StartPageSlug = "page-1"
             };
 
-            // Act
             var result = formAnswers.GetReducedAnswers(formSchema);
 
-            // Assert
             Assert.Equal(2, result.Count);
         }
 
         [Fact]
         public void GetReducedAnswers_ShouldReturnPageAnswers_ThatExistInSchema()
         {
-            // Arrange
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
@@ -111,23 +106,14 @@ namespace form_builder_tests.UnitTests.Extensions
                 }
             };
 
-            var formSchema = new FormSchemaBuilder()
-                .WithPage(new Page
+            var formSchema = new FormSchema
+            {
+                Pages = new List<Page>
                 {
-                    PageSlug = "page-1",
-                    Behaviours = new List<Behaviour>
+                    new Page
                     {
-                        new Behaviour
-                        {
-                            BehaviourType = EBehaviourType.GoToPage,
-                            PageSlug = "page-3"
-                        }
-                    }
-                })
-                .WithPage(new Page
-                {
-                    PageSlug = "page-2",
-                    Behaviours = new List<Behaviour>
+                        PageSlug = "page-1",
+                        Behaviours = new List<Behaviour>
                         {
                             new Behaviour
                             {
@@ -135,22 +121,31 @@ namespace form_builder_tests.UnitTests.Extensions
                                 PageSlug = "page-3"
                             }
                         }
-                }
-                )
-                .WithFirstPageSlug("page-1")
-                .Build();
+                    },
+                    new Page
+                    {
+                        PageSlug = "page-2",
+                        Behaviours = new List<Behaviour>
+                        {
+                            new Behaviour
+                            {
+                                BehaviourType = EBehaviourType.GoToPage,
+                                PageSlug = "page-3"
+                            }
+                        }
+                    }
+                },
+                StartPageSlug = "page-1"
+            };
 
-            // Act
             var result = formAnswers.GetReducedAnswers(formSchema);
 
-            // Assert
             Assert.Single(result);
         }
 
         [Fact]
         public void GetReducedAnswers_ShouldReturnPageAnswers_ThatExistInAnswers()
         {
-            // Arrange
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
@@ -168,56 +163,57 @@ namespace form_builder_tests.UnitTests.Extensions
                 }
             };
 
-            var formSchema = new FormSchemaBuilder()
-                .WithPage(new Page
+            var formSchema = new FormSchema
+            {
+                Pages = new List<Page>
                 {
-                    PageSlug = "page-1",
-                    Behaviours = new List<Behaviour>
+                    new Page
                     {
-                        new Behaviour
+                        PageSlug = "page-1",
+                        Behaviours = new List<Behaviour>
                         {
-                            BehaviourType = EBehaviourType.GoToPage,
-                            PageSlug = "page-3"
+                            new Behaviour
+                            {
+                                BehaviourType = EBehaviourType.GoToPage,
+                                PageSlug = "page-3"
+                            }
+                        }
+                    },
+                    new Page
+                    {
+                        PageSlug = "page-2",
+                        Behaviours = new List<Behaviour>
+                        {
+                            new Behaviour
+                            {
+                                BehaviourType = EBehaviourType.GoToPage,
+                                PageSlug = "page-3"
+                            }
+                        }
+                    },
+                    new Page
+                    {
+                        PageSlug = "page-3",
+                        Behaviours = new List<Behaviour>
+                        {
+                            new Behaviour
+                            {
+                                BehaviourType = EBehaviourType.SubmitForm
+                            }
                         }
                     }
-                })
-                .WithPage(new Page
-                {
-                    PageSlug = "page-2",
-                    Behaviours = new List<Behaviour>
-                    {
-                        new Behaviour
-                        {
-                            BehaviourType = EBehaviourType.GoToPage,
-                            PageSlug = "page-3"
-                        }
-                    }
-                })
-                .WithPage(new Page
-                {
-                    PageSlug = "page-3",
-                    Behaviours = new List<Behaviour>
-                    {
-                        new Behaviour
-                        {
-                            BehaviourType = EBehaviourType.SubmitForm
-                        }
-                    }
-                })
-                .WithFirstPageSlug("page-1")
-                .Build();
+                },
+                StartPageSlug = "page-1"
+            };
 
-            // Act
             var result = formAnswers.GetReducedAnswers(formSchema);
 
-            // Assert
             Assert.Single(result);
         }
 
         [Fact]
         public void GetReducedAnswers_ShouldReturnCorrectPages_IfNoAnswersGiven()
         {
-            // Arrange
             var formAnswers = new FormAnswers
             {
                 FormName = "test",
@@ -248,37 +244,39 @@ namespace form_builder_tests.UnitTests.Extensions
                 }
             };
 
-            var formSchema = new FormSchemaBuilder()
-                .WithPage(new Page
+            var formSchema = new FormSchema
+            {
+                Pages = new List<Page>
                 {
-                    PageSlug = "page-1",
-                    Behaviours = new List<Behaviour>
+                    new Page
                     {
-                        new Behaviour
+                        PageSlug = "page-1",
+                        Behaviours = new List<Behaviour>
                         {
-                            BehaviourType = EBehaviourType.GoToPage,
-                            PageSlug = "page-2"
+                            new Behaviour
+                            {
+                                BehaviourType = EBehaviourType.GoToPage,
+                                PageSlug = "page-2"
+                            }
+                        }
+                    },
+                    new Page
+                    {
+                        PageSlug = "page-2",
+                        Behaviours = new List<Behaviour>
+                        {
+                            new Behaviour
+                            {
+                                BehaviourType = EBehaviourType.SubmitForm
+                            }
                         }
                     }
-                })
-                .WithPage(new Page
-                {
-                    PageSlug = "page-2",
-                    Behaviours = new List<Behaviour>
-                    {
-                        new Behaviour
-                        {
-                            BehaviourType = EBehaviourType.SubmitForm
-                        }
-                    }
-                })
-                .WithFirstPageSlug("page-1")
-                .Build();
+                },
+                StartPageSlug = "page-1"
+            };
 
-            // Act
             var result = formAnswers.GetReducedAnswers(formSchema);
 
-            // Assert
             Assert.Equal(2, result.Count);
         }
     }

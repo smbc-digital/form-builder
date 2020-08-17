@@ -2,18 +2,22 @@
 
 @pagecontent
 Scenario: Render information on the page correctly
-	Given I navigate to "/ui-page-content/page1"
-	Then I should see the header
-	And I should see a "h1" element with "This is a H1" text
+	Given I navigate to "/pagecontent/page1"
+	Then I should see a "h1" element with "page1" text
 	And I should see a "h2" element with "This is a H2" text
 	And I should see a "h3" element with "This is a H3" text
 	And I should see a "h4" element with "This is a H4" text
 	And I should see a "h5" element with "This is a H5" text
 	And I should see a "h6" element with "This is a H6" text
-	And I should see a "p" element with "Lorem Ipsum is simply dummy text of the printing and typesetting industry" text
+	And I should see a "p" element with "This is paragraph text" text
 	And I should see an unordered list with list items
 	And I should see an ordered list with list items
 	And I should see an img element
-	And I should see an inline alert element with label "Inline alert with additional text" and text "This is some text"
+	And I should see a "h2" element with "This is a label" text
+	And I should see a "p" element with "This is some text" text
+	And I should see a strong element within a p tag
+	And I should see an image element within a p tag
 	And I should see a link element within a p tag
-	And I should see the footer
+	And I should see the form title in the header
+
+	
