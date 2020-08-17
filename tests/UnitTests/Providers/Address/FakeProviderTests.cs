@@ -1,7 +1,7 @@
-﻿using form_builder.Providers.Address;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Providers.Address;
 using Xunit;
-using System.Linq;
 
 namespace form_builder_tests.UnitTests.Providers.Address
 {

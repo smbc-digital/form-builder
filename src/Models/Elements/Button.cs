@@ -1,12 +1,12 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using form_builder.Constants;
+using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using form_builder.Constants;
-using form_builder.Extensions;
 
 namespace form_builder.Models.Elements
 {
@@ -24,17 +24,14 @@ namespace form_builder.Models.Elements
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
-            IHostingEnvironment environment,
+            IWebHostEnvironment environment,
             List<object> results = null)
         {
-            var viewData = new Dictionary<string, dynamic> { { "displayAnchor", !CheckForStartPageSlug(formSchema, page) }, { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) }, { "buttonText", GetButtonText(page.Elements, viewModel, page) } };
+            var viewData = new Dictionary<string, dynamic> { { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) } };
+
+            Properties.Text = GetButtonText(page.Elements, viewModel, page);
 
             return viewRender.RenderAsync("Button", this, viewData);
-        }
-
-        private bool CheckForStartPageSlug(FormSchema form, Page page)
-        {
-            return form.StartPageSlug == page.PageSlug;
         }
 
         private bool CheckForBehaviour(List<Behaviour> behaviour)
@@ -54,30 +51,22 @@ namespace form_builder.Models.Elements
 
         private bool ShowSpinner(List<Behaviour> behaviour, List<IElement> element, Dictionary<string, dynamic> viewModel)
         {
-            if (CheckForBehaviour(behaviour) || CheckForStreetAddress(element, viewModel))
-            {
-                return true;
-            }
-
-            return false;
+             return CheckForBehaviour(behaviour) || CheckForStreetAddress(element, viewModel);
         }
 
         private string GetButtonText(List<IElement> element, Dictionary<string, dynamic> viewModel, Page page)
         {
             if (element.Any(_ => _.Type == EElementType.Address) && viewModel.IsInitial())
-            {
                 return SystemConstants.AddressSearchButtonText;
-            }
 
             if (element.Any(_ => _.Type == EElementType.Street) && viewModel.IsInitial())
-            {
                 return SystemConstants.StreetSearchButtonText;
-            }
 
             if (element.Any(_ => _.Type == EElementType.Organisation) && viewModel.IsInitial())
-            {
                 return SystemConstants.OrganisationSearchButtonText;
-            }
+
+            if(page.Behaviours.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay))
+                return string.IsNullOrEmpty(Properties.Text) ? SystemConstants.SubmitButtonText : Properties.Text;
 
             return string.IsNullOrEmpty(Properties.Text) ? SystemConstants.NextStepButtonText : Properties.Text;
         }

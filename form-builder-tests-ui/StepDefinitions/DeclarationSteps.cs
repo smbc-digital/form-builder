@@ -62,10 +62,8 @@ namespace form_builder_tests_ui.StepDefinitions
             //Arrange
             var webDriver = BrowserSession.Native as IWebDriver;
 
-            //Act
-
             //Assert
-            webDriver.FindElement(By.ClassName("back-button")).Click();
+            webDriver.FindElement(By.ClassName("govuk-back-link")).Click();
         }
     }
 }

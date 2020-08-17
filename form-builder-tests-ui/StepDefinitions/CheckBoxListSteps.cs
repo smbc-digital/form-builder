@@ -56,7 +56,7 @@ namespace form_builder_tests_ui.StepDefinitions
             Assert.False(webDriver.FindElement(By.Id(inputId)).Selected);
         }
 
-        [Then(@"The the previous link is clicked")]
+        [Then(@"The previous link is clicked")]
         public void ThePreviousLinkIsClicked()
         {
             //Arrange
@@ -65,7 +65,7 @@ namespace form_builder_tests_ui.StepDefinitions
             //Act
 
             //Assert
-            webDriver.FindElement(By.ClassName("back-button")).Click();
+            webDriver.FindElement(By.ClassName("govuk-back-link")).Click();
         }
     }
 }

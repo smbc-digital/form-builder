@@ -2,14 +2,14 @@
 @{
     ViewData["Title"] = Model.FormName;
     ViewData["PageTitle"] = Model.PageTitle;
-    ViewData["BannerTypeformUrl"] = Model.FeedbackForm;
+    ViewData["FeedbackForm"] = Model.FeedbackForm;
+    ViewData["FeedbackPhase"] = Model.FeedbackPhase;
+    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadCrumbs;
+    ViewData["Breadcrumbs"] = Model.BreadCrumbs;
 }
 
-<div id="root" class="text-center">
-    @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { autocomplete = "on", novalidate="novalidate",enctype="multipart/form-data"}))
-    {
-        @Html.Raw(Model.RawHTML)
-
-        @Html.HiddenFor(_ => _.Path)
-    }
-</div>
+@using (Html.BeginForm("Index", "Home", FormMethod.Post, new { autocomplete = "on", novalidate = "novalidate", enctype = "multipart/form-data" }))
+{
+    @Html.Raw(Model.RawHTML)
+    @Html.HiddenFor(_ => _.Path)
+}

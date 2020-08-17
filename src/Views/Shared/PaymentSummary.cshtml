@@ -1,0 +1,16 @@
+﻿@model form_builder.ViewModels.PaymentSummaryViewModel
+@{
+    ViewData["Title"] = Model.FormName;
+    ViewData["PageTitle"] = Model.PageTitle;
+    ViewData["FeedbackForm"] = Model.FeedbackForm;
+    ViewData["FeedbackPhase"] = Model.FeedbackPhase;
+}
+
+<h1 class="govuk-heading-l">@Model.FormName</h1>
+<p>You are now about to pay for the @Model.Description, use the button below to go to our payments page.</p>
+<p>Continue to our payment page to fill in your card details and complete your order.</p>
+<p>The cost is £@Model.Amount</p>
+<br>
+<button data-prevent-double-click="true" className="govuk-button" type="submit" id="submit-pay">
+    Submit and pay
+</button>

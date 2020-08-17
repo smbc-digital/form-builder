@@ -1,31 +1,22 @@
-﻿@model form_builder.Models.Elements.Element
+﻿@model form_builder.Models.Elements.Street
 @{
-    var questionId = $"{Model.Properties.QuestionId}-street";
-    var hintId = $"{questionId}-hint";
-    var errorId = $"{questionId}-error";
-    var streetLabel = string.IsNullOrEmpty(Model.Properties.StreetLabel) ? "Search for a street" : Model.Properties.StreetLabel;
+    var elementProperties = Model.GenerateElementProperties();
+    elementProperties.Add("class", $"govuk-input govuk-input--width-20 {(Model.IsValid ? string.Empty : "govuk-input--error")}");
 }
 
-@if(Model.Properties.LegendAsH1) {
-    <h1>@streetLabel</h1>
-} else {
-    <label class="h2">@streetLabel</label>
-}
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
 
-@if (Model.Properties.Optional)
-{
-    <span class="optional">(optional)</span>
-}
 
-@if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
-{
-    <p class="description" id=@hintId>@Model.Properties.Hint</p>
-}
+    <partial name="LabelH1" />
+    @if (!string.IsNullOrEmpty(@Model.Properties.StreetIAG))
+    {
+        <section class="govuk-inset-text">
+            <p>@Model.Properties.StreetIAG</p>
+        </section>
+     }
+    <partial name="Hint" />
 
-@Html.TextBox(questionId, Model.Properties.Value, Model.GenerateElementProperties())
+    <partial name="Error" />
 
-@if (!Model.IsValid)
-{
-    var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
-    <p class="input-error-content" id="@errorId">@validationMessage</p>
-}
+    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elementProperties)
+</div>
