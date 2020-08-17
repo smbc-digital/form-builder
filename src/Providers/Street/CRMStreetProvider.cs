@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using form_builder.Providers.Street;
-using StockportGovUK.NetStandard.Gateways.VerintServiceGateway;
+using StockportGovUK.NetStandard.Gateways.VerintService;
 using StockportGovUK.NetStandard.Models.Addresses;
 
-namespace form_builder.Providers.Address
+namespace form_builder.Providers.Street
 {
     public class CRMStreetProvider : IStreetProvider
     {

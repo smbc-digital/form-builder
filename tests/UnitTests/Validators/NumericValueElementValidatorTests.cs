@@ -1,7 +1,7 @@
-﻿using form_builder.Validators;
-using System.Collections.Generic;
-using Xunit;
+﻿using System.Collections.Generic;
 using form_builder.Builders;
+using form_builder.Validators;
+using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
 {
@@ -56,6 +56,28 @@ namespace form_builder_tests.UnitTests.Validators
 
             Assert.False(result.IsValid);
             Assert.Equal($"{label} must be a whole number", result.Message);
+        }
+
+        [Fact]
+        public void Validate_ShouldReturnCustomValidationResult_WhenElementNotValidNumber()
+        {
+            var errorMessage = "Provide an integer";
+            var label = "Test label";
+            var element = new ElementBuilder()
+                .WithQuestionId("tets-id")
+                .WithNumeric(true)
+                .WithLabel(label)
+                .Build();
+
+            element.Properties.NotAnIntegerValidationMessage = errorMessage;
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("tets-id", "a123");
+
+            var result = _validator.Validate(element, viewModel);
+
+            Assert.False(result.IsValid);
+            Assert.Equal(errorMessage, result.Message);
         }
 
         [Fact]

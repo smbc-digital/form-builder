@@ -1,7 +1,7 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using form_builder.Enum;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using System.Collections.Generic;
 
 namespace form_builder.Models
 {
@@ -20,8 +20,11 @@ namespace form_builder.Models
     public class SubmitSlug
     {
         public string Environment { get; set; }
+
         public string URL { get; set; }
+
         public string AuthToken { get; set; }
+
         public string CallbackUrl { get; set; }
     }
 }

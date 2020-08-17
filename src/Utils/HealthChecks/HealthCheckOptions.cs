@@ -14,62 +14,64 @@ namespace form_builder.Utils.HealthChecks
 
         public static HealthCheckOptions Options => new HealthCheckOptions
         {
-            ResponseWriter = async (c, r) =>
+            ResponseWriter = async (context, report) =>
             {
-                c.Response.ContentType = MediaTypeNames.Application.Json;
+                context.Response.ContentType = MediaTypeNames.Application.Json;
 
-                switch (r.Status)
+                switch (report.Status)
                 {
                     case HealthStatus.Healthy:
-                        await c.Response.WriteAsync(ProcessHealthy(r));
+                        await context.Response.WriteAsync(ProcessHealthy(report));
                         break;
+
                     case HealthStatus.Unhealthy:
-                        await c.Response.WriteAsync(ProcessUnhealthy(r));
+                        await context.Response.WriteAsync(ProcessUnhealthy(report));
                         break;
+
                     default:
                         break;
                 }
             }
         };
 
-        private static string ProcessUnhealthy(HealthReport report)
-        {
-            return JsonConvert.SerializeObject(new
+        private static string ProcessUnhealthy(HealthReport report) =>
+            JsonConvert.SerializeObject(new
+            {
+                application = new
                 {
-                    application = new {
-                        name = _assembly.Name,
-                        version = _assembly.Version.ToString(),
-                        status = report.Status.ToString(),
-                    },
-                    checks = report.Entries.Select(e =>
-                        new {
-                            description = e.Key,
-                            status = e.Value.Status.ToString(),
-                            exception = e.Value.Exception?.Message,
-                            data = e.Value.Data.Select(_ => $"{_.Key}: {_.Value}"),
-                            responseTime = e.Value.Duration.TotalMilliseconds
-                        }),
-                    totalResponseTime = report.TotalDuration.TotalMilliseconds
-                });
-        }
+                    name = _assembly.Name,
+                    version = _assembly.Version.ToString(),
+                    status = report.Status.ToString(),
+                },
+                checks = report.Entries.Select(e =>
+                    new
+                    {
+                        description = e.Key,
+                        status = e.Value.Status.ToString(),
+                        exception = e.Value.Exception?.Message,
+                        data = e.Value.Data.Select(_ => $"{_.Key}: {_.Value}"),
+                        responseTime = e.Value.Duration.TotalMilliseconds
+                    }),
+                totalResponseTime = report.TotalDuration.TotalMilliseconds
+            });
 
-        private static string ProcessHealthy(HealthReport report)
-        {
-            return JsonConvert.SerializeObject(new
+        private static string ProcessHealthy(HealthReport report) =>
+            JsonConvert.SerializeObject(new
+            {
+                application = new
                 {
-                    application = new {
-                        name = _assembly.Name,
-                        version = _assembly.Version.ToString(),
-                        status = report.Status.ToString(),
-                    },
-                    checks = report.Entries.Select(e =>
-                        new {
-                            description = e.Key,
-                            status = e.Value.Status.ToString(),
-                            responseTime = e.Value.Duration.TotalMilliseconds
-                        }),
-                    totalResponseTime = report.TotalDuration.TotalMilliseconds
-                });
-        }
+                    name = _assembly.Name,
+                    version = _assembly.Version.ToString(),
+                    status = report.Status.ToString(),
+                },
+                checks = report.Entries.Select(e =>
+                    new
+                    {
+                        description = e.Key,
+                        status = e.Value.Status.ToString(),
+                        responseTime = e.Value.Duration.TotalMilliseconds
+                    }),
+                totalResponseTime = report.TotalDuration.TotalMilliseconds
+            });
     }
 }

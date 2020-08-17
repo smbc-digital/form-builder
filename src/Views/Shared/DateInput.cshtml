@@ -1,42 +1,62 @@
 ﻿@using form_builder.Helpers
 @model form_builder.Models.Elements.Element
 @{
-    var hintId = $"{Model.Properties.QuestionId}-hint";
-
-    var dayId = $"{Model.Properties.QuestionId}-day";
-    var monthId = $"{Model.Properties.QuestionId}-month";
-    var yearId = $"{Model.Properties.QuestionId}-year";
     var maxYear = DateTime.Now.Year + 100;
+    var inputClassesShort = "govuk-input govuk-date-input__input govuk-input--width-2";
+    var inputClassesLong = "govuk-input govuk-date-input__input govuk-input--width-4";
+    var labelClasses = "govuk-label";
+    if (Model.Properties.StrongLabel)
+    {
+        labelClasses += " govuk-label--s";
+    }
+    else
+    {
+        labelClasses += " govuk-date-input__label";
+    }
 
-    var errorId = $"{Model.Properties.QuestionId}-error";
-    var classes = new string[] { "input-memorable-date" };
+    if (!Model.IsValid)
+    {
+        inputClassesShort += " govuk-input--error";
+        inputClassesLong += " govuk-input--error";
+    }
 }
 
-@await Html.BeginFieldSet(Model, classes)
-    <partial name="Legend" model="@Model"/>
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
 
-    <p id="@hintId">@Model.Properties.Hint</p>
-    <div>
-        <label for="@dayId">
-            Day
-        </label>
-        @Html.TextBox(dayId, Model.Properties.Day, new { maxlength = "2", type = "number" })
-    </div>
-    <div>
-        <label for="@monthId">
-            Month
-        </label>
-        @Html.TextBox(monthId, Model.Properties.Month, new { maxlength = "2", type = "number" })
-    </div>
-    <div>
-        <label for="@yearId">
-            Year
-        </label>
-        @Html.TextBox(yearId, Model.Properties.Year, new { maxlength = "4", type = "number", max = maxYear })
-    </div>
+    <partial name="LegendH1" />
 
-    @if (!Model.IsValid)
-    {
-        <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
-    }
-@await Html.EndFieldSet()
+    <partial name="Hint" />
+
+    <partial name="Error" />
+
+    <div class="govuk-date-input">
+        <div class="govuk-date-input__item">
+            <div class="govuk-form-group">
+                <label class="@labelClasses" for=@Model.GetCustomItemId("day")>
+                    Day
+                </label>
+                @Html.TextBox(Model.GetCustomItemId("day"), Model.Properties.Day, new { autocomplete = "bday-day", maxlength = "2", type = "number", @class = inputClassesShort })
+            </div>
+        </div>
+
+        <div class="govuk-date-input__item">
+            <div class="govuk-form-group">
+                <label class="@labelClasses" for=@Model.GetCustomItemId("month")>
+                    Month
+                </label>
+                @Html.TextBox(Model.GetCustomItemId("month"), Model.Properties.Month, new { autocomplete = "bday-month", maxlength = "2", type = "number", @class = inputClassesShort })
+            </div>
+        </div>
+
+        <div class="govuk-date-input__item">
+            <div class="govuk-form-group">
+                <label class="@labelClasses" for=@Model.GetCustomItemId("year")>
+                    Year
+                </label>
+                @Html.TextBox(Model.GetCustomItemId("year"), Model.Properties.Year, new { autocomplete = "bday-year", maxlength = "4", type = "number", @class = inputClassesLong, max = maxYear })
+            </div>
+        </div>
+    </div>
+    @Html.EndFieldSet()
+</div>

@@ -1,8 +1,8 @@
-using form_builder.Mappers;
-using form_builder.Models;
-using form_builder.Builders.Document;
 using System.Collections.Generic;
 using System.Linq;
+using form_builder.Builders.Document;
+using form_builder.Mappers;
+using form_builder.Models;
 
 namespace form_builder.Helpers.DocumentCreation
 {
@@ -28,7 +28,7 @@ namespace form_builder.Helpers.DocumentCreation
                 .SelectMany(_ => _.ValidatableElements)
                 .ToList();
 
-            formSchemaQuestions.ForEach((question) => {
+            formSchemaQuestions.ForEach(question => {
                 var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
 
                 summaryBuilder.Add(question.GetLabelText(), answer, question.Type);

@@ -1,10 +1,6 @@
 ﻿@model form_builder.Models.Elements.Element
 
-@{
-    var displayClass = string.IsNullOrEmpty(Model.Properties.ClassName) ? null : $"class={Model.Properties.ClassName}";
-}
-
-<ul @displayClass>
+<ul class="govuk-list govuk-list--bullet @Model.Properties.ClassName">
     @foreach (var li in Model.Properties.ListItems)
     {
         <li>@Html.Raw(li)</li>

@@ -1,7 +1,7 @@
-﻿using System;
-using TechTalk.SpecFlow;
+﻿using TechTalk.SpecFlow;
 using Xunit;
 using System.Threading;
+using OpenQA.Selenium;
 
 
 namespace form_builder_tests_ui.StepDefinitions
@@ -33,7 +33,7 @@ namespace form_builder_tests_ui.StepDefinitions
         [Then(@"I wait five seconds")]
         public void ThenIWaitFiveSeconds()
         {
-            Thread.Sleep(6000);
+            Thread.Sleep(5000);
         }
     }
 }

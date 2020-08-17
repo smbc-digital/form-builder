@@ -1,7 +1,7 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using form_builder.Enum;
+using form_builder.Models;
 
 namespace form_builder.Extensions
 {
@@ -12,7 +12,7 @@ namespace form_builder.Extensions
                 answer.Pages,
                 answer.Pages.SelectMany(_ => _.Answers).ToDictionary(x => x.QuestionId, x => x.Response),
                 schema.Pages,
-                schema.StartPageSlug,
+                schema.FirstPageSlug,
                 new List<PageAnswers>());
 
         private static List<PageAnswers> RecursivelyReduceAnswers(

@@ -11,10 +11,8 @@ namespace form_builder.Helpers.Session
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public string GetSessionGuid()
-        {
-            return _httpContextAccessor.HttpContext.Session.GetString("sessionGuid");
-        }
+        public string GetSessionGuid() =>
+            _httpContextAccessor.HttpContext.Session.GetString("sessionGuid");
 
         public void SetSessionGuid(string value)
         {
