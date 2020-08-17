@@ -3,7 +3,7 @@ Feature: Email
 	In order to fill in my details I have to navigate to Page1
 
 Scenario: Email standard use
-	Given I navigate to "/email/page1"
+	Given I navigate to "/ui-email/page1"
 	Then I should see the header
 	And I should see the "name" input
 	And I should see the "email" input

@@ -1,27 +1,16 @@
-﻿@model form_builder.ViewModels.ElementViewModel
+﻿@model form_builder.Models.Elements.Organisation
 @{
-    var questionId = $"{Model.Element.Properties.QuestionId}-organisation-searchterm";
-    var hintId = $"{questionId}-hint";
-    var errorId = $"{questionId}-error";
-    var tag = Model.Element.Properties.LegendAsH1 ? "h1" : "label";
+    var elementProperties = Model.GenerateElementProperties();
+    elementProperties.Add("class", $"govuk-input govuk-input--width-20 {(Model.IsValid ? string.Empty : "govuk-input--error")}");
+    elementProperties.Add("autocomplete", "organization");
 }
 
-<@Html.Raw(tag) @Model.Element.WriteHtmlForAndClassAttribute("-organisation-searchterm")>@Model.Element.Properties.Label</@Html.Raw(tag)>
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    <partial name="LabelH1" />
 
-@if (Model.Element.Properties.Optional)
-{
-    <span class="optional">(optional)</span>
-}
+    <partial name="Hint" />
 
-@if (!string.IsNullOrEmpty(Model.Element.Properties.Hint.Trim()))
-{
-    <p class="description" id=@hintId>@Model.Element.Properties.Hint</p>
-}
+    <partial name="Error" />
 
-@Html.TextBox(questionId, Model.Element.Properties.Value, Model.Element.GenerateElementProperties())
-
-@if (!Model.Element.IsValid)
-{
-    var validationMessage = string.IsNullOrEmpty(Model.Element.Properties.CustomValidationMessage) ? Model.Element.ValidationMessage : Model.Element.Properties.CustomValidationMessage;
-    <p class="input-error-content" id="@errorId">@validationMessage</p>
-}
+    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elementProperties)
+</div>

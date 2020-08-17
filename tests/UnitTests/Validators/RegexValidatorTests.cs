@@ -1,7 +1,7 @@
-﻿using form_builder.Builders;
+﻿using System.Collections.Generic;
+using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Validators;
-using System.Collections.Generic;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
@@ -14,7 +14,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldShowRegexValidationMessageWhenNiFieldIsEmpty()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithQuestionId("ni")
@@ -25,8 +25,10 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("ni", "");
 
-            //Assert
+            // Act
             var result = _regexElementValidator.Validate(element, viewModel);
+
+            // Assert
             Assert.False(result.IsValid);
             Assert.Equal("Check the NI Number and try again", result.Message);
         }
@@ -34,7 +36,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldCheckRegexIsValid()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithQuestionId("ni")
@@ -45,15 +47,17 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("ni", "BV123456E");
 
-            //Assert
+            // Act
             var result = _regexElementValidator.Validate(element, viewModel);
+
+            // Assert
             Assert.True(result.IsValid);
         }
 
         [Fact]
         public void Validate_ShouldCheckRegexIsInvalid()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithQuestionId("ni")
@@ -64,15 +68,17 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("ni", "notAnNiNumber");
 
-            //Assert
+            // Act
             var result = _regexElementValidator.Validate(element, viewModel);
+
+            // Assert
             Assert.False(result.IsValid);
         }
 
         [Fact]
         public void Validate_ShouldShowNormalRegexMessageWhenNIFieldIsEmpty()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithQuestionId("niNumber")
@@ -82,8 +88,10 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>();
 
-            //Assert
+            // Act
             var result = _requiredElementValidator.Validate(element, viewModel);
+
+            // Assert
             Assert.False(result.IsValid);
             Assert.Equal("Check the ni number and try again", result.Message);
         }
@@ -91,7 +99,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldShowNoRegexMessageWhenNIFieldIsEmptyAndOptional()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithQuestionId("ni")
@@ -103,8 +111,10 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("ni", "");
 
-            //Assert
+            // Act
             var result = _regexElementValidator.Validate(element, viewModel);
+
+            // Assert
             Assert.True(result.IsValid);
         }
     }

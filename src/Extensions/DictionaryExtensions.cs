@@ -17,9 +17,9 @@ namespace form_builder.Extensions
 
                 if (item.Value.Length == 1)
                 {
-                    if (item.Key.EndsWith("-address") && !string.IsNullOrEmpty(item.Value[0]))
+                    if (item.Key.EndsWith(AddressConstants.SELECT_SUFFIX) && !string.IsNullOrEmpty(item.Value[0]))
                     {
-                        string[] addressDetails = item.Value[0].Split('|');
+                        var addressDetails = item.Value[0].Split('|');
                         if (!string.IsNullOrEmpty(addressDetails[0]))
                         {
                             normalisedFormData.Add($"{item.Key}", addressDetails[0]);
@@ -29,9 +29,9 @@ namespace form_builder.Extensions
                             normalisedFormData.Add($"{item.Key}-description", addressDetails[1]);
                         }
                     }
-                    else if (item.Key.EndsWith("-streetaddress") && !string.IsNullOrEmpty(item.Value[0]))
+                    else if (item.Key.EndsWith(StreetConstants.SELECT_SUFFIX) && !string.IsNullOrEmpty(item.Value[0]))
                     {
-                        string[] streetDetails = item.Value[0].Split('|');
+                        var streetDetails = item.Value[0].Split('|');
                         if (!string.IsNullOrEmpty(streetDetails[0]))
                         {
                             normalisedFormData.Add($"{item.Key}", streetDetails[0]);
@@ -41,9 +41,9 @@ namespace form_builder.Extensions
                             normalisedFormData.Add($"{item.Key}-description", streetDetails[1]);
                         }
                     }
-                    else if (item.Key.EndsWith("-organisation") && !string.IsNullOrEmpty(item.Value[0]))
+                    else if (item.Key.EndsWith(OrganisationConstants.SELECT_SUFFIX) && !string.IsNullOrEmpty(item.Value[0]))
                     {
-                        string[] organisationDetails = item.Value[0].Split('|');
+                        var organisationDetails = item.Value[0].Split('|');
                         if (!string.IsNullOrEmpty(organisationDetails[0]))
                         {
                             normalisedFormData.Add($"{item.Key}", organisationDetails[0]);

@@ -4,7 +4,7 @@ Feature: DateInput
 
 
 Scenario: Dateinput standard use
-	Given I navigate to "/dateinput/page1"
+	Given I navigate to "/ui-date-input/page1"
 	When I click the "nextPage" button
 	Then I should see a validation message for "passportIssuedone-error" input
 	Then I should not see a validation message for "dobone-error" input
@@ -22,7 +22,7 @@ Scenario: Dateinput standard use
 	Then I should see todays date refilled in the date input in for "passportIssuedone" blah
 
 Scenario: User enters a date in the past
-	Given I navigate to "/dateinput/page1"
+	Given I navigate to "/ui-date-input/page1"
 	Then I fill the day with "01" value, month with "01" value and year with "2012" value on "passportIssuedone"
 	When I click the "nextPage" button
 	Given I navigate to "/dateinput/page2"
@@ -32,7 +32,7 @@ Scenario: User enters a date in the past
 	Then I should see the values "01", "01" and "2010" in the date input for "passportIssuedtwo" blah
 
 Scenario: User enters a date in the future
-	Given I navigate to "/dateinput/page1"
+	Given I navigate to "/ui-date-input/page1"
 	Then I fill the day with "01" value, month with "01" value and year with "2012" value on "passportIssuedone"
 	When I click the "nextPage" button
 	Given I navigate to "/dateinput/page2"

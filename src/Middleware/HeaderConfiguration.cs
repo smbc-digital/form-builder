@@ -20,17 +20,17 @@ namespace form_builder.Middleware
             var queryString = context.Request.QueryString.ToString();
             if (queryString.Contains("utm_source=lagan") || context.Request.Cookies.ContainsKey("is_verint"))
             {
-                headers["Content-Security-Policy"] = $"frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk http://scnverintlive.stockport.gov.uk:8080 http://scnverinttest.stockport.gov.uk:8080";
-                headers["X-Content-Security-Policy"] = $"frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk http://scnverintlive.stockport.gov.uk:8080 http://scnverinttest.stockport.gov.uk:8080";
+                headers["Content-Security-Policy"] = "frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk http://scnverintlive.stockport.gov.uk:8080 http://scnverinttest.stockport.gov.uk:8080";
+                headers["X-Content-Security-Policy"] = "frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk http://scnverintlive.stockport.gov.uk:8080 http://scnverinttest.stockport.gov.uk:8080";
                 context.Response.Cookies.Append("is_verint", "yes");
             }
             else
             {
-                headers["Content-Security-Policy"] = $"frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk";
-                headers["X-Content-Security-Policy"] = $"frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk";
+                headers["Content-Security-Policy"] = "frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk";
+                headers["X-Content-Security-Policy"] = "frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk";
             }
 
-            headers["Access-Control-Allow-Origin"] = $"http://www.stockport.gov.uk https://www.stockport.gov.uk";
+            headers["Access-Control-Allow-Origin"] = "http://www.stockport.gov.uk https://www.stockport.gov.uk";
             headers["X-Content-Type-Options"] = "nosniff";
             headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
 
