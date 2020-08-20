@@ -6,14 +6,10 @@
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
 
-
     <partial name="LabelH1" />
-    @if (!string.IsNullOrEmpty(@Model.Properties.StreetIAG))
-    {
-        <section class="govuk-inset-text">
-            <p>@Model.Properties.StreetIAG</p>
-        </section>
-     }
+
+    <partial name="InsetText" model="@Model.Properties.StreetIAG" />
+
     <partial name="Hint" />
 
     <partial name="Error" />

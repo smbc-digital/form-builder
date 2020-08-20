@@ -16,7 +16,7 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public bool? Email { get; set; }
 
-        public bool? Telephone{ get; set; }
+        public bool? Telephone { get; set; }
 
         public bool Numeric { get; set; } = false;
 
@@ -59,5 +59,7 @@ namespace form_builder.Models.Properties.ElementProperties
         public bool Spellcheck { get; set; } = true;
 
         public string NotAnIntegerValidationMessage { get; set; } = string.Empty;
+
+        public string IAG { get; set; }
     }
 }
