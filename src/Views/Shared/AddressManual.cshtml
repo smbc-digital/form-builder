@@ -1,6 +1,7 @@
 ﻿@using form_builder.Constants;
 @model form_builder.Models.Elements.AddressManual;
 @{
+    var IAGMessage = "No address found at the postcode. Enter your address manually.";
     var inputClass = "govuk-input";
     var invalidInputClasses = $"{inputClass} govuk-input--error";
 
@@ -26,9 +27,7 @@
 
     @if (Model.Properties.DisplayNoResultsIAG)
     {
-        <section class="govuk-inset-text">
-            No address found at the postcode. Enter your address manually.
-        </section>
+        <partial name="InsetText" model="@IAGMessage" />
     }
 
     @if (!string.IsNullOrEmpty(Model.Properties.AddressManualHint.Trim()))
