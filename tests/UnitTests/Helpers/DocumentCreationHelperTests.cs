@@ -56,11 +56,9 @@ namespace form_builder_tests.UnitTests.Helpers
             // Act
             var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
-            // Assert
-            Assert.Single(result);
+            Assert.Equal(2, result.Count);
             Assert.Equal($"{labelText}: test value", result[0]);
         }
-
 
         [Theory]
         [InlineData(EElementType.Textbox)]
@@ -99,8 +97,7 @@ namespace form_builder_tests.UnitTests.Helpers
             // Act
             var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
-            // Assert
-            Assert.Single(result);
+            Assert.Equal(2, result.Count);
             Assert.Equal($"{labelText}: {value}", result[0]);
         }
 
@@ -149,11 +146,10 @@ namespace form_builder_tests.UnitTests.Helpers
             // Act
             var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
-            // Assert
-            Assert.Equal(3, result.Count);
+            Assert.Equal(6, result.Count);
             Assert.Equal($"{labelText}: {value}", result[0]);
-            Assert.Equal($"{labelText2}: {value}", result[1]);
-            Assert.Equal($"{labelText3}: {value}", result[2]);
+            Assert.Equal($"{labelText2}: {value}", result[2]);
+            Assert.Equal($"{labelText3}: {value}", result[4]);
         }
     }
 }

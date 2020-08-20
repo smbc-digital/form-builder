@@ -28,5 +28,10 @@ namespace form_builder.Builders.Document
 
             return _data;
         }
+
+        public void AddBlankLine()
+        {
+            _data.Add("");
+        }
     }
 }
