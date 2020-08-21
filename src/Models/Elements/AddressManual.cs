@@ -37,7 +37,7 @@ namespace form_builder.Models.Elements
 
         public string Line1ValidationMessage => ErrorMessages[0];
 
-        public bool IsTownValid => string.IsNullOrEmpty(PostcodeValidationMessage);
+        public bool IsTownValid => string.IsNullOrEmpty(TownValidationMessage);
 
         public ErrorViewModel TownValidationModel => new ErrorViewModel
         {
