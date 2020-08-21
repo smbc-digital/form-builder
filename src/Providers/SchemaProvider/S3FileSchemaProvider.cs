@@ -28,7 +28,7 @@ namespace form_builder.Providers.SchemaProvider
         {
             try
             {
-                var s3Result = await _s3Gateway.GetObject(_configuration["S3BucketKey"], $"{_environment.EnvironmentName.ToS3EnvPrefix()}/{schemaName}.json");
+                var s3Result = await _s3Gateway.GetObject(_configuration["S3BucketKey"], $"{_environment.EnvironmentName.ToS3EnvPrefix()}/{_configuration["ApplicationVersion"]}/{schemaName}.json");
 
                 using (Stream responseStream = s3Result.ResponseStream)
                 using (StreamReader reader = new StreamReader(responseStream))
@@ -39,7 +39,7 @@ namespace form_builder.Providers.SchemaProvider
             }
             catch (AmazonS3Exception e)
             {
-                var ex = new Exception($"S3FileSchemaProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_environment.EnvironmentName.ToS3EnvPrefix()} {schemaName} ", e);
+                var ex = new Exception($"S3FileSchemaProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_environment.EnvironmentName.ToS3EnvPrefix()}/{_configuration["ApplicationVersion"]}/{schemaName}", e);
                 throw ex;
             }
             catch (Exception e)
