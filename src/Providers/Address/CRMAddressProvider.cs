@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using StockportGovUK.NetStandard.Gateways.VerintServiceGateway;
+using StockportGovUK.NetStandard.Gateways.VerintService;
 using StockportGovUK.NetStandard.Models.Addresses;
 
 namespace form_builder.Providers.Address
@@ -19,7 +19,8 @@ namespace form_builder.Providers.Address
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string streetOrPostcode)
         {
             var response = await _verintServiceGateway.SearchForPropertyByPostcode(streetOrPostcode);
-            return response.ResponseContent;
+
+            return response.ResponseContent ?? new List<AddressSearchResult>();
         }
     }
 }

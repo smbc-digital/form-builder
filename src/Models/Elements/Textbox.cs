@@ -1,11 +1,9 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
 {
@@ -16,15 +14,24 @@ namespace form_builder.Models.Elements
             Type = EElementType.Textbox;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(
+            IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,
+            Dictionary<string, dynamic> viewModel,
+            Page page,
+            FormSchema formSchema,
+            IWebHostEnvironment environment,
+            List<object> results = null)
         {
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
+            Properties.Value = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
-        public override Dictionary<string, dynamic> GenerateElementProperties(string type)
+        public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var properties = new Dictionary<string, dynamic>()
             {
@@ -32,18 +39,24 @@ namespace form_builder.Models.Elements
                 { "id", Properties.QuestionId },
                 { "maxlength", Properties.MaxLength },
                 { "value", Properties.Value},
-                { "autocomplete", "on" }
+                { "spellcheck", Properties.Spellcheck.ToString() }
             };
+            
+            if (Properties.Numeric)
+            {
+                properties.Add("type", "number");
+                properties.Add("max", Properties.Max);
+                properties.Add("min", Properties.Min);
+            }
 
             if(Properties.Telephone == true)
-            {
                 properties["autocomplete"] = "tel";
-            }
 
             if (DisplayAriaDescribedby)
-            {
-                properties.Add("aria-describedby", DescribedByValue());
-            }
+                properties.Add("aria-describedby", GetDescribedByAttributeValue());
+
+            if (!string.IsNullOrEmpty(Properties.Purpose))
+                properties.Add("autocomplete", Properties.Purpose);
 
             return properties;
         }

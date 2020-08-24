@@ -7,8 +7,12 @@ namespace form_builder.Providers.Street
     public class FakeStreetProvider : IStreetProvider
     {
         public string ProviderName { get => "Fake"; }
+
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string street)
         {
+            if (street.ToLower().Replace(" ", "").Equals("nodata"))
+                return await Task.FromResult(new List<AddressSearchResult>());
+
             return await Task.FromResult(new List<AddressSearchResult> {
                 new AddressSearchResult {
                     Name = "Green lane",

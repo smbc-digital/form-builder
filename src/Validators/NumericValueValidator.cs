@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using form_builder.Models.Elements;
 
@@ -17,7 +16,6 @@ namespace form_builder.Validators
             }
 
             var value = viewModel[element.Properties.QuestionId];
-
             if(string.IsNullOrEmpty(value) && element.Properties.Optional)
             {
                 return new ValidationResult
@@ -27,17 +25,16 @@ namespace form_builder.Validators
             }
 
             var isValid = int.TryParse(value, out int output);
-
             if (!isValid)
             {
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = $"{element.Properties.Label} must be a whole number"
+                    Message = !string.IsNullOrEmpty(element.Properties.NotAnIntegerValidationMessage) ? element.Properties.NotAnIntegerValidationMessage : $"{element.Properties.Label} must be a whole number"
                 };
             }
 
-            if(value.Length > element.Properties.MaxLength)
+            if (value.Length > element.Properties.MaxLength)
             {
                 return new ValidationResult
                 {
@@ -51,16 +48,16 @@ namespace form_builder.Validators
                 var max = int.Parse(element.Properties.Max);
                 var min = int.Parse(element.Properties.Min);
 
-
                 if (output > max || output < min)
                 {
                     return new ValidationResult
                     {
                         IsValid = false,
-                        Message = $"{element.Properties.Label} must be between {min} and {max} inclusive"
+                        Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage)
+                            ? element.Properties.UpperLimitValidationMessage
+                            : $"{ element.Properties.Label} must be between {min} and {max} inclusive"
                     };
                 }
-
             }
 
             if (!string.IsNullOrEmpty(element.Properties.Max))
@@ -75,13 +72,11 @@ namespace form_builder.Validators
                         Message = $"{element.Properties.Label} must be less than or equal to {max}"
                     };
                 }
-
             }
 
             if (!string.IsNullOrEmpty(element.Properties.Min))
             {
                 var min = int.Parse(element.Properties.Min);
-
                 if (output < min)
                 {
                     return new ValidationResult
@@ -90,7 +85,6 @@ namespace form_builder.Validators
                         Message = $"{element.Properties.Label} must be greater than or equal to {min}"
                     };
                 }
-
             }
 
             return new ValidationResult

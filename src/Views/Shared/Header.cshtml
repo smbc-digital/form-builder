@@ -1,16 +1,24 @@
 ﻿@{
     var displayHeading = (string)ViewData["Title"] != "Error";
+    var startPageUrl = string.Empty;
+
+    if (!string.IsNullOrWhiteSpace(Model?.StartPageUrl))
+    {
+        startPageUrl = Model.StartPageUrl;
+    }
 }
-<div class="center-wrapper" id="header-wrapper">
-    <div id="header-logo-width">
-        <div id="header-logo">
-            <a href="https://www.stockport.gov.uk">Stockport Metropolitan Borough Council Homepage</a>
+<header class="smbc-header " role="banner" data-module="govuk-header">
+    <div class="smbc-header__container govuk-width-container">
+        <div class="govuk-header__logo">
+            <a href="https://www.stockport.gov.uk/" class="govuk-header__link smbc-header__link--homepage">STOCKPORT.GOV.UK</a>
+        </div>
+        <div class="govuk-header__content">
+            @if (displayHeading)
+            {
+                <a href="@startPageUrl" class="govuk-header__link smbc-header__link--service-name">
+                    @Model.FormName
+                </a>
+            }
         </div>
     </div>
-    @if (displayHeading)
-    {
-        <div id="formTitle">
-            <a href="@Model.StartFormUrl"><strong>@Model.FormName</strong></a>
-        </div>
-    }
-</div>
+</header>

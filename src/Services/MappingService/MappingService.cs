@@ -1,6 +1,11 @@
-﻿using form_builder.Cache;
+﻿using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Enum;
+using form_builder.Extensions;
+using form_builder.Factories.Schema;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -8,12 +13,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Models.FileManagement;
-using form_builder.Factories.Schema;
 
 namespace form_builder.Services.MappingService
 {
@@ -43,10 +43,10 @@ namespace form_builder.Services.MappingService
         public async Task<MappingEntity> Map(string sessionGuid, string form)
         {
             var baseForm = await _schemaFactory.Build(form);
-
             var formData = _distributedCache.GetString(sessionGuid);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
             convertedAnswers.FormName = form;
+            convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
 
             return new MappingEntity
             {
@@ -76,16 +76,18 @@ namespace form_builder.Services.MappingService
                 if (element.Type == EElementType.FileUpload)
                     return CheckAndCreateForFileUpload(splitTargets[0], element, formAnswers, obj);
 
-                object objectValue;
-                if (obj.TryGetValue(splitTargets[0], out objectValue))
+                object answerValue = _elementMapper.GetAnswerValue(element, formAnswers);
+                if (answerValue != null && obj.TryGetValue(splitTargets[0], out var objectValue))
                 {
-                    var combinedValue = $"{objectValue} {_elementMapper.GetAnswerValue(element, formAnswers)}";
+                    var combinedValue = $"{objectValue} {answerValue}";
                     obj.Remove(splitTargets[0]);
                     obj.Add(splitTargets[0], combinedValue.Trim());
                     return obj;
                 }
 
-                obj.Add(splitTargets[0], _elementMapper.GetAnswerValue(element, formAnswers));
+                if(answerValue != null)
+                    obj.Add(splitTargets[0], answerValue);
+
                 return obj;
             }
 
@@ -109,13 +111,13 @@ namespace form_builder.Services.MappingService
             if (obj.TryGetValue(target, out objectValue))
             {
                 var files = (List<File>) objectValue;
-
                 if (value != null)
                 {
                     obj.Remove(target);
                     files.Add((File) value);
                     obj.Add(target, files);
                 }
+
                 return obj;
             }
             else

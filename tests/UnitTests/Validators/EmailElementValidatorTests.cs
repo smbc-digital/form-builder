@@ -1,7 +1,7 @@
-﻿using form_builder.Builders;
+﻿using System.Collections.Generic;
+using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Validators;
-using System.Collections.Generic;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
@@ -14,7 +14,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldShowEmailValidationMessageWhenEmailFieldIsEmpty()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithQuestionId("email")
@@ -25,16 +25,18 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("email", "notanemail");
 
-            //Assert
+            // Act
             var result = _emailElementValidator.Validate(element, viewModel);
+
+            // Assert
             Assert.False(result.IsValid);
-            Assert.Equal("Enter your email must be a valid email address", result.Message);
+            Assert.Equal("Enter an email address in the correct format, like name@example.com", result.Message);
         }
 
         [Fact]
         public void Validate_ShouldCheckEmailIsValid()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithQuestionId("email")
@@ -45,15 +47,17 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("email", "isanemail@stockport.gov.uk");
 
-            //Assert
+            // Act
             var result = _emailElementValidator.Validate(element, viewModel);
+
+            // Assert
             Assert.True(result.IsValid);
         }
 
         [Fact]
         public void Validate_ShouldShowNormalValidationMessageWhenEmailFieldIsEmpty()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithQuestionId("email")
@@ -63,8 +67,10 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>();
 
-            //Assert
+            // Act
             var result = _requiredElementValidator.Validate(element, viewModel);
+
+            // Assert
             Assert.False(result.IsValid);
             Assert.Equal("Check the enter your email and try again", result.Message);
         }
@@ -72,7 +78,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldShowNoValidationMessageWhenEmailFieldIsEmptyAndOptional()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithQuestionId("email")
@@ -84,8 +90,10 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("email", "");
 
-            //Assert
+            // Act
             var result = _emailElementValidator.Validate(element, viewModel);
+
+            // Assert
             Assert.True(result.IsValid);
         }
     }

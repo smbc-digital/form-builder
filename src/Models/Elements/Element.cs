@@ -1,19 +1,17 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
-using form_builder.Models.Properties;
+using form_builder.Models.Properties.ElementProperties;
 using form_builder.Validators;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
 {
     public class Element : IElement
     {
-        private ValidationResult validationResult;
+        protected ValidationResult validationResult;
 
         public Element()
         {
@@ -24,121 +22,72 @@ namespace form_builder.Models.Elements
 
         public BaseProperty Properties { get; set; }
 
+        public virtual bool DisplayHint => !string.IsNullOrEmpty(Properties.Hint.Trim());
+
+        public bool HadCustomClasses => !string.IsNullOrEmpty(Properties.ClassName);
+
+        public virtual string QuestionId => Properties.QuestionId;
+
+        public virtual string Label => Properties.Label;        
+
+        public virtual string Hint => Properties.Hint;
+
+        public virtual string HintId => $"{QuestionId}-hint"; 
+
+        public virtual string ErrorId => $"{QuestionId}-error"; 
+
+        public bool DisplayAriaDescribedby => DisplayHint || !IsValid; 
+
+        public bool IsValid => validationResult.IsValid; 
+
+        public string ValidationMessage => validationResult.Message;
+
         public string Lookup { get; set; }
-
-        public bool DisplayAriaDescribedby
+        
+        public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators)
         {
-            get
-            {
-                return Properties.Hint != string.Empty || !IsValid;
-            }
-        }
-
-        public bool IsValid
-        {
-            get
-            {
-                return validationResult.IsValid;
-            }
-        }
-
-        public string ValidationMessage
-        {
-            get
-            {
-                return validationResult.Message;
-            }
-        }
-
-        public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
-        {
-            foreach (var validator in form_builder)
+            foreach (var validator in validators)
             {
                 var result = validator.Validate(this, viewModel);
-
                 if (!result.IsValid)
                 {
                     validationResult = result;
+
                     return;
                 }
             }
         }
 
-        public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "")
+        public virtual string GenerateFieldsetProperties() => string.Empty;
+
+        public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "") => new Dictionary<string, dynamic>();
+
+        public string GetListItemId(int index) =>  $"{QuestionId}-{index}";
+
+        public string GetCustomItemId(string key) => $"{QuestionId}-{key}";
+
+        public string GetCustomHintId(string key) => $"{GetCustomItemId(key)}-hint";
+
+        public string GetCustomErrorId(string key) =>  $"{GetCustomItemId(key)}-error";
+
+        public string GetListItemHintId(int index) => $"{GetListItemId(index)}-hint";
+
+        public string DescribedByAttribute() => DisplayAriaDescribedby ? $"aria-describedby=\"{GetDescribedByAttributeValue()}\"" : string.Empty;
+
+        public string GetDescribedByAttributeValue() => CreateDescribedByAttributeValue($"{QuestionId}");
+
+        public string GetDescribedByAttributeValue(string prefix) => CreateDescribedByAttributeValue($"{QuestionId}{prefix}");
+
+        private string CreateDescribedByAttributeValue(string key)
         {
-            return new Dictionary<string, dynamic>();
-        }
-
-        public virtual string GenerateFieldsetProperties()
-        {
-            return string.Empty;
-        }
-
-        public Dictionary<string, dynamic> GenerateElementProperties(int index)
-        {
-            switch (Type)
-            {
-                case EElementType.Radio:
-                    var properties = new Dictionary<string, dynamic>()
-                    {
-                        {"name", Properties.QuestionId },
-                        { "id", $"{Properties.QuestionId}-{index}" },
-                        { "value", Properties.Value}
-                    };
-
-                    if (!string.IsNullOrEmpty(Properties.Options[index].Hint))
-                    {
-                        properties.Add("aria-describedby", $"{Properties.QuestionId}-{index}-hint");
-                    }
-
-                    return properties;
-                default:
-                    return null;
-            }
-        }
-
-        public Dictionary<string, dynamic> GenerateElementProperties(string errorMessage, string errorId)
-        {
-            switch (Type)
-            {
-                case EElementType.AddressManual:
-                    var properties = new Dictionary<string, dynamic>();
-                    if(!IsValid && !string.IsNullOrEmpty(errorMessage))
-                    {
-                        properties.Add("aria-describedby", errorId);
-                    }
-                    return properties;
-                default:
-                    return null;
-            }
-            
-        }
-
-        public string DescribedByValue()
-        {
-            return DescribeValue($"{Properties.QuestionId}");
-        }
-
-        public string DescribedByValue(string prefix)
-        {
-            return DescribeValue($"{Properties.QuestionId}{prefix}");
-        }
-
-        private string DescribeValue(string key)
-        {
-            var describedByValue = string.Empty;
-
-            if (!string.IsNullOrEmpty(Properties.Hint))
-            {
-                describedByValue += $"{key}-hint ";
-            }
+            var describedBy = new List<string>();
+            if (DisplayHint)
+                describedBy.Add(HintId);
 
             if (!IsValid)
-            {
-                describedByValue += $"{key}-error";
-            }
+                describedBy.Add(ErrorId);
 
-            return describedByValue.Trim();
+            return string.Join(" ", describedBy);
         }
 
         public string WriteHtmlForAndClassAttribute(string prefix = "")
@@ -146,49 +95,25 @@ namespace form_builder.Models.Elements
             var data = string.Empty;
 
             if (DisplayOptional)
-            {
-                data = "class = optional";
+                data = "class = smbc-body";
 
-            }
-
-            if (!Properties.LegendAsH1)
-            {
-                return $"{data} for = {Properties.QuestionId}{prefix}";
-            }
-
-            return data;
+            return !Properties.LegendAsH1 ? $"{data} for = {QuestionId}{prefix}" : data;
         }
 
-        public string WriteOptional(string prefix = "")
-        {
-            if (DisplayOptional)
-            {
-                return "class = optional";
+        public string WriteOptional(string prefix = "") => DisplayOptional ? "class = optional" : null;
 
-            }
+        public virtual Task<string> RenderAsync(
+            IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,
+            Dictionary<string, dynamic> viewModel,
+            Page page,
+            FormSchema formSchema,
+            IWebHostEnvironment environment,
+            List<object> results = null) => viewRender.RenderAsync(Type.ToString(), this, null);
 
-            return null;
-        }
+        private bool DisplayOptional => Properties.Optional;
 
-        public virtual Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
-        {
-            return viewRender.RenderAsync(Type.ToString(), this, null);
-        }
-
-        private bool DisplayOptional
-        {
-            get
-            {
-                return Properties.Optional;
-            }
-        }
-
-        
-
-        public virtual string GetLabelText(){
-            var optionalLabelText = Properties.Optional ? " (optional)" : string.Empty;
-
-            return $"{Properties.Label}{optionalLabelText}";
-        }
+        public virtual string GetLabelText() => $"{Properties.Label}{(Properties.Optional ? " (optional)" : string.Empty)}";
     }
 }

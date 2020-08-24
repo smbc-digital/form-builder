@@ -8,8 +8,14 @@ namespace form_builder.Constants
 
         public static readonly int DefaultMaxFileSize = 24117248;
 
-        public static readonly string NextStepButtonText = "Next step";
+        public static readonly string NextStepButtonText = "Continue";
 
-        public static readonly string AddressSearchButtonText = "Find the address";
+        public static readonly string SubmitButtonText = "Submit";
+
+        public static readonly string AddressSearchButtonText = "Find address";
+
+        public static readonly string StreetSearchButtonText = "Find street";
+
+        public static readonly string OrganisationSearchButtonText = "Find organisation";
     }
 }

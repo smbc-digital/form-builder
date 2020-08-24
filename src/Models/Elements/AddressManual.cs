@@ -1,70 +1,141 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Validators;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
 {
     public class AddressManual : Element
     {
+        private string[] ErrorMessages
+        {
+            get
+            {
+                var messages = ValidationMessage.Split(", ");
+
+                return messages.Length < 3 ? new string[] { string.Empty, string.Empty, string.Empty } : messages;
+            }
+        }
+
+        public string ChangeHeader => "Postcode:";
+
+        public bool IsLine1Valid => string.IsNullOrEmpty(Line1ValidationMessage);
+
+        public ErrorViewModel Line1ValidationModel => new ErrorViewModel
+        {
+            Id = GetCustomErrorId(AddressManualConstants.ADDRESS_LINE_1),
+            IsValid = IsLine1Valid,
+            Message = Line1ValidationMessage
+        };
+
+        public string Line1ValidationMessage => ErrorMessages[0];
+
+        public bool IsTownValid => string.IsNullOrEmpty(TownValidationMessage);
+
+        public ErrorViewModel TownValidationModel => new ErrorViewModel
+        {
+            Id = GetCustomErrorId(AddressManualConstants.TOWN),
+            IsValid = IsTownValid,
+            Message = TownValidationMessage
+        };
+
+        public string TownValidationMessage => ErrorMessages[1];
+
+        public bool IsPostcodeValid => string.IsNullOrEmpty(PostcodeValidationMessage);
+
+        public string PostcodeValidationMessage => ErrorMessages[2];
+
+        public override string Label => Properties.AddressManualLabel;
+
+        public ErrorViewModel PostcodeValidationModel => new ErrorViewModel
+        {
+            Id = GetCustomErrorId(AddressManualConstants.POSTCODE),
+            IsValid = IsPostcodeValid,
+            Message = PostcodeValidationMessage
+        };
+
+        public string ReturnURL { get; set; }
         public AddressManual()
         {
             Type = EElementType.AddressManual;
         }
 
-        public override string GenerateFieldsetProperties(){
-            if(!string.IsNullOrWhiteSpace(Properties.AddressManualHint)){
-                return $"aria-describedby = {Properties.QuestionId}-hint";
-            }
-            
-            return string.Empty;
-        }
-        
-        protected void SetAddressProperties(Dictionary<string, dynamic> viewModel, string searchTerm)
+        public AddressManual(ValidationResult validation)
         {
-            Properties.AddressManualAddressLine1 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine1")).Value;
-            Properties.AddressManualAddressLine2 = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressLine2")).Value;
-            Properties.AddressManualAddressTown = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressTown")).Value;
-            Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains("AddressManualAddressPostcode")).Value ?? searchTerm;           
+            Type = EElementType.AddressManual;
+            validationResult = validation;
         }
 
-        public override async Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override string GenerateFieldsetProperties() =>
+            !string.IsNullOrWhiteSpace(Properties.AddressManualHint) 
+                ? $"aria-describedby = {Properties.QuestionId}-hint"
+                : string.Empty;
+
+        private Dictionary<string, dynamic> GenerateElementProperties(string errorMessage = "", string errorId = "", string autocomplete = "")
         {
+            var properties = new Dictionary<string, dynamic>();
+            if (!IsValid && !string.IsNullOrEmpty(errorMessage))
+                properties.Add("aria-describedby", errorId);
 
-            if (viewModel.ContainsKey("AddressStatus"))
+            if (!string.IsNullOrEmpty(autocomplete))
+                properties.Add("autocomplete", autocomplete);
+
+            return properties;
+        }
+
+        public Dictionary<string, dynamic> GenerateAddress1ElementProperties()
+            => GenerateElementProperties(Line1ValidationMessage, GetCustomErrorId(AddressManualConstants.ADDRESS_LINE_1), "address-line1");
+
+        public Dictionary<string, dynamic> GenerateAddress2ElementProperties()
+            => GenerateElementProperties(autocomplete: "address-line2");
+
+        public Dictionary<string, dynamic> GenerateTownElementProperties()
+            => GenerateElementProperties(TownValidationMessage, GetCustomErrorId(AddressManualConstants.TOWN), "address-level1");
+
+        public Dictionary<string, dynamic> GeneratePostcodeElementProperties()
+            => GenerateElementProperties(PostcodeValidationMessage, GetCustomErrorId(AddressManualConstants.POSTCODE), "postal-code");
+
+        protected void SetAddressProperties(IElementHelper elementHelper, string pageSlug, string guid, Dictionary<string, dynamic> viewModel)
+        {
+            Properties.Value = elementHelper.CurrentValue<string>(this, viewModel, pageSlug, guid, AddressConstants.SEARCH_SUFFIX);
+            Properties.AddressManualAddressLine1 = elementHelper.CurrentValue<string>(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.ADDRESS_LINE_1}");
+            Properties.AddressManualAddressLine2 = elementHelper.CurrentValue<string>(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.ADDRESS_LINE_2}");
+            Properties.AddressManualAddressTown = elementHelper.CurrentValue<string>(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.TOWN}");
+            Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.POSTCODE)).Value;
+
+            if (string.IsNullOrEmpty(Properties.AddressManualAddressPostcode))
             {
-                viewModel.Remove("AddressStatus");
-            };
+                var value = elementHelper.CurrentValue<string>(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.POSTCODE}");
+                Properties.AddressManualAddressPostcode = string.IsNullOrEmpty(value) ? Properties.Value : value;
+            }   
+        }
 
-            viewModel.Add("AddressStatus", "Manual");
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, "-postcode");
-            
-            SetAddressProperties(viewModel, Properties.Value);
+        public override async Task<string> RenderAsync(IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,
+            Dictionary<string, dynamic> viewModel,
+            Page page,
+            FormSchema formSchema,
+            IWebHostEnvironment environment,
+            List<object> results = null)
+        {
+            SetAddressProperties(elementHelper, page.PageSlug, guid, viewModel);
 
-            var searchResultsCount =  elementHelper.GetFormDataValue(guid, $"{Properties.QuestionId}-srcount");
-
-            var isValid = int.TryParse(searchResultsCount.ToString(), out int output);
-
-            if (isValid && output == 0)
-            {
-
+            if (results != null && results.Count == 0)
                 Properties.DisplayNoResultsIAG = true;
-            }
 
-            var viewElement = new ElementViewModel
-            {
-                Element = this,
-                ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
-        };
+            ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
+                ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
+                : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
 
-            return await viewRender.RenderAsync(Type.ToString(), viewElement);
+            return await viewRender.RenderAsync("AddressManual", this);
         }
     }
 }

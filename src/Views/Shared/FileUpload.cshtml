@@ -1,34 +1,24 @@
 ﻿@model form_builder.Models.Elements.FileUpload
 @{
-    var questionId = $"{Model.Properties.QuestionId}-fileupload";
-    var hintId = $"{questionId}-hint";
-    var errorId = $"{questionId}-error";
-    var sizeValidationError = $"{questionId}-fileSizeError";
+    var sizeValidationError = $"{Model.QuestionId}-fileSizeError";
+    var elements = Model.GenerateElementProperties();
+    elements.Add("class", "govuk-file-upload");
 }
 
-@if (Model.Properties.LabelAsH1) {
-    <h1>
-        <label @Model.WriteOptional() for="@questionId">@Model.Properties.Label</label>
-    </h1>
-} else {
-    <label @Model.WriteOptional() for="@questionId">@Model.Properties.Label</label>
-}
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
 
-@if (Model.Properties.Optional)
-{
-    <span class="optional">(optional)</span>
-}
+    <partial name="LabelH1" />
 
-@if (!string.IsNullOrEmpty(Model.Properties.Hint.Trim()))
-{
-    <p class="description" id=@hintId>@Model.Properties.Hint</p>
-}
-@Html.TextBox(questionId, Model.Properties.Value, Model.GenerateElementProperties())
+    <partial name="InsetText" model="@Model.Properties.IAG" />
 
-@if (!Model.IsValid)
-{
-    <p class="input-error-content" id="@errorId">@Model.ValidationMessage</p>
-}
-<p class="input-error-content" id="@sizeValidationError" style="display: none">The selected file must be smaller than 23MB</p>
+    <partial name="Hint" />
 
+    <partial name="Error" />
 
+    @* TODO:This will work for fileupload, but not the form-group, need to work that out *@
+    <span class="govuk-error-message" id="@sizeValidationError" style="display: none">
+        <span class="govuk-visually-hidden">Error:</span> The selected file must be smaller than 23MB
+    </span>
+
+    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
+</div>

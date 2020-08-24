@@ -1,4 +1,9 @@
-﻿using form_builder.Enum;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Builders;
+using form_builder.ContentFactory;
+using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.Address;
@@ -8,13 +13,7 @@ using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Moq;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
-using form_builder.Builders;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -24,6 +23,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
         private readonly Mock<IAddressProvider> _addressProvider = new Mock<IAddressProvider>();
+        private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
         private readonly IEnumerable<IAddressProvider> _addressProviders;
 
         public AddressServiceTests()
@@ -34,11 +34,11 @@ namespace form_builder_tests.UnitTests.Services
                 _addressProvider.Object
             };
 
-            _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders);
+            _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders, _mockPageContentFactory.Object);
         }
         
         [Fact]
-        public async Task ProcesssAddress_ShouldCallAddressProvider_WhenCorrectJourney()
+        public async Task ProcessAddress_ShouldCallAddressProvider_WhenCorrectJourney()
         {
             var questionId = "test-address";
 
@@ -61,6 +61,7 @@ namespace form_builder_tests.UnitTests.Services
                     }
                 }
             };
+
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
             var element = new ElementBuilder()
@@ -82,19 +83,17 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcesssAddress(viewModel, page, schema, "", "page-one");
+            await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
         }
 
 
-        [Theory]
-        [InlineData(true, "Search")]
-        public async Task ProcesssAddress_ShouldNotCallAddressProvider_WhenAddressIsOptional(bool isValid, string journey)
+        [Fact]
+        public async Task ProcessAddress_ShouldNotCallAddressProvider_WhenAddressIsOptional()
         {
             var questionId = "test-address";
 
@@ -117,6 +116,7 @@ namespace form_builder_tests.UnitTests.Services
                     }
                 }
             };
+
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
             var element = new ElementBuilder()
@@ -128,7 +128,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithValidatedModel(isValid)
+                .WithValidatedModel(true)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -139,17 +139,16 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", journey },
                 { $"{element.Properties.QuestionId}-postcode", "" },
             };
 
-            var result = await _service.ProcesssAddress(viewModel, page, schema, "", "page-one");
+            await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public async Task ProcesssAddress_ShouldCall_PageHelper_ToProcessSearchResults()
+        public async Task ProcessAddress_ShouldCall_PageHelper_ToProcessSearchResults()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.Address)
@@ -167,27 +166,24 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()))
+            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcesssAddress(viewModel, page, schema, "", "page-one");
+            await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.ProcessAddressJourney("Search", It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>()), Times.Once);
         }
 
         [Fact]
-        public async Task ProcesssAddress_Application_ShouldThrowApplicationException_WhenNoMatchingAddressProvider()
+        public async Task ProcessAddress_Application_ShouldThrowApplicationException_WhenNoMatchingAddressProvider()
         {
             var addressProvider = "NON-EXIST-PROVIDER";
-            var searchResultsCallback = new List<AddressSearchResult>();
             var element = new ElementBuilder()
                 .WithType(EElementType.Address)
                 .WithAddressProvider(addressProvider)
@@ -207,23 +203,20 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssAddress(viewModel, page, schema, "", "page-one"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
             Assert.Equal($"AddressController: An exception has occured while attempting to perform postcode lookup", result.Message);
         }
 
         [Fact]
-        public async Task ProcesssAddress_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
+        public async Task ProcessAddress_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
         {
-
             _addressProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
                 .Throws<Exception>();
 
-            var searchResultsCallback = new List<AddressSearchResult>();
             var element = new ElementBuilder()
                 .WithType(EElementType.Address)
                 .WithAddressProvider("testAddressProvider")
@@ -243,14 +236,13 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 { "Guid", Guid.NewGuid().ToString() },
-                { "AddressStatus", "Search" },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcesssAddress(viewModel, page, schema, "", "page-one"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<AddressSearchResult>>(), It.IsAny<List<OrganisationSearchResult>>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
             Assert.StartsWith($"AddressController: An exception has occured while attempting to perform postcode lookup", result.Message);
         }
     }

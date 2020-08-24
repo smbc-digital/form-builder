@@ -1,52 +1,29 @@
-﻿@model Tuple<form_builder.ViewModels.ElementViewModel, List<SelectListItem>>
+﻿@model form_builder.Models.Elements.Address
 @{
-    var questionId = $"{Model.Item1.Element.Properties.QuestionId}-address";
-    var hintId = $"{questionId}-hint";
-    var errorId = $"{questionId}-error";
+    var elementProperties = Model.GenerateElementProperties("Select");
+    elementProperties.Add("class", Model.IsValid ? "govuk-select" : "govuk-select govuk-select--error");
 }
 
-@if(Model.Item1.Element.Properties.LegendAsH1) {
-    <h1>@Model.Item1.Element.Properties.AddressLabel
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    @Html.Hidden(@Model.AddressSearchQuestionId, @Model.Properties.Value)
 
-    @if (Model.Item1.Element.Properties.Optional)
+    @if (Model.Properties.LabelAsH1)
     {
-        <span class="optional">(optional)</span>
+        <partial name="LabelH1" />
+        <partial name="ChangeSearch" />
     }
-    </h1>
-} else {
-    <label class="h2">@Model.Item1.Element.Properties.AddressLabel
-    @if (Model.Item1.Element.Properties.Optional)
+    else
     {
-        <span class="optional">(optional)</span>
+        <partial name="ChangeSearch" />
+        <partial name="LabelH1" />
     }
-    </label>
-}
 
-<div class="user-search-term">
-    <p><strong>Postcode: </strong>@Model.Item1.Element.Properties.Value </p>
-    <a class="back-button" href="@Model.Item1.ReturnURL">Change</a>
+
+    <partial name="Hint" />
+    <partial name="Error" />
+
+    @Html.DropDownList(@Model.QuestionId, @Model.Items, elementProperties)
+    <p class="smbc-body govuk-link govuk-!-margin-top-5">
+        <a class="govuk-link" href="@Model.ManualAddressURL">@Model.Properties.AddressManualLinkText</a>
+    </p>
 </div>
-
-@if (!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectHint))
-{
-    <p id=@hintId>@Html.Raw(Model.Item1.Element.Properties.SelectHint)</p>
-}
-
-@if(!string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectLabel)){
-    <label for="@questionId" @Model.Item1.Element.WriteOptional()>@Model.Item1.Element.Properties.SelectLabel</label>
-    @if (Model.Item1.Element.Properties.Optional)
-    {
-        <span class="optional">(optional)</span>
-    }
-}
-
-@Html.DropDownList(@questionId, @Model.Item2, @Model.Item1.Element.GenerateElementProperties("Select"))
-
-@if (!Model.Item1.Element.IsValid)
-{
-    {
-        var validationMessage = string.IsNullOrEmpty(Model.Item1.Element.Properties.SelectCustomValidationMessage) ? Model.Item1.Element.ValidationMessage : Model.Item1.Element.Properties.SelectCustomValidationMessage;
-        <p class="input-error-content" id="@errorId">@validationMessage</p>
-    }
-}
-<p><a href="@Model.Item1.ManualAddressURL">@Model.Item1.Element.Properties.AddressManualLinkText</a></p>

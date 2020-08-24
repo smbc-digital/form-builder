@@ -1,38 +1,42 @@
-﻿@model form_builder.Models.Elements.Element
+﻿@model form_builder.Models.Elements.Textarea
 @{
-    var hintId = $"{Model.Properties.QuestionId}-hint";
-    var errorId = $"{Model.Properties.QuestionId}-error";
+    var elementProperties = Model.GenerateElementProperties();
+    elementProperties.Add("class", !Model.IsValid
+        ? "govuk-textarea govuk-js-character-count govuk-textarea--error"
+        : "govuk-textarea govuk-js-character-count");
 }
 
-@if (Model.Properties.LabelAsH1)
+@if (Model.DisplayCharacterCount)
 {
-    <h1>
-        <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
-        @if (Model.Properties.Optional)
-        {
-            <span class="optional">(optional)</span>
-        }
-    </h1>
+    <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="@Model.Properties.MaxLength">
+        <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+            <partial name="LabelH1" />
+
+            <partial name="InsetText" model="@Model.Properties.IAG" />
+
+            <partial name="Hint" />
+
+            <partial name="Error" />
+
+            @Html.TextArea(Model.QuestionId, Model.Properties.Value, elementProperties)
+        </div>
+
+        <span id=@Model.GetCustomItemId("info") class="govuk-hint govuk-character-count__message" aria-live="polite">
+            You can enter up to @Model.Properties.MaxLength characters
+        </span>
+    </div>
 }
 else
 {
-    <label @Model.WriteOptional() for="@Model.Properties.QuestionId">@Model.Properties.Label</label>
-    @if (Model.Properties.Optional)
-    {
-        <span class="optional">(optional)</span>
-    }
-}
+    <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+        <partial name="LabelH1" />
 
-@if (!string.IsNullOrEmpty(Model.Properties.Hint))
-{
-    <div id=@hintId>@Html.Raw(Model.Properties.Hint)</div><br />
-}
+        <partial name="InsetText" model="@Model.Properties.IAG" />
 
-<p>Your description can be up to @Model.Properties.MaxLength characters</p>
-@Html.TextArea(Model.Properties.QuestionId, Model.Properties.Value, @Model.GenerateElementProperties())
+        <partial name="Hint" />
 
-@if (!Model.IsValid)
-{
-    var validationMessage = string.IsNullOrEmpty(Model.Properties.CustomValidationMessage) ? Model.ValidationMessage : Model.Properties.CustomValidationMessage;
-    <p class="input-error-content text-area-validation" id="@errorId">@validationMessage</p>
+        <partial name="Error" />
+
+        @Html.TextArea(Model.QuestionId, Model.Properties.Value, elementProperties)
+    </div>
 }

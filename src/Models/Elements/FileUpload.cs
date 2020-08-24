@@ -1,14 +1,10 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Internal;
-using form_builder.Constants;
 
 namespace form_builder.Models.Elements
 {
@@ -19,37 +15,46 @@ namespace form_builder.Models.Elements
             Type = EElementType.FileUpload;
         }
 
+        public override string QuestionId => $"{base.QuestionId}-fileupload";
+
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var allowedFileType = Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
-            var maxFileSize = Properties.MaxFileSize > 0 ? Properties.MaxFileSize*1024000 : SystemConstants.DefaultMaxFileSize;
-            maxFileSize = maxFileSize > SystemConstants.DefaultMaxFileSize
-                ? SystemConstants.DefaultMaxFileSize
-                : Properties.MaxFileSize * 1024000;
+            var convertedMaxFileSize = Properties.MaxFileSize * 1024000;
+            var appliedMaxFileSize = convertedMaxFileSize > 0 && convertedMaxFileSize < SystemConstants.DefaultMaxFileSize 
+                                ? convertedMaxFileSize 
+                                : SystemConstants.DefaultMaxFileSize;
 
-            var properties = new Dictionary<string, dynamic>()
+            var properties = new Dictionary<string, dynamic>
             {
-                { "name", $"{Properties.QuestionId}-fileupload" },
-                { "id", $"{Properties.QuestionId}-fileupload" },
+                { "name", QuestionId },
+                { "id", QuestionId },
                 { "type", "file" },
-                { "accept", allowedFileType.Join(",") },
-                { "max-file-size", maxFileSize },
-                { "onchange", "ValidateSize(this)" }
+                { "accept", string.Join(',', allowedFileType)},
+                { "max-file-size", appliedMaxFileSize },
+                { "onchange", "window.SMBCFrontend.ValidateSize(this)" }
             };
 
             if (DisplayAriaDescribedby)
-            {
-                properties.Add("aria-describedby", DescribedByValue("-fileupload"));
-            }
+                properties.Add("aria-describedby", GetDescribedByAttributeValue());
 
             return properties;
         }
 
-        public override Task<string> RenderAsync(IViewRender viewRender, IElementHelper elementHelper, string guid, List<AddressSearchResult> addressSearchResults, List<OrganisationSearchResult> organisationResults, Dictionary<string, dynamic> viewModel, Page page, FormSchema formSchema, IHostingEnvironment environment)
+        public override Task<string> RenderAsync(
+            IViewRender viewRender,
+            IElementHelper elementHelper,
+            string guid,
+            Dictionary<string, dynamic> viewModel,
+            Page page,
+            FormSchema formSchema,
+            IWebHostEnvironment environment,
+            List<object> results = null)
         {
-            elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
+            elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, string.Empty);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
     }

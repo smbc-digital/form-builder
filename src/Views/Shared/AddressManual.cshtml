@@ -1,73 +1,64 @@
-﻿@model form_builder.ViewModels.ElementViewModel
+﻿@using form_builder.Constants;
+@model form_builder.Models.Elements.AddressManual;
 @{
-    var hintId = $"{Model.Element.Properties.QuestionId}-hint";
-    var searchQuestionId = $"{Model.Element.Properties.QuestionId}-postcode";
-    var line1ErrorId = $"{Model.Element.Properties.QuestionId}-addressline1-error";
-    var townErrorId = $"{Model.Element.Properties.QuestionId}-town-error";
-    var postcodeErrorId = $"{Model.Element.Properties.QuestionId}-postcode-error";
-    var line1id = $"{Model.Element.Properties.QuestionId}-AddressManualAddressLine1";
-    var line2id = $"{Model.Element.Properties.QuestionId}-AddressManualAddressLine2";
-    var line3id = $"{Model.Element.Properties.QuestionId}-AddressManualAddressTown";
-    var line4id = $"{Model.Element.Properties.QuestionId}-AddressManualAddressPostcode";
-    var errorMessages = Model.Element.ValidationMessage.Split(", ");
-    if(errorMessages.Length < 3)
-    {
-        errorMessages = new string[]{string.Empty,string.Empty, string.Empty };
-    }
+    var IAGMessage = "No address found at the postcode. Enter your address manually.";
+    var inputClass = "govuk-input";
+    var invalidInputClasses = $"{inputClass} govuk-input--error";
+
+    var line1ElementProperties = Model.GenerateAddress1ElementProperties();
+    line1ElementProperties.Add("class", Model.IsLine1Valid ? inputClass : invalidInputClasses);
+
+    var line2ElementProperties = Model.GenerateAddress2ElementProperties();
+    line2ElementProperties.Add("class", inputClass);
+
+    var townElementProperties = Model.GenerateTownElementProperties();
+    townElementProperties.Add("class", Model.IsTownValid ? $"{inputClass} govuk-!-width-two-thirds" : $"{invalidInputClasses} govuk-!-width-two-thirds");
+
+    var postcodeElementProperties = Model.GeneratePostcodeElementProperties();
+    postcodeElementProperties.Add("class", Model.IsPostcodeValid ? $"{inputClass} govuk-input--width-10" : $"{invalidInputClasses} govuk-input--width-10");
 }
 
-@Html.Hidden(@searchQuestionId, Model.Element.Properties.Value)
+@Html.Hidden(@Model.GetCustomItemId("postcode"), Model.Properties.Value)
 
-<fieldset @Model.Element.GenerateFieldsetProperties()>
-    @if(Model.Element.Properties.LegendAsH1) {
-        <h1>@Model.Element.Properties.AddressManualLabel</h1>
-    } else {
-        <label class="h2">@Model.Element.Properties.AddressManualLabel</label>
+<fieldset class="govuk-fieldset" @Model.GenerateFieldsetProperties()>
+    <partial name="LegendH1" />
+
+    <partial name="ChangeSearch" />
+
+    @if (Model.Properties.DisplayNoResultsIAG)
+    {
+        <partial name="InsetText" model="@IAGMessage" />
     }
 
-    <div class="user-search-term">
-        <p><strong>Postcode: </strong>@Model.Element.Properties.Value </p>
-        <a class="back-button" href="@Model.ManualAddressURL">Change</a>
+    @if (!string.IsNullOrEmpty(Model.Properties.AddressManualHint.Trim()))
+    {
+        <p class="govuk-hint" id=@Model.HintId>@Model.Properties.AddressManualHint</p>
+    }
+
+    <div class="govuk-form-group @(Model.IsLine1Valid ? string.Empty : " govuk-form-group--error")">
+        <label class="govuk-label govuk-label--m" for=@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1)>Address line 1</label>
+        <partial name="ErrorBase" model=Model.Line1ValidationModel />
+        @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1), Model.Properties.AddressManualAddressLine1, line1ElementProperties)
     </div>
 
-    @if (Model.Element.Properties.DisplayNoResultsIAG)
-    {
-        <div>
-            <section class="alert-information-form">
-                <span class="fa fa-info-circle"></span>
-                <p>No address found at the postcode. Enter your address manually.</p>
-            </section>
-        </div>
-    }
+    <div class="govuk-form-group">
+        <label class="govuk-label govuk-label--m" class="optional" for=@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_2)>
+            Address line 2
+            <span class="smbc-body">(optional)</span>
+        </label>
+        @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_2), Model.Properties.AddressManualAddressLine2, line2ElementProperties)
+    </div>
 
-    @if (!string.IsNullOrEmpty(Model.Element.Properties.AddressManualHint.Trim()))
-    {
-        <p id=@hintId>@Model.Element.Properties.AddressManualHint</p>
-    }
+    <div class="govuk-form-group @(Model.IsTownValid ? string.Empty : " govuk-form-group--error")">
+        <label class="govuk-label govuk-label--m" for=@Model.GetCustomItemId(AddressManualConstants.TOWN)>Town or city</label>
+        <partial name="ErrorBase" model=Model.TownValidationModel />
+        @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.TOWN), Model.Properties.AddressManualAddressTown, townElementProperties)
+    </div>
 
-    <label for="@line1id">Address line 1</label>
-    @Html.TextBox(line1id, Model.Element.Properties.AddressManualAddressLine1, Model.Element.GenerateElementProperties(errorMessages[0], line1ErrorId))
-    @if (!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[0]))
-    {
-        <p class="input-error-content" id="@line1ErrorId">@errorMessages[0]</p>
-    }
+    <div class="govuk-form-group @(Model.IsPostcodeValid ? string.Empty : " govuk-form-group--error")">
+        <label class="govuk-label govuk-label--m" for=@Model.GetCustomItemId(AddressManualConstants.POSTCODE)>Postcode</label>
+        <partial name="ErrorBase" model=Model.PostcodeValidationModel />
 
-    <label class="optional" for="@line2id">Address line 2</label>
-    <span class="optional">(optional)</span>
-    @Html.TextBox(line2id, Model.Element.Properties.AddressManualAddressLine2, Model.Element.GenerateElementProperties())
-
-    <label for="@line3id">Town</label>
-    @Html.TextBox(line3id, Model.Element.Properties.AddressManualAddressTown, Model.Element.GenerateElementProperties(errorMessages[1], townErrorId))
-    @if (!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[1]))
-    {
-        <p class="input-error-content" id="@townErrorId">@errorMessages[1]</p>
-    }
-
-    <label for="@line4id">Postcode</label>
-    @Html.TextBox(line4id, Model.Element.Properties.AddressManualAddressPostcode, Model.Element.GenerateElementProperties(errorMessages[2], postcodeErrorId))
-    @if (!Model.Element.IsValid && !string.IsNullOrEmpty(errorMessages[2]))
-    {
-        <p class="input-error-content" id="@postcodeErrorId">@errorMessages[2]</p>
-    }
-
+        @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.POSTCODE), Model.Properties.AddressManualAddressPostcode, postcodeElementProperties)
+    </div>
 </fieldset>
