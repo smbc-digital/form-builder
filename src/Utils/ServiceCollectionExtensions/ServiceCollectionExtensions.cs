@@ -50,6 +50,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
+using StockportGovUK.NetStandard.Gateways;
+using StockportGovUK.NetStandard.Gateways.AddressService;
+using StockportGovUK.NetStandard.Gateways.CivicaPay;
+using StockportGovUK.NetStandard.Gateways.Extensions;
+using StockportGovUK.NetStandard.Gateways.OrganisationService;
+using StockportGovUK.NetStandard.Gateways.StreetService;
+using StockportGovUK.NetStandard.Gateways.VerintService;
 
 namespace form_builder.Utils.ServiceCollectionExtensions
 {
@@ -85,9 +92,16 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             return services;
         }
 
-        public static IServiceCollection AddGateways(this IServiceCollection services)
+        public static IServiceCollection AddGateways(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton<IS3Gateway, S3Gateway>();
+
+            services.AddHttpClient<IGateway, Gateway>(configuration);
+            services.AddHttpClient<ICivicaPayGateway, CivicaPayGateway>(configuration);
+            services.AddHttpClient<IVerintServiceGateway, VerintServiceGateway>(configuration);
+            services.AddHttpClient<IAddressServiceGateway, AddressServiceGateway>(configuration);
+            services.AddHttpClient<IStreetServiceGateway, StreetServiceGateway>(configuration);
+            services.AddHttpClient<IOrganisationServiceGateway, OrganisationServiceGateway>(configuration);
 
             return services;
         }
