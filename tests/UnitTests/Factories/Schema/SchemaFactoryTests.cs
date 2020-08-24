@@ -10,6 +10,7 @@ using form_builder.Models;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -26,9 +27,12 @@ namespace form_builder_tests.UnitTests.Factories.Schema
         private readonly Mock<IReusableElementSchemaTransformFactory> _mockReusableElementSchemaFactory = new Mock<IReusableElementSchemaTransformFactory>();
         private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new Mock<IOptions<DistributedCacheConfiguration>>();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+        private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
 
         public SchemaFactoryTests()
         {
+            _mockConfiguration.Setup(_ => _["ApplicationVersion"]).Returns("v2");
+
             _mockDistributedCacheExpirationConfiguration
                 .Setup(_ => _.Value)
                 .Returns(new DistributedCacheExpirationConfiguration
@@ -50,7 +54,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
-            _schemaFactory = new SchemaFactory(_mockDistributedCache.Object, _mockSchemaProvider.Object, _mockLookupSchemaFactory.Object, _mockReusableElementSchemaFactory.Object, _mockDistributedCacheConfiguration.Object, _mockDistributedCacheExpirationConfiguration.Object);
+            _schemaFactory = new SchemaFactory(_mockDistributedCache.Object, _mockSchemaProvider.Object, _mockLookupSchemaFactory.Object, _mockReusableElementSchemaFactory.Object, _mockDistributedCacheConfiguration.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockConfiguration.Object);
         }
 
         [Fact]
