@@ -8,6 +8,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -25,21 +26,23 @@ namespace form_builder.Factories.Schema
         private readonly ISchemaProvider _schemaProvider;
         private readonly DistrbutedCacheConfiguration _distrbutedCacheConfiguration;
         private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly IConfiguration _configuration;
 
-        public SchemaFactory(IDistributedCacheWrapper distrbutedCache, ISchemaProvider schemaProvider, ISchemaTransformFactory lookupSchemaFactory, IOptions<DistrbutedCacheConfiguration> distrbutedCacheConfiguration, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration)
+        public SchemaFactory(IDistributedCacheWrapper distrbutedCache, ISchemaProvider schemaProvider, ISchemaTransformFactory lookupSchemaFactory, IOptions<DistrbutedCacheConfiguration> distrbutedCacheConfiguration, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IConfiguration configuration)
         {
             _distrbutedCache = distrbutedCache;
             _schemaProvider = schemaProvider;
             _lookupSchemaFactory = lookupSchemaFactory;
             _distrbutedCacheConfiguration = distrbutedCacheConfiguration.Value;
             _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _configuration = configuration;
         }
 
         public async Task<FormSchema> Build(string formKey)
         {
             if(_distrbutedCacheConfiguration.UseDistrbutedCache && _distrbutedCacheExpirationConfiguration.FormJson > 0)
             {
-                var data = _distrbutedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{formKey}");
+                var data = _distrbutedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}");
 
                 if(data != null)
                     return JsonConvert.DeserializeObject<FormSchema>(data);
@@ -55,7 +58,7 @@ namespace form_builder.Factories.Schema
                 .ToList();
 
             if(_distrbutedCacheConfiguration.UseDistrbutedCache && _distrbutedCacheExpirationConfiguration.FormJson > 0)
-                await _distrbutedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{formKey}", JsonConvert.SerializeObject(formSchema), _distrbutedCacheExpirationConfiguration.FormJson);
+                await _distrbutedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}", JsonConvert.SerializeObject(formSchema), _distrbutedCacheExpirationConfiguration.FormJson);
 
             return formSchema;
         }

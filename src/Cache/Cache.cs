@@ -4,6 +4,7 @@ using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -18,12 +19,14 @@ namespace form_builder.Cache
         private readonly IDistributedCacheWrapper _distrbutedCache;
         private readonly ISchemaProvider _schemaProvider;
         private readonly IOptions<DistrbutedCacheConfiguration> _distrbutedCacheConfiguration;
+        private readonly IConfiguration _configuration;
 
-        public Cache(IDistributedCacheWrapper distrbutedCache, ISchemaProvider schemaProvider, IOptions<DistrbutedCacheConfiguration> distrbutedCacheConfiguration)
+        public Cache(IDistributedCacheWrapper distrbutedCache, ISchemaProvider schemaProvider, IOptions<DistrbutedCacheConfiguration> distrbutedCacheConfiguration, IConfiguration configuration)
         {
             _distrbutedCache = distrbutedCache;
             _schemaProvider = schemaProvider;
             _distrbutedCacheConfiguration = distrbutedCacheConfiguration;
+            _configuration = configuration;
         }
 
         public async Task<T> GetFromCacheOrDirectlyFromSchemaAsync<T>(string cacheKey, int minutes, ESchemaType type)
@@ -33,7 +36,7 @@ namespace form_builder.Cache
 
             if (_distrbutedCacheConfiguration.Value.UseDistrbutedCache && minutes > 0)
             {
-                var data = _distrbutedCache.GetString($"{type.ToESchemaTypePrefix()}{cacheKey}");
+                var data = _distrbutedCache.GetString($"{type.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{cacheKey}");
 
                 if(data == null)
                 {
@@ -41,7 +44,7 @@ namespace form_builder.Cache
 
                     if (result != null)
                     {
-                        await _distrbutedCache.SetStringAsync($"{type.ToESchemaTypePrefix()}{cacheKey}", JsonConvert.SerializeObject(result), minutes);
+                        await _distrbutedCache.SetStringAsync($"{type.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{cacheKey}", JsonConvert.SerializeObject(result), minutes);
                     };
 
                     return result;

@@ -3,6 +3,7 @@ using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 using System.Threading;
@@ -17,15 +18,19 @@ namespace form_builder_tests.UnitTests.Cache
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<ISchemaProvider> _mockSchemaProvider = new Mock<ISchemaProvider>();
         private readonly Mock<IOptions<DistrbutedCacheConfiguration>> _mockDistrbutedCacheSettings = new Mock<IOptions<DistrbutedCacheConfiguration>>();
+        private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
+        private const string _applicationVersion = "v2";
 
         public CacheTests()
         {
+            _mockConfiguration.Setup(_ => _["ApplicationVersion"]).Returns(_applicationVersion);
+
             _mockDistrbutedCacheSettings.Setup(_ => _.Value).Returns(new DistrbutedCacheConfiguration
             {
                 UseDistrbutedCache = true
             });
 
-            _cache = new form_builder.Cache.Cache(_mockDistributedCacheWrapper.Object, _mockSchemaProvider.Object, _mockDistrbutedCacheSettings.Object);
+            _cache = new form_builder.Cache.Cache(_mockDistributedCacheWrapper.Object, _mockSchemaProvider.Object, _mockDistrbutedCacheSettings.Object, _mockConfiguration.Object);
         }
 
         [Fact]
@@ -62,7 +67,7 @@ namespace form_builder_tests.UnitTests.Cache
 
             var result = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>("testform", 10, ESchemaType.FormJson);
 
-            _mockDistributedCacheWrapper.Verify(_ => _.GetString(It.Is<string>(x => x == "form-json-testform")), Times.Once);
+            _mockDistributedCacheWrapper.Verify(_ => _.GetString(It.Is<string>(x => x == $"form-json-{_applicationVersion}-testform")), Times.Once);
             _mockSchemaProvider.Verify(_ => _.Get<FormSchema>(It.IsAny<string>()), Times.Never);
             _mockDistributedCacheWrapper.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
             Assert.IsType<FormSchema>(result);
@@ -79,7 +84,7 @@ namespace form_builder_tests.UnitTests.Cache
 
             var result = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>("testform", minutes, ESchemaType.FormJson);
 
-            _mockDistributedCacheWrapper.Verify(_ => _.GetString(It.Is<string>(x => x == "form-json-testform")), Times.Once);
+            _mockDistributedCacheWrapper.Verify(_ => _.GetString(It.Is<string>(x => x == $"form-json-{_applicationVersion}-testform")), Times.Once);
             _mockSchemaProvider.Verify(_ => _.Get<FormSchema>(It.IsAny<string>()), Times.Once);
             _mockDistributedCacheWrapper.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.Is<int>(x => x == minutes), It.IsAny<CancellationToken>()), Times.Once);
             Assert.IsType<FormSchema>(result);

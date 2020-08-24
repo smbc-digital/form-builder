@@ -1,22 +1,17 @@
-using Amazon.S3;
 using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Factories.Transform;
-using form_builder.Gateways;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -31,9 +26,12 @@ namespace form_builder_tests.UnitTests.Factories.Schema
         private readonly Mock<ISchemaTransformFactory> _mockLookupSchemaFactory  = new Mock<ISchemaTransformFactory>();
         private readonly Mock<IOptions<DistrbutedCacheConfiguration>> _mockDistrbutedCacheConfiguration = new Mock<IOptions<DistrbutedCacheConfiguration>>();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+        private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
 
         public SchemaFactoryTests()
         {
+            _mockConfiguration.Setup(_ => _["ApplicationVersion"]).Returns("v2");
+
             _mockDistrbutedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
             {
                 FormJson = 1
@@ -50,7 +48,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
-            _schemaFactory = new SchemaFactory(_mockDistrbutedCache.Object, _mockSchemaProvider.Object, _mockLookupSchemaFactory.Object, _mockDistrbutedCacheConfiguration.Object,_mockDistrbutedCacheExpirationConfiguration.Object);
+            _schemaFactory = new SchemaFactory(_mockDistrbutedCache.Object, _mockSchemaProvider.Object, _mockLookupSchemaFactory.Object, _mockDistrbutedCacheConfiguration.Object,_mockDistrbutedCacheExpirationConfiguration.Object, _mockConfiguration.Object);
         }
 
         [Fact]
