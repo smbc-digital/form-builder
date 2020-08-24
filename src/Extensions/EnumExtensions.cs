@@ -5,12 +5,12 @@ namespace form_builder.Extensions
 {
     public static class EnumExtensions
     {
-        public static string ToESchemaTypePrefix(this ESchemaType value)
+        public static string ToESchemaTypePrefix(this ESchemaType value, string applicationVersion)
         {
             switch (value)
             {
                 case ESchemaType.FormJson:
-                    return "form-json-";
+                    return $"form-json-{applicationVersion}-";
                 case ESchemaType.PaymentConfiguration:
                     return "paymentconfig-";
                 default:
