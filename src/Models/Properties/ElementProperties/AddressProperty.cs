@@ -31,5 +31,9 @@
         public bool Disabled { get; set; } = false;
 
         public string AddressManualLinkText { get; set; } = "I can't find my address in the list";
+
+        public bool DisableManualAddress { get; set; } = false;
+
+        public string NoManualAddressDetailText { get; set; }
     }
 }

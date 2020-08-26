@@ -74,6 +74,7 @@ namespace form_builder.Models
             pageHelper.CheckForIncomingFormDataValues(Pages);
             pageHelper.CheckForPageActions(this);
             pageHelper.CheckRenderConditionsValid(Pages);
+            pageHelper.CheckAddressNoManualTextIsSet(Pages);
         }
 
         public bool IsAvailable(string environment)

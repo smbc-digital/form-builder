@@ -224,7 +224,7 @@ namespace form_builder.Services.AddressService
                 _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", addressResults, guid);
             }
 
-            if (!addressResults.Any())
+            if (!addressResults.Any() && !addressElement.Properties.DisableManualAddress)
             {
                 return new ProcessRequestEntity
                 {

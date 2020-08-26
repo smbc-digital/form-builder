@@ -441,5 +441,19 @@ namespace form_builder.Helpers.PageHelpers
 
             return pages.FirstOrDefault(page => page.CheckPageMeetsConditions(answers));
         }
+
+        public void CheckAddressNoManualTextIsSet(List<Page> pages)
+        {
+            var addressElements = pages.Where(_ => _.Elements != null)
+                .SelectMany(_ => _.Elements)
+                .Where(_ => _.Type == EElementType.Address)
+                .Where(_ => _.Properties.DisableManualAddress)
+                .ToList();
+
+            addressElements.ForEach(element => {
+                if (string.IsNullOrWhiteSpace(element.Properties.NoManualAddressDetailText))
+                    throw new ApplicationException($"AddressElement:DisableManualAddess set to true, NoManualAddressDetailText must have value");
+            });
+        }
     }
 }

@@ -38,5 +38,7 @@ namespace form_builder.Helpers.PageHelpers
         void CheckRenderConditionsValid(List<Page> pages);
         
         Page GetPageWithMatchingRenderConditions(List<Page> pages);
+
+        void CheckAddressNoManualTextIsSet(List<Page> pages);
     }
 }
