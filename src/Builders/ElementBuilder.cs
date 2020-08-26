@@ -282,5 +282,19 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithDisableManualAddress(bool disableManualAddress)
+        {
+            _property.DisableManualAddress = disableManualAddress;
+
+            return this;
+        }
+
+        public ElementBuilder WithNoManualAddressDetailText(string noManualAddressDetailText)
+        {
+            _property.NoManualAddressDetailText = noManualAddressDetailText;
+
+            return this;
+        }
     }
 }

@@ -2121,5 +2121,50 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal(page2, result);
             Assert.NotNull(result);
         }
+
+        [Fact]
+        public void CheckAddressNoManualTextIsSet_ShouldAllowSchema_IfDetailsTextIsSet()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Address)
+                .WithDisableManualAddress(true)
+                .WithNoManualAddressDetailText("Test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+                
+            var pages = new List<Page> { page };
+
+            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("guid");
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(It.IsAny<string>());
+
+            // Act
+            _pageHelper.CheckAddressNoManualTextIsSet(pages);
+        }
+
+        [Fact]
+        public void CheckAddressNoManualTextIsSet_ShouldThrowException_IfNoDetailsTextIsSet()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Address)
+                .WithDisableManualAddress(true)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+                
+            var pages = new List<Page> { page };
+
+            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("guid");
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(It.IsAny<string>());
+
+            // Act
+            Assert.Throws<ApplicationException>(() => _pageHelper.CheckAddressNoManualTextIsSet(pages));
+        }
     }
 }

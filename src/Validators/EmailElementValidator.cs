@@ -34,7 +34,7 @@ namespace form_builder.Validators
 
             var value = viewModel[element.Properties.QuestionId];
             var isValid = true;
-            var regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+            var regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w)+)+)$");
             Match match = regex.Match(value);
 
             if (!match.Success)
