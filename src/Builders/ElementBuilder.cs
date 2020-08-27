@@ -296,5 +296,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithDisableOnClick(bool value)
+        {
+            _property.DisableOnClick = value;
+
+            return this;
+        }
     }
 }
