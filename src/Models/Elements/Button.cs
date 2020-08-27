@@ -27,11 +27,12 @@ namespace form_builder.Models.Elements
             IWebHostEnvironment environment,
             List<object> results = null)
         {
-            var viewData = new Dictionary<string, dynamic> { { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) } };
-
             Properties.Text = GetButtonText(page.Elements, viewModel, page);
 
-            return viewRender.RenderAsync("Button", this, viewData);
+            if(!Properties.DisableOnClick)
+                Properties.DisableOnClick = DisableIfSubmitOrLookup(page.Behaviours, page.Elements, viewModel);
+
+            return viewRender.RenderAsync("Button", this);
         }
 
         private bool CheckForBehaviour(List<Behaviour> behaviour)
@@ -49,7 +50,7 @@ namespace form_builder.Models.Elements
             return isStreetAddress;
         }
 
-        private bool ShowSpinner(List<Behaviour> behaviour, List<IElement> element, Dictionary<string, dynamic> viewModel)
+        private bool DisableIfSubmitOrLookup(List<Behaviour> behaviour, List<IElement> element, Dictionary<string, dynamic> viewModel)
         {
              return CheckForBehaviour(behaviour) || CheckForStreetAddress(element, viewModel);
         }
