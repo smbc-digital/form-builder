@@ -12,6 +12,7 @@
         LessThan,
         GreaterThanEqualTo,
         LessThanEqualTo,
-        EndsWith 
+        EndsWith,
+        IsOneOf
     }
 }
