@@ -197,5 +197,106 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.Equal("test text", callback.Properties.Text);
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Button")), It.IsAny<Button>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
+
+        [Fact]
+        public async Task RenderAsync_DisableButton_OnClick_ShouldDefault_ToFalse()
+        {
+            //Arrange
+            var callback = new Button();
+            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Button>(), It.IsAny<Dictionary<string, dynamic>>()))
+                    .Callback<string, Button, Dictionary<string, dynamic>>((a, b, c) => callback = b);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Button)
+                .WithPropertyText("test text")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+
+            //Act
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+
+            //Assert
+            Assert.False(callback.Properties.DisableOnClick);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Button")), It.IsAny<Button>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+        }
+        
+        [Fact]
+        public async Task RenderAsync_ShouldDisableButton_OnClick_WhenPropertyIsEnabled()
+        {
+            //Arrange
+            var callback = new Button();
+            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Button>(), It.IsAny<Dictionary<string, dynamic>>()))
+                    .Callback<string, Button, Dictionary<string, dynamic>>((a, b, c) => callback = b);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Button)
+                .WithPropertyText("test text")
+                .WithDisableOnClick(true)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+
+            //Act
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+
+            //Assert
+            Assert.True(callback.Properties.DisableOnClick);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Button")), It.IsAny<Button>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+        }
+
+        [Theory]
+        [InlineData(EBehaviourType.SubmitAndPay)]
+        [InlineData(EBehaviourType.SubmitForm)]
+        public async Task RenderAsync_ShouldDisableButton_OnClick_WhenPageHas_SubmitForm_OrSubmitAndPay_Action(EBehaviourType type)
+        {
+            //Arrange
+            var callback = new Button();
+            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Button>(), It.IsAny<Dictionary<string, dynamic>>()))
+                    .Callback<string, Button, Dictionary<string, dynamic>>((a, b, c) => callback = b);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Button)
+                .WithPropertyText("test text")
+                .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(type)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithBehaviour(behaviour)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+
+            //Act
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+
+            //Assert
+            Assert.True(callback.Properties.DisableOnClick);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Button")), It.IsAny<Button>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+        }
     }
 }

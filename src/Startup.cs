@@ -13,8 +13,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StockportGovUK.AspNetCore.Middleware.App;
-using StockportGovUK.NetStandard.Gateways;
-using StockportGovUK.NetStandard.Gateways.Extensions;
 
 namespace form_builder
 {
