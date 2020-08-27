@@ -40,19 +40,19 @@ namespace form_builder.Models.Elements
             return behaviour.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay);
         }
 
-        private bool CheckForStreetAddress(List<IElement> element, Dictionary<string, dynamic> viewModel)
+        private bool CheckForLookups(List<IElement> element, Dictionary<string, dynamic> viewModel)
         {
-            var isStreetAddress = element.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.Street);
+            var containsLookupElement = element.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.Street  || _.Type == EElementType.Organisation);
 
-            if (isStreetAddress && !viewModel.IsInitial())
+            if (containsLookupElement && !viewModel.IsInitial())
                 return false;
                 
-            return isStreetAddress;
+            return containsLookupElement;
         }
 
         private bool DisableIfSubmitOrLookup(List<Behaviour> behaviour, List<IElement> element, Dictionary<string, dynamic> viewModel)
         {
-             return CheckForBehaviour(behaviour) || CheckForStreetAddress(element, viewModel);
+             return CheckForBehaviour(behaviour) || CheckForLookups(element, viewModel);
         }
 
         private string GetButtonText(List<IElement> element, Dictionary<string, dynamic> viewModel, Page page)
