@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using form_builder.Models;
 
 namespace form_builder.Conditions
@@ -20,6 +21,9 @@ namespace form_builder.Conditions
 
             return viewModel.ContainsKey(condition.QuestionId) && string.IsNullOrEmpty((string)viewModel[condition.QuestionId]) == val;
         }
+
+        public static bool IsOneOf(Condition condition, Dictionary<string, dynamic> viewModel) 
+            => viewModel.ContainsKey(condition.QuestionId) && condition.ComparisonValue.Contains((string)viewModel[condition.QuestionId].ToLower());
 
         public static bool CheckboxContains(Condition condition, Dictionary<string, dynamic> viewModel)
         {
