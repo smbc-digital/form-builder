@@ -20,7 +20,7 @@ namespace form_builder.Models
                     return ECondition.EqualTo;
 
                 if (!string.IsNullOrEmpty(CheckboxContains))
-                    return ECondition.CheckboxContains;
+                    return ECondition.Contains;
 
                 if (IsBefore > 0)
                     return ECondition.IsBefore;

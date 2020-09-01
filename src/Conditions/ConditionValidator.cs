@@ -15,7 +15,6 @@ namespace form_builder.Conditions
             { ECondition.IsAfter, DateComparator.DateIsAfter },
             { ECondition.IsNullOrEmpty, StringComparator.IsNullOrEmpty },
             { ECondition.EqualTo, StringComparator.IsEqualTo },
-            { ECondition.CheckboxContains, StringComparator.Contains },
             { ECondition.Contains, StringComparator.Contains },
             { ECondition.GreaterThan, IntegerComparator.IsGreaterThan },
             { ECondition.LessThan, IntegerComparator.IsLessThan },

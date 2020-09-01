@@ -57,8 +57,8 @@ namespace form_builder_tests.UnitTests.Conditions
                 {"test2", "apple,mango"}
             };
 
-            var condition1 = new Condition { ComparisonValue = "pear", QuestionId = "test", ConditionType = ECondition.CheckboxContains };
-            var condition2 = new Condition { ComparisonValue = "plum", QuestionId = "test2", ConditionType = ECondition.CheckboxContains };
+            var condition1 = new Condition { ComparisonValue = "pear", QuestionId = "test", ConditionType = ECondition.Contains };
+            var condition2 = new Condition { ComparisonValue = "plum", QuestionId = "test2", ConditionType = ECondition.Contains };
             var conditionValidator = new ConditionValidator();
 
             // Act & Assert
