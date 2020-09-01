@@ -346,8 +346,7 @@ namespace form_builder.Helpers.PageHelpers
                 return obj;
             }
 
-            object subObject;
-            if (!obj.TryGetValue(splitTargets[0], out subObject))
+            if (!obj.TryGetValue(splitTargets[0], out object subObject))
                 subObject = new ExpandoObject();
 
             subObject = RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), value, subObject as IDictionary<string, dynamic>);
@@ -454,6 +453,36 @@ namespace form_builder.Helpers.PageHelpers
                 if (string.IsNullOrWhiteSpace(element.Properties.NoManualAddressDetailText))
                     throw new ApplicationException($"AddressElement:DisableManualAddess set to true, NoManualAddressDetailText must have value");
             });
+        }
+
+        public void CheckForAnyConditionType(List<Page> pages)
+        {
+            var anyCondtionType = new List<Condition>();
+
+            var anyConditionTypeRenderConditions = pages.Where(_ => _.Behaviours != null)
+                .SelectMany(_ => _.Behaviours)
+                .Where(_ => _.Conditions != null)
+                .SelectMany(_ => _.Conditions)
+                .Where(_ => _.ConditionType == ECondition.Any)
+                .ToList();
+
+            var anyConditionTypeBehaviours = pages.Where(_ => _.RenderConditions != null)
+                .SelectMany(_ => _.RenderConditions)
+                .Where(_ => _.ConditionType == ECondition.Any)
+                .ToList();
+
+            anyCondtionType.AddRange(anyConditionTypeRenderConditions);
+            anyCondtionType.AddRange(anyConditionTypeBehaviours);
+
+            if (anyCondtionType.Any())
+            {
+                anyCondtionType.ForEach((condition) =>
+                {
+                    if (string.IsNullOrEmpty(condition.ComparisonValue))
+                        throw new ApplicationException($"PageHelper:CheckForAnyConditionType, any condition type required a comparison value");
+                });
+            }
+
         }
     }
 }
