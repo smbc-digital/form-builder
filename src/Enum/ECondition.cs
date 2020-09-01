@@ -5,6 +5,7 @@
         Undefined = 0,
         EqualTo,
         CheckboxContains,
+        Contains,
         IsNullOrEmpty,
         IsBefore,
         IsAfter,

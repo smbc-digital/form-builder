@@ -25,7 +25,7 @@ namespace form_builder.Conditions
         public static bool IsOneOf(Condition condition, Dictionary<string, dynamic> viewModel) 
             => viewModel.ContainsKey(condition.QuestionId) && condition.ComparisonValue.Contains((string)viewModel[condition.QuestionId].ToLower());
 
-        public static bool CheckboxContains(Condition condition, Dictionary<string, dynamic> viewModel)
+        public static bool Contains(Condition condition, Dictionary<string, dynamic> viewModel)
         {
             var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? condition.ComparisonValue.ToLower() : condition.CheckboxContains.ToLower();
             
