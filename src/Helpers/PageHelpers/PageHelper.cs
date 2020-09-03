@@ -295,11 +295,11 @@ namespace form_builder.Helpers.PageHelpers
             if (formSchema.DocumentType.Any())
             {
                 if (formSchema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
-                    throw new ApplicationException($"PageHelper::CheckForDocumentDownload, Unknown document download type configured");
+                    throw new ApplicationException("PageHelper::CheckForDocumentDownload, Unknown document download type configured");
             }
             else
             {
-                throw new ApplicationException($"PageHelper::CheckForDocumentDownload, No document download type configured");
+                throw new ApplicationException("PageHelper::CheckForDocumentDownload, No document download type configured");
             }
         }
 
@@ -346,8 +346,7 @@ namespace form_builder.Helpers.PageHelpers
                 return obj;
             }
 
-            object subObject;
-            if (!obj.TryGetValue(splitTargets[0], out subObject))
+            if (!obj.TryGetValue(splitTargets[0], out object subObject))
                 subObject = new ExpandoObject();
 
             subObject = RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), value, subObject as IDictionary<string, dynamic>);
@@ -411,10 +410,10 @@ namespace form_builder.Helpers.PageHelpers
                     throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction there is no PageActionSlug for {_environment.EnvironmentName}");
 
                 if (string.IsNullOrEmpty(foundSlug.URL))
-                    throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url");
+                    throw new ApplicationException("PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url");
 
                 if (string.IsNullOrEmpty(action.Properties.TargetQuestionId))
-                    throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a TargetQuestionId");
+                    throw new ApplicationException("PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a TargetQuestionId");
             });
         }
 
@@ -452,8 +451,38 @@ namespace form_builder.Helpers.PageHelpers
 
             addressElements.ForEach(element => {
                 if (string.IsNullOrWhiteSpace(element.Properties.NoManualAddressDetailText))
-                    throw new ApplicationException($"AddressElement:DisableManualAddess set to true, NoManualAddressDetailText must have value");
+                    throw new ApplicationException("AddressElement:DisableManualAddress set to true, NoManualAddressDetailText must have value");
             });
+        }
+
+        public void CheckForAnyConditionType(List<Page> pages)
+        {
+            var anyConditionType = new List<Condition>();
+
+            var anyConditionTypeRenderConditions = pages.Where(_ => _.Behaviours != null)
+                .SelectMany(_ => _.Behaviours)
+                .Where(_ => _.Conditions != null)
+                .SelectMany(_ => _.Conditions)
+                .Where(_ => _.ConditionType == ECondition.Any)
+                .ToList();
+
+            var anyConditionTypeBehaviours = pages.Where(_ => _.RenderConditions != null)
+                .SelectMany(_ => _.RenderConditions)
+                .Where(_ => _.ConditionType == ECondition.Any)
+                .ToList();
+
+            anyConditionType.AddRange(anyConditionTypeRenderConditions);
+            anyConditionType.AddRange(anyConditionTypeBehaviours);
+
+            if (anyConditionType.Any())
+            {
+                anyConditionType.ForEach(condition =>
+                {
+                    if (string.IsNullOrEmpty(condition.ComparisonValue))
+                        throw new ApplicationException("PageHelper:CheckForAnyConditionType, any condition type requires a comparison value");
+                });
+            }
+
         }
     }
 }
