@@ -295,11 +295,11 @@ namespace form_builder.Helpers.PageHelpers
             if (formSchema.DocumentType.Any())
             {
                 if (formSchema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
-                    throw new ApplicationException($"PageHelper::CheckForDocumentDownload, Unknown document download type configured");
+                    throw new ApplicationException("PageHelper::CheckForDocumentDownload, Unknown document download type configured");
             }
             else
             {
-                throw new ApplicationException($"PageHelper::CheckForDocumentDownload, No document download type configured");
+                throw new ApplicationException("PageHelper::CheckForDocumentDownload, No document download type configured");
             }
         }
 
@@ -410,10 +410,10 @@ namespace form_builder.Helpers.PageHelpers
                     throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction there is no PageActionSlug for {_environment.EnvironmentName}");
 
                 if (string.IsNullOrEmpty(foundSlug.URL))
-                    throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url");
+                    throw new ApplicationException("PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url");
 
                 if (string.IsNullOrEmpty(action.Properties.TargetQuestionId))
-                    throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a TargetQuestionId");
+                    throw new ApplicationException("PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a TargetQuestionId");
             });
         }
 
@@ -451,7 +451,7 @@ namespace form_builder.Helpers.PageHelpers
 
             addressElements.ForEach(element => {
                 if (string.IsNullOrWhiteSpace(element.Properties.NoManualAddressDetailText))
-                    throw new ApplicationException($"AddressElement:DisableManualAddress set to true, NoManualAddressDetailText must have value");
+                    throw new ApplicationException("AddressElement:DisableManualAddress set to true, NoManualAddressDetailText must have value");
             });
         }
 
@@ -479,7 +479,7 @@ namespace form_builder.Helpers.PageHelpers
                 anyConditionType.ForEach(condition =>
                 {
                     if (string.IsNullOrEmpty(condition.ComparisonValue))
-                        throw new ApplicationException($"PageHelper:CheckForAnyConditionType, any condition type requires a comparison value");
+                        throw new ApplicationException("PageHelper:CheckForAnyConditionType, any condition type requires a comparison value");
                 });
             }
 
