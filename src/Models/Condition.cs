@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using form_builder.Enum;
 
 namespace form_builder.Models
 {
     public class Condition
     {
+        public List<Condition> Conditions { get; set; }
         private ECondition _condition;
         public ECondition ConditionType
         {

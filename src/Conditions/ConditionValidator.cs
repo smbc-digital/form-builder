@@ -7,7 +7,7 @@ namespace form_builder.Conditions
 {
     public class ConditionValidator
     {
-        private Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>> ConditionList =
+        private readonly Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>> ConditionList =
 
         new Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>>
         {
@@ -24,7 +24,29 @@ namespace form_builder.Conditions
             { ECondition.IsOneOf, StringComparator.IsOneOf }
         };
 
-        public bool IsValid(Condition condition, Dictionary<string, dynamic> viewModel) =>
-            ConditionList[condition.ConditionType](condition, viewModel);
+        public bool IsValid(Condition condition, Dictionary<string, dynamic> viewModel) 
+        {
+            if (condition.ConditionType.Equals(ECondition.Any))
+                return AnyNumberOfConditionsIsValid(condition, viewModel);
+
+            return ConditionList[condition.ConditionType](condition, viewModel);
+        }
+
+        public bool AnyNumberOfConditionsIsValid(Condition condition, Dictionary<string, dynamic> viewModel)
+        {
+            var isValidCount = 0;
+            var targetConditionCount = int.Parse(condition.ComparisonValue);
+
+            foreach (var con in condition.Conditions)
+            {
+                if(ConditionList[con.ConditionType](con, viewModel))
+                    isValidCount++;
+
+                if(isValidCount >= targetConditionCount)
+                    break;
+            }
+
+            return isValidCount >= targetConditionCount;
+        }
     }
 }

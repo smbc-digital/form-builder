@@ -13,6 +13,7 @@
         GreaterThanEqualTo,
         LessThanEqualTo,
         EndsWith,
-        IsOneOf
+        IsOneOf,
+        Any
     }
 }
