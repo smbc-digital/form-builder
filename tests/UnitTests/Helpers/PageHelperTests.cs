@@ -2163,8 +2163,65 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("guid");
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(It.IsAny<string>());
 
-            // Act
+            // Act & Assert
             Assert.Throws<ApplicationException>(() => _pageHelper.CheckAddressNoManualTextIsSet(pages));
+        }
+
+        [Fact]
+        public void CheckForAnyConditionType_ShouldThrowException_IfComparisonValueIsNullOrEmpty()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .Build();
+
+            var condition = new ConditionBuilder()
+                .WithConditionType(ECondition.Any)
+                .WithQuestionId("test")
+                .Build();
+            
+            var behaviour = new BehaviourBuilder()
+                .WithCondition(condition)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithBehaviour(behaviour)
+                .Build();
+
+            var pages = new List<Page> { page };
+
+            // Act & Assert
+            Assert.Throws<ApplicationException>(() => _pageHelper.CheckForAnyConditionType(pages));
+        }
+
+        [Fact]
+        public void CheckForAnyConditionType_ShouldAllowSchema_IfComparisonValueIsSet()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+          .WithType(EElementType.Textbox)
+          .Build();
+
+            var condition = new ConditionBuilder()
+                .WithConditionType(ECondition.Any)
+                .WithComparisonValue("compValue")
+                .WithQuestionId("test")
+                .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithCondition(condition)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithBehaviour(behaviour)
+                .Build();
+
+            var pages = new List<Page> { page };
+
+            // Act
+            _pageHelper.CheckForAnyConditionType(pages);
         }
     }
 }

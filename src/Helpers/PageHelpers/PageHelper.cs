@@ -451,13 +451,13 @@ namespace form_builder.Helpers.PageHelpers
 
             addressElements.ForEach(element => {
                 if (string.IsNullOrWhiteSpace(element.Properties.NoManualAddressDetailText))
-                    throw new ApplicationException($"AddressElement:DisableManualAddess set to true, NoManualAddressDetailText must have value");
+                    throw new ApplicationException($"AddressElement:DisableManualAddress set to true, NoManualAddressDetailText must have value");
             });
         }
 
         public void CheckForAnyConditionType(List<Page> pages)
         {
-            var anyCondtionType = new List<Condition>();
+            var anyConditionType = new List<Condition>();
 
             var anyConditionTypeRenderConditions = pages.Where(_ => _.Behaviours != null)
                 .SelectMany(_ => _.Behaviours)
@@ -471,15 +471,15 @@ namespace form_builder.Helpers.PageHelpers
                 .Where(_ => _.ConditionType == ECondition.Any)
                 .ToList();
 
-            anyCondtionType.AddRange(anyConditionTypeRenderConditions);
-            anyCondtionType.AddRange(anyConditionTypeBehaviours);
+            anyConditionType.AddRange(anyConditionTypeRenderConditions);
+            anyConditionType.AddRange(anyConditionTypeBehaviours);
 
-            if (anyCondtionType.Any())
+            if (anyConditionType.Any())
             {
-                anyCondtionType.ForEach((condition) =>
+                anyConditionType.ForEach(condition =>
                 {
                     if (string.IsNullOrEmpty(condition.ComparisonValue))
-                        throw new ApplicationException($"PageHelper:CheckForAnyConditionType, any condition type required a comparison value");
+                        throw new ApplicationException($"PageHelper:CheckForAnyConditionType, any condition type requires a comparison value");
                 });
             }
 

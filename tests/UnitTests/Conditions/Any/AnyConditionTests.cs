@@ -1,15 +1,14 @@
+using System.Collections.Generic;
 using form_builder.Conditions;
 using form_builder.Enum;
-using form_builder.Models;
 using form_builder_tests.Builders;
-using System.Collections.Generic;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Conditions
+namespace form_builder_tests.UnitTests.Conditions.Any
 {
     public class AnyConditionTests
     {
-        private readonly ConditionValidator conditionValidator = new ConditionValidator();
+        private readonly ConditionValidator _conditionValidator = new ConditionValidator();
 
         [Theory]
         [InlineData(1)]
@@ -61,7 +60,7 @@ namespace form_builder_tests.UnitTests.Conditions
                 .Build();
 
             // Act & Assert
-            Assert.True(conditionValidator.IsValid(anyCondition, viewModel));
+            Assert.True(_conditionValidator.IsValid(anyCondition, viewModel));
         }
 
         [Fact]
@@ -110,7 +109,7 @@ namespace form_builder_tests.UnitTests.Conditions
                 .Build();
 
             // Act & Assert
-            Assert.False(conditionValidator.IsValid(anyCondition, viewModel));
+            Assert.False(_conditionValidator.IsValid(anyCondition, viewModel));
         }
     }
 }
