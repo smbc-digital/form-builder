@@ -30,7 +30,7 @@
 
     <partial name="Header" />
 
-    <div class="govuk-width-container" role="main">
+    <main class="govuk-width-container">
         @if (!string.IsNullOrEmpty(feedbackPhase))
         {
             <div class="govuk-phase-banner">
@@ -42,7 +42,9 @@
                         This is a new service - your <a class="govuk-link" href="@feedbackFormUrl" rel="noreferrer noopener" target="_blank">feedback</a> will help us to improve it.
                     </span>
                 </p>
-            </div>}
+            </div>
+        }
+        
         @if (displayBreadcrumbs)
         {
             <partial name="Breadcrumbs" model="@breadcrumbs" />
@@ -50,16 +52,17 @@
 
         @if (!Model.HideBackButton)
         {
-            <a href="javascript:history.back(-1)" class="govuk-back-link">Back</a>}
+            <a href="javascript:history.back(-1)" class="govuk-back-link">Back</a>
+        }
 
-        <main class="govuk-main-wrapper " id="main-content">
+        <div class="govuk-main-wrapper " id="main-content">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
                     @RenderBody()
                 </div>
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
 
     <partial name="Footer" />
     <script type="text/javascript" src="https://design-system.stockport.gov.uk/int/1.0.0/smbc-frontend.min.js"></script>
