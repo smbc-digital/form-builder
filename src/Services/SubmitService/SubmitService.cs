@@ -55,15 +55,6 @@ namespace form_builder.Services.SubmitService
                 ? string.Empty
                 : submitSlug.AuthToken);
 
-            //if (string.IsNullOrWhiteSpace(submitSlug.AuthToken))
-            //{
-            //    _gateway.ChangeAuthenticationHeader(string.Empty);
-            //}
-            //else
-            //{
-            //    _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
-            //}
-
             var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
             if (!response.IsSuccessStatusCode)
             {
