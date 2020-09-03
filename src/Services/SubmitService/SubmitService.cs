@@ -51,14 +51,18 @@ namespace form_builder.Services.SubmitService
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
-            if (string.IsNullOrWhiteSpace(submitSlug.AuthToken))
-            {
-                _gateway.ChangeAuthenticationHeader(string.Empty);
-            }
-            else
-            {
-                _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
-            }
+            _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(submitSlug.AuthToken)
+                ? string.Empty
+                : submitSlug.AuthToken);
+
+            //if (string.IsNullOrWhiteSpace(submitSlug.AuthToken))
+            //{
+            //    _gateway.ChangeAuthenticationHeader(string.Empty);
+            //}
+            //else
+            //{
+            //    _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
+            //}
 
             var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
             if (!response.IsSuccessStatusCode)
@@ -100,6 +104,7 @@ namespace form_builder.Services.SubmitService
             }
 
             var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
+
             if (!response.IsSuccessStatusCode)
             {
                 throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");

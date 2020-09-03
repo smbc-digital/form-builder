@@ -55,7 +55,7 @@ namespace form_builder.Services.RetrieveExternalDataService
                     _.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
 
                 if (submitSlug == null)
-                    throw new ApplicationException($"RetrieveExternalDataService::Process, there is no PageActionSlug defined for this environment");
+                    throw new ApplicationException("RetrieveExternalDataService::Process, there is no PageActionSlug defined for this environment");
 
                 var entity = _actionHelper.GenerateUrl(submitSlug.URL, mappingData.FormAnswers);
 
