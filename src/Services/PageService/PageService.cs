@@ -43,7 +43,6 @@ namespace form_builder.Services.PageService
         private readonly IMappingService _mappingService;
         private readonly ISuccessPageFactory _successPageContentFactory;
         private readonly IPageFactory _pageContentFactory;
-        private readonly ILogger<PageService> _logger;
 
         public PageService(
             IEnumerable<IElementValidator> validators, 
