@@ -6,6 +6,7 @@ using form_builder.Providers.EmailProvider;
 
 namespace form_builder.Models.Actions
 {
+    #pragma warning disable CS1998
     public class Action : IAction
     {
         public EActionType Type { get; set; }
