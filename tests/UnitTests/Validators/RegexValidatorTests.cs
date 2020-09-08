@@ -93,7 +93,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Equal("Check the ni number and try again", result.Message);
+            Assert.Equal("Enter the ni number", result.Message);
         }
 
         [Fact]

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models;
@@ -25,7 +26,7 @@ namespace form_builder.Validators
 
             if (element.Type != EElementType.Address && element.Type != EElementType.Street && element.Type != EElementType.Organisation)
             {
-                validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
+                validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the " + element.Properties.Label.ToLower();
             }
 
             if (element.Type == EElementType.FileUpload)
@@ -43,7 +44,7 @@ namespace form_builder.Validators
                 else
                 {
                     key = $"{element.Properties.QuestionId}-postcode";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the postcode";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : ValidationConstants.POSTCODE_EMPTY;
 
                 }
             }

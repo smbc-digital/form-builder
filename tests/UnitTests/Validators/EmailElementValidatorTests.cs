@@ -72,7 +72,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Equal("Check the enter your email and try again", result.Message);
+            Assert.Equal("Enter the enter your email", result.Message);
         }
 
         [Fact]

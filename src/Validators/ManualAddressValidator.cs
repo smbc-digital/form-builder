@@ -41,17 +41,17 @@ namespace form_builder.Validators
 
             if (string.IsNullOrEmpty(valueAddressPostcode))
             {
-                addressPostcodeMessage = "Enter a postcode";
+                addressPostcodeMessage = ValidationConstants.POSTCODE_EMPTY;
                 addressPostcodeValid = false;
             }
             else if (!AddressConstants.STOCKPORT_POSTCODE_REGEX.IsMatch(valueAddressPostcode) && element.Properties.StockportPostcode == true)
             {
-                addressPostcodeMessage = "Enter a valid Stockport postcode";
+                addressPostcodeMessage = ValidationConstants.POSTCODE_INCORRECT_FORMAT;
                 addressPostcodeValid = false;
             }
             else if (!AddressConstants.POSTCODE_REGEX.IsMatch(valueAddressPostcode))
             {
-                addressPostcodeMessage = "Enter a valid Postcode";
+                addressPostcodeMessage = ValidationConstants.POSTCODE_INCORRECT_FORMAT;
                 addressPostcodeValid = false;
             }
 
