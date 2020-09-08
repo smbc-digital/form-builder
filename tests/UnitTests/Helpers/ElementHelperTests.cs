@@ -6,6 +6,7 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
+using form_builder_tests.Builders;
 using Moq;
 using Xunit;
 
@@ -664,6 +665,37 @@ namespace form_builder_tests.UnitTests.Helpers
 
             //Assert
             Assert.True(_elementHelper.CheckForProvider(element));
+        }
+
+        [Fact]
+        public void GenerateQuestionAndAnswersList_ShouldReturnFormSummary_WhenDataHas_PreviousAnswers() 
+        {
+             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers{ Pages = new List<PageAnswers> { new PageAnswers{ PageSlug = "page-one", Answers = new List<Answers>{ new Answers { QuestionId = "question", Response = "test answer" } } } } }));
+
+            var Behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
+            var element = new ElementBuilder()
+                .WithQuestionId("question")
+                .WithType(EElementType.Textbox)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithBehaviour(Behaviour)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            var result = _elementHelper.GenerateQuestionAndAnswersList("12345",formSchema); 
+
+            Assert.NotEmpty(result);
+            Assert.Single(result);
         }
     }
 }

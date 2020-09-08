@@ -33,5 +33,7 @@ namespace form_builder.Models.Elements
 
             return viewRender.RenderAsync(Type.ToString(), this);
         }
+
+        public override string GetLabelText() => "Map";
     }
 }
