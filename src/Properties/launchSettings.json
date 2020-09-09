@@ -16,7 +16,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "report-a-flood",
+      "launchUrl": "test-form",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       }
