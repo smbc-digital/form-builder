@@ -24,12 +24,6 @@ namespace form_builder.ContentFactory
         public async Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, List<object> results = null)
         {
             FormBuilderViewModel result = await _pageHelper.GenerateHtml(page, viewModel, baseForm, sessionGuid, results);
-
-            //hideback button
-            //check if page has address/street/org
-            //if it does if the current page is search
-            //override page.HideBackButton and do not hide back button
-
             result.Path = page.PageSlug;
             result.FormName = baseForm.FormName;
             result.PageTitle = page.Title;
