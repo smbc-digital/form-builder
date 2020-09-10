@@ -303,5 +303,12 @@ namespace form_builder.Builders
 
             return this;
         }
+        
+        public ElementBuilder WithCustomValidationMessage(string value)
+        {
+            _property.CustomValidationMessage = value;
+
+            return this;
+        }
     }
 }
