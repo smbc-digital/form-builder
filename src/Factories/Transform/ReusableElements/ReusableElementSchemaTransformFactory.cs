@@ -77,6 +77,15 @@ namespace form_builder.Factories.Transform.ReusableElements
             if (reusableElement.Properties.Optional)
                 substituteElement.Properties.Optional = true;
 
+            if (reusableElement.Properties.MaxLength != 200)
+                substituteElement.Properties.MaxLength = reusableElement.Properties.MaxLength;
+
+            if (!string.IsNullOrEmpty(reusableElement.Properties.Hint))
+                substituteElement.Properties.Hint = reusableElement.Properties.Hint;
+
+            if (!string.IsNullOrEmpty(reusableElement.Properties.CustomValidationMessage))
+                substituteElement.Properties.CustomValidationMessage = reusableElement.Properties.CustomValidationMessage;
+
             return substituteElement;
         }
 
