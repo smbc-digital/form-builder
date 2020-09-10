@@ -77,6 +77,9 @@ namespace form_builder.Factories.Transform.ReusableElements
             if (reusableElement.Properties.Optional)
                 substituteElement.Properties.Optional = true;
 
+            if (reusableElement.Properties.MaxLength != 200)
+                substituteElement.Properties.MaxLength = reusableElement.Properties.MaxLength;
+
             return substituteElement;
         }
 
