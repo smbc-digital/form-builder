@@ -39,7 +39,7 @@ namespace form_builder.Models.Elements
                 { "id", Properties.QuestionId },
                 { "maxlength", Properties.MaxLength },
                 { "value", Properties.Value},
-                { "spellcheck", Properties.Spellcheck.ToString() }
+                { "spellcheck", Properties.Spellcheck.ToString().ToLower() }
             };
             
             if (Properties.Numeric)

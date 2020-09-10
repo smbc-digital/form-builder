@@ -216,22 +216,21 @@ namespace form_builder.Helpers.ElementHelpers
             var formAnswers = GetFormData(guid);
             var reducedAnswers = FormAnswersExtensions.GetReducedAnswers(formAnswers, formSchema);
             var formSummary = new List<PageSummary>();
-            var pages = formSchema.Pages.ToList();
 
-            foreach (var page in pages)
+            foreach (var page in formSchema.Pages.ToList())
             {
                 var pageSummary = new PageSummary
                 {
-                    PageTitle = page.Title, 
+                    PageTitle = page.Title,
                     PageSlug = page.PageSlug
                 };
 
                 var summaryBuilder = new SummaryDictionaryBuilder();
                 var formSchemaQuestions = page.ValidatableElements
-                    .Where(_ => _ != null)                    
-                    .ToList();               
+                    .Where(_ => _ != null)
+                    .ToList();
 
-                if(formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())                    
+                if(!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())
                     continue;
 
                 formSchemaQuestions.ForEach(question => {
