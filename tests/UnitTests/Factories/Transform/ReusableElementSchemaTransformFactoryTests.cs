@@ -184,11 +184,11 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             var element = (Reusable)new ElementBuilder()
                 .WithType(EElementType.Reusable)
                 .WithQuestionId("ReusableTest")
+                .WithOptional(true)
+                .WithTargetMapping("target.mapping")
                 .Build();
 
             element.ElementRef = "test";
-            element.Properties.Optional = true;
-            element.Properties.TargetMapping = "target.mapping";
 
             // Act
             var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema()
@@ -230,10 +230,10 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             var element = (Reusable)new ElementBuilder()
                 .WithType(EElementType.Reusable)
                 .WithQuestionId("ReusableTest")
+                .WithMaxLength(30)
                 .Build();
 
             element.ElementRef = "test";
-            element.Properties.MaxLength = 30;
 
             // Act
             var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema()
@@ -252,6 +252,94 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             // Assert
             Assert.IsType<FormSchema>(result);
             Assert.Equal(30, result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.MaxLength);
+        }
+
+        [Fact]
+        public async Task Transform_ShouldCall_TransformDataProvider_And_ShouldUpdate_Hint_WhenSupplied()
+        {
+            // Arrange
+            var hintText = "hint text";
+            _transformDataProvider
+                .Setup(_ => _.Get(It.IsAny<string>()))
+                .ReturnsAsync(new Textbox
+                {
+                    Properties = new BaseProperty
+                    {
+                        QuestionId = "ReusableTest"
+                    }
+                });
+
+            ReusableElementSchemaTransformFactory = new ReusableElementSchemaTransformFactory(_transformDataProvider.Object);
+
+            var element = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("ReusableTest")
+                .WithHint(hintText)
+                .Build();
+
+            element.ElementRef = "test";
+
+            // Act
+            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            {
+                Pages = new List<Page>{
+                    new Page()
+                    {
+                        Elements = new List<IElement>
+                        {
+                            element
+                        }
+                    }
+                }
+            });
+
+            // Assert
+            Assert.IsType<FormSchema>(result);
+            Assert.Equal(hintText, result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.Hint);
+        }
+
+                [Fact]
+        public async Task Transform_ShouldCall_TransformDataProvider_And_ShouldUpdate_CustomValidationMessage_WhenSupplied()
+        {
+            // Arrange
+            var validationMessage = "custom validation message";
+            _transformDataProvider
+                .Setup(_ => _.Get(It.IsAny<string>()))
+                .ReturnsAsync(new Textbox
+                {
+                    Properties = new BaseProperty
+                    {
+                        QuestionId = "ReusableTest"
+                    }
+                });
+
+            ReusableElementSchemaTransformFactory = new ReusableElementSchemaTransformFactory(_transformDataProvider.Object);
+
+            var element = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("ReusableTest")
+                .WithCustomValidationMessage(validationMessage)
+                .Build();
+
+            element.ElementRef = "test";
+
+            // Act
+            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            {
+                Pages = new List<Page>{
+                    new Page()
+                    {
+                        Elements = new List<IElement>
+                        {
+                            element
+                        }
+                    }
+                }
+            });
+
+            // Assert
+            Assert.IsType<FormSchema>(result);
+            Assert.Equal(validationMessage, result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.CustomValidationMessage);
         }
     }
 }
