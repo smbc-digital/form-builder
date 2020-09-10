@@ -209,5 +209,49 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             Assert.Equal("target.mapping", result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.TargetMapping);
             Assert.True(result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.Optional);
         }
+
+        
+        [Fact]
+        public async Task Transform_ShouldCall_TransformDataProvider_And_ShouldUpdate_MaxLength_WhenSupplied()
+        {
+            // Arrange
+            _transformDataProvider
+                .Setup(_ => _.Get(It.IsAny<string>()))
+                .ReturnsAsync(new Textbox
+                {
+                    Properties = new BaseProperty
+                    {
+                        QuestionId = "ReusableTest"
+                    }
+                });
+
+            ReusableElementSchemaTransformFactory = new ReusableElementSchemaTransformFactory(_transformDataProvider.Object);
+
+            var element = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("ReusableTest")
+                .Build();
+
+            element.ElementRef = "test";
+            element.Properties.MaxLength = 30;
+
+            // Act
+            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            {
+                Pages = new List<Page>{
+                    new Page()
+                    {
+                        Elements = new List<IElement>
+                        {
+                            element
+                        }
+                    }
+                }
+            });
+
+            // Assert
+            Assert.IsType<FormSchema>(result);
+            Assert.Equal(30, result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.MaxLength);
+        }
     }
 }
