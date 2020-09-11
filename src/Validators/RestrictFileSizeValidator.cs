@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models;
@@ -18,14 +19,14 @@ namespace form_builder.Validators
             if (!viewModel.ContainsKey(key))
                 return new ValidationResult { IsValid = true };
 
-            DocumentModel documentModel = viewModel[key];
+            List<DocumentModel> documentModel = viewModel[key];
 
             if (documentModel == null)
                 return new ValidationResult { IsValid = true };
 
             var maxFileSize = element.Properties.MaxFileSize > 0 ? element.Properties.MaxFileSize * 1048576 : SystemConstants.DefaultMaxFileSize;
 
-            if (documentModel.FileSize <= maxFileSize)
+            if (documentModel.All(_ => _.FileSize <= maxFileSize))
                 return new ValidationResult { IsValid = true };
 
             return new ValidationResult

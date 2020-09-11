@@ -78,9 +78,9 @@ namespace form_builder.Validators
             }
 
             bool isValid;
-            if (element.Type == EElementType.FileUpload)
+            if (element.Type == EElementType.FileUpload || element.Type == EElementType.MultipleFileUpload)
             {
-                DocumentModel value = viewModel.ContainsKey(key)
+                List<DocumentModel> value = viewModel.ContainsKey(key)
                     ? viewModel[key]
                     : null;
 

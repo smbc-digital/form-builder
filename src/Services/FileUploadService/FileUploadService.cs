@@ -29,9 +29,11 @@ namespace form_builder.Services.FileUploadService
         {
             fileUpload.Where(_ => _ != null)
                 .ToList()
-                .ForEach((file) =>
+                .GroupBy(_ => _.QuestionId)
+                .ToList()
+                .ForEach((group) =>
                 {
-                    viewModel.Add(file.QuestionId, new DocumentModel { Content = file.Base64EncodedContent, FileSize = file.Length });
+                    viewModel.Add(group.Key, group.Select(_ => new DocumentModel { Content =_.Base64EncodedContent, FileSize = _.Length }).ToList());
                 });
 
             return viewModel;

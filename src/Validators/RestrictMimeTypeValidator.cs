@@ -31,7 +31,7 @@ namespace form_builder.Validators
                 };
             }
 
-            DocumentModel documentModel = viewModel[key];
+            List<DocumentModel> documentModel = viewModel[key];
 
             if (documentModel == null)
             {
@@ -41,13 +41,13 @@ namespace form_builder.Validators
                 };
             }
 
-            var convertedBase64File = Convert.FromBase64String(documentModel.Content);
-            var fileType = convertedBase64File.GetFileType();
+            var convertedBase64File = documentModel.Select(_ => Convert.FromBase64String(_.Content));
+            var fileType = convertedBase64File.Select(_ => _.GetFileType());
             var allowedFileTypes = element.Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
 
             if (fileType != null)
             {
-                if (allowedFileTypes.Contains($".{fileType.Extension}"))
+                if (fileType.All(_ => allowedFileTypes.Contains($".{_.Extension}")))
                 {
                     return new ValidationResult
                     {
