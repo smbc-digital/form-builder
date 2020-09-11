@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using form_builder.Constants;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators
@@ -45,9 +46,7 @@ namespace form_builder.Validators
             return new ValidationResult
             {
                 IsValid = isValid,
-                Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage)
-                    ? element.Properties.CustomValidationMessage
-                    : "Enter an email address in the correct format, like name@example.com"
+                Message = ValidationConstants.EMAIL_INCORRECT_FORMAT
             };
         }
     }
