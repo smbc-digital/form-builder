@@ -29,9 +29,9 @@ namespace form_builder.Validators
                 validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the " + element.Properties.Label.ToLower();
             }
 
-            if (element.Type == EElementType.FileUpload)
+            if (element.Type == EElementType.FileUpload || element.Type == EElementType.MultipleFileUpload)
             {
-                key = $"{element.Properties.QuestionId}-fileupload";
+                key = $"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
             }
 
             if (element.Type == EElementType.Address)
