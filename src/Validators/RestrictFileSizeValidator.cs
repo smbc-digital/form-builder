@@ -11,7 +11,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            if (element.Type != EElementType.FileUpload)
+            if (element.Type != EElementType.FileUpload || element.Type != EElementType.MultipleFileUpload)
                 return new ValidationResult { IsValid = true };
 
             var key = $"{element.Properties.QuestionId}-fileupload";
