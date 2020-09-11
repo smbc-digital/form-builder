@@ -57,7 +57,9 @@ namespace form_builder.Helpers.ElementHelpers
 
         public T CurrentValue<T>(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
         {
+            //Todo
             var defaultValue = (T) Convert.ChangeType(string.Empty, typeof(T));
+            //var defaultValue = (T) Convert.ChangeType(typeof(T).BaseType ? new string[] : string.Empty, typeof(T));
 
             if (element.Type == EElementType.FileUpload)
                 return defaultValue;

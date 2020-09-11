@@ -16,7 +16,7 @@ namespace form_builder.Models.Elements
         }
 
         public override string QuestionId => $"{base.QuestionId}-fileupload";
-
+        public List<FileUploadModel> FileUpload { get; set; }
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var allowedFileType = Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
@@ -47,6 +47,7 @@ namespace form_builder.Models.Elements
             IWebHostEnvironment environment,
             List<object> results = null)
         {
+            FileUpload= elementHelper.CurrentValue<List<FileUploadModel>>(this, viewModel, page.PageSlug, guid, string.Empty);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
 

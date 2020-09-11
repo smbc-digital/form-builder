@@ -16,7 +16,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "test-form",
+      "launchUrl": "file-upload",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       }

@@ -41,26 +41,28 @@ namespace form_builder.Services.FileUploadService
 
         public List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files)
         {
-            files.ToList().ForEach(file =>
+            files.GroupBy(_ => _.QuestionId).ToList().ForEach(file =>
             {
-                var key = $"{ file.QuestionId}-{_sessionHelper.GetSessionGuid()}";
-                _distributedCache.SetStringAsync($"file-{key}", file.Base64EncodedContent, _distributedCacheExpirationConfiguration.FileUpload);
-                var model = new FileUploadModel
+                var key = $"{ file.Key}-{_sessionHelper.GetSessionGuid()}";
+                var fileContent = file.Select(_ => _.Base64EncodedContent);
+                _distributedCache.SetStringAsync($"file-{key}", JsonConvert.SerializeObject(fileContent), _distributedCacheExpirationConfiguration.FileUpload);
+                
+                var fileUploadModel = file.Select(_ => new FileUploadModel
                 {
                     Key = $"file-{key}",
-                    TrustedOriginalFileName = WebUtility.HtmlEncode(file.UntrustedOriginalFileName),
-                    UntrustedOriginalFileName = file.UntrustedOriginalFileName
-                };
+                    TrustedOriginalFileName = WebUtility.HtmlEncode(_.UntrustedOriginalFileName),
+                    UntrustedOriginalFileName = _.UntrustedOriginalFileName
+                });               
 
-                if (answers.Exists(_ => _.QuestionId == file.QuestionId))
+                if (answers.Exists(_ => _.QuestionId == file.Key))
                 {
-                    var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId == file.QuestionId);
+                    var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId == file.Key);
                     if (fileUploadAnswer != null)
-                        fileUploadAnswer.Response = model;
+                        fileUploadAnswer.Response = fileUploadModel;
                 } 
                 else
                 {
-                    answers.Add(new Answers { QuestionId = file.QuestionId, Response = JsonConvert.SerializeObject(model) });
+                    answers.Add(new Answers { QuestionId = file.Key, Response = JsonConvert.SerializeObject(fileUploadModel) });
                 }
             });
 
