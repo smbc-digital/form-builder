@@ -14,7 +14,9 @@ namespace form_builder.Helpers.ElementHelpers
 {
     public interface IElementHelper
     {
-        T CurrentValue<T>(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "");
+        string CurrentValue(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "");
+
+        T CurrentValue<T>(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "") where T : new();
         
         bool CheckForQuestionId(Element element);
         
@@ -55,21 +57,33 @@ namespace form_builder.Helpers.ElementHelpers
             _elementMapper = elementMapper;
         }
 
-        public T CurrentValue<T>(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
+        public string CurrentValue(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
         {
             //Todo
-            var defaultValue = (T) Convert.ChangeType(string.Empty, typeof(T));
-            //var defaultValue = (T) Convert.ChangeType(typeof(T).BaseType ? new string[] : string.Empty, typeof(T));
+            var defaultValue =  string.Empty;
+
+            return GetCurrentValueFromCache<string>(defaultValue, element, answers, pageSlug, guid, suffix);
+        }
+
+        public T CurrentValue<T>(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "") where T : new()
+        {
+            //Todo
+            var defaultValue = new T();
 
             if (element.Type == EElementType.FileUpload)
                 return defaultValue;
 
+            return GetCurrentValueFromCache<T>(defaultValue, element, answers, pageSlug, guid, suffix);
+        }
+
+        private T GetCurrentValueFromCache<T>(T defaultValue, Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix)
+        {
             var currentValue = answers.ContainsKey($"{element.Properties.QuestionId}{suffix}");
 
             if (!currentValue)
             {
-                var cacheData = _distributedCache.GetString(guid);  
-                if(cacheData != null)
+                var cacheData = _distributedCache.GetString(guid);
+                if (cacheData != null)
                 {
                     var mappedCacheData = JsonConvert.DeserializeObject<FormAnswers>(cacheData);
                     var storedValue = mappedCacheData.Pages.FirstOrDefault(_ => _.PageSlug == pageSlug);

@@ -13,6 +13,7 @@ using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
+using form_builder.Services.FileUploadService;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService.Entities;
@@ -36,6 +37,7 @@ namespace form_builder.Services.PageService
         private readonly IStreetService _streetService;
         private readonly IAddressService _addressService;
         private readonly IOrganisationService _organisationService;
+        private readonly IFileUploadService _fileUploadService;
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IWebHostEnvironment _environment;
@@ -48,7 +50,8 @@ namespace form_builder.Services.PageService
             IEnumerable<IElementValidator> validators, 
             IPageHelper pageHelper, 
             ISessionHelper sessionHelper, 
-            IAddressService addressService, 
+            IAddressService addressService,
+            IFileUploadService fileUploadService,
             IStreetService streetService, 
             IOrganisationService organisationService, 
             IDistributedCacheWrapper distributedCache, 
@@ -66,6 +69,7 @@ namespace form_builder.Services.PageService
             _streetService = streetService;
             _addressService = addressService;
             _organisationService = organisationService;
+            _fileUploadService = fileUploadService;
             _distributedCache = distributedCache;
             _schemaFactory = schemaFactory;
             _successPageContentFactory = successPageFactory;
@@ -185,6 +189,9 @@ namespace form_builder.Services.PageService
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Organisation))
                 return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
+
+            //if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
+            //    return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path);
 
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 

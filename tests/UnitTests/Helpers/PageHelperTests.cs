@@ -158,7 +158,7 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             //Arrange
             _mockElementHelper
-                .Setup(_ => _.CurrentValue<string>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
+                .Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
                     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
@@ -199,7 +199,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Address>(), null))
                 .Callback<string, Address, Dictionary<string, object>>((x, y, z) => callback = y);
 
-            _mockElementHelper.Setup(_ => _.CurrentValue<string>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
                     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 

@@ -51,7 +51,7 @@ namespace form_builder.Models.Elements
             IWebHostEnvironment environment,
             List<object> results = null)
         {
-            elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, string.Empty);
+            elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
 
