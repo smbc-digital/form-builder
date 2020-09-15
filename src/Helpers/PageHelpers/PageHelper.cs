@@ -122,7 +122,7 @@ namespace form_builder.Helpers.PageHelpers
             var fileList = files.ToList();
             foreach (var file in fileList)
             {
-                SaveFormData($"{file.UntrustedOriginalFileName}-{guid}", file.UntrustedOriginalFileName, guid);
+                SaveFormData($"{file.QuestionId}-{file.UntrustedOriginalFileName}-{guid}", file.UntrustedOriginalFileName, guid);
             }
         }
 

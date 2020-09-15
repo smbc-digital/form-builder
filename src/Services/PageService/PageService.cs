@@ -141,16 +141,16 @@ namespace form_builder.Services.PageService
 
             if (subPath.Equals(FileUploadConstants.SelectedFiles))
             {
+                var element = page.Elements.First(_ => _.Type.Equals(EElementType.MultipleFileUpload));
                 var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
                 if (!string.IsNullOrEmpty(formData))
                     convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-                if (convertedAnswers.FormData.Any(_ => _.Key.Contains($"{sessionGuid}")))
+                if (convertedAnswers.FormData.Any(_ => _.Key.Contains($"{element.Properties.QuestionId}")))
                 {
-                    var search = convertedAnswers.FormData.TakeWhile(_ => _.Key.Contains(sessionGuid)).ToList();
-                    searchResults = new List<object>();
-                    searchResults.AddRange(search.Cast<object>());
+                    var search = convertedAnswers.FormData.TakeWhile(_ => _.Key.Contains(element.Properties.QuestionId)).ToList();
+                    searchResults = search.Select(_ => _.Value).ToList();
                 }
             }
 
