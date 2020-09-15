@@ -44,6 +44,8 @@ namespace form_builder.Services.FileUploadService
                     viewModel.Add(group.Key, group.Select(_ => new DocumentModel { Content =_.Base64EncodedContent, FileSize = _.Length }).ToList());
                 });
 
+            viewModel["subPath"] = "selected-files";
+
             return viewModel;
         }
 
@@ -71,8 +73,8 @@ namespace form_builder.Services.FileUploadService
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-            var multipleFileElement = (convertedAnswers.FormData[$"{path}{FileUploadConstants.FileUpload}"] as IEnumerable<object>).ToList();
-
+            var element = currentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.MultipleFileUpload));
+            
             if (!currentPage.IsValid)
             {
                 var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null);
@@ -84,6 +86,8 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
+            var multipleFileElement = (viewModel[$"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}"] as IEnumerable<object>).ToList();
+
             if (multipleFileElement.Any())
             {
                 return new ProcessRequestEntity
@@ -94,7 +98,7 @@ namespace form_builder.Services.FileUploadService
                     {
                         form = baseForm.BaseURL,
                         path,
-                        subPath = FileUploadConstants.FileUpload
+                        subPath = FileUploadConstants.SelectedFiles
                     }
                 };
             }
@@ -106,7 +110,7 @@ namespace form_builder.Services.FileUploadService
                 {
                     form = baseForm.BaseURL,
                     path,
-                    subPath = FileUploadConstants.FileUpload
+                    subPath = ""
                 }
             };
         }
