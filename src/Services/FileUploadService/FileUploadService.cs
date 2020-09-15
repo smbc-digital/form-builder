@@ -6,6 +6,7 @@ using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.ContentFactory;
 using form_builder.Enum;
+using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
@@ -21,16 +22,19 @@ namespace form_builder.Services.FileUploadService
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly ISessionHelper _sessionHelper;
         private readonly IPageFactory _pageFactory;
+        private readonly IPageHelper _pageHelper;
 
         public FileUploadService(IDistributedCacheWrapper distributedCache,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ISessionHelper sessionHelper,
-            IPageFactory pageFactory)
+            IPageFactory pageFactory, 
+            IPageHelper pageHelper)
         {
             _distributedCache = distributedCache;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _sessionHelper = sessionHelper;
             _pageFactory = pageFactory;
+            _pageHelper = pageHelper;
         }
 
         public Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload)
@@ -41,7 +45,11 @@ namespace form_builder.Services.FileUploadService
                 .ToList()
                 .ForEach((group) =>
                 {
-                    viewModel.Add(group.Key, group.Select(_ => new DocumentModel { Content =_.Base64EncodedContent, FileSize = _.Length }).ToList());
+                    viewModel.Add(group.Key, group.Select(_ => new DocumentModel
+                    {
+                        Content =_.Base64EncodedContent, 
+                        FileSize = _.Length
+                    }).ToList());
                 });
 
             viewModel["subPath"] = "selected-files";
@@ -54,10 +62,11 @@ namespace form_builder.Services.FileUploadService
             Page currentPage,
             FormSchema baseForm,
             string guid,
-            string path)
+            string path,
+            IEnumerable<CustomFormFile> files)
         {
             viewModel.TryGetValue(FileUploadConstants.SubPathViewModelKey, out var subPath);
-            return await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path);
+            return await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files);
         }
 
         private async Task<ProcessRequestEntity> ProcessSelectedFiles(
@@ -65,7 +74,8 @@ namespace form_builder.Services.FileUploadService
          Page currentPage,
          FormSchema baseForm,
          string guid,
-         string path)
+         string path,
+         IEnumerable<CustomFormFile> files)
         {
             var cachedAnswers = _distributedCache.GetString(guid);
 
@@ -86,9 +96,10 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            var multipleFileElement = (viewModel[$"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}"] as IEnumerable<object>).ToList();
+            var model = (viewModel[$"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}"] as IEnumerable<object>).ToList();
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid);
 
-            if (multipleFileElement.Any())
+            if (model.Any())
             {
                 return new ProcessRequestEntity
                 {

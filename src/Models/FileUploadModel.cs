@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace form_builder.Models
 {
-    public class FileUploadModel
+    public class FileUploadModel : DocumentModel
     {
         public string Key { get; set; }
 

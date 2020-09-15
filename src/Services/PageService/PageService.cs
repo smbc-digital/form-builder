@@ -139,6 +139,21 @@ namespace form_builder.Services.PageService
                     searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
             }
 
+            if (subPath.Equals(FileUploadConstants.SelectedFiles))
+            {
+                var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+
+                if (!string.IsNullOrEmpty(formData))
+                    convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+                if (convertedAnswers.FormData.Any(_ => _.Key.Contains($"{sessionGuid}")))
+                {
+                    var search = convertedAnswers.FormData.TakeWhile(_ => _.Key.Contains(sessionGuid)).ToList();
+                    searchResults = new List<object>();
+                    searchResults.AddRange(search.Cast<object>());
+                }
+            }
+
             if (page.Elements.Any(_ => _.Type == EElementType.PaymentSummary))
             {
                 var data = await _mappingService.Map(sessionGuid, form);
@@ -191,7 +206,7 @@ namespace form_builder.Services.PageService
                 return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
-                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path);
+                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files);
 
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 

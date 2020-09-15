@@ -15,6 +15,7 @@ namespace form_builder.Services.FileUploadService
             Page currentPage,
             FormSchema baseForm,
             string guid,
-            string path);
+            string path,
+            IEnumerable<CustomFormFile> files);
     }
 }

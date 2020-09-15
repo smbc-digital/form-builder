@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Cache;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ElementHelpers;
@@ -101,7 +102,9 @@ namespace form_builder.Helpers.PageHelpers
             }
 
             if (files != null && files.Any() && isPageValid)
+            {
                 answers = SaveFormFileAnswers(answers, files);
+            }
 
             convertedAnswers.Pages?.Add(new PageAnswers
             {
@@ -113,6 +116,14 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.FormName = form;
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
+
+            if (files == null || !files.Any() || !isPageValid) return;
+
+            var fileList = files.ToList();
+            foreach (var file in fileList)
+            {
+                SaveFormData($"{file.UntrustedOriginalFileName}-{guid}", file.UntrustedOriginalFileName, guid);
+            }
         }
 
         public void HasDuplicateQuestionIDs(List<Page> pages, string formName)
