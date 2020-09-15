@@ -42,5 +42,7 @@ namespace form_builder.Helpers.PageHelpers
         void CheckAddressNoManualTextIsSet(List<Page> pages);
 
         void CheckForAnyConditionType(List<Page> pages);
+
+        List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files);
     }
 }

@@ -190,8 +190,8 @@ namespace form_builder.Services.PageService
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Organisation))
                 return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            //if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
-            //    return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path);
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
+                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path);
 
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,13 +37,12 @@ namespace form_builder.Helpers.PageHelpers
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly ICache _cache;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
-        private readonly IFileUploadService _fileUploadService;
         private readonly ISessionHelper _sessionHelper;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
             IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            IEnumerable<IPaymentProvider> paymentProviders, IFileUploadService fileUploadService, ISessionHelper sessionHelper)
+            IEnumerable<IPaymentProvider> paymentProviders, ISessionHelper sessionHelper)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -52,7 +52,6 @@ namespace form_builder.Helpers.PageHelpers
             _cache = cache;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _paymentProviders = paymentProviders;
-            _fileUploadService = fileUploadService;
             _sessionHelper = sessionHelper;
         }
 
@@ -102,7 +101,7 @@ namespace form_builder.Helpers.PageHelpers
             }
 
             if (files != null && files.Any() && isPageValid)
-                answers = _fileUploadService.SaveFormFileAnswers(answers, files);
+                answers = SaveFormFileAnswers(answers, files);
 
             convertedAnswers.Pages?.Add(new PageAnswers
             {
@@ -483,6 +482,36 @@ namespace form_builder.Helpers.PageHelpers
                 });
             }
 
+        }
+
+        public List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files)
+        {
+            files.GroupBy(_ => _.QuestionId).ToList().ForEach(file =>
+            {
+                var key = $"{ file.Key}-{_sessionHelper.GetSessionGuid()}";
+                var fileContent = file.Select(_ => _.Base64EncodedContent);
+                _distributedCache.SetStringAsync($"file-{key}", JsonConvert.SerializeObject(fileContent), _distributedCacheExpirationConfiguration.FileUpload);
+
+                var fileUploadModel = file.Select(_ => new FileUploadModel
+                {
+                    Key = $"file-{key}",
+                    TrustedOriginalFileName = WebUtility.HtmlEncode(_.UntrustedOriginalFileName),
+                    UntrustedOriginalFileName = _.UntrustedOriginalFileName
+                });
+
+                if (answers.Exists(_ => _.QuestionId == file.Key))
+                {
+                    var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId == file.Key);
+                    if (fileUploadAnswer != null)
+                        fileUploadAnswer.Response = fileUploadModel;
+                }
+                else
+                {
+                    answers.Add(new Answers { QuestionId = file.Key, Response = JsonConvert.SerializeObject(fileUploadModel) });
+                }
+            });
+
+            return answers;
         }
     }
 }
