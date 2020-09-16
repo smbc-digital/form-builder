@@ -66,7 +66,10 @@ namespace form_builder.Models.Elements
             if (element.Any(_ => _.Type == EElementType.Organisation) && viewModel.IsInitial())
                 return SystemConstants.OrganisationSearchButtonText;
 
-            if(page.Behaviours.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay))
+            if (element.Any(_ => _.Type == EElementType.MultipleFileUpload) && viewModel.IsInitial())
+                return SystemConstants.UploadFilesButtonText;
+
+            if (page.Behaviours.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay))
                 return string.IsNullOrEmpty(Properties.Text) ? SystemConstants.SubmitButtonText : Properties.Text;
 
             return string.IsNullOrEmpty(Properties.Text) ? SystemConstants.NextStepButtonText : Properties.Text;
