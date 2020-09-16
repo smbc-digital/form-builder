@@ -10,11 +10,43 @@
     <partial name="LabelH1" />
 
     <partial name="Error" />
+    <br />
+    <label class="govuk-label ">You must upload:</label>
+    <ul>
+        <li>###</li>
+        <li>###</li>
+    </ul>
 
-    @foreach (var file in Model.FileUpload)
+    <br />
+    <label class="govuk-label govuk-label--s">Accepted Files</label>
+    <br />
+    <label class="govuk-label ">You can upload JPEG,PDF,PNG,HTML, PTF and Word documents.</label>
+    <br />
+    <label class="govuk-label ">The maximum individual file size is 5MB.</label>
+    <br />
+    <label class="govuk-label ">The total size of all your added files must not be more than 20MB.</label>
+    <br />
+
+    @if (Model.FileUpload.Count > 0)
     {
-        <p>@file</p>
+        <label class="govuk-label govuk-label--s">Files uploaded</label>
+        <br />
     }
+
+    <table style="width:80%;">
+        @foreach (var file in Model.FileUpload)
+        {
+            <tr>
+                <th>
+                    <label class="govuk-label" style="text-align:left;">@file</label>
+                </th>
+                <th>
+                    <a style="color:Highlight; text-decoration:underline; font-weight: normal;">Delete</a>
+                </th>
+            </tr>
+        }
+    </table>
+    <br />
 
     @* TODO:This will work for fileupload, but not the form-group, need to work that out *@
     <span class="govuk-error-message" id="@sizeValidationError" style="display: none">
