@@ -76,7 +76,6 @@ namespace form_builder.Controllers
         [Route("{form}")]
         [Route("{form}/{path}")]
         [Route("{form}/{path}/{subPath}")]
-        [Route("{form}/{path}/{subPath}/{file}")]
         public async Task<IActionResult> Index(
             string form,
             string path,
@@ -89,9 +88,6 @@ namespace form_builder.Controllers
 
             if (filename.Length > 0 || filename != "")
                 viewModel = _fileUploadService.RemoveFile(viewModel, fileUpload, filename);
-
-            if (fileUpload != null && fileUpload.Any())
-                viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
 
             if (fileUpload != null && fileUpload.Any())
                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
@@ -133,6 +129,27 @@ namespace form_builder.Controllers
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
             }
+        }
+
+        [HttpPost]
+        //[Route("{form}/{path}/{subPath}/{filename}")]
+        public IActionResult RemoveFile(
+            string form,
+            string path,
+            Dictionary<string, string[]> formData,
+            IEnumerable<CustomFormFile> fileUpload,
+            string subPath = "",
+            string filename = "")
+        {
+            var viewModel = formData.ToNormaliseDictionary(subPath);
+
+            if (filename.Length > 0 || filename != "")
+                viewModel = _fileUploadService.RemoveFile(viewModel, fileUpload, filename);
+
+            return RedirectToAction("Index", new
+            {
+                path
+            });
         }
 
         [HttpGet]

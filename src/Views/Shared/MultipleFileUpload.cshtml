@@ -41,7 +41,9 @@
                     <label class="govuk-label" style="text-align:left;">@file</label>
                 </th>
                 <th>
-                    <a href="#" style="color:Highlight; text-decoration:underline; font-weight: normal;" id="@file">Delete</a>
+                    <button type="submit" name="filename" value="@file" 
+                            formaction="Index" formmethod="post">Delete</button>
+                    @*@Html.ActionLink("Delete", "RemoveFile", null, new {filename = file})"*@
                 </th>
             </tr>
         }
