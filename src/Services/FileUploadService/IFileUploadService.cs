@@ -9,7 +9,8 @@ namespace form_builder.Services.FileUploadService
     {
         Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload);
 
-       
+        Dictionary<string, dynamic> RemoveFile(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload, string filename);
+
         Task<ProcessRequestEntity> ProcessFile(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,

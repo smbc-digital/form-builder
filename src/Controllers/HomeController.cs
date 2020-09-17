@@ -76,16 +76,24 @@ namespace form_builder.Controllers
         [Route("{form}")]
         [Route("{form}/{path}")]
         [Route("{form}/{path}/{subPath}")]
+        [Route("{form}/{path}/{subPath}/{file}")]
         public async Task<IActionResult> Index(
             string form,
             string path,
             Dictionary<string, string[]> formData,
             IEnumerable<CustomFormFile> fileUpload,
-            string subPath = "")
+            string subPath = "",
+            string filename = "")
         {
             var viewModel = formData.ToNormaliseDictionary(subPath);
 
-            if(fileUpload != null && fileUpload.Any())
+            if (filename.Length > 0 || filename != "")
+                viewModel = _fileUploadService.RemoveFile(viewModel, fileUpload, filename);
+
+            if (fileUpload != null && fileUpload.Any())
+                viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
+
+            if (fileUpload != null && fileUpload.Any())
                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
 
             var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload);

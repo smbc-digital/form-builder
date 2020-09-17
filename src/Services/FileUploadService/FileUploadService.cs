@@ -57,6 +57,26 @@ namespace form_builder.Services.FileUploadService
             return viewModel;
         }
 
+        public Dictionary<string, dynamic> RemoveFile(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload, string filename)
+        {
+            fileUpload.Where(_ => _ != null && _.UntrustedOriginalFileName != filename)
+                .ToList()
+                .GroupBy(_ => _.QuestionId)
+                .ToList()
+                .ForEach((group) =>
+                {
+                    viewModel.Add(group.Key, group.Select(_ => new DocumentModel
+                    {
+                        Content = _.Base64EncodedContent,
+                        FileSize = _.Length
+                    }).ToList());
+                });
+
+            viewModel["subPath"] = "selected-files";
+
+            return viewModel;
+        }
+
         public async Task<ProcessRequestEntity> ProcessFile(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
