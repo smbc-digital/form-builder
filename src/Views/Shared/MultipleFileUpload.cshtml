@@ -1,67 +1,74 @@
+@using form_builder.Constants
 @model form_builder.Models.Elements.MultipleFileUpload
 @{
     var sizeValidationError = $"{Model.QuestionId}-fileSizeError";
     var elements = Model.GenerateElementProperties();
     elements.Add("class", "govuk-file-upload");
+    var uploadButtonClasses = Model.FileUpload.Any() ? "govuk-button govuk-button--secondary" : "govuk-button";
 }
 
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
 
-    <partial name="LabelH1" />
+        <partial name="LabelH1" />
 
-    <partial name="Error" />
-    <br />
-    <label class="govuk-label ">You must upload:</label>
-    <ul>
-        <li>###</li>
-        <li>###</li>
-    </ul>
-
-    <br />
-    <label class="govuk-label govuk-label--s">Accepted Files</label>
-    <br />
-    <label class="govuk-label ">You can upload JPEG,PDF,PNG,HTML, RTF and Word documents.</label>
-    <br />
-    <label class="govuk-label ">The maximum individual file size is 5MB.</label>
-    <br />
-    <label class="govuk-label ">The total size of all your added files must not be more than 20MB.</label>
-    <br />
-
-    @if (Model.FileUpload.Count > 0)
-    {
-        <label class="govuk-label govuk-label--s">Files uploaded</label>
+        <partial name="Error" />
         <br />
-    }
+        <label class="govuk-label ">You must upload:</label>
+        <ul>
+            <li>###</li>
+            <li>###</li>
+        </ul>
 
-    <table style="width:80%;">
-        @foreach (var file in Model.FileUpload)
+        <br />
+        <label class="govuk-label govuk-label--s">Accepted Files</label>
+        <br />
+        <label class="govuk-label ">You can upload JPEG,PDF,PNG,HTML, RTF and Word documents.</label>
+        <br />
+        <label class="govuk-label ">The maximum individual file size is 5MB.</label>
+        <br />
+        <label class="govuk-label ">The total size of all your added files must not be more than 20MB.</label>
+        <br />
+
+        @if (Model.FileUpload.Count > 0)
         {
-            <tr>
-                <th>
-                    <label class="govuk-label" style="text-align:left;">@file</label>
-                </th>
-                <th>
-                    <button type="submit" name="filename" value="@file" 
-                            formaction="Index" formmethod="post">Delete</button>
-                </th>
-            </tr>
+            <label class="govuk-label govuk-label--s">Files uploaded</label>
+            <br />
         }
-    </table>
-    <br />
 
-    @* TODO:This will work for fileupload, but not the form-group, need to work that out *@
-    <span class="govuk-error-message" id="@sizeValidationError" style="display: none">
-        <span class="govuk-visually-hidden">Error:</span> The selected file must be smaller than 23MB
-    </span>
+        <table style="width:80%;">
+            @foreach (var file in Model.FileUpload)
+            {
+                <tr>
+                    <th>
+                        <label class="govuk-label" style="text-align:left;">@file</label>
+                    </th>
+                    <th>
+                        <button type="submit" name="@FileUploadConstants.FileToDelete" value="@file"
+                                formaction="Index" formmethod="post">
+                            Delete
+                        </button>
+                    </th>
+                </tr>
+            }
+        </table>
+        <br />
 
-    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
-    
-    <button data-prevent-double-click="true"
-            @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
-            class="govuk-button @Model.Properties.ClassName"
-            id="upload"
-            @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)
-            data-module="govuk-button">
-        Upload file(s)
-    </button>
-</div>
+        @* TODO:This will work for fileupload, but not the form-group, need to work that out *@
+        <span class="govuk-error-message" id="@sizeValidationError" style="display: none">
+            <span class="govuk-visually-hidden">Error:</span> The selected file must be smaller than 23MB
+        </span>
+
+        @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <button data-prevent-double-click="true"
+                @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
+                class="@uploadButtonClasses"
+                id="upload"
+                data-module="govuk-button">
+            Upload file(s)
+        </button>
+    </div>

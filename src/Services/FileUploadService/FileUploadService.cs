@@ -53,8 +53,6 @@ namespace form_builder.Services.FileUploadService
                     }).ToList());
                 });
 
-            viewModel["subPath"] = "selected-files";
-
             return viewModel;
         }
 
@@ -69,13 +67,13 @@ namespace form_builder.Services.FileUploadService
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-            var formDataKeyToRemove = convertedAnswers.FormData.FirstOrDefault(_ => _.Key.Contains(viewModel["filename"]));
+            var formDataKeyToRemove = convertedAnswers.FormData.FirstOrDefault(_ => _.Key.Contains(viewModel[FileUploadConstants.FileToDelete]));
 
             convertedAnswers.FormData.Remove(formDataKeyToRemove.Key);
 
             var pageAnswersString = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault();
             List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(pageAnswersString.Response.ToString());
-            response.Remove(response.FirstOrDefault(_ => _.TrustedOriginalFileName.Equals(viewModel["filename"])));
+            response.Remove(response.FirstOrDefault(_ => _.TrustedOriginalFileName.Equals(viewModel[FileUploadConstants.FileToDelete])));
             convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path)).Answers.FirstOrDefault().Response = response;
 
             _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
@@ -103,7 +101,7 @@ namespace form_builder.Services.FileUploadService
         {
             viewModel.TryGetValue(FileUploadConstants.SubPathViewModelKey, out var subPath);
 
-            return viewModel.ContainsKey("filename") ? RemoveFile(viewModel, baseForm, path, guid) : await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files);
+            return viewModel.ContainsKey(FileUploadConstants.FileToDelete) ? RemoveFile(viewModel, baseForm, path, guid) : await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files);
         }
 
         private async Task<ProcessRequestEntity> ProcessSelectedFiles(

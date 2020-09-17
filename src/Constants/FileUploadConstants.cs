@@ -5,7 +5,7 @@ namespace form_builder.Constants
         public const string SUFFIX = "-fileupload";
         public const string Upload = "Upload";
         public const string SelectedFiles = "selected-files";
-        public const string FileUpload = "FileUpload";
+        public const string FileToDelete = "filename";
         public const string SubPathViewModelKey = "subPath";
     }
 }

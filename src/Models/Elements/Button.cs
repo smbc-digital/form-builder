@@ -12,6 +12,7 @@ namespace form_builder.Models.Elements
 {
     public class Button : Element
     {
+        public bool DisplayButton { get; set; } = true;
         public Button()
         {
             Type = EElementType.Button;
@@ -31,6 +32,11 @@ namespace form_builder.Models.Elements
 
             if(!Properties.DisableOnClick)
                 Properties.DisableOnClick = DisableIfSubmitOrLookup(page.Behaviours, page.Elements, viewModel);
+
+            if (page.Elements.Any(_ => _.Type.Equals(EElementType.MultipleFileUpload)) && string.IsNullOrEmpty(viewModel[FileUploadConstants.SubPathViewModelKey]))
+            {
+                DisplayButton = false;
+            }
 
             return viewRender.RenderAsync("Button", this);
         }
@@ -65,9 +71,6 @@ namespace form_builder.Models.Elements
 
             if (element.Any(_ => _.Type == EElementType.Organisation) && viewModel.IsInitial())
                 return SystemConstants.OrganisationSearchButtonText;
-
-            //if (element.Any(_ => _.Type == EElementType.MultipleFileUpload) && viewModel.IsInitial())
-            //    return SystemConstants.UploadFilesButtonText;
 
             if (page.Behaviours.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay))
                 return string.IsNullOrEmpty(Properties.Text) ? SystemConstants.SubmitButtonText : Properties.Text;
