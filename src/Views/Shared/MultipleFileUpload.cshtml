@@ -43,7 +43,6 @@
                 <th>
                     <button type="submit" name="filename" value="@file" 
                             formaction="Index" formmethod="post">Delete</button>
-                    @*@Html.ActionLink("Delete", "RemoveFile", null, new {filename = file})"*@
                 </th>
             </tr>
         }
@@ -56,4 +55,13 @@
     </span>
 
     @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
+    
+    <button data-prevent-double-click="true"
+            @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
+            class="govuk-button @Model.Properties.ClassName"
+            id="upload"
+            @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)
+            data-module="govuk-button">
+        Upload file(s)
+    </button>
 </div>

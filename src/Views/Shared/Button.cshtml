@@ -5,6 +5,10 @@
         class="govuk-button @Model.Properties.ClassName"
         id="@Model.Properties.ButtonId"
         @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)
-        data-module="govuk-button">
+        data-module="govuk-button"
+        type = "submit"
+        formaction="index" formmethod="post"
+        name="continue"
+        value="continue">
     @Model.Properties.Text
 </button>

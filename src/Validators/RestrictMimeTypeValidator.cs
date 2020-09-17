@@ -13,7 +13,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            if (element.Type != EElementType.FileUpload  || element.Type != EElementType.MultipleFileUpload)
+            if (element.Type != EElementType.FileUpload  || element.Type != EElementType.MultipleFileUpload || viewModel.ContainsKey("continue"))
             {
                 return new ValidationResult
                 {

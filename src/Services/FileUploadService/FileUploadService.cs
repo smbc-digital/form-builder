@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
@@ -57,24 +58,39 @@ namespace form_builder.Services.FileUploadService
             return viewModel;
         }
 
-        public Dictionary<string, dynamic> RemoveFile(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload, string filename)
+        public ProcessRequestEntity RemoveFile(Dictionary<string, dynamic> viewModel,
+            FormSchema baseForm,
+            string path, 
+            string sessionGuid)
         {
-            fileUpload.Where(_ => _ != null && _.UntrustedOriginalFileName != filename)
-                .ToList()
-                .GroupBy(_ => _.QuestionId)
-                .ToList()
-                .ForEach((group) =>
+            var cachedAnswers = _distributedCache.GetString(sessionGuid);
+
+            var convertedAnswers = cachedAnswers == null
+                ? new FormAnswers { Pages = new List<PageAnswers>() }
+                : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+
+            var formDataKeyToRemove = convertedAnswers.FormData.FirstOrDefault(_ => _.Key.Contains(viewModel["filename"]));
+
+            convertedAnswers.FormData.Remove(formDataKeyToRemove.Key);
+
+            var pageAnswersString = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault();
+            List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(pageAnswersString.Response.ToString());
+            response.Remove(response.FirstOrDefault(_ => _.TrustedOriginalFileName.Equals(viewModel["filename"])));
+            convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path)).Answers.FirstOrDefault().Response = response;
+
+            _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
+
+            return new ProcessRequestEntity
+            {
+                RedirectToAction = true,
+                RedirectAction = "Index",
+                RouteValues = new
                 {
-                    viewModel.Add(group.Key, group.Select(_ => new DocumentModel
-                    {
-                        Content = _.Base64EncodedContent,
-                        FileSize = _.Length
-                    }).ToList());
-                });
-
-            viewModel["subPath"] = "selected-files";
-
-            return viewModel;
+                    form = baseForm.BaseURL,
+                    path,
+                    subPath = FileUploadConstants.SelectedFiles
+                }
+            };
         }
 
         public async Task<ProcessRequestEntity> ProcessFile(
@@ -86,7 +102,8 @@ namespace form_builder.Services.FileUploadService
             IEnumerable<CustomFormFile> files)
         {
             viewModel.TryGetValue(FileUploadConstants.SubPathViewModelKey, out var subPath);
-            return await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files);
+
+            return viewModel.ContainsKey("filename") ? RemoveFile(viewModel, baseForm, path, guid) : await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files);
         }
 
         private async Task<ProcessRequestEntity> ProcessSelectedFiles(
@@ -97,12 +114,6 @@ namespace form_builder.Services.FileUploadService
          string path,
          IEnumerable<CustomFormFile> files)
         {
-            var cachedAnswers = _distributedCache.GetString(guid);
-
-            var convertedAnswers = cachedAnswers == null
-                ? new FormAnswers { Pages = new List<PageAnswers>() }
-                : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-
             var element = currentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.MultipleFileUpload));
             
             if (!currentPage.IsValid)
