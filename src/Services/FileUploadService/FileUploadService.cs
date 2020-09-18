@@ -99,8 +99,6 @@ namespace form_builder.Services.FileUploadService
             string path,
             IEnumerable<CustomFormFile> files)
         {
-            viewModel.TryGetValue(FileUploadConstants.SubPathViewModelKey, out var subPath);
-
             return viewModel.ContainsKey(FileUploadConstants.FileToDelete) ? RemoveFile(viewModel, baseForm, path, guid) : await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files);
         }
 
