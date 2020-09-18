@@ -229,8 +229,10 @@ namespace form_builder.Services.PageService
 
         public async Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid, string subPath, List<object> results)
         {
-            var viewModelData = new Dictionary<string, dynamic>();
-            viewModelData.Add(LookUpConstants.SubPathViewModelKey, subPath);
+            var viewModelData = new Dictionary<string, dynamic>
+            {
+                { LookUpConstants.SubPathViewModelKey, subPath }
+            };
 
             var viewModel = await _pageContentFactory.Build(page, viewModelData, baseForm, sessionGuid, results);
 
