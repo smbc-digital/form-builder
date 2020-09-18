@@ -21,7 +21,8 @@ namespace form_builder.Conditions
             { ECondition.GreaterThanEqualTo, IntegerComparator.IsGreaterThanEqualTo },
             { ECondition.LessThanEqualTo, IntegerComparator.IsLessThanEqualTo },
             { ECondition.EndsWith, StringComparator.EndsWith },
-            { ECondition.IsOneOf, StringComparator.IsOneOf }
+            { ECondition.IsOneOf, StringComparator.IsOneOf },
+            { ECondition.HasFilesUploaded, StringComparator.HasFilesUploaded }
         };
 
         public bool IsValid(Condition condition, Dictionary<string, dynamic> viewModel) 

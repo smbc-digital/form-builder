@@ -58,6 +58,7 @@ namespace form_builder.Models.Elements
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
+            Dictionary<string, dynamic> answers,
             List<object> results = null)
         {
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
@@ -68,7 +69,7 @@ namespace form_builder.Models.Elements
                     {
                         Properties = Properties
                     };
-                    return await manualAddressElement.RenderAsync(viewRender, elementHelper, guid, viewModel, page, formSchema, environment, results);
+                    return await manualAddressElement.RenderAsync(viewRender, elementHelper, guid, viewModel, page, formSchema, environment, answers, results);
 
                 case LookUpConstants.Automatic:
                     IsSelect = true;

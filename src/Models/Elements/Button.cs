@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Conditions;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -12,7 +13,12 @@ namespace form_builder.Models.Elements
 {
     public class Button : Element
     {
-        public bool DisplayButton { get; set; } = true;
+        public bool DisplaySubmitDataButton { get; set; } = true;
+
+        public bool DisplayNonDataSubmitButton { get; set; } = false;
+
+        public List<Condition> Conditions { get; set; }
+
         public Button()
         {
             Type = EElementType.Button;
@@ -26,19 +32,44 @@ namespace form_builder.Models.Elements
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
-            List<object> results = null)
+            Dictionary<string, dynamic> answers,
+            List<object> results = null
+            )
         {
             Properties.Text = GetButtonText(page.Elements, viewModel, page);
+
+            if (Conditions != null)
+            {
+                DisplaySubmitDataButton = CheckButtonMeetsConditions(answers);
+
+                if (DisplaySubmitDataButton && page.Elements.Any(_ => _.Type.Equals(EElementType.MultipleFileUpload)))
+                {
+                    DisplayNonDataSubmitButton = true;
+                    DisplaySubmitDataButton = false;
+                }
+                    
+            }
 
             if(!Properties.DisableOnClick)
                 Properties.DisableOnClick = DisableIfSubmitOrLookup(page.Behaviours, page.Elements, viewModel);
 
-            if (page.Elements.Any(_ => _.Type.Equals(EElementType.MultipleFileUpload)) && string.IsNullOrEmpty(viewModel[FileUploadConstants.SubPathViewModelKey]))
-            {
-                DisplayButton = false;
-            }
+            //if (page.Elements.Any(_ => _.Type.Equals(EElementType.MultipleFileUpload)) && string.IsNullOrEmpty(viewModel[FileUploadConstants.SubPathViewModelKey]))
+            //{
+            //    var fileUploadElement =
+            //        page.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.MultipleFileUpload));
+            //    // We need to check if there are no files in the answers/formdata
+            //    DisplayButton = false;
+            //}
 
             return viewRender.RenderAsync("Button", this);
+        }
+
+        private bool CheckButtonMeetsConditions(Dictionary<string, dynamic> answers)
+        {
+            var conditionValidator = new ConditionValidator();
+
+            return Conditions.Count == 0 ||
+                   Conditions.All(condition => conditionValidator.IsValid(condition, answers));
         }
 
         private bool CheckForBehaviour(List<Behaviour> behaviour)

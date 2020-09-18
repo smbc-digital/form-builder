@@ -12,7 +12,9 @@ namespace form_builder.Helpers.PageHelpers
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<object> results = null);
         
         void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid);
-        
+
+        Dictionary<string, dynamic> GetAnswers();
+
         void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName);
         
         Task CheckForPaymentConfiguration(List<Page> pages, string formName);

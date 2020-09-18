@@ -68,6 +68,8 @@ namespace form_builder.Helpers.PageHelpers
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
 
+            var answers = GetAnswers();
+
             foreach (var element in page.Elements)
                 formModel.RawHTML += await element.RenderAsync(
                     _viewRender,
@@ -77,7 +79,9 @@ namespace form_builder.Helpers.PageHelpers
                     page,
                     baseForm,
                     _environment,
-                    results);
+                    answers,
+                    results
+                    );
 
             return formModel;
         }
@@ -90,8 +94,11 @@ namespace form_builder.Helpers.PageHelpers
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-            if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == viewModel["Path"].ToLower()))
+            if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == viewModel["Path"].ToLower()) && !viewModel.ContainsKey(ButtonConstants.PrimaryButtonName))
                 convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageSlug != viewModel["Path"].ToLower()).ToList();
+
+            if (viewModel.ContainsKey(ButtonConstants.PrimaryButtonName))
+                return;
 
             var answers = new List<Answers>();
 
@@ -124,6 +131,17 @@ namespace form_builder.Helpers.PageHelpers
             {
                 SaveFormData($"{file.QuestionId}-{file.UntrustedOriginalFileName}-{guid}", file.UntrustedOriginalFileName, guid);
             }
+        }
+
+        public Dictionary<string, dynamic> GetAnswers()
+        {
+            var guid = _sessionHelper.GetSessionGuid();
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = !string.IsNullOrEmpty(formData)
+                ? JsonConvert.DeserializeObject<FormAnswers>(formData)
+                : new FormAnswers { Pages = new List<PageAnswers>() };
+
+            return convertedAnswers.Pages.SelectMany(_ => _.Answers).ToDictionary(_ => _.QuestionId, _ => _.Response);
         }
 
         public void HasDuplicateQuestionIDs(List<Page> pages, string formName)

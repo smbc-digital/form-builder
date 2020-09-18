@@ -21,6 +21,7 @@ namespace form_builder.Models.Elements
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
+            Dictionary<string, dynamic> answers,
             List<object> results = null)
         {
             Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);

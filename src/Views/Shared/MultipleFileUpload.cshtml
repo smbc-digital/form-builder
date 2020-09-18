@@ -10,24 +10,12 @@
     <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
 
         <partial name="LabelH1" />
+        
+        <partial name="InsetText" model="@Model.Properties.IAG" />
+
+        <partial name="Hint" />
 
         <partial name="Error" />
-        @*<br />
-        <label class="govuk-label ">You must upload:</label>
-        <ul>
-            <li>###</li>
-            <li>###</li>
-        </ul>
-
-        <br />
-        <label class="govuk-label govuk-label--s">Accepted Files</label>
-        <br />
-        <label class="govuk-label ">You can upload JPEG,PDF,PNG,HTML, RTF and Word documents.</label>
-        <br />
-        <label class="govuk-label ">The maximum individual file size is 5MB.</label>
-        <br />
-        <label class="govuk-label ">The total size of all your added files must not be more than 20MB.</label>
-        <br />*@
 
         @if (Model.FileUpload.Count > 0)
         {
@@ -59,7 +47,6 @@
         </span>
 
         @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
-        <br>
         <br>
         <br>
         <br>

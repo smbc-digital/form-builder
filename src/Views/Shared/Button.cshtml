@@ -2,7 +2,7 @@
 @model form_builder.Models.Elements.Button
 
 @{
-    if (Model.DisplayButton)
+    if (Model.DisplaySubmitDataButton)
     {
         <button data-prevent-double-click="true"
                 @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
@@ -10,7 +10,21 @@
                 id="@Model.Properties.ButtonId"
                 @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)
                 data-module="govuk-button"
-                type = "submit"
+                type="submit"
+                formaction="index" formmethod="post">
+            @Model.Properties.Text
+        </button>
+    }
+
+    if (Model.DisplayNonDataSubmitButton)
+    {
+        <button data-prevent-double-click="true"
+                @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
+                class="govuk-button @Model.Properties.ClassName"
+                id="@Model.Properties.ButtonId"
+                @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)
+                data-module="govuk-button"
+                type="submit"
                 formaction="index" formmethod="post"
                 name="@ButtonConstants.PrimaryButtonName"
                 value="@ButtonConstants.PrimaryButtonName">

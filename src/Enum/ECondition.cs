@@ -14,6 +14,7 @@
         LessThanEqualTo,
         EndsWith,
         IsOneOf,
-        Any
+        Any,
+        HasFilesUploaded
     }
 }
