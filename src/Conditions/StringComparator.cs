@@ -25,7 +25,6 @@ namespace form_builder.Conditions
         public static bool HasFilesUploaded(Condition condition, Dictionary<string, dynamic> viewModel)
         {
             var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? bool.Parse(condition.ComparisonValue) : condition.IsNullOrEmpty;
-            var keyToCheck = condition.QuestionId + FileUploadConstants.SUFFIX;
             var answer = viewModel.ContainsKey(condition.QuestionId + FileUploadConstants.SUFFIX) ? (string)viewModel[condition.QuestionId + FileUploadConstants.SUFFIX].ToString() : "";
             var isNullOrEmptyArray = string.IsNullOrEmpty(answer) || answer.Equals("[]");
             return viewModel.ContainsKey(condition.QuestionId + FileUploadConstants.SUFFIX) && isNullOrEmptyArray == val;

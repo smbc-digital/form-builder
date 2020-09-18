@@ -2,6 +2,6 @@
 {
     public class ButtonConstants
     {
-        public const string PrimaryButtonName = "continue";
+        public const string NoDataSubmit = "noDataSubmit";
     }
 }

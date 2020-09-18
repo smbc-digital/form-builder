@@ -47,19 +47,10 @@ namespace form_builder.Models.Elements
                     DisplayNonDataSubmitButton = true;
                     DisplaySubmitDataButton = false;
                 }
-                    
             }
 
             if(!Properties.DisableOnClick)
                 Properties.DisableOnClick = DisableIfSubmitOrLookup(page.Behaviours, page.Elements, viewModel);
-
-            //if (page.Elements.Any(_ => _.Type.Equals(EElementType.MultipleFileUpload)) && string.IsNullOrEmpty(viewModel[FileUploadConstants.SubPathViewModelKey]))
-            //{
-            //    var fileUploadElement =
-            //        page.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.MultipleFileUpload));
-            //    // We need to check if there are no files in the answers/formdata
-            //    DisplayButton = false;
-            //}
 
             return viewRender.RenderAsync("Button", this);
         }

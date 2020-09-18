@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Configuration;
@@ -20,20 +19,14 @@ namespace form_builder.Services.FileUploadService
     public class FileUploadService : IFileUploadService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
-        private readonly ISessionHelper _sessionHelper;
         private readonly IPageFactory _pageFactory;
         private readonly IPageHelper _pageHelper;
 
         public FileUploadService(IDistributedCacheWrapper distributedCache,
-            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            ISessionHelper sessionHelper,
             IPageFactory pageFactory, 
             IPageHelper pageHelper)
         {
             _distributedCache = distributedCache;
-            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
-            _sessionHelper = sessionHelper;
             _pageFactory = pageFactory;
             _pageHelper = pageHelper;
         }
@@ -56,7 +49,8 @@ namespace form_builder.Services.FileUploadService
             return viewModel;
         }
 
-        public ProcessRequestEntity RemoveFile(Dictionary<string, dynamic> viewModel,
+        public ProcessRequestEntity RemoveFile(
+            Dictionary<string, dynamic> viewModel,
             FormSchema baseForm,
             string path, 
             string sessionGuid)
@@ -68,7 +62,6 @@ namespace form_builder.Services.FileUploadService
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
             var formDataKeyToRemove = convertedAnswers.FormData.FirstOrDefault(_ => _.Key.Contains(viewModel[FileUploadConstants.FileToDelete]));
-
             convertedAnswers.FormData.Remove(formDataKeyToRemove.Key);
 
             var pageAnswersString = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault();
@@ -99,7 +92,9 @@ namespace form_builder.Services.FileUploadService
             string path,
             IEnumerable<CustomFormFile> files)
         {
-            return viewModel.ContainsKey(FileUploadConstants.FileToDelete) ? RemoveFile(viewModel, baseForm, path, guid) : await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files);
+            return viewModel.ContainsKey(FileUploadConstants.FileToDelete) 
+                ? RemoveFile(viewModel, baseForm, path, guid) 
+                : await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files);
         }
 
         private async Task<ProcessRequestEntity> ProcessSelectedFiles(

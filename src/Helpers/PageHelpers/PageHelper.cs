@@ -94,11 +94,8 @@ namespace form_builder.Helpers.PageHelpers
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-            if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == viewModel["Path"].ToLower()) && !viewModel.ContainsKey(ButtonConstants.PrimaryButtonName))
+            if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == viewModel["Path"].ToLower()))
                 convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageSlug != viewModel["Path"].ToLower()).ToList();
-
-            if (viewModel.ContainsKey(ButtonConstants.PrimaryButtonName))
-                return;
 
             var answers = new List<Answers>();
 

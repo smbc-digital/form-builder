@@ -206,9 +206,14 @@ namespace form_builder.Services.PageService
                 return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
             if (files != null && files.Any() || viewModel.ContainsKey(FileUploadConstants.FileToDelete))
-                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files);
-
-            _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
+            {
+                var entity = await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files);
+                if (!viewModel.ContainsKey(ButtonConstants.NoDataSubmit))
+                    return entity;
+            }
+                
+            if (!viewModel.ContainsKey(ButtonConstants.NoDataSubmit))
+                _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
             if (!currentPage.IsValid)
             {
