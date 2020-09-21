@@ -3,7 +3,7 @@
 @{
     var sizeValidationError = $"{Model.QuestionId}-fileSizeError";
     var elements = Model.GenerateElementProperties();
-    elements.Add("class", "govuk-file-upload");
+    elements.Add("class", "govuk-file-upload govuk-!-margin-bottom-9 govuk-!-display-block");
     var uploadButtonClasses = Model.FileUpload.Any() ? "govuk-button govuk-button--secondary" : "govuk-button";
 }
 
@@ -47,10 +47,7 @@
         </span>
 
         @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
-        <br>
-        <br>
-        <br>
-        <br>
+
         <button data-prevent-double-click="true"
                 @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
                 class="@uploadButtonClasses"

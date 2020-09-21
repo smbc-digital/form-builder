@@ -139,7 +139,7 @@ namespace form_builder.Services.PageService
                     searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
             }
 
-            if (subPath.Equals(FileUploadConstants.SelectedFiles))
+            if (page.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
             {
                 var element = page.Elements.First(_ => _.Type.Equals(EElementType.MultipleFileUpload));
                 var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };

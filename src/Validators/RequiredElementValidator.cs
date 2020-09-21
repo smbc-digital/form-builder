@@ -80,7 +80,7 @@ namespace form_builder.Validators
             bool isValid;
             if (element.Type == EElementType.FileUpload || element.Type == EElementType.MultipleFileUpload)
             {
-                if (viewModel.ContainsKey("continue"))
+                if (viewModel.ContainsKey(ButtonConstants.NoDataSubmit))
                 {
                     isValid = true;
                 }
