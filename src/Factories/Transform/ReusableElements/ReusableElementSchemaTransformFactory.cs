@@ -35,21 +35,22 @@ namespace form_builder.Factories.Transform.ReusableElements
         {
             var substitutions = new List<Task<ElementSubstitutionRecord>>();
 
-            foreach (var page in formSchema.Pages)
+            for (int i = 0; i < formSchema.Pages.Count; i++)
             {
+                var page = formSchema.Pages[i];
                 page.Elements
                     .Where(_ => _.Type == EElementType.Reusable)
                     .ToList()
-                    .ForEach(_ => substitutions.Add(CreateSubstitutionRecord(page.PageSlug, page.Elements.IndexOf(_), _)));
+                    .ForEach(_ => substitutions.Add(CreateSubstitutionRecord(i, page.Elements.IndexOf(_), _)));
             }
 
-            return await Task.WhenAll<ElementSubstitutionRecord>(substitutions);
+            return await Task.WhenAll(substitutions);
         }
 
-        private async Task<ElementSubstitutionRecord> CreateSubstitutionRecord(string slug, int elementIndex, IElement element) =>
+        private async Task<ElementSubstitutionRecord> CreateSubstitutionRecord(int pageIndex, int elementIndex, IElement element) =>
             new ElementSubstitutionRecord
             {
-                PageSlug = slug,
+                PageIndex = pageIndex,
                 OriginalElementIndex = elementIndex,
                 SubstituteElement = await CreateSubstituteRecord(element)
             };
@@ -57,7 +58,6 @@ namespace form_builder.Factories.Transform.ReusableElements
         private async Task<IElement> CreateSubstituteRecord(IElement entry)
         {
             var reusableElement = (Reusable)entry;
-
             if (string.IsNullOrEmpty(reusableElement.Properties.QuestionId))
                 throw new Exception($"ReusableElementSchemaTransformFactory::CreateSubstituteRecord, no question ID was specified");
 
@@ -71,7 +71,7 @@ namespace form_builder.Factories.Transform.ReusableElements
 
             substituteElement.Properties.QuestionId = reusableElement.Properties.QuestionId;
 
-            if (!string.IsNullOrEmpty(entry.Properties.TargetMapping))
+            if (!string.IsNullOrEmpty(reusableElement.Properties.TargetMapping))
                 substituteElement.Properties.TargetMapping = reusableElement.Properties.TargetMapping;
 
             if (reusableElement.Properties.Optional)
@@ -96,9 +96,9 @@ namespace form_builder.Factories.Transform.ReusableElements
 
             substitutions
                 .ToList()
-                .ForEach(substitution => formSchema
-                                        .Pages
-                                        .First(_ => _.PageSlug == substitution.PageSlug).Elements[substitution.OriginalElementIndex] = substitution.SubstituteElement);
+                .ForEach(_ => {
+                    formSchema.Pages[_.PageIndex].Elements[_.OriginalElementIndex] = _.SubstituteElement;
+                });
 
             return formSchema;
         }
@@ -106,7 +106,7 @@ namespace form_builder.Factories.Transform.ReusableElements
 
     public class ElementSubstitutionRecord
     {
-        public string PageSlug { get; set; }
+        public int PageIndex { get; set; }
         public int OriginalElementIndex { get; set; }
         public IElement SubstituteElement { get; set; }
     }
