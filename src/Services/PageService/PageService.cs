@@ -205,14 +205,14 @@ namespace form_builder.Services.PageService
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Organisation))
                 return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            if (files != null && files.Any() || viewModel.ContainsKey(FileUploadConstants.FileToDelete))
+            if (files != null && files.Any() || viewModel != null && viewModel.ContainsKey(FileUploadConstants.FileToDelete))
             {
                 var entity = await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files);
                 if (!viewModel.ContainsKey(ButtonConstants.NoDataSubmit))
                     return entity;
             }
                 
-            if (!viewModel.ContainsKey(ButtonConstants.NoDataSubmit))
+            if (viewModel != null && !viewModel.ContainsKey(ButtonConstants.NoDataSubmit))
                 _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
             if (!currentPage.IsValid)

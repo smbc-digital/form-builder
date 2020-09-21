@@ -26,7 +26,6 @@ namespace form_builder.Models.Elements
                 { "name", QuestionId },
                 { "id", QuestionId },
                 { "type", "file" },
-                //{ "files", "" },
                 { "multiple", true },
                 { "accept", string.Join(',', allowedFileType)}
             };

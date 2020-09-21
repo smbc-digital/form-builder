@@ -58,8 +58,10 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
+            var docs = new List<DocumentModel>();
             var documentModel = new DocumentModel { FileSize = 16, Content = "VGhpcyBpcyBhIHRlc3Q=" };
-            viewModel.Add("fileUpload-fileupload", documentModel);
+            docs.Add(documentModel);
+            viewModel.Add("fileUpload-fileupload", docs);
 
             // Act
             var result = _restrictMimeTypeValidator.Validate(element, viewModel);
@@ -101,8 +103,10 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
+            var docs = new List<DocumentModel>();
             var documentModel = new DocumentModel { FileSize = 16, Content = base64EncodedImage };
-            viewModel.Add("fileUpload-fileupload", documentModel);
+            docs.Add(documentModel);
+            viewModel.Add("fileUpload-fileupload", docs);
 
             // Act
             var result = _restrictMimeTypeValidator.Validate(element, viewModel);

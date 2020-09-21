@@ -36,6 +36,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
 
+            var answers = new Dictionary<string, dynamic>();
+
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .Build();
@@ -48,7 +50,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 viewModel,
                 page,
                 schema,
-                _mockHostingEnv.Object);
+                _mockHostingEnv.Object,
+                answers);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<form_builder.Models.Elements.Address>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -72,6 +75,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                     LookUpConstants.Automatic}
             };
 
+            var answers = new Dictionary<string, dynamic>();
+
             _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
@@ -88,6 +93,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 page,
                 schema,
                 _mockHostingEnv.Object,
+                answers,
                 new List<object>());
 
             //Assert
@@ -125,6 +131,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                     LookUpConstants.Automatic}
             };
 
+            var answers = new Dictionary<string, dynamic>();
+
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .WithBaseUrl(baseUrl)
@@ -138,6 +146,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 page,
                 schema,
                 _mockHostingEnv.Object,
+                answers,
                 new List<object>());
 
             //Assert

@@ -47,9 +47,10 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
+            var answers = new Dictionary<string, dynamic>();
 
             //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema,  _mockHostingEnv.Object,answers);
 
             //Assert
             Assert.Equal(SystemConstants.AddressSearchButtonText, callback.Properties.Text);
@@ -84,8 +85,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
 
+            var answers = new Dictionary<string, dynamic>();
             //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object,answers);
 
             //Assert
             Assert.Equal(SystemConstants.NextStepButtonText, callback.Properties.Text);
@@ -119,8 +121,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
 
+            var answers = new Dictionary<string, dynamic>();
             //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, answers);
 
             //Assert
             Assert.Equal(SystemConstants.SubmitButtonText, callback.Properties.Text);
@@ -154,8 +157,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
 
+            var answers = new Dictionary<string, dynamic>();
             //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, answers);
 
             //Assert
             Assert.Equal(SystemConstants.SubmitButtonText, callback.Properties.Text);
@@ -190,8 +194,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
 
+            var answers = new Dictionary<string, dynamic>();
             //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object,answers);
 
             //Assert
             Assert.Equal("test text", callback.Properties.Text);
@@ -221,8 +226,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
 
+            var answers = new Dictionary<string, dynamic>();
             //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, answers);
 
             //Assert
             Assert.False(callback.Properties.DisableOnClick);
@@ -253,8 +259,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
 
+            var answers = new Dictionary<string, dynamic>();
             //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, answers);
 
             //Assert
             Assert.True(callback.Properties.DisableOnClick);
@@ -291,8 +298,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
 
+            var answers = new Dictionary<string, dynamic>();
             //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, answers);
 
             //Assert
             Assert.True(callback.Properties.DisableOnClick);

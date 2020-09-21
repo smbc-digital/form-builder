@@ -43,12 +43,14 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 {"street-street", "street"}
             };
 
+            var answers = new Dictionary<string, dynamic>();
+
             var schema = new FormSchemaBuilder()
                 .WithName("Street name")
                 .Build();
 
             //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, answers);
 
             // Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("StreetSelect")), It.IsAny<form_builder.Models.Elements.Street>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -65,6 +67,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
 
+            var answers = new Dictionary<string, dynamic>();
+
             var schema = new FormSchemaBuilder()
                 .WithName("Street name")
                 .Build();
@@ -77,7 +81,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 viewModel,
                 page,
                 schema,
-                _mockHostingEnv.Object);
+                _mockHostingEnv.Object,
+                answers);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("StreetSearch")),It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);

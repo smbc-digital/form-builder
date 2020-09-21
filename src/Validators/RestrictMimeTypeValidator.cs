@@ -13,12 +13,15 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            if (element.Type != EElementType.FileUpload  || element.Type != EElementType.MultipleFileUpload || viewModel.ContainsKey("continue"))
+            if (element.Type != EElementType.FileUpload)
             {
-                return new ValidationResult
+                if (element.Type != EElementType.MultipleFileUpload || viewModel.ContainsKey("continue"))
                 {
-                    IsValid = true
-                };
+                    return new ValidationResult
+                    {
+                        IsValid = true
+                    };
+                }                
             }
 
             var key = $"{element.Properties.QuestionId}-fileupload";
@@ -41,13 +44,15 @@ namespace form_builder.Validators
                 };
             }
 
-            var convertedBase64File = documentModel.Select(_ => Convert.FromBase64String(_.Content));
-            var fileType = convertedBase64File.Select(_ => _.GetFileType());
+            var documentsFiles = documentModel.Select(_ =>  Convert.FromBase64String(_.Content));
+            
             var allowedFileTypes = element.Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
 
-            if (fileType != null)
+            var fileTypes = documentsFiles.Select(_ => _.GetFileType());
+            if (fileTypes != null)
             {
-                if (fileType.All(_ => allowedFileTypes.Contains($".{_.Extension}")))
+                var availableFileTypes = fileTypes.Where(_ => _ != null);
+                if (availableFileTypes.Any() && availableFileTypes.All(_ => allowedFileTypes.Contains($".{_.Extension}")))
                 {
                     return new ValidationResult
                     {
