@@ -9,6 +9,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.Transforms.ReusableElements;
+using form_builder_tests.Builders;
 using Moq;
 using Xunit;
 
@@ -21,6 +22,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
 
         public ReusableElementSchemaTransformFactoryTests()
         {
+            ReusableElementSchemaTransformFactory = new ReusableElementSchemaTransformFactory(_transformDataProvider.Object);
         }
 
         [Fact]
@@ -298,7 +300,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             Assert.Equal(hintText, result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.Hint);
         }
 
-                [Fact]
+        [Fact]
         public async Task Transform_ShouldCall_TransformDataProvider_And_ShouldUpdate_CustomValidationMessage_WhenSupplied()
         {
             // Arrange
@@ -340,6 +342,224 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             // Assert
             Assert.IsType<FormSchema>(result);
             Assert.Equal(validationMessage, result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.CustomValidationMessage);
+        }
+
+        [Fact]
+        public async Task Transform_ShouldTranform_Correct_Elements_WhenMultiplePagesExists_WithSameSlug()
+        {
+            // Arrange
+            _transformDataProvider
+                .Setup(_ => _.Get(It.Is<string>(_ => _ == "elementRef1")))
+                .ReturnsAsync(new Textbox
+                {
+                    Properties = new BaseProperty
+                    {
+                        QuestionId = "baseQuestionIdRef1",
+                    }
+                });
+
+            _transformDataProvider
+                .Setup(_ => _.Get(It.Is<string>(_ => _ == "elementRef2")))
+                .ReturnsAsync(new Textbox
+                {
+                    Properties = new BaseProperty
+                    {
+                        QuestionId = "baseQuestionIdRef2",
+                    }
+                });
+
+            _transformDataProvider
+                .Setup(_ => _.Get(It.Is<string>(_ => _ == "elementRef3")))
+                .ReturnsAsync(new Textbox
+                {
+                    Properties = new BaseProperty
+                    {
+                        QuestionId = "baseQuestionIdRef3"
+                    }
+                });
+
+            _transformDataProvider
+                .Setup(_ => _.Get(It.Is<string>(_ => _ == "elementRef4")))
+                .ReturnsAsync(new Textbox
+                {
+                    Properties = new BaseProperty
+                    {
+                        QuestionId = "baseQuestionIdRef4"
+                    }
+                });
+
+            var element = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("test1")
+                .Build();
+            element.ElementRef = "elementRef1";
+
+            var element2 = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("test2")
+                .Build();
+            element2.ElementRef = "elementRef2";
+
+            var element3 = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("test3")
+                .Build();
+            element3.ElementRef = "elementRef3";
+
+            var element4 = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("test4")
+                .Build();
+            element4.ElementRef = "elementRef4";
+
+            var pageOne = new PageBuilder()
+                .WithPageSlug("duplicate")
+                .WithElement(element)
+                .WithElement(element2)
+                .Build();
+
+            var pageTwo = new PageBuilder()
+                .WithPageSlug("duplicate")
+                .WithElement(element3)
+                .WithElement(element4)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(pageOne)
+                .WithPage(pageTwo)
+                .Build();
+
+            // Act
+            var result = await ReusableElementSchemaTransformFactory.Transform(formSchema);
+
+            // Assert
+            Assert.IsType<FormSchema>(result);
+            Assert.Equal("test1", result.Pages[0].Elements[0].Properties.QuestionId);
+            Assert.Equal("test2", result.Pages[0].Elements[1].Properties.QuestionId);
+            Assert.Equal("test3", result.Pages[1].Elements[0].Properties.QuestionId);
+            Assert.Equal("test4", result.Pages[1].Elements[1].Properties.QuestionId);
+        }
+
+        [Fact]
+        public async Task Transform_ShouldTranform_ElementsRef_WhenUsedMultipleTimes_AcrossPages()
+        {
+            // Arrange
+            _transformDataProvider
+                .Setup(_ => _.Get(It.Is<string>(_ => _ == "elementRef1")))
+                .ReturnsAsync(() => new ElementBuilder().WithType(EElementType.Textbox).WithQuestionId("baseQuestionIdRef1").Build());
+
+            var element = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("test1")
+                .Build();
+            element.ElementRef = "elementRef1";
+
+            var element2 = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("test2")
+                .Build();
+            element2.ElementRef = "elementRef1";
+
+            var element3 = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("test3")
+                .Build();
+            element3.ElementRef = "elementRef1";
+
+            var pageOne = new PageBuilder()
+                .WithPageSlug("page-one")
+                .WithElement(element)
+                .Build();
+
+            var pageTwo = new PageBuilder()
+                .WithPageSlug("page-two")
+                .WithElement(element2)
+                .Build();
+
+            var pageThree = new PageBuilder()
+                .WithPageSlug("page-three")
+                .WithElement(element3)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(pageOne)
+                .WithPage(pageTwo)
+                .WithPage(pageThree)
+                .Build();
+
+            // Act
+            var result = await ReusableElementSchemaTransformFactory.Transform(formSchema);
+
+            // Assert
+            Assert.IsType<FormSchema>(result);
+            Assert.Equal("test1", result.Pages[0].Elements[0].Properties.QuestionId);
+            Assert.Equal("test2", result.Pages[1].Elements[0].Properties.QuestionId);
+            Assert.Equal("test3", result.Pages[2].Elements[0].Properties.QuestionId);
+        }
+
+        [Fact]
+        public async Task Transform_ShouldTranform_Correct_Elements_WhenMultiplePagesExists_WithSameSlug_AndSameElementReference()
+        {
+            // Arrange
+            _transformDataProvider
+                .Setup(_ => _.Get(It.Is<string>(_ => _ == "elementRef1")))
+                .ReturnsAsync(() => new ElementBuilder().WithType(EElementType.Textbox).WithQuestionId("baseQuestionIdRef1").Build());
+
+            _transformDataProvider
+                .Setup(_ => _.Get(It.Is<string>(_ => _ == "elementRef2")))
+                .ReturnsAsync(() => new ElementBuilder().WithType(EElementType.Radio).WithQuestionId("baseQuestionIdRef2").Build());
+
+            var element = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("test1")
+                .Build();
+            element.ElementRef = "elementRef1";
+
+            var element2 = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("test2")
+                .Build();
+            element2.ElementRef = "elementRef2";
+
+            var element3 = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("test3")
+                .Build();
+            element3.ElementRef = "elementRef1";
+
+            var element4 = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("test4")
+                .Build();
+
+            element4.ElementRef = "elementRef2";
+
+            var pageOne = new PageBuilder()
+                .WithPageSlug("duplicate")
+                .WithElement(element)
+                .WithElement(element2)
+                .Build();
+
+            var pageTwo = new PageBuilder()
+                .WithPageSlug("duplicate")
+                .WithElement(element3)
+                .WithElement(element4)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(pageOne)
+                .WithPage(pageTwo)
+                .Build();
+
+            // Act
+            var result = await ReusableElementSchemaTransformFactory.Transform(formSchema);
+
+            // Assert
+            Assert.IsType<FormSchema>(result);
+            Assert.Equal("test1", result.Pages[0].Elements[0].Properties.QuestionId);
+            Assert.Equal("test2", result.Pages[0].Elements[1].Properties.QuestionId);
+            Assert.Equal("test3", result.Pages[1].Elements[0].Properties.QuestionId);
+            Assert.Equal("test4", result.Pages[1].Elements[1].Properties.QuestionId);
         }
     }
 }
