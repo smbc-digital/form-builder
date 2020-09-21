@@ -350,43 +350,19 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             // Arrange
             _transformDataProvider
                 .Setup(_ => _.Get(It.Is<string>(_ => _ == "elementRef1")))
-                .ReturnsAsync(new Textbox
-                {
-                    Properties = new BaseProperty
-                    {
-                        QuestionId = "baseQuestionIdRef1",
-                    }
-                });
+                .ReturnsAsync(new ElementBuilder().WithType(EElementType.Textbox).WithQuestionId("baseQuestionIdRef1").Build());
 
             _transformDataProvider
                 .Setup(_ => _.Get(It.Is<string>(_ => _ == "elementRef2")))
-                .ReturnsAsync(new Textbox
-                {
-                    Properties = new BaseProperty
-                    {
-                        QuestionId = "baseQuestionIdRef2",
-                    }
-                });
+                .ReturnsAsync(new ElementBuilder().WithType(EElementType.Textbox).WithQuestionId("baseQuestionIdRef2").Build());
 
             _transformDataProvider
                 .Setup(_ => _.Get(It.Is<string>(_ => _ == "elementRef3")))
-                .ReturnsAsync(new Textbox
-                {
-                    Properties = new BaseProperty
-                    {
-                        QuestionId = "baseQuestionIdRef3"
-                    }
-                });
+                .ReturnsAsync(new ElementBuilder().WithType(EElementType.Textbox).WithQuestionId("baseQuestionIdRef3").Build());
 
             _transformDataProvider
                 .Setup(_ => _.Get(It.Is<string>(_ => _ == "elementRef4")))
-                .ReturnsAsync(new Textbox
-                {
-                    Properties = new BaseProperty
-                    {
-                        QuestionId = "baseQuestionIdRef4"
-                    }
-                });
+                .ReturnsAsync(new ElementBuilder().WithType(EElementType.Textbox).WithQuestionId("baseQuestionIdRef4").Build());
 
             var element = (Reusable)new ElementBuilder()
                 .WithType(EElementType.Reusable)
