@@ -40,16 +40,16 @@ namespace form_builder.Validators
                     IsValid = true
                 };
             }
-
-            var documentsFiles = documentModel.Select(_ =>  Convert.FromBase64String(_.Content));
             
             var allowedFileTypes = element.Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
 
-            var fileTypes = documentsFiles.Select(_ => _.GetFileType());
+            var fileTypes = documentModel.Select(_ => new MimeTypeFile{ FileType= Convert.FromBase64String(_.Content).GetFileType(), File= _ });
+            var invalidFiles = new List<MimeTypeFile>();
             if (fileTypes != null)
             {
                 var availableFileTypes = fileTypes.Where(_ => _ != null);
-                if (availableFileTypes.Any() && availableFileTypes.All(_ => allowedFileTypes.Contains($".{_.Extension}")))
+                invalidFiles = availableFileTypes.Where(_ => !allowedFileTypes.Contains($".{_.FileType.Extension}")).ToList();
+                if (!invalidFiles.Any())
                 {
                     return new ValidationResult
                     {
@@ -58,15 +58,42 @@ namespace form_builder.Validators
                 }
             }
 
-            var fileTypesErrorMessage = allowedFileTypes.Count > 1
-                ? string.Join(", ", allowedFileTypes.Take(allowedFileTypes.Count - 1)) + $" or {allowedFileTypes.Last()}"
-                : allowedFileTypes.First();
+            return element.Type == EElementType.FileUpload
+               ? SingleFileUpload(allowedFileTypes, documentModel)
+               : MultiFileUpload(allowedFileTypes, invalidFiles);            
+        }
+
+        private ValidationResult MultiFileUpload(List<string> allowedFileTypes, List<MimeTypeFile> invalidFiles)
+        {
+            var fileTypesErrorMessage = GenerateErrorMessage(allowedFileTypes);
+
+            var validationMessage = invalidFiles.Count == 1
+                ? fileTypesErrorMessage
+                : invalidFiles.Select(_ => $"{_.File.FileName} must be a {fileTypesErrorMessage}").Aggregate((curr, acc) => $" {acc} <br/> {curr} ");
 
             return new ValidationResult
             {
                 IsValid = false,
                 Message = $"The selected file must be a {fileTypesErrorMessage.Replace(".", string.Empty)}."
             };
+        }
+
+        private ValidationResult SingleFileUpload(List<string> allowedFileTypes, List<DocumentModel> documentModel)
+        {
+            var fileTypesErrorMessage = GenerateErrorMessage(allowedFileTypes);
+
+            return new ValidationResult
+            {
+                IsValid = false,
+                Message = $"The selected file must be a {fileTypesErrorMessage.Replace(".", string.Empty)}."
+            };
+        }
+
+        private static string GenerateErrorMessage(List<string> allowedFileTypes)
+        {
+            return allowedFileTypes.Count > 1
+                  ? string.Join(", ", allowedFileTypes.Take(allowedFileTypes.Count - 1)) + $" or {allowedFileTypes.Last()}"
+                  : allowedFileTypes.First();
         }
     }
 }

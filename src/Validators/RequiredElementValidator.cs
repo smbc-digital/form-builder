@@ -91,6 +91,7 @@ namespace form_builder.Validators
                         : null;
 
                     isValid = !(value is null);
+                    validationMessage = ValidationConstants.FILEUPLOAD_EMPTY;
                 }
             }
             else

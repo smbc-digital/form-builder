@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Configuration;
@@ -42,7 +43,8 @@ namespace form_builder.Services.FileUploadService
                     viewModel.Add(group.Key, group.Select(_ => new DocumentModel
                     {
                         Content =_.Base64EncodedContent, 
-                        FileSize = _.Length
+                        FileSize = _.Length,
+                        FileName = WebUtility.HtmlEncode(_.UntrustedOriginalFileName)
                     }).ToList());
                 });
 
