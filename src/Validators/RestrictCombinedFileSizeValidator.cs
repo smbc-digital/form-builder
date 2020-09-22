@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.Session;
@@ -25,7 +23,7 @@ namespace form_builder.Validators
 
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            if (element.Type != EElementType.FileUpload && (element.Type != EElementType.MultipleFileUpload || viewModel.ContainsKey(ButtonConstants.NoDataSubmit)))
+            if (element.Type != EElementType.MultipleFileUpload)
                 return new ValidationResult { IsValid = true };
 
             var key = $"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";

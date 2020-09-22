@@ -66,6 +66,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         public static IServiceCollection AddValidators(this IServiceCollection services)
         {
             services.AddTransient<IElementValidator, RequiredElementValidator>();
+            services.AddTransient<IElementValidator, FileUploadElementValidator>();
             services.AddTransient<IElementValidator, NumericValueValidator>();
             services.AddTransient<IElementValidator, AutomaticAddressElementValidator>();
             services.AddTransient<IElementValidator, ManualAddressValidator>();
@@ -86,8 +87,8 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddTransient<IElementValidator, TimeInputValidator>();
             services.AddTransient<IElementValidator, MaxLengthValidator>();
             services.AddTransient<IElementValidator, AddressPostcodeValidator>();
-            services.AddTransient<IElementValidator, RestrictFileSizeValidator>();
             services.AddTransient<IElementValidator, RestrictMimeTypeValidator>();
+            services.AddTransient<IElementValidator, RestrictFileSizeValidator>();
             services.AddTransient<IElementValidator, RestrictCombinedFileSizeValidator>();
 
             return services;

@@ -63,11 +63,8 @@ namespace form_builder.Services.FileUploadService
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-            var formDataKeyToRemove = convertedAnswers.FormData.FirstOrDefault(_ => _.Key.Contains(viewModel[FileUploadConstants.FileToDelete]));
-            convertedAnswers.FormData.Remove(formDataKeyToRemove.Key);
-
-            var pageAnswersString = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault();
-            List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(pageAnswersString.Response.ToString());
+            var currentPageAnswers = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault();
+            List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(currentPageAnswers.Response.ToString());
             response.Remove(response.FirstOrDefault(_ => _.TrustedOriginalFileName.Equals(viewModel[FileUploadConstants.FileToDelete])));
             convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path)).Answers.FirstOrDefault().Response = response;
 
@@ -80,8 +77,7 @@ namespace form_builder.Services.FileUploadService
                 RouteValues = new
                 {
                     form = baseForm.BaseURL,
-                    path,
-                    subPath = FileUploadConstants.SelectedFiles
+                    path
                 }
             };
         }
@@ -108,20 +104,9 @@ namespace form_builder.Services.FileUploadService
          IEnumerable<CustomFormFile> files)
         {
             var element = currentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.MultipleFileUpload));
-            List<object> searchResults = null;
             if (!currentPage.IsValid)
             {
-                var cachedAnswers = _distributedCache.GetString(guid);
-
-                var convertedAnswers = cachedAnswers == null
-                    ? new FormAnswers { Pages = new List<PageAnswers>() }
-                    : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-                if (convertedAnswers.FormData.Any(_ => _.Key.Contains($"{element.Properties.QuestionId}")))
-                {
-                    var search = convertedAnswers.FormData.TakeWhile(_ => _.Key.Contains(element.Properties.QuestionId)).ToList();
-                    searchResults = search.Select(_ => _.Value).ToList();
-                }
-                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, searchResults);
+                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid);
 
                 return new ProcessRequestEntity
                 {
@@ -131,22 +116,16 @@ namespace form_builder.Services.FileUploadService
             }
 
             var model = (viewModel[$"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}"] as IEnumerable<object>).ToList();
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid);
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
 
-            if (model.Any())
+            if (viewModel.ContainsKey(ButtonConstants.NoDataSubmit))
             {
                 return new ProcessRequestEntity
                 {
-                    RedirectToAction = true,
-                    RedirectAction = "Index",
-                    RouteValues = new
-                    {
-                        form = baseForm.BaseURL,
-                        path,
-                        subPath = FileUploadConstants.SelectedFiles
-                    }
+                    Page = currentPage
                 };
             }
+
             return new ProcessRequestEntity
             {
                 RedirectToAction = true,
@@ -154,8 +133,7 @@ namespace form_builder.Services.FileUploadService
                 RouteValues = new
                 {
                     form = baseForm.BaseURL,
-                    path,
-                    subPath = ""
+                    path
                 }
             };
         }     

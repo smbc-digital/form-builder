@@ -11,7 +11,7 @@ namespace form_builder.Helpers.PageHelpers
         
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<object> results = null);
         
-        void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid);
+        void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false);
 
         Dictionary<string, dynamic> GetAnswers();
 
@@ -45,6 +45,6 @@ namespace form_builder.Helpers.PageHelpers
 
         void CheckForAnyConditionType(List<Page> pages);
 
-        List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files);
+        List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload);
     }
 }

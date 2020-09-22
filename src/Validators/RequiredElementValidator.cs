@@ -13,7 +13,8 @@ namespace form_builder.Validators
         {
             if (element.Type == EElementType.DateInput || element.Type == EElementType.Map ||
                 element.Type == EElementType.TimeInput || element.Type == EElementType.DatePicker ||
-                element.Properties.Optional || (element.Type == EElementType.Address && viewModel.IsManual()))
+                element.Type == EElementType.MultipleFileUpload || element.Properties.Optional || 
+                (element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
                 {
@@ -29,7 +30,7 @@ namespace form_builder.Validators
                 validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the " + element.Properties.Label.ToLower();
             }
 
-            if (element.Type == EElementType.FileUpload || element.Type == EElementType.MultipleFileUpload)
+            if (element.Type == EElementType.FileUpload)
             {
                 key = $"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
             }
@@ -78,21 +79,14 @@ namespace form_builder.Validators
             }
 
             bool isValid;
-            if (element.Type == EElementType.FileUpload || element.Type == EElementType.MultipleFileUpload)
+            if (element.Type == EElementType.FileUpload)
             {
-                if (viewModel.ContainsKey(ButtonConstants.NoDataSubmit))
-                {
-                    isValid = true;
-                }
-                else
-                {
-                    List<DocumentModel> value = viewModel.ContainsKey(key)
-                        ? viewModel[key]
-                        : null;
+                List<DocumentModel> value = viewModel.ContainsKey(key)
+                    ? viewModel[key]
+                    : null;
 
-                    isValid = !(value is null);
-                    validationMessage = ValidationConstants.FILEUPLOAD_EMPTY;
-                }
+                isValid = !(value is null);
+                validationMessage = ValidationConstants.FILEUPLOAD_EMPTY;
             }
             else
             {

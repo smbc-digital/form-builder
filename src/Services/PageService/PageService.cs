@@ -22,7 +22,6 @@ using form_builder.Services.StreetService;
 using form_builder.Validators;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -205,14 +204,10 @@ namespace form_builder.Services.PageService
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Organisation))
                 return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            if (files != null && files.Any() || viewModel != null && viewModel.ContainsKey(FileUploadConstants.FileToDelete))
-            {
-                var entity = await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files);
-                if (!viewModel.ContainsKey(ButtonConstants.NoDataSubmit))
-                    return entity;
-            }
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload) && (files != null && files.Any() || viewModel != null && viewModel.ContainsKey(FileUploadConstants.FileToDelete)))
+                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files);
                 
-            if (viewModel != null && !viewModel.ContainsKey(ButtonConstants.NoDataSubmit))
+            if (viewModel != null)
                 _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
             if (!currentPage.IsValid)

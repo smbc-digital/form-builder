@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace form_builder.Models.Elements
 {
@@ -16,7 +19,7 @@ namespace form_builder.Models.Elements
         }
 
         public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
-        public List<object> FileUpload { get; set; }
+        public List<string> CurrentFilesUploaded { get; set; } = new List<string>();
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var allowedFileType = Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
@@ -47,7 +50,13 @@ namespace form_builder.Models.Elements
             Dictionary<string, dynamic> answers,
             List<object> results = null)
         {
-            FileUpload = results ?? new List<object>();
+            var currentAnswer = elementHelper.CurrentValue<JArray>(this, viewModel, page.PageSlug, guid, FileUploadConstants.SUFFIX);
+
+            if(currentAnswer != null){
+                List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(currentAnswer.ToString());
+                CurrentFilesUploaded = response.Select(_ => _.TrustedOriginalFileName).ToList();
+            }
+
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
 

@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Cache;
 using form_builder.Configuration;
-using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ElementHelpers;
@@ -19,7 +18,6 @@ using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
-using form_builder.Services.FileUploadService;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
@@ -86,16 +84,20 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid)
+        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+            var currentPageAnswers = new PageAnswers();
 
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == viewModel["Path"].ToLower()))
+            {
+                currentPageAnswers = convertedAnswers.Pages.Where(_ => _.PageSlug == viewModel["Path"].ToLower()).ToList().FirstOrDefault();
                 convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageSlug != viewModel["Path"].ToLower()).ToList();
+            }
 
             var answers = new List<Answers>();
 
@@ -107,7 +109,7 @@ namespace form_builder.Helpers.PageHelpers
 
             if (files != null && files.Any() && isPageValid)
             {
-                answers = SaveFormFileAnswers(answers, files);
+                answers = SaveFormFileAnswers(answers, files, appendMultipleFileUploadParts, currentPageAnswers);
             }
 
             convertedAnswers.Pages?.Add(new PageAnswers
@@ -120,14 +122,6 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.FormName = form;
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
-
-            if (files == null || !files.Any() || !isPageValid) return;
-
-            var fileList = files.ToList();
-            foreach (var file in fileList)
-            {
-                SaveFormData($"{file.QuestionId}-{file.UntrustedOriginalFileName}-{guid}", file.UntrustedOriginalFileName, guid);
-            }
         }
 
         public Dictionary<string, dynamic> GetAnswers()
@@ -510,7 +504,7 @@ namespace form_builder.Helpers.PageHelpers
 
         }
 
-        public List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files)
+        public List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload)
         {
             files.GroupBy(_ => _.QuestionId).ToList().ForEach(file =>
             {
@@ -523,10 +517,20 @@ namespace form_builder.Helpers.PageHelpers
                     Key = $"file-{key}",
                     TrustedOriginalFileName = WebUtility.HtmlEncode(_.UntrustedOriginalFileName),
                     UntrustedOriginalFileName = _.UntrustedOriginalFileName,
-                    FileSize = _.Length,
-                    Content = _.Base64EncodedContent
-                });
+                    FileSize = _.Length
+                }).ToList();
 
+                if(isMultipleFileUploadElementType)
+                {
+                    var data = currentAnswersForFileUpload.Answers?.FirstOrDefault(_ => _.QuestionId.Equals(file.Key))?.Response;
+                    if(data != null){
+                        List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(data.ToString());
+                        fileUploadModel.AddRange(response.ToList());
+                    }
+                }
+
+                //TODO: remove duplicates keys
+                
                 if (answers.Exists(_ => _.QuestionId == file.Key))
                 {
                     var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId == file.Key);

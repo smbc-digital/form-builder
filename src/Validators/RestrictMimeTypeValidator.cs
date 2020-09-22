@@ -13,12 +13,12 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            if (element.Type != EElementType.FileUpload && element.Type != EElementType.MultipleFileUpload || viewModel.ContainsKey(ButtonConstants.NoDataSubmit))
+            if (element.Type != EElementType.FileUpload && element.Type != EElementType.MultipleFileUpload)
             {              
-                    return new ValidationResult
-                    {
-                        IsValid = true
-                    };                
+                return new ValidationResult
+                {
+                    IsValid = true
+                };                
             }
 
             var key = $"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
@@ -92,8 +92,8 @@ namespace form_builder.Validators
         private static string GenerateErrorMessage(List<string> allowedFileTypes)
         {
             return allowedFileTypes.Count > 1
-                  ? string.Join(", ", allowedFileTypes.Take(allowedFileTypes.Count - 1)) + $" or {allowedFileTypes.Last()}"
-                  : allowedFileTypes.First();
+                  ? string.Join(", ", allowedFileTypes.Take(allowedFileTypes.Count - 1)).ToUpper() + $" or {allowedFileTypes.Last().ToUpper()}"
+                  : allowedFileTypes.First().ToUpper();
         }
     }
 }
