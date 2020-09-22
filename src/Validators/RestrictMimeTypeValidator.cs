@@ -15,7 +15,7 @@ namespace form_builder.Validators
         {
             if (element.Type != EElementType.FileUpload)
             {
-                if (element.Type != EElementType.MultipleFileUpload || viewModel.ContainsKey("continue"))
+                if (element.Type != EElementType.MultipleFileUpload || viewModel.ContainsKey(ButtonConstants.NoDataSubmit))
                 {
                     return new ValidationResult
                     {
@@ -24,7 +24,7 @@ namespace form_builder.Validators
                 }                
             }
 
-            var key = $"{element.Properties.QuestionId}-fileupload";
+            var key = $"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
 
             if (!viewModel.ContainsKey(key))
             {

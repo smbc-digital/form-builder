@@ -277,7 +277,7 @@ namespace form_builder.Services.PageService
             if (formFileUploadElements.Count > 0)
                 formFileUploadElements.ForEach(_ =>
                 {
-                    _distributedCache.Remove($"file-{_.Properties.QuestionId}-fileupload-{sessionGuid}");
+                    _distributedCache.Remove($"file-{_.Properties.QuestionId}{FileUploadConstants.SUFFIX}-{sessionGuid}");
                 });
 
             if(baseForm.DocumentDownload)

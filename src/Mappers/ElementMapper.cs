@@ -102,7 +102,7 @@ namespace form_builder.Mappers
                     .ToList()
                     .SelectMany(_ => _.Answers)
                     .ToList()
-                    .FirstOrDefault(_ => _.QuestionId == $"{question.Properties.QuestionId}-fileupload")?.Response;
+                    .FirstOrDefault(_ => _.QuestionId == $"{question.Properties.QuestionId}{FileUploadConstants.SUFFIX}")?.Response;
                 return fileInput == null ? string.Empty : JsonConvert.DeserializeObject<FileUploadModel>(fileInput.ToString()).TrustedOriginalFileName;
             }
 
@@ -155,7 +155,7 @@ namespace form_builder.Mappers
 
         private object GetFileUploadElementValue(string key, FormAnswers formAnswers)
         {
-            key = $"{key}-fileupload";
+            key = $"{key}{FileUploadConstants.SUFFIX}";
             var model = new File();
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == key)

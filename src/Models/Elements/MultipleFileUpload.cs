@@ -15,7 +15,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.MultipleFileUpload;
         }
 
-        public override string QuestionId => $"{base.QuestionId}-fileupload";
+        public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
         public List<object> FileUpload { get; set; }
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
