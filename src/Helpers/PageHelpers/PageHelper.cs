@@ -522,7 +522,9 @@ namespace form_builder.Helpers.PageHelpers
                 {
                     Key = $"file-{key}",
                     TrustedOriginalFileName = WebUtility.HtmlEncode(_.UntrustedOriginalFileName),
-                    UntrustedOriginalFileName = _.UntrustedOriginalFileName
+                    UntrustedOriginalFileName = _.UntrustedOriginalFileName,
+                    FileSize = _.Length,
+                    Content = _.Base64EncodedContent
                 });
 
                 if (answers.Exists(_ => _.QuestionId == file.Key))

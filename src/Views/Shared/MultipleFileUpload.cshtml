@@ -10,12 +10,12 @@
     <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
 
         <partial name="LabelH1" />
-        
+
         <partial name="InsetText" model="@Model.Properties.IAG" />
 
         <partial name="Hint" />
 
-        <partial name="Error" />
+
 
         @if (Model.FileUpload.Count > 0)
         {
@@ -41,6 +41,8 @@
         </table>
         <br />
 
+        <partial name="Error" />
+
         @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
 
         <button data-prevent-double-click="true"
@@ -48,6 +50,6 @@
                 class="@uploadButtonClasses"
                 id="upload"
                 data-module="govuk-button">
-            Upload file(s)
+            @SystemConstants.UploadFilesButtonText
         </button>
     </div>

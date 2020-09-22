@@ -108,10 +108,20 @@ namespace form_builder.Services.FileUploadService
          IEnumerable<CustomFormFile> files)
         {
             var element = currentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.MultipleFileUpload));
-            
+            List<object> searchResults = null;
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null);
+                var cachedAnswers = _distributedCache.GetString(guid);
+
+                var convertedAnswers = cachedAnswers == null
+                    ? new FormAnswers { Pages = new List<PageAnswers>() }
+                    : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+                if (convertedAnswers.FormData.Any(_ => _.Key.Contains($"{element.Properties.QuestionId}")))
+                {
+                    var search = convertedAnswers.FormData.TakeWhile(_ => _.Key.Contains(element.Properties.QuestionId)).ToList();
+                    searchResults = search.Select(_ => _.Value).ToList();
+                }
+                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, searchResults);
 
                 return new ProcessRequestEntity
                 {

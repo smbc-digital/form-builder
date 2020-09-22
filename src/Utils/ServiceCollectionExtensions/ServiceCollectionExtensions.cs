@@ -88,6 +88,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddTransient<IElementValidator, AddressPostcodeValidator>();
             services.AddTransient<IElementValidator, RestrictFileSizeValidator>();
             services.AddTransient<IElementValidator, RestrictMimeTypeValidator>();
+            services.AddTransient<IElementValidator, RestrictCombinedFileSizeValidator>();
 
             return services;
         }
