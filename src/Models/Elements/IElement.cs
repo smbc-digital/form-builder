@@ -34,7 +34,6 @@ namespace form_builder.Models.Elements
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
-            Dictionary<string, dynamic> answers,
             List<object> results = null);
 
         Dictionary<string, dynamic> GenerateElementProperties(string type = "");

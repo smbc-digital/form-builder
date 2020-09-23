@@ -57,7 +57,7 @@
 
 </div>
 
-@if (Model.CurrentFilesUploaded.Any() && !Model.Properties.Optional || Model.Properties.Optional)
+@if ((Model.CurrentFilesUploaded.Any() && !Model.Properties.Optional) || Model.Properties.Optional)
 {
     <button data-prevent-double-click="true"
             data-disable-on-click=true

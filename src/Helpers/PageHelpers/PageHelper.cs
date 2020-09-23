@@ -66,8 +66,6 @@ namespace form_builder.Helpers.PageHelpers
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
 
-            var answers = GetAnswers();
-
             foreach (var element in page.Elements)
                 formModel.RawHTML += await element.RenderAsync(
                     _viewRender,
@@ -77,7 +75,6 @@ namespace form_builder.Helpers.PageHelpers
                     page,
                     baseForm,
                     _environment,
-                    answers,
                     results
                     );
 
@@ -122,17 +119,6 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.FormName = form;
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
-        }
-
-        public Dictionary<string, dynamic> GetAnswers()
-        {
-            var guid = _sessionHelper.GetSessionGuid();
-            var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = !string.IsNullOrEmpty(formData)
-                ? JsonConvert.DeserializeObject<FormAnswers>(formData)
-                : new FormAnswers { Pages = new List<PageAnswers>() };
-
-            return convertedAnswers.Pages.SelectMany(_ => _.Answers).ToDictionary(_ => _.QuestionId, _ => _.Response);
         }
 
         public void HasDuplicateQuestionIDs(List<Page> pages, string formName)
