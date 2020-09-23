@@ -525,7 +525,7 @@ namespace form_builder.Helpers.PageHelpers
                     var data = currentAnswersForFileUpload.Answers?.FirstOrDefault(_ => _.QuestionId.Equals(file.Key))?.Response;
                     if(data != null){
                         List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(data.ToString());
-                        fileUploadModel.AddRange(response.Where(_ => !fileUploadModel.Any(x => x.TrustedOriginalFileName == _.TrustedOriginalFileName)).ToList());
+                        fileUploadModel.InsertRange(0, response.Where(_ => !fileUploadModel.Any(x => x.TrustedOriginalFileName == _.TrustedOriginalFileName)).ToList());
                     }
                 }
 
