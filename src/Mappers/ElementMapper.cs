@@ -66,6 +66,7 @@ namespace form_builder.Mappers
                     return GetOrganisationElementValue(key, formAnswers);
 
                 case EElementType.FileUpload:
+                case EElementType.MultipleFileUpload:
                     return GetFileUploadElementValue(key, formAnswers);
 
                 default:
@@ -156,7 +157,9 @@ namespace form_builder.Mappers
         private object GetFileUploadElementValue(string key, FormAnswers formAnswers)
         {
             key = $"{key}{FileUploadConstants.SUFFIX}";
-            var model = new File();
+           
+            var listOfFiles = new List<File>();
+
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId == key)
                 .ToList()
@@ -164,19 +167,25 @@ namespace form_builder.Mappers
 
             if (value != null && value.Response != null)
             {
-                FileUploadModel uploadModel = JsonConvert.DeserializeObject<FileUploadModel>(value.Response.ToString());
+                List<FileUploadModel> uploadedFiles = JsonConvert.DeserializeObject<List<FileUploadModel>>(value.Response.ToString());
 
-                var fileData = _distributedCacheWrapper.GetString(uploadModel.Key);
+                foreach (var file in uploadedFiles)
+                {
+                    var fileData = _distributedCacheWrapper.GetString(file.Key);
 
-                if (fileData == null)
-                    throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {uploadModel.Key} from the distributed cache");
+                    if (fileData == null)
+                        throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {file.Key} from the distributed cache");
+                    
+                    var model = new File();
+                    model.Content = fileData;
+                    model.TrustedOriginalFileName = file.UntrustedOriginalFileName;
+                    model.UntrustedOriginalFileName = file.TrustedOriginalFileName;
+                    model.KeyName = key;
 
-                model.Content = fileData;
-                model.TrustedOriginalFileName = uploadModel.UntrustedOriginalFileName;
-                model.UntrustedOriginalFileName = uploadModel.TrustedOriginalFileName;
-                model.KeyName = key;
-                
-                return model;
+                    listOfFiles.Add(model);
+                }
+                                                
+                return listOfFiles;
             }
 
             return null;

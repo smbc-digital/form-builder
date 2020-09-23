@@ -13,12 +13,6 @@ namespace form_builder.Models.Elements
 {
     public class Button : Element
     {
-        public bool DisplaySubmitDataButton { get; set; } = true;
-
-        public bool DisplayNonDataSubmitButton { get; set; } = false;
-
-        public List<Condition> Conditions { get; set; }
-
         public Button()
         {
             Type = EElementType.Button;
@@ -36,31 +30,12 @@ namespace form_builder.Models.Elements
             List<object> results = null
             )
         {
-            Properties.Text = GetButtonText(page.Elements, viewModel, page);
-
-            if (Conditions != null)
-            {
-                DisplaySubmitDataButton = CheckButtonMeetsConditions(answers);
-
-                if (DisplaySubmitDataButton && page.Elements.Any(_ => _.Type.Equals(EElementType.MultipleFileUpload)))
-                {
-                    DisplayNonDataSubmitButton = true;
-                    DisplaySubmitDataButton = false;
-                }
-            }
+            Properties.Text = GetButtonText(page.Elements, viewModel, page);          
 
             if(!Properties.DisableOnClick)
                 Properties.DisableOnClick = DisableIfSubmitOrLookup(page.Behaviours, page.Elements, viewModel);
 
             return viewRender.RenderAsync("Button", this);
-        }
-
-        private bool CheckButtonMeetsConditions(Dictionary<string, dynamic> answers)
-        {
-            var conditionValidator = new ConditionValidator();
-
-            return Conditions.Count == 0 ||
-                   Conditions.All(condition => conditionValidator.IsValid(condition, answers));
         }
 
         private bool CheckForBehaviour(List<Behaviour> behaviour)

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
@@ -18,6 +19,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.MultipleFileUpload;
         }
 
+        public string AllowFileTypeText { get { return Properties.AllowedFileTypes?.ToReadableFileType() ?? SystemConstants.AcceptedMimeTypes.ToReadableFileType();} }
         public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
         public List<string> CurrentFilesUploaded { get; set; } = new List<string>();
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")

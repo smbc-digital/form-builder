@@ -5,47 +5,68 @@
     var elements = Model.GenerateElementProperties();
     elements.Add("class", "govuk-file-upload govuk-!-margin-bottom-5 govuk-!-display-block");
     var uploadButtonClasses = Model.CurrentFilesUploaded.Any() ? "govuk-button govuk-button--secondary" : "govuk-button";
+    var maxFileSize = $"{Model.Properties.MaxFileSize}MB";
 }
 
-    <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
 
-        <partial name="LabelH1" />
+    <partial name="LabelH1" />
 
-        <partial name="InsetText" model="@Model.Properties.IAG" />
+    <partial name="InsetText" model="@Model.Properties.IAG" />
 
-        <partial name="Hint" />
+    <p class="smbc-body">You can upload @Model.AllowFileTypeText.</p>
+    <p class="smbc-body">The maximum individual file size is @maxFileSize.</p>
+    <p class="smbc-body">The total size of all your added files must not be more than @Model.Properties.MaxCombinedFileSize.</p>
 
-        @if (Model.CurrentFilesUploaded.Any())
-        {
-            <label class="govuk-label govuk-label--s govuk-!-margin-bottom-5">Files uploaded</label>
-             <table style="width:80%;">
-                @foreach (var file in Model.CurrentFilesUploaded)
-                {
-                    <tr>
-                        <th>
-                            <label class="govuk-label" style="text-align:left;">@file</label>
-                        </th>
-                        <th>
-                            <button type="submit" name="@FileUploadConstants.FileToDelete" value="@file"
-                                    formaction="Index" formmethod="post" style=" background: none !important; border: none; padding: 0 !important; color: #069; text-decoration: underline; cursor: pointer;">
-                                Delete
-                            </button>
-                        </th>
-                    </tr>
-                }
-            </table>
-            <br />
-        }
+    <partial name="Hint" />
 
-        <partial name="Error" />
+    @if (Model.CurrentFilesUploaded.Any())
+    {
+        <label class="govuk-label govuk-label--s govuk-!-margin-bottom-5">Files uploaded</label>
+        <table style="width:80%;">
+            @foreach (var file in Model.CurrentFilesUploaded)
+            {
+                <tr>
+                    <th>
+                        <label class="govuk-label" style="text-align:left;">@file</label>
+                    </th>
+                    <th>
+                        <button type="submit" name="@FileUploadConstants.FileToDelete" value="@file"
+                                formaction="Index" formmethod="post" style=" background: none !important; border: none; padding: 0 !important; color: #069; text-decoration: underline; cursor: pointer;">
+                            Delete
+                        </button>
+                    </th>
+                </tr>
+            }
+        </table>
+        <br />
+    }
 
-        @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
+    <partial name="Error" />
 
-        <button data-prevent-double-click="true"
-                @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
-                class="@uploadButtonClasses"
-                id="upload"
-                data-module="govuk-button">
-            @SystemConstants.UploadFilesButtonText
-        </button>
-    </div>
+    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
+
+    <button data-prevent-double-click="true"
+            @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
+            class="@uploadButtonClasses"
+            id="upload"
+            data-module="govuk-button">
+        @SystemConstants.UploadFilesButtonText
+    </button>
+
+</div>
+
+@if (Model.CurrentFilesUploaded.Any() && !Model.Properties.Optional || Model.Properties.Optional)
+{
+    <button data-prevent-double-click="true"
+            data-disable-on-click=true
+            class="govuk-button"
+            id="@Model.QuestionId-SubmitButton"
+            data-module="govuk-button"
+            type="submit"
+            formaction="index" formmethod="post"
+            name="@ButtonConstants.NoDataSubmit"
+            value="@ButtonConstants.NoDataSubmit">
+        Continue
+    </button>
+}

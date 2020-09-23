@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using MimeDetective;
@@ -65,7 +66,7 @@ namespace form_builder.Validators
 
         private ValidationResult MultiFileUpload(List<string> allowedFileTypes, List<MimeTypeFile> invalidFiles)
         {
-            var fileTypesErrorMessage = GenerateErrorMessage(allowedFileTypes);
+            var fileTypesErrorMessage = allowedFileTypes.ToReadableFileType();
 
             var validationMessage = invalidFiles.Count == 1
                 ? fileTypesErrorMessage
@@ -80,20 +81,13 @@ namespace form_builder.Validators
 
         private ValidationResult SingleFileUpload(List<string> allowedFileTypes, List<DocumentModel> documentModel)
         {
-            var fileTypesErrorMessage = GenerateErrorMessage(allowedFileTypes);
+            var fileTypesErrorMessage = allowedFileTypes.ToReadableFileType();
 
             return new ValidationResult
             {
                 IsValid = false,
                 Message = $"The selected file must be a {fileTypesErrorMessage.Replace(".", string.Empty)}."
             };
-        }
-
-        private static string GenerateErrorMessage(List<string> allowedFileTypes)
-        {
-            return allowedFileTypes.Count > 1
-                  ? string.Join(", ", allowedFileTypes.Take(allowedFileTypes.Count - 1)).ToUpper() + $" or {allowedFileTypes.Last().ToUpper()}"
-                  : allowedFileTypes.First().ToUpper();
         }
     }
 }
