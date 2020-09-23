@@ -4,7 +4,6 @@
     var sizeValidationError = $"{Model.QuestionId}-fileSizeError";
     var elements = Model.GenerateElementProperties();
     elements.Add("class", "govuk-file-upload govuk-!-margin-bottom-5 govuk-!-display-block");
-    var uploadButtonClasses = Model.CurrentFilesUploaded.Any() ? "govuk-button govuk-button--secondary" : "govuk-button";
     var maxFileSize = $"{Model.Properties.MaxFileSize}MB";
     var maxFileSizeText = $"{Model.MaxFileSizeText}MB";
 }
@@ -24,20 +23,21 @@
     @if (Model.CurrentFilesUploaded.Any())
     {
         <label class="govuk-label govuk-label--s govuk-!-margin-bottom-5">Files uploaded</label>
-        <table style="width:80%;">
+        <table class="smbc-table govuk-grid-column-full">
             @foreach (var file in Model.CurrentFilesUploaded)
             {
-                <tr>
-                    <th>
-                        <label class="govuk-label" style="text-align:left;">@file</label>
-                    </th>
-                    <th>
+            <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">@file</td>
+                    <td class="govuk-table__cell">
                         <button type="submit" name="@FileUploadConstants.FileToDelete" value="@file"
                                 formaction="Index" formmethod="post" style=" background: none !important; border: none; padding: 0 !important; color: #069; text-decoration: underline; cursor: pointer;">
                             Delete
                         </button>
-                    </th>
+                    </td>
                 </tr>
+            </tbody>
+
             }
         </table>
         <br />
@@ -49,7 +49,7 @@
 
     <button data-prevent-double-click="true"
             @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
-            class="@uploadButtonClasses"
+            class="govuk-button govuk-button--secondary"
             id="upload"
             data-module="govuk-button">
         @SystemConstants.UploadFilesButtonText
