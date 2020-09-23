@@ -2,6 +2,7 @@
 using System.Linq;
 using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -60,7 +61,7 @@ namespace form_builder.Validators
             return new ValidationResult
             {
                 IsValid = false,
-                Message = $"The total size of all your added files must not be more than {element.Properties.MaxCombinedFileSize}MB"
+                Message = $"The total size of all your added files must not be more than {SystemConstants.DefaultMaxCombinedFileSize.ReadableMaxFileSize()}MB"
             };
         }
     }

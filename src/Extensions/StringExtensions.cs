@@ -39,5 +39,11 @@ namespace form_builder.Extensions
                     throw new Exception("Unknown environment name");
             }
         }
+
+        public static int ReadableMaxFileSize(this int value)
+        {
+            var megaByteValue = (value / 1024f) / 1024f;
+            return Convert.ToInt32(megaByteValue);
+        }
     }
 }

@@ -20,6 +20,9 @@ namespace form_builder.Models.Elements
         }
 
         public string AllowFileTypeText { get { return Properties.AllowedFileTypes?.ToReadableFileType() ?? SystemConstants.AcceptedMimeTypes.ToReadableFileType();} }
+
+        public int MaxFileSizeText { get { return Properties.MaxCombinedFileSize == 0 ? SystemConstants.DefaultMaxCombinedFileSize.ReadableMaxFileSize() : Properties.MaxCombinedFileSize; } }
+
         public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
         public List<string> CurrentFilesUploaded { get; set; } = new List<string>();
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
