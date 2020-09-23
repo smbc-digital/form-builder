@@ -51,10 +51,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 { $"{organisationElement.Properties.QuestionId}-organisation", "test org" }
             };
 
-            var answers = new Dictionary<string, dynamic>();
-
             //Act
-            await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object, answers);
+            await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"),It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -89,15 +87,13 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 { $"{organisationElement.Properties.QuestionId}-organisation", "test org" }
             };
 
-            var answers = new Dictionary<string, dynamic>();
-
             var searchResults = new List<object>
             {
                 new OrganisationSearchResult{ Reference = "123455", Name = "name123" }
             };
 
             //Act
-            await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, answers, searchResults);
+            await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, searchResults);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"),It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()), Times.Once);

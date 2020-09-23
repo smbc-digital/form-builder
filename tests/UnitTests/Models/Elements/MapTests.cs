@@ -32,8 +32,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var viewModel = new Dictionary<string, dynamic>();
 
-            var answers = new Dictionary<string, dynamic>();
-
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .Build();
@@ -46,8 +44,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 viewModel,
                 page,
                 schema,
-                _mockHostingEnv.Object,
-                answers);
+                _mockHostingEnv.Object);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Map")), It.IsAny<Map>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
