@@ -115,6 +115,28 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
+            if(currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.NoDataSubmit) && (files == null || !files.Any()))
+            {
+                return new ProcessRequestEntity
+                {
+                    Page = currentPage
+                };
+            }
+
+            if(!viewModel.ContainsKey(ButtonConstants.NoDataSubmit) && (files == null || !files.Any()))
+            {
+                return new ProcessRequestEntity
+                {
+                    RedirectToAction = true,
+                    RedirectAction = "Index",
+                    RouteValues = new
+                    {
+                        form = baseForm.BaseURL,
+                        path
+                    }
+                };
+            }
+
             var model = (viewModel[$"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}"] as IEnumerable<object>).ToList();
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
 

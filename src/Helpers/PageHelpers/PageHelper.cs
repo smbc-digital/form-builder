@@ -525,12 +525,11 @@ namespace form_builder.Helpers.PageHelpers
                     var data = currentAnswersForFileUpload.Answers?.FirstOrDefault(_ => _.QuestionId.Equals(file.Key))?.Response;
                     if(data != null){
                         List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(data.ToString());
-                        fileUploadModel.AddRange(response.ToList());
+                        fileUploadModel.AddRange(response.Where(_ => !fileUploadModel.Any(x => x.TrustedOriginalFileName == _.TrustedOriginalFileName)).ToList());
                     }
                 }
 
                 //TODO: remove duplicates keys
-                
                 if (answers.Exists(_ => _.QuestionId == file.Key))
                 {
                     var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId == file.Key);

@@ -3,7 +3,7 @@
 @{
     var sizeValidationError = $"{Model.QuestionId}-fileSizeError";
     var elements = Model.GenerateElementProperties();
-    elements.Add("class", "govuk-file-upload govuk-!-margin-bottom-9 govuk-!-display-block");
+    elements.Add("class", "govuk-file-upload govuk-!-margin-bottom-5 govuk-!-display-block");
     var uploadButtonClasses = Model.CurrentFilesUploaded.Any() ? "govuk-button govuk-button--secondary" : "govuk-button";
 }
 
@@ -17,8 +17,7 @@
 
         @if (Model.CurrentFilesUploaded.Any())
         {
-            <label class="govuk-label govuk-label--s">Files uploaded</label>
-            <br />
+            <label class="govuk-label govuk-label--s govuk-!-margin-bottom-5">Files uploaded</label>
              <table style="width:80%;">
                 @foreach (var file in Model.CurrentFilesUploaded)
                 {

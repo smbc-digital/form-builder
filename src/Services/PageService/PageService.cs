@@ -204,11 +204,11 @@ namespace form_builder.Services.PageService
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Organisation))
                 return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload) && (files != null && files.Any() || viewModel != null && viewModel.ContainsKey(FileUploadConstants.FileToDelete)))
+            // && (files != null && files.Any() || viewModel != null && viewModel.ContainsKey(FileUploadConstants.FileToDelete)
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
                 return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files);
-                
-            if (viewModel != null)
-                _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
+            
+            _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
             if (!currentPage.IsValid)
             {
