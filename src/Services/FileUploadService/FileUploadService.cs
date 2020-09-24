@@ -48,7 +48,20 @@ namespace form_builder.Services.FileUploadService
             return viewModel;
         }
 
-        public ProcessRequestEntity RemoveFile(
+        public async Task<ProcessRequestEntity> ProcessFile(
+            Dictionary<string, dynamic> viewModel,
+            Page currentPage,
+            FormSchema baseForm,
+            string guid,
+            string path,
+            IEnumerable<CustomFormFile> files)
+        {
+            return viewModel.ContainsKey(FileUploadConstants.FileToDelete) 
+                ? RemoveFile(viewModel, baseForm, path, guid) 
+                : await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files);
+        }
+
+        private ProcessRequestEntity RemoveFile(
             Dictionary<string, dynamic> viewModel,
             FormSchema baseForm,
             string path, 
@@ -77,19 +90,6 @@ namespace form_builder.Services.FileUploadService
                     path
                 }
             };
-        }
-
-        public async Task<ProcessRequestEntity> ProcessFile(
-            Dictionary<string, dynamic> viewModel,
-            Page currentPage,
-            FormSchema baseForm,
-            string guid,
-            string path,
-            IEnumerable<CustomFormFile> files)
-        {
-            return viewModel.ContainsKey(FileUploadConstants.FileToDelete) 
-                ? RemoveFile(viewModel, baseForm, path, guid) 
-                : await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files);
         }
 
         private async Task<ProcessRequestEntity> ProcessSelectedFiles(
