@@ -17,26 +17,26 @@
 
     @if (Model.CurrentFilesUploaded.Any())
     {
-        <label class="govuk-label govuk-label--s govuk-!-margin-bottom-5">Files uploaded</label>
-        <table class="smbc-table govuk-grid-column-full">
-            @foreach (var file in Model.CurrentFilesUploaded)
-            {
-            <tbody class="govuk-table__body">
-                <tr class="govuk-table__row">
-                    <td class="govuk-table__cell">@file</td>
-                    <td class="govuk-table__cell">
-                        <button type="submit" name="@FileUploadConstants.FileToDelete" value="@file"
-                                formaction="Index" 
-                                formmethod="post" 
-                                class="smbc-button--clear">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
+            <label class="govuk-label govuk-label--s govuk-!-margin-bottom-5">Files uploaded</label>
+            <table class="govuk-table">
+                @foreach (var file in Model.CurrentFilesUploaded)
+                {
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">@file</td>
+                        <td class="govuk-table__cell">
+                            <button type="submit" name="@FileUploadConstants.FileToDelete" value="@file"
+                                    formaction="Index" 
+                                    formmethod="post" 
+                                    class="govuk-button smbc-button--link">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
 
-            }
-        </table>
+                }
+            </table>
     }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
@@ -46,13 +46,13 @@
 
 </div>
 
-    <button data-prevent-double-click="true"
-            @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
-            class="govuk-button govuk-button--secondary"
-            id="upload"
-            data-module="govuk-button">
-        @SystemConstants.UploadFilesButtonText
-    </button>
+<button data-prevent-double-click="true"
+        @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
+        class="govuk-button govuk-button--secondary"
+        id="upload"
+        data-module="govuk-button">
+    @SystemConstants.UploadFilesButtonText
+</button>
 
 @if ((Model.CurrentFilesUploaded.Any() && !Model.Properties.Optional) || Model.Properties.Optional)
 {
