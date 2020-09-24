@@ -20,9 +20,7 @@ namespace form_builder.Conditions
             { ECondition.LessThan, IntegerComparator.IsLessThan },
             { ECondition.GreaterThanEqualTo, IntegerComparator.IsGreaterThanEqualTo },
             { ECondition.LessThanEqualTo, IntegerComparator.IsLessThanEqualTo },
-            { ECondition.EndsWith, StringComparator.EndsWith },
-            { ECondition.IsOneOf, StringComparator.IsOneOf },
-            { ECondition.HasFilesUploaded, StringComparator.HasFilesUploaded }
+            { ECondition.EndsWith, StringComparator.EndsWith }
         };
 
         public bool IsValid(Condition condition, Dictionary<string, dynamic> viewModel) 
