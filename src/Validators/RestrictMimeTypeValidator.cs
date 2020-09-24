@@ -48,8 +48,13 @@ namespace form_builder.Validators
             var invalidFiles = new List<MimeTypeFile>();
             if (fileTypes != null)
             {
-                var availableFileTypes = fileTypes.Where(_ => _ != null);
-                invalidFiles = availableFileTypes.Where(_ => !allowedFileTypes.Contains($".{_.FileType.Extension}")).ToList();
+                var availableFileTypes = fileTypes.Where(_ => _ != null && _.FileType != null);
+                var unknownFileTypes = fileTypes.Where(_ => _ != null && _.FileType == null);
+
+                if (unknownFileTypes.Any())
+                    invalidFiles.AddRange(unknownFileTypes.ToList());
+
+                invalidFiles.AddRange(availableFileTypes.Where(_ => !allowedFileTypes.Contains($".{_.FileType.Extension}")).ToList());
                 if (!invalidFiles.Any())
                 {
                     return new ValidationResult

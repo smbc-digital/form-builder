@@ -113,7 +113,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.StartsWith("The selected file must be a png", result.Message);
+            Assert.StartsWith("The selected file must be a PNG", result.Message);
         }
     }
 }

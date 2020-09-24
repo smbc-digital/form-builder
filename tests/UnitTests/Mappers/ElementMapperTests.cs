@@ -632,7 +632,7 @@ namespace form_builder_tests.UnitTests.Mappers
                             new Answers
                             {
                                 QuestionId = "fileUpload_fileUploadTestKey-fileupload",
-                                Response = JsonConvert.SerializeObject(new FileUploadModel{ UntrustedOriginalFileName = key })
+                                Response = JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel{ UntrustedOriginalFileName = key } })
                             }
                         }
                     }
@@ -649,12 +649,12 @@ namespace form_builder_tests.UnitTests.Mappers
 
             // Assert
             _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
-            var model = Assert.IsType<File>(result);
-            Assert.Equal("testfile", model.Content);
+            var model = Assert.IsType<List<File>>(result);
+            Assert.Equal("testfile", model[0].Content);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldCall_ThrowExceptionWhenDistributedCacheThrows()
+        public void GetAnswerValue_Should_ThrowException_WhenDistributedCacheThrows()
         {
             // Arrange
             var key = "fileUploadTestKey";
@@ -670,10 +670,15 @@ namespace form_builder_tests.UnitTests.Mappers
                             new Answers
                             {
                                 QuestionId = $"{key}-fileupload",
-                                Response = JsonConvert.SerializeObject(new FileUploadModel
-                                {
-                                    Key = key
-                                })
+                                Response = JsonConvert.SerializeObject(
+                                    new List<FileUploadModel>
+                                    {
+                                        new FileUploadModel
+                                        {
+                                            Key = key
+                                        }
+                                    }
+                                )
                             }
                         }
                     }
