@@ -6,10 +6,7 @@
     elements.Add("class", "govuk-file-upload govuk-!-margin-bottom-5 govuk-!-display-block");
 }
 
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-
     <partial name="LabelH1" />
-
     <partial name="InsetText" model="@Model.Properties.IAG" />
 
     <p class="smbc-body">You can upload @Model.AllowFileTypeText.</p>
@@ -40,12 +37,14 @@
 
             }
         </table>
-        <br />
     }
 
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
     <partial name="Error" />
 
     @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
+
+</div>
 
     <button data-prevent-double-click="true"
             @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
@@ -55,13 +54,11 @@
         @SystemConstants.UploadFilesButtonText
     </button>
 
-</div>
-
 @if ((Model.CurrentFilesUploaded.Any() && !Model.Properties.Optional) || Model.Properties.Optional)
 {
     <button data-prevent-double-click="true"
             data-disable-on-click=true
-            class="govuk-button"
+            class="govuk-button govuk-!-display-block"
             id="@Model.QuestionId-SubmitButton"
             data-module="govuk-button"
             type="submit"
