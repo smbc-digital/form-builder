@@ -19,12 +19,12 @@
     {
             <label class="govuk-label govuk-label--s govuk-!-margin-bottom-5">Files uploaded</label>
             <table class="govuk-table">
+                <tbody class="govuk-table__body">
                 @foreach (var file in Model.CurrentFilesUploaded)
                 {
-                <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell">@file</td>
-                        <td class="govuk-table__cell">
+                        <td class="govuk-table__cell smbc-table__cell--wrap smbc-!-width-90">@file</td>
+                        <td class="govuk-table__cell smbc-!-width-10">
                             <button type="submit" name="@FileUploadConstants.FileToDelete" value="@file"
                                     formaction="Index" 
                                     formmethod="post" 
@@ -33,9 +33,8 @@
                             </button>
                         </td>
                     </tr>
-                </tbody>
-
                 }
+                </tbody>
             </table>
     }
 
