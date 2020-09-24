@@ -4,8 +4,6 @@
     var sizeValidationError = $"{Model.QuestionId}-fileSizeError";
     var elements = Model.GenerateElementProperties();
     elements.Add("class", "govuk-file-upload govuk-!-margin-bottom-5 govuk-!-display-block");
-    var maxFileSize = $"{Model.Properties.MaxFileSize}MB";
-    var maxFileSizeText = $"{Model.MaxFileSizeText}MB";
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
@@ -15,8 +13,8 @@
     <partial name="InsetText" model="@Model.Properties.IAG" />
 
     <p class="smbc-body">You can upload @Model.AllowFileTypeText.</p>
-    <p class="smbc-body">The maximum individual file size is @maxFileSize.</p>
-    <p class="smbc-body">The total size of all your added files must not be more than @maxFileSizeText.</p>
+    <p class="smbc-body">The maximum individual file size is @Model.MaxFileSizeText.</p>
+    <p class="smbc-body">The total size of all your added files must not be more than @Model.MaxCombinedFileSizeText.</p>
 
     <partial name="Hint" />
 

@@ -61,7 +61,7 @@ namespace form_builder.Validators
             return new ValidationResult
             {
                 IsValid = false,
-                Message = $"The total size of all your added files must not be more than {SystemConstants.DefaultMaxCombinedFileSize.ReadableMaxFileSize()}MB"
+                Message = $"The total size of all your added files must not be more than {maxCombinedFileSize.ToReadableMaxFileSize()}MB"
             };
         }
     }

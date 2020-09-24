@@ -40,7 +40,7 @@ namespace form_builder.Extensions
             }
         }
 
-        public static int ReadableMaxFileSize(this int value)
+        public static int ToReadableMaxFileSize(this int value)
         {
             var megaByteValue = (value / 1024f) / 1024f;
             return Convert.ToInt32(megaByteValue);
