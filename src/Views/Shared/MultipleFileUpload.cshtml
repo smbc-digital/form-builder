@@ -3,7 +3,7 @@
 @{
     var sizeValidationError = $"{Model.QuestionId}-fileSizeError";
     var elements = Model.GenerateElementProperties();
-    elements.Add("class", "govuk-file-upload govuk-!-margin-bottom-5 govuk-!-display-block");
+    elements.Add("class", "smbc-file-upload govuk-!-margin-bottom-5 govuk-!-display-block");
 }
 
     <partial name="LabelH1" />
@@ -28,7 +28,7 @@
                             <button type="submit" name="@FileUploadConstants.FileToDelete" value="@file"
                                     formaction="Index" 
                                     formmethod="post" 
-                                    class="govuk-button smbc-button--link">
+                                    class="govuk-button smbc-button--link smbc-!-alignment-right">
                                 Delete
                             </button>
                         </td>
