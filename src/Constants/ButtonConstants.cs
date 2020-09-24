@@ -2,6 +2,6 @@
 {
     public class ButtonConstants
     {
-        public const string NoDataSubmit = "noDataSubmit";
+        public const string NO_DATA_SUBMIT = "noDataSubmit";
     }
 }

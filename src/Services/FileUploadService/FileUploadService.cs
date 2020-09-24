@@ -56,7 +56,7 @@ namespace form_builder.Services.FileUploadService
             string path,
             IEnumerable<CustomFormFile> files)
         {
-            return viewModel.ContainsKey(FileUploadConstants.FileToDelete) 
+            return viewModel.ContainsKey(FileUploadConstants.FILE_TO_DELETE) 
                 ? RemoveFile(viewModel, baseForm, path, guid) 
                 : await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files);
         }
@@ -75,7 +75,7 @@ namespace form_builder.Services.FileUploadService
 
             var currentPageAnswers = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault();
             List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(currentPageAnswers.Response.ToString());
-            response.Remove(response.FirstOrDefault(_ => _.TrustedOriginalFileName.Equals(viewModel[FileUploadConstants.FileToDelete])));
+            response.Remove(response.FirstOrDefault(_ => _.TrustedOriginalFileName.Equals(viewModel[FileUploadConstants.FILE_TO_DELETE])));
             convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path)).Answers.FirstOrDefault().Response = response;
 
             _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
@@ -112,7 +112,7 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            if(currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.NoDataSubmit) && (files == null || !files.Any()))
+            if(currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.NO_DATA_SUBMIT) && (files == null || !files.Any()))
             {
                 return new ProcessRequestEntity
                 {
@@ -120,7 +120,7 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            if(!viewModel.ContainsKey(ButtonConstants.NoDataSubmit) && (files == null || !files.Any()))
+            if(!viewModel.ContainsKey(ButtonConstants.NO_DATA_SUBMIT) && (files == null || !files.Any()))
             {
                 return new ProcessRequestEntity
                 {
@@ -137,7 +137,7 @@ namespace form_builder.Services.FileUploadService
             var model = (viewModel[$"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}"] as IEnumerable<object>).ToList();
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
 
-            if (viewModel.ContainsKey(ButtonConstants.NoDataSubmit))
+            if (viewModel.ContainsKey(ButtonConstants.NO_DATA_SUBMIT))
             {
                 return new ProcessRequestEntity
                 {
