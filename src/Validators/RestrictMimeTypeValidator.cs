@@ -75,7 +75,7 @@ namespace form_builder.Validators
 
             var validationMessage = invalidFiles.Count == 1
                 ? $"The selected file must be a {fileTypesErrorMessage.Replace(".", string.Empty)}."
-                : invalidFiles.Select(_ => $"{_.File.FileName} must be a {fileTypesErrorMessage}").Aggregate((curr, acc) => $" {acc} <br/> {curr} ");
+                : invalidFiles.Select(_ => $"{_.File.FileName} must be a {fileTypesErrorMessage}").Aggregate((curr, acc) => $"{acc} <br/> {curr}");
 
             return new ValidationResult
             {
