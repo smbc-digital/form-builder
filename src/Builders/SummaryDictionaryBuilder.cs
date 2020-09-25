@@ -19,18 +19,7 @@ namespace form_builder.Builders
 				_filesData.Add($"{question}: {answer}");
 			else
 			{
-				if (type == EElementType.Address)
-				{
-					_data.Add("Address", answer);
-				}
-				else if (type == EElementType.Street)
-				{
-					_data.Add("Street", answer);
-				}
-				else
-				{
-					_data.Add(question, answer);
-				}
+				_data.Add(question, answer);
 			}
 		}
 
