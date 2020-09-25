@@ -98,13 +98,23 @@ namespace form_builder.Mappers
 
         public string GetAnswerStringValue(IElement question, FormAnswers formAnswers)
         {
-            if(question.Type == EElementType.FileUpload){
+            if(question.Type == EElementType.FileUpload || question.Type == EElementType.MultipleFileUpload)
+            {
                 var fileInput = formAnswers.Pages
                     .ToList()
                     .SelectMany(_ => _.Answers)
                     .ToList()
                     .FirstOrDefault(_ => _.QuestionId == $"{question.Properties.QuestionId}{FileUploadConstants.SUFFIX}")?.Response;
-                return fileInput == null ? string.Empty : JsonConvert.DeserializeObject<FileUploadModel>(fileInput.ToString()).TrustedOriginalFileName;
+
+                if(fileInput == null)
+                    return string.Empty;
+
+                List<FileUploadModel> fileUploadData = JsonConvert.DeserializeObject<List<FileUploadModel>>(fileInput.ToString());
+
+                if(question.Type == EElementType.FileUpload)
+                    return fileUploadData.FirstOrDefault()?.TrustedOriginalFileName;
+
+                return fileUploadData.Any() ? fileUploadData.Select(_ => _.TrustedOriginalFileName).Aggregate((cur, acc) => $"{acc} \\r\\n\\ {cur}") : string.Empty;
             }
 
             object value = GetAnswerValue(question, formAnswers);
@@ -178,8 +188,8 @@ namespace form_builder.Mappers
                     
                     var model = new File();
                     model.Content = fileData;
-                    model.TrustedOriginalFileName = file.UntrustedOriginalFileName;
-                    model.UntrustedOriginalFileName = file.TrustedOriginalFileName;
+                    model.TrustedOriginalFileName = file.TrustedOriginalFileName;
+                    model.UntrustedOriginalFileName = file.UntrustedOriginalFileName;
                     model.KeyName = key;
 
                     listOfFiles.Add(model);
