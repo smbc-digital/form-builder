@@ -25,7 +25,8 @@ namespace form_builder_tests.UnitTests.Services
     public class FileUploadServiceTests
     {
         private readonly FileUploadService _service;
-        private readonly IEnumerable<IElementValidator> _validators;
+        private readonly Mock<IEnumerable<IElementValidator>> _validators = new Mock<IEnumerable<IElementValidator>>();
+        private readonly Mock<IElementValidator> _testValidator = new Mock<IElementValidator>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IPageFactory> _mockPageFactory = new Mock<IPageFactory>();
         private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
@@ -57,10 +58,12 @@ namespace form_builder_tests.UnitTests.Services
                     null))
                 .ReturnsAsync(new FormBuilderViewModel());
 
-            _validators = new List<IElementValidator>
-            {
-                new FileUploadElementValidator(_mockSessionHelper.Object, _mockDistributedCache.Object)
-            };
+            _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>()))
+                .Returns(new ValidationResult { IsValid = true });
+
+            var elementValidatorItems = new List<IElementValidator> { _testValidator.Object };
+
+            _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
 
             _service = new FileUploadService(_mockDistributedCache.Object, _mockPageFactory.Object, _mockPageHelper.Object);
         }
@@ -192,7 +195,14 @@ namespace form_builder_tests.UnitTests.Services
                 .WithBaseUrl("baseUrl")
                 .Build();
 
-            page.Validate(new Dictionary<string, dynamic>(), _validators);
+            _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>()))
+                .Returns(new ValidationResult { IsValid = false });
+
+            var elementValidatorItems = new List<IElementValidator> { _testValidator.Object };
+
+            _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
+
+            page.Validate(new Dictionary<string, dynamic>(), _validators.Object);
 
             // Act
             var result = await _service.ProcessFile(new Dictionary<string, dynamic>(), page, schema,
