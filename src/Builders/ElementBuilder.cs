@@ -310,5 +310,19 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithMaxCombinedFileSize(int value)
+        {
+            _property.MaxCombinedFileSize = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithMaxFileSize(int value)
+        {
+            _property.MaxFileSize = value;
+
+            return this;
+        }
     }
 }
