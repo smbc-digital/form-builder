@@ -10,12 +10,12 @@ using Newtonsoft.Json;
 
 namespace form_builder.Validators
 {
-    public class FileUploadElementValidator : IElementValidator
+    public class MultipleFileUploadElementValidator : IElementValidator
     {
         private readonly ISessionHelper _sessionHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
 
-        public FileUploadElementValidator(ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
+        public MultipleFileUploadElementValidator(ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
         {
             _sessionHelper = sessionHelper;
             _distributedCache = distributedCache;

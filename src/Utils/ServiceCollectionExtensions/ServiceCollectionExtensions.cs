@@ -66,7 +66,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         public static IServiceCollection AddValidators(this IServiceCollection services)
         {
             services.AddTransient<IElementValidator, RequiredElementValidator>();
-            services.AddTransient<IElementValidator, FileUploadElementValidator>();
+            services.AddTransient<IElementValidator, MultipleFileUploadElementValidator>();
             services.AddTransient<IElementValidator, NumericValueValidator>();
             services.AddTransient<IElementValidator, AutomaticAddressElementValidator>();
             services.AddTransient<IElementValidator, ManualAddressValidator>();

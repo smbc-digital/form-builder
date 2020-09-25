@@ -6,22 +6,20 @@ using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.Validators;
 using Moq;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
 {
-    public class FileUploadElementValidatorTest
+    public class MultipleFileUploadElementValidatorTests
     {
-        private readonly FileUploadElementValidator _fileUploadElementValidatorTest;
+        private readonly MultipleFileUploadElementValidator _fileUploadElementValidatorTest;
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
 
-        public FileUploadElementValidatorTest()
+        public MultipleFileUploadElementValidatorTests()
         {
-            _fileUploadElementValidatorTest = new FileUploadElementValidator(_mockSessionHelper.Object, _mockDistributedCacheWrapper.Object);
+            _fileUploadElementValidatorTest = new MultipleFileUploadElementValidator(_mockSessionHelper.Object, _mockDistributedCacheWrapper.Object);
         }
 
         [Fact]

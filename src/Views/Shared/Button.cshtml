@@ -1,5 +1,4 @@
-﻿@using form_builder.Constants
-@model form_builder.Models.Elements.Button
+﻿@model form_builder.Models.Elements.Button
 
 
 <button data-prevent-double-click="true"
@@ -7,9 +6,7 @@
         class="govuk-button @Model.Properties.ClassName"
         id="@Model.Properties.ButtonId"
         @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)
-        data-module="govuk-button"
-        type="submit"
-        formaction="index" formmethod="post">
+        data-module="govuk-button">
     @Model.Properties.Text
 </button>
 

@@ -138,21 +138,6 @@ namespace form_builder.Services.PageService
                     searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
             }
 
-            if (page.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
-            {
-                var element = page.Elements.First(_ => _.Type.Equals(EElementType.MultipleFileUpload));
-                var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-
-                if (!string.IsNullOrEmpty(formData))
-                    convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
-                if (convertedAnswers.FormData.Any(_ => _.Key.Contains($"{element.Properties.QuestionId}")))
-                {
-                    var search = convertedAnswers.FormData.TakeWhile(_ => _.Key.Contains(element.Properties.QuestionId)).ToList();
-                    searchResults = search.Select(_ => _.Value).ToList();
-                }
-            }
-
             if (page.Elements.Any(_ => _.Type == EElementType.PaymentSummary))
             {
                 var data = await _mappingService.Map(sessionGuid, form);
