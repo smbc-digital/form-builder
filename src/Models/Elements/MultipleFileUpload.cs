@@ -43,6 +43,7 @@ namespace form_builder.Models.Elements
 
             return properties;
         }
+        public string SubmitButtonText;
 
         public override Task<string> RenderAsync(
             IViewRender viewRender,
@@ -56,6 +57,8 @@ namespace form_builder.Models.Elements
         {
             var currentAnswer = elementHelper.CurrentValue<JArray>(this, viewModel, page.PageSlug, guid, FileUploadConstants.SUFFIX);
 
+            SubmitButtonText = SetSubmitButtonText(page);
+
             if(currentAnswer != null){
                 List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(currentAnswer.ToString());
                 CurrentFilesUploaded = response.Select(_ => _.TrustedOriginalFileName).ToList();
@@ -65,6 +68,14 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForLabel(this);
 
             return viewRender.RenderAsync(Type.ToString(), this);
+        }
+
+        private string SetSubmitButtonText(Page page)
+        {
+            if (page.Behaviours.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay))
+                return string.IsNullOrEmpty(Properties.PageSubmitButtonLabel) ? SystemConstants.SubmitButtonText : Properties.PageSubmitButtonLabel;
+
+            return string.IsNullOrEmpty(Properties.PageSubmitButtonLabel) ? SystemConstants.NextStepButtonText : Properties.PageSubmitButtonLabel;
         }
     }
 }
