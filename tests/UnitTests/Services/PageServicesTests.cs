@@ -749,7 +749,6 @@ namespace form_builder_tests.UnitTests.Services
             _mockPageHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>()), Times.Never);
         }
 
-
         [Fact]
         public async Task ProcessRequest_Should_CallPageHelper_WhenPageContains_InboundValues()
         {
@@ -777,6 +776,93 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), It.IsAny<IEnumerable<CustomFormFile>>());
 
             _mockPageHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessRequest_ShouldCallFileUploadService_WhenMultipleFileUploadElement()
+        {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+
+            _fileUploadService
+                .Setup(_ => _.ProcessFile(It.IsAny<Dictionary<string, dynamic>>(),
+                    It.IsAny<Page>(),
+                    It.IsAny<FormSchema>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    null))
+                .ReturnsAsync(new ProcessRequestEntity());
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId("fileUpload")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { "Guid", Guid.NewGuid().ToString() },
+                { $"{element.Properties.QuestionId}-fileupload", "file" }
+            };
+
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null);
+
+            _fileUploadService.Verify(_ => _.ProcessFile(It.IsAny<Dictionary<string, dynamic>>(),
+                It.IsAny<Page>(),
+                It.IsAny<FormSchema>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                null), Times.Once());
+            Assert.IsType<ProcessRequestEntity>(result);
+        }
+
+        [Fact]
+        public async Task ProcessRequest_ShouldNotCallFileUploadService_WhenNoMultipleFileUploadElement()
+        {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+
+            _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel());
+
+            var page = new PageBuilder()
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null);
+
+            _fileUploadService.Verify(_ => _.ProcessFile(It.IsAny<Dictionary<string, dynamic>>(),
+                It.IsAny<Page>(),
+                It.IsAny<FormSchema>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                null), Times.Never);
         }
     }
 }
