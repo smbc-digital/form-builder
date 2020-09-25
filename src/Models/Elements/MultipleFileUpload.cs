@@ -73,9 +73,9 @@ namespace form_builder.Models.Elements
         private string SetSubmitButtonText(Page page)
         {
             if (page.Behaviours.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay))
-                return string.IsNullOrEmpty(Properties.PageSubmitButtonLabel) ? SystemConstants.SubmitButtonText : Properties.PageSubmitButtonLabel;
+                return string.IsNullOrEmpty(Properties.PageSubmitButtonLabel) ? ButtonConstants.SUBMIT_TEXT : Properties.PageSubmitButtonLabel;
 
-            return string.IsNullOrEmpty(Properties.PageSubmitButtonLabel) ? SystemConstants.NextStepButtonText : Properties.PageSubmitButtonLabel;
+            return string.IsNullOrEmpty(Properties.PageSubmitButtonLabel) ? ButtonConstants.NEXTSTEP_TEXT : Properties.PageSubmitButtonLabel;
         }
     }
 }

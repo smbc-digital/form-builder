@@ -60,18 +60,18 @@ namespace form_builder.Models.Elements
         private string GetButtonText(List<IElement> element, Dictionary<string, dynamic> viewModel, Page page)
         {
             if (element.Any(_ => _.Type == EElementType.Address) && viewModel.IsInitial())
-                return SystemConstants.AddressSearchButtonText;
+                return ButtonConstants.ADDRESS_SEARCH_TEXT;
 
             if (element.Any(_ => _.Type == EElementType.Street) && viewModel.IsInitial())
-                return SystemConstants.StreetSearchButtonText;
+                return ButtonConstants.STREET_SEARCH_TEXT;
 
             if (element.Any(_ => _.Type == EElementType.Organisation) && viewModel.IsInitial())
-                return SystemConstants.OrganisationSearchButtonText;
+                return ButtonConstants.ORG_SEARCH_TEXT;
 
             if (page.Behaviours.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay))
-                return string.IsNullOrEmpty(Properties.Text) ? SystemConstants.SubmitButtonText : Properties.Text;
+                return string.IsNullOrEmpty(Properties.Text) ? ButtonConstants.SUBMIT_TEXT : Properties.Text;
 
-            return string.IsNullOrEmpty(Properties.Text) ? SystemConstants.NextStepButtonText : Properties.Text;
+            return string.IsNullOrEmpty(Properties.Text) ? ButtonConstants.NEXTSTEP_TEXT : Properties.Text;
         }
     }
 }
