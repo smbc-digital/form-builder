@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.ContentFactory;
-using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
@@ -100,7 +99,6 @@ namespace form_builder.Services.FileUploadService
          string path,
          IEnumerable<CustomFormFile> files)
         {
-            var element = currentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.MultipleFileUpload));
             if (!currentPage.IsValid)
             {
                 var formModel = await _pageFactory.Build(currentPage, new Dictionary<string, dynamic>(), baseForm, guid);
@@ -112,7 +110,7 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            if(currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.NO_DATA_SUBMIT) && (files == null || !files.Any()))
+            if(currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files == null || !files.Any()))
             {
                 return new ProcessRequestEntity
                 {
@@ -120,7 +118,7 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            if(!viewModel.ContainsKey(ButtonConstants.NO_DATA_SUBMIT) && (files == null || !files.Any()))
+            if(!viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files == null || !files.Any()))
             {
                 return new ProcessRequestEntity
                 {
@@ -134,10 +132,9 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            var model = (viewModel[$"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}"] as IEnumerable<object>).ToList();
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
 
-            if (viewModel.ContainsKey(ButtonConstants.NO_DATA_SUBMIT))
+            if (viewModel.ContainsKey(ButtonConstants.SUBMIT))
             {
                 return new ProcessRequestEntity
                 {
