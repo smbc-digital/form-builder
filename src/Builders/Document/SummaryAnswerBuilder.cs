@@ -31,7 +31,7 @@ namespace form_builder.Builders.Document
 
         public void AddBlankLine()
         {
-            _data.Add("");
+            _data.Add(string.Empty);
         }
     }
 }
