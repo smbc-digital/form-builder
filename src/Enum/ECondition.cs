@@ -13,8 +13,6 @@
         GreaterThanEqualTo,
         LessThanEqualTo,
         EndsWith,
-        IsOneOf,
-        Any,
-        HasFilesUploaded
+        Any
     }
 }
