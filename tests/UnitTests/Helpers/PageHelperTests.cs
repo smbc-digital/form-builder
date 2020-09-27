@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Builders;
@@ -2218,6 +2220,135 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Act
             _pageHelper.CheckForAnyConditionType(pages);
+        }
+
+        [Fact]
+        public void SaveFormFileAnswer_ShouldInsertFilesToAnswers_IfAnswerDontExist()
+        {
+            // Arrange                                        
+            var questionId = "fileUpload_FileQuestionId";
+            var file = new List<CustomFormFile>();
+            file.Add( new CustomFormFile("abc", questionId, 0, "replace-me.txt"));
+
+            var page = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>
+                {
+                    new Answers { QuestionId = "Item1", Response = "old-answer" },
+                    new Answers { QuestionId = "Item2", Response = "old-answer" }
+                }
+            };
+          
+            var fileUpload = new List<FileUploadModel>();
+            fileUpload.Add(
+              new FileUploadModel
+              {
+                  Key = $"file-{questionId}-",
+                  TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
+                  UntrustedOriginalFileName = "replace-me.txt",
+                  FileSize = 0
+              }
+            );
+
+            // Act
+            var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, false, page);
+
+            // Assert
+            Assert.Contains(results, x => x.QuestionId == "fileUpload_FileQuestionId");
+            Assert.Contains(results, x => x.Response == JsonConvert.SerializeObject(fileUpload));
+        }
+
+        [Fact]
+        public void SaveFormFileAnswer_ShouldUpdateResponseFileForMultipleUpload_IfAnswerExist()
+        {
+            // Arrange                                        
+            var questionId = "Item1";
+            var file = new List<CustomFormFile>();
+            file.Add(new CustomFormFile(null, questionId, 1, null));
+            
+            var expectedFileUpload = new List<FileUploadModel>();
+            expectedFileUpload.Add(new FileUploadModel {Key = $"file-{questionId}-",TrustedOriginalFileName = "replace-me.txt", UntrustedOriginalFileName = "replace-me.txt", FileSize = 0});
+            expectedFileUpload.Add(new FileUploadModel {Key = $"file-{questionId}-",TrustedOriginalFileName = null,UntrustedOriginalFileName = null,FileSize = 1});
+
+          
+            var expectedPage = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>
+                {
+                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(expectedFileUpload) }
+                }
+            };
+
+            var fileUpload = new List<FileUploadModel>();
+            fileUpload.Add(
+              new FileUploadModel
+              {
+                  Key = $"file-{questionId}-",TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),UntrustedOriginalFileName = "replace-me.txt",FileSize = 0
+              }
+            );
+
+            var page = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>
+                {
+                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(fileUpload) }
+                }
+            };            
+
+            // Act
+            var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
+            // Assert
+            Assert.Contains(JsonConvert.SerializeObject(expectedFileUpload), JsonConvert.SerializeObject(results));
+        }
+
+        [Fact]
+        public void SaveFormFileAnswer_ShouldUpdateResponseFileForSingleUpload_IfAnswerExist()
+        {
+            // Arrange                                        
+            var questionId = "Item1";
+            var file = new List<CustomFormFile>();
+            file.Add(new CustomFormFile(null, questionId, 1, null));
+
+            var fileUpload = new List<FileUploadModel>();
+            fileUpload.Add(
+              new FileUploadModel
+              {
+                  Key = $"file-{questionId}-",
+                  TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
+                  UntrustedOriginalFileName = "replace-me.txt",
+                  FileSize = 0
+              }
+            );
+
+            var page = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>
+                {
+                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(fileUpload) }
+                }
+            };
+
+
+            var expectedFileUpload = new List<FileUploadModel>();
+            expectedFileUpload.Add(new FileUploadModel { Key = $"file-{questionId}-", TrustedOriginalFileName = null, UntrustedOriginalFileName = null, FileSize = 1 });
+
+
+            var expectedPage = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>
+                {
+                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(expectedFileUpload) }
+                }
+            };
+            // Act
+            var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, false, page);
+            // Assert
+            Assert.Contains(JsonConvert.SerializeObject(expectedFileUpload), JsonConvert.SerializeObject(results));
         }
     }
 }

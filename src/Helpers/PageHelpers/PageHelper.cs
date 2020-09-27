@@ -515,7 +515,6 @@ namespace form_builder.Helpers.PageHelpers
                     }
                 }
 
-                //TODO: remove duplicates keys
                 if (answers.Exists(_ => _.QuestionId == file.Key))
                 {
                     var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId == file.Key);
