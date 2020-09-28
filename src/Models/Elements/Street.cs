@@ -75,7 +75,8 @@ namespace form_builder.Models.Elements
                         : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
 
                     var selectedStreet = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, StreetConstants.SELECT_SUFFIX);
-                    Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} streets found", string.Empty) };
+                    var searchSuffix = results?.Count == 1 ? "street found" : "streets found";
+                    Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} {searchSuffix}", string.Empty) };
 
                     results?.ForEach((objectResult) => {
                         AddressSearchResult searchResult;

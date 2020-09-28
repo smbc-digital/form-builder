@@ -15,11 +15,11 @@ namespace form_builder.Builders
 			if (string.IsNullOrWhiteSpace(answer))
 				return;
       
-      if (type == EElementType.FileUpload || type == EElementType.MultipleFileUpload)
-         _filesData.Add($"{question}: {answer}");
-      else
-         _data.Add(question, answer);
-    }
+			if (type == EElementType.FileUpload || type == EElementType.MultipleFileUpload)
+				_filesData.Add($"{question}: {answer}");
+			else
+				_data.Add(question, answer);
+    	}
 
 		public Dictionary<string, string> Build()
 		{

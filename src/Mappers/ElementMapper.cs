@@ -82,19 +82,18 @@ namespace form_builder.Mappers
             }
         }
 
-        private object GetDeclarationElementValue(string key, FormAnswers formAnswers)
-        {
-            var value = formAnswers.Pages
-                .SelectMany(_ => _.Answers)
-                .FirstOrDefault(_ => _.QuestionId == key);
+		private object GetDeclarationElementValue(string key, FormAnswers formAnswers)
+		{
+			var value = formAnswers.Pages
+				.SelectMany(_ => _.Answers)
+				.FirstOrDefault(_ => _.QuestionId == key);
 
-            if (value == null || string.IsNullOrEmpty(value.Response))
-            {
-                return new List<string>();
-            }
-            var val = value.Response.Split(",");
-            return new List<string>(val);
-                }
+			if (value == null || string.IsNullOrEmpty(value.Response))
+			{
+				return "false";
+			}
+			return "true";
+		}
 
         public string GetAnswerStringValue(IElement question, FormAnswers formAnswers)
         {

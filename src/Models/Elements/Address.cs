@@ -85,7 +85,8 @@ namespace form_builder.Models.Elements
                         : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
                     var selectedAddress = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SELECT_SUFFIX);
-                    Items = new List<SelectListItem> { new SelectListItem($"{results.Count} addresses found", string.Empty) };
+                    var searchSuffix = results?.Count == 1 ? "address found" : "addresses found";
+                    Items = new List<SelectListItem> { new SelectListItem($"{results.Count} {searchSuffix}", string.Empty) };
                     
                     results.ForEach((objectResult) =>
                     {
