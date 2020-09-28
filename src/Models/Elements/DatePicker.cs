@@ -27,7 +27,7 @@ namespace form_builder.Models.Elements
             IWebHostEnvironment environment,
             List<object> results = null)
         {
-            Properties.Value = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, string.Empty);
+            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
 
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);

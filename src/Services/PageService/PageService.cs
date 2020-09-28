@@ -13,6 +13,7 @@ using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
+using form_builder.Services.FileUploadService;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService.Entities;
@@ -21,7 +22,6 @@ using form_builder.Services.StreetService;
 using form_builder.Validators;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -36,6 +36,7 @@ namespace form_builder.Services.PageService
         private readonly IStreetService _streetService;
         private readonly IAddressService _addressService;
         private readonly IOrganisationService _organisationService;
+        private readonly IFileUploadService _fileUploadService;
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IWebHostEnvironment _environment;
@@ -48,7 +49,8 @@ namespace form_builder.Services.PageService
             IEnumerable<IElementValidator> validators, 
             IPageHelper pageHelper, 
             ISessionHelper sessionHelper, 
-            IAddressService addressService, 
+            IAddressService addressService,
+            IFileUploadService fileUploadService,
             IStreetService streetService, 
             IOrganisationService organisationService, 
             IDistributedCacheWrapper distributedCache, 
@@ -66,6 +68,7 @@ namespace form_builder.Services.PageService
             _streetService = streetService;
             _addressService = addressService;
             _organisationService = organisationService;
+            _fileUploadService = fileUploadService;
             _distributedCache = distributedCache;
             _schemaFactory = schemaFactory;
             _successPageContentFactory = successPageFactory;
@@ -186,6 +189,9 @@ namespace form_builder.Services.PageService
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Organisation))
                 return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
+                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files);
+            
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
             if (!currentPage.IsValid)
@@ -207,8 +213,10 @@ namespace form_builder.Services.PageService
 
         public async Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid, string subPath, List<object> results)
         {
-            var viewModelData = new Dictionary<string, dynamic>();
-            viewModelData.Add(LookUpConstants.SubPathViewModelKey, subPath);
+            var viewModelData = new Dictionary<string, dynamic>
+            {
+                { LookUpConstants.SubPathViewModelKey, subPath }
+            };
 
             var viewModel = await _pageContentFactory.Build(page, viewModelData, baseForm, sessionGuid, results);
 
@@ -248,7 +256,7 @@ namespace form_builder.Services.PageService
             if (formFileUploadElements.Count > 0)
                 formFileUploadElements.ForEach(_ =>
                 {
-                    _distributedCache.Remove($"file-{_.Properties.QuestionId}-fileupload-{sessionGuid}");
+                    _distributedCache.Remove($"file-{_.Properties.QuestionId}{FileUploadConstants.SUFFIX}-{sessionGuid}");
                 });
 
             if(baseForm.DocumentDownload)

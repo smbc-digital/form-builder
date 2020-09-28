@@ -15,7 +15,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.FileUpload;
         }
 
-        public override string QuestionId => $"{base.QuestionId}-fileupload";
+        public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
 
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
@@ -51,7 +51,7 @@ namespace form_builder.Models.Elements
             IWebHostEnvironment environment,
             List<object> results = null)
         {
-            elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, string.Empty);
+            elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
 

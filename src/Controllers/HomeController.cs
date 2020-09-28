@@ -85,7 +85,7 @@ namespace form_builder.Controllers
         {
             var viewModel = formData.ToNormaliseDictionary(subPath);
 
-            if(fileUpload != null && fileUpload.Any())
+            if (fileUpload != null && fileUpload.Any())
                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
 
             var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload);

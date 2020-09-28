@@ -54,7 +54,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressManual"), It.IsAny<form_builder.Models.Elements.AddressManual>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-            _mockElementHelper.Verify(_ => _.CurrentValue<string>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()), Times.Exactly(4));
+            _mockElementHelper.Verify(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()), Times.Exactly(4));
         }
 
         [Fact]
@@ -88,8 +88,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 viewModel,
                 page,
                 schema,
-                _mockHostingEnv.Object, 
-                new List<object>());
+                _mockHostingEnv.Object,
+                new List<object>()
+                );
 
             //Assert
             Assert.True(callbackElement.Properties.DisplayNoResultsIAG);

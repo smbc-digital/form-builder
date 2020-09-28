@@ -29,25 +29,6 @@ namespace form_builder_tests.UnitTests.Conditions
         }
 
         [Fact]
-        public void IsOneOf_Should_Return_True_False()
-        {
-            // Arrange
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                { "test", "pear" },
-                { "test2", "apple" }
-            };
-
-            var condition1 = new Condition { ComparisonValue = "pear,plum,apple", QuestionId = "test", ConditionType = ECondition.IsOneOf };
-            var condition2 = new Condition { ComparisonValue = "pear,plum,lemon", QuestionId = "test2", ConditionType = ECondition.IsOneOf };
-            var conditionValidator = new ConditionValidator();
-
-            // Act & Assert
-            Assert.True(conditionValidator.IsValid(condition1, viewModel));
-            Assert.False(conditionValidator.IsValid(condition2, viewModel));
-        }
-
-        [Fact]
         public void CheckBox_Contains_Should_Return_True_False()
         {
             // Arrange

@@ -12,7 +12,7 @@ namespace form_builder.Extensions
             
             foreach (var item in formData)
             {
-                if (item.Key.EndsWith("-fileupload"))
+                if (item.Key.EndsWith(FileUploadConstants.SUFFIX))
                     continue;
 
                 if (item.Value.Length == 1)

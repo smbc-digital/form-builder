@@ -73,7 +73,7 @@ namespace form_builder.Services.MappingService
 
             if (splitTargets.Length == 1)
             {
-                if (element.Type == EElementType.FileUpload)
+                if (element.Type == EElementType.FileUpload || element.Type == EElementType.MultipleFileUpload)
                     return CheckAndCreateForFileUpload(splitTargets[0], element, formAnswers, obj);
 
                 object answerValue = _elementMapper.GetAnswerValue(element, formAnswers);
@@ -114,19 +114,17 @@ namespace form_builder.Services.MappingService
                 if (value != null)
                 {
                     obj.Remove(target);
-                    files.Add((File) value);
+                    files.AddRange((List<File>) value);
                     obj.Add(target, files);
                 }
 
                 return obj;
             }
             else
-            {
-                var files = new List<File>();
+            {            
                 if (value != null)
                 {
-                    files.Add((File) value);
-                    obj.Add(target, files);
+                    obj.Add(target, (List<File>)value);
                 }
             }
 

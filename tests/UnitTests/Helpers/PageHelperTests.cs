@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Builders;
@@ -42,7 +44,6 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider =
             new Mock<IEnumerable<IPaymentProvider>>();
         private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
-        private readonly Mock<IFileUploadService> _mockFileUploadService = new Mock<IFileUploadService>();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
 
         public PageHelperTests()
@@ -89,7 +90,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 _mockElementHelper.Object, _mockDistributedCache.Object,
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockCache.Object, _mockDistributedCacheExpirationSettings.Object,
-                _mockPaymentProvider.Object, _mockFileUploadService.Object, _mockSessionHelper.Object);
+                _mockPaymentProvider.Object, _mockSessionHelper.Object);
         }
 
         [Fact]
@@ -158,7 +159,7 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             //Arrange
             _mockElementHelper
-                .Setup(_ => _.CurrentValue<string>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
+                .Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
                     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
@@ -199,7 +200,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Address>(), null))
                 .Callback<string, Address, Dictionary<string, object>>((x, y, z) => callback = y);
 
-            _mockElementHelper.Setup(_ => _.CurrentValue<string>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
                     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
@@ -614,8 +615,8 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection, true);
 
             // Assert
-            _mockDistributedCache.Verify(
-                _ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), CancellationToken.None), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -725,9 +726,6 @@ namespace form_builder_tests.UnitTests.Helpers
 
             form.Pages.Add(page);
             var mockData = JsonConvert.SerializeObject(form);
-
-            _mockFileUploadService.Setup(service => service.SaveFormFileAnswers(It.IsAny<List<Answers>>(),
-                It.IsAny<IEnumerable<CustomFormFile>>())).Returns(allTheAnswers);
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(mockData);
@@ -2135,7 +2133,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-                
+
             var pages = new List<Page> { page };
 
             _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("guid");
@@ -2157,7 +2155,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-                
+
             var pages = new List<Page> { page };
 
             _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("guid");
@@ -2179,7 +2177,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithConditionType(ECondition.Any)
                 .WithQuestionId("test")
                 .Build();
-            
+
             var behaviour = new BehaviourBuilder()
                 .WithCondition(condition)
                 .Build();
@@ -2222,6 +2220,135 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Act
             _pageHelper.CheckForAnyConditionType(pages);
+        }
+
+        [Fact]
+        public void SaveFormFileAnswer_ShouldInsertFilesToAnswers_IfAnswerDontExist()
+        {
+            // Arrange                                        
+            var questionId = "fileUpload_FileQuestionId";
+            var file = new List<CustomFormFile>();
+            file.Add( new CustomFormFile("abc", questionId, 0, "replace-me.txt"));
+
+            var page = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>
+                {
+                    new Answers { QuestionId = "Item1", Response = "old-answer" },
+                    new Answers { QuestionId = "Item2", Response = "old-answer" }
+                }
+            };
+          
+            var fileUpload = new List<FileUploadModel>();
+            fileUpload.Add(
+              new FileUploadModel
+              {
+                  Key = $"file-{questionId}-",
+                  TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
+                  UntrustedOriginalFileName = "replace-me.txt",
+                  FileSize = 0
+              }
+            );
+
+            // Act
+            var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, false, page);
+
+            // Assert
+            Assert.Contains(results, x => x.QuestionId == "fileUpload_FileQuestionId");
+            Assert.Contains(results, x => x.Response == JsonConvert.SerializeObject(fileUpload));
+        }
+
+        [Fact]
+        public void SaveFormFileAnswer_ShouldUpdateResponseFileForMultipleUpload_IfAnswerExist()
+        {
+            // Arrange                                        
+            var questionId = "Item1";
+            var file = new List<CustomFormFile>();
+            file.Add(new CustomFormFile(null, questionId, 1, null));
+            
+            var expectedFileUpload = new List<FileUploadModel>();
+            expectedFileUpload.Add(new FileUploadModel {Key = $"file-{questionId}-",TrustedOriginalFileName = "replace-me.txt", UntrustedOriginalFileName = "replace-me.txt", FileSize = 0});
+            expectedFileUpload.Add(new FileUploadModel {Key = $"file-{questionId}-",TrustedOriginalFileName = null,UntrustedOriginalFileName = null,FileSize = 1});
+
+          
+            var expectedPage = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>
+                {
+                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(expectedFileUpload) }
+                }
+            };
+
+            var fileUpload = new List<FileUploadModel>();
+            fileUpload.Add(
+              new FileUploadModel
+              {
+                  Key = $"file-{questionId}-",TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),UntrustedOriginalFileName = "replace-me.txt",FileSize = 0
+              }
+            );
+
+            var page = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>
+                {
+                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(fileUpload) }
+                }
+            };            
+
+            // Act
+            var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
+            // Assert
+            Assert.Contains(JsonConvert.SerializeObject(expectedFileUpload), JsonConvert.SerializeObject(results));
+        }
+
+        [Fact]
+        public void SaveFormFileAnswer_ShouldUpdateResponseFileForSingleUpload_IfAnswerExist()
+        {
+            // Arrange                                        
+            var questionId = "Item1";
+            var file = new List<CustomFormFile>();
+            file.Add(new CustomFormFile(null, questionId, 1, null));
+
+            var fileUpload = new List<FileUploadModel>();
+            fileUpload.Add(
+              new FileUploadModel
+              {
+                  Key = $"file-{questionId}-",
+                  TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
+                  UntrustedOriginalFileName = "replace-me.txt",
+                  FileSize = 0
+              }
+            );
+
+            var page = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>
+                {
+                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(fileUpload) }
+                }
+            };
+
+
+            var expectedFileUpload = new List<FileUploadModel>();
+            expectedFileUpload.Add(new FileUploadModel { Key = $"file-{questionId}-", TrustedOriginalFileName = null, UntrustedOriginalFileName = null, FileSize = 1 });
+
+
+            var expectedPage = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>
+                {
+                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(expectedFileUpload) }
+                }
+            };
+            // Act
+            var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, false, page);
+            // Assert
+            Assert.Contains(JsonConvert.SerializeObject(expectedFileUpload), JsonConvert.SerializeObject(results));
         }
     }
 }

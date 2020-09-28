@@ -13,7 +13,8 @@ namespace form_builder.Validators
         {
             if (element.Type == EElementType.DateInput || element.Type == EElementType.Map ||
                 element.Type == EElementType.TimeInput || element.Type == EElementType.DatePicker ||
-                element.Properties.Optional || (element.Type == EElementType.Address && viewModel.IsManual()))
+                element.Type == EElementType.MultipleFileUpload || element.Properties.Optional || 
+                (element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
                 {
@@ -31,7 +32,7 @@ namespace form_builder.Validators
 
             if (element.Type == EElementType.FileUpload)
             {
-                key = $"{element.Properties.QuestionId}-fileupload";
+                key = $"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
             }
 
             if (element.Type == EElementType.Address)
@@ -80,11 +81,12 @@ namespace form_builder.Validators
             bool isValid;
             if (element.Type == EElementType.FileUpload)
             {
-                DocumentModel value = viewModel.ContainsKey(key)
+                List<DocumentModel> value = viewModel.ContainsKey(key)
                     ? viewModel[key]
                     : null;
 
                 isValid = !(value is null);
+                validationMessage = ValidationConstants.FILEUPLOAD_EMPTY;
             }
             else
             {

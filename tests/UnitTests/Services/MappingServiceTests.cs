@@ -335,12 +335,14 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         
-        [Fact]
-        public async Task Map_ShouldReturnEmptyExpandoObject_WhenNullResponse_ForFile()
+        [Theory]
+        [InlineData(EElementType.FileUpload)]
+        [InlineData(EElementType.MultipleFileUpload)]
+        public async Task Map_ShouldReturnEmptyExpandoObject_WhenNullResponse_ForFile(EElementType type)
         {
             // Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId("file")
                 .Build();
 
@@ -377,17 +379,19 @@ namespace form_builder_tests.UnitTests.Services
         }
 
                 
-        [Fact]
-        public async Task Map_ShouldReturnExpandoObject_WithSingleFile()
+        [Theory]
+        [InlineData(EElementType.FileUpload)]
+        [InlineData(EElementType.MultipleFileUpload)]
+        public async Task Map_ShouldReturnExpandoObject_WithSingleFile(EElementType type)
         {
             // Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId("file")
                 .Build();
 
             var element2 = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId("filetwo")
                 .Build();
 
@@ -414,7 +418,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(null);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(new File());
+                .Returns(new List<File>{ new File()});
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -427,24 +431,26 @@ namespace form_builder_tests.UnitTests.Services
             Assert.NotNull(castResultsData);
         }
 
-        [Fact]
-        public async Task Map_ShouldReturnExpandoObject_WithTwoFiles_WithSameMapping()
+        [Theory]
+        [InlineData(EElementType.FileUpload)]
+        [InlineData(EElementType.MultipleFileUpload)]
+        public async Task Map_ShouldReturnExpandoObject_WithTwoFiles_WithSameMapping(EElementType type)
         {
             // Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId("file")
                 .WithTargetMapping("file")
                 .Build();
 
             var element2 = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId("filetwo")
                 .WithTargetMapping("file")
                 .Build();
 
             var element3 = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId("filethree")
                 .WithTargetMapping("file")
                 .Build();
@@ -471,13 +477,13 @@ namespace form_builder_tests.UnitTests.Services
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "file"), It.IsAny<FormAnswers>()))
-                .Returns(new File());
+                .Returns(new List<File>{new File()});
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filetwo"), It.IsAny<FormAnswers>()))
                 .Returns(null);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filethree"), It.IsAny<FormAnswers>()))
-                .Returns(new File());
+                .Returns(new List<File>{new File()});
 
             // Act
             var result = await _service.Map("form", "guid");
