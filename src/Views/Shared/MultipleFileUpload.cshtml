@@ -3,7 +3,10 @@
 @{
     var sizeValidationError = $"{Model.QuestionId}-fileSizeError";
     var elements = Model.GenerateElementProperties();
-    elements.Add("class", "smbc-file-upload govuk-!-margin-bottom-5 govuk-!-display-block");
+    var baseCssClasses = "smbc-file-upload govuk-!-margin-bottom-5 govuk-!-display-block";
+    elements.Add("class", !Model.IsValid
+        ? $"{baseCssClasses} govuk-input--error"
+        : baseCssClasses);
 }
 
     <partial name="LabelH1" />
@@ -60,8 +63,6 @@
             class="govuk-button govuk-!-display-block"
             id="@Model.QuestionId-SubmitButton"
             data-module="govuk-button"
-            type="submit"
-            formaction="index" formmethod="post"
             name="@ButtonConstants.SUBMIT"
             value="@ButtonConstants.SUBMIT">
         @Model.SubmitButtonText
