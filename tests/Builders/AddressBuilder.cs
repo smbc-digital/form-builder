@@ -5,7 +5,7 @@ namespace form_builder_tests.Builders
 {
     public class AddressBuilder
     {
-        private BaseProperty _property = new BaseProperty();
+        private readonly BaseProperty _property = new BaseProperty();
 
         public Address Build() => new Address
         {

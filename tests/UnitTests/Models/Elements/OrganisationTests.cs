@@ -45,9 +45,11 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
-            viewModel.Add($"{organisationElement.Properties.QuestionId}-organisation", "test org");
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic },
+                { $"{organisationElement.Properties.QuestionId}-organisation", "test org" }
+            };
 
             //Act
             await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object);
@@ -79,9 +81,11 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
-            viewModel.Add($"{organisationElement.Properties.QuestionId}-organisation", "test org");
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic },
+                { $"{organisationElement.Properties.QuestionId}-organisation", "test org" }
+            };
 
             var searchResults = new List<object>
             {

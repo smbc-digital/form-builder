@@ -1,4 +1,5 @@
-﻿@model form_builder.Models.Elements.Element
+﻿@model form_builder.Models.Elements.Button
+
 
 <button data-prevent-double-click="true"
         @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
@@ -8,3 +9,4 @@
         data-module="govuk-button">
     @Model.Properties.Text
 </button>
+

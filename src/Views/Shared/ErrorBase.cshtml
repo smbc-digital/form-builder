@@ -2,6 +2,6 @@
 @if (!Model.IsValid)
 {
     <span class="govuk-error-message" id="@Model.Id">
-        <span class="govuk-visually-hidden">Error:</span> @Model.Message
+        <span class="govuk-visually-hidden">Error:</span>@Html.Raw(@Model.Message) 
     </span>
 }

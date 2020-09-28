@@ -1,0 +1,70 @@
+@using form_builder.Constants
+@model form_builder.Models.Elements.MultipleFileUpload
+@{
+    var sizeValidationError = $"{Model.QuestionId}-fileSizeError";
+    var elements = Model.GenerateElementProperties();
+    var baseCssClasses = "smbc-file-upload govuk-!-margin-bottom-5 govuk-!-display-block";
+    elements.Add("class", !Model.IsValid
+        ? $"{baseCssClasses} govuk-input--error"
+        : baseCssClasses);
+}
+
+    <partial name="LabelH1" />
+    <partial name="InsetText" model="@Model.Properties.IAG" />
+
+    <p class="smbc-body">You can upload @Model.AllowFileTypeText.</p>
+    <p class="smbc-body">The maximum individual file size is @Model.MaxFileSizeText.</p>
+    <p class="smbc-body">The total size of all your added files must not be more than @Model.MaxCombinedFileSizeText.</p>
+
+    <partial name="Hint" />
+
+    @if (Model.CurrentFilesUploaded.Any())
+    {
+            <label class="govuk-label govuk-label--s govuk-!-margin-bottom-5">Files uploaded</label>
+            <table class="govuk-table">
+                <tbody class="govuk-table__body">
+                @foreach (var file in Model.CurrentFilesUploaded)
+                {
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell smbc-table__cell--wrap smbc-!-width-90">@file</td>
+                        <td class="govuk-table__cell smbc-!-width-10">
+                            <button type="submit" 
+                                    name="@FileUploadConstants.FILE_TO_DELETE" 
+                                    value="@file"
+                                    class="govuk-button smbc-button--link smbc-!-alignment-right">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+    }
+
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    <partial name="Error" />
+
+    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
+
+</div>
+
+<button data-prevent-double-click="true"
+        @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
+        class="govuk-button govuk-button--secondary"
+        id="upload"
+        data-module="govuk-button">
+    @ButtonConstants.UPLOAD_FILES_TEXT
+</button>
+
+@if ((Model.CurrentFilesUploaded.Any() && !Model.Properties.Optional) || Model.Properties.Optional)
+{
+    <button data-prevent-double-click="true"
+            data-disable-on-click=true
+            class="govuk-button govuk-!-display-block"
+            id="@Model.QuestionId-SubmitButton"
+            data-module="govuk-button"
+            name="@ButtonConstants.SUBMIT"
+            value="@ButtonConstants.SUBMIT">
+        @Model.SubmitButtonText
+    </button>
+}

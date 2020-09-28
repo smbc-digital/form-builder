@@ -151,5 +151,46 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal($"{labelText2}: {value}", result[2]);
             Assert.Equal($"{labelText3}: {value}", result[4]);
         }
+
+        [Fact]
+        public void GenerateQuestionAndAnswersList_ShouldReturn_FilesData()
+        {
+            // Arrange
+            var value = "file.txt";
+            _mockElementMapper
+                .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns(value);
+
+            var formAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+            var labelText = "I am a label";
+            var labelText2 = "second label";
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId("testQuestion1")
+                .WithLabel(labelText)
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId("testQuestion2")
+                .WithLabel(labelText2)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithElement(element2)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            // Act
+            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+
+            Assert.Equal($"{labelText}: {value}", result[4]);
+            Assert.Equal($"{labelText2}: {value}", result[5]);
+        }
     }
 }

@@ -68,15 +68,16 @@ namespace form_builder.Models.Elements
             {
                 case LookUpConstants.Automatic:
                     IsSelect = true;
-                    Properties.Value = elementHelper.CurrentValue<string>(this, answers, page.PageSlug, guid, string.Empty);
+                    Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, string.Empty);
 
                     ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
                         ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
                         : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
 
-                    var selectedStreet = elementHelper.CurrentValue<string>(this, answers, page.PageSlug, guid, StreetConstants.SELECT_SUFFIX);
+                    var selectedStreet = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, StreetConstants.SELECT_SUFFIX);
                     var searchSuffix = results?.Count == 1 ? "street found" : "streets found";
                     Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} {searchSuffix}", string.Empty) };
+
                     results?.ForEach((objectResult) => {
                         AddressSearchResult searchResult;
 
@@ -92,7 +93,7 @@ namespace form_builder.Models.Elements
 
                 default:
 
-                    Properties.Value = elementHelper.CurrentValue<string>(this, answers, page.PageSlug, guid, string.Empty);
+                    Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, string.Empty);
                     return await viewRender.RenderAsync("StreetSearch", this);
             }
         }

@@ -49,10 +49,10 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var viewModel = new Dictionary<string, dynamic>();
 
             //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema,  _mockHostingEnv.Object);
 
             //Assert
-            Assert.Equal(SystemConstants.AddressSearchButtonText, callback.Properties.Text);
+            Assert.Equal(ButtonConstants.ADDRESS_SEARCH_TEXT, callback.Properties.Text);
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Button")), It.IsAny<Button>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
@@ -88,7 +88,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
-            Assert.Equal(SystemConstants.NextStepButtonText, callback.Properties.Text);
+            Assert.Equal(ButtonConstants.NEXTSTEP_TEXT, callback.Properties.Text);
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "Button"), It.IsAny<Button>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
@@ -123,7 +123,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
-            Assert.Equal(SystemConstants.SubmitButtonText, callback.Properties.Text);
+            Assert.Equal(ButtonConstants.SUBMIT_TEXT, callback.Properties.Text);
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Button")), It.IsAny<Button>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
@@ -158,7 +158,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
 
             //Assert
-            Assert.Equal(SystemConstants.SubmitButtonText, callback.Properties.Text);
+            Assert.Equal(ButtonConstants.SUBMIT_TEXT, callback.Properties.Text);
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Button")), It.IsAny<Button>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 

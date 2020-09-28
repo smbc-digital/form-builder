@@ -81,6 +81,7 @@ namespace form_builder.Models
             element.Type == EElementType.Street ||
             element.Type == EElementType.Organisation ||
             element.Type == EElementType.FileUpload ||
+            element.Type == EElementType.MultipleFileUpload ||
             element.Type == EElementType.Map
         );
 

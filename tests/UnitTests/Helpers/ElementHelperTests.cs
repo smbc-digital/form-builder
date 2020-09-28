@@ -40,7 +40,7 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add("test-id", "this is the value");
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, "", "");
+            var result = _elementHelper.CurrentValue(element, viewModel, "", "");
 
             // Assert
             Assert.Equal("this is the value", result);
@@ -63,7 +63,7 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty);
+            var result = _elementHelper.CurrentValue(element, viewModel, string.Empty, string.Empty);
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -87,7 +87,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty);
+            var result = _elementHelper.CurrentValue(element, viewModel, string.Empty, string.Empty);
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -124,7 +124,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, "test-slug", string.Empty);
+            var result = _elementHelper.CurrentValue(element, viewModel, "test-slug", string.Empty);
 
             // Assert
             Assert.Equal("this is the value", result);
@@ -156,7 +156,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, "test-slug", string.Empty);
+            var result = _elementHelper.CurrentValue(element, viewModel, "test-slug", string.Empty);
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -559,9 +559,9 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add(yearId, "2010");
 
             // Act
-            var dayResult = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty, "-day");
-            var monthResult = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty, "-month");
-            var yearResult = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty, "-year");
+            var dayResult = _elementHelper.CurrentValue(element, viewModel, string.Empty, string.Empty, "-day");
+            var monthResult = _elementHelper.CurrentValue(element, viewModel, string.Empty, string.Empty, "-month");
+            var yearResult = _elementHelper.CurrentValue(element, viewModel, string.Empty, string.Empty, "-year");
 
             // Assert
             Assert.Equal("14", dayResult);
@@ -583,9 +583,9 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var dayResult = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty, "-day");
-            var monthResult = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty, "-month");
-            var yearResult = _elementHelper.CurrentValue<string>(element, viewModel, string.Empty, string.Empty, "-year");
+            var dayResult = _elementHelper.CurrentValue(element, viewModel, string.Empty, string.Empty, "-day");
+            var monthResult = _elementHelper.CurrentValue(element, viewModel, string.Empty, string.Empty, "-month");
+            var yearResult = _elementHelper.CurrentValue(element, viewModel, string.Empty, string.Empty, "-year");
 
             // Assert
             Assert.Equal("", dayResult);

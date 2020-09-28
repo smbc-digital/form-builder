@@ -615,8 +615,10 @@ namespace form_builder_tests.UnitTests.Mappers
             Assert.IsType<string>(result);
         }
 
-        [Fact]
-        public void GetAnswerValue_ShouldCall_DistributedCache_ToGetFileUploadContent()
+        [Theory]
+        [InlineData(EElementType.FileUpload)]
+        [InlineData(EElementType.MultipleFileUpload)]
+        public void GetAnswerValue_ShouldCall_DistributedCache_ToGetFileUploadContent(EElementType type)
         {
             // Arrange
             var key = "fileUpload_fileUploadTestKey";
@@ -632,7 +634,7 @@ namespace form_builder_tests.UnitTests.Mappers
                             new Answers
                             {
                                 QuestionId = "fileUpload_fileUploadTestKey-fileupload",
-                                Response = JsonConvert.SerializeObject(new FileUploadModel{ UntrustedOriginalFileName = key })
+                                Response = JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel{ UntrustedOriginalFileName = key } })
                             }
                         }
                     }
@@ -640,7 +642,7 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             var element = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId(key)
                 .Build();
 
@@ -649,12 +651,62 @@ namespace form_builder_tests.UnitTests.Mappers
 
             // Assert
             _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
-            var model = Assert.IsType<File>(result);
-            Assert.Equal("testfile", model.Content);
+            var model = Assert.IsType<List<File>>(result);
+            Assert.Equal("testfile", model[0].Content);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldCall_ThrowExceptionWhenDistributedCacheThrows()
+        public void GetAnswerValue_ShouldCall_DistributedCache_MultipleTimes_ToGet_All_FileUploadContent()
+        {
+            // Arrange
+            var key = "fileUpload_fileUploadTestKey";
+            _wrapper.Setup(_ => _.GetString(It.Is<string>(_ => _ == "datakeyfile1")))
+                .Returns("file1content");
+
+            _wrapper.Setup(_ => _.GetString(It.Is<string>(_ => _ == "datakeyfile2")))
+                .Returns("file2content");
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers
+                            {
+                                QuestionId = "fileUpload_fileUploadTestKey-fileupload",
+                                Response = JsonConvert.SerializeObject(new List<FileUploadModel>
+                                { 
+                                    new FileUploadModel{ TrustedOriginalFileName = "file1.txt", Key = "datakeyfile1" }, 
+                                    new FileUploadModel{ TrustedOriginalFileName = "file2.txt", Key = "datakeyfile2"  } 
+                                })
+                            }
+                        }
+                    }
+                }
+            };
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId(key)
+                .Build();
+
+            // Act
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+
+            // Assert
+            _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Exactly(2));
+            var model = Assert.IsType<List<File>>(result);
+            Assert.Equal("file1content", model[0].Content);
+            Assert.Equal("file2content", model[1].Content);
+            Assert.Equal("file1.txt", model[0].TrustedOriginalFileName);
+            Assert.Equal("file2.txt", model[1].TrustedOriginalFileName);
+        }
+
+        [Theory]
+        [InlineData(EElementType.FileUpload)]
+        [InlineData(EElementType.MultipleFileUpload)]
+        public void GetAnswerValue_Should_ThrowException_WhenDistributedCacheThrows(EElementType type)
         {
             // Arrange
             var key = "fileUploadTestKey";
@@ -670,10 +722,15 @@ namespace form_builder_tests.UnitTests.Mappers
                             new Answers
                             {
                                 QuestionId = $"{key}-fileupload",
-                                Response = JsonConvert.SerializeObject(new FileUploadModel
-                                {
-                                    Key = key
-                                })
+                                Response = JsonConvert.SerializeObject(
+                                    new List<FileUploadModel>
+                                    {
+                                        new FileUploadModel
+                                        {
+                                            Key = key
+                                        }
+                                    }
+                                )
                             }
                         }
                     }
@@ -681,7 +738,7 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             var element = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId(key)
                 .Build();
 
@@ -975,17 +1032,19 @@ namespace form_builder_tests.UnitTests.Mappers
             Assert.Equal(value.SelectedAddress, result);
         }
 
-        [Fact]
-        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForFileUpload()
+        [Theory]
+        [InlineData(EElementType.FileUpload)]
+        [InlineData(EElementType.MultipleFileUpload)]
+        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForFileUpload(EElementType type)
         {
             // Arrange
             var questionId = "test-questionID";
             var labelText = "Evidence file";
-            var value = new FileUploadModel { TrustedOriginalFileName = "your_upload_file.txt" };
+            var value = new List<FileUploadModel>{new FileUploadModel { TrustedOriginalFileName = "your_upload_file.txt" }};
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-fileupload", Response = Newtonsoft.Json.JsonConvert.SerializeObject(value) } } } } };
 
             var element = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId(questionId)
                 .WithLabel(labelText)
                 .Build();
@@ -994,7 +1053,29 @@ namespace form_builder_tests.UnitTests.Mappers
             var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
-            Assert.Equal(value.TrustedOriginalFileName, result);
+            Assert.Equal(value[0].TrustedOriginalFileName, result);
+        }
+
+        [Fact]
+        public void GetAnswerStringValue_ShouldReturn_MultipleStrings_WhenMultipleFiles_AreWithinAnswerValue()
+        {
+            // Arrange
+            var questionId = "test-questionID";
+            var labelText = "Evidence file";
+            var value = new List<FileUploadModel>{new FileUploadModel { TrustedOriginalFileName = "your_upload_file.txt" }, new FileUploadModel { TrustedOriginalFileName = "filetwo.jpg" }};
+            var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-fileupload", Response = Newtonsoft.Json.JsonConvert.SerializeObject(value) } } } } };
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId(questionId)
+                .WithLabel(labelText)
+                .Build();
+
+            // Act
+            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+
+            // Assert
+            Assert.Equal($"{value[1].TrustedOriginalFileName} \\r\\n\\ {value[0].TrustedOriginalFileName}", result);
         }
 
         [Fact]

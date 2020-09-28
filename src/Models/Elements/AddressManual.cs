@@ -104,15 +104,15 @@ namespace form_builder.Models.Elements
 
         protected void SetAddressProperties(IElementHelper elementHelper, string pageSlug, string guid, Dictionary<string, dynamic> viewModel)
         {
-            Properties.Value = elementHelper.CurrentValue<string>(this, viewModel, pageSlug, guid, AddressConstants.SEARCH_SUFFIX);
-            Properties.AddressManualAddressLine1 = elementHelper.CurrentValue<string>(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.ADDRESS_LINE_1}");
-            Properties.AddressManualAddressLine2 = elementHelper.CurrentValue<string>(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.ADDRESS_LINE_2}");
-            Properties.AddressManualAddressTown = elementHelper.CurrentValue<string>(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.TOWN}");
+            Properties.Value = elementHelper.CurrentValue(this, viewModel, pageSlug, guid, AddressConstants.SEARCH_SUFFIX);
+            Properties.AddressManualAddressLine1 = elementHelper.CurrentValue(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.ADDRESS_LINE_1}");
+            Properties.AddressManualAddressLine2 = elementHelper.CurrentValue(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.ADDRESS_LINE_2}");
+            Properties.AddressManualAddressTown = elementHelper.CurrentValue(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.TOWN}");
             Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.POSTCODE)).Value;
 
             if (string.IsNullOrEmpty(Properties.AddressManualAddressPostcode))
             {
-                var value = elementHelper.CurrentValue<string>(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.POSTCODE}");
+                var value = elementHelper.CurrentValue(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.POSTCODE}");
                 Properties.AddressManualAddressPostcode = string.IsNullOrEmpty(value) ? Properties.Value : value;
             }   
         }

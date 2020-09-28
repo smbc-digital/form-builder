@@ -11,8 +11,8 @@ namespace form_builder.Helpers.PageHelpers
         
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, List<object> results = null);
         
-        void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid);
-        
+        void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false);
+
         void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName);
         
         Task CheckForPaymentConfiguration(List<Page> pages, string formName);
@@ -42,5 +42,7 @@ namespace form_builder.Helpers.PageHelpers
         void CheckAddressNoManualTextIsSet(List<Page> pages);
 
         void CheckForAnyConditionType(List<Page> pages);
+
+        List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload);
     }
 }

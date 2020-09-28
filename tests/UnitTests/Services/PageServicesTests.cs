@@ -14,6 +14,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
+using form_builder.Services.FileUploadService;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService;
@@ -40,6 +41,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IStreetService> _streetService = new Mock<IStreetService>();
         private readonly Mock<IAddressService> _addressService = new Mock<IAddressService>();
+        private readonly Mock<IFileUploadService> _fileUploadService = new Mock<IFileUploadService>();
         private readonly Mock<IOrganisationService> _organisationService = new Mock<IOrganisationService>();
         private readonly Mock<IDistributedCacheWrapper> _distributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
@@ -81,7 +83,7 @@ namespace form_builder_tests.UnitTests.Services
                 FormJson = 1
             });
 
-            _service = new PageService(_validators.Object, _mockPageHelper.Object, _sessionHelper.Object, _addressService.Object, _streetService.Object, _organisationService.Object, 
+            _service = new PageService(_validators.Object, _mockPageHelper.Object, _sessionHelper.Object, _addressService.Object, _fileUploadService.Object, _streetService.Object, _organisationService.Object, 
             _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object);
         }
 
@@ -716,7 +718,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
-            _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"document-{guid.ToString()}"), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
+            _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"document-{guid}"), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -747,7 +749,6 @@ namespace form_builder_tests.UnitTests.Services
             _mockPageHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>()), Times.Never);
         }
 
-
         [Fact]
         public async Task ProcessRequest_Should_CallPageHelper_WhenPageContains_InboundValues()
         {
@@ -772,9 +773,96 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
 
-            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null);
+            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), It.IsAny<IEnumerable<CustomFormFile>>());
 
             _mockPageHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessRequest_ShouldCallFileUploadService_WhenMultipleFileUploadElement()
+        {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+
+            _fileUploadService
+                .Setup(_ => _.ProcessFile(It.IsAny<Dictionary<string, dynamic>>(),
+                    It.IsAny<Page>(),
+                    It.IsAny<FormSchema>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    null))
+                .ReturnsAsync(new ProcessRequestEntity());
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId("fileUpload")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { "Guid", Guid.NewGuid().ToString() },
+                { $"{element.Properties.QuestionId}-fileupload", "file" }
+            };
+
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null);
+
+            _fileUploadService.Verify(_ => _.ProcessFile(It.IsAny<Dictionary<string, dynamic>>(),
+                It.IsAny<Page>(),
+                It.IsAny<FormSchema>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                null), Times.Once());
+            Assert.IsType<ProcessRequestEntity>(result);
+        }
+
+        [Fact]
+        public async Task ProcessRequest_ShouldNotCallFileUploadService_WhenNoMultipleFileUploadElement()
+        {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+
+            _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel());
+
+            var page = new PageBuilder()
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null);
+
+            _fileUploadService.Verify(_ => _.ProcessFile(It.IsAny<Dictionary<string, dynamic>>(),
+                It.IsAny<Page>(),
+                It.IsAny<FormSchema>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                null), Times.Never);
         }
     }
 }

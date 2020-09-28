@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,6 @@ using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
-using form_builder.Services.FileUploadService;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
@@ -36,13 +36,12 @@ namespace form_builder.Helpers.PageHelpers
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly ICache _cache;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
-        private readonly IFileUploadService _fileUploadService;
         private readonly ISessionHelper _sessionHelper;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
             IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            IEnumerable<IPaymentProvider> paymentProviders, IFileUploadService fileUploadService, ISessionHelper sessionHelper)
+            IEnumerable<IPaymentProvider> paymentProviders, ISessionHelper sessionHelper)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -52,7 +51,6 @@ namespace form_builder.Helpers.PageHelpers
             _cache = cache;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _paymentProviders = paymentProviders;
-            _fileUploadService = fileUploadService;
             _sessionHelper = sessionHelper;
         }
 
@@ -77,21 +75,26 @@ namespace form_builder.Helpers.PageHelpers
                     page,
                     baseForm,
                     _environment,
-                    results);
+                    results
+                    );
 
             return formModel;
         }
 
-        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid)
+        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+            var currentPageAnswers = new PageAnswers();
 
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == viewModel["Path"].ToLower()))
+            {
+                currentPageAnswers = convertedAnswers.Pages.Where(_ => _.PageSlug == viewModel["Path"].ToLower()).ToList().FirstOrDefault();
                 convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageSlug != viewModel["Path"].ToLower()).ToList();
+            }
 
             var answers = new List<Answers>();
 
@@ -102,7 +105,9 @@ namespace form_builder.Helpers.PageHelpers
             }
 
             if (files != null && files.Any() && isPageValid)
-                answers = _fileUploadService.SaveFormFileAnswers(answers, files);
+            {
+                answers = SaveFormFileAnswers(answers, files, appendMultipleFileUploadParts, currentPageAnswers);
+            }
 
             convertedAnswers.Pages?.Add(new PageAnswers
             {
@@ -113,7 +118,7 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.Path = viewModel["Path"];
             convertedAnswers.FormName = form;
 
-            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
+            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
         public void HasDuplicateQuestionIDs(List<Page> pages, string formName)
@@ -483,6 +488,46 @@ namespace form_builder.Helpers.PageHelpers
                 });
             }
 
+        }
+
+        public List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload)
+        {
+            files.GroupBy(_ => _.QuestionId).ToList().ForEach(file =>
+            {
+                var key = $"{ file.Key}-{_sessionHelper.GetSessionGuid()}";
+                var fileContent = file.Select(_ => _.Base64EncodedContent);
+                _distributedCache.SetStringAsync($"file-{key}", JsonConvert.SerializeObject(fileContent), _distributedCacheExpirationConfiguration.FileUpload);
+
+                var fileUploadModel = file.Select(_ => new FileUploadModel
+                {
+                    Key = $"file-{key}",
+                    TrustedOriginalFileName = WebUtility.HtmlEncode(_.UntrustedOriginalFileName),
+                    UntrustedOriginalFileName = _.UntrustedOriginalFileName,
+                    FileSize = _.Length
+                }).ToList();
+
+                if(isMultipleFileUploadElementType)
+                {
+                    var data = currentAnswersForFileUpload.Answers?.FirstOrDefault(_ => _.QuestionId.Equals(file.Key))?.Response;
+                    if(data != null){
+                        List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(data.ToString());
+                        fileUploadModel.InsertRange(0, response.Where(_ => !fileUploadModel.Any(x => x.TrustedOriginalFileName == _.TrustedOriginalFileName)).ToList());
+                    }
+                }
+
+                if (answers.Exists(_ => _.QuestionId == file.Key))
+                {
+                    var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId == file.Key);
+                    if (fileUploadAnswer != null)
+                        fileUploadAnswer.Response = fileUploadModel;
+                }
+                else
+                {
+                    answers.Add(new Answers { QuestionId = file.Key, Response = JsonConvert.SerializeObject(fileUploadModel) });
+                }
+            });
+
+            return answers;
         }
     }
 }
