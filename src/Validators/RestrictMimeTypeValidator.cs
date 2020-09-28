@@ -74,8 +74,8 @@ namespace form_builder.Validators
             var fileTypesErrorMessage = allowedFileTypes.ToReadableFileType();
 
             var validationMessage = invalidFiles.Count == 1
-                ? $"The selected file must be a {fileTypesErrorMessage.Replace(".", string.Empty)}."
-                : invalidFiles.Select(_ => $"{_.File.FileName} must be a {fileTypesErrorMessage}").Aggregate((curr, acc) => $"{acc} <br/> {curr}");
+                ? $"The selected file must be a {fileTypesErrorMessage}."
+                : invalidFiles.Select(_ => $"{_.File.FileName} must be a {fileTypesErrorMessage}.").Aggregate((curr, acc) => $"{acc} <br/> {curr}");
 
             return new ValidationResult
             {
@@ -91,7 +91,7 @@ namespace form_builder.Validators
             return new ValidationResult
             {
                 IsValid = false,
-                Message = $"The selected file must be a {fileTypesErrorMessage.Replace(".", string.Empty)}."
+                Message = $"The selected file must be a {fileTypesErrorMessage}."
             };
         }
     }
