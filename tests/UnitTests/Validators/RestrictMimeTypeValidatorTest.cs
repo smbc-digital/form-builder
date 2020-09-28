@@ -124,7 +124,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Equal("file2.txt must be a .JPG <br/> file1.txt must be a .JPG", result.Message);
+            Assert.Equal("file2.txt must be a JPG. <br/> file1.txt must be a JPG.", result.Message);
         }
 
         [Fact]
@@ -211,7 +211,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.StartsWith("The selected file must be a PNG", result.Message);
+            Assert.Equal("The selected file must be a PNG.", result.Message);
         }
 
         [Fact]
@@ -235,7 +235,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.StartsWith("The selected file must be a PNG", result.Message);
+            Assert.Equal("The selected file must be a PNG.", result.Message);
         }
 
         [Fact]
@@ -262,7 +262,116 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Equal("file2.png must be a .PNG <br/> file1.png must be a .PNG", result.Message);
+            Assert.Equal("file2.png must be a PNG. <br/> file1.png must be a PNG.", result.Message);
         }
+
+        [Fact]
+        public void Validate_MultipleFileUpload_Should_ReturnsFalseWhen_MultipleFilesAreNot_AllowedExtensions()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId("fileUpload")
+                .WithAcceptedMimeType(".png")
+                .WithAcceptedMimeType(".txt")
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            var docs = new List<DocumentModel>
+            {
+                new DocumentModel { FileName = "file1.png", FileSize = 16, Content = base64EncodedImage },
+                new DocumentModel { FileName = "file2.png", FileSize = 16, Content = base64EncodedImage }
+            };
+
+            viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
+
+            // Act
+            var result = _validator.Validate(element, viewModel);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Equal("file2.png must be a PNG or TXT. <br/> file1.png must be a PNG or TXT.", result.Message);
+        }
+
+        [Fact]
+        public void Validate_MultipleFileUpload_Should_ReturnsFalseWhen_SingleFileIsNot_AllowedExtensions()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId("fileUpload")
+                .WithAcceptedMimeType(".png")
+                .WithAcceptedMimeType(".txt")
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            var docs = new List<DocumentModel>();
+            var documentModel = new DocumentModel { FileSize = 16, Content = base64EncodedImage };
+            docs.Add(documentModel);
+            viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
+
+            // Act
+            var result = _validator.Validate(element, viewModel);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Equal("The selected file must be a PNG or TXT.", result.Message);
+        }
+
+        [Fact]
+        public void Validate_MultipleFileUpload_Should_ReturnsFalseWhen_MultipleFilesAreNot_AllowedExtensions_WithThreeAcceptedMimeTypes()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId("fileUpload")
+                .WithAcceptedMimeType(".png")
+                .WithAcceptedMimeType(".txt")
+                .WithAcceptedMimeType(".pdf")
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            var docs = new List<DocumentModel>
+            {
+                new DocumentModel { FileName = "file1.png", FileSize = 16, Content = base64EncodedImage },
+                new DocumentModel { FileName = "file2.png", FileSize = 16, Content = base64EncodedImage }
+            };
+
+            viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
+
+            // Act
+            var result = _validator.Validate(element, viewModel);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Equal("file2.png must be a PNG, TXT or PDF. <br/> file1.png must be a PNG, TXT or PDF.", result.Message);
+        }
+
+        [Fact]
+        public void Validate_MultipleFileUpload_Should_ReturnsFalseWhen_SingleFileIsNot_AllowedExtensions_WithThreeAcceptedMimeTypes()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId("fileUpload")
+                .WithAcceptedMimeType(".png")
+                .WithAcceptedMimeType(".txt")
+                .WithAcceptedMimeType(".pdf")
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            var docs = new List<DocumentModel>();
+            var documentModel = new DocumentModel { FileSize = 16, Content = base64EncodedImage };
+            docs.Add(documentModel);
+            viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
+
+            // Act
+            var result = _validator.Validate(element, viewModel);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Equal("The selected file must be a PNG, TXT or PDF.", result.Message);
+        }
+
     }
 }
