@@ -19,7 +19,6 @@ using form_builder.Models.Properties.ActionProperties;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
-using form_builder.Services.FileUploadService;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
@@ -2235,28 +2234,19 @@ namespace form_builder_tests.UnitTests.Helpers
                 PageSlug = "path",
                 Answers = new List<Answers>
                 {
-                    new Answers { QuestionId = "Item1", Response = "old-answer" },
-                    new Answers { QuestionId = "Item2", Response = "old-answer" }
+                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel()}) },
+                    new Answers { QuestionId = "Item2", Response = JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel()}) }
                 }
             };
           
-            var fileUpload = new List<FileUploadModel>();
-            fileUpload.Add(
-              new FileUploadModel
-              {
-                  Key = $"file-{questionId}-",
-                  TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
-                  UntrustedOriginalFileName = "replace-me.txt",
-                  FileSize = 0
-              }
-            );
-
             // Act
             var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, false, page);
 
             // Assert
-            Assert.Contains(results, x => x.QuestionId == "fileUpload_FileQuestionId");
-            Assert.Contains(results, x => x.Response == JsonConvert.SerializeObject(fileUpload));
+            Assert.NotNull(results);
+            Assert.Equal(3, results.Count());
+            var itemData = Assert.IsType<List<FileUploadModel>>(results[2].Response);
+            Assert.StartsWith("file-fileUpload_FileQuestionId-", results[2].Response[0].Key);
         }
 
         [Fact]
@@ -2264,28 +2254,15 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             // Arrange                                        
             var questionId = "Item1";
+            var currentAnswerKey = $"file-{questionId}-{Guid.NewGuid()}";
             var file = new List<CustomFormFile>();
             file.Add(new CustomFormFile(null, questionId, 1, null));
-            
-            var expectedFileUpload = new List<FileUploadModel>();
-            expectedFileUpload.Add(new FileUploadModel {Key = $"file-{questionId}-",TrustedOriginalFileName = "replace-me.txt", UntrustedOriginalFileName = "replace-me.txt", FileSize = 0});
-            expectedFileUpload.Add(new FileUploadModel {Key = $"file-{questionId}-",TrustedOriginalFileName = null,UntrustedOriginalFileName = null,FileSize = 1});
-
-          
-            var expectedPage = new PageAnswers
-            {
-                PageSlug = "path",
-                Answers = new List<Answers>
-                {
-                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(expectedFileUpload) }
-                }
-            };
 
             var fileUpload = new List<FileUploadModel>();
             fileUpload.Add(
               new FileUploadModel
               {
-                  Key = $"file-{questionId}-",TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),UntrustedOriginalFileName = "replace-me.txt",FileSize = 0
+                  Key = currentAnswerKey, TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"), UntrustedOriginalFileName = "replace-me.txt", FileSize = 0
               }
             );
 
@@ -2300,8 +2277,13 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Act
             var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
+
             // Assert
-            Assert.Contains(JsonConvert.SerializeObject(expectedFileUpload), JsonConvert.SerializeObject(results));
+            Assert.NotNull(results);
+            var itemData = Assert.IsType<List<FileUploadModel>>(results[0].Response);
+            Assert.Equal(2, itemData.Count);
+            Assert.Equal(currentAnswerKey, itemData[0].Key);
+            Assert.StartsWith($"file-{questionId}-", itemData[1].Key);
         }
 
         [Fact]
@@ -2316,7 +2298,7 @@ namespace form_builder_tests.UnitTests.Helpers
             fileUpload.Add(
               new FileUploadModel
               {
-                  Key = $"file-{questionId}-",
+                  Key = $"file-OLD-ANSWER",
                   TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
                   UntrustedOriginalFileName = "replace-me.txt",
                   FileSize = 0
@@ -2332,23 +2314,81 @@ namespace form_builder_tests.UnitTests.Helpers
                 }
             };
 
+            // Act
+            var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, false, page);
 
-            var expectedFileUpload = new List<FileUploadModel>();
-            expectedFileUpload.Add(new FileUploadModel { Key = $"file-{questionId}-", TrustedOriginalFileName = null, UntrustedOriginalFileName = null, FileSize = 1 });
+            // Assert
+            Assert.NotNull(results);
+            var itemData = Assert.IsType<List<FileUploadModel>>(results[0].Response);
+            Assert.Single(itemData);
+            Assert.StartsWith($"file-{questionId}-", itemData[0].Key);
+        }
 
+        
+        [Fact]
+        public void SaveFormFileAnswer_ShouldSave_Files_InDistributedCache()
+        {
+            // Arrange                                        
+            var questionId = "fileUpload";
+            var file = new List<CustomFormFile>();
+            file.Add(new CustomFormFile("content", questionId, 1, "fileone.txt"));
+            file.Add(new CustomFormFile("content", questionId, 1, "filetwo.txt"));
+            var page = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>()
+            };
 
-            var expectedPage = new PageAnswers
+            // Act
+            _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
+
+            // Assert
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Exactly(2));
+        }
+
+        [Fact]
+        public void SaveFormFileAnswer_ShouldNotSave_ExisitingFiles_IfUploadedTwice_InDistributedCache()
+        {
+            // Arrange                                        
+            var questionId = "fileUpload";
+            var file = new List<CustomFormFile>();
+            file.Add(new CustomFormFile("content", questionId, 1, "newfile.txt"));
+            file.Add(new CustomFormFile("content", questionId, 1, "existingfile.txt"));
+            file.Add(new CustomFormFile("content", questionId, 1, "existingfiletwo.txt"));
+
+            var fileUpload = new List<FileUploadModel>();
+            fileUpload.Add(
+              new FileUploadModel
+              {
+                  Key = questionId,
+                  TrustedOriginalFileName = WebUtility.HtmlEncode("existingfile.txt"),
+                  UntrustedOriginalFileName = "existingfile.txt",
+                  FileSize = 0
+              }
+            );
+            fileUpload.Add(
+            new FileUploadModel
+            {
+                  Key = questionId,
+                  TrustedOriginalFileName = WebUtility.HtmlEncode("existingfiletwo.txt"),
+                  UntrustedOriginalFileName = "existingfiletwo.txt",
+                  FileSize = 0
+            });
+
+            var page = new PageAnswers
             {
                 PageSlug = "path",
                 Answers = new List<Answers>
                 {
-                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(expectedFileUpload) }
+                    new Answers { QuestionId = questionId, Response = JsonConvert.SerializeObject(fileUpload) }
                 }
             };
+
             // Act
-            var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, false, page);
+            _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
+
             // Assert
-            Assert.Contains(JsonConvert.SerializeObject(expectedFileUpload), JsonConvert.SerializeObject(results));
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once());
         }
     }
 }
