@@ -654,7 +654,48 @@ namespace form_builder_tests.UnitTests.Services
             var guid = Guid.NewGuid();
             var questionIDOne = "fileUploadone";
             var questionIDTwo = "fileUploadtwo";
+            var fileOneKey = $"file-{questionIDOne}-12345";
+            var fileTwoKey = $"file-{questionIDTwo}-12345";
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+
+            var cacheData = new FormAnswers
+            {
+                Path = "page-one",
+                FormName = "form",
+                Pages = new List<PageAnswers> 
+                {
+                    new PageAnswers 
+                    {
+                        Answers = new List<Answers> 
+                        {
+                            new Answers 
+                            {
+                                QuestionId = $"{questionIDOne}{FileUploadConstants.SUFFIX}",
+                                Response = new List<FileUploadModel>
+                                {
+                                    new FileUploadModel 
+                                    {
+                                        Key = fileOneKey
+                                    }
+                                }
+                            },
+                            new Answers 
+                            {
+                                QuestionId = $"{questionIDTwo}{FileUploadConstants.SUFFIX}",
+                                Response = new List<FileUploadModel>
+                                {
+                                    new FileUploadModel 
+                                    {
+                                        Key = fileTwoKey
+                                    }
+                                }
+                            }
+                        }    
+                    }
+                }
+            };
+
+            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.FileUpload)
@@ -680,8 +721,8 @@ namespace form_builder_tests.UnitTests.Services
             await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"file-{questionIDOne}-fileupload-{guid}")), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == $"file-{questionIDTwo}-fileupload-{guid}")), Times.Once);
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileOneKey)), Times.Once);
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileTwoKey)), Times.Once);
         }
 
         [Fact]
@@ -689,17 +730,17 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             var guid = Guid.NewGuid();
-            var questionIDOne = "fileUploadone";
-            var questionIDTwo = "fileUploadtwo";
+            var questionIDOne = "questionOne";
+            var questionIDTwo = "questionTwo";
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
 
             var element = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(EElementType.Textbox)
                 .WithQuestionId(questionIDOne)
                 .Build();
 
             var element2 = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(EElementType.Textarea)
                 .WithQuestionId(questionIDTwo)
                 .Build();
 

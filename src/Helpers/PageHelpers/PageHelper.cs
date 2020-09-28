@@ -494,26 +494,34 @@ namespace form_builder.Helpers.PageHelpers
         {
             files.GroupBy(_ => _.QuestionId).ToList().ForEach(file =>
             {
-                var key = $"{ file.Key}-{_sessionHelper.GetSessionGuid()}";
-                var fileContent = file.Select(_ => _.Base64EncodedContent);
-                _distributedCache.SetStringAsync($"file-{key}", JsonConvert.SerializeObject(fileContent), _distributedCacheExpirationConfiguration.FileUpload);
-
-                var fileUploadModel = file.Select(_ => new FileUploadModel
-                {
-                    Key = $"file-{key}",
-                    TrustedOriginalFileName = WebUtility.HtmlEncode(_.UntrustedOriginalFileName),
-                    UntrustedOriginalFileName = _.UntrustedOriginalFileName,
-                    FileSize = _.Length
-                }).ToList();
-
+                var fileUploadModel = new List<FileUploadModel>();
+                var filsToAdd = file.ToList();
                 if(isMultipleFileUploadElementType)
                 {
                     var data = currentAnswersForFileUpload.Answers?.FirstOrDefault(_ => _.QuestionId.Equals(file.Key))?.Response;
                     if(data != null){
                         List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(data.ToString());
-                        fileUploadModel.InsertRange(0, response.Where(_ => !fileUploadModel.Any(x => x.TrustedOriginalFileName == _.TrustedOriginalFileName)).ToList());
+                        fileUploadModel.AddRange(response);
+                        filsToAdd = filsToAdd.Where(_ => !response.Any(x => WebUtility.HtmlEncode(_.UntrustedOriginalFileName) == x.TrustedOriginalFileName)).ToList();
                     }
                 }
+
+                var keys = filsToAdd.Select(_ => $"file-{file.Key}-{Guid.NewGuid()}").ToArray();
+
+                var fileContent = filsToAdd.Select(_ => _.Base64EncodedContent).ToList();
+
+                for (int i = 0; i < fileContent.Count; i++)
+                {
+                     _distributedCache.SetStringAsync(keys[i], JsonConvert.SerializeObject(fileContent[i]), _distributedCacheExpirationConfiguration.FileUpload);
+                }
+
+                fileUploadModel.AddRange(filsToAdd.Select((_, index) => new FileUploadModel
+                {
+                    Key = keys[index],
+                    TrustedOriginalFileName = WebUtility.HtmlEncode(_.UntrustedOriginalFileName),
+                    UntrustedOriginalFileName = _.UntrustedOriginalFileName,
+                    FileSize = _.Length
+                }).ToList());
 
                 if (answers.Exists(_ => _.QuestionId == file.Key))
                 {
@@ -523,7 +531,7 @@ namespace form_builder.Helpers.PageHelpers
                 }
                 else
                 {
-                    answers.Add(new Answers { QuestionId = file.Key, Response = JsonConvert.SerializeObject(fileUploadModel) });
+                    answers.Add(new Answers { QuestionId = file.Key, Response = fileUploadModel });
                 }
             });
 

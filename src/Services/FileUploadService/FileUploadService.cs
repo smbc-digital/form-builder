@@ -74,10 +74,13 @@ namespace form_builder.Services.FileUploadService
 
             var currentPageAnswers = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault();
             List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(currentPageAnswers.Response.ToString());
-            response.Remove(response.FirstOrDefault(_ => _.TrustedOriginalFileName.Equals(viewModel[FileUploadConstants.FILE_TO_DELETE])));
+
+            var fileToRemove = response.FirstOrDefault(_ => _.TrustedOriginalFileName.Equals(viewModel[FileUploadConstants.FILE_TO_DELETE]));
+            response.Remove(fileToRemove);
             convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path)).Answers.FirstOrDefault().Response = response;
 
             _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
+            _distributedCache.Remove(fileToRemove.Key);
 
             return new ProcessRequestEntity
             {
