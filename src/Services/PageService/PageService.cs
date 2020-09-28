@@ -24,6 +24,7 @@ using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace form_builder.Services.PageService
 {
@@ -250,13 +251,21 @@ namespace form_builder.Services.PageService
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             var formFileUploadElements = baseForm.Pages.SelectMany(_ => _.Elements)
-                .Where(_ => _.Type == EElementType.FileUpload)
+                .Where(_ => _.Type == EElementType.FileUpload || _.Type == EElementType.MultipleFileUpload)
                 .ToList();
 
-            if (formFileUploadElements.Count > 0)
-                formFileUploadElements.ForEach(_ =>
+            if (formFileUploadElements.Any())
+                formFileUploadElements.ForEach(fileElement =>
                 {
-                    _distributedCache.Remove($"file-{_.Properties.QuestionId}{FileUploadConstants.SUFFIX}-{sessionGuid}");
+                    var formFileAnswerData = formAnswers.Pages.SelectMany(_ => _.Answers).FirstOrDefault(_ => _.QuestionId == $"{fileElement.Properties.QuestionId}{FileUploadConstants.SUFFIX}")?.Response ?? string.Empty;
+                    List<FileUploadModel> convertedFileUploadAnswer = JsonConvert.DeserializeObject<List<FileUploadModel>>(formFileAnswerData.ToString());
+
+                    if(convertedFileUploadAnswer.Any())
+                    {
+                        convertedFileUploadAnswer.ForEach((_) => {
+                            _distributedCache.Remove(_.Key);
+                        });
+                    }
                 });
 
             if(baseForm.DocumentDownload)
