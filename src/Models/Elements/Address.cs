@@ -45,6 +45,8 @@ namespace form_builder.Models.Elements
             }
         }
 
+        public override string GetLabelText() => $"Address{(Properties.Optional? " (optional)" : string.Empty)}";
+
         public Address()
         {
             Type = EElementType.Address;
@@ -84,6 +86,7 @@ namespace form_builder.Models.Elements
 
                     var selectedAddress = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, AddressConstants.SELECT_SUFFIX);
                     Items = new List<SelectListItem> { new SelectListItem($"{results.Count} addresses found", string.Empty) };
+                    
                     results.ForEach((objectResult) =>
                     {
                         AddressSearchResult searchResult;

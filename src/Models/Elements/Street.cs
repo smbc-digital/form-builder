@@ -43,6 +43,8 @@ namespace form_builder.Models.Elements
             }
         }
 
+        public override string GetLabelText() => $"Street{(Properties.Optional ? " (optional)" : string.Empty)}";
+
         public Street()
         {
             Type = EElementType.Street;
@@ -74,6 +76,7 @@ namespace form_builder.Models.Elements
 
                     var selectedStreet = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, StreetConstants.SELECT_SUFFIX);
                     Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} streets found", string.Empty) };
+
                     results?.ForEach((objectResult) => {
                         AddressSearchResult searchResult;
 
