@@ -28,6 +28,7 @@ namespace form_builder.Validators
 
             var key = $"{ element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
             var isValid = false;
+            var message = ValidationConstants.FILEUPLOAD_EMPTY;
             
             List<DocumentModel> value = viewModel.ContainsKey(key)
                 ? viewModel[key]
@@ -35,8 +36,8 @@ namespace form_builder.Validators
 
             isValid = !(value is null);
 
-            //check saved answeras if any have been uploaded already
-            if(value == null)
+            // Check saved answers if any have been uploaded already
+            if (value == null)
             {
                 var sessionGuid = _sessionHelper.GetSessionGuid();
                 var cachedAnswers = _distributedCache.GetString(sessionGuid);
@@ -53,7 +54,13 @@ namespace form_builder.Validators
                 {
                     response = JsonConvert.DeserializeObject<List<FileUploadModel>>(pageAnswersString.Response.ToString());
 
-                    if(response.Any()){
+                    // Sets a different message if on the subpage and no files selected
+                    if (response.Any() && !viewModel.ContainsKey(ButtonConstants.SUBMIT))
+                    {
+                        message = ValidationConstants.FILEUPLOAD_NO_FILE_SELECTED;
+                    }
+
+                    else if (response.Any()) {
                         isValid = true;
                     }
                 }
@@ -62,7 +69,7 @@ namespace form_builder.Validators
             return new ValidationResult
             {
                 IsValid = isValid,
-                Message = ValidationConstants.FILEUPLOAD_EMPTY
+                Message = message
             };
         }
     }
