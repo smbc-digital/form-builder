@@ -39,7 +39,6 @@ namespace form_builder.Validators
 
             isValid = !(value is null);
 
-            // Check saved answers if any have been uploaded already
             if (value == null)
             {
                 var sessionGuid = _sessionHelper.GetSessionGuid();
