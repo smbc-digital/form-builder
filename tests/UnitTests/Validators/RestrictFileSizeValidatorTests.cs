@@ -124,7 +124,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Equal($"The selected file must smaller than {maxFileSize} MB", result.Message);
+            Assert.Equal($"The selected file must be smaller than {maxFileSize} MB", result.Message);
         }
 
         [Fact]
@@ -151,7 +151,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Equal($"The selected file must smaller than 3 MB", result.Message);
+            Assert.Equal($"The selected file must be smaller than 3 MB", result.Message);
         }
 
         [Fact]
