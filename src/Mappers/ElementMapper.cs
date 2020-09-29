@@ -72,7 +72,7 @@ namespace form_builder.Mappers
                 default:
                     if (element.Properties.Numeric)
                         return GetNumericElementValue(key, formAnswers);
-                    
+
                     var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                        .Where(_ => _.QuestionId == key)
                        .ToList()
@@ -82,22 +82,22 @@ namespace form_builder.Mappers
             }
         }
 
-		private object GetDeclarationElementValue(string key, FormAnswers formAnswers)
-		{
-			var value = formAnswers.Pages
-				.SelectMany(_ => _.Answers)
-				.FirstOrDefault(_ => _.QuestionId == key);
+        private object GetDeclarationElementValue(string key, FormAnswers formAnswers)
+        {
+            var value = formAnswers.Pages
+                .SelectMany(_ => _.Answers)
+                .FirstOrDefault(_ => _.QuestionId == key);
 
-			if (value == null || string.IsNullOrEmpty(value.Response))
-			{
-				return "false";
-			}
-			return "true";
-		}
+            if (value == null || string.IsNullOrEmpty(value.Response))
+            {
+                return "Unchecked";
+            }
+            return "Checked";
+        }
 
         public string GetAnswerStringValue(IElement question, FormAnswers formAnswers)
         {
-            if(question.Type == EElementType.FileUpload || question.Type == EElementType.MultipleFileUpload)
+            if (question.Type == EElementType.FileUpload || question.Type == EElementType.MultipleFileUpload)
             {
                 var fileInput = formAnswers.Pages
                     .ToList()
@@ -105,12 +105,12 @@ namespace form_builder.Mappers
                     .ToList()
                     .FirstOrDefault(_ => _.QuestionId == $"{question.Properties.QuestionId}{FileUploadConstants.SUFFIX}")?.Response;
 
-                if(fileInput == null)
+                if (fileInput == null)
                     return string.Empty;
 
                 List<FileUploadModel> fileUploadData = JsonConvert.DeserializeObject<List<FileUploadModel>>(fileInput.ToString());
 
-                if(question.Type == EElementType.FileUpload)
+                if (question.Type == EElementType.FileUpload)
                     return fileUploadData.FirstOrDefault()?.TrustedOriginalFileName;
 
                 return fileUploadData.Any() ? fileUploadData.Select(_ => _.TrustedOriginalFileName).Aggregate((cur, acc) => $"{acc} \\r\\n\\ {cur}") : string.Empty;
@@ -118,7 +118,7 @@ namespace form_builder.Mappers
 
             object value = GetAnswerValue(question, formAnswers);
 
-            if(value == null)
+            if (value == null)
                 return string.Empty;
 
             switch (question.Type)
@@ -137,27 +137,27 @@ namespace form_builder.Mappers
                 case EElementType.Radio:
                     var selectValue = question.Properties.Options.FirstOrDefault(_ => _.Value == value.ToString());
                     return selectValue?.Text ?? string.Empty;
-                
+
                 case EElementType.Checkbox:
                     var answerCheckbox = string.Empty;
                     var list = (List<string>)value;
                     list.ForEach((answersCheckbox) => answerCheckbox += $" {question.Properties.Options.FirstOrDefault(_ => _.Value == answersCheckbox)?.Text ?? string.Empty},");
-                    return answerCheckbox.EndsWith(",") ? answerCheckbox.Remove(answerCheckbox.Length - 1).Trim() :answerCheckbox.Trim();
-                
+                    return answerCheckbox.EndsWith(",") ? answerCheckbox.Remove(answerCheckbox.Length - 1).Trim() : answerCheckbox.Trim();
+
                 case EElementType.Organisation:
                     var orgValue = (Organisation)value;
                     return !string.IsNullOrEmpty(orgValue.Name) ? orgValue.Name : string.Empty;
                 case EElementType.Address:
                     var addressValue = (Address)value;
-                    if(!string.IsNullOrEmpty(addressValue.SelectedAddress))
+                    if (!string.IsNullOrEmpty(addressValue.SelectedAddress))
                         return addressValue.SelectedAddress;
                     var manualLine2Text = string.IsNullOrWhiteSpace(addressValue.AddressLine2) ? string.Empty : $",{addressValue.AddressLine2}";
                     return string.IsNullOrWhiteSpace(addressValue.AddressLine1) ? string.Empty : $"{addressValue.AddressLine1}{manualLine2Text},{addressValue.Town},{addressValue.Postcode}";
-                
+
                 case EElementType.Street:
                     var streetValue = (Address)value;
                     return string.IsNullOrEmpty(streetValue.PlaceRef) && string.IsNullOrEmpty(streetValue.SelectedAddress) ? string.Empty : streetValue.SelectedAddress;
-                
+
                 default:
                     return value.ToString();
             }
@@ -166,7 +166,7 @@ namespace form_builder.Mappers
         private object GetFileUploadElementValue(string key, FormAnswers formAnswers)
         {
             key = $"{key}{FileUploadConstants.SUFFIX}";
-           
+
             var listOfFiles = new List<File>();
 
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
@@ -184,7 +184,7 @@ namespace form_builder.Mappers
 
                     if (fileData == null)
                         throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {file.Key} from the distributed cache");
-                    
+
                     var model = new File();
                     model.Content = fileData;
                     model.TrustedOriginalFileName = file.TrustedOriginalFileName;
@@ -193,7 +193,7 @@ namespace form_builder.Mappers
 
                     listOfFiles.Add(model);
                 }
-                                                
+
                 return listOfFiles;
             }
 
@@ -226,7 +226,7 @@ namespace form_builder.Mappers
 
             return addressObject.IsEmpty() ? null : addressObject;
         }
-        
+
         private Address GetStreetElementValue(string key, FormAnswers formAnswers)
         {
             var addressObject = new Address();
@@ -264,7 +264,7 @@ namespace form_builder.Mappers
 
             return null;
         }
-        
+
         private TimeSpan? GetTimeElementValue(string key, FormAnswers formAnswers)
         {
             dynamic dateObject = new ExpandoObject();
@@ -313,7 +313,7 @@ namespace form_builder.Mappers
 
             if (value == null || string.IsNullOrEmpty(value.Response))
                 return null;
-            
+
             return int.Parse(value.Response);
         }
         private DateTime? GetDatePickerElementValue(string key, FormAnswers formAnswers)
@@ -335,7 +335,7 @@ namespace form_builder.Mappers
 
             if (value == null || string.IsNullOrEmpty(value.Response))
                 return new List<string>();
-            
+
             var val = value.Response.Split(",");
 
             return new List<string>(val);
