@@ -5,7 +5,7 @@
     var elements = Model.GenerateElementProperties();
     var baseCssClasses = "smbc-file-upload govuk-!-margin-bottom-5 govuk-!-display-block";
     elements.Add("class", !Model.IsValid
-        ? $"{baseCssClasses} govuk-input--error"
+        ? $"{baseCssClasses} govuk-input--error govuk-!-padding-left-2"
         : baseCssClasses);
     var uploadButtonCss = Model.CurrentFilesUploaded.Any() && !Model.Properties.Optional ? "govuk-button govuk-button--secondary" : "govuk-button";
 }
