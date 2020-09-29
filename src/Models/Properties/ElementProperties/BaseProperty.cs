@@ -61,5 +61,7 @@ namespace form_builder.Models.Properties.ElementProperties
         public string NotAnIntegerValidationMessage { get; set; } = string.Empty;
 
         public string IAG { get; set; }
+
+        public bool HideOptionalText { get;set; }
     }
 }

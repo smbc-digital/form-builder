@@ -26,6 +26,9 @@ namespace form_builder.Validators
             if(element.Type != EElementType.MultipleFileUpload)
                 return new ValidationResult { IsValid = true };
 
+            if(element.Properties.Optional && viewModel.ContainsKey(ButtonConstants.SUBMIT))
+                return new ValidationResult { IsValid = true };
+
             var key = $"{ element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
             var isValid = false;
             var message = ValidationConstants.FILEUPLOAD_EMPTY;
