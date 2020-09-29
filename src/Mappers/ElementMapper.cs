@@ -90,9 +90,9 @@ namespace form_builder.Mappers
 
             if (value == null || string.IsNullOrEmpty(value.Response))
             {
-                return "Unchecked";
+                return "False";
             }
-            return "Checked";
+            return "True";
         }
 
         public string GetAnswerStringValue(IElement question, FormAnswers formAnswers)
@@ -144,9 +144,16 @@ namespace form_builder.Mappers
                     list.ForEach((answersCheckbox) => answerCheckbox += $" {question.Properties.Options.FirstOrDefault(_ => _.Value == answersCheckbox)?.Text ?? string.Empty},");
                     return answerCheckbox.EndsWith(",") ? answerCheckbox.Remove(answerCheckbox.Length - 1).Trim() : answerCheckbox.Trim();
 
+                case EElementType.Declaration:
+                    var decValue = value;
+                    if (decValue == null || string.IsNullOrEmpty(formAnswers.Pages.SelectMany(_ => _.Answers).FirstOrDefault(_ => _.QuestionId == question.Properties.QuestionId)?.Response))
+                        return "Unchecked";
+                    return "Checked";
+
                 case EElementType.Organisation:
                     var orgValue = (Organisation)value;
                     return !string.IsNullOrEmpty(orgValue.Name) ? orgValue.Name : string.Empty;
+
                 case EElementType.Address:
                     var addressValue = (Address)value;
                     if (!string.IsNullOrEmpty(addressValue.SelectedAddress))
