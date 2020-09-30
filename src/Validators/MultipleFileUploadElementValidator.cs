@@ -53,7 +53,7 @@ namespace form_builder.Validators
 
                 var path = viewModel.FirstOrDefault(_ => _.Key.Equals("Path")).Value;
 
-                var pageAnswersString = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault();
+                var pageAnswersString = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault(_ => _.QuestionId == key);
                 var response = new List<FileUploadModel>();
                 if (pageAnswersString != null)
                 {
