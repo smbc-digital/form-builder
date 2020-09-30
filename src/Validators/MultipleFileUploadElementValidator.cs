@@ -31,16 +31,12 @@ namespace form_builder.Validators
 
             var key = $"{ element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
             var isValid = false;
-            var message = ValidationConstants.FILEUPLOAD_EMPTY;
             
             List<DocumentModel> value = viewModel.ContainsKey(key)
                 ? viewModel[key]
                 : null;
 
             isValid = !(value is null);
-
-            if (!viewModel.ContainsKey(key) && !viewModel.ContainsKey(ButtonConstants.SUBMIT) && element.Properties.Optional)
-                return new ValidationResult { IsValid = false, Message = ValidationConstants.FILEUPLOAD_NO_FILE_SELECTED };
 
             if (value == null)
             {
@@ -60,21 +56,15 @@ namespace form_builder.Validators
                     response = JsonConvert.DeserializeObject<List<FileUploadModel>>(pageAnswersString.Response.ToString());
 
                     // Sets a different message if on the subpage and no files selected
-                    if (response.Any() && !viewModel.ContainsKey(ButtonConstants.SUBMIT))
-                    {
-                        message = ValidationConstants.FILEUPLOAD_NO_FILE_SELECTED;
-                    }
-                    else if (response.Any())
-                    {
+                    if (response.Any())
                         isValid = true;
-                    }
                 }
             }
 
             return new ValidationResult
             {
                 IsValid = isValid,
-                Message = message
+                Message = ValidationConstants.FILEUPLOAD_EMPTY
             };
         }
     }

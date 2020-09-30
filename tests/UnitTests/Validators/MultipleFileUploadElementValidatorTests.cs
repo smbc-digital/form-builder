@@ -129,50 +129,6 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.True(result.IsValid);
-        }
-
-        [Fact]
-        public void Validate_Should_Return_NoFilesSelected_OnEmptyFilesList_AndNotClickedSubmitButton()
-        {
-            // Arrange       
-            var element = new ElementBuilder()
-                .WithType(EElementType.MultipleFileUpload)
-                .WithQuestionId("fileUpload")
-                .WithOptional(true)
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
-
-            // Act
-            var result = _fileUploadElementValidatorTest.Validate(element, viewModel);
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Equal(ValidationConstants.FILEUPLOAD_NO_FILE_SELECTED, result.Message);
-        }
-
-        [Fact]
-        public void Validate_Should_Return_NoFileSelectedMessage_WhenNoFilesAdded_OnUpload()
-        {
-            // Arrange
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid())
-                .Returns("12345");
-            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>{ new PageAnswers{ PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = $"fileUpload{FileUploadConstants.SUFFIX}", Response = Newtonsoft.Json.JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel() }) } } } } }));
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.MultipleFileUpload)
-                .WithQuestionId("fileUpload")
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>{ { "Path", "page-one"} };
-
-            // Act
-            var result = _fileUploadElementValidatorTest.Validate(element, viewModel);
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Equal(ValidationConstants.FILEUPLOAD_NO_FILE_SELECTED, result.Message);
-        }
+        }      
     }
 }
