@@ -8,6 +8,7 @@ using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
+using form_builder.Extensions;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
@@ -187,8 +188,8 @@ namespace form_builder.Mappers
 
                     var model = new File();
                     model.Content = fileData;
-                    model.TrustedOriginalFileName = file.TrustedOriginalFileName;
-                    model.UntrustedOriginalFileName = file.UntrustedOriginalFileName;
+                    model.TrustedOriginalFileName = file.TrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100);
+                    model.UntrustedOriginalFileName = file.UntrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100);
                     model.KeyName = key;
 
                     listOfFiles.Add(model);
