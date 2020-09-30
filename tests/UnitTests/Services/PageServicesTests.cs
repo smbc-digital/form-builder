@@ -817,6 +817,73 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task FinalisePageJourney_ShouldNotError_WhenFileUPload_DataIsNull()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+            var questionIDOne = "fileUploadone";
+            var questionIDTwo = "fileUploadtwo";
+            var fileOneKey = $"file-{questionIDOne}-123";
+            var fileTwoKey = $"file-{questionIDOne}-456";
+            var fileThreeKey = $"file-{questionIDOne}-789";
+            var fileFourKey = $"file-{questionIDTwo}-123";
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+
+            var cacheData = new FormAnswers
+            {
+                Path = "page-one",
+                FormName = "form",
+                Pages = new List<PageAnswers> 
+                {
+                    new PageAnswers 
+                    {
+                        Answers = new List<Answers> 
+                        {
+                            new Answers 
+                            {
+                                QuestionId = $"{questionIDOne}{FileUploadConstants.SUFFIX}",
+                                Response = null,
+                            },
+                            new Answers 
+                            {
+                                QuestionId = $"{questionIDTwo}{FileUploadConstants.SUFFIX}",
+                                Response = null
+                            }
+                        }    
+                    }
+                }
+            };
+
+            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId(questionIDOne)
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.FileUpload)
+                .WithQuestionId(questionIDTwo)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithPageSlug("page-one")
+                .WithElement(element)
+                .WithElement(element2)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            // Act
+            await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
+
+            // Assert
+            _distributedCache.Verify(_ => _.Remove(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
         public async Task FinalisePageJourney_Should_SetCache_WhenDocumentDownload_True()
         {
             // Arrange
