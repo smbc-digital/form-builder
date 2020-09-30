@@ -35,7 +35,9 @@ namespace form_builder.Models.Elements
                 { "id", QuestionId },
                 { "type", "file" },
                 { "multiple", true },
-                { "accept", string.Join(',', allowedFileType)}
+                { "accept", string.Join(',', allowedFileType)},
+                { "max-file-size", SystemConstants.DefaultMaxFileSize },
+                { "data-module", "smbc-multiple-file-upload" }
             };
 
             if (DisplayAriaDescribedby)
