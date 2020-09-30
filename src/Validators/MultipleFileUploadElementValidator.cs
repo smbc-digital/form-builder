@@ -26,6 +26,9 @@ namespace form_builder.Validators
             if(element.Type != EElementType.MultipleFileUpload)
                 return new ValidationResult { IsValid = true };
 
+            if(element.Properties.Optional && viewModel.ContainsKey(ButtonConstants.SUBMIT))
+                return new ValidationResult { IsValid = true };
+
             var key = $"{ element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
             var isValid = false;
             var message = ValidationConstants.FILEUPLOAD_EMPTY;
@@ -36,7 +39,9 @@ namespace form_builder.Validators
 
             isValid = !(value is null);
 
-            // Check saved answers if any have been uploaded already
+            if (!viewModel.ContainsKey(key) && !viewModel.ContainsKey(ButtonConstants.SUBMIT) && element.Properties.Optional)
+                return new ValidationResult { IsValid = false, Message = ValidationConstants.FILEUPLOAD_NO_FILE_SELECTED };
+
             if (value == null)
             {
                 var sessionGuid = _sessionHelper.GetSessionGuid();
@@ -59,8 +64,8 @@ namespace form_builder.Validators
                     {
                         message = ValidationConstants.FILEUPLOAD_NO_FILE_SELECTED;
                     }
-
-                    else if (response.Any()) {
+                    else if (response.Any())
+                    {
                         isValid = true;
                     }
                 }

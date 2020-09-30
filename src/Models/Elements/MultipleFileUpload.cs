@@ -22,9 +22,9 @@ namespace form_builder.Models.Elements
         public string AllowFileTypeText { get { return Properties.AllowedFileTypes?.ToReadableFileType() ?? SystemConstants.AcceptedMimeTypes.ToReadableFileType();} }
         public string MaxFileSizeText { get { return $"{(Properties.MaxFileSize * 1024000 == 0 ? SystemConstants.DefaultMaxFileSize.ToReadableMaxFileSize() : Properties.MaxFileSize)}MB"; } }
         public string MaxCombinedFileSizeText { get { return $"{(Properties.MaxCombinedFileSize == 0 ? SystemConstants.DefaultMaxCombinedFileSize.ToReadableMaxFileSize() : Properties.MaxCombinedFileSize)}MB"; } }
-
         public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
         public List<string> CurrentFilesUploaded { get; set; } = new List<string>();
+
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var allowedFileType = Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
@@ -65,6 +65,8 @@ namespace form_builder.Models.Elements
                 List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(currentAnswer.ToString());
                 CurrentFilesUploaded = response.Select(_ => _.TrustedOriginalFileName).ToList();
             }
+
+            Properties.HideOptionalText = true;
 
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
