@@ -39,7 +39,6 @@ namespace form_builder.Validators
                 return new ValidationResult { IsValid = true };
 
             var validationMessage = invalidFileSizes.Count == 1 
-
                 ? $"The selected file must be smaller than {maxFileSize / 1048576}MB"
                 : invalidFileSizes.Select(_ => $"{_.FileName} must be smaller than {maxFileSize / 1048576}MB").Aggregate((curr, acc) => $"{acc} <br/> {curr}");
 
