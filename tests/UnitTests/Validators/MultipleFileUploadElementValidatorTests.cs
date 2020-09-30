@@ -158,7 +158,7 @@ namespace form_builder_tests.UnitTests.Validators
             _mockSessionHelper.Setup(_ => _.GetSessionGuid())
                 .Returns("12345");
             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>{ new PageAnswers{ PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "", Response = Newtonsoft.Json.JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel() }) } } } } }));
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>{ new PageAnswers{ PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = $"fileUpload{FileUploadConstants.SUFFIX}", Response = Newtonsoft.Json.JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel() }) } } } } }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.MultipleFileUpload)

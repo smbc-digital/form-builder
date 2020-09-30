@@ -205,7 +205,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Returns("12345");
 
             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.Is<string>(_ => _ == "12345")))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "fileuploadquestion", Response = Newtonsoft.Json.JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel { FileSize = 2048576 } }) } } } } }));
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers{ Pages = new List<PageAnswers>{ new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = $"fileuploadquestion{FileUploadConstants.SUFFIX}", Response = Newtonsoft.Json.JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel { FileSize = 2048576 } }) } } } } }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.MultipleFileUpload)
