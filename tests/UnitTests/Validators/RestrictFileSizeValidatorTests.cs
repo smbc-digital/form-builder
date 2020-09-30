@@ -101,8 +101,8 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Theory]
-        [InlineData(EElementType.FileUpload, 0, 23)]
-        [InlineData(EElementType.MultipleFileUpload, 0, 23)]
+        [InlineData(EElementType.FileUpload, 0, 10)]
+        [InlineData(EElementType.MultipleFileUpload, 0, 10)]
         [InlineData(EElementType.FileUpload, 2, 2)]
         [InlineData(EElementType.MultipleFileUpload, 2, 2)]
         public void Validate_ShouldReturn_False_ValidationResult_When_File_IsOver_MaxSizeLimit(EElementType type, int maxSize, int maxFileSize)

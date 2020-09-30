@@ -260,7 +260,7 @@ namespace form_builder.Services.PageService
                     var formFileAnswerData = formAnswers.Pages.SelectMany(_ => _.Answers).FirstOrDefault(_ => _.QuestionId == $"{fileElement.Properties.QuestionId}{FileUploadConstants.SUFFIX}")?.Response ?? string.Empty;
                     List<FileUploadModel> convertedFileUploadAnswer = JsonConvert.DeserializeObject<List<FileUploadModel>>(formFileAnswerData.ToString());
 
-                    if(convertedFileUploadAnswer.Any())
+                    if(convertedFileUploadAnswer != null && convertedFileUploadAnswer.Any())
                     {
                         convertedFileUploadAnswer.ForEach((_) => {
                             _distributedCache.Remove(_.Key);

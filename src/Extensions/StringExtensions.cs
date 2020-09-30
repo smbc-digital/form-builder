@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace form_builder.Extensions
 {
@@ -44,6 +45,16 @@ namespace form_builder.Extensions
         {
             var megaByteValue = (value / 1024f) / 1024f;
             return Convert.ToInt32(megaByteValue);
+        }
+
+        public static string ToMaxSpecifiedStringLengthForFileName(this string value, int length)
+        {
+            if(value.Length <= length)
+                return value;
+
+            var extension = Path.GetExtension(value);
+
+            return $"{value.Substring(0, length - extension.Length)}{extension}";
         }
     }
 }
