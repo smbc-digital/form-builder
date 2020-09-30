@@ -634,7 +634,7 @@ namespace form_builder_tests.UnitTests.Mappers
                             new Answers
                             {
                                 QuestionId = "fileUpload_fileUploadTestKey-fileupload",
-                                Response = JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel{ UntrustedOriginalFileName = key } })
+                                Response = JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel{ UntrustedOriginalFileName = key, TrustedOriginalFileName = key } })
                             }
                         }
                     }
@@ -677,8 +677,8 @@ namespace form_builder_tests.UnitTests.Mappers
                                 QuestionId = "fileUpload_fileUploadTestKey-fileupload",
                                 Response = JsonConvert.SerializeObject(new List<FileUploadModel>
                                 { 
-                                    new FileUploadModel{ TrustedOriginalFileName = "file1.txt", Key = "datakeyfile1" }, 
-                                    new FileUploadModel{ TrustedOriginalFileName = "file2.txt", Key = "datakeyfile2"  } 
+                                    new FileUploadModel{  UntrustedOriginalFileName ="file1.txt",  TrustedOriginalFileName = "file1.txt", Key = "datakeyfile1" }, 
+                                    new FileUploadModel{  UntrustedOriginalFileName ="file2.txt", TrustedOriginalFileName = "file2.txt", Key = "datakeyfile2"  } 
                                 })
                             }
                         }
