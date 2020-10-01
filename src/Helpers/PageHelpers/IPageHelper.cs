@@ -13,6 +13,8 @@ namespace form_builder.Helpers.PageHelpers
         
         void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false);
 
+        void SaveCaseReference(string guid, string caseReference);
+
         void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName);
         
         Task CheckForPaymentConfiguration(List<Page> pages, string formName);

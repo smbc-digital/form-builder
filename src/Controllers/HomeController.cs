@@ -133,6 +133,7 @@ namespace form_builder.Controllers
         {
             var result = await _submitWorkflow.Submit(form);
 
+            // Remove saving in TempData as we will save the ref in the form answers
             TempData["reference"] = result;
             return RedirectToAction("Success", new
             {
@@ -147,7 +148,9 @@ namespace form_builder.Controllers
             var result = await _successWorkflow.Process(EBehaviourType.SubmitForm, form);
             
             var success = new SuccessViewModel {
+                // Change Reference to use Reference from result (from saved answers)
                 Reference = (string)TempData["reference"],
+                // Add DocumentUploadUrl from result
                 PageContent = result.HtmlContent,
                 FormAnswers = result.FormAnswers,
                 FormName = result.FormName,

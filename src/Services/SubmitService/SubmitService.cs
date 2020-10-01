@@ -66,6 +66,8 @@ namespace form_builder.Services.SubmitService
                 var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
                 reference = JsonConvert.DeserializeObject<string>(content);
             }
+
+            // Call SaveCaseReference in pageHelper
             return reference;
         }
 

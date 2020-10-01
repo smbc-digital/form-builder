@@ -120,6 +120,14 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
+        public void SaveCaseReference(string guid, string caseReference)
+        {
+            // get cached answers
+            // deserialise the answers
+            // set reference
+            // serialise and set string
+        }
+
         public void HasDuplicateQuestionIDs(List<Page> pages, string formName)
         {
             var questionIds = new List<string>();
