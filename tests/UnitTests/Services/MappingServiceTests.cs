@@ -496,5 +496,50 @@ namespace form_builder_tests.UnitTests.Services
             Assert.NotNull(castResultsData);
             Assert.NotNull(castResultsData.file);
         }
+
+        [Fact]
+        public async Task Map_ShouldReturnExpandoObject_WithAdditionalFormAnswersData()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("textbox")
+                .Build();
+                
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+               .Returns(JsonConvert.SerializeObject(new FormAnswers
+               {
+                   Pages = new List<PageAnswers>(),
+                   AdditionalFormAnswersData = new Dictionary<string, object>{ { "additional", "answerData" }}
+               }));
+
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "textbox"), It.IsAny<FormAnswers>()))
+                .Returns("textbox answer");
+
+            // Act
+            var result = await _service.Map("form", "guid");
+
+            // Assert
+            var resultData = Assert.IsType<ExpandoObject>(result.Data);
+            dynamic castResultsData = resultData;
+
+            Assert.NotNull(castResultsData);
+            Assert.NotNull(castResultsData.textbox);
+            Assert.NotNull(castResultsData.additional);
+            Assert.Equal("answerData", castResultsData.additional);
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models;
@@ -12,6 +13,7 @@ using form_builder.Workflows;
 using form_builder.Workflows.ActionsWorkflow;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 
 namespace form_builder.Controllers
 {
@@ -61,13 +63,18 @@ namespace form_builder.Controllers
             string path,
             string subPath = "")
         {
-            var response = await _pageService.ProcessPage(form, path, subPath);
+            var queryParamters = Request.Query;
+            var response = await _pageService.ProcessPage(form, path, subPath, queryParamters);
             if (response.ShouldRedirect)
-                return RedirectToAction("Index", new
-                {
-                    path = response.TargetPage,
-                    form
-                });
+            {
+                var routeValuesDictionary = new RouteValueDictionaryBuilder()
+                    .WithValue("path", response.TargetPage)
+                    .WithValue("form", form)
+                    .WithQueryValues(queryParamters)
+                    .Build();
+
+                return RedirectToAction("Index", routeValuesDictionary);
+            }
 
             return View(response.ViewName, response.ViewModel);
         }
