@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -30,7 +31,8 @@ namespace form_builder.Models.Elements
         )
         {
             Properties.Text ??= ButtonConstants.DOCUMENT_UPLOAD_TEXT;
-            Properties.DocumentUploadUrl = Properties.SubmitSlugs.FirstOrDefault(_ => _.Environment.Equals(environment.EnvironmentName))?.URL + $"?caseReference={formAnswers.CaseReference}";
+            var caseRefInbytes = Encoding.ASCII.GetBytes(formAnswers.CaseReference);
+            Properties.DocumentUploadUrl = Properties.SubmitSlugs.FirstOrDefault(_ => _.Environment.Equals(environment.EnvironmentName))?.URL + $"?caseReference={Convert.ToBase64String(caseRefInbytes)}";
 
             return viewRender.RenderAsync("DocumentUpload", this);
         }
