@@ -8,6 +8,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -19,6 +20,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
         [Fact]
         public async Task RenderAsync_ShouldCall_ElementHelper_ToGetCurrentValue_AndRenderView()
@@ -38,6 +40,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
+
             //Act
             await element.RenderAsync(
                 _mockIViewRender.Object,
@@ -46,7 +50,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 viewModel,
                 page,
                 schema,
-                _mockHostingEnv.Object);
+                _mockHostingEnv.Object,
+                _mockHttpContextAccessor.Object,
+                formAnswers);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("MultipleFileUpload")), It.IsAny<MultipleFileUpload>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -80,6 +86,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
+
             //Act
             await element.RenderAsync(
                 _mockIViewRender.Object,
@@ -88,7 +96,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 viewModel,
                 page,
                 schema,
-                _mockHostingEnv.Object);
+                _mockHostingEnv.Object,
+                _mockHttpContextAccessor.Object,
+                formAnswers);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("MultipleFileUpload")), It.IsAny<MultipleFileUpload>(), It.IsAny<Dictionary<string, object>>()), Times.Once);

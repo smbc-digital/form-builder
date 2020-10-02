@@ -55,6 +55,7 @@ namespace form_builder_tests.UnitTests.Services
                     It.IsAny<Dictionary<string, dynamic>>(),
                     It.IsAny<FormSchema>(),
                     It.IsAny<string>(),
+                    It.IsAny<FormAnswers>(),
                     null))
                 .ReturnsAsync(new FormBuilderViewModel());
 
@@ -209,7 +210,7 @@ namespace form_builder_tests.UnitTests.Services
                 new Guid().ToString(), It.IsAny<string>(), null);
 
             // Assert
-            _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), null), Times.Once);
+            _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), null), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
         }
 

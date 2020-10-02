@@ -102,7 +102,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
 
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
         }
 
         [Fact]
@@ -159,7 +159,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
 
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
         }
 
         [Fact]
@@ -307,7 +307,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessOrganisation(viewModel, page, schema, "", "page-one"));
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
             Assert.StartsWith($"OrganisationService.ProccessInitialOrganisation:: An exception has occured while attempting to perform organisation lookup, Exception: ", result.Message);
         }
     }

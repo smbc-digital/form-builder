@@ -60,11 +60,11 @@ namespace form_builder_tests.UnitTests.Services
             _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
 
             _mockPageHelper
-                .Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+                .Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                         .ReturnsAsync(new FormBuilderViewModel());
 
             _mockPageHelper
-                .Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), null))
+                .Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), null))
                         .ReturnsAsync(new FormBuilderViewModel());
 
             _mockEnvironment.Setup(_ => _.EnvironmentName)
@@ -91,7 +91,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessRequest_ShouldCall_Schema_And_Session_Service()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
-            _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+            _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var element = new ElementBuilder()
@@ -124,7 +124,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcessRequest("form", "page-one", viewModel, null);
 
-            _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Once);
+            _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             _mockSchemaFactory.Verify(_ => _.Build(It.IsAny<string>()), Times.Once);
             _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
@@ -247,7 +247,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
 
-            _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+            _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .Throws<ApplicationException>();
 
             var element = new ElementBuilder()
@@ -280,7 +280,7 @@ namespace form_builder_tests.UnitTests.Services
 
             await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null));
 
-            _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Once);
+            _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
         }
 
         [Fact]
@@ -588,7 +588,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+            _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(viewModel);
 
             _mockPageHelper
@@ -633,7 +633,7 @@ namespace form_builder_tests.UnitTests.Services
             _sessionHelper.Setup(_ => _.GetSessionGuid())
                 .Returns("guid");
 
-            _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+            _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(viewModel);
 
             _mockPageHelper
@@ -924,7 +924,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessRequest_ShouldNot_CallPageHelper_WhenPageContains_NoInboundValues()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
-            _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+            _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var page = new PageBuilder()
@@ -952,7 +952,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessRequest_Should_CallPageHelper_WhenPageContains_InboundValues()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
-            _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+            _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var page = new PageBuilder()
@@ -1035,7 +1035,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
 
-            _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+            _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
             var page = new PageBuilder()
