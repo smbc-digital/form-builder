@@ -21,3 +21,15 @@
         }
     </dl>
 }
+
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    <h2 class="govuk-heading-m">Additional Non Question Answers</h2>
+    @foreach (var additonalData in Model.FormAnswers.AdditionalFormAnswersData)
+    {
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">@additonalData.Key</dt>
+                <dd class="govuk-summary-list__value">
+                    @additonalData.Value
+            </div>
+    }
+</dl>

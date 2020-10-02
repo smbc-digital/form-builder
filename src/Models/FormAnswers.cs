@@ -20,6 +20,7 @@ namespace form_builder.Models
         public string StartPageUrl { get; set; }
 
         public Dictionary<string, object> FormData { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> AdditionalFormAnswersData { get; set; } = new Dictionary<string, object>();
 
         public List<PageAnswers> Pages { get; set; }
     }

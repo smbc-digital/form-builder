@@ -1468,190 +1468,6 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void AddIncomingFormDataValues_ShouldThrowException_WhenIncomingValueIsNull()
-        {
-            // Arrange
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithPageSlug("test-test")
-                .Build();
-
-            var incomingValue = new IncomingValuesBuilder()
-                .WithQuestionId("testQuestionId")
-                .WithName("testName")
-                .WithOptional(false)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithBehaviour(behaviour)
-                .WithIncomingValue(incomingValue)
-                .Build();
-
-            var formData = new Dictionary<string, dynamic>();
-
-            // Act & Assert
-            var result = Assert.Throws<Exception>(() => _pageHelper.AddIncomingFormDataValues(page, formData));
-            Assert.Equal("DictionaryExtensions::IncomingValue, FormData does not contains testName required value",
-                result.Message);
-        }
-
-        [Fact]
-        public void AddIncomingFormDataValues_ShouldReturnSingleObject()
-        {
-            // Arrange
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithPageSlug("test-test")
-                .Build();
-
-            var incomingValue = new IncomingValuesBuilder()
-                .WithQuestionId("questionIdTest")
-                .WithName("nameTest")
-                .WithOptional(true)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithBehaviour(behaviour)
-                .WithIncomingValue(incomingValue)
-                .Build();
-
-            var formData = new Dictionary<string, dynamic>
-            {
-                {"nameTest", "45.23645"}
-            };
-
-            // Act
-            var result = _pageHelper.AddIncomingFormDataValues(page, formData);
-
-            // Assert
-            Assert.Single(result);
-            Assert.True(result.ContainsKey("questionIdTest"));
-            Assert.True(result.ContainsValue("45.23645"));
-            Assert.False(result.ContainsKey("nameTest"));
-        }
-
-        [Fact]
-        public void AddIncomingFormDataValues_ShouldReturnSingleObject_WithOptionalTrue()
-        {
-            // Arrange
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithPageSlug("test-test")
-                .Build();
-
-            var incomingValue = new IncomingValuesBuilder()
-                .WithQuestionId("questionIdTest")
-                .WithName("nameTest")
-                .WithOptional(true)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithBehaviour(behaviour)
-                .WithIncomingValue(incomingValue)
-                .Build();
-
-            var formData = new Dictionary<string, dynamic>();
-
-            // Act
-            var result = _pageHelper.AddIncomingFormDataValues(page, formData);
-
-            // Assert
-            Assert.Empty(result);
-        }
-
-        [Fact]
-        public void AddIncomingFormDataValues_ShouldReturnMultipleValuesObject()
-        {
-            // Arrange
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithPageSlug("test-test")
-                .Build();
-
-            var incomingValue = new IncomingValuesBuilder()
-                .WithQuestionId("questionIdTest")
-                .WithName("nameTest")
-                .WithOptional(true)
-                .Build();
-
-            var incomingValue2 = new IncomingValuesBuilder()
-                .WithQuestionId("questionIdTest2")
-                .WithName("nameTest2")
-                .WithOptional(true)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithBehaviour(behaviour)
-                .WithIncomingValue(incomingValue)
-                .WithIncomingValue(incomingValue2)
-                .Build();
-
-            var formData = new Dictionary<string, dynamic>
-            {
-                {"nameTest", "45.23645"},
-                {"nameTest2", "-2.345"}
-            };
-
-            // Act
-            var result = _pageHelper.AddIncomingFormDataValues(page, formData);
-
-            // Assert
-            Assert.Equal(2, result.Count);
-            Assert.True(result.ContainsKey("questionIdTest"));
-            Assert.True(result.ContainsValue("45.23645"));
-            Assert.False(result.ContainsKey("nameTest"));
-            Assert.True(result.ContainsKey("questionIdTest2"));
-            Assert.True(result.ContainsValue("-2.345"));
-            Assert.False(result.ContainsKey("nameTest2"));
-        }
-
-        [Fact]
-        public void AddIncomingFormDataValues_ShouldCall_RecursiveCheckAndCreate_AndReturnCorrectObject()
-        {
-            // Arrange
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.GoToPage)
-                .WithPageSlug("test-test")
-                .Build();
-
-            var incomingValue = new IncomingValuesBuilder()
-                .WithQuestionId("questionIdTest")
-                .WithName("nameTest")
-                .WithOptional(true)
-                .Build();
-
-            var incomingValue2 = new IncomingValuesBuilder()
-                .WithQuestionId("questionIdTest2.nameTest2")
-                .WithName("nameTest2")
-                .WithOptional(true)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithBehaviour(behaviour)
-                .WithIncomingValue(incomingValue)
-                .WithIncomingValue(incomingValue2)
-                .Build();
-
-            var formData = new Dictionary<string, dynamic>
-            {
-                {"nameTest", "45.23645"},
-                {"questionIdTest2.nameTest2", "-2.345"}
-            };
-
-            // Act
-            var result = _pageHelper.AddIncomingFormDataValues(page, formData);
-
-            // Assert
-            Assert.Equal(2, result.Count);
-            Assert.True(result.ContainsKey("questionIdTest"));
-            Assert.True(result.ContainsValue("45.23645"));
-            Assert.False(result.ContainsKey("nameTest"));
-            Assert.True(result.ContainsKey("questionIdTest2.nameTest2"));
-            Assert.True(result.ContainsValue("-2.345"));
-            Assert.False(result.ContainsKey("nameTest2"));
-        }
-
-        [Fact]
         public void CheckForIncomingFormDataValues_ShouldThrowException_WhenQuestionId_OR_Name_Empty()
         {
             // Arrange
@@ -1663,11 +1479,13 @@ namespace form_builder_tests.UnitTests.Helpers
             var incomingValueWithNoQuestionId = new IncomingValuesBuilder()
                 .WithQuestionId("")
                 .WithName("testName")
+                .WithHttpActionType(EHttpActionType.Post)
                 .Build();
 
             var incomingValueWithNoName = new IncomingValuesBuilder()
                 .WithQuestionId("testQuestionId")
                 .WithName("")
+                .WithHttpActionType(EHttpActionType.Post)
                 .Build();
 
             var page = new PageBuilder()
@@ -1684,6 +1502,36 @@ namespace form_builder_tests.UnitTests.Helpers
             // Act & Assert
             var result = Assert.Throws<Exception>(() => _pageHelper.CheckForIncomingFormDataValues(pages));
             Assert.Equal("PageHelper::CheckForIncomingFormDataValues, QuestionId or Name cannot be empty", result.Message);
+        }
+
+
+        [Fact]
+        public void CheckForIncomingFormDataValues_ShouldThrowException_WhenActionType_IsUnknown()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var incomingValueWithNoType = new IncomingValuesBuilder()
+                .WithQuestionId("testQuestionId")
+                .WithHttpActionType(EHttpActionType.Unknown)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithIncomingValue(incomingValueWithNoType)
+                .Build();
+
+            var pages = new List<Page>
+            {
+                page
+            };
+
+            // Act & Assert
+            var result = Assert.Throws<Exception>(() => _pageHelper.CheckForIncomingFormDataValues(pages));
+            Assert.Equal("PageHelper::CheckForIncomingFormDataValues, EHttpActionType cannot be unknwon, set to Get or Post", result.Message);
         }
 
         [Theory]
@@ -2349,7 +2197,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public void SaveFormFileAnswer_ShouldNotSave_ExisitingFiles_IfUploadedTwice_InDistributedCache()
         {
-            // Arrange                                        
+            // Arrange
             var questionId = "fileUpload";
             var file = new List<CustomFormFile>();
             file.Add(new CustomFormFile("content", questionId, 1, "newfile.txt"));
@@ -2389,6 +2237,40 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Assert
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once());
+        }
+
+        [Fact]
+        public void SaveNonQuestionAnswers_ShouldNotCallDistributedCache_WhenNoDataProvided()
+        {
+            // Arrange
+            var guid = "12345";
+
+            // Act
+            _pageHelper.SaveNonQuestionAnswers(new Dictionary<string, object>(), "form", "path", guid);
+
+            // Assert
+            _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x.Equals(guid))), Times.Never);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(guid)),It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact]
+        public void SaveNonQuestionAnswers_ShouldSet_NonQuestionAnswers_WhenProvidedData()
+        {
+            // Arrange
+            var callbackValue = string.Empty;
+            var guid = "12345";
+            var data = new Dictionary<string, object>{ { "test", "value" }};
+            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(),It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, string, CancellationToken>((x,y,z) => callbackValue = y);
+
+            // Act
+            _pageHelper.SaveNonQuestionAnswers(data, "form", "path",guid);
+
+            // Assert
+            _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x.Equals(guid))), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(guid)),It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+            var callbackData = JsonConvert.DeserializeObject<FormAnswers>(callbackValue);
+            Assert.Single(callbackData.AdditionalFormAnswersData);
         }
     }
 }

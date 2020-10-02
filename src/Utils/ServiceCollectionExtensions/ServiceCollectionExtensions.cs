@@ -13,6 +13,7 @@ using form_builder.Helpers;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.DocumentCreation;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Mappers;
@@ -131,6 +132,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddSingleton<IElementMapper, ElementMapper>();
             services.AddSingleton<IDocumentCreationHelper, DocumentCreationHelper>();
             services.AddSingleton<IActionHelper, ActionHelper>();
+            services.AddSingleton<IIncomingDataHelper, IncomingDataHelper>();
 
             services.AddHttpContextAccessor();
             services.AddScoped<IViewRender, ViewRender>();
