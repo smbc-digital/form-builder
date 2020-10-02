@@ -333,12 +333,9 @@ namespace form_builder.Helpers.PageHelpers
 
         public void CheckForIncomingFormDataValues(List<Page> pages)
         {
-            if(pages.Any(_ => _.IncomingValues.Any(x => x.HttpActionType.Equals(EHttpActionType.Unknown))))
-                throw new Exception("PageHelper::CheckForIncomingFormDataValues, EHttpActionType cannot be unknwon, set to Get or Post");
-
-            if (pages.Any(_ => _.HasIncomingPostValues || _.HasIncomingGetValues))
+            if (pages.Any(_ => _.HasIncomingValues))
             {
-                pages.Where(_ => _.HasIncomingPostValues || _.HasIncomingGetValues)
+                pages.Where(_ => _.HasIncomingValues)
                     .ToList()
                     .ForEach(x => x.IncomingValues.ForEach(_ =>
                         {

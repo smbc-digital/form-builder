@@ -42,6 +42,7 @@ namespace form_builder.Models
 
         [JsonIgnore] public bool IsValid => !InvalidElements.Any();
 
+        public bool HasIncomingValues => IncomingValues.Any();
         public bool HasIncomingGetValues => IncomingValues.Any(_ => _.HttpActionType == EHttpActionType.Get);
         public bool HasIncomingPostValues => IncomingValues.Any(_ => _.HttpActionType == EHttpActionType.Post);
 
