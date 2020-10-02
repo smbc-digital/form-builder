@@ -29,8 +29,8 @@ namespace form_builder.Helpers.PageHelpers
         
         void SaveFormData(string key, object value, string guid);
         
-        Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, Dictionary<string, dynamic> formData);
-        
+        void SaveNonQuestionAnswers(Dictionary<string, object> values, string form, string path, string guid);
+
         void CheckForIncomingFormDataValues(List<Page> pages);
         
         void CheckForPageActions(FormSchema formSchema);

@@ -64,6 +64,9 @@ namespace form_builder.Services.MappingService
                 .ToList()
                 .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
 
+            if(formAnswers.AdditionalFormAnswersData.Any())
+                data = AddNonQuestionAnswers(data, formAnswers.AdditionalFormAnswersData);
+
             return data;
         }
 
@@ -129,6 +132,12 @@ namespace form_builder.Services.MappingService
             }
 
             return obj;
+        }
+
+        private IDictionary<string, dynamic> AddNonQuestionAnswers(IDictionary<string, dynamic> currentData, Dictionary<string, object> newData)
+        {
+            newData.ToList().ForEach(x => currentData.Add(x.Key, x.Value));
+            return currentData;
         }
     }
 }

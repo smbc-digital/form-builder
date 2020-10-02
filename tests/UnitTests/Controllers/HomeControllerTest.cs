@@ -15,7 +15,9 @@ using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing;
 using Moq;
 using Xunit;
 
@@ -372,7 +374,7 @@ namespace form_builder_tests.UnitTests.Controllers
         public async Task Index_ShouldCallPageService()
         {
             // Arrange
-            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IQueryCollection>()))
                 .ReturnsAsync(new ProcessPageEntity());
 
             // Act
@@ -380,14 +382,14 @@ namespace form_builder_tests.UnitTests.Controllers
 
 
             // Assert
-            _pageService.Verify(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _pageService.Verify(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IQueryCollection>()), Times.Once);
         }
 
         [Fact]
         public async Task Index_ShouldReturnViewResult()
         {
             // Arrange
-            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IQueryCollection>()))
                 .ReturnsAsync(new ProcessPageEntity());
 
             // Act
@@ -401,9 +403,9 @@ namespace form_builder_tests.UnitTests.Controllers
         public async Task Index_ShouldRedirect_WhenOnRedirectIsTrue()
         {
             // Arrange
-            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IQueryCollection>()))
                 .ReturnsAsync(new ProcessPageEntity {  ShouldRedirect = true });
-
+            
             // Act
             var result = await _homeController.Index("form", "path");
 
