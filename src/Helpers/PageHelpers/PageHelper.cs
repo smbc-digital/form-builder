@@ -19,6 +19,7 @@ using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -36,11 +37,12 @@ namespace form_builder.Helpers.PageHelpers
         private readonly ICache _cache;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly ISessionHelper _sessionHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
             IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            IEnumerable<IPaymentProvider> paymentProviders, ISessionHelper sessionHelper)
+            IEnumerable<IPaymentProvider> paymentProviders, ISessionHelper sessionHelper, IHttpContextAccessor httpContextAccessor)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -51,6 +53,7 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _paymentProviders = paymentProviders;
             _sessionHelper = sessionHelper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(
@@ -75,6 +78,7 @@ namespace form_builder.Helpers.PageHelpers
                     page,
                     baseForm,
                     _environment,
+                    _httpContextAccessor,
                     formAnswers,
                     results
                     );

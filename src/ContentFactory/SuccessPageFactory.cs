@@ -73,8 +73,6 @@ namespace form_builder.ContentFactory
                     baseForm.Pages[successIndex] = page;
             }
 
-
-
             var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(),baseForm, sessionGuid, formAnswers);
 
             return new SuccessPageEntity

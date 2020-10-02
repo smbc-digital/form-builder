@@ -6,6 +6,7 @@ using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json.Linq;
 using StockportGovUK.NetStandard.Models.Addresses;
@@ -52,14 +53,14 @@ namespace form_builder.Models.Elements
             Type = EElementType.Address;
         }
 
-        public override async Task<string> RenderAsync(
-            IViewRender viewRender,
+        public override async Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
+            IHttpContextAccessor httpContextAccessor,
             FormAnswers formAnswers,
             List<object> results = null)
         {
@@ -71,7 +72,7 @@ namespace form_builder.Models.Elements
                     {
                         Properties = Properties
                     };
-                    return await manualAddressElement.RenderAsync(viewRender, elementHelper, guid, viewModel, page, formSchema, environment, new FormAnswers(), results);
+                    return await manualAddressElement.RenderAsync(viewRender, elementHelper, guid, viewModel, page, formSchema, environment, httpContextAccessor, new FormAnswers(), results);
 
                 case LookUpConstants.Automatic:
                     IsSelect = true;

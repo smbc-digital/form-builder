@@ -131,10 +131,8 @@ namespace form_builder.Controllers
         [Route("{form}/submit")]
         public async Task<IActionResult> Submit(string form)
         {
-            var result = await _submitWorkflow.Submit(form);
+            await _submitWorkflow.Submit(form);
 
-            // Remove saving in TempData as we will save the ref in the form answers
-            //TempData["reference"] = result;
             return RedirectToAction("Success", new
             {
                 form
