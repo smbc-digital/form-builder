@@ -44,6 +44,7 @@ namespace form_builder.Services.SubmitService
         {
             if(_submissionServiceConfiguration.FakeSubmission)
             {
+                _pageHelper.SaveCaseReference(sessionGuid, "123456");
                 return "123456"; 
             }
             var reference = string.Empty;
@@ -67,7 +68,8 @@ namespace form_builder.Services.SubmitService
                 reference = JsonConvert.DeserializeObject<string>(content);
             }
 
-            // Call SaveCaseReference in pageHelper
+            _pageHelper.SaveCaseReference(sessionGuid, reference);
+
             return reference;
         }
 

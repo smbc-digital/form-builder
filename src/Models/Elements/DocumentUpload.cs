@@ -25,12 +25,12 @@ namespace form_builder.Models.Elements
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
+            FormAnswers formAnswers,
             List<object> results = null
         )
         {
             Properties.Text ??= ButtonConstants.DOCUMENT_UPLOAD_TEXT;
-
-            // call helper to generate env appropriate url & encode the case ref and append as query param
+            Properties.DocumentUploadUrl = Properties.SubmitSlugs.FirstOrDefault(_ => _.Environment.Equals(environment.EnvironmentName))?.URL + $"?caseReference={formAnswers.CaseReference}";
 
             return viewRender.RenderAsync("DocumentUpload", this);
         }

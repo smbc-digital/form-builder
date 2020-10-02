@@ -110,6 +110,7 @@ namespace form_builder.Models.Elements
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
+            FormAnswers formAnswers,
             List<object> results = null) => viewRender.RenderAsync(Type.ToString(), this, null);
 
         private bool DisplayOptional => Properties.Optional;

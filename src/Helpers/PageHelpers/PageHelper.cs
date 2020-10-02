@@ -58,6 +58,7 @@ namespace form_builder.Helpers.PageHelpers
             Dictionary<string, dynamic> viewModel,
             FormSchema baseForm,
             string guid,
+            FormAnswers formAnswers,
             List<object> results = null)
         {
             var formModel = new FormBuilderViewModel();
@@ -74,6 +75,7 @@ namespace form_builder.Helpers.PageHelpers
                     page,
                     baseForm,
                     _environment,
+                    formAnswers,
                     results
                     );
 
@@ -122,10 +124,14 @@ namespace form_builder.Helpers.PageHelpers
 
         public void SaveCaseReference(string guid, string caseReference)
         {
-            // get cached answers
-            // deserialise the answers
-            // set reference
-            // serialise and set string
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+
+            if (!string.IsNullOrEmpty(formData))
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+            convertedAnswers.CaseReference = caseReference;
+            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
         public void HasDuplicateQuestionIDs(List<Page> pages, string formName)
