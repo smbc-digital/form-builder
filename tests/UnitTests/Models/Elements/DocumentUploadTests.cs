@@ -1,0 +1,161 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using form_builder.Builders;
+using form_builder.Constants;
+using form_builder.Enum;
+using form_builder.Helpers;
+using form_builder.Helpers.ElementHelpers;
+using form_builder.Mappers;
+using form_builder.Models;
+using form_builder.Models.Elements;
+using form_builder.Providers.StorageProvider;
+using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Moq;
+using Newtonsoft.Json.Linq;
+using Xunit;
+
+namespace form_builder_tests.UnitTests.Models.Elements
+{
+    public class DocuemntUploadTest
+    {
+        private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
+        private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
+
+        public DocuemntUploadTest()
+        {
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
+            _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
+               .Returns(new HostString("www.test.com"));
+        }
+
+        [Fact]
+        public async Task RenderAsync_ShouldCallGenerateDocumentUploadUrl_Base64StringCaseRef()
+        {
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.DocumentUpload)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            var formAnswers = new FormAnswers();
+
+            //Act
+            await element.RenderAsync(
+                _mockIViewRender.Object,
+                _mockElementHelper.Object,
+                string.Empty,
+                viewModel,
+                page,
+                schema,
+                _mockHostingEnv.Object,
+                _mockHttpContextAccessor.Object,
+                formAnswers);
+
+            //Assert
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("DocumentUpload")), It.IsAny<DocumentUpload>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockElementHelper.Verify(_ => _.GenerateDocumentUploadUrl(It.IsAny<Element>(), It.IsAny<FormSchema>(), It.IsAny<FormAnswers>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task RenderAsync_ShouldSet_DocumentUploadUrl()
+        {
+            var url = "test";
+
+            var callBackValue = new DocumentUpload();
+            _mockElementHelper.Setup(_ => _.GenerateDocumentUploadUrl(It.IsAny<Element>(), It.IsAny<FormSchema>(), It.IsAny<FormAnswers>()))
+                .Returns(url);
+
+            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<DocumentUpload>(), It.IsAny<Dictionary<string, dynamic>>()))
+                .Callback<string, DocumentUpload, Dictionary<string, object>>((x, y, z) => callBackValue = y);
+
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.DocumentUpload)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            var formAnswers = new FormAnswers();
+
+            //Act
+            await element.RenderAsync(
+                _mockIViewRender.Object,
+                _mockElementHelper.Object,
+                string.Empty,
+                viewModel,
+                page,
+                schema,
+                _mockHostingEnv.Object,
+                _mockHttpContextAccessor.Object,
+                formAnswers);
+
+            //Assert
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("DocumentUpload")), It.IsAny<DocumentUpload>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockElementHelper.Verify(_ => _.GenerateDocumentUploadUrl(It.IsAny<Element>(), It.IsAny<FormSchema>(), It.IsAny<FormAnswers>()), Times.Once);
+            Assert.NotEmpty(callBackValue.Properties.DocumentUploadUrl);
+            Assert.Equal(url, callBackValue.Properties.DocumentUploadUrl);
+        }
+
+        [Fact]
+        public void RenderAsync_ShouldGenerateValid_DocumentUploadUrl()
+        {
+            //Arrange          
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                CaseReference = "12345"
+            };
+
+            var urlOrigin = $"https://www.test.com/";
+            var urlPath = $"{schema.BaseURL}/{FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH}{SystemConstants.CaseReferenceQueryString}{Convert.ToBase64String(Encoding.ASCII.GetBytes(formAnswers.CaseReference))}";
+
+            _mockElementHelper.Setup(_ => _.GenerateDocumentUploadUrl(It.IsAny<Element>(),
+                It.IsAny<FormSchema>(),
+                It.IsAny<FormAnswers>()
+                )
+            );
+
+            var elementHelper = new ElementHelper(
+                _mockDistributedCacheWrapper.Object,
+                _mockElementMapper.Object,
+                _mockHostingEnv.Object,
+                _mockHttpContextAccessor.Object
+                );
+            //Act
+            var results = elementHelper.GenerateDocumentUploadUrl(new DocumentUpload(), schema, formAnswers);
+
+            //Assert
+            Assert.NotNull(results);
+            Assert.Equal($"{urlOrigin}{urlPath}", results);
+
+        }
+    }
+}

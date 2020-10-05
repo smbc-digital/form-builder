@@ -7,6 +7,8 @@ using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
@@ -16,11 +18,16 @@ namespace form_builder_tests.UnitTests.Helpers
     {
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
+        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
         private readonly ElementHelper _elementHelper;
 
         public ElementHelperTests()
         {
-            _elementHelper = new ElementHelper(_mockDistributedCacheWrapper.Object, _mockElementMapper.Object);
+            _elementHelper = new ElementHelper(_mockDistributedCacheWrapper.Object,
+                _mockElementMapper.Object,
+                _mockWebHostEnvironment.Object,
+                _mockHttpContextAccessor.Object);
         }
 
         [Theory]

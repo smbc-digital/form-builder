@@ -15,7 +15,7 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.Models.Elements
 {
-    public class MultipleFileUploadests
+    public class MultipleFileUploadTests
     {
         private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();

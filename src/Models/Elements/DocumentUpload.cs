@@ -33,12 +33,7 @@ namespace form_builder.Models.Elements
         {
             Properties.Text ??= ButtonConstants.DOCUMENT_UPLOAD_TEXT;
 
-            var caseRefInBytes = Encoding.ASCII.GetBytes(formAnswers.CaseReference);
-            var urlOrigin = $"https://{httpContextAccessor.HttpContext.Request.Host}/";
-            var urlPath = $"{formSchema.BaseURL}/{FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH}{SystemConstants.CaseReferenceQueryString}{Convert.ToBase64String(caseRefInBytes)}";
-            Properties.DocumentUploadUrl = environment.EnvironmentName.Equals("local")
-                ? $"{urlOrigin}{urlPath}"
-                : $"{urlOrigin}v2/{urlPath}";
+            Properties.DocumentUploadUrl = elementHelper.GenerateDocumentUploadUrl(this, formSchema, formAnswers);
 
             return viewRender.RenderAsync("DocumentUpload", this);
         }

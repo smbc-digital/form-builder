@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
 namespace form_builder.Helpers.ElementHelpers
@@ -45,16 +49,26 @@ namespace form_builder.Helpers.ElementHelpers
         FormAnswers GetFormData(string guid);
         
         List <PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema);
+
+        string GenerateDocumentUploadUrl(Element element, FormSchema formSchema, FormAnswers formAnswers);
     }
 
     public class ElementHelper : IElementHelper
     {
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IElementMapper _elementMapper;
-        public ElementHelper(IDistributedCacheWrapper distributedCacheWrapper, IElementMapper elementMapper)
+        private readonly IWebHostEnvironment _environment;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public ElementHelper(IDistributedCacheWrapper distributedCacheWrapper,
+            IElementMapper elementMapper,
+            IWebHostEnvironment environment,
+            IHttpContextAccessor httpContextAccessor)
         {
             _distributedCache = distributedCacheWrapper;
             _elementMapper = elementMapper;
+            _environment = environment;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public string CurrentValue(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
@@ -259,6 +273,16 @@ namespace form_builder.Helpers.ElementHelpers
             }
 
             return formSummary;
+        }
+
+        public string GenerateDocumentUploadUrl(Element element, FormSchema formSchema, FormAnswers formAnswers)
+        {
+            var urlOrigin = $"https://{_httpContextAccessor.HttpContext.Request.Host}/";
+            var urlPath = $"{formSchema.BaseURL}/{FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH}{SystemConstants.CaseReferenceQueryString}{Convert.ToBase64String(Encoding.ASCII.GetBytes(formAnswers.CaseReference))}";
+
+            return _environment.EnvironmentName.Equals("local")
+                ? $"{urlOrigin}{urlPath}"
+                : $"{urlOrigin}v2/{urlPath}";
         }
     }
 }
