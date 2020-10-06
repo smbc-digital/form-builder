@@ -77,7 +77,6 @@ namespace form_builder.Helpers.PageHelpers
                     page,
                     baseForm,
                     _environment,
-                    _httpContextAccessor,
                     formAnswers,
                     results
                     );
