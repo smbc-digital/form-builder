@@ -8,6 +8,7 @@ using form_builder.ContentFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
+using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
@@ -22,9 +23,9 @@ using form_builder.Services.StreetService;
 using form_builder.Validators;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace form_builder.Services.PageService
 {
@@ -45,6 +46,7 @@ namespace form_builder.Services.PageService
         private readonly IMappingService _mappingService;
         private readonly ISuccessPageFactory _successPageContentFactory;
         private readonly IPageFactory _pageContentFactory;
+        private readonly IIncomingDataHelper _incomingDataHelper;
 
         public PageService(
             IEnumerable<IElementValidator> validators, 
@@ -61,7 +63,8 @@ namespace form_builder.Services.PageService
             IPageFactory pageFactory,
             ISchemaFactory schemaFactory,
             IMappingService mappingService,
-            IPayService payService)
+            IPayService payService,
+            IIncomingDataHelper incomingDataHelper)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -78,9 +81,10 @@ namespace form_builder.Services.PageService
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _payService = payService;
             _mappingService = mappingService;
+            _incomingDataHelper = incomingDataHelper;
         }
         
-        public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath)
+        public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParamters)
         {
             if (string.IsNullOrEmpty(path))
                 _sessionHelper.RemoveSessionGuid();
@@ -147,6 +151,12 @@ namespace form_builder.Services.PageService
                 page.Elements.First(_ => _.Type == EElementType.PaymentSummary).Properties.Value = paymentAmount.Settings.Amount;
             }
 
+            if(page.HasIncomingGetValues)
+            {
+                var result = _incomingDataHelper.AddIncomingFormDataValues(page, queryParamters);
+                _pageHelper.SaveNonQuestionAnswers(result, form, path, sessionGuid);
+            }
+
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
 
             return new ProcessPageEntity
@@ -176,8 +186,8 @@ namespace form_builder.Services.PageService
             if (currentPage == null)
                 throw new NullReferenceException($"Current page '{path}' object could not be found.");
 
-            if(currentPage.HasIncomingValues)
-                viewModel = _pageHelper.AddIncomingFormDataValues(currentPage, viewModel);
+            if(currentPage.HasIncomingPostValues)
+                viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
             currentPage.Validate(viewModel, _validators);
 

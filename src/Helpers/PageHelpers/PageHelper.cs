@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -37,6 +36,7 @@ namespace form_builder.Helpers.PageHelpers
         private readonly ICache _cache;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly ISessionHelper _sessionHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
             IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
@@ -52,6 +52,7 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _paymentProviders = paymentProviders;
             _sessionHelper = sessionHelper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(
@@ -307,6 +308,31 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
+        public void SaveNonQuestionAnswers(Dictionary<string, object> values, string form, string path, string guid)
+        {
+            if(!values.Any())
+                return;
+
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+
+            convertedAnswers.FormName = form;
+            convertedAnswers.Path = path;
+
+            if (!string.IsNullOrEmpty(formData))
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+            values.ToList().ForEach((_) => {
+            if (convertedAnswers.AdditionalFormAnswersData.ContainsKey(_.Key))
+                convertedAnswers.AdditionalFormAnswersData.Remove(_.Key);
+
+                convertedAnswers.AdditionalFormAnswersData.Add(_.Key, _.Value);
+            });
+
+            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+        }
+
+
         public void CheckForDocumentDownload(FormSchema formSchema)
         {
             if (!formSchema.DocumentDownload) return;
@@ -330,50 +356,14 @@ namespace form_builder.Helpers.PageHelpers
                     .ToList()
                     .ForEach(x => x.IncomingValues.ForEach(_ =>
                         {
+                             if (_.HttpActionType.Equals(EHttpActionType.Unknown))
+                                throw new Exception("PageHelper::CheckForIncomingFormDataValues, EHttpActionType cannot be unknwon, set to Get or Post");
+
                             if (string.IsNullOrEmpty(_.QuestionId) || string.IsNullOrEmpty(_.Name))
                                 throw new Exception("PageHelper::CheckForIncomingFormDataValues, QuestionId or Name cannot be empty");
                         }
                     ));
             }
-        }
-
-        public Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, Dictionary<string, dynamic> formData)
-        {
-            page.IncomingValues.ForEach(_ =>
-            {
-                var containsValue = formData.ContainsKey(_.Name);
-
-                if (!_.Optional && !containsValue)
-                    throw new Exception($"DictionaryExtensions::IncomingValue, FormData does not contains {_.Name} required value");
-
-                if (!containsValue) return;
-
-                formData = RecursiveCheckAndCreate(_.QuestionId, formData[_.Name], formData);
-                formData.Remove(_.Name);
-            });
-
-            return formData;
-        }
-
-        private IDictionary<string, dynamic> RecursiveCheckAndCreate(string targetMapping, string value, IDictionary<string, dynamic> obj)
-        {
-            var splitTargets = targetMapping.Split(".");
-
-            if (splitTargets.Length == 1)
-            {
-                obj.Add(splitTargets[0], value);
-                return obj;
-            }
-
-            if (!obj.TryGetValue(splitTargets[0], out object subObject))
-                subObject = new ExpandoObject();
-
-            subObject = RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), value, subObject as IDictionary<string, dynamic>);
-
-            obj.Remove(splitTargets[0]);
-            obj.Add(splitTargets[0], subObject);
-
-            return obj;
         }
 
         public void CheckForPageActions(FormSchema formSchema)

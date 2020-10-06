@@ -147,10 +147,10 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var callbackCacheProvider = string.Empty;
             var cachedAnswers =
-                "{\"FormName\":\"file-upload\",\"Path\":\"page-one\",\"CaseReference\":null,\"StartPageUrl\":null,\"FormData\":{},\"Pages\":[{\"PageSlug\":\"page-one\",\"Answers\":[{\"QuestionId\":\"fileUpload-fileupload\",\"Response\":[{\"Key\":\"file-fileUpload-fileupload-b3df0129-c527-4fb8-8cd6-e35e622116f6\",\"TrustedOriginalFileName\":\"SMBC.png\",\"UntrustedOriginalFileName\":\"SMBC.png\",\"Content\":null,\"FileSize\":26879,\"FileName\":null}]}]}]}";
+                "{\"FormName\":\"file-upload\",\"Path\":\"page-one\",\"CaseReference\":null,\"StartPageUrl\":null,\"FormData\":{},\"AdditionalFormAnswersData\":{},\"Pages\":[{\"PageSlug\":\"page-one\",\"Answers\":[{\"QuestionId\":\"fileUpload-fileupload\",\"Response\":[{\"Key\":\"file-fileUpload-fileupload-b3df0129-c527-4fb8-8cd6-e35e622116f6\",\"TrustedOriginalFileName\":\"SMBC.png\",\"UntrustedOriginalFileName\":\"SMBC.png\",\"Content\":null,\"FileSize\":26879,\"FileName\":null}]}]}]}";
             
             var updatedAnswers = 
-                "{\"FormName\":\"file-upload\",\"Path\":\"page-one\",\"CaseReference\":null,\"StartPageUrl\":null,\"FormData\":{},\"Pages\":[{\"PageSlug\":\"page-one\",\"Answers\":[{\"QuestionId\":\"fileUpload-fileupload\",\"Response\":[]}]}]}";
+                "{\"FormName\":\"file-upload\",\"Path\":\"page-one\",\"CaseReference\":null,\"StartPageUrl\":null,\"FormData\":{},\"AdditionalFormAnswersData\":{},\"Pages\":[{\"PageSlug\":\"page-one\",\"Answers\":[{\"QuestionId\":\"fileUpload-fileupload\",\"Response\":[]}]}]}";
 
             var viewModel = new Dictionary<string, dynamic>
             {
