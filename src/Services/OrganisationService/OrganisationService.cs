@@ -81,7 +81,7 @@ namespace form_builder.Services.OrganisationService
             if (!currentPage.IsValid)
             {
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
-                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
+                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, cachedSearchResults.ToList());
 
                 return new ProcessRequestEntity
                 {
@@ -126,7 +126,7 @@ namespace form_builder.Services.OrganisationService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid);
+                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers);
 
                 formModel.Path = currentPage.PageSlug;
                 formModel.FormName = baseForm.FormName;

@@ -6,6 +6,7 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Validators;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Models.Elements
 {
@@ -102,14 +103,14 @@ namespace form_builder.Models.Elements
 
         public string WriteOptional(string prefix = "") => DisplayOptional ? "class = optional" : null;
 
-        public virtual Task<string> RenderAsync(
-            IViewRender viewRender,
+        public virtual Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
+            FormAnswers formAnswers,
             List<object> results = null) => viewRender.RenderAsync(Type.ToString(), this, null);
 
         private bool DisplayOptional => Properties.Optional;

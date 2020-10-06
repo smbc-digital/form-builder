@@ -61,9 +61,9 @@ namespace form_builder_tests.UnitTests.ContentFactory
             // Arrange
             var callBack = new Page();
             _mockPageContentFactory
-                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel())
-                .Callback<Page, Dictionary<string, dynamic>, FormSchema, string, List<object>>((a, b, c, d, e) => callBack = a);
+                .Callback<Page, Dictionary<string, dynamic>, FormSchema, string, FormAnswers, List<object>>((a, b, c, d, e, f) => callBack = a);
 
             _mockPageHelper
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
@@ -73,7 +73,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             var result = await _factory.Build(string.Empty, new FormSchema { BaseURL = "base-test", FirstPageSlug = "page-one", Pages = new List<Page>() }, string.Empty, new FormAnswers(), EBehaviourType.SubmitAndPay);
 
             // Assert
-            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Once);
+            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             Assert.Equal("Success", result.ViewName);
             Assert.Equal("Thank you for your payment", callBack.Elements[0].Properties.Text);
             Assert.Equal(6, callBack.Elements.Count);
@@ -93,9 +93,9 @@ namespace form_builder_tests.UnitTests.ContentFactory
             // Arrange
             var callBack = new Page();
             _mockPageContentFactory
-                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel())
-                .Callback<Page, Dictionary<string, dynamic>, FormSchema, string, List<object>>((a, b, c, d, e) => callBack = a);
+                .Callback<Page, Dictionary<string, dynamic>, FormSchema, string, FormAnswers, List<object>>((a, b, c, d, e, f) => callBack = a);
 
             _mockPageHelper
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
@@ -105,7 +105,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             var result = await _factory.Build(string.Empty, new FormSchema { BaseURL = "base-test", FirstPageSlug = "page-one", Pages = new List<Page> { new Page { PageSlug = "success", Elements = new List<IElement> { new H2() } } } }, string.Empty, new FormAnswers(), behaviourType);
 
             // Assert
-            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Once);
+            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             Assert.Equal("Success", result.ViewName);
             Assert.Single(callBack.Elements);
             Assert.Equal(EElementType.H2, callBack.Elements[0].Type);
@@ -137,9 +137,9 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .Build();
 
             _mockPageContentFactory
-                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel())
-                .Callback<Page, Dictionary<string, dynamic>, FormSchema, string, List<object>>((a, b, c, d, e) => callBack = a);
+                .Callback<Page, Dictionary<string, dynamic>, FormSchema, string, FormAnswers, List<object>>((a, b, c, d, e, f) => callBack = a);
 
             _mockPageHelper
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
@@ -150,7 +150,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
 
             // Assert
             Assert.Equal("Success", result.ViewName);
-            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Once);
+            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             Assert.Equal(2, callBack.Elements.Count);
             Assert.Equal(EElementType.DocumentDownload, callBack.Elements[1].Type);
             Assert.Equal($"Download {EDocumentType.Txt} document", callBack.Elements[1].Properties.Label);
@@ -177,7 +177,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .Build();
 
             _mockPageContentFactory
-                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()))
+                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
             _mockPageHelper

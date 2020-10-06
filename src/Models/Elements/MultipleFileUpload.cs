@@ -7,6 +7,7 @@ using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -48,14 +49,14 @@ namespace form_builder.Models.Elements
         }
         public string SubmitButtonText;
 
-        public override Task<string> RenderAsync(
-            IViewRender viewRender,
+        public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
+            FormAnswers formAnswers,
             List<object> results = null)
         {
             var currentAnswer = elementHelper.CurrentValue<JArray>(this, viewModel, page.PageSlug, guid, FileUploadConstants.SUFFIX);

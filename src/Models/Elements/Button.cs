@@ -8,6 +8,7 @@ using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Models.Elements
 {
@@ -18,16 +19,15 @@ namespace form_builder.Models.Elements
             Type = EElementType.Button;
         }
 
-        public override Task<string> RenderAsync(
-            IViewRender viewRender,
+        public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
-            List<object> results = null
-            )
+            FormAnswers formAnswers,
+            List<object> results = null)
         {
             Properties.Text = GetButtonText(page.Elements, viewModel, page);          
 

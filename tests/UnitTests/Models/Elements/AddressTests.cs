@@ -3,9 +3,11 @@ using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
@@ -16,6 +18,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
         public AddressTests()
         {
@@ -40,6 +43,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
             //Act
             var result = await element.RenderAsync(
                 _mockIViewRender.Object,
@@ -48,7 +52,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 viewModel,
                 page,
                 schema,
-                _mockHostingEnv.Object);
+                _mockHostingEnv.Object,
+                formAnswers);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<form_builder.Models.Elements.Address>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -79,8 +84,10 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
+
             //Act
-           await element.RenderAsync(
+            await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 string.Empty,
@@ -88,6 +95,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 page,
                 schema,
                 _mockHostingEnv.Object,
+                formAnswers,
                 new List<object>());
 
             //Assert
@@ -130,6 +138,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithBaseUrl(baseUrl)
                 .Build();
 
+            var formAnswers = new FormAnswers();
+
             //Act
             var result = await element.RenderAsync(_mockIViewRender.Object,
                 _mockElementHelper.Object,
@@ -138,6 +148,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 page,
                 schema,
                 _mockHostingEnv.Object,
+                formAnswers,
                 new List<object>());
 
             //Assert

@@ -9,5 +9,6 @@
         public static readonly string STREET_SEARCH_TEXT = "Find street";
         public static readonly string ORG_SEARCH_TEXT = "Find organisation";
         public static readonly string UPLOAD_FILES_TEXT = "Upload file(s)";
+        public static readonly string DOCUMENT_UPLOAD_TEXT = "Upload your documents";
     }
 }

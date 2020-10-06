@@ -4,6 +4,7 @@ using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
 namespace form_builder.Models.Elements
@@ -19,14 +20,14 @@ namespace form_builder.Models.Elements
             Type = EElementType.Map;
         }
 
-        public override Task<string> RenderAsync(
-            IViewRender viewRender,
+        public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
+            FormAnswers formAnswers,
             List<object> results = null)
         {
             Properties.Value = JsonConvert.SerializeObject(elementHelper.CurrentValue<object>(this, viewModel, page.PageSlug, guid));

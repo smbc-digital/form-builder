@@ -5,8 +5,10 @@ using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Models;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using StockportGovUK.NetStandard.Models.Verint.Lookup;
 using Xunit;
@@ -18,6 +20,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
         public OrganisationTests(){
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
@@ -45,6 +48,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
+
             var viewModel = new Dictionary<string, dynamic>
             {
                 { LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic },
@@ -52,7 +57,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             };
 
             //Act
-            await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object);
+            await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object, formAnswers);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"),It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -81,6 +86,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
+
             var viewModel = new Dictionary<string, dynamic>
             {
                 { LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic },
@@ -93,7 +100,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             };
 
             //Act
-            await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, searchResults);
+            await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, formAnswers, searchResults);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"),It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
