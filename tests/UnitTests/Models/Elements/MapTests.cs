@@ -50,7 +50,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 page,
                 schema,
                 _mockHostingEnv.Object,
-                _mockHttpContextAccessor.Object,
                 formAnswers);
 
             //Assert
