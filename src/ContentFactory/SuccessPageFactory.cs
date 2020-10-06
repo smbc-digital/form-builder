@@ -49,6 +49,7 @@ namespace form_builder.ContentFactory
                 {
                     ViewName = "Submit",
                     FormAnswers = formAnswers,
+                    CaseReference = formAnswers.CaseReference,
                     FeedbackFormUrl = baseForm.FeedbackForm,
                     FeedbackPhase = baseForm.FeedbackPhase,
                     FormName = baseForm.FormName,
@@ -72,11 +73,12 @@ namespace form_builder.ContentFactory
                     baseForm.Pages[successIndex] = page;
             }
 
-            var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(),baseForm, sessionGuid);
+            var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(),baseForm, sessionGuid, formAnswers);
 
             return new SuccessPageEntity
             {
                 HtmlContent = result.RawHTML,
+                CaseReference = formAnswers.CaseReference,
                 FeedbackFormUrl = result.FeedbackForm,
                 FeedbackPhase = result.FeedbackPhase,
                 FormName = result.FormName,

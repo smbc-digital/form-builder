@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
@@ -17,7 +19,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
         public StreetTests()
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
@@ -47,8 +49,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("Street name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
             //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object);
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, _mockHttpContextAccessor.Object, formAnswers);
 
             // Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("StreetSelect")), It.IsAny<form_builder.Models.Elements.Street>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -69,6 +72,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("Street name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
+
             //Act
             await element.RenderAsync(
                 _mockIViewRender.Object,
@@ -77,7 +82,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 viewModel,
                 page,
                 schema,
-                _mockHostingEnv.Object);
+                _mockHostingEnv.Object,
+                _mockHttpContextAccessor.Object,
+                formAnswers);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("StreetSearch")),It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);

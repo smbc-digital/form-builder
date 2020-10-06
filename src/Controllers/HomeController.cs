@@ -138,9 +138,8 @@ namespace form_builder.Controllers
         [Route("{form}/submit")]
         public async Task<IActionResult> Submit(string form)
         {
-            var result = await _submitWorkflow.Submit(form);
+            await _submitWorkflow.Submit(form);
 
-            TempData["reference"] = result;
             return RedirectToAction("Success", new
             {
                 form
@@ -154,7 +153,7 @@ namespace form_builder.Controllers
             var result = await _successWorkflow.Process(EBehaviourType.SubmitForm, form);
             
             var success = new SuccessViewModel {
-                Reference = (string)TempData["reference"],
+                Reference = result.CaseReference,
                 PageContent = result.HtmlContent,
                 FormAnswers = result.FormAnswers,
                 FormName = result.FormName,

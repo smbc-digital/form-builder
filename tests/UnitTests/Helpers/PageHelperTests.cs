@@ -21,6 +21,7 @@ using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -44,6 +45,7 @@ namespace form_builder_tests.UnitTests.Helpers
             new Mock<IEnumerable<IPaymentProvider>>();
         private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
+        private readonly Mock<IHttpContextAccessor> _httpContextAccessor = new Mock<IHttpContextAccessor>();
 
         public PageHelperTests()
         {
@@ -89,7 +91,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 _mockElementHelper.Object, _mockDistributedCache.Object,
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockCache.Object, _mockDistributedCacheExpirationSettings.Object,
-                _mockPaymentProvider.Object, _mockSessionHelper.Object);
+                _mockPaymentProvider.Object, _mockSessionHelper.Object, _httpContextAccessor.Object);
         }
 
         [Fact]
@@ -104,8 +106,10 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
+
             // Act
-            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty);
+            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers);
 
             // Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "H1"),
@@ -144,8 +148,9 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
             //Act
-            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers);
 
             //Assert
             _mockIViewRender.Verify(
@@ -180,8 +185,9 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
             //Act
-            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, new List<object>());
+            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers, new List<object>());
 
             //Assert
             _mockIViewRender.Verify(
@@ -232,8 +238,9 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithBaseUrl(baseUrl)
                 .Build();
 
+            var formAnswers = new FormAnswers();
             //Act
-            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, new List<object>());
+            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers, new List<object>());
 
             //Assert
             Assert.Equal($"/{baseUrl}/{pageSlug}", callback.ReturnURL);
@@ -267,8 +274,9 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
             //Act
-            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty);
+            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("AddressSearch")),
@@ -306,8 +314,9 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithName("Street name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
             //Act
-            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty);
+            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("StreetSelect")),
@@ -333,8 +342,9 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
             //Act
-            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty);
+            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty , formAnswers);
 
             //Assert
             _mockIViewRender.Verify(
@@ -375,8 +385,9 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithBaseUrl(baseUrl)
                 .Build();
 
+            var formAnswers = new FormAnswers();
             //Act
-            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty);
+            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers);
 
             //Assert
             Assert.Equal($"/{baseUrl}/{pageSlug}", callback.ReturnURL);
@@ -404,8 +415,9 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
             //Act
-            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty);
+            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers);
 
             //Assert
             _mockIViewRender.Verify(
@@ -432,8 +444,9 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
             //Act
-            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty);
+            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers);
 
             //Assert
             _mockIViewRender.Verify(

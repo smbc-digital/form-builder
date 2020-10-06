@@ -9,6 +9,8 @@ namespace form_builder.Services.PageService.Entities
 
         public FormAnswers FormAnswers { get; set; }
 
+        public string CaseReference { get; set; }
+
         public string FeedbackFormUrl { get; set; }
 
         public string FeedbackPhase { get; set; }

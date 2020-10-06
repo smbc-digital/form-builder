@@ -30,11 +30,12 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 It.IsAny<Dictionary<string, dynamic>>(),
                 It.IsAny<FormSchema>(),
                 It.IsAny<string>(),
+                It.IsAny<FormAnswers>(),
                 It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel { RawHTML = html });
 
             // Act
-            var result = await _factory.Build(new Page(), new Dictionary<string, dynamic>(), new FormSchema(), string.Empty);
+            var result = await _factory.Build(new Page(), new Dictionary<string, dynamic>(), new FormSchema(), string.Empty, new FormAnswers());
 
             // Assert
             Assert.Equal(html, result.RawHTML);
@@ -43,6 +44,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 It.IsAny<Dictionary<string, dynamic>>(),
                 It.IsAny<FormSchema>(),
                 It.IsAny<string>(),
+                It.IsAny<FormAnswers>(),
                 It.IsAny<List<object>>()), Times.Once);
         }
 
@@ -59,6 +61,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 It.IsAny<Dictionary<string, dynamic>>(),
                 It.IsAny<FormSchema>(),
                 It.IsAny<string>(),
+                It.IsAny<FormAnswers>(),
                 It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel { RawHTML = html });
 
@@ -69,13 +72,15 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .WithStartPageUrl(startPageUrl)
                 .Build();
 
+            var formAnswers = new FormAnswers();
+
             var page = new PageBuilder()
                 .WithPageSlug(pageUrl)
                 .WithPageTitle("page title")
                 .Build();
 
             // Act
-            var result = await _factory.Build(page, new Dictionary<string, dynamic>(), formSchema, string.Empty);
+            var result = await _factory.Build(page, new Dictionary<string, dynamic>(), formSchema, string.Empty, formAnswers);
 
             // Assert
             Assert.Equal(html, result.RawHTML);

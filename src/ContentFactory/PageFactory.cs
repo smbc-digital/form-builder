@@ -9,7 +9,7 @@ namespace form_builder.ContentFactory
 {
     public interface IPageFactory
     {
-        Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, List<object> results = null);
+        Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, List<object> results = null);
     }
 
     public class PageFactory : IPageFactory
@@ -21,9 +21,9 @@ namespace form_builder.ContentFactory
             _pageHelper = pageHelper;
         }
 
-        public async Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, List<object> results = null)
+        public async Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, List<object> results = null)
         {
-            var result = await _pageHelper.GenerateHtml(page, viewModel, baseForm, sessionGuid, results);
+            var result = await _pageHelper.GenerateHtml(page, viewModel, baseForm, sessionGuid, formAnswers, results);
             result.Path = page.PageSlug;
             result.FormName = baseForm.FormName;
             result.PageTitle = page.Title;

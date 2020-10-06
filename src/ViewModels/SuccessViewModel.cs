@@ -18,6 +18,8 @@ namespace form_builder.ViewModels
 
         public string StartPageUrl { get; set; }
 
+        public string DocumentUploadUrl { get; set; }
+
         public bool HideBackButton => true;
 
         public string PageTitle { get; set; }
