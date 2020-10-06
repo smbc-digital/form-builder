@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
@@ -103,6 +104,41 @@ namespace form_builder_tests.UnitTests.Models.Elements
             _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()), Times.Once);
             Assert.NotEmpty(callBackValue.CurrentFilesUploaded);
             Assert.Single(callBackValue.CurrentFilesUploaded);
+        }
+
+        [Theory]
+        [InlineData(2)]
+        [InlineData(10)]
+        public void GenerateElementProperties_Should_Generate_ElementProperties(int value)
+        {
+            //Arrange
+            var questionId = "filetest";
+            var element = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId(questionId)
+                .WithMaxFileSize(value)
+                .Build();
+
+            var formAnswers = new FormAnswers();
+
+            //Act
+            var result = element.GenerateElementProperties();
+
+            //Assert
+            Assert.Equal(7, result.Count);
+            Assert.True(result.ContainsKey("data-individual-file-size"));
+            Assert.True(result.ContainsKey("data-module"));
+            Assert.True(result.ContainsKey("multiple"));
+            Assert.True(result.ContainsKey("multiple"));
+            Assert.True(result.ContainsKey("type"));
+            Assert.True(result.ContainsKey("accept"));
+            Assert.True(result.ContainsKey("id"));
+            Assert.True(result.ContainsKey("name"));
+            Assert.True(result.ContainsValue($"{questionId}{FileUploadConstants.SUFFIX}"));
+            Assert.True(result.ContainsValue("file"));
+            Assert.True(result.ContainsValue(true));
+            Assert.True(result.ContainsValue("smbc-multiple-file-upload"));
+            Assert.True(result.ContainsValue(value * 1024000));
         }
     }
 }
