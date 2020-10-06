@@ -1,6 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
@@ -8,12 +13,13 @@ using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Models.Elements
 {
-    public class Select : Element
+    public class DocumentUpload : Element
     {
-        public Select()
+        public DocumentUpload()
         {
-            Type = EElementType.Select;
+            Type = EElementType.DocumentUpload;
         }
+
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
@@ -25,14 +31,11 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid);
-            elementHelper.CheckForQuestionId(this);
-            elementHelper.CheckForLabel(this);
-            elementHelper.ReSelectPreviousSelectedOptions(this);
-            elementHelper.CheckForLabel(this);
-            elementHelper.CheckForSelectOptions(this);
+            Properties.Text ??= ButtonConstants.DOCUMENT_UPLOAD_TEXT;
 
-            return viewRender.RenderAsync(Type.ToString(), this);
+            Properties.DocumentUploadUrl = elementHelper.GenerateDocumentUploadUrl(this, formSchema, formAnswers);
+
+            return viewRender.RenderAsync("DocumentUpload", this);
         }
     }
 }

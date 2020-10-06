@@ -7,6 +7,7 @@ using form_builder.Models.Properties.ElementProperties;
 using form_builder.Validators;
 using JsonSubTypes;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -26,14 +27,15 @@ namespace form_builder.Models.Elements
 
         void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder);
 
-        Task<string> RenderAsync(
-            IViewRender viewRender,
+        Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
+            IHttpContextAccessor httpContextAccessor,
+            FormAnswers formAnswers,
             List<object> results = null);
 
         Dictionary<string, dynamic> GenerateElementProperties(string type = "");

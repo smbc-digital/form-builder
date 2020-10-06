@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Mappers;
 using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
@@ -16,11 +21,22 @@ namespace form_builder_tests.UnitTests.Helpers
     {
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
+        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
         private readonly ElementHelper _elementHelper;
+        private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
 
         public ElementHelperTests()
         {
-            _elementHelper = new ElementHelper(_mockDistributedCacheWrapper.Object, _mockElementMapper.Object);
+            _elementHelper = new ElementHelper(_mockDistributedCacheWrapper.Object,
+                _mockElementMapper.Object,
+                _mockWebHostEnvironment.Object,
+                _mockHttpContextAccessor.Object);
+
+            _mockWebHostEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
+
+            _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
+               .Returns(new HostString("www.test.com"));
         }
 
         [Theory]
@@ -696,6 +712,44 @@ namespace form_builder_tests.UnitTests.Helpers
 
             Assert.NotEmpty(result);
             Assert.Single(result);
+        }
+
+        [Fact]
+        public void GenerateValidDocumentUploadUrl_ShouldReturnUrlWithCaseRefEncoded()
+        {
+            //Arrange          
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                CaseReference = "12345"
+            };
+
+            var urlOrigin = $"https://www.test.com/";
+            var caseReference = Convert.ToBase64String(Encoding.ASCII.GetBytes(formAnswers.CaseReference));
+            var urlPath = $"{schema.BaseURL}/{FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH}{SystemConstants.CaseReferenceQueryString}{caseReference}";
+
+            _mockElementHelper.Setup(_ => _.GenerateDocumentUploadUrl(It.IsAny<Element>(),
+                It.IsAny<FormSchema>(),
+                It.IsAny<FormAnswers>()
+                )
+            );
+
+            var elementHelper = new ElementHelper(
+                _mockDistributedCacheWrapper.Object,
+                _mockElementMapper.Object,
+                _mockWebHostEnvironment.Object,
+                _mockHttpContextAccessor.Object
+                );
+            //Act
+            var results = elementHelper.GenerateDocumentUploadUrl(new DocumentUpload(), schema, formAnswers);
+
+            //Assert
+            Assert.NotNull(results);
+            Assert.Equal($"{urlOrigin}{urlPath}", results);
+            Assert.Contains(caseReference, results);
         }
     }
 }
