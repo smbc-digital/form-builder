@@ -19,7 +19,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
         private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
         [Fact]
         public async Task RenderAsync_ShouldCall_PageHelper_ToGetCurrentValue()
@@ -50,7 +49,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 page,
                 schema,
                 _mockHostingEnv.Object,
-                _mockHttpContextAccessor.Object,
                 formAnswers);
 
             //Assert

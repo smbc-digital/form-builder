@@ -26,7 +26,6 @@ namespace form_builder.Models.Elements
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
-            IHttpContextAccessor httpContextAccessor,
             FormAnswers formAnswers,
             List<object> results = null)
         {

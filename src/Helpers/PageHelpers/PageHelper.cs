@@ -37,7 +37,6 @@ namespace form_builder.Helpers.PageHelpers
         private readonly ICache _cache;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly ISessionHelper _sessionHelper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
             IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
@@ -53,7 +52,6 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _paymentProviders = paymentProviders;
             _sessionHelper = sessionHelper;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(
@@ -78,7 +76,6 @@ namespace form_builder.Helpers.PageHelpers
                     page,
                     baseForm,
                     _environment,
-                    _httpContextAccessor,
                     formAnswers,
                     results
                     );
