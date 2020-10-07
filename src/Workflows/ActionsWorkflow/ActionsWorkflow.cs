@@ -7,6 +7,7 @@ using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Services.EmailService;
 using form_builder.Services.RetrieveExternalDataService;
+using form_builder.Services.ValidateService;
 
 namespace form_builder.Workflows.ActionsWorkflow
 {
@@ -20,14 +21,17 @@ namespace form_builder.Workflows.ActionsWorkflow
         private readonly IRetrieveExternalDataService _retrieveExternalDataService;
         private readonly IEmailService _emailService;
         private readonly ISchemaFactory _schemaFactory;
+        private readonly IValidateService _validateService;
 
         public ActionsWorkflow(IRetrieveExternalDataService retrieveExternalDataService,
             IEmailService emailService,
-            ISchemaFactory schemaFactory)
+            ISchemaFactory schemaFactory,
+            IValidateService validateService)
         {
             _retrieveExternalDataService = retrieveExternalDataService;
             _emailService = emailService;
             _schemaFactory = schemaFactory;
+            _validateService = validateService;
         }
 
         public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
@@ -40,6 +44,9 @@ namespace form_builder.Workflows.ActionsWorkflow
 
             if (actions.Any(_ => _.Type.Equals(EActionType.UserEmail) || _.Type.Equals(EActionType.BackOfficeEmail)))
                 await _emailService.Process(actions.Where(_ => _.Type == EActionType.UserEmail || _.Type == EActionType.BackOfficeEmail).ToList());
+
+            if (actions.Any(_ => _.Type.Equals(EActionType.Validate)))
+                await _validateService.Process(actions.Where(_ => _.Type == EActionType.Validate).ToList(), formSchema, formName);
         }
     }
 }

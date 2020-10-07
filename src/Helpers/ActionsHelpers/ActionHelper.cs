@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Services.RetrieveExternalDataService.Entities;
+using form_builder.Services.ValidateService.Entities;
 
 namespace form_builder.Helpers.ActionsHelpers
 {
@@ -11,6 +12,8 @@ namespace form_builder.Helpers.ActionsHelpers
         ExternalDataEntity GenerateUrl(string baseUrl, FormAnswers formAnswers);
 
         string GetEmailToAddresses(IAction action, FormAnswers formAnswers);
+
+        ValidateEntity GenerateDoumentUploadUrl(string baseUrl, FormAnswers formAnswers);
     }
 
     public class ActionHelper : IActionHelper
@@ -60,6 +63,17 @@ namespace form_builder.Helpers.ActionsHelpers
 
             var subObject = new Answers { Response = (dynamic)answer.Response[splitTargets[1]] };
             return RecursiveGetAnswerValue(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), subObject);
+        }
+
+        public ValidateEntity GenerateDoumentUploadUrl(string baseUrl, FormAnswers formAnswers)
+        {
+            var matches = TagRegex.Matches(baseUrl);
+            var newUrl = matches.Aggregate(baseUrl, (current, match) => Replace(match, current, formAnswers));
+            return new ValidateEntity
+            {
+                Url = newUrl,
+                IsPost = false
+            };
         }
     }
 }

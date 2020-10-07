@@ -39,6 +39,7 @@ using form_builder.Services.PayService;
 using form_builder.Services.RetrieveExternalDataService;
 using form_builder.Services.StreetService;
 using form_builder.Services.SubmitService;
+using form_builder.Services.ValidateService;
 using form_builder.Validators;
 using form_builder.Workflows;
 using form_builder.Workflows.ActionsWorkflow;
@@ -212,6 +213,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddSingleton<IDocumentSummaryService, DocumentSummaryService>();
             services.AddSingleton<IRetrieveExternalDataService, RetrieveExternalDataService>();
             services.AddSingleton<IEmailService, EmailService>();
+            services.AddSingleton<IValidateService, ValidateService>();
 
             return services;
         }
