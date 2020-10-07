@@ -12,7 +12,7 @@ namespace form_builder.Helpers.IncomingDataHelper
     public interface IIncomingDataHelper
     {
         Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, Dictionary<string, dynamic> formData);
-        Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, IQueryCollection queryCollection);
+        Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, IQueryCollection queryCollection, FormAnswers formAnswers);
     }
 
     public class IncomingDataHelper : IIncomingDataHelper
@@ -35,13 +35,16 @@ namespace form_builder.Helpers.IncomingDataHelper
             return formData;
         }
 
-        public Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, IQueryCollection queryCollection)
+        public Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, IQueryCollection queryCollection, FormAnswers formAnswers)
         {
             var formData = new Dictionary<string, dynamic>();
             var queryData = queryCollection.ToDictionary(x => x.Key, x => (dynamic)x.Value);
             page.IncomingValues.Where(_ => _.HttpActionType.Equals(EHttpActionType.Get)).ToList().ForEach(_ =>
             {
                 var containsValue = queryData.ContainsKey(_.Name);
+
+                if(!containsValue && formAnswers.AdditionalFormAnswersData.ContainsKey(_.QuestionId))
+                    return;
 
                 if (!_.Optional && !containsValue)
                     throw new Exception($"IncomingDataHelper::AddIncomingFormDataValues, FormData does not contain {_.Name} required value");

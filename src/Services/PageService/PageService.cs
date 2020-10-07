@@ -153,7 +153,11 @@ namespace form_builder.Services.PageService
 
             if(page.HasIncomingGetValues)
             {
-                var result = _incomingDataHelper.AddIncomingFormDataValues(page, queryParamters);
+                var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+                if (!string.IsNullOrEmpty(formData))
+                    convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+                var result = _incomingDataHelper.AddIncomingFormDataValues(page, queryParamters, convertedAnswers);
                 _pageHelper.SaveNonQuestionAnswers(result, form, path, sessionGuid);
             }
 

@@ -11,7 +11,6 @@ namespace form_builder_tests.UnitTests.Services
 {
     public class FormAnswersAdditionalDataTagParserTests
     {
-
         private FormAnswersAdditionalDataTagParser _tagParser = new FormAnswersAdditionalDataTagParser();
 
         [Theory]
