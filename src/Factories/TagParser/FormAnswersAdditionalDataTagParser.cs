@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using form_builder.Models;
-using form_builder.Models.Elements;
 
 namespace form_builder.Factories.TagParser
 {
@@ -18,42 +18,37 @@ namespace form_builder.Factories.TagParser
             page.Elements.Select((element) =>
             {
                 if (!string.IsNullOrEmpty(element.Properties.Text))
-                {
-                    return Parse(element, answersDictionary);
-                }
+                    element.Properties.Text = Parse(element.Properties.Text, answersDictionary);
+                    
                 return element;
             }).ToList();
 
             return page;
         }
 
-        private IElement Parse(IElement element, Dictionary<string, object> answersDictionary)
+        private string Parse(string value, Dictionary<string, object> answersDictionary)
         {
-            var matches = Regex.Matches(element.Properties.Text);
-
-            if (matches.Any())
+            var match = Regex.Match(value);
+            if (match.Success)
             {
-                foreach (Match match in matches)
-                {
-                    var splitMatch = match.Value.Split(":");
-                    var questionId = splitMatch[1];
+                var splitMatch = match.Value.Split(":");
+                var questionId = splitMatch[1];
 
-                    if (string.IsNullOrEmpty(questionId))
-                        continue;
+                if (string.IsNullOrEmpty(questionId))
+                    throw new Exception($"FormAnswerTagParser::Parse, replacement values questionId is null or empty, Match value: {match.Value}");
 
-                    var value = (string)answersDictionary[questionId];
+                var questionValue = (string)answersDictionary[questionId];
 
-                    if (string.IsNullOrEmpty(value))
-                        continue;
+                if (string.IsNullOrEmpty(questionValue))
+                    throw new Exception($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is null or empty, Match value: {match.Value}");
 
-                    var replacementText = new StringBuilder(element.Properties.Text);
-                    replacementText.Remove(match.Index - 2, match.Length + 4);
-                    replacementText.Insert(match.Index - 2, value);
-                    element.Properties.Text = replacementText.ToString();
-                }
+                var replacementText = new StringBuilder(value);
+                replacementText.Remove(match.Index - 2, match.Length + 4);
+                replacementText.Insert(match.Index - 2, questionValue);
+                Parse(replacementText.ToString(), answersDictionary);
             }
 
-            return element;
+            return value;
         }
     }
 }
