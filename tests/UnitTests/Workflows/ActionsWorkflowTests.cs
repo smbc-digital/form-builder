@@ -7,6 +7,7 @@ using form_builder.Models.Actions;
 using form_builder.Services.EmailService;
 using form_builder.Services.RetrieveExternalDataService;
 using form_builder.Services.ValidateService;
+using form_builder.Services.ValidateService.Entities;
 using form_builder.Workflows.ActionsWorkflow;
 using Moq;
 using Xunit;
@@ -46,6 +47,28 @@ namespace form_builder_tests.UnitTests.Workflows
 
             // Assert
             _mockRetrieveExternalDataService.Verify(_ => _.Process(page.PageActions, It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Process_ShouldCallService_IfValidateActionExists()
+        {
+            // Arrange
+            var page = new Page
+            {
+                PageActions = new List<IAction>
+                {
+                    new Validate
+                    {
+                        Type = EActionType.Validate
+                    }
+                }
+            };
+
+            // Act
+            await _actionsWorkflow.Process(page.PageActions, new FormSchema(), "form");
+
+            // Assert
+            _mockValidateService.Verify(_ => _.Process(page.PageActions, It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Once);
         }
     }
 }
