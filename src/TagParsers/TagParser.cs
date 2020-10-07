@@ -1,34 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using form_builder.Models;
 
-namespace form_builder.Factories.TagParser
+namespace form_builder.TagParser
 {
-    public class FormAnswersAdditionalDataTagParser : ITagParser
+    public class TagParser
     {
-        public Regex Regex => new Regex("(?<={{)ANSWERDATA:.*?(?=}})", RegexOptions.Compiled);
-
-        public Page Parse(Page page, FormAnswers formAnswers)
+        public string Parse(string value, Dictionary<string, object> answersDictionary, Regex regex)
         {
-            var answersDictionary = formAnswers.AdditionalFormAnswersData;
-
-            page.Elements.Select((element) =>
-            {
-                if (!string.IsNullOrEmpty(element.Properties.Text))
-                    element.Properties.Text = Parse(element.Properties.Text, answersDictionary);
-                    
-                return element;
-            }).ToList();
-
-            return page;
-        }
-
-        private string Parse(string value, Dictionary<string, object> answersDictionary)
-        {
-            var match = Regex.Match(value);
+            var match = regex.Match(value);
             if (match.Success)
             {
                 var splitMatch = match.Value.Split(":");
@@ -45,7 +26,7 @@ namespace form_builder.Factories.TagParser
                 var replacementText = new StringBuilder(value);
                 replacementText.Remove(match.Index - 2, match.Length + 4);
                 replacementText.Insert(match.Index - 2, questionValue);
-                Parse(replacementText.ToString(), answersDictionary);
+                return Parse(replacementText.ToString(), answersDictionary, regex);
             }
 
             return value;
