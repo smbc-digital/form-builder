@@ -16,43 +16,6 @@ using Newtonsoft.Json;
 
 namespace form_builder.Helpers.ElementHelpers
 {
-    public interface IElementHelper
-    {
-        string CurrentValue(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "");
-
-        T CurrentValue<T>(Element element, Dictionary<string, dynamic> viewModel, string pageSlug, string guid, string suffix = "") where T : new();
-        
-        bool CheckForQuestionId(Element element);
-        
-        bool CheckForLabel(Element element);
-        
-        bool CheckForMaxLength(Element element);
-        
-        bool CheckIfLabelAndTextEmpty(Element element);
-        
-        bool CheckForRadioOptions(Element element);
-        
-        bool CheckForSelectOptions(Element element);
-        
-        bool CheckForCheckBoxListValues(Element element);
-        
-        bool CheckAllDateRestrictionsAreNotEnabled(Element element);
-        
-        void ReSelectPreviousSelectedOptions(Element element);
-        
-        void ReCheckPreviousRadioOptions(Element element);
-        
-        bool CheckForProvider(Element element);
-        
-        object GetFormDataValue(string guid, string key);
-        
-        FormAnswers GetFormData(string guid);
-        
-        List <PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema);
-
-        string GenerateDocumentUploadUrl(Element element, FormSchema formSchema, FormAnswers formAnswers);
-    }
-
     public class ElementHelper : IElementHelper
     {
         private readonly IDistributedCacheWrapper _distributedCache;
@@ -71,15 +34,15 @@ namespace form_builder.Helpers.ElementHelpers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public string CurrentValue(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "")
+        public string CurrentValue(Element element, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string pageSlug, string guid, string suffix = "")
         {
             //Todo
             var defaultValue =  string.Empty;
 
-            return GetCurrentValueFromCache<string>(defaultValue, element, answers, pageSlug, guid, suffix);
+            return GetCurrentValueFromSavedAnswers<string>(defaultValue, element, viewmodel, answers, pageSlug, guid, suffix);
         }
 
-        public T CurrentValue<T>(Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix = "") where T : new()
+        public T CurrentValue<T>(Element element, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string pageSlug, string guid, string suffix = "") where T : new()
         {
             //Todo
             var defaultValue = new T();
@@ -87,32 +50,25 @@ namespace form_builder.Helpers.ElementHelpers
             if (element.Type == EElementType.FileUpload)
                 return defaultValue;
 
-            return GetCurrentValueFromCache<T>(defaultValue, element, answers, pageSlug, guid, suffix);
+            return GetCurrentValueFromSavedAnswers<T>(defaultValue, element, viewmodel, answers, pageSlug, guid, suffix);
         }
 
-        private T GetCurrentValueFromCache<T>(T defaultValue, Element element, Dictionary<string, dynamic> answers, string pageSlug, string guid, string suffix)
+        private T GetCurrentValueFromSavedAnswers<T>(T defaultValue, Element element, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string pageSlug, string guid, string suffix)
         {
-            var currentValue = answers.ContainsKey($"{element.Properties.QuestionId}{suffix}");
+            var currentValue = viewmodel.ContainsKey($"{element.Properties.QuestionId}{suffix}");
 
             if (!currentValue)
             {
-                var cacheData = _distributedCache.GetString(guid);
-                if (cacheData != null)
+                var storedValue = answers.Pages.FirstOrDefault(_ => _.PageSlug == pageSlug);
+                if (storedValue != null)
                 {
-                    var mappedCacheData = JsonConvert.DeserializeObject<FormAnswers>(cacheData);
-                    var storedValue = mappedCacheData.Pages.FirstOrDefault(_ => _.PageSlug == pageSlug);
-
-                    if (storedValue != null)
-                    {
-                        var value = storedValue.Answers.FirstOrDefault(_ => _.QuestionId == $"{element.Properties.QuestionId}{suffix}");
-
-                        return value != null ? (T)value.Response : defaultValue;
-                    }
+                    var value = storedValue.Answers.FirstOrDefault(_ => _.QuestionId == $"{element.Properties.QuestionId}{suffix}");
+                    return value != null ? (T)value.Response : defaultValue;
                 }
                 return defaultValue;
             }
 
-            return answers[$"{element.Properties.QuestionId}{suffix}"];
+            return viewmodel[$"{element.Properties.QuestionId}{suffix}"];
         }
 
         public bool CheckForLabel(Element element)

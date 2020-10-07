@@ -207,7 +207,7 @@ namespace form_builder.Services.PageService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, sessionGuid, new FormAnswers());
+                var formModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, sessionGuid);
 
                 return new ProcessRequestEntity
                 {
@@ -229,7 +229,7 @@ namespace form_builder.Services.PageService
                 { LookUpConstants.SubPathViewModelKey, subPath }
             };
 
-            var viewModel = await _pageContentFactory.Build(page, viewModelData, baseForm, sessionGuid, new FormAnswers(), results);
+            var viewModel = await _pageContentFactory.Build(page, viewModelData, baseForm, sessionGuid, null, results);
 
             return viewModel;
         }

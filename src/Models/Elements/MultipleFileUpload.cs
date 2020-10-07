@@ -7,7 +7,6 @@ using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -25,7 +24,7 @@ namespace form_builder.Models.Elements
         public string MaxCombinedFileSizeText { get { return $"{(Properties.MaxCombinedFileSize == 0 ? SystemConstants.DefaultMaxCombinedFileSize.ToReadableMaxFileSize() : Properties.MaxCombinedFileSize)}MB"; } }
         public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
         public List<string> CurrentFilesUploaded { get; set; } = new List<string>();
-        public int MaxFileSize => Properties.MaxFileSize * 1024000 > 0 && Properties.MaxFileSize * 1024000 < SystemConstants.DefaultMaxFileSize ? Properties.MaxFileSize * 1024000 : SystemConstants.DefaultMaxFileSize;
+        public int MaxFileSize => Properties.MaxFileSize * 1048576 > 0 && Properties.MaxFileSize * 1048576 < SystemConstants.DefaultMaxFileSize ? Properties.MaxFileSize * 1048576 : SystemConstants.DefaultMaxFileSize;
 
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
@@ -59,7 +58,7 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            var currentAnswer = elementHelper.CurrentValue<JArray>(this, viewModel, page.PageSlug, guid, FileUploadConstants.SUFFIX);
+            var currentAnswer = elementHelper.CurrentValue<JArray>(this, viewModel, formAnswers, page.PageSlug, guid, FileUploadConstants.SUFFIX);
 
             SubmitButtonText = SetSubmitButtonText(page);
 

@@ -5,7 +5,6 @@ using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Models.Elements
 {
@@ -52,7 +51,7 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            elementHelper.CurrentValue(this, viewModel, page.PageSlug, guid, string.Empty);
+            elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, string.Empty);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
 

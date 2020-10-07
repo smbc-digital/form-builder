@@ -6,6 +6,7 @@ using Amazon.SimpleEmail;
 using form_builder.Configuration;
 using form_builder.ContentFactory;
 using form_builder.Factories.Schema;
+using form_builder.Factories.TagParser;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Gateways;
@@ -94,6 +95,15 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
             return services;
         }
+
+        public static IServiceCollection AddTagParsers(this IServiceCollection services)
+        {
+            services.AddTransient<ITagParser, FormAnswerTagParser>();
+            services.AddTransient<ITagParser, FormAnswersAdditionalDataTagParser>();
+
+            return services;
+        }
+
 
         public static IServiceCollection AddGateways(this IServiceCollection services, IConfiguration configuration)
         {
