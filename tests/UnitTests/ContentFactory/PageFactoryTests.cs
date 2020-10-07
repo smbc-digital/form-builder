@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using form_builder.ContentFactory;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Providers.StorageProvider;
+using form_builder.TagParser;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Moq;
@@ -14,10 +16,16 @@ namespace form_builder_tests.UnitTests.ContentFactory
     {
         private readonly PageFactory _factory;
         private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new Mock<IEnumerable<ITagParser>>();
+        private readonly Mock<ITagParser> _tagParser = new Mock<ITagParser>();
 
         public PageFactoryTests()
         {
-            _factory = new PageFactory(_mockPageHelper.Object);
+            var _mockTagParsersItems = new List<ITagParser>();
+            _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => _mockTagParsersItems.GetEnumerator());
+
+            _factory = new PageFactory(_mockPageHelper.Object, _mockTagParsers.Object, _mockDistributedCacheWrapper.Object);
         }
 
         [Fact]
@@ -90,6 +98,71 @@ namespace form_builder_tests.UnitTests.ContentFactory
             Assert.Equal("feedbackurl", result.FeedbackForm);
             Assert.Equal("BETA", result.FeedbackPhase);
             Assert.Equal(startPageUrl, result.StartPageUrl);
+        }
+
+        [Fact]
+        public async Task Build_ShouldCallCache_ToGetCurrentFormAnswers_WhenFormAnswers_AreNull()
+        {
+            // Arrange
+            _mockPageHelper.Setup(_ => _.GenerateHtml(
+                It.IsAny<Page>(),
+                It.IsAny<Dictionary<string, dynamic>>(),
+                It.IsAny<FormSchema>(),
+                It.IsAny<string>(),
+                It.IsAny<FormAnswers>(),
+                It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel { RawHTML = string.Empty });
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("base")
+                .WithName("form name")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithPageSlug("page-one")
+                .Build();
+
+            // Act
+            await _factory.Build(page, new Dictionary<string, dynamic>(), formSchema, string.Empty);
+
+            // Assert
+            _mockDistributedCacheWrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Build_ShouldCall_Parse_On_TagParsers()
+        {
+            // Arrange
+            _tagParser.Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()))
+                .Returns(new Page());
+            var tagParserItems = new List<ITagParser> { _tagParser.Object, _tagParser.Object };
+            _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => tagParserItems.GetEnumerator());
+
+            _mockPageHelper.Setup(_ => _.GenerateHtml(
+                It.IsAny<Page>(),
+                It.IsAny<Dictionary<string, dynamic>>(),
+                It.IsAny<FormSchema>(),
+                It.IsAny<string>(),
+                It.IsAny<FormAnswers>(),
+                It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel { RawHTML = string.Empty });
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("base")
+                .WithName("form name")
+                .Build();
+
+            var formAnswers = new FormAnswers();
+
+            var page = new PageBuilder()
+                .WithPageSlug("page-one")
+                .Build();
+
+            // Act
+            await _factory.Build(page, new Dictionary<string, dynamic>(), formSchema, string.Empty, formAnswers);
+
+            // Assert
+            _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Exactly(2));
         }
     }
 }

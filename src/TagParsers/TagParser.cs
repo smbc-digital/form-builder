@@ -15,13 +15,13 @@ namespace form_builder.TagParser
                 var splitMatch = match.Value.Split(":");
                 var questionId = splitMatch[1];
 
-                if (string.IsNullOrEmpty(questionId))
-                    throw new Exception($"FormAnswerTagParser::Parse, replacement values questionId is null or empty, Match value: {match.Value}");
+                if(!answersDictionary.ContainsKey(questionId))
+                    throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is not stored within answers, Match value: {match.Value}");
 
                 var questionValue = (string)answersDictionary[questionId];
 
                 if (string.IsNullOrEmpty(questionValue))
-                    throw new Exception($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is null or empty, Match value: {match.Value}");
+                    throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is null or empty, Match value: {match.Value}");
 
                 var replacementText = new StringBuilder(value);
                 replacementText.Remove(match.Index - 2, match.Length + 4);

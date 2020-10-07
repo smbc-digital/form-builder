@@ -59,7 +59,7 @@ namespace form_builder.Helpers.ElementHelpers
 
             if (!currentValue)
             {
-                var storedValue = answers.Pages.FirstOrDefault(_ => _.PageSlug == pageSlug);
+                var storedValue = answers.Pages?.FirstOrDefault(_ => _.PageSlug == pageSlug);
                 if (storedValue != null)
                 {
                     var value = storedValue.Answers.FirstOrDefault(_ => _.QuestionId == $"{element.Properties.QuestionId}{suffix}");

@@ -24,7 +24,7 @@ namespace form_builder.Models.Elements
         public string MaxCombinedFileSizeText { get { return $"{(Properties.MaxCombinedFileSize == 0 ? SystemConstants.DefaultMaxCombinedFileSize.ToReadableMaxFileSize() : Properties.MaxCombinedFileSize)}MB"; } }
         public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
         public List<string> CurrentFilesUploaded { get; set; } = new List<string>();
-        public int MaxFileSize => Properties.MaxFileSize * 1048576 > 0 && Properties.MaxFileSize * 1048576 < SystemConstants.DefaultMaxFileSize ? Properties.MaxFileSize * 1048576 : SystemConstants.DefaultMaxFileSize;
+        public int MaxFileSize => Properties.MaxFileSize * 1024000 > 0 && Properties.MaxFileSize * 1024000 < SystemConstants.DefaultMaxFileSize ? Properties.MaxFileSize * 1024000 : SystemConstants.DefaultMaxFileSize;
 
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
