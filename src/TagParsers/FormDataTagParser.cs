@@ -4,13 +4,13 @@ using form_builder.Models;
 
 namespace form_builder.TagParser
 {
-    public class FormAnswersAdditionalDataTagParser : TagParser, ITagParser
+    public class FormDataTagParser : TagParser, ITagParser
     {
-        public FormAnswersAdditionalDataTagParser() : base()
+        public FormDataTagParser() : base()
         {
         }
 
-        public Regex Regex => new Regex("(?<={{)ANSWERDATA:.*?(?=}})", RegexOptions.Compiled);
+        public Regex Regex => new Regex("(?<={{)FORMDATA:.*?(?=}})", RegexOptions.Compiled);
 
         public Page Parse(Page page, FormAnswers formAnswers)
         {   

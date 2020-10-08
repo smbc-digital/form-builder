@@ -99,7 +99,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         public static IServiceCollection AddTagParsers(this IServiceCollection services)
         {
             services.AddTransient<ITagParser, FormAnswerTagParser>();
-            services.AddTransient<ITagParser, FormAnswersAdditionalDataTagParser>();
+            services.AddTransient<ITagParser, FormDataTagParser>();
 
             return services;
         }

@@ -9,23 +9,23 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
 {
-    public class FormAnswersAdditionalDataTagParserTests
+    public class FormDataTagParserTests
     {
-        private FormAnswersAdditionalDataTagParser _tagParser = new FormAnswersAdditionalDataTagParser();
+        private FormDataTagParser _tagParser = new FormDataTagParser();
 
         [Theory]
-        [InlineData("{{ANSWERDATA:firstname}}")]
-        [InlineData("{{ANSWERDATA:ref}}")]
+        [InlineData("{{FORMDATA:firstname}}")]
+        [InlineData("{{FORMDATA:ref}}")]
         public void Regex_ShouldReturnTrue_Result(string value)
         {
             Assert.True(_tagParser.Regex.Match(value).Success);
         }
 
         [Theory]
-        [InlineData("{{ANSWERDATAA:firstname}}")]
-        [InlineData("{{NSWERDATA:ref}}")]
-        [InlineData("{ANSWERDATA:firstname}")]
-        [InlineData("{{ANSWERDATA:firstname}")]
+        [InlineData("{{FORMDATAA:firstname}}")]
+        [InlineData("{{ORMDATA:ref}}")]
+        [InlineData("{FORMDATA:firstname}")]
+        [InlineData("{{FORMDATA:firstname}")]
         [InlineData("{{TAG:firstname}")]
         [InlineData("{{DIFFERENTTAG:firstname}}")]
         public void Regex_ShouldReturnFalse_Result(string value)
@@ -78,7 +78,7 @@ namespace form_builder_tests.UnitTests.Services
 
              var element = new ElementBuilder()
                 .WithType(EElementType.P)
-                .WithPropertyText("this value {{ANSWERDATA:firstname}} should be replaced with name question")
+                .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with name question")
                 .Build();
 
             var page = new PageBuilder()
@@ -104,7 +104,7 @@ namespace form_builder_tests.UnitTests.Services
 
              var element = new ElementBuilder()
                 .WithType(EElementType.P)
-                .WithPropertyText("this value {{ANSWERDATA:firstname}} should be replaced with firstname and this {{ANSWERDATA:lastname}} with lastname")
+                .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with firstname and this {{FORMDATA:lastname}} with lastname")
                 .Build();
 
             var page = new PageBuilder()
