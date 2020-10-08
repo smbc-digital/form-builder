@@ -462,7 +462,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var formAnswers = new FormAnswers
             {
-                AdditionalFormAnswersData = new Dictionary<string, object>
+                AdditionalFormData = new Dictionary<string, object>
                 {
                     { "test", "11111" }
                 }

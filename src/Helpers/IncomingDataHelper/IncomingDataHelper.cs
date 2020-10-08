@@ -43,7 +43,7 @@ namespace form_builder.Helpers.IncomingDataHelper
             {
                 var containsValue = queryData.ContainsKey(_.Name);
 
-                if(!containsValue && formAnswers.AdditionalFormAnswersData.ContainsKey(_.QuestionId))
+                if(!containsValue && formAnswers.AdditionalFormData.ContainsKey(_.QuestionId))
                     return;
 
                 if (!_.Optional && !containsValue)

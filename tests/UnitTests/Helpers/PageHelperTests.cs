@@ -2283,7 +2283,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x.Equals(guid))), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(guid)),It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
             var callbackData = JsonConvert.DeserializeObject<FormAnswers>(callbackValue);
-            Assert.Single(callbackData.AdditionalFormAnswersData);
+            Assert.Single(callbackData.AdditionalFormData);
         }
     }
 }

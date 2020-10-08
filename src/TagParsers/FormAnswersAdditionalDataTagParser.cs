@@ -14,7 +14,7 @@ namespace form_builder.TagParser
 
         public Page Parse(Page page, FormAnswers formAnswers)
         {   
-            var answersDictionary = formAnswers.AdditionalFormAnswersData;
+            var answersDictionary = formAnswers.AdditionalFormData;
 
             page.Elements.Select((element) =>
             {

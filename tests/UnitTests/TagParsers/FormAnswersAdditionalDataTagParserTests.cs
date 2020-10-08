@@ -87,7 +87,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var formAnswers = new FormAnswers
             {
-                AdditionalFormAnswersData = new Dictionary<string, object> 
+                AdditionalFormData = new Dictionary<string, object> 
                 {
                     { "firstname", "testfirstname"}
                 }
@@ -113,7 +113,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var formAnswers = new FormAnswers
             {
-                AdditionalFormAnswersData = new Dictionary<string, object> 
+                AdditionalFormData = new Dictionary<string, object> 
                 {
                     { "firstname", "testfirstname"},
                     { "lastname", "testlastname"}
