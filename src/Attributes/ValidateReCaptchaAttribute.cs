@@ -28,7 +28,7 @@ namespace form_builder.Attributes
             {
                 await DoReCaptchaValidation(context);
             }
-            
+
             await base.OnActionExecutionAsync(context, next);
         }
 
@@ -66,22 +66,15 @@ namespace form_builder.Attributes
             });
 
             var response = await _gateway.PostAsync(_configuration.ApiVerificationEndpoint, request, false);
-            var content = await response.Content.ReadAsStringAsync();
-
-            var reCaptchaResponse = JsonConvert.DeserializeObject<ReCaptchaResponse>(content);
-            if (reCaptchaResponse == null)
+            
+            if (response.Content == null)
             {
                 AddModelError(context, "Unable To Read Response From Server");
             }
-            else if (!reCaptchaResponse.Success)
+            else if (!response.IsSuccessStatusCode)
             {
                 AddModelError(context, "Invalid reCaptcha");
             }
-        }
-
-        public class ReCaptchaResponse
-        {
-            public bool Success { get; set; }
         }
     }
 }
