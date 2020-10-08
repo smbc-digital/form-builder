@@ -24,12 +24,11 @@ namespace form_builder.Attributes
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var formData = (IDictionary<string, string[]>) context.ActionArguments["formData"];
-            if (formData != null && !formData.ContainsKey("Submit"))
+            if (context.ActionArguments["path"].Equals("document-upload") && formData != null && formData.ContainsKey("Submit"))
             {
-                await base.OnActionExecutionAsync(context, next);
+                await DoReCaptchaValidation(context);
             }
-
-            await DoReCaptchaValidation(context);
+            
             await base.OnActionExecutionAsync(context, next);
         }
 
