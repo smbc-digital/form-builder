@@ -64,8 +64,8 @@ namespace form_builder.Services.MappingService
                 .ToList()
                 .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
 
-            if(formAnswers.AdditionalFormAnswersData.Any())
-                data = AddNonQuestionAnswers(data, formAnswers.AdditionalFormAnswersData);
+            if(formAnswers.AdditionalFormData.Any())
+                data = AddNonQuestionAnswers(data, formAnswers.AdditionalFormData);
 
             return data;
         }

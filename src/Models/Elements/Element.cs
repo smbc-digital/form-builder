@@ -6,7 +6,6 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Validators;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Models.Elements
 {

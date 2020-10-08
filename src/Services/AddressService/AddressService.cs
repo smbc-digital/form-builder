@@ -178,7 +178,7 @@ namespace form_builder.Services.AddressService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null);
+                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, null);
 
                 return new ProcessRequestEntity
                 {
