@@ -104,7 +104,7 @@ namespace form_builder.Services.FileUploadService
         {
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageFactory.Build(currentPage, new Dictionary<string, dynamic>(), baseForm, guid, new FormAnswers());
+                var formModel = await _pageFactory.Build(currentPage, new Dictionary<string, dynamic>(), baseForm, guid);
 
                 return new ProcessRequestEntity
                 {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using form_builder.Enum;
 using form_builder.Helpers.IncomingDataHelper;
+using form_builder.Models;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -229,9 +230,8 @@ namespace form_builder_tests.UnitTests.Services
             var queryData = new QueryCollection();
 
             // Act & Assert
-            var result = Assert.Throws<Exception>(() => _helper.AddIncomingFormDataValues(page, queryData));
-            Assert.Equal("IncomingDataHelper::AddIncomingFormDataValues, FormData does not contain testName required value",
-                result.Message);
+            var result = Assert.Throws<Exception>(() => _helper.AddIncomingFormDataValues(page, queryData, new FormAnswers()));
+            Assert.Equal("IncomingDataHelper::AddIncomingFormDataValues, FormData does not contain testName required value", result.Message);
         }
 
         [Fact]
@@ -263,7 +263,7 @@ namespace form_builder_tests.UnitTests.Services
             var formData = new QueryCollection(queryData);
 
             // Act
-            var result = _helper.AddIncomingFormDataValues(page, formData);
+            var result = _helper.AddIncomingFormDataValues(page, formData, new FormAnswers());
 
             // Assert
             Assert.Single(result);
@@ -294,7 +294,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
                 
             // Act
-            var result = _helper.AddIncomingFormDataValues(page, new QueryCollection());
+            var result = _helper.AddIncomingFormDataValues(page, new QueryCollection(), new FormAnswers());
 
             // Assert
             Assert.Empty(result);
@@ -339,7 +339,7 @@ namespace form_builder_tests.UnitTests.Services
             var formData = new QueryCollection(queryData);
 
             // Act
-            var result = _helper.AddIncomingFormDataValues(page, formData);
+            var result = _helper.AddIncomingFormDataValues(page, formData, new FormAnswers());
 
             // Assert
             Assert.Equal(2, result.Count);
@@ -387,7 +387,7 @@ namespace form_builder_tests.UnitTests.Services
             var formData = new QueryCollection(queryData);
 
             // Act
-            var result = _helper.AddIncomingFormDataValues(page, formData);
+            var result = _helper.AddIncomingFormDataValues(page, formData, new FormAnswers());
 
             // Assert
             Assert.Equal(2, result.Count);
@@ -427,7 +427,7 @@ namespace form_builder_tests.UnitTests.Services
             var formData = new QueryCollection(queryData);
 
             // Act
-            var result = _helper.AddIncomingFormDataValues(page, formData);
+            var result = _helper.AddIncomingFormDataValues(page, formData, new FormAnswers());
 
             // Assert
             Assert.Single(result);
@@ -435,5 +435,44 @@ namespace form_builder_tests.UnitTests.Services
             Assert.True(result.ContainsValue("123456Test"));
         }
         
+        [Fact]
+        public void AddIncomingFormDataValues_Get_ShouldCheckIfData_IsAlreadyStored_IfNotIn_QueryParameters()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var incomingValue = new IncomingValuesBuilder()
+                .WithQuestionId("test")
+                .WithName("baseEncodeTest")
+                .WithHttpActionType(EHttpActionType.Get)
+                .WithBase64Encoding(true)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithIncomingValue(incomingValue)
+                .Build();
+
+            var queryData = new Dictionary<string, StringValues>();
+
+            var formData = new QueryCollection(queryData);
+
+            var formAnswers = new FormAnswers
+            {
+                AdditionalFormData = new Dictionary<string, object>
+                {
+                    { "test", "11111" }
+                }
+            };
+
+            // Act
+            var result = _helper.AddIncomingFormDataValues(page, formData, formAnswers);
+
+            // Assert
+            Assert.Empty(result);
+        }
     }
 }

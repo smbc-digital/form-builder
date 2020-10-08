@@ -523,7 +523,7 @@ namespace form_builder_tests.UnitTests.Services
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
                    Pages = new List<PageAnswers>(),
-                   AdditionalFormAnswersData = new Dictionary<string, object>{ { "additional", "answerData" }}
+                   AdditionalFormData = new Dictionary<string, object>{ { "additional", "answerData" }}
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "textbox"), It.IsAny<FormAnswers>()))

@@ -1108,14 +1108,14 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             Assert.IsType<ProcessPageEntity>(result);
-            _mockIncomingDataHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>()), Times.Once);
+            _mockIncomingDataHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>(), It.IsAny<FormAnswers>()), Times.Once);
         }
 
         [Fact]
         public async Task ProcessRequest_ShouldCall_IncomingDataHelper_AndSaveData_WhenFormHasIncomingGetValues()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
-            _mockIncomingDataHelper.Setup(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>()))
+            _mockIncomingDataHelper.Setup(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>(), It.IsAny<FormAnswers>()))
                 .Returns(new Dictionary<string, dynamic>{ { "test", "testdata"} });
 
             var element = new ElementBuilder()
@@ -1150,7 +1150,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             Assert.IsType<ProcessPageEntity>(result);
-            _mockIncomingDataHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>()), Times.Once);
+            _mockIncomingDataHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>(), It.IsAny<FormAnswers>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveNonQuestionAnswers(It.IsAny<Dictionary<string, object>>(), It.Is<string>(_ => _ == "form"), It.Is<string>(_ => _ == "page-one"),It.IsAny<string>()), Times.Once);
         }
     }
