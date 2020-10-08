@@ -134,7 +134,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
             // Act
-            await _service.ProcessFile(viewModel, It.IsAny<Page>(), formSchema, Guid.NewGuid().ToString(), "page-one", null);
+            await _service.ProcessFile(viewModel, It.IsAny<Page>(), formSchema, Guid.NewGuid().ToString(), "page-one", null, true);
 
             // Assert
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
@@ -169,7 +169,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
             // Act
-            var result = await _service.ProcessFile(viewModel, It.IsAny<Page>(), formSchema, Guid.NewGuid().ToString(), "page-one", null);
+            var result = await _service.ProcessFile(viewModel, It.IsAny<Page>(), formSchema, Guid.NewGuid().ToString(), "page-one", null, true);
 
             // Assert
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), updatedAnswers, CancellationToken.None), Times.Once);
@@ -207,7 +207,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act
             var result = await _service.ProcessFile(new Dictionary<string, dynamic>(), page, schema,
-                new Guid().ToString(), It.IsAny<string>(), null);
+                new Guid().ToString(), It.IsAny<string>(), null, true);
 
             // Assert
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), null), Times.Once);
@@ -227,7 +227,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act
             var result = await _service.ProcessFile(viewModel, _page, _schema,
-                new Guid().ToString(), It.IsAny<string>(), null);
+                new Guid().ToString(), It.IsAny<string>(), null, true);
 
             // Assert
             Assert.IsType<ProcessRequestEntity>(result);
@@ -248,7 +248,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act
             var result = await _service.ProcessFile(new Dictionary<string, dynamic>(), _page, _schema,
-                new Guid().ToString(), "path", null);
+                new Guid().ToString(), "path", null, true);
 
             // Assert
             Assert.IsType<ProcessRequestEntity>(result);
@@ -277,7 +277,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act
             var result = await _service.ProcessFile(viewModel, _page, _schema, new Guid().ToString(),
-                It.IsAny<string>(), fileUpload);
+                It.IsAny<string>(), fileUpload, true);
 
             // Assert
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<CustomFormFile>>(), true, true), Times.Once);
@@ -306,10 +306,105 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act
             var result = await _service.ProcessFile(new Dictionary<string, dynamic>(), _page, _schema, new Guid().ToString(),
-                "path", fileUpload);
+                "path", fileUpload, true);
 
             // Assert
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<CustomFormFile>>(), true, true), Times.Once);
+            Assert.IsType<ProcessRequestEntity>(result);
+            Assert.True(result.RedirectToAction);
+            Assert.Equal("Index", result.RedirectAction);
+            Assert.Equal(JsonConvert.SerializeObject(expectedRouteValues), JsonConvert.SerializeObject(result.RouteValues));
+            Assert.Null(result.Page);
+        }
+
+        [Fact]
+        public async Task ProcessFile_ProcessSelectedFiles_ShouldCallPageHelper_IfSubmitWithFilesButModelStateNotValid()
+        {
+            // Arrange
+            var fileUpload = new List<CustomFormFile>
+            {
+                new CustomFormFile("content", "fileUpload-fileupload", 12, "SMBC.png"),
+                new CustomFormFile("more content", "fileUpload-fileupload", 21, "TEST.jpg")
+            };
+
+            // Act
+            await _service.ProcessFile(new Dictionary<string, dynamic>(), _page, _schema, new Guid().ToString(),
+                "path", fileUpload, false);
+
+            // Assert
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<CustomFormFile>>(), true, true), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessFile_ProcessSelectedFiles_ShouldNotCallPageHelper_IfSubmitWithoutFilesButModelStateNotValid()
+        {
+            // Arrange
+
+            // Act
+            await _service.ProcessFile(new Dictionary<string, dynamic>(), _page, _schema, new Guid().ToString(),
+                "path", null, false);
+
+            // Assert
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<CustomFormFile>>(), It.IsAny<bool>(), true), Times.Never);
+        }
+
+        [Fact]
+        public async Task ProcessFile_ProcessSelectedFiles_ShouldReturnCorrectProcessRequestEntity_IfFilesExistAndIsSubmittingButModelStateInvalid()
+        {
+            // Arrange
+            var expectedRouteValues = new
+            {
+                form = "baseUrl",
+                path = "path"
+            };
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {
+                    "Submit", "Submit"
+                }
+            };
+
+            var fileUpload = new List<CustomFormFile>
+            {
+                new CustomFormFile("content", "fileUpload-fileupload", 12, "SMBC.png"),
+                new CustomFormFile("more content", "fileUpload-fileupload", 21, "TEST.jpg")
+            };
+
+            // Act
+            var result = await _service.ProcessFile(viewModel, _page, _schema, new Guid().ToString(),
+                "path", fileUpload, false);
+
+            // Assert
+            Assert.IsType<ProcessRequestEntity>(result);
+            Assert.True(result.RedirectToAction);
+            Assert.Equal("Index", result.RedirectAction);
+            Assert.Equal(JsonConvert.SerializeObject(expectedRouteValues), JsonConvert.SerializeObject(result.RouteValues));
+            Assert.Null(result.Page);
+        }
+
+        [Fact]
+        public async Task ProcessFile_ProcessSelectedFiles_ShouldReturnCorrectProcessRequestEntity_IfNoFilesExistAndIsSubmittingButModelStateInvalid()
+        {
+            // Arrange
+            var expectedRouteValues = new
+            {
+                form = "baseUrl",
+                path = "path"
+            };
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {
+                    "Submit", "Submit"
+                }
+            };
+
+            // Act
+            var result = await _service.ProcessFile(viewModel, _page, _schema, new Guid().ToString(),
+                "path", null, false);
+
+            // Assert
             Assert.IsType<ProcessRequestEntity>(result);
             Assert.True(result.RedirectToAction);
             Assert.Equal("Index", result.RedirectAction);

@@ -53,6 +53,7 @@ namespace form_builder
                 .ConfigureDocumentCreationProviders()
                 .ConfigureEmailProviders(HostingEnvironment)
                 .AddHelpers()
+                .AddAttributes()
                 .AddServices()
                 .AddWorkflows()
                 .AddFactories()
