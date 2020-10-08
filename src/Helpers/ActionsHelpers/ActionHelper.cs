@@ -3,31 +3,30 @@ using System.Text.RegularExpressions;
 using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Services.RetrieveExternalDataService.Entities;
-using form_builder.Services.ValidateService.Entities;
 
 namespace form_builder.Helpers.ActionsHelpers
 {
     public interface IActionHelper
     {
-        ExternalDataEntity GenerateUrl(string baseUrl, FormAnswers formAnswers);
+        RequestEntity GenerateUrl(IAction action, string baseUrl, FormAnswers formAnswers);
 
         string GetEmailToAddresses(IAction action, FormAnswers formAnswers);
-
-        ValidateEntity GenerateDoumentUploadUrl(string baseUrl, FormAnswers formAnswers);
     }
 
     public class ActionHelper : IActionHelper
     {
         private static Regex TagRegex => new Regex("(?<={{).*?(?=}})", RegexOptions.Compiled);
 
-        public ExternalDataEntity GenerateUrl(string baseUrl, FormAnswers formAnswers)
+        public RequestEntity GenerateUrl(IAction action, string baseUrl, FormAnswers formAnswers)
         {
             var matches = TagRegex.Matches(baseUrl);
             var newUrl = matches.Aggregate(baseUrl, (current, match) => Replace(match, current, formAnswers));
-            return new ExternalDataEntity
+            var IsPost = action.Properties.Performed == "Get"? false : !matches.Any();
+
+            return new RequestEntity
             {
                 Url = newUrl,
-                IsPost = !matches.Any()
+                IsPost = IsPost
             };
         }
 
@@ -63,17 +62,6 @@ namespace form_builder.Helpers.ActionsHelpers
 
             var subObject = new Answers { Response = (dynamic)answer.Response[splitTargets[1]] };
             return RecursiveGetAnswerValue(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), subObject);
-        }
-
-        public ValidateEntity GenerateDoumentUploadUrl(string baseUrl, FormAnswers formAnswers)
-        {
-            var matches = TagRegex.Matches(baseUrl);
-            var newUrl = matches.Aggregate(baseUrl, (current, match) => Replace(match, current, formAnswers));
-            return new ValidateEntity
-            {
-                Url = newUrl,
-                IsPost = false
-            };
         }
     }
 }

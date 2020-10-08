@@ -57,7 +57,7 @@ namespace form_builder.Services.RetrieveExternalDataService
                 if (submitSlug == null)
                     throw new ApplicationException("RetrieveExternalDataService::Process, there is no PageActionSlug defined for this environment");
 
-                var entity = _actionHelper.GenerateUrl(submitSlug.URL, mappingData.FormAnswers);
+                var entity = _actionHelper.GenerateUrl(action, submitSlug.URL, mappingData.FormAnswers);
 
                 if (!string.IsNullOrEmpty(submitSlug.AuthToken))
                     _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);

@@ -9,7 +9,6 @@ using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder.Services.ValidateService;
-using form_builder.Services.ValidateService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
@@ -21,6 +20,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
+using Action = form_builder.Models.Actions.Action;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -85,8 +85,8 @@ namespace form_builder_tests.UnitTests.Services
             _mockMappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(_mappingEntity);
             _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(_successResponse);
-            _mockActionHelper.Setup(_ => _.GenerateDoumentUploadUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
-                .Returns(new ValidateEntity
+            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<Action>(), It.IsAny<string>(), It.IsAny<FormAnswers>()))
+                .Returns(new RequestEntity
                 {
                     Url = "www.test.com / testResponse",
                     IsPost = false
