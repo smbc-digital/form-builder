@@ -136,7 +136,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.True(result.ContainsValue("file"));
             Assert.True(result.ContainsValue(true));
             Assert.True(result.ContainsValue("smbc-multiple-file-upload"));
-            Assert.True(result.ContainsValue(value * 1024000));
+            Assert.True(result.ContainsValue(value * SystemConstants.OneMBInBinaryBytes));
         }
     }
 }
