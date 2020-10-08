@@ -55,7 +55,6 @@ namespace form_builder.Validators
                 {
                     response = JsonConvert.DeserializeObject<List<FileUploadModel>>(pageAnswersString.Response.ToString());
 
-                    // Sets a different message if on the subpage and no files selected
                     if (response.Any())
                         isValid = true;
                 }
