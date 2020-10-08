@@ -20,7 +20,7 @@ namespace form_builder.Models.Elements
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var allowedFileType = Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
-            var convertedMaxFileSize = Properties.MaxFileSize * 1024000;
+            var convertedMaxFileSize = Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes;
             var appliedMaxFileSize = convertedMaxFileSize > 0 && convertedMaxFileSize < SystemConstants.DefaultMaxFileSize 
                                 ? convertedMaxFileSize 
                                 : SystemConstants.DefaultMaxFileSize;
