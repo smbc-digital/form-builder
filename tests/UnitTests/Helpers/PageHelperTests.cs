@@ -163,7 +163,7 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             //Arrange
             _mockElementHelper
-                .Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
+                .Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(),
                     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
@@ -205,7 +205,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Address>(), null))
                 .Callback<string, Address, Dictionary<string, object>>((x, y, z) => callback = y);
 
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),It.IsAny<FormAnswers>(),
                     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
@@ -2283,7 +2283,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x.Equals(guid))), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(guid)),It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
             var callbackData = JsonConvert.DeserializeObject<FormAnswers>(callbackValue);
-            Assert.Single(callbackData.AdditionalFormAnswersData);
+            Assert.Single(callbackData.AdditionalFormData);
         }
     }
 }

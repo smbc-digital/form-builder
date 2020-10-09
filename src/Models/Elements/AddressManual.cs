@@ -9,7 +9,6 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Validators;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Models.Elements
 {
@@ -103,17 +102,17 @@ namespace form_builder.Models.Elements
         public Dictionary<string, dynamic> GeneratePostcodeElementProperties()
             => GenerateElementProperties(PostcodeValidationMessage, GetCustomErrorId(AddressManualConstants.POSTCODE), "postal-code");
 
-        protected void SetAddressProperties(IElementHelper elementHelper, string pageSlug, string guid, Dictionary<string, dynamic> viewModel)
+        protected void SetAddressProperties(IElementHelper elementHelper, FormAnswers formAnswers, string pageSlug, string guid, Dictionary<string, dynamic> viewModel)
         {
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, pageSlug, guid, AddressConstants.SEARCH_SUFFIX);
-            Properties.AddressManualAddressLine1 = elementHelper.CurrentValue(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.ADDRESS_LINE_1}");
-            Properties.AddressManualAddressLine2 = elementHelper.CurrentValue(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.ADDRESS_LINE_2}");
-            Properties.AddressManualAddressTown = elementHelper.CurrentValue(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.TOWN}");
+            Properties.Value = elementHelper.CurrentValue(this, viewModel, formAnswers, pageSlug, guid, AddressConstants.SEARCH_SUFFIX);
+            Properties.AddressManualAddressLine1 = elementHelper.CurrentValue(this, viewModel, formAnswers, pageSlug, guid, $"-{AddressManualConstants.ADDRESS_LINE_1}");
+            Properties.AddressManualAddressLine2 = elementHelper.CurrentValue(this, viewModel, formAnswers, pageSlug, guid, $"-{AddressManualConstants.ADDRESS_LINE_2}");
+            Properties.AddressManualAddressTown = elementHelper.CurrentValue(this, viewModel, formAnswers, pageSlug, guid, $"-{AddressManualConstants.TOWN}");
             Properties.AddressManualAddressPostcode = viewModel.FirstOrDefault(_ => _.Key.Contains(AddressManualConstants.POSTCODE)).Value;
 
             if (string.IsNullOrEmpty(Properties.AddressManualAddressPostcode))
             {
-                var value = elementHelper.CurrentValue(this, viewModel, pageSlug, guid, $"-{AddressManualConstants.POSTCODE}");
+                var value = elementHelper.CurrentValue(this, viewModel, formAnswers, pageSlug, guid, $"-{AddressManualConstants.POSTCODE}");
                 Properties.AddressManualAddressPostcode = string.IsNullOrEmpty(value) ? Properties.Value : value;
             }   
         }
@@ -128,7 +127,7 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            SetAddressProperties(elementHelper, page.PageSlug, guid, viewModel);
+            SetAddressProperties(elementHelper, formAnswers, page.PageSlug, guid, viewModel);
 
             if (results != null && results.Count == 0)
                 Properties.DisplayNoResultsIAG = true;

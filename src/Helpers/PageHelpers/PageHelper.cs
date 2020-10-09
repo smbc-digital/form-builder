@@ -323,10 +323,10 @@ namespace form_builder.Helpers.PageHelpers
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             values.ToList().ForEach((_) => {
-            if (convertedAnswers.AdditionalFormAnswersData.ContainsKey(_.Key))
-                convertedAnswers.AdditionalFormAnswersData.Remove(_.Key);
+            if (convertedAnswers.AdditionalFormData.ContainsKey(_.Key))
+                convertedAnswers.AdditionalFormData.Remove(_.Key);
 
-                convertedAnswers.AdditionalFormAnswersData.Add(_.Key, _.Value);
+                convertedAnswers.AdditionalFormData.Add(_.Key, _.Value);
             });
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));

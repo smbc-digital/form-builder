@@ -48,7 +48,7 @@ namespace form_builder.Helpers.ActionsHelpers
         {
             var splitTargets = match.Value.Split(".");
             var formAnswerDictionary= formAnswers.Pages.SelectMany(_ => _.Answers).Select(x => new Answers { QuestionId = x.QuestionId, Response = x.Response }).ToList();
-            formAnswerDictionary.AddRange(formAnswers.AdditionalFormAnswersData.Select(x => new Answers {QuestionId = x.Key, Response = x.Value}).ToList());
+            formAnswerDictionary.AddRange(formAnswers.AdditionalFormData.Select(x => new Answers {QuestionId = x.Key, Response = x.Value}).ToList());
 
             var answer = RecursiveGetAnswerValue(match.Value, formAnswerDictionary.First(a => a.QuestionId.Equals(splitTargets[0])));
 

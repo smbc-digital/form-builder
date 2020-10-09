@@ -40,6 +40,7 @@ using form_builder.Services.RetrieveExternalDataService;
 using form_builder.Services.StreetService;
 using form_builder.Services.SubmitService;
 using form_builder.Services.ValidateService;
+using form_builder.TagParser;
 using form_builder.Validators;
 using form_builder.Workflows;
 using form_builder.Workflows.ActionsWorkflow;
@@ -95,6 +96,15 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
             return services;
         }
+
+        public static IServiceCollection AddTagParsers(this IServiceCollection services)
+        {
+            services.AddTransient<ITagParser, FormAnswerTagParser>();
+            services.AddTransient<ITagParser, FormDataTagParser>();
+
+            return services;
+        }
+
 
         public static IServiceCollection AddGateways(this IServiceCollection services, IConfiguration configuration)
         {

@@ -77,7 +77,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                     LookUpConstants.Automatic}
             };
 
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>(), It.IsAny<string>(),It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
             var schema = new FormSchemaBuilder()
@@ -108,7 +108,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             //Arrange
             var callback = new Address();
 
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
             _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Address>(), null))

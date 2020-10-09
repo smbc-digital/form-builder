@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using form_builder.Constants;
 
 namespace form_builder.Extensions
 {
@@ -43,7 +44,7 @@ namespace form_builder.Extensions
 
         public static int ToReadableMaxFileSize(this int value)
         {
-            var megaByteValue = (value / 1024f) / 1024f;
+            var megaByteValue = value / SystemConstants.OneMBInBinaryBytes;
             return Convert.ToInt32(megaByteValue);
         }
 
