@@ -67,6 +67,13 @@ namespace form_builder_tests.Builders
             return this;
         }
 
+        public ActionBuilder WithHttpActionType(EHttpActionType httpActionType)
+        {
+            _actionProperties.HttpActionType = httpActionType;
+
+            return this;
+        }
+
         public ActionBuilder WithPageActionSlug(PageActionSlug pageActionSlug)
         {
             if (_actionProperties.PageActionSlugs == null) _actionProperties.PageActionSlugs = new List<PageActionSlug>();
