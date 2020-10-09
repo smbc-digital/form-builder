@@ -380,9 +380,14 @@ namespace form_builder.Helpers.PageHelpers
                 .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
                 .Where(_ => _.Type == EActionType.RetrieveExternalData)).ToList();
 
+            var validateActions = formSchema.FormActions.Where(_ => _.Type.Equals(EActionType.Validate))
+               .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
+               .Where(_ => _.Type == EActionType.Validate)).ToList();
+
             CheckEmailAction(userEmail);
             CheckEmailAction(backOfficeEmail);
             CheckRetrieveExternalDataAction(retrieveExternalDataActions);
+            CheckValidateAction(validateActions);
         }
 
         private void CheckEmailAction(List<IAction> actions)
@@ -403,6 +408,26 @@ namespace form_builder.Helpers.PageHelpers
 
                 if (string.IsNullOrEmpty(action.Properties.Subject))
                     throw new ApplicationException("PageHelper:: CheckEmailAction, Subject doesn't have a value");
+            });
+        }
+
+        private void CheckValidateAction(List<IAction> actions)
+        {
+            if (!actions.Any())
+                return;
+
+            actions.ForEach(action =>
+            {
+                var foundSlug = action.Properties.PageActionSlugs.FirstOrDefault(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+
+                if (foundSlug == null)
+                    throw new ApplicationException($"PageHelper:CheckValidateAction, Validate there is no PageActionSlug for {_environment.EnvironmentName}");
+
+                if (string.IsNullOrEmpty(foundSlug.URL))
+                    throw new ApplicationException("PageHelper:CheckValidateAction, Validate action type does not contain a url");
+
+                if (action.Properties.HttpActionType == EHttpActionType.Unknown)
+                    throw new ApplicationException("PageHelper:CheckValidateAction, Validate action type does not contain 'Unknown'");
             });
         }
 
