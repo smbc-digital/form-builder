@@ -56,18 +56,16 @@ namespace form_builder.Services.ValidateService
                 if (submitSlug == null)
                     throw new ApplicationException("ValidateService::Process, there is no PageActionSlug defined for this environment");
 
-                var entity = _actionHelper.GenerateUrl(action, submitSlug.URL, mappingData.FormAnswers);
+                var entity = _actionHelper.GenerateUrl(submitSlug.URL, mappingData.FormAnswers);
 
                 if (!string.IsNullOrEmpty(submitSlug.AuthToken))
                     _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
 
-                if (entity.IsPost == false)
-                    response = await _gateway.GetAsync(entity.Url);                        
+                response = await _gateway.GetAsync(entity.Url);                        
 
                 if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"ValidateService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");             
             }
-
         }
     }
 }

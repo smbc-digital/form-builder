@@ -103,8 +103,8 @@ namespace form_builder.Controllers
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
 
-            if (currentPageResult.Page.HasPageActions)
-                await _actionsWorkflow.Process(currentPageResult.Page.PageActions, null, form);
+            if (currentPageResult.Page.HasPageActionsPostValues)
+                await _actionsWorkflow.Process(currentPageResult.Page.PageActions.Where(_ => _.Properties.HttpActionType == EHttpActionType.Post).ToList(), null, form);
 
             var behaviour = _pageService.GetBehaviour(currentPageResult);
 

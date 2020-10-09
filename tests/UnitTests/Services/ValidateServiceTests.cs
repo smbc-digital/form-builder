@@ -85,7 +85,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockMappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(_mappingEntity);
             _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(_successResponse);
-            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<Action>(), It.IsAny<string>(), It.IsAny<FormAnswers>()))
+            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new RequestEntity
                 {
                     Url = "www.test.com / testResponse",

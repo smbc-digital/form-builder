@@ -89,7 +89,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(_successResponse);
             _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(_successResponse);
-            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<Action>(), It.IsAny<string>(), It.IsAny<FormAnswers>()))
+            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new RequestEntity
                 {
                     Url = "www.test.com/testResponse",
@@ -139,7 +139,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldCallGateway_PostAsync()
         {
             // Arrange
-            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<Action>(), It.IsAny<string>(), It.IsAny<FormAnswers>()))
+            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new RequestEntity
                 {
                     Url = string.Empty,
@@ -257,7 +257,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldCallDistributedCache_SetStringAsync()
         {
             // Arrange
-            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<Action>(), It.IsAny<string>(), It.IsAny<FormAnswers>()))
+            _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new RequestEntity
                 {
                     Url = string.Empty,

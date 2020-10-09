@@ -24,6 +24,7 @@ using form_builder.Services.PayService;
 using form_builder.Services.StreetService;
 using form_builder.Validators;
 using form_builder.ViewModels;
+using form_builder.Workflows.ActionsWorkflow;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -54,6 +55,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IPageFactory> _mockPageFactory = new Mock<IPageFactory>();
         private readonly Mock<IIncomingDataHelper> _mockIncomingDataHelper = new Mock<IIncomingDataHelper>();
         private readonly Mock<ISuccessPageFactory> _mockSuccessPageFactory = new Mock<ISuccessPageFactory>();
+        private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new Mock<IActionsWorkflow>();
 
         public PageServicesTests()
         {
@@ -87,7 +89,7 @@ namespace form_builder_tests.UnitTests.Services
             });
 
             _service = new PageService(_validators.Object, _mockPageHelper.Object, _sessionHelper.Object, _addressService.Object, _fileUploadService.Object, _streetService.Object, _organisationService.Object, 
-            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object);
+            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object, _mockActionsWorkflow.Object);
         }
 
         [Fact]

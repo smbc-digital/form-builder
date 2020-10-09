@@ -584,6 +584,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithTargetQuestionId(string.Empty)
                 .Build();
 
+            pageActions.Properties.HttpActionType = EHttpActionType.Post;
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithPageSlug("page-one")

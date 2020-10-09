@@ -1,14 +1,14 @@
-﻿using System.Linq;
-using System.Text.RegularExpressions;
-using form_builder.Models;
+﻿using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Services.RetrieveExternalDataService.Entities;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace form_builder.Helpers.ActionsHelpers
 {
     public interface IActionHelper
     {
-        RequestEntity GenerateUrl(IAction action, string baseUrl, FormAnswers formAnswers);
+        RequestEntity GenerateUrl(string baseUrl, FormAnswers formAnswers);
 
         string GetEmailToAddresses(IAction action, FormAnswers formAnswers);
     }
@@ -17,16 +17,15 @@ namespace form_builder.Helpers.ActionsHelpers
     {
         private static Regex TagRegex => new Regex("(?<={{).*?(?=}})", RegexOptions.Compiled);
 
-        public RequestEntity GenerateUrl(IAction action, string baseUrl, FormAnswers formAnswers)
+        public RequestEntity GenerateUrl(string baseUrl, FormAnswers formAnswers)
         {
             var matches = TagRegex.Matches(baseUrl);
             var newUrl = matches.Aggregate(baseUrl, (current, match) => Replace(match, current, formAnswers));
-            var IsPost = action.Properties.Performed == "Get"? false : !matches.Any();
 
             return new RequestEntity
             {
                 Url = newUrl,
-                IsPost = IsPost
+                IsPost = !matches.Any()
             };
         }
 
@@ -48,7 +47,10 @@ namespace form_builder.Helpers.ActionsHelpers
         private string Replace(Match match, string current, FormAnswers formAnswers)
         {
             var splitTargets = match.Value.Split(".");
-            var answer = RecursiveGetAnswerValue(match.Value, formAnswers.Pages.SelectMany(_ => _.Answers).First(a => a.QuestionId.Equals(splitTargets[0])));
+            var formAnswerDictionary= formAnswers.Pages.SelectMany(_ => _.Answers).Select(x => new Answers { QuestionId = x.QuestionId, Response = x.Response }).ToList();
+            formAnswerDictionary.AddRange(formAnswers.AdditionalFormAnswersData.Select(x => new Answers {QuestionId = x.Key, Response = x.Value}).ToList());
+
+            var answer = RecursiveGetAnswerValue(match.Value, formAnswerDictionary.First(a => a.QuestionId.Equals(splitTargets[0])));
 
             return current.Replace($"{{{{{match.Groups[0].Value}}}}}", answer);
         }
