@@ -25,6 +25,7 @@ namespace form_builder.Models.Elements
         public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
         public List<string> CurrentFilesUploaded { get; set; } = new List<string>();
         public int MaxFileSize => Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes > 0 && Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes < SystemConstants.DefaultMaxFileSize ? Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes : SystemConstants.DefaultMaxFileSize;
+        public bool DisplaySubmitButton => (CurrentFilesUploaded.Any() && !Properties.Optional) || Properties.Optional;
 
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
@@ -46,6 +47,7 @@ namespace form_builder.Models.Elements
 
             return properties;
         }
+
         public string SubmitButtonText;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
