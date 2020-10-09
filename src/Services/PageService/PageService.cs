@@ -22,6 +22,7 @@ using form_builder.Services.PayService;
 using form_builder.Services.StreetService;
 using form_builder.Validators;
 using form_builder.ViewModels;
+using form_builder.Workflows.ActionsWorkflow;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -47,7 +48,7 @@ namespace form_builder.Services.PageService
         private readonly ISuccessPageFactory _successPageContentFactory;
         private readonly IPageFactory _pageContentFactory;
         private readonly IIncomingDataHelper _incomingDataHelper;
-
+        private readonly IActionsWorkflow _actionsWorkflow;
         public PageService(
             IEnumerable<IElementValidator> validators, 
             IPageHelper pageHelper, 
@@ -64,7 +65,8 @@ namespace form_builder.Services.PageService
             ISchemaFactory schemaFactory,
             IMappingService mappingService,
             IPayService payService,
-            IIncomingDataHelper incomingDataHelper)
+            IIncomingDataHelper incomingDataHelper,
+            IActionsWorkflow actionsWorkflow)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -82,6 +84,7 @@ namespace form_builder.Services.PageService
             _payService = payService;
             _mappingService = mappingService;
             _incomingDataHelper = incomingDataHelper;
+            _actionsWorkflow = actionsWorkflow;
         }
         
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParamters)
@@ -161,6 +164,11 @@ namespace form_builder.Services.PageService
                 _pageHelper.SaveNonQuestionAnswers(result, form, path, sessionGuid);
             }
 
+            if (page.HasPageActionsGetValues)
+            {
+                await _actionsWorkflow.Process(page.PageActions, null, form);
+            }
+
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
 
             return new ProcessPageEntity
@@ -173,7 +181,8 @@ namespace form_builder.Services.PageService
             string form,
             string path,
             Dictionary<string, dynamic> viewModel,
-            IEnumerable<CustomFormFile> files)
+            IEnumerable<CustomFormFile> files,
+            bool modelStateIsValid)
         {
             var baseForm = await _schemaFactory.Build(form);
 
@@ -205,7 +214,7 @@ namespace form_builder.Services.PageService
                 return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
-                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files);
+                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files, modelStateIsValid);
             
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 

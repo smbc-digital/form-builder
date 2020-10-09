@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Hosting;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
 using Xunit;
+using Action = form_builder.Models.Actions.Action;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -89,7 +90,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(_successResponse);
             _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
-                .Returns(new ExternalDataEntity
+                .Returns(new RequestEntity
                 {
                     Url = "www.test.com/testResponse",
                     IsPost = false
@@ -139,7 +140,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
-                .Returns(new ExternalDataEntity
+                .Returns(new RequestEntity
                 {
                     Url = string.Empty,
                     IsPost = true
@@ -257,7 +258,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockActionHelper.Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
-                .Returns(new ExternalDataEntity
+                .Returns(new RequestEntity
                 {
                     Url = string.Empty,
                     IsPost = false
