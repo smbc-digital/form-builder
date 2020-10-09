@@ -5,6 +5,7 @@
         Unknown,
         RetrieveExternalData,
         UserEmail,
-        BackOfficeEmail
+        BackOfficeEmail,
+        Validate
     }
 }

@@ -7,6 +7,7 @@ namespace form_builder.Models.Properties.ActionProperties
         public string TargetQuestionId { get; set; }
 
         public List<PageActionSlug> PageActionSlugs { get; set; }
+
     }
 
     public class PageActionSlug

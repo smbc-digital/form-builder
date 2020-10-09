@@ -50,6 +50,11 @@ namespace form_builder.Models
 
         public bool HasPageActions => PageActions.Any();
 
+        public bool HasIncomingAction => PageActions.Any();
+        public bool HasPageActionsGetValues => PageActions.Any(_ => _.Properties.HttpActionType == EHttpActionType.Get);
+        public bool HasPageActionsPostValues => PageActions.Any(_ => _.Properties.HttpActionType == EHttpActionType.Post);
+
+
         public List<Condition> RenderConditions { get; set; } = new List<Condition>();
 
         public bool HasRenderConditions => RenderConditions.Any();

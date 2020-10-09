@@ -582,6 +582,7 @@ namespace form_builder_tests.UnitTests.Controllers
                     AuthToken = string.Empty
                 })
                 .WithTargetQuestionId(string.Empty)
+                .WithHttpActionType(EHttpActionType.Post)
                 .Build();
 
             var page = new PageBuilder()
