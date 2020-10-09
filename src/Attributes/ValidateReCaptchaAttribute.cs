@@ -3,7 +3,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
+using form_builder.Controllers.Document;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
@@ -14,11 +16,13 @@ namespace form_builder.Attributes
     {
         private readonly IGateway _gateway;
         private readonly ReCaptchaConfiguration _configuration;
+        private readonly ILogger<DocumentController> _logger;
 
-        public ValidateReCaptchaAttribute(IGateway gateway, IOptions<ReCaptchaConfiguration> configuration)
+        public ValidateReCaptchaAttribute(IGateway gateway, IOptions<ReCaptchaConfiguration> configuration, ILogger<DocumentController> logger)
         {
             _configuration = configuration.Value;
             _gateway = gateway;
+            _logger = logger;
         }
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -42,6 +46,7 @@ namespace form_builder.Attributes
             if (!context.HttpContext.Request.HasFormContentType)
             {
                 AddModelError(context, "No reCaptcha Token Found");
+                _logger.LogWarning("ValidateReCaptchaAttribute:: DoReCaptchaValidation:: No reCaptcha Token Found");
                 return;
             }
 
@@ -70,10 +75,12 @@ namespace form_builder.Attributes
             if (response.Content == null)
             {
                 AddModelError(context, "Unable To Read Response From Server");
+                _logger.LogWarning("ValidateReCaptchaAttribute:: ValidateReCaptcha:: Unable To Read Response From Server");
             }
             else if (!response.IsSuccessStatusCode)
             {
                 AddModelError(context, "Invalid reCaptcha");
+                _logger.LogWarning("ValidateReCaptchaAttribute:: ValidateReCaptcha:: Invalid reCaptcha");
             }
         }
     }
