@@ -173,7 +173,8 @@ namespace form_builder.Services.PageService
             string form,
             string path,
             Dictionary<string, dynamic> viewModel,
-            IEnumerable<CustomFormFile> files)
+            IEnumerable<CustomFormFile> files,
+            bool modelStateIsValid)
         {
             var baseForm = await _schemaFactory.Build(form);
 
@@ -205,7 +206,7 @@ namespace form_builder.Services.PageService
                 return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
-                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files);
+                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files, modelStateIsValid);
             
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
