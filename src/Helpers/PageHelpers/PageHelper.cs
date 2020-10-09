@@ -418,16 +418,16 @@ namespace form_builder.Helpers.PageHelpers
 
             actions.ForEach(action =>
             {
-                if (action.Properties.HttpActionType != EHttpActionType.Unknown)
-                {
-                    var foundSlug = action.Properties.PageActionSlugs.FirstOrDefault(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+                var foundSlug = action.Properties.PageActionSlugs.FirstOrDefault(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
 
-                    if (foundSlug == null)
-                        throw new ApplicationException($"PageHelper:CheckValidateAction, Validate there is no PageActionSlug for {_environment.EnvironmentName}");
+                if (foundSlug == null)
+                    throw new ApplicationException($"PageHelper:CheckValidateAction, Validate there is no PageActionSlug for {_environment.EnvironmentName}");
 
-                    if (string.IsNullOrEmpty(foundSlug.URL))
-                        throw new ApplicationException("PageHelper:CheckValidateAction, Validate action type does not contain a url");
-                }               
+                if (string.IsNullOrEmpty(foundSlug.URL))
+                    throw new ApplicationException("PageHelper:CheckValidateAction, Validate action type does not contain a url");
+
+                if (action.Properties.HttpActionType == EHttpActionType.Unknown)
+                    throw new ApplicationException("PageHelper:CheckValidateAction, Validate action type does not contain 'Unknown'");
             });
         }
 
