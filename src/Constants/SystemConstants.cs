@@ -10,6 +10,8 @@ namespace form_builder.Constants
 
         public static readonly int DefaultMaxCombinedFileSize = 24117248;
 
+        public static readonly int OneMBInBinaryBytes = 1048576;
+
         public static readonly string CaseReferenceQueryString = "?caseReference=";
     }
 }

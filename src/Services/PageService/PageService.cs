@@ -153,7 +153,11 @@ namespace form_builder.Services.PageService
 
             if(page.HasIncomingGetValues)
             {
-                var result = _incomingDataHelper.AddIncomingFormDataValues(page, queryParamters);
+                var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+                if (!string.IsNullOrEmpty(formData))
+                    convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+                var result = _incomingDataHelper.AddIncomingFormDataValues(page, queryParamters, convertedAnswers);
                 _pageHelper.SaveNonQuestionAnswers(result, form, path, sessionGuid);
             }
 
@@ -169,7 +173,8 @@ namespace form_builder.Services.PageService
             string form,
             string path,
             Dictionary<string, dynamic> viewModel,
-            IEnumerable<CustomFormFile> files)
+            IEnumerable<CustomFormFile> files,
+            bool modelStateIsValid)
         {
             var baseForm = await _schemaFactory.Build(form);
 
@@ -201,13 +206,13 @@ namespace form_builder.Services.PageService
                 return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
-                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files);
+                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files, modelStateIsValid);
             
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, sessionGuid, new FormAnswers());
+                var formModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, sessionGuid);
 
                 return new ProcessRequestEntity
                 {
@@ -229,7 +234,7 @@ namespace form_builder.Services.PageService
                 { LookUpConstants.SubPathViewModelKey, subPath }
             };
 
-            var viewModel = await _pageContentFactory.Build(page, viewModelData, baseForm, sessionGuid, new FormAnswers(), results);
+            var viewModel = await _pageContentFactory.Build(page, viewModelData, baseForm, sessionGuid, null, results);
 
             return viewModel;
         }

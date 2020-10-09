@@ -53,11 +53,12 @@ namespace form_builder.Services.FileUploadService
             FormSchema baseForm,
             string guid,
             string path,
-            IEnumerable<CustomFormFile> files)
+            IEnumerable<CustomFormFile> files,
+            bool modelStateIsValid)
         {
             return viewModel.ContainsKey(FileUploadConstants.FILE_TO_DELETE) 
                 ? RemoveFile(viewModel, baseForm, path, guid) 
-                : await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files);
+                : await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files, modelStateIsValid);
         }
 
         private ProcessRequestEntity RemoveFile(
@@ -100,11 +101,12 @@ namespace form_builder.Services.FileUploadService
          FormSchema baseForm,
          string guid,
          string path,
-         IEnumerable<CustomFormFile> files)
+         IEnumerable<CustomFormFile> files,
+         bool modelStateIsValid)
         {
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageFactory.Build(currentPage, new Dictionary<string, dynamic>(), baseForm, guid, new FormAnswers());
+                var formModel = await _pageFactory.Build(currentPage, new Dictionary<string, dynamic>(), baseForm, guid);
 
                 return new ProcessRequestEntity
                 {
@@ -113,7 +115,7 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            if(currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files == null || !files.Any()))
+            if(currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files == null || !files.Any()) && modelStateIsValid)
             {
                 return new ProcessRequestEntity
                 {
@@ -135,9 +137,10 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
+            if (files != null && files.Any())
+                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
 
-            if (viewModel.ContainsKey(ButtonConstants.SUBMIT))
+            if (viewModel.ContainsKey(ButtonConstants.SUBMIT) && modelStateIsValid)
             {
                 return new ProcessRequestEntity
                 {

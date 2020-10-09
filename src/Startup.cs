@@ -39,6 +39,7 @@ namespace form_builder
             services
                 .ConfigureCookiePolicy()
                 .AddValidators()
+                .AddTagParsers()
                 .AddStorageProvider(Configuration)
                 .AddSchemaProvider(HostingEnvironment)
                 .AddTransformDataProvider(HostingEnvironment)
@@ -53,6 +54,7 @@ namespace form_builder
                 .ConfigureDocumentCreationProviders()
                 .ConfigureEmailProviders(HostingEnvironment)
                 .AddHelpers()
+                .AddAttributes()
                 .AddServices()
                 .AddWorkflows()
                 .AddFactories()

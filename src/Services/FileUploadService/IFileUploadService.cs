@@ -15,6 +15,7 @@ namespace form_builder.Services.FileUploadService
             FormSchema baseForm,
             string guid,
             string path,
-            IEnumerable<CustomFormFile> files);
+            IEnumerable<CustomFormFile> files,
+            bool modelStateIsValid);
     }
 }

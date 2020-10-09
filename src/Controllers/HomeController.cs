@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Attributes;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -13,7 +14,6 @@ using form_builder.Workflows;
 using form_builder.Workflows.ActionsWorkflow;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 
 namespace form_builder.Controllers
 {
@@ -80,6 +80,7 @@ namespace form_builder.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(ValidateReCaptchaAttribute))]
         [Route("{form}")]
         [Route("{form}/{path}")]
         [Route("{form}/{path}/{subPath}")]
@@ -95,7 +96,7 @@ namespace form_builder.Controllers
             if (fileUpload != null && fileUpload.Any())
                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
 
-            var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload);
+            var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload, ModelState.IsValid);
 
             if (currentPageResult.RedirectToAction && !string.IsNullOrWhiteSpace(currentPageResult.RedirectAction))
                 return RedirectToAction(currentPageResult.RedirectAction, currentPageResult.RouteValues ?? new { form, path });

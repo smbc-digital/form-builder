@@ -31,7 +31,7 @@ namespace form_builder.Validators
 
         private ValidationResult MultiFileUpload(Element element, List<DocumentModel> documentModel)
         {
-            var maxFileSize = element.Properties.MaxFileSize > 0 ? element.Properties.MaxFileSize * 1048576 : SystemConstants.DefaultMaxFileSize;
+            var maxFileSize = element.Properties.MaxFileSize > 0 ? element.Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes : SystemConstants.DefaultMaxFileSize;
 
             var invalidFileSizes = documentModel.Where(_ => _.FileSize >= maxFileSize).ToList();
 
@@ -39,8 +39,8 @@ namespace form_builder.Validators
                 return new ValidationResult { IsValid = true };
 
             var validationMessage = invalidFileSizes.Count == 1 
-                ? $"The selected file must be smaller than {maxFileSize / 1048576}MB"
-                : invalidFileSizes.Select(_ => $"{_.FileName} must be smaller than {maxFileSize / 1048576}MB").Aggregate((curr, acc) => $"{acc} <br/> {curr}");
+                ? $"The selected file must be smaller than {maxFileSize / SystemConstants.OneMBInBinaryBytes}MB"
+                : invalidFileSizes.Select(_ => $"{_.FileName} must be smaller than {maxFileSize / SystemConstants.OneMBInBinaryBytes}MB").Aggregate((curr, acc) => $"{acc} <br/> {curr}");
 
             return new ValidationResult
             { 
@@ -51,7 +51,7 @@ namespace form_builder.Validators
 
         private ValidationResult SingleFileUpload(Element element, List<DocumentModel> documentModel)
         {
-            var maxFileSize = element.Properties.MaxFileSize > 0 ? element.Properties.MaxFileSize * 1048576 : SystemConstants.DefaultMaxFileSize;
+            var maxFileSize = element.Properties.MaxFileSize > 0 ? element.Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes : SystemConstants.DefaultMaxFileSize;
 
             if (documentModel.All(_ => _.FileSize <= maxFileSize))
                 return new ValidationResult { IsValid = true };
@@ -59,7 +59,7 @@ namespace form_builder.Validators
             return new ValidationResult
             {
                 IsValid = false,
-                Message = $"The selected file must be smaller than {maxFileSize / 1048576}MB"
+                Message = $"The selected file must be smaller than {maxFileSize / SystemConstants.OneMBInBinaryBytes}MB"
             };
         }
     }

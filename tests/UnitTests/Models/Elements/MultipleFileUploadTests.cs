@@ -56,7 +56,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("MultipleFileUpload")), It.IsAny<MultipleFileUpload>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-            _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()), Times.Once);
+            _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),  It.IsAny<FormAnswers>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var currentAnswer = new List<FileUploadModel>{ new FileUploadModel() };
             
             var callBackValue = new MultipleFileUpload();
-            _mockElementHelper.Setup(_ => _.CurrentValue<JArray>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
+            _mockElementHelper.Setup(_ => _.CurrentValue<JArray>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),  It.IsAny<FormAnswers>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()))
                 .Returns(JArray.FromObject(currentAnswer));
 
             _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<MultipleFileUpload>(), It.IsAny<Dictionary<string, dynamic>>()))
@@ -101,7 +101,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("MultipleFileUpload")), It.IsAny<MultipleFileUpload>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-            _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()), Times.Once);
+            _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),  It.IsAny<FormAnswers>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()), Times.Once);
             Assert.NotEmpty(callBackValue.CurrentFilesUploaded);
             Assert.Single(callBackValue.CurrentFilesUploaded);
         }
@@ -118,8 +118,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithQuestionId(questionId)
                 .WithMaxFileSize(value)
                 .Build();
-
-            var formAnswers = new FormAnswers();
 
             //Act
             var result = element.GenerateElementProperties();
@@ -138,7 +136,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.True(result.ContainsValue("file"));
             Assert.True(result.ContainsValue(true));
             Assert.True(result.ContainsValue("smbc-multiple-file-upload"));
-            Assert.True(result.ContainsValue(value * 1024000));
+            Assert.True(result.ContainsValue(value * SystemConstants.OneMBInBinaryBytes));
         }
     }
 }

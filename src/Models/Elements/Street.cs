@@ -6,7 +6,6 @@ using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json.Linq;
 using StockportGovUK.NetStandard.Models.Addresses;
@@ -54,7 +53,7 @@ namespace form_builder.Models.Elements
         public override async Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
-            Dictionary<string, dynamic> answers,
+            Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
             IWebHostEnvironment environment,
@@ -63,19 +62,19 @@ namespace form_builder.Models.Elements
         {
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForProvider(this);
-            answers.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
+            viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
 
             switch (subPath as string)
             {
                 case LookUpConstants.Automatic:
                     IsSelect = true;
-                    Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, string.Empty);
+                    Properties.Value = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, string.Empty);
 
                     ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
                         ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
                         : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
 
-                    var selectedStreet = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, StreetConstants.SELECT_SUFFIX);
+                    var selectedStreet = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, StreetConstants.SELECT_SUFFIX);
                     var searchSuffix = results?.Count == 1 ? "street found" : "streets found";
                     Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} {searchSuffix}", string.Empty) };
 
@@ -94,7 +93,7 @@ namespace form_builder.Models.Elements
 
                 default:
 
-                    Properties.Value = elementHelper.CurrentValue(this, answers, page.PageSlug, guid, string.Empty);
+                    Properties.Value = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, string.Empty);
                     return await viewRender.RenderAsync("StreetSearch", this);
             }
         }

@@ -37,7 +37,7 @@ namespace form_builder.Validators
             if (documentModel == null)
                 return new ValidationResult { IsValid = true };
 
-            var maxCombinedFileSize = element.Properties.MaxCombinedFileSize > 0 ? element.Properties.MaxCombinedFileSize * 1048576 : SystemConstants.DefaultMaxCombinedFileSize;
+            var maxCombinedFileSize = element.Properties.MaxCombinedFileSize > 0 ? element.Properties.MaxCombinedFileSize * SystemConstants.OneMBInBinaryBytes : SystemConstants.DefaultMaxCombinedFileSize;
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var cachedAnswers = _distributedCache.GetString(sessionGuid);
