@@ -5,5 +5,7 @@
         public int MaxCombinedFileSize { get; set; }
 
         public string PageSubmitButtonLabel { get; set; }
+
+        public bool DisplayReCaptcha { get; set; } = false;
     }
 }

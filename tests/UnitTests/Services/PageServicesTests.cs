@@ -127,7 +127,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
 
-            var result = await _service.ProcessRequest("form", "page-one", viewModel, null);
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null, true);
 
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             _mockSchemaFactory.Verify(_ => _.Build(It.IsAny<string>()), Times.Once);
@@ -162,7 +162,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null));
+            await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null, true));
         }
 
         [Fact]
@@ -200,7 +200,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcessRequest("form", "page-one", viewModel, null);
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null, true);
 
             _addressService.Verify(_ => _.ProcessAddress(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
@@ -241,7 +241,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await _service.ProcessRequest("form", "page-one", viewModel, null);
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null, true);
 
             _streetService.Verify(_ => _.ProcessStreet(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
@@ -283,7 +283,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null));
+            await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null, true));
 
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
         }
@@ -319,7 +319,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessRequest("form", "page-one", viewModel, null));
+            var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessRequest("form", "page-one", viewModel, null, true));
             Assert.Equal("Session guid null.", result.Message);
         }
 
@@ -559,7 +559,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-organisation-searchterm", "orgName" },
             };
 
-            var result = await _service.ProcessRequest("form", "page-one", viewModel, null);
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null, true);
 
             _organisationService.Verify(_ => _.ProcessOrganisation(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
@@ -646,7 +646,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(page);
 
             //Act
-            var result = await _service.ProcessRequest("form", "first-page", new Dictionary<string, dynamic>(), It.IsAny<IEnumerable<CustomFormFile>>());
+            var result = await _service.ProcessRequest("form", "first-page", new Dictionary<string, dynamic>(), It.IsAny<IEnumerable<CustomFormFile>>(), true);
 
             //Assert
             Assert.Equal(viewModel.StartPageUrl, result.ViewModel.StartPageUrl);
@@ -948,7 +948,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
 
-            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null);
+            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null, true);
 
             _mockIncomingDataHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>()), Times.Never);
         }
@@ -981,7 +981,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
 
-            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), It.IsAny<IEnumerable<CustomFormFile>>());
+            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), It.IsAny<IEnumerable<CustomFormFile>>(), true);
 
             _mockIncomingDataHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
         }
@@ -997,7 +997,8 @@ namespace form_builder_tests.UnitTests.Services
                     It.IsAny<FormSchema>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),
-                    null))
+                    null,
+                    It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity());
 
             var element = new ElementBuilder()
@@ -1028,14 +1029,15 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-fileupload", "file" }
             };
 
-            var result = await _service.ProcessRequest("form", "page-one", viewModel, null);
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null, true);
 
             _fileUploadService.Verify(_ => _.ProcessFile(It.IsAny<Dictionary<string, dynamic>>(),
                 It.IsAny<Page>(),
                 It.IsAny<FormSchema>(),
                 It.IsAny<string>(),
                 It.IsAny<string>(),
-                null), Times.Once());
+                null,
+                It.IsAny<bool>()), Times.Once());
             Assert.IsType<ProcessRequestEntity>(result);
         }
 
@@ -1063,14 +1065,15 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
 
-            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null);
+            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null, true);
 
             _fileUploadService.Verify(_ => _.ProcessFile(It.IsAny<Dictionary<string, dynamic>>(),
                 It.IsAny<Page>(),
                 It.IsAny<FormSchema>(),
                 It.IsAny<string>(),
                 It.IsAny<string>(),
-                null), Times.Never);
+                null,
+                It.IsAny<bool>()), Times.Never);
         }
 
         [Fact]
