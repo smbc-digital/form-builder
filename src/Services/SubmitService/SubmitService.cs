@@ -1,19 +1,15 @@
-﻿using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Providers.StorageProvider;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using form_builder.Configuration;
+using form_builder.Extensions;
+using form_builder.Helpers.PageHelpers;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
-using form_builder.Extensions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using form_builder.Configuration;
+using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Gateways;
 
-namespace form_builder.Services.SubmtiService
+namespace form_builder.Services.SubmitService
 {
     public interface ISubmitService
     {
@@ -23,34 +19,24 @@ namespace form_builder.Services.SubmtiService
     }
     public class SubmitService : ISubmitService
     {
-        private readonly IDistributedCacheWrapper _distributedCache;
-
         private readonly IGateway _gateway;
 
         private readonly IPageHelper _pageHelper;
 
-        private readonly ISessionHelper _sessionHelper;
-
-        private readonly ILogger<SubmitService> _logger;
-
-        private readonly IHostingEnvironment _environment;
-
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly DistributedCacheExpirationConfiguration _distrbutedCacheExpirationConfiguration;
+        private readonly IWebHostEnvironment _environment;
 
         private readonly SubmissionServiceConfiguration _submissionServiceConfiguration;
 
 
-        public SubmitService(ILogger<SubmitService> logger, IDistributedCacheWrapper distributedCache, IGateway gateway, IPageHelper pageHelper, ISessionHelper sessionHelper, IHostingEnvironment environment, IHttpContextAccessor httpContextAccessor, IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration, IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration)
+        public SubmitService(
+            IGateway gateway, 
+            IPageHelper pageHelper, 
+            IWebHostEnvironment environment, 
+            IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration)
         {
-            _distributedCache = distributedCache;
             _gateway = gateway;
             _pageHelper = pageHelper;
-            _sessionHelper = sessionHelper;
-            _logger = logger;
             _environment = environment;
-            _httpContextAccessor = httpContextAccessor;
-            _distrbutedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
             _submissionServiceConfiguration = submissionServiceConfiguration.Value;
         }
 
@@ -58,21 +44,17 @@ namespace form_builder.Services.SubmtiService
         {
             if(_submissionServiceConfiguration.FakeSubmission)
             {
+                _pageHelper.SaveCaseReference(sessionGuid, "123456");
                 return "123456"; 
             }
             var reference = string.Empty;
 
-            var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
+            var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
-            if (string.IsNullOrWhiteSpace(submitSlug.AuthToken))
-            {
-                _gateway.ChangeAuthenticationHeader(string.Empty);
-            }
-            else
-            {
-                _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
-            }
+            _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(submitSlug.AuthToken)
+                ? string.Empty
+                : submitSlug.AuthToken);
 
             var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
             if (!response.IsSuccessStatusCode)
@@ -85,6 +67,9 @@ namespace form_builder.Services.SubmtiService
                 var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
                 reference = JsonConvert.DeserializeObject<string>(content);
             }
+
+            _pageHelper.SaveCaseReference(sessionGuid, reference);
+
             return reference;
         }
 
@@ -95,7 +80,7 @@ namespace form_builder.Services.SubmtiService
                 return "123456";
             }
 
-            var currentPage = mappingEntity.BaseForm.GetPage(mappingEntity.FormAnswers.Path);
+            var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
 
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
@@ -114,6 +99,7 @@ namespace form_builder.Services.SubmtiService
             }
 
             var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
+
             if (!response.IsSuccessStatusCode)
             {
                 throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");

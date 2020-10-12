@@ -3,9 +3,9 @@
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
         <h1 class="govuk-fieldset__heading">
             @Model.Label
-            
-            @if (Model.Properties.Optional)
-            { <span class="smbc-body">(optional)</span> }
+
+            @if (Model.Properties.Optional && !Model.Properties.HideOptionalText)
+            {<span class="smbc-body">(optional)</span>}
         </h1>
     </legend>
 }
@@ -13,7 +13,7 @@ else
 {
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
         @Model.Label
-        @if (Model.Properties.Optional)
+        @if (Model.Properties.Optional && !Model.Properties.HideOptionalText)
         {
             <span class="smbc-body">(optional)</span>
         }

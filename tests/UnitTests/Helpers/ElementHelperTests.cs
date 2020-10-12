@@ -1,25 +1,42 @@
-﻿using form_builder.Builders;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Mappers;
 using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
+using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Moq;
-using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Helpers
 {
     public class ElementHelperTests
     {
-        private readonly Mock<IDistributedCacheWrapper> _mockDistrbutedCacheWrapper = new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
+        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
         private readonly ElementHelper _elementHelper;
+        private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
 
         public ElementHelperTests()
         {
-            _elementHelper = new ElementHelper(_mockDistrbutedCacheWrapper.Object, _mockElementMapper.Object);
+            _elementHelper = new ElementHelper(_mockDistributedCacheWrapper.Object,
+                _mockElementMapper.Object,
+                _mockWebHostEnvironment.Object,
+                _mockHttpContextAccessor.Object);
+
+            _mockWebHostEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
+
+            _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
+               .Returns(new HostString("www.test.com"));
         }
 
         [Theory]
@@ -39,7 +56,7 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add("test-id", "this is the value");
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, "", "");
+            var result = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), "", "");
 
             // Assert
             Assert.Equal("this is the value", result);
@@ -56,11 +73,13 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithValue("this is the value")
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("test-id2", "this is the value");
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {"test-id2", "this is the value"}
+            };
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, "", "");
+            var result = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty);
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -71,7 +90,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void CurrentValue_ShouldReturnEmpty_WhenCacheDoesNotContainPageData()
         {
             // Arrange
-            _mockDistrbutedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
 
             var element = new ElementBuilder()
@@ -84,7 +103,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, "", "");
+            var result = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty);
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -94,22 +113,21 @@ namespace form_builder_tests.UnitTests.Helpers
         public void CurrentValue_ShouldReturnStoredValueOfElement_WhenCacheDataContainsElementValue()
         {
             // Arrange
-            _mockDistrbutedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
                 {
-                    Pages = new List<PageAnswers>
-                    {
-                        new PageAnswers {
-                        PageSlug = "test-slug",
-                        Answers = new List<Answers>{
-                            new Answers {
-                                QuestionId = "test-id",
-                                Response = "this is the value"
-                                }
+                    new PageAnswers {
+                    PageSlug = "test-slug",
+                    Answers = new List<Answers>{
+                        new Answers {
+                            QuestionId = "test-id",
+                            Response = "this is the value"
                             }
                         }
                     }
-                }));
+                }
+            };
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
@@ -121,7 +139,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, "test-slug", "");
+            var result = _elementHelper.CurrentValue(element, viewModel, formAnswers, "test-slug", string.Empty);
 
             // Assert
             Assert.Equal("this is the value", result);
@@ -131,7 +149,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void CurrentValue_ShouldReturnEmpty_WhenCacheDataDoesNotContainElementValue()
         {
             // Arrange
-            _mockDistrbutedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers
                 {
                     Pages = new List<PageAnswers>
@@ -153,7 +171,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue<string>(element, viewModel, "test-slug", "");
+            var result = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), "test-slug", string.Empty);
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -170,8 +188,6 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithQuestionId("test-id")
                .WithLabel("test-text")
                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _elementHelper.CheckForLabel(element);
@@ -191,9 +207,7 @@ namespace form_builder_tests.UnitTests.Helpers
               .WithQuestionId("test-id")
               .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
-            // Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
         }
 
@@ -227,7 +241,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithType(elementType)
                 .Build();
 
-            // Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForQuestionId(element));
         }
 
@@ -258,7 +272,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithRestrictPastDate(true)
                 .Build();
 
-            //Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element));
         }
 
@@ -274,9 +288,7 @@ namespace form_builder_tests.UnitTests.Helpers
               .WithLabel(string.Empty)
               .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
-            // Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
         }
 
@@ -289,8 +301,6 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithQuestionId("issueOne")
                .WithMaxLength(2000)
                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _elementHelper.CheckForMaxLength(element);
@@ -309,8 +319,6 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithMaxLength(1)
                .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
             // Act
             var result = _elementHelper.CheckForMaxLength(element);
 
@@ -328,9 +336,7 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithMaxLength(0)
                .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
-            // Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForMaxLength(element));
         }
 
@@ -343,8 +349,6 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithLabel("test-text")
                .WithPropertyText("Test")
                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _elementHelper.CheckIfLabelAndTextEmpty(element);
@@ -361,23 +365,20 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithType(EElementType.InlineAlert)
                .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
-            // Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckIfLabelAndTextEmpty(element));
         }
-
 
         [Fact]
         public void CheckForRadioOptions_ShouldThrowException_IfNoOptionsAreGiven()
         {
-            //Arrange
+            // Arrange
             var element = new ElementBuilder()
                .WithType(EElementType.Radio)
                .WithQuestionId("questionId")
                .WithLabel("Label").Build();
 
-            //Assert
+            // Act & Assert
             var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
         }
 
@@ -392,10 +393,8 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithOptions(new List<Option>())
                .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
-            //Assert
-            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
+            // Act & Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
         }
 
         [Theory]
@@ -414,24 +413,24 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithPropertyText(text)
                 .Build();
 
-            // Assert
+            // Act & Assert
             Assert.Equal(text, element.Properties.Text);
         }
 
         [Theory]
         [InlineData(EElementType.OL)]
         [InlineData(EElementType.UL)]
-        public void ElemenetBuilder_ShouldCreateListsWithListItems(EElementType eElementType)
+        public void ElementBuilder_ShouldCreateListsWithListItems(EElementType eElementType)
         {
             // Arrange
-            List<string> listItems = new List<string> { "item 1", "item 2", "item 3" };
+            var listItems = new List<string> { "item 1", "item 2", "item 3" };
 
             var element = new ElementBuilder()
                 .WithType(eElementType)
                 .WithListItems(listItems)
                 .Build();
 
-            // Assert
+            // Act & Assert
             Assert.Equal(3, element.Properties.ListItems.Count);
             Assert.Equal("item 1", element.Properties.ListItems[0]);
         }
@@ -446,7 +445,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithSource("source")
                 .Build();
 
-            // Assert
+            // Act & Assert
             Assert.Equal("alt text", element.Properties.AltText);
             Assert.Equal("source", element.Properties.Source);
         }
@@ -464,16 +463,13 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2", Hint = "Option 2 Hint" } })
                 .Build();
 
-            //Assert
+            // Act & Assert
             Assert.True(_elementHelper.CheckForRadioOptions(element));
-
             Assert.Equal("questionId", element.Properties.QuestionId);
             Assert.Equal("Label", element.Properties.Label);
-
             Assert.Equal("option1", element.Properties.Options[0].Value);
             Assert.Equal("Option 1", element.Properties.Options[0].Text);
             Assert.Equal("Option 1 Hint", element.Properties.Options[0].Hint);
-
             Assert.Equal("option2", element.Properties.Options[1].Value);
             Assert.Equal("Option 2", element.Properties.Options[1].Text);
             Assert.Equal("Option 2 Hint", element.Properties.Options[1].Hint);
@@ -492,15 +488,12 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2"} })
                 .Build();
 
-            //Assert
+            // Act & Assert
             Assert.True(_elementHelper.CheckForSelectOptions(element));
-
             Assert.Equal("questionId", element.Properties.QuestionId);
             Assert.Equal("Label", element.Properties.Label);
-
             Assert.Equal("option1", element.Properties.Options[0].Value);
             Assert.Equal("Option 1", element.Properties.Options[0].Text);
-
             Assert.Equal("option2", element.Properties.Options[1].Value);
             Assert.Equal("Option 2", element.Properties.Options[1].Text);
         }
@@ -508,6 +501,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public void ElementBuilder_ShouldCreateCheckBoxList()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Checkbox)
                 .WithQuestionId("questionId")
@@ -516,11 +510,11 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2"} })
                 .Build();
 
+            // Act & Assert
             Assert.Equal("questionId", element.Properties.QuestionId);
             Assert.Equal("Label", element.Properties.Label);
             Assert.Equal("option1", element.Properties.Options[0].Value);
             Assert.Equal("Option 1", element.Properties.Options[0].Text);
-
             Assert.Equal("option2", element.Properties.Options[1].Value);
             Assert.Equal("Option 2", element.Properties.Options[1].Text);
         }
@@ -537,7 +531,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 { new Option { Value = "option1", Text = "Option 1"}})
                 .Build();
 
-            //Assert
+            // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForSelectOptions(element));
         }
 
@@ -553,10 +547,8 @@ namespace form_builder_tests.UnitTests.Helpers
                   new Option { Value = "option2", Text = "Option 2"} })
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-
-            // Assert
-            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
+            // Act & Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckForLabel(element));
         }
 
         [Fact]
@@ -582,9 +574,9 @@ namespace form_builder_tests.UnitTests.Helpers
             viewModel.Add(yearId, "2010");
 
             // Act
-            var dayResult = _elementHelper.CurrentValue<string>(element, viewModel, "", "", "-day");
-            var monthResult = _elementHelper.CurrentValue<string>(element, viewModel, "", "", "-month");
-            var yearResult = _elementHelper.CurrentValue<string>(element, viewModel, "", "", "-year");
+            var dayResult = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty, "-day");
+            var monthResult = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty, "-month");
+            var yearResult = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty, "-year");
 
             // Assert
             Assert.Equal("14", dayResult);
@@ -606,9 +598,9 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var dayResult = _elementHelper.CurrentValue<string>(element, viewModel,"","", "-day");
-            var monthResult = _elementHelper.CurrentValue<string>(element, viewModel,"","", "-month");
-            var yearResult = _elementHelper.CurrentValue<string>(element, viewModel,"","", "-year");
+            var dayResult = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty, "-day");
+            var monthResult = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty, "-month");
+            var yearResult = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty, "-year");
 
             // Assert
             Assert.Equal("", dayResult);
@@ -670,7 +662,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             //Assert
-            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForProvider(element));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForProvider(element));
         }
 
         [Theory]
@@ -688,6 +680,75 @@ namespace form_builder_tests.UnitTests.Helpers
 
             //Assert
             Assert.True(_elementHelper.CheckForProvider(element));
+        }
+
+        [Fact]
+        public void GenerateQuestionAndAnswersList_ShouldReturnFormSummary_WhenDataHas_PreviousAnswers() 
+        {
+             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers{ Pages = new List<PageAnswers> { new PageAnswers{ PageSlug = "page-one", Answers = new List<Answers>{ new Answers { QuestionId = "question", Response = "test answer" } } } } }));
+
+            var Behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
+            var element = new ElementBuilder()
+                .WithQuestionId("question")
+                .WithType(EElementType.Textbox)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithBehaviour(Behaviour)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            var result = _elementHelper.GenerateQuestionAndAnswersList("12345",formSchema); 
+
+            Assert.NotEmpty(result);
+            Assert.Single(result);
+        }
+
+        [Fact]
+        public void GenerateValidDocumentUploadUrl_ShouldReturnUrlWithCaseRefEncoded()
+        {
+            //Arrange          
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                CaseReference = "12345"
+            };
+
+            var urlOrigin = $"https://www.test.com/";
+            var caseReference = Convert.ToBase64String(Encoding.ASCII.GetBytes(formAnswers.CaseReference));
+            var urlPath = $"{schema.BaseURL}/{FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH}{SystemConstants.CaseReferenceQueryString}{caseReference}";
+
+            _mockElementHelper.Setup(_ => _.GenerateDocumentUploadUrl(It.IsAny<Element>(),
+                It.IsAny<FormSchema>(),
+                It.IsAny<FormAnswers>()
+                )
+            );
+
+            var elementHelper = new ElementHelper(
+                _mockDistributedCacheWrapper.Object,
+                _mockElementMapper.Object,
+                _mockWebHostEnvironment.Object,
+                _mockHttpContextAccessor.Object
+                );
+            //Act
+            var results = elementHelper.GenerateDocumentUploadUrl(new DocumentUpload(), schema, formAnswers);
+
+            //Assert
+            Assert.NotNull(results);
+            Assert.Equal($"{urlOrigin}{urlPath}", results);
+            Assert.Contains(caseReference, results);
         }
     }
 }

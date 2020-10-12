@@ -1,10 +1,10 @@
-﻿using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.Transforms.Lookups;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Models;
+using form_builder.Models.Elements;
+using form_builder.Providers.Transforms.Lookups;
 
 namespace form_builder.Factories.Transform.Lookups
 {
@@ -18,7 +18,7 @@ namespace form_builder.Factories.Transform.Lookups
         }
 
 
-        public async Task<FormSchema> Transform(FormSchema formSchema)
+        public FormSchema Transform(FormSchema formSchema)
         {
             formSchema.Pages
                 .SelectMany(_ => _.ValidatableElements)
@@ -26,7 +26,6 @@ namespace form_builder.Factories.Transform.Lookups
                 .Select(async element => { return await TransformElement(element); })
                 .Select(t => t.Result)
                 .ToList();
-
 
             return formSchema;
         }
@@ -36,9 +35,7 @@ namespace form_builder.Factories.Transform.Lookups
             var lookupOptions = await _lookupTransformDataProvider.Get<List<Option>>(entry.Lookup);
 
             if(!lookupOptions.Any())
-            {
                 throw new Exception($"LookupSchemaTransformFactory::Build, No lookup options found for question {entry.Properties.QuestionId} with lookup value {entry.Lookup}");
-            }
 
             entry.Properties.Options.AddRange(lookupOptions);
 

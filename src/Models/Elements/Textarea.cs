@@ -1,9 +1,9 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace form_builder.Models.Elements
 {
@@ -15,20 +15,21 @@ namespace form_builder.Models.Elements
             Type = EElementType.Textarea;
         }
 
-        public override Task<string> RenderAsync(
-            IViewRender viewRender,
+        public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
-            IHostingEnvironment environment,
+            IWebHostEnvironment environment,
+            FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Value = elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid);
+            Properties.Value = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckForMaxLength(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
@@ -43,9 +44,7 @@ namespace form_builder.Models.Elements
             };
 
             if (Properties.MaxLength >= 200)
-            {
                 properties.Add("rows", Properties.MaxLength > 500 ? "15" : "5");
-            }
 
             if (!DisplayAriaDescribedby)
                 return properties;

@@ -1,14 +1,13 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Elements;
+using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 
 namespace form_builder.ContentFactory
 {
@@ -20,29 +19,29 @@ namespace form_builder.ContentFactory
     public class SuccessPageFactory : ISuccessPageFactory
     {
         private readonly IPageHelper _pageHelper;
-        private readonly IHostingEnvironment _environment;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPageFactory _pageFactory;
-        public SuccessPageFactory(IHttpContextAccessor httpContextAccessor, IHostingEnvironment environment, IPageHelper pageHelper, IPageFactory pageFactory)
+        private readonly ISessionHelper _sessionHelper;
+        private readonly IDistributedCacheWrapper _distributedCache;
+        public SuccessPageFactory(IPageHelper pageHelper, IPageFactory pageFactory, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
         {
             _pageHelper = pageHelper;
-            _environment = environment;
             _pageFactory = pageFactory;
-            _httpContextAccessor = httpContextAccessor;
+            _sessionHelper = sessionHelper;
+            _distributedCache = distributedCache;
         }
 
         public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType)
         {
-            var page = baseForm.GetPage("success");
-            
-            if(page == null && behaviourType == EBehaviourType.SubmitAndPay)
+            var page = baseForm.GetPage(_pageHelper, "success");
+
+            _distributedCache.Remove(sessionGuid);
+            _sessionHelper.RemoveSessionGuid();
+
+            if (page == null && behaviourType == EBehaviourType.SubmitAndPay)
             {
                 page = GenerateGenericPaymentPage();
                 baseForm.Pages.Add(page);
-            }   
-
-            if(page == null && (_environment.EnvironmentName == "prod" || _environment.EnvironmentName == "stage"))
-                throw new Exception($"SuccessPageContentFactory::Build, No success page configured for form {form}");
+            }
 
             if (page == null)
             {
@@ -50,6 +49,7 @@ namespace form_builder.ContentFactory
                 {
                     ViewName = "Submit",
                     FormAnswers = formAnswers,
+                    CaseReference = formAnswers.CaseReference,
                     FeedbackFormUrl = baseForm.FeedbackForm,
                     FeedbackPhase = baseForm.FeedbackPhase,
                     FormName = baseForm.FormName,
@@ -57,7 +57,7 @@ namespace form_builder.ContentFactory
                 };
             }
 
-            if(baseForm.DocumentDownload && page != null)
+            if (baseForm.DocumentDownload)
             {
                     baseForm.DocumentType.ForEach((docType) => {
                         var element = new ElementBuilder()
@@ -73,11 +73,12 @@ namespace form_builder.ContentFactory
                     baseForm.Pages[successIndex] = page;
             }
 
-            var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(),baseForm, sessionGuid);
+            var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(),baseForm, sessionGuid, formAnswers);
 
             return new SuccessPageEntity
             {
                 HtmlContent = result.RawHTML,
+                CaseReference = formAnswers.CaseReference,
                 FeedbackFormUrl = result.FeedbackForm,
                 FeedbackPhase = result.FeedbackPhase,
                 FormName = result.FormName,

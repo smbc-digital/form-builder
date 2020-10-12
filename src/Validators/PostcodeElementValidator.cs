@@ -33,7 +33,6 @@ namespace form_builder.Validators
             }
 
             var value = viewModel[element.Properties.QuestionId];
-
             var isValid = true;
             if (!AddressConstants.POSTCODE_REGEX.Match(value).Success)
             {
@@ -43,7 +42,7 @@ namespace form_builder.Validators
             return new ValidationResult
             {
                 IsValid = isValid,
-                Message = isValid ? string.Empty : $"{ element.Properties.Label} must be a valid postcode"
+                Message = isValid ? string.Empty : ValidationConstants.POSTCODE_INCORRECT_FORMAT
             };
         }
     }

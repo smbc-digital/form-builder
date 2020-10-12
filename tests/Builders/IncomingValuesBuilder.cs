@@ -1,4 +1,5 @@
-﻿using form_builder.Models;
+﻿using form_builder.Enum;
+using form_builder.Models;
 
 namespace form_builder_tests.Builders
 {
@@ -7,16 +8,17 @@ namespace form_builder_tests.Builders
         private string _questionId;
         private string _name;
         private bool _optional;
+        private EHttpActionType _httpActionType;
+        private bool _base64Encoded;
 
-        public IncomingValue Build()
+        public IncomingValue Build() => new IncomingValue
         {
-            return new IncomingValue
-            {
-                QuestionId = _questionId,
-                Name = _name,
-                Optional = _optional
-            };
-        }
+            QuestionId = _questionId,
+            Name = _name,
+            Optional = _optional,
+            HttpActionType = _httpActionType,
+            Base64Encoded = _base64Encoded
+        };
 
         public IncomingValuesBuilder WithQuestionId(string questionId)
         {
@@ -35,6 +37,20 @@ namespace form_builder_tests.Builders
         public IncomingValuesBuilder WithOptional(bool optional)
         {
             _optional = optional;
+
+            return this;
+        }
+
+        public IncomingValuesBuilder WithHttpActionType(EHttpActionType value)
+        {
+            _httpActionType = value;
+
+            return this;
+        }
+
+        public IncomingValuesBuilder WithBase64Encoding(bool value)
+        {
+            _base64Encoded = value;
 
             return this;
         }

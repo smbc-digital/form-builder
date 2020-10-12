@@ -1,12 +1,15 @@
 ﻿using form_builder.Models;
 using form_builder.ViewModels;
+using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Services.PageService.Entities
 {
     public class PageEntity
     {
         public string ViewName { get; set; } = "Index";
+
         public Page Page { get; set; }
+
         public FormBuilderViewModel ViewModel { get; set; }
     }
 

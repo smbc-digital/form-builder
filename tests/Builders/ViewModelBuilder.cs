@@ -13,7 +13,8 @@ namespace form_builder_tests.Builders
 
         public ViewModelBuilder WithEntry(string key, string value)
         {
-            _viewModel.Add(key, new string[] { value });
+            _viewModel.Add(key, new[] { value });
+
             return this;
         }
     }

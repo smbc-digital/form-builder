@@ -1,39 +1,46 @@
-﻿using System.Collections.Generic;
-using form_builder.Controllers;
-using Xunit;
-using Moq;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
-using Microsoft.AspNetCore.Mvc;
+using form_builder.Builders;
+using form_builder.Controllers;
 using form_builder.Enum;
-using form_builder_tests.Builders;
+using form_builder.Models;
+using form_builder.Models.Properties.ActionProperties;
+using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
 using form_builder.Services.PageService.Entities;
-using form_builder.Models;
 using form_builder.Workflows;
-using form_builder.Services.FileUploadService;
-using form_builder.Builders;
-using form_builder.Models.Properties.ActionProperties;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting;
 using form_builder.Workflows.ActionsWorkflow;
+using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Primitives;
+using Moq;
+using Xunit;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
     public class HomeControllerTest
     {
-        private HomeController _homeController;
+        private readonly HomeController _homeController;
         private readonly Mock<IPageService> _pageService = new Mock<IPageService>();
         private readonly Mock<ISubmitWorkflow> _submitWorkflow = new Mock<ISubmitWorkflow>();
         private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new Mock<IPaymentWorkflow>();
         private readonly Mock<IFileUploadService> _mockFileUploadService = new Mock<IFileUploadService>();
-        private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new Mock<IActionsWorkflow>();
-        private readonly Mock<ISuccessWorkflow> _mockSucessWorkflow = new Mock<ISuccessWorkflow>();
+        private readonly Mock<ISuccessWorkflow> _mockSuccessWorkflow = new Mock<ISuccessWorkflow>();
 
         public HomeControllerTest()
         {
+            var context = new Mock<HttpContext>();
+            context.SetupGet(_ => _.Request.Query)
+                .Returns(new QueryCollection());
+
             var httpContext = new DefaultHttpContext();
             var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
 
@@ -44,9 +51,14 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockFileUploadService.Object,
                 _mockHostingEnv.Object,
                 _mockActionsWorkflow.Object,
-                _mockSucessWorkflow.Object) {TempData = tempData};
+                _mockSuccessWorkflow.Object)
+            { TempData = tempData };
 
-            _mockSucessWorkflow.Setup(_ => _.Process(It.IsAny<EBehaviourType>(), It.IsAny<string>())).ReturnsAsync(new SuccessPageEntity
+            _homeController.ControllerContext = new ControllerContext();
+            _homeController.ControllerContext.HttpContext = new DefaultHttpContext();
+            _homeController.ControllerContext.HttpContext.Request.Query = new QueryCollection();
+
+            _mockSuccessWorkflow.Setup(_ => _.Process(It.IsAny<EBehaviourType>(), It.IsAny<string>())).ReturnsAsync(new SuccessPageEntity
             {
                 FormAnswers = new FormAnswers(),
                 FormName = "form",
@@ -57,7 +69,10 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public void Home_ShouldRedirectTo_www_When_Prod_Env_ForHomeRoute()
         {
+            // Arrange
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("prod");
+
+            // Act
             var result = _homeController.Home();
 
             // Assert
@@ -68,7 +83,10 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public void Home_ShouldReturnErrorView_WhenNonProdEnv_ForHomeRoute()
         {
+            // Arrange
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
+
+            // Act
             var result = _homeController.Home();
 
             // Assert
@@ -98,7 +116,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithBehaviour(behaviour)
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string,dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.GoToExternalPage, PageSlug = "https://www.bbc.co.uk/weather/2636882" });
 
@@ -115,6 +133,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Index_ShouldRunBehaviourForRedirect_GoToPage()
         {
+            // Arrange
             var element = new ElementBuilder()
               .WithType(EElementType.H1)
               .WithQuestionId("test-id")
@@ -133,9 +152,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithBehaviour(behaviour)
                 .Build();
 
-
-            // Arrange
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.GoToPage, PageSlug = "page-two" });
 
@@ -172,14 +189,14 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithBehaviour(behaviour)
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.SubmitForm });
 
             var viewModel = new Dictionary<string, string[]>();
 
             // Act
-            var result = await _homeController.Index("form", "page-one", viewModel,null);
+            var result = await _homeController.Index("form", "page-one", viewModel, null);
 
             // Assert
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
@@ -207,14 +224,14 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithValidatedModel(true)
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.Unknown });
 
             var viewModel = new Dictionary<string, string[]>();
 
             // Act & Assert
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _homeController.Index("form", "page-one", viewModel,null));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _homeController.Index("form", "page-one", viewModel, null));
             Assert.Equal($"The provided behaviour type 'Unknown' is not valid", result.Message);
 
         }
@@ -222,6 +239,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Index_Post_ShouldReturnView_WhenPageIsInvalid()
         {
+            // Arrange
             var element = new ElementBuilder()
                .WithType(EElementType.Address)
                .WithAddressProvider("testAddressProvider")
@@ -234,7 +252,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithValidatedModel(true)
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page, ViewName = "Search", UseGeneratedViewModel = true });
 
             var viewModel = new ViewModelBuilder()
@@ -242,7 +260,10 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
+            // Act
             var result = await _homeController.Index("form", "page-one", viewModel, null, "automatic");
+
+            // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Search", viewResult.ViewName);
         }
@@ -250,6 +271,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Index_Post_ShouldRedirectWhen_RedirectToAction_IsReturnedFrom_ProcessRequest()
         {
+            // Arrange
             var actionName = "AddressManual";
 
             var element = new ElementBuilder()
@@ -258,13 +280,7 @@ namespace form_builder_tests.UnitTests.Controllers
                .WithQuestionId("test-address")
                .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .WithValidatedModel(true)
-                .Build();
-
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { RedirectAction = actionName, RedirectToAction = true });
 
             var viewModel = new ViewModelBuilder()
@@ -272,12 +288,15 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
+            // Act
             var result = await _homeController.Index("testform", "page-one", viewModel, null, "automatic");
+
+            // Assert
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.True(redirectResult.RouteValues.ContainsKey("form"));
             Assert.True(redirectResult.RouteValues.ContainsKey("path"));
-            Assert.Contains("testform",redirectResult.RouteValues.Values);
-            Assert.Contains("page-one",redirectResult.RouteValues.Values);
+            Assert.Contains("testform", redirectResult.RouteValues.Values);
+            Assert.Contains("page-one", redirectResult.RouteValues.Values);
             Assert.Equal(actionName, redirectResult.ActionName);
         }
 
@@ -286,6 +305,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [InlineData("Index", EBehaviourType.GoToPage)]
         public async Task Index_Post_Should_PerformRedirectToAction_WhenPageIsValid_And_SelectJourney_OnBehaviour(string viewName, EBehaviourType behaviourType)
         {
+            // Arrange
             var element = new ElementBuilder()
                .WithType(EElementType.Address)
                .WithQuestionId("test-address")
@@ -309,12 +329,14 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = behaviourType });
 
+            // Act
             var result = await _homeController.Index("form", "page-one", viewModel, null, "automatic");
 
+            // Assert
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal(viewName, viewResult.ActionName);
         }
@@ -322,6 +344,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Index_Post_Should_PerformGoToExternalPageBehaviour_WhenPageIsValid_And_SelectJourney()
         {
+            // Arrange
             var element = new ElementBuilder()
                .WithType(EElementType.Address)
                .WithQuestionId("test-address")
@@ -345,12 +368,14 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"{element.Properties.QuestionId}-postcode", "SK11aa")
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.GoToExternalPage, PageSlug = "submit-url" });
 
+            // Act
             var result = await _homeController.Index("form", "page-one", viewModel, null, "automatic");
 
+            // Assert
             var redirectResult = Assert.IsType<RedirectResult>(result);
             Assert.Equal("submit-url", redirectResult.Url);
         }
@@ -358,45 +383,86 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Index_ShouldCallPageService()
         {
-            //Arrange
-            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            // Arrange
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IQueryCollection>()))
                 .ReturnsAsync(new ProcessPageEntity());
 
-            //Act
-            var result = await _homeController.Index("form", "path");
+            // Act
+            await _homeController.Index("form", "path");
 
 
-            //Assert
-            _pageService.Verify(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            // Assert
+            _pageService.Verify(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IQueryCollection>()), Times.Once);
         }
 
         [Fact]
         public async Task Index_ShouldReturnViewResult()
         {
-            //Arrange
-            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            // Arrange
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IQueryCollection>()))
                 .ReturnsAsync(new ProcessPageEntity());
 
-            //Act
+            // Act
             var result = await _homeController.Index("form", "path");
 
-            //Assert
+            // Assert
             Assert.IsType<ViewResult>(result);
         }
 
         [Fact]
         public async Task Index_ShouldRedirect_WhenOnRedirectIsTrue()
         {
-            //Arrange
-            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new ProcessPageEntity {  ShouldRedirect = true });
+            // Arrange
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IQueryCollection>()))
+                .ReturnsAsync(new ProcessPageEntity { ShouldRedirect = true });
 
-            //Act
             var result = await _homeController.Index("form", "path");
 
-            //Assert
+            // Assert
             Assert.IsType<RedirectToActionResult>(result);
         }
+
+        [Fact]
+        public async Task Index_ShouldRedirect_WhenOnRedirectIsTrue_WithQueryValues()
+        {
+            // Arrange
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IQueryCollection>()))
+                .ReturnsAsync(new ProcessPageEntity { ShouldRedirect = true });
+
+            // Act
+            var queryCollection = new QueryCollection(new Dictionary<string, StringValues>
+            {
+                {"test", new StringValues("value")},
+                {"testtwo", new StringValues("testtwo")}
+            });
+            _homeController.ControllerContext = new ControllerContext();
+            _homeController.ControllerContext.HttpContext = new DefaultHttpContext();
+            _homeController.ControllerContext.HttpContext.Request.Query = queryCollection;
+
+            // _homeController.
+            var result = await _homeController.Index("form", "path");
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.True(redirectResult.RouteValues.ContainsKey("test"));
+            Assert.True(redirectResult.RouteValues.ContainsKey("testtwo"));
+            Assert.Equal(4, redirectResult.RouteValues.Count);
+        }
+
+        [Fact]
+        public async Task Index_ShouldRedirect_WhenOnRedirectIsTrue_WithNoAdditionalRouteValues_WhenNoQueryParamtersPassed()
+        {
+            // Arrange
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IQueryCollection>()))
+                .ReturnsAsync(new ProcessPageEntity { ShouldRedirect = true });
+
+            var result = await _homeController.Index("form", "path");
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal(2, redirectResult.RouteValues.Count);
+        }
+
 
         [Fact]
         public async Task Submit_ShouldRedirect_ToSuccessAction_OnSuccess()
@@ -415,6 +481,7 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task Index_ShouldRedirectToUrlWhen_SubmitAndPay()
         {
+            // Arrange
             var element = new ElementBuilder()
                .WithType(EElementType.Textbox)
                .WithQuestionId("test")
@@ -437,20 +504,23 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"test", "test")
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.SubmitAndPay });
             _paymentWorkflow.Setup(_ => _.Submit(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync("https://www.return.url");
 
+            // Act
             var result = await _homeController.Index("form", "page-one", viewModel, null);
 
+            // Assert
             Assert.IsType<RedirectResult>(result);
         }
 
         [Fact]
         public async Task Index_ShouldAddFileUploadToViewModel_WhenSupplied()
         {
+            // Arrange
             var element = new ElementBuilder()
               .WithType(EElementType.FileUpload)
               .WithQuestionId("test")
@@ -468,7 +538,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithBehaviour(behaviour)
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.SubmitAndPay });
             _paymentWorkflow.Setup(_ => _.Submit(It.IsAny<string>(), It.IsAny<string>()))
@@ -482,9 +552,11 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry("Guid", Guid.NewGuid().ToString())
                 .Build();
 
+            // Act
             await _homeController.Index("form", "page-one", viewModel, collection);
 
-            _pageService.Verify(service => service.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, object>>(), collection), Times.AtLeastOnce);
+            // Assert
+            _pageService.Verify(service => service.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, object>>(), collection, It.IsAny<bool>()), Times.AtLeastOnce);
         }
 
         [Fact]
@@ -510,6 +582,7 @@ namespace form_builder_tests.UnitTests.Controllers
                     AuthToken = string.Empty
                 })
                 .WithTargetQuestionId(string.Empty)
+                .WithHttpActionType(EHttpActionType.Post)
                 .Build();
 
             var page = new PageBuilder()
@@ -525,7 +598,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithEntry($"test", "test")
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.SubmitAndPay });
             _paymentWorkflow.Setup(_ => _.Submit(It.IsAny<string>(), It.IsAny<string>()))
@@ -533,7 +606,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             // Act
             await _homeController.Index("form", "page-one", viewModel, null);
-            
+
             // Assert
             _mockActionsWorkflow.Verify(_ => _.Process(page.PageActions, It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Once);
         }
@@ -561,10 +634,10 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry($"test", "test")
+                .WithEntry("test", "test")
                 .Build();
 
-            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
                 .ReturnsAsync(new ProcessRequestEntity { Page = page });
             _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).Returns(new Behaviour { BehaviourType = EBehaviourType.SubmitAndPay });
             _paymentWorkflow.Setup(_ => _.Submit(It.IsAny<string>(), It.IsAny<string>()))
@@ -584,7 +657,7 @@ namespace form_builder_tests.UnitTests.Controllers
             await _homeController.Success("form");
 
             // Assert
-            _mockSucessWorkflow.Verify(_ => _.Process(EBehaviourType.SubmitForm, "form"), Times.Once);
+            _mockSuccessWorkflow.Verify(_ => _.Process(EBehaviourType.SubmitForm, "form"), Times.Once);
         }
 
         [Fact]

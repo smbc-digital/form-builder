@@ -1,12 +1,12 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using form_builder.Constants;
+using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using form_builder.Constants;
-using form_builder.Extensions;
 
 namespace form_builder.Models.Elements
 {
@@ -17,21 +17,22 @@ namespace form_builder.Models.Elements
             Type = EElementType.Button;
         }
 
-        public override Task<string> RenderAsync(
-            IViewRender viewRender,
+        public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
-            IHostingEnvironment environment,
+            IWebHostEnvironment environment,
+            FormAnswers formAnswers,
             List<object> results = null)
         {
-            var viewData = new Dictionary<string, dynamic> { { "showSpinner", ShowSpinner(page.Behaviours, page.Elements, viewModel) } };
+            Properties.Text = GetButtonText(page.Elements, viewModel, page);          
 
-            Properties.Text = GetButtonText(page.Elements, viewModel, page);
+            if(!Properties.DisableOnClick)
+                Properties.DisableOnClick = DisableIfSubmitOrLookup(page.Behaviours, page.Elements, viewModel);
 
-            return viewRender.RenderAsync("Button", this, viewData);
+            return viewRender.RenderAsync("Button", this);
         }
 
         private bool CheckForBehaviour(List<Behaviour> behaviour)
@@ -39,36 +40,36 @@ namespace form_builder.Models.Elements
             return behaviour.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay);
         }
 
-        private bool CheckForStreetAddress(List<IElement> element, Dictionary<string, dynamic> viewModel)
+        private bool CheckForLookups(List<IElement> element, Dictionary<string, dynamic> viewModel)
         {
-            var isStreetAddress = element.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.Street);
+            var containsLookupElement = element.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.Street  || _.Type == EElementType.Organisation);
 
-            if (isStreetAddress && !viewModel.IsInitial())
+            if (containsLookupElement && !viewModel.IsInitial())
                 return false;
                 
-            return isStreetAddress;
+            return containsLookupElement;
         }
 
-        private bool ShowSpinner(List<Behaviour> behaviour, List<IElement> element, Dictionary<string, dynamic> viewModel)
+        private bool DisableIfSubmitOrLookup(List<Behaviour> behaviour, List<IElement> element, Dictionary<string, dynamic> viewModel)
         {
-             return CheckForBehaviour(behaviour) || CheckForStreetAddress(element, viewModel);
+             return CheckForBehaviour(behaviour) || CheckForLookups(element, viewModel);
         }
 
         private string GetButtonText(List<IElement> element, Dictionary<string, dynamic> viewModel, Page page)
         {
             if (element.Any(_ => _.Type == EElementType.Address) && viewModel.IsInitial())
-                return SystemConstants.AddressSearchButtonText;
+                return ButtonConstants.ADDRESS_SEARCH_TEXT;
 
             if (element.Any(_ => _.Type == EElementType.Street) && viewModel.IsInitial())
-                return SystemConstants.StreetSearchButtonText;
+                return ButtonConstants.STREET_SEARCH_TEXT;
 
             if (element.Any(_ => _.Type == EElementType.Organisation) && viewModel.IsInitial())
-                return SystemConstants.OrganisationSearchButtonText;
+                return ButtonConstants.ORG_SEARCH_TEXT;
 
-            if(page.Behaviours.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay))
-                return string.IsNullOrEmpty(Properties.Text) ? SystemConstants.SubmitButtonText : Properties.Text;
+            if (page.Behaviours.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay))
+                return string.IsNullOrEmpty(Properties.Text) ? ButtonConstants.SUBMIT_TEXT : Properties.Text;
 
-            return string.IsNullOrEmpty(Properties.Text) ? SystemConstants.NextStepButtonText : Properties.Text;
+            return string.IsNullOrEmpty(Properties.Text) ? ButtonConstants.NEXTSTEP_TEXT : Properties.Text;
         }
     }
 }

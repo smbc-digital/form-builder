@@ -37,6 +37,8 @@
         Summary,
         Reusable,
         Map,
-        PaymentSummary
+        PaymentSummary,
+        MultipleFileUpload,
+        DocumentUpload
     }
 }

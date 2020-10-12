@@ -8,10 +8,8 @@ namespace form_builder.Validators
 {
     public class ManualAddressValidator : IElementValidator
     {
-
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-
             if (!(element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
@@ -41,20 +39,19 @@ namespace form_builder.Validators
             var addressPostcodeMessage = string.Empty;
             var addressPostcodeValid = true;
 
-
             if (string.IsNullOrEmpty(valueAddressPostcode))
             {
-                addressPostcodeMessage = "Enter a postcode";
+                addressPostcodeMessage = ValidationConstants.POSTCODE_EMPTY;
                 addressPostcodeValid = false;
             }
             else if (!AddressConstants.STOCKPORT_POSTCODE_REGEX.IsMatch(valueAddressPostcode) && element.Properties.StockportPostcode == true)
             {
-                addressPostcodeMessage = "Enter a valid Stockport postcode";
+                addressPostcodeMessage = ValidationConstants.POSTCODE_INCORRECT_FORMAT;
                 addressPostcodeValid = false;
             }
             else if (!AddressConstants.POSTCODE_REGEX.IsMatch(valueAddressPostcode))
             {
-                addressPostcodeMessage = "Enter a valid Postcode";
+                addressPostcodeMessage = ValidationConstants.POSTCODE_INCORRECT_FORMAT;
                 addressPostcodeValid = false;
             }
 

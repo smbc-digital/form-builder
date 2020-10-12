@@ -1,28 +1,26 @@
 ﻿@model form_builder.Models.Elements.Textarea
 @{
     var elementProperties = Model.GenerateElementProperties();
-    if(!Model.IsValid)
-    {
-        elementProperties.Add("class", "govuk-textarea govuk-js-character-count govuk-textarea--error");
-    }
-    else{
-        elementProperties.Add("class", "govuk-textarea govuk-js-character-count");
-    }
+    elementProperties.Add("class", !Model.IsValid
+        ? "govuk-textarea govuk-js-character-count govuk-textarea--error"
+        : "govuk-textarea govuk-js-character-count");
 }
 
-@if(Model.DisplayCharacterCount)
+@if (Model.DisplayCharacterCount)
 {
     <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="@Model.Properties.MaxLength">
         <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
             <partial name="LabelH1" />
 
+            <partial name="InsetText" model="@Model.Properties.IAG" />
+
             <partial name="Hint" />
-            
+
             <partial name="Error" />
-            
-            @Html.TextArea(Model.QuestionId, Model.Properties.Value, elementProperties) 
+
+            @Html.TextArea(Model.QuestionId, Model.Properties.Value, elementProperties)
         </div>
-        
+
         <span id=@Model.GetCustomItemId("info") class="govuk-hint govuk-character-count__message" aria-live="polite">
             You can enter up to @Model.Properties.MaxLength characters
         </span>
@@ -33,10 +31,12 @@ else
     <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
         <partial name="LabelH1" />
 
+        <partial name="InsetText" model="@Model.Properties.IAG" />
+
         <partial name="Hint" />
-        
+
         <partial name="Error" />
-        
-        @Html.TextArea(Model.QuestionId, Model.Properties.Value, elementProperties) 
+
+        @Html.TextArea(Model.QuestionId, Model.Properties.Value, elementProperties)
     </div>
 }

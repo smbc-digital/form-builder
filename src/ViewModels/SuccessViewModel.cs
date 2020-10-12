@@ -1,5 +1,5 @@
-using form_builder.Models;
 using System.Collections.Generic;
+using form_builder.Models;
 
 namespace form_builder.ViewModels
 {
@@ -17,6 +17,8 @@ namespace form_builder.ViewModels
         public string PageContent { get; set; }
 
         public string StartPageUrl { get; set; }
+
+        public string DocumentUploadUrl { get; set; }
 
         public bool HideBackButton => true;
 

@@ -17,6 +17,7 @@ namespace form_builder.Providers.SchemaProvider
         {
             return Get<FormSchema>(schemaName);
         }
+
         async Task<T> ISchemaProvider.Get<T>(string schemaName)
         {
             var baseForm = System.IO.File.ReadAllText($@".\DSL\{schemaName}.json");

@@ -1,5 +1,7 @@
-﻿using form_builder.Builders;
-using form_builder.Cache;
+﻿using System.Collections.Generic;
+using System.Dynamic;
+using System.Threading.Tasks;
+using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
@@ -14,9 +16,6 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
@@ -28,7 +27,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDistributedCacheWrapper> _mockDistrubutedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
 
         public MappingServiceTests()
         {
@@ -56,7 +55,7 @@ namespace form_builder_tests.UnitTests.Services
                     Pages = new List<PageAnswers>()
                 }));
 
-            _mockDistrbutedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
+            _mockDistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
             {
                 FormJson = 1
             });
@@ -64,13 +63,12 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _service = new MappingService( _mockDistrubutedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockDistrbutedCacheExpirationConfiguration.Object);
+            _service = new MappingService( _mockDistrubutedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockDistributedCacheExpirationConfiguration.Object);
         }
 
         [Fact]
         public async Task Map_ShouldCallCacheProvider_ToGetFormData()
         {
-
             // Act
             await _service.Map("form", "guid");
 
@@ -81,7 +79,6 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldCallCache_ToGetFormSchema()
         {
-
             // Act
             await _service.Map("form", "guid");
 
@@ -92,6 +89,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldReturnEmptyExpandoObject_WhenFormContains_NoValidatableElements()
         {
+            // Arrange
             var element = new ElementBuilder()
                  .WithType(EElementType.H1)
                  .WithQuestionId("test-question")
@@ -133,6 +131,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldReturnExpandoObject_WhenFormContains_SingleValidatableElement()
         {
+            // Arrange
             var element = new ElementBuilder()
                  .WithType(EElementType.H1)
                  .WithQuestionId("test-question")
@@ -174,6 +173,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldReturnExpandoObject_WhenFormContains_MultipleValidatableElementsWithTargetMapping()
         {
+            // Arrange
             var element = new ElementBuilder()
                  .WithType(EElementType.H1)
                  .WithQuestionId("test-question")
@@ -225,6 +225,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldReturnExpandoObject_WhenFormContains_ValidatableElementWithComplexTargetMapping()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithTargetMapping("one.two.three.four.five.six")
@@ -276,6 +277,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Map_ShouldReturnExpandoObject_WhenFormContains_MutipleValidatableElementsWithComplexTargetMapping()
         {
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithTargetMapping("one.two.three.four.five.six")
@@ -333,11 +335,14 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         
-        [Fact]
-        public async Task Map_ShouldReturnEmptyExpandoObject_WhenNullResponse_ForFile()
+        [Theory]
+        [InlineData(EElementType.FileUpload)]
+        [InlineData(EElementType.MultipleFileUpload)]
+        public async Task Map_ShouldReturnEmptyExpandoObject_WhenNullResponse_ForFile(EElementType type)
         {
+            // Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId("file")
                 .Build();
 
@@ -374,16 +379,19 @@ namespace form_builder_tests.UnitTests.Services
         }
 
                 
-        [Fact]
-        public async Task Map_ShouldReturnExpandoObject_WithSingleFile()
+        [Theory]
+        [InlineData(EElementType.FileUpload)]
+        [InlineData(EElementType.MultipleFileUpload)]
+        public async Task Map_ShouldReturnExpandoObject_WithSingleFile(EElementType type)
         {
+            // Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId("file")
                 .Build();
 
             var element2 = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId("filetwo")
                 .Build();
 
@@ -410,7 +418,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(null);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(new File());
+                .Returns(new List<File>{ new File()});
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -423,23 +431,26 @@ namespace form_builder_tests.UnitTests.Services
             Assert.NotNull(castResultsData);
         }
 
-        [Fact]
-        public async Task Map_ShouldReturnExpandoObject_WithTwoFiles_WithSameMapping()
+        [Theory]
+        [InlineData(EElementType.FileUpload)]
+        [InlineData(EElementType.MultipleFileUpload)]
+        public async Task Map_ShouldReturnExpandoObject_WithTwoFiles_WithSameMapping(EElementType type)
         {
+            // Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId("file")
                 .WithTargetMapping("file")
                 .Build();
 
             var element2 = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId("filetwo")
                 .WithTargetMapping("file")
                 .Build();
 
             var element3 = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
+                .WithType(type)
                 .WithQuestionId("filethree")
                 .WithTargetMapping("file")
                 .Build();
@@ -466,13 +477,13 @@ namespace form_builder_tests.UnitTests.Services
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "file"), It.IsAny<FormAnswers>()))
-                .Returns(new File());
+                .Returns(new List<File>{new File()});
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filetwo"), It.IsAny<FormAnswers>()))
                 .Returns(null);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filethree"), It.IsAny<FormAnswers>()))
-                .Returns(new File());
+                .Returns(new List<File>{new File()});
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -484,6 +495,51 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal(2,castResultsData.file.Count);
             Assert.NotNull(castResultsData);
             Assert.NotNull(castResultsData.file);
+        }
+
+        [Fact]
+        public async Task Map_ShouldReturnExpandoObject_WithAdditionalFormAnswersData()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("textbox")
+                .Build();
+                
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+               .Returns(JsonConvert.SerializeObject(new FormAnswers
+               {
+                   Pages = new List<PageAnswers>(),
+                   AdditionalFormData = new Dictionary<string, object>{ { "additional", "answerData" }}
+               }));
+
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "textbox"), It.IsAny<FormAnswers>()))
+                .Returns("textbox answer");
+
+            // Act
+            var result = await _service.Map("form", "guid");
+
+            // Assert
+            var resultData = Assert.IsType<ExpandoObject>(result.Data);
+            dynamic castResultsData = resultData;
+
+            Assert.NotNull(castResultsData);
+            Assert.NotNull(castResultsData.textbox);
+            Assert.NotNull(castResultsData.additional);
+            Assert.Equal("answerData", castResultsData.additional);
         }
     }
 }

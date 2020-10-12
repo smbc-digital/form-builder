@@ -1,19 +1,19 @@
-﻿using form_builder.Enum;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Builders;
+using form_builder.ContentFactory;
+using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
+using form_builder.Providers.Street;
 using form_builder.Services.StreetService;
 using form_builder_tests.Builders;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Xunit;
-using form_builder.Builders;
-using form_builder.Providers.Street;
-using StockportGovUK.NetStandard.Models.Enums;
 using Newtonsoft.Json;
-using form_builder.ContentFactory;
+using StockportGovUK.NetStandard.Models.Enums;
+using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -25,9 +25,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IStreetProvider> _streetProvider = new Mock<IStreetProvider>();
         private IEnumerable<IStreetProvider> _streetProviders;
         private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
-
-        private const string SearchResultsUniqueId = "123456";
-        private const string SearchResultsReference = "Test street";
 
         public StreetServiceTests()
         {
@@ -94,10 +91,10 @@ namespace form_builder_tests.UnitTests.Services
                 { element.Properties.QuestionId, "searchTerm" },
             };
 
-            var result = await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
+            await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
 
             _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
         }
 
         [Fact]
@@ -150,10 +147,10 @@ namespace form_builder_tests.UnitTests.Services
                 { element.Properties.QuestionId, "" },
             };
 
-            var result = await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
+            await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
 
             _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
         }
 
         [Fact]
@@ -208,10 +205,10 @@ namespace form_builder_tests.UnitTests.Services
                 { element.Properties.QuestionId, "streetname" },
             };
 
-            var result = await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
+            await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
 
             _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()), Times.Never);
+            _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Never);
             _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>()), Times.Never);
         }
 
@@ -264,10 +261,10 @@ namespace form_builder_tests.UnitTests.Services
                 { element.Properties.QuestionId, "new street search" },
             };
 
-            var result = await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
+            await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
 
             _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()), Times.Once);
+            _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
             _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>()), Times.Once);
         }
 
@@ -301,7 +298,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessStreet(viewModel, page, schema, "", "page-one"));
             _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
             Assert.StartsWith($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup, Exception: ", result.Message);
         }
     }

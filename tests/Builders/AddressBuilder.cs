@@ -5,25 +5,24 @@ namespace form_builder_tests.Builders
 {
     public class AddressBuilder
     {
-        private BaseProperty _property = new BaseProperty();
+        private readonly BaseProperty _property = new BaseProperty();
 
-        public Address Build()
+        public Address Build() => new Address
         {
-            return new Address
-            {
-                Properties = _property,
-            };
-        }
+            Properties = _property,
+        };
 
         public AddressBuilder WithPropertyText(string propertyText)
         {
             _property.Text = propertyText;
+
             return this;
         }
 
         public AddressBuilder WithQuestionId(string questionId)
         {
             _property.QuestionId = questionId;
+
             return this;
         }
     }

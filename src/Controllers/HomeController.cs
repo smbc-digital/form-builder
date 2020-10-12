@@ -1,17 +1,19 @@
-﻿using form_builder.Enum;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using form_builder.Attributes;
+using form_builder.Builders;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
-using form_builder.Workflows;
-using Microsoft.EntityFrameworkCore.Internal;
 using form_builder.ViewModels;
+using form_builder.Workflows;
+using form_builder.Workflows.ActionsWorkflow;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using form_builder.Workflows.ActionsWorkflow;
 
 namespace form_builder.Controllers
 {
@@ -23,13 +25,13 @@ namespace form_builder.Controllers
         private readonly IActionsWorkflow _actionsWorkflow;
         private readonly ISuccessWorkflow _successWorkflow;
         private readonly IFileUploadService _fileUploadService;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
         public HomeController(IPageService pageService,
             ISubmitWorkflow submitWorkflow,
             IPaymentWorkflow paymentWorkflow,
             IFileUploadService fileUploadService,
-            IHostingEnvironment hostingEnvironment, 
+            IWebHostEnvironment hostingEnvironment, 
             IActionsWorkflow actionsWorkflow, 
             ISuccessWorkflow successWorkflow)
         {
@@ -61,18 +63,24 @@ namespace form_builder.Controllers
             string path,
             string subPath = "")
         {
-            var response = await _pageService.ProcessPage(form, path, subPath);
+            var queryParamters = Request.Query;
+            var response = await _pageService.ProcessPage(form, path, subPath, queryParamters);
             if (response.ShouldRedirect)
-                return RedirectToAction("Index", new
-                {
-                    path = response.TargetPage,
-                    form
-                });
+            {
+                var routeValuesDictionary = new RouteValueDictionaryBuilder()
+                    .WithValue("path", response.TargetPage)
+                    .WithValue("form", form)
+                    .WithQueryValues(queryParamters)
+                    .Build();
+
+                return RedirectToAction("Index", routeValuesDictionary);
+            }
 
             return View(response.ViewName, response.ViewModel);
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(ValidateReCaptchaAttribute))]
         [Route("{form}")]
         [Route("{form}/{path}")]
         [Route("{form}/{path}/{subPath}")]
@@ -85,19 +93,19 @@ namespace form_builder.Controllers
         {
             var viewModel = formData.ToNormaliseDictionary(subPath);
 
-            if(fileUpload != null && fileUpload.Any())
+            if (fileUpload != null && fileUpload.Any())
                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
 
-            var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload);
+            var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload, ModelState.IsValid);
 
             if (currentPageResult.RedirectToAction && !string.IsNullOrWhiteSpace(currentPageResult.RedirectAction))
-                return RedirectToAction(currentPageResult.RedirectAction, currentPageResult.RouteValues != null ? currentPageResult.RouteValues : new { form, path });
+                return RedirectToAction(currentPageResult.RedirectAction, currentPageResult.RouteValues ?? new { form, path });
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
 
-            if (currentPageResult.Page.HasPageActions)
-                await _actionsWorkflow.Process(currentPageResult.Page.PageActions, null, form);
+            if (currentPageResult.Page.HasPageActionsPostValues)
+                await _actionsWorkflow.Process(currentPageResult.Page.PageActions.Where(_ => _.Properties.HttpActionType == EHttpActionType.Post).ToList(), null, form);
 
             var behaviour = _pageService.GetBehaviour(currentPageResult);
 
@@ -131,9 +139,8 @@ namespace form_builder.Controllers
         [Route("{form}/submit")]
         public async Task<IActionResult> Submit(string form)
         {
-            var result = await _submitWorkflow.Submit(form);
+            await _submitWorkflow.Submit(form);
 
-            TempData["reference"] = result;
             return RedirectToAction("Success", new
             {
                 form
@@ -147,7 +154,7 @@ namespace form_builder.Controllers
             var result = await _successWorkflow.Process(EBehaviourType.SubmitForm, form);
             
             var success = new SuccessViewModel {
-                Reference = (string)TempData["reference"],
+                Reference = result.CaseReference,
                 PageContent = result.HtmlContent,
                 FormAnswers = result.FormAnswers,
                 FormName = result.FormName,

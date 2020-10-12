@@ -1,40 +1,53 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Providers.StorageProvider;
+using form_builder.TagParser;
 using form_builder.ViewModels;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace form_builder.ContentFactory
 {
     public interface IPageFactory
     {
-        Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, List<object> results = null);
+        Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers = null, List<object> results = null);
     }
-    
+
     public class PageFactory : IPageFactory
     {
         private readonly IPageHelper _pageHelper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IHostingEnvironment _environment;
+        private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IEnumerable<ITagParser> _tagParsers;
 
-        public PageFactory(IPageHelper pageHelper, IHttpContextAccessor httpContextAccessor, IHostingEnvironment environment)
+        public PageFactory(IPageHelper pageHelper, IEnumerable<ITagParser> tagParsers, IDistributedCacheWrapper distributedCache)
         {
             _pageHelper = pageHelper;
-            _httpContextAccessor = httpContextAccessor;
-            _environment = environment;
+            _tagParsers = tagParsers;
+            _distributedCache = distributedCache;
         }
 
-        public async Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, List<object> results = null)
+        public async Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers = null, List<object> results = null)
         {
-            var result = await _pageHelper.GenerateHtml(page, viewModel, baseForm, sessionGuid, results);         
+            if(formAnswers == null){
+                var cachedAnswers = _distributedCache.GetString(sessionGuid);
+
+                formAnswers = cachedAnswers == null
+                    ? new FormAnswers { Pages = new List<PageAnswers>() }
+                    : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+            }
+
+            _tagParsers.ToList().ForEach(_ => _.Parse(page, formAnswers));
+            
+            var result = await _pageHelper.GenerateHtml(page, viewModel, baseForm, sessionGuid, formAnswers, results);
             result.Path = page.PageSlug;
             result.FormName = baseForm.FormName;
             result.PageTitle = page.Title;
             result.FeedbackForm = baseForm.FeedbackForm;
             result.FeedbackPhase = baseForm.FeedbackPhase;
-            result.HideBackButton = page.HideBackButton;
+            result.HideBackButton = (viewModel.IsAutomatic() || viewModel.IsManual()) ? false : page.HideBackButton;
             result.BreadCrumbs = baseForm.BreadCrumbs;
             result.DisplayBreadCrumbs = page.DisplayBreadCrumbs;
             result.StartPageUrl = baseForm.StartPageUrl;

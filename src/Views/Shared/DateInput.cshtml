@@ -22,9 +22,11 @@
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-    @Html.BeginFieldSet(Model, new string[] {"govuk-fieldset" })
+    @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
 
     <partial name="LegendH1" />
+
+    <partial name="InsetText" model="@Model.Properties.IAG" />
 
     <partial name="Hint" />
 
@@ -54,7 +56,7 @@
                 <label class="@labelClasses" for=@Model.GetCustomItemId("year")>
                     Year
                 </label>
-                @Html.TextBox(Model.GetCustomItemId("year"), Model.Properties.Year, new { autocomplete = "bday-year", maxlength = "4", type = "number", @class= inputClassesLong, max = maxYear })
+                @Html.TextBox(Model.GetCustomItemId("year"), Model.Properties.Year, new { autocomplete = "bday-year", maxlength = "4", type = "number", @class = inputClassesLong, max = maxYear })
             </div>
         </div>
     </div>

@@ -2,15 +2,17 @@
 @model form_builder.Models.Elements.Element
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-    @Html.BeginFieldSet(Model, new string[] {"govuk-fieldset" })
+    @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
 
-        <partial name="LegendH1" />
-        
-        <partial name="Hint" />
+    <partial name="LegendH1" />
 
-        <partial name="Error" />
+    <partial name="InsetText" model="@Model.Properties.IAG" />
 
-        <partial name="CheckboxOptions" />
+    <partial name="Hint" />
+
+    <partial name="Error" />
+
+    <partial name="CheckboxOptions" />
 
     @Html.EndFieldSet()
 </div>

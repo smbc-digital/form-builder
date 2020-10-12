@@ -8,11 +8,9 @@
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
     @if (@Model.Properties.StockportPostcode == true)
     {
-        <section class="govuk-inset-text">
-            <p>@Model.Properties.AddressIAG</p>
-        </section>
+        <partial name="InsetText" model="@Model.Properties.AddressIAG" />
     }
-    
+
     <partial name="LabelH1" />
 
     <partial name="Hint" />

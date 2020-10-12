@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using form_builder.Constants;
 
 namespace form_builder.Extensions
 {
@@ -37,8 +39,23 @@ namespace form_builder.Extensions
                     return string.Empty;
                 default:
                     throw new Exception("Unknown environment name");
-
             }
+        }
+
+        public static int ToReadableMaxFileSize(this int value)
+        {
+            var megaByteValue = value / SystemConstants.OneMBInBinaryBytes;
+            return Convert.ToInt32(megaByteValue);
+        }
+
+        public static string ToMaxSpecifiedStringLengthForFileName(this string value, int length)
+        {
+            if(value.Length <= length)
+                return value;
+
+            var extension = Path.GetExtension(value);
+
+            return $"{value.Substring(0, length - extension.Length)}{extension}";
         }
     }
 }

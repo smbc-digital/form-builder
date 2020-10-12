@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Models.Elements;
-using form_builder.Models;
 using form_builder.Extensions;
+using form_builder.Models;
+using form_builder.Models.Elements;
 
 namespace form_builder.Validators
 {
@@ -10,10 +11,10 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-
-            if (element.Type == EElementType.DateInput || element.Type == EElementType.Map || 
-                element.Type == EElementType.TimeInput || element.Type == EElementType.DatePicker || 
-                element.Properties.Optional || (element.Type == EElementType.Address && viewModel.IsManual()))
+            if (element.Type == EElementType.DateInput || element.Type == EElementType.Map ||
+                element.Type == EElementType.TimeInput || element.Type == EElementType.DatePicker ||
+                element.Type == EElementType.MultipleFileUpload || element.Properties.Optional || 
+                (element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
                 {
@@ -22,17 +23,16 @@ namespace form_builder.Validators
             }
 
             var key = element.Properties.QuestionId;
-
             var validationMessage = string.Empty;
 
             if (element.Type != EElementType.Address && element.Type != EElementType.Street && element.Type != EElementType.Organisation)
             {
-                validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the " + element.Properties.Label.ToLower() + " and try again";
+                validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the " + element.Properties.Label.ToLower();
             }
 
             if (element.Type == EElementType.FileUpload)
             {
-                key = $"{element.Properties.QuestionId}-fileupload";
+                key = $"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
             }
 
             if (element.Type == EElementType.Address)
@@ -45,7 +45,7 @@ namespace form_builder.Validators
                 else
                 {
                     key = $"{element.Properties.QuestionId}-postcode";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the postcode";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : ValidationConstants.POSTCODE_EMPTY;
 
                 }
             }
@@ -56,7 +56,6 @@ namespace form_builder.Validators
                 {
                     key = $"{element.Properties.QuestionId}-street";
                     validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Select the street from the list";
-
                 }
                 else
                 {
@@ -71,7 +70,6 @@ namespace form_builder.Validators
                 {
                     key = $"{element.Properties.QuestionId}-organisation";
                     validationMessage = !string.IsNullOrEmpty(element.Properties.SelectCustomValidationMessage) ? element.Properties.SelectCustomValidationMessage : "Select the organisation from the list";
-
                 }
                 else
                 {
@@ -83,21 +81,22 @@ namespace form_builder.Validators
             bool isValid;
             if (element.Type == EElementType.FileUpload)
             {
-                DocumentModel value = viewModel.ContainsKey(key)
+                List<DocumentModel> value = viewModel.ContainsKey(key)
                     ? viewModel[key]
                     : null;
 
                 isValid = !(value is null);
+                validationMessage = ValidationConstants.FILEUPLOAD_EMPTY;
             }
             else
             {
                 var value = viewModel.ContainsKey(key)
                 ? viewModel[key]
                 : null;
-                
+
                 isValid = !string.IsNullOrEmpty(value);
             }
-            
+
             return new ValidationResult
             {
                 IsValid = isValid,

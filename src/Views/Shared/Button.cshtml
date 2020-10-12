@@ -1,16 +1,12 @@
-﻿@model form_builder.Models.Elements.Element
-@{
-    @* TODO: Not sure what to do about spinners - have included double click protection from gds (Probably still needs js file refs for this to work) *@
-    @* TODO: Remove id once UX confirmed we don't need the spinner*@
-    @* var showSpinner = (bool)ViewData["showSpinner"]; *@
-    @* var displayAnchor = (bool)ViewData["displayAnchor"]; *@
-    @* var spinnerButton = showSpinner ? $"onclick=spinnerButton('{@Model.Properties.ButtonId}');" : null; *@
-}
+﻿@model form_builder.Models.Elements.Button
 
-<button 
-    data-prevent-double-click="true"
-    class="govuk-button @Model.Properties.ClassName"
-    id="@Model.Properties.ButtonId"
-    @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)>
+
+<button data-prevent-double-click="true"
+        @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
+        class="govuk-button @Model.Properties.ClassName"
+        id="@Model.Properties.ButtonId"
+        @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)
+        data-module="govuk-button">
     @Model.Properties.Text
 </button>
+

@@ -1,11 +1,10 @@
-﻿
-namespace form_builder.Enum
+﻿namespace form_builder.Enum
 {
     public enum ECondition
     {
         Undefined = 0,
         EqualTo,
-        CheckboxContains,
+        Contains,
         IsNullOrEmpty,
         IsBefore,
         IsAfter,
@@ -13,6 +12,7 @@ namespace form_builder.Enum
         LessThan,
         GreaterThanEqualTo,
         LessThanEqualTo,
-        EndsWith 
+        EndsWith,
+        Any
     }
 }

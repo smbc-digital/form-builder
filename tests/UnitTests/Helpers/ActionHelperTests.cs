@@ -4,9 +4,11 @@ using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Models;
+using form_builder.Models.Actions;
 using form_builder.Models.Properties.ActionProperties;
 using form_builder.Services.MappingService.Entities;
 using form_builder_tests.Builders;
+using Moq;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Helpers
@@ -47,7 +49,7 @@ namespace form_builder_tests.UnitTests.Helpers
                         }
                     }
             })
-                .Build();
+            .Build();
 
         private readonly FormSchema _formSchema = new FormSchemaBuilder()
             .WithStartPageUrl("page-one")
@@ -66,7 +68,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 },
                 Type = EActionType.UserEmail
             })
-        .Build();
+            .Build();
 
         public ActionHelperTests()
         {

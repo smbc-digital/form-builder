@@ -1,43 +1,42 @@
-﻿using form_builder.Enum;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Builders;
+using form_builder.ContentFactory;
+using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Providers.Organisation;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.OrganisationService;
 using form_builder_tests.Builders;
 using Moq;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Models.Enums;
-using Xunit;
 using StockportGovUK.NetStandard.Models.Organisation;
-using form_builder.Builders;
-using form_builder.Providers.Organisation;
-using form_builder.ContentFactory;
+using Xunit;
 
-namespace form_builder_tests.UnitTests.Services 
+namespace form_builder_tests.UnitTests.Services
 {
     public class OrganisationServiceTests
     {
         private readonly OrganisationService _service;
-        private OrganisationSearch _searchModel;
+        private readonly OrganisationSearch _searchModel;
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
         private readonly Mock<IOrganisationProvider> _organisationProvider = new Mock<IOrganisationProvider>();
-        private IEnumerable<IOrganisationProvider> _organisatioProviders;
+        private readonly IEnumerable<IOrganisationProvider> _organisationProviders;
         private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
 
         public OrganisationServiceTests()
         {
             _organisationProvider.Setup(_ => _.ProviderName).Returns("Fake");
-            _organisatioProviders = new List<IOrganisationProvider>
+            _organisationProviders = new List<IOrganisationProvider>
             {
                 _organisationProvider.Object
             };
 
-
-            _service = new OrganisationService(_mockDistributedCache.Object, _organisatioProviders, _pageHelper.Object, _mockPageContentFactory.Object);
+            _service = new OrganisationService(_mockDistributedCache.Object, _organisationProviders, _pageHelper.Object, _mockPageContentFactory.Object);
 
             _searchModel = new OrganisationSearch
             {
@@ -100,10 +99,10 @@ namespace form_builder_tests.UnitTests.Services
                 { element.Properties.QuestionId, "searchTerm" },
             };
 
-            var result = await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
+            await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
 
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
         }
 
         [Fact]
@@ -157,10 +156,10 @@ namespace form_builder_tests.UnitTests.Services
                 { element.Properties.QuestionId, "" },
             };
 
-            var result = await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
+            await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
 
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
         }
 
         [Fact]
@@ -215,10 +214,10 @@ namespace form_builder_tests.UnitTests.Services
                 { element.Properties.QuestionId, _searchModel.SearchTerm },
             };
 
-            var result = await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
+            await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
 
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()), Times.Never);
+            _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Never);
             _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>()), Times.Never);
         }
 
@@ -271,10 +270,10 @@ namespace form_builder_tests.UnitTests.Services
                 { element.Properties.QuestionId, _searchModel.SearchTerm },
             };
 
-            var result = await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
+            await _service.ProcessOrganisation(viewModel, page, schema, "", "page-one");
 
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()), Times.Once);
+            _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
             _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>()), Times.Once);
         }
 
@@ -308,7 +307,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessOrganisation(viewModel, page, schema, "", "page-one"));
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<List<object>>()), Times.Never);
+            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
             Assert.StartsWith($"OrganisationService.ProccessInitialOrganisation:: An exception has occured while attempting to perform organisation lookup, Exception: ", result.Message);
         }
     }

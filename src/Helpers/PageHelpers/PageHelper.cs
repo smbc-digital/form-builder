@@ -1,26 +1,27 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.Session;
 using form_builder.Models;
+using form_builder.Models.Actions;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
-using form_builder.Services.FileUploadService;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Dynamic;
-using form_builder.Models.Properties.ActionProperties;
 
 namespace form_builder.Helpers.PageHelpers
 {
@@ -30,16 +31,17 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IElementHelper _elementHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly ICache _cache;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
-        private readonly IFileUploadService _fileUploadService;
+        private readonly ISessionHelper _sessionHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
-            IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IHostingEnvironment enviroment, ICache cache,
-            IOptions<DistributedCacheExpirationConfiguration> distrbutedCacheExpirationConfiguration,
-            IEnumerable<IPaymentProvider> paymentProviders, IFileUploadService fileUploadService)
+            IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
+            IEnumerable<IPaymentProvider> paymentProviders, ISessionHelper sessionHelper, IHttpContextAccessor httpContextAccessor)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -47,9 +49,10 @@ namespace form_builder.Helpers.PageHelpers
             _disallowedKeys = disallowedKeys.Value;
             _environment = enviroment;
             _cache = cache;
-            _distributedCacheExpirationConfiguration = distrbutedCacheExpirationConfiguration.Value;
+            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _paymentProviders = paymentProviders;
-            _fileUploadService = fileUploadService;
+            _sessionHelper = sessionHelper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(
@@ -57,9 +60,10 @@ namespace form_builder.Helpers.PageHelpers
             Dictionary<string, dynamic> viewModel,
             FormSchema baseForm,
             string guid,
+            FormAnswers formAnswers,
             List<object> results = null)
         {
-            FormBuilderViewModel formModel = new FormBuilderViewModel();
+            var formModel = new FormBuilderViewModel();
 
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
@@ -73,21 +77,27 @@ namespace form_builder.Helpers.PageHelpers
                     page,
                     baseForm,
                     _environment,
-                    results);
+                    formAnswers,
+                    results
+                    );
 
             return formModel;
         }
 
-        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid)
+        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+            var currentPageAnswers = new PageAnswers();
 
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == viewModel["Path"].ToLower()))
+            {
+                currentPageAnswers = convertedAnswers.Pages.Where(_ => _.PageSlug == viewModel["Path"].ToLower()).ToList().FirstOrDefault();
                 convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageSlug != viewModel["Path"].ToLower()).ToList();
+            }
 
             var answers = new List<Answers>();
 
@@ -98,9 +108,11 @@ namespace form_builder.Helpers.PageHelpers
             }
 
             if (files != null && files.Any() && isPageValid)
-                answers = _fileUploadService.SaveFormFileAnswers(answers, files);
+            {
+                answers = SaveFormFileAnswers(answers, files, appendMultipleFileUploadParts, currentPageAnswers);
+            }
 
-            convertedAnswers.Pages.Add(new PageAnswers
+            convertedAnswers.Pages?.Add(new PageAnswers
             {
                 PageSlug = viewModel["Path"].ToLower(),
                 Answers = answers
@@ -109,12 +121,24 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.Path = viewModel["Path"];
             convertedAnswers.FormName = form;
 
-            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
+            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+        }
+
+        public void SaveCaseReference(string guid, string caseReference)
+        {
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+
+            if (!string.IsNullOrEmpty(formData))
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+            convertedAnswers.CaseReference = caseReference;
+            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
         public void HasDuplicateQuestionIDs(List<Page> pages, string formName)
         {
-            List<string> qIds = new List<string>();
+            var questionIds = new List<string>();
             foreach (var page in pages)
             {
                 foreach (var element in page.Elements)
@@ -135,13 +159,13 @@ namespace form_builder.Helpers.PageHelpers
                         && element.Type != EElementType.HR
                         )
                     {
-                        qIds.Add(element.Properties.QuestionId);
+                        questionIds.Add(element.Properties.QuestionId);
                     }
                 }
             }
 
             var hashSet = new HashSet<string>();
-            if (qIds.Any(id => !hashSet.Add(id)))
+            if (questionIds.Any(id => !hashSet.Add(id)))
                 throw new ApplicationException($"The provided json '{formName}' has duplicate QuestionIDs");
         }
 
@@ -196,18 +220,14 @@ namespace form_builder.Helpers.PageHelpers
                 .Select(_ => string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping)
                 .ToList();
 
-            questionIds.ForEach(_ =>
+            questionIds.ForEach(questionId =>
             {
                 var regex = new Regex(@"^[a-zA-Z.]+$", RegexOptions.IgnoreCase);
-                if (!regex.IsMatch(_.ToString()))
-                {
-                    throw new ApplicationException($"The provided json '{formName}' contains invalid QuestionIDs or TargetMapping, {_.ToString()} contains invalid characters");
-                }
+                if (!regex.IsMatch(questionId.ToString()))
+                    throw new ApplicationException($"The provided json '{formName}' contains invalid QuestionIDs or TargetMapping, {questionId} contains invalid characters");
 
-                if (_.ToString().EndsWith(".") || _.ToString().StartsWith("."))
-                {
-                    throw new ApplicationException($"The provided json '{formName}' contains invalid QuestionIDs or TargetMapping, {_.ToString()} contains invalid characters");
-                }
+                if (questionId.ToString().EndsWith(".") || questionId.ToString().StartsWith("."))
+                    throw new ApplicationException($"The provided json '{formName}' contains invalid QuestionIDs or TargetMapping, {questionId} contains invalid characters");
             });
         }
 
@@ -221,7 +241,7 @@ namespace form_builder.Helpers.PageHelpers
                 if (item.SubmitSlugs.Count <= 0) continue;
 
                 var foundEnvironmentSubmitSlug = false;
-                foreach (var subItem in item.SubmitSlugs.Where(subItem => subItem.Environment.ToLower() == _environment.EnvironmentName.ToS3EnvPrefix().ToLower()))
+                foreach (var subItem in item.SubmitSlugs.Where(subItem => subItem.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower())))
                 {
                     foundEnvironmentSubmitSlug = true;
                 }
@@ -279,17 +299,39 @@ namespace form_builder.Helpers.PageHelpers
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
             if (!string.IsNullOrEmpty(formData))
-            {
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-            }
 
             if (convertedAnswers.FormData.ContainsKey(key))
-            {
                 convertedAnswers.FormData.Remove(key);
-            }
+
             convertedAnswers.FormData.Add(key, value);
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
+
+        public void SaveNonQuestionAnswers(Dictionary<string, object> values, string form, string path, string guid)
+        {
+            if(!values.Any())
+                return;
+
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+
+            convertedAnswers.FormName = form;
+            convertedAnswers.Path = path;
+
+            if (!string.IsNullOrEmpty(formData))
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+            values.ToList().ForEach((_) => {
+            if (convertedAnswers.AdditionalFormData.ContainsKey(_.Key))
+                convertedAnswers.AdditionalFormData.Remove(_.Key);
+
+                convertedAnswers.AdditionalFormData.Add(_.Key, _.Value);
+            });
+
+            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+        }
+
 
         public void CheckForDocumentDownload(FormSchema formSchema)
         {
@@ -298,11 +340,11 @@ namespace form_builder.Helpers.PageHelpers
             if (formSchema.DocumentType.Any())
             {
                 if (formSchema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
-                    throw new ApplicationException($"PageHelper::CheckForDocumentDownload, Unknown document download type configured");
+                    throw new ApplicationException("PageHelper::CheckForDocumentDownload, Unknown document download type configured");
             }
             else
             {
-                throw new ApplicationException($"PageHelper::CheckForDocumentDownload, No document download type configured");
+                throw new ApplicationException("PageHelper::CheckForDocumentDownload, No document download type configured");
             }
         }
 
@@ -314,51 +356,14 @@ namespace form_builder.Helpers.PageHelpers
                     .ToList()
                     .ForEach(x => x.IncomingValues.ForEach(_ =>
                         {
+                             if (_.HttpActionType.Equals(EHttpActionType.Unknown))
+                                throw new Exception("PageHelper::CheckForIncomingFormDataValues, EHttpActionType cannot be unknwon, set to Get or Post");
+
                             if (string.IsNullOrEmpty(_.QuestionId) || string.IsNullOrEmpty(_.Name))
                                 throw new Exception("PageHelper::CheckForIncomingFormDataValues, QuestionId or Name cannot be empty");
                         }
                     ));
             }
-        }
-
-        public Dictionary<string, dynamic> AddIncomingFormDataValues(Page page, Dictionary<string, dynamic> formData)
-        {
-            page.IncomingValues.ForEach(_ =>
-            {
-                var containsValue = formData.ContainsKey(_.Name);
-
-                if (!_.Optional && !containsValue)
-                    throw new Exception($"DictionaryExtensions::IncomingValue, FormData does not contains {_.Name} required value");
-
-                if (!containsValue) return;
-
-                formData = RecursiveCheckAndCreate(_.QuestionId, formData[_.Name], formData);
-                formData.Remove(_.Name);
-            });
-
-            return formData;
-        }
-
-        private IDictionary<string, dynamic> RecursiveCheckAndCreate(string targetMapping, string value, IDictionary<string, dynamic> obj)
-        {
-            var splitTargets = targetMapping.Split(".");
-
-            if (splitTargets.Length == 1)
-            {
-                obj.Add(splitTargets[0], value);
-                return obj;
-            }
-
-            object subObject;
-            if (!obj.TryGetValue(splitTargets[0], out subObject))
-                subObject = new ExpandoObject();
-
-            subObject = RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), value, subObject as IDictionary<string, dynamic>);
-
-            obj.Remove(splitTargets[0]);
-            obj.Add(splitTargets[0], subObject);
-
-            return obj;
         }
 
         public void CheckForPageActions(FormSchema formSchema)
@@ -375,9 +380,14 @@ namespace form_builder.Helpers.PageHelpers
                 .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
                 .Where(_ => _.Type == EActionType.RetrieveExternalData)).ToList();
 
+            var validateActions = formSchema.FormActions.Where(_ => _.Type.Equals(EActionType.Validate))
+               .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
+               .Where(_ => _.Type == EActionType.Validate)).ToList();
+
             CheckEmailAction(userEmail);
             CheckEmailAction(backOfficeEmail);
             CheckRetrieveExternalDataAction(retrieveExternalDataActions);
+            CheckValidateAction(validateActions);
         }
 
         private void CheckEmailAction(List<IAction> actions)
@@ -401,6 +411,26 @@ namespace form_builder.Helpers.PageHelpers
             });
         }
 
+        private void CheckValidateAction(List<IAction> actions)
+        {
+            if (!actions.Any())
+                return;
+
+            actions.ForEach(action =>
+            {
+                var foundSlug = action.Properties.PageActionSlugs.FirstOrDefault(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+
+                if (foundSlug == null)
+                    throw new ApplicationException($"PageHelper:CheckValidateAction, Validate there is no PageActionSlug for {_environment.EnvironmentName}");
+
+                if (string.IsNullOrEmpty(foundSlug.URL))
+                    throw new ApplicationException("PageHelper:CheckValidateAction, Validate action type does not contain a url");
+
+                if (action.Properties.HttpActionType == EHttpActionType.Unknown)
+                    throw new ApplicationException("PageHelper:CheckValidateAction, Validate action type does not contain 'Unknown'");
+            });
+        }
+
         private void CheckRetrieveExternalDataAction(List<IAction> actions)
         {
             if (!actions.Any())
@@ -414,11 +444,127 @@ namespace form_builder.Helpers.PageHelpers
                     throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction there is no PageActionSlug for {_environment.EnvironmentName}");
 
                 if (string.IsNullOrEmpty(foundSlug.URL))
-                    throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url");
+                    throw new ApplicationException("PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a url");
 
                 if (string.IsNullOrEmpty(action.Properties.TargetQuestionId))
-                    throw new ApplicationException($"PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a TargetQuestionId");
+                    throw new ApplicationException("PageHelper:CheckRetrieveExternalDataAction, RetrieveExternalDataAction action type does not contain a TargetQuestionId");
             });
+        }
+
+        public void CheckRenderConditionsValid(List<Page> pages)
+        {
+            var groups = pages.GroupBy(_ => _.PageSlug, (key, g) => new { Slug = key, Pages = g.ToList() });
+
+            foreach (var group in groups)
+            {
+                if (group.Pages.Count(_ => !_.HasRenderConditions) > 1)
+                    throw new ApplicationException($"PageHelper:CheckRenderConditionsValid, More than one {@group.Slug} page has no render conditions");
+            }
+        }
+
+        public Page GetPageWithMatchingRenderConditions(List<Page> pages)
+        {
+            var guid = _sessionHelper.GetSessionGuid();
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = !string.IsNullOrEmpty(formData)
+                ? JsonConvert.DeserializeObject<FormAnswers>(formData)
+                : new FormAnswers {Pages = new List<PageAnswers>()};
+
+            var answers = convertedAnswers.Pages.SelectMany(_ => _.Answers).ToDictionary(_ => _.QuestionId, _ => _.Response);
+
+            return pages.FirstOrDefault(page => page.CheckPageMeetsConditions(answers));
+        }
+
+        public void CheckAddressNoManualTextIsSet(List<Page> pages)
+        {
+            var addressElements = pages.Where(_ => _.Elements != null)
+                .SelectMany(_ => _.Elements)
+                .Where(_ => _.Type == EElementType.Address)
+                .Where(_ => _.Properties.DisableManualAddress)
+                .ToList();
+
+            addressElements.ForEach(element => {
+                if (string.IsNullOrWhiteSpace(element.Properties.NoManualAddressDetailText))
+                    throw new ApplicationException("AddressElement:DisableManualAddress set to true, NoManualAddressDetailText must have value");
+            });
+        }
+
+        public void CheckForAnyConditionType(List<Page> pages)
+        {
+            var anyConditionType = new List<Condition>();
+
+            var anyConditionTypeRenderConditions = pages.Where(_ => _.Behaviours != null)
+                .SelectMany(_ => _.Behaviours)
+                .Where(_ => _.Conditions != null)
+                .SelectMany(_ => _.Conditions)
+                .Where(_ => _.ConditionType == ECondition.Any)
+                .ToList();
+
+            var anyConditionTypeBehaviours = pages.Where(_ => _.RenderConditions != null)
+                .SelectMany(_ => _.RenderConditions)
+                .Where(_ => _.ConditionType == ECondition.Any)
+                .ToList();
+
+            anyConditionType.AddRange(anyConditionTypeRenderConditions);
+            anyConditionType.AddRange(anyConditionTypeBehaviours);
+
+            if (anyConditionType.Any())
+            {
+                anyConditionType.ForEach(condition =>
+                {
+                    if (string.IsNullOrEmpty(condition.ComparisonValue))
+                        throw new ApplicationException("PageHelper:CheckForAnyConditionType, any condition type requires a comparison value");
+                });
+            }
+
+        }
+
+        public List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload)
+        {
+            files.GroupBy(_ => _.QuestionId).ToList().ForEach(file =>
+            {
+                var fileUploadModel = new List<FileUploadModel>();
+                var filsToAdd = file.ToList();
+                if(isMultipleFileUploadElementType)
+                {
+                    var data = currentAnswersForFileUpload.Answers?.FirstOrDefault(_ => _.QuestionId.Equals(file.Key))?.Response;
+                    if(data != null){
+                        List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(data.ToString());
+                        fileUploadModel.AddRange(response);
+                        filsToAdd = filsToAdd.Where(_ => !response.Any(x => WebUtility.HtmlEncode(_.UntrustedOriginalFileName) == x.TrustedOriginalFileName)).ToList();
+                    }
+                }
+
+                var keys = filsToAdd.Select(_ => $"file-{file.Key}-{Guid.NewGuid()}").ToArray();
+
+                var fileContent = filsToAdd.Select(_ => _.Base64EncodedContent).ToList();
+
+                for (int i = 0; i < fileContent.Count; i++)
+                {
+                     _distributedCache.SetStringAsync(keys[i], JsonConvert.SerializeObject(fileContent[i]), _distributedCacheExpirationConfiguration.FileUpload);
+                }
+
+                fileUploadModel.AddRange(filsToAdd.Select((_, index) => new FileUploadModel
+                {
+                    Key = keys[index],
+                    TrustedOriginalFileName = WebUtility.HtmlEncode(_.UntrustedOriginalFileName),
+                    UntrustedOriginalFileName = _.UntrustedOriginalFileName,
+                    FileSize = _.Length
+                }).ToList());
+
+                if (answers.Exists(_ => _.QuestionId == file.Key))
+                {
+                    var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId == file.Key);
+                    if (fileUploadAnswer != null)
+                        fileUploadAnswer.Response = fileUploadModel;
+                }
+                else
+                {
+                    answers.Add(new Answers { QuestionId = file.Key, Response = fileUploadModel });
+                }
+            });
+
+            return answers;
         }
     }
 }

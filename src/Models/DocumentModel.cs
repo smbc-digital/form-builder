@@ -3,6 +3,9 @@
     public class DocumentModel
     {
         public string Content { get; set; }
+
         public long FileSize { get; set; }
+
+        public string FileName { get; set; }
     }
 }

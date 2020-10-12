@@ -1,5 +1,11 @@
-﻿using form_builder.Configuration;
+﻿using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Threading.Tasks;
+using form_builder.Configuration;
 using form_builder.Enum;
+using form_builder.Extensions;
+using form_builder.Factories.Schema;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -7,13 +13,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Models.FileManagement;
-using form_builder.Factories.Schema;
-using form_builder.Extensions;
 
 namespace form_builder.Services.MappingService
 {
@@ -43,10 +43,8 @@ namespace form_builder.Services.MappingService
         public async Task<MappingEntity> Map(string sessionGuid, string form)
         {
             var baseForm = await _schemaFactory.Build(form);
-
             var formData = _distributedCache.GetString(sessionGuid);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
             convertedAnswers.FormName = form;
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
 
@@ -66,6 +64,9 @@ namespace form_builder.Services.MappingService
                 .ToList()
                 .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
 
+            if(formAnswers.AdditionalFormData.Any())
+                data = AddNonQuestionAnswers(data, formAnswers.AdditionalFormData);
+
             return data;
         }
 
@@ -75,7 +76,7 @@ namespace form_builder.Services.MappingService
 
             if (splitTargets.Length == 1)
             {
-                if (element.Type == EElementType.FileUpload)
+                if (element.Type == EElementType.FileUpload || element.Type == EElementType.MultipleFileUpload)
                     return CheckAndCreateForFileUpload(splitTargets[0], element, formAnswers, obj);
 
                 object answerValue = _elementMapper.GetAnswerValue(element, formAnswers);
@@ -113,26 +114,30 @@ namespace form_builder.Services.MappingService
             if (obj.TryGetValue(target, out objectValue))
             {
                 var files = (List<File>) objectValue;
-
                 if (value != null)
                 {
                     obj.Remove(target);
-                    files.Add((File) value);
+                    files.AddRange((List<File>) value);
                     obj.Add(target, files);
                 }
+
                 return obj;
             }
             else
-            {
-                var files = new List<File>();
+            {            
                 if (value != null)
                 {
-                    files.Add((File) value);
-                    obj.Add(target, files);
+                    obj.Add(target, (List<File>)value);
                 }
             }
 
             return obj;
+        }
+
+        private IDictionary<string, dynamic> AddNonQuestionAnswers(IDictionary<string, dynamic> currentData, Dictionary<string, object> newData)
+        {
+            newData.ToList().ForEach(x => currentData.Add(x.Key, x.Value));
+            return currentData;
         }
     }
 }

@@ -1,4 +1,8 @@
-﻿using form_builder.Constants;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.ContentFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -8,10 +12,6 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace form_builder.Services.StreetService
 {
@@ -27,7 +27,11 @@ namespace form_builder.Services.StreetService
         private readonly IEnumerable<IStreetProvider> _streetProviders;
         private readonly IPageFactory _pageFactory;
 
-        public StreetService(IDistributedCacheWrapper distributedCache, IEnumerable<IStreetProvider> streetProviders, IPageHelper pageHelper, IPageFactory pageFactory)
+        public StreetService(
+            IDistributedCacheWrapper distributedCache, 
+            IEnumerable<IStreetProvider> streetProviders, 
+            IPageHelper pageHelper, 
+            IPageFactory pageFactory)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
@@ -81,7 +85,7 @@ namespace form_builder.Services.StreetService
             {
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
 
-                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
+                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, cachedSearchResults.ToList());
 
                 return new ProcessRequestEntity
                 {
@@ -125,7 +129,7 @@ namespace form_builder.Services.StreetService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid);
+                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers);
 
                 return new ProcessRequestEntity
                 {
@@ -176,7 +180,7 @@ namespace form_builder.Services.StreetService
             catch (Exception e)
             {
                 throw new ApplicationException($"PageHelper.ProccessInitialStreet: An exception has occured while attempting to generate Html, Exception: {e.Message}");
-            };
+            }
         }
     }
 }

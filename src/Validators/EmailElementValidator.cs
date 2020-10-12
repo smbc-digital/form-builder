@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using form_builder.Constants;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators
@@ -8,7 +9,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            if(element.Properties.Email != true)
+            if (element.Properties.Email != true)
             {
                 return new ValidationResult
                 {
@@ -24,18 +25,17 @@ namespace form_builder.Validators
                 };
             }
 
-            if ((!element.Properties.Email.HasValue || !element.Properties.Email.Value) || !viewModel.ContainsKey(element.Properties.QuestionId))
+            if (!element.Properties.Email.HasValue || !element.Properties.Email.Value || !viewModel.ContainsKey(element.Properties.QuestionId))
             {
-                return new ValidationResult{
+                return new ValidationResult
+                {
                     IsValid = true
                 };
             }
-        
+
             var value = viewModel[element.Properties.QuestionId];
-
             var isValid = true;
-            var regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
-
+            var regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w)+)+)$");
             Match match = regex.Match(value);
 
             if (!match.Success)
@@ -43,11 +43,11 @@ namespace form_builder.Validators
                 isValid = false;
             }
 
-            return new ValidationResult {
+            return new ValidationResult
+            {
                 IsValid = isValid,
-                Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter an email address in the correct format, like name@example.com"
-        };          
-
+                Message = ValidationConstants.EMAIL_INCORRECT_FORMAT
+            };
         }
     }
 }

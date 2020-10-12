@@ -1,26 +1,27 @@
-﻿using form_builder.Cache;
-using form_builder.Configuration;
-using form_builder.Enum;
-using form_builder.Providers.PaymentProvider;
-using form_builder.Services.PayService;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Moq;
-using StockportGovUK.NetStandard.Gateways;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using form_builder.Cache;
+using form_builder.Configuration;
+using form_builder.Enum;
+using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
-using form_builder.Services.MappingService;
-using Microsoft.AspNetCore.Hosting;
-using Xunit;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
+using form_builder.Providers.PaymentProvider;
+using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
+using form_builder.Services.PayService;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Moq;
+using StockportGovUK.NetStandard.Gateways;
+using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -35,12 +36,13 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
 
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistrbutedCacheExpirationSettings
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings
             = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
 
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
-        private readonly Mock<IHostingEnvironment> _mockHostingEnvironment = new Mock<IHostingEnvironment>();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnvironment = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
 
         public PayServiceTests()
         {
@@ -81,7 +83,7 @@ namespace form_builder_tests.UnitTests.Services
                     }
                 });
 
-            _mockDistrbutedCacheExpirationSettings.Setup(_ => _.Value).Returns(
+            _mockDistributedCacheExpirationSettings.Setup(_ => _.Value).Returns(
                 new DistributedCacheExpirationConfiguration
                 {
                     UserData = 30,
@@ -132,8 +134,8 @@ namespace form_builder_tests.UnitTests.Services
 
             _service = new PayService(_mockPaymentProvider.Object, _mockLogger.Object, _mockGateway.Object,
                 _mockCache.Object,
-                _mockDistrbutedCacheExpirationSettings.Object, _mockSessionHelper.Object, _mockMappingService.Object,
-                _mockHostingEnvironment.Object);
+                _mockDistributedCacheExpirationSettings.Object, _mockSessionHelper.Object, _mockMappingService.Object,
+                _mockHostingEnvironment.Object, _mockPageHelper.Object);
         }
 
         private static MappingEntity GetMappingEntityData()
@@ -143,7 +145,7 @@ namespace form_builder_tests.UnitTests.Services
                 AuthToken = "testToken",
                 Environment = "local",
                 URL = "customer-pay",
-                CallbackUrl = "ddjshfkfjhk"
+                CallbackUrl = "callbackUrl"
             };
 
             var formAnswers = new FormAnswers
@@ -174,9 +176,28 @@ namespace form_builder_tests.UnitTests.Services
             return mappingEntity;
         }
 
+        private static readonly Behaviour Behaviour = new BehaviourBuilder()
+            .WithBehaviourType(EBehaviourType.SubmitAndPay)
+            .WithPageSlug("test-test")
+            .WithSubmitSlug(new SubmitSlug
+            {
+                URL = "test",
+                AuthToken = "test",
+                Environment = "local",
+                CallbackUrl = "test"
+            })
+            .Build();
+
+        private static readonly Page Page = new PageBuilder()
+            .WithBehaviour(Behaviour)
+            .WithPageSlug("test")
+            .Build();
+
         [Fact]
         public async Task ProcessPayment_ShouldThrowException_WhenPaymentConfig_IsNull()
         {
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
+
             var result = await Assert.ThrowsAsync<Exception>(() =>
                 _service.ProcessPayment(GetMappingEntityData(), "nonexistanceform", "page-one", "12345", "guid"));
 
@@ -186,6 +207,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPayment_ShouldThrowException_WhenPaymentProvider_IsNull()
         {
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
+
             var result = await Assert.ThrowsAsync<Exception>(() =>
                 _service.ProcessPayment(GetMappingEntityData(), "testFormwithnovalidpayment", "page-one", "12345",
                     "guid"));
@@ -196,6 +219,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPayment_ShouldCallPaymentProvider_And_ReturnUrl()
         {
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
+
             _paymentProvider.Setup(_ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(), It.IsAny<PaymentInformation>()))
                 .ReturnsAsync("url");
@@ -211,6 +236,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowException_WhenPaymentConfig_IsNull()
         {
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
+
             var result = await Assert.ThrowsAsync<Exception>(() =>
                 _service.ProcessPaymentResponse("nonexistanceform", "12345", "reference"));
 
@@ -220,6 +247,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowException_WhenPaymentProvider_IsNull()
         {
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
+
             var result = await Assert.ThrowsAsync<Exception>(() =>
                 _service.ProcessPaymentResponse("nonexistanceform", "12345", "reference"));
 
@@ -229,6 +258,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldThrowException_WhenPaymentProviderThrows()
         {
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
+
             _paymentProvider.Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
                 .Throws<Exception>();
 
@@ -239,6 +270,8 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPaymentResponse_ShouldReturnPaymentReference_OnSuccessfull_PaymentProviderCall()
         {
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
+
             var result = await _service.ProcessPaymentResponse("testForm", "12345", "reference");
 
             Assert.IsType<string>(result);

@@ -10,23 +10,36 @@
     @if (Model.Properties.LabelAsH1)
     {
         <partial name="LabelH1" />
-
         <partial name="ChangeSearch" />
     }
     else
     {
         <partial name="ChangeSearch" />
-
         <partial name="LabelH1" />
     }
 
-
     <partial name="Hint" />
-
     <partial name="Error" />
 
     @Html.DropDownList(@Model.QuestionId, @Model.Items, elementProperties)
-    <p class="smbc-body govuk-link govuk-!-margin-top-5">
-        <a class="govuk-link" href="@Model.ManualAddressURL">@Model.Properties.AddressManualLinkText</a>
-    </p>
+
+    @if (Model.Properties.DisableManualAddress)
+    {
+        <details class="govuk-details govuk-!-margin-top-5" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    I can't find my address in the list
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                @Model.Properties.NoManualAddressDetailText
+            </div>
+        </details>
+    }
+    else
+    {
+        <p class="smbc-body govuk-link govuk-!-margin-top-5">
+            <a class="govuk-link" href="@Model.ManualAddressURL">@Model.Properties.AddressManualLinkText</a>
+        </p>
+    }
 </div>

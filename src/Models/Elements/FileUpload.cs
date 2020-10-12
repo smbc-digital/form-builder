@@ -1,11 +1,10 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Internal;
-using form_builder.Constants;
 
 namespace form_builder.Models.Elements
 {
@@ -16,47 +15,46 @@ namespace form_builder.Models.Elements
             Type = EElementType.FileUpload;
         }
 
-        public override string QuestionId => $"{base.QuestionId}-fileupload";
+        public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
 
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
             var allowedFileType = Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
-            var convertedMaxFileSize = Properties.MaxFileSize * 1024000;
+            var convertedMaxFileSize = Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes;
             var appliedMaxFileSize = convertedMaxFileSize > 0 && convertedMaxFileSize < SystemConstants.DefaultMaxFileSize 
                                 ? convertedMaxFileSize 
                                 : SystemConstants.DefaultMaxFileSize;
 
-            var properties = new Dictionary<string, dynamic>()
+            var properties = new Dictionary<string, dynamic>
             {
                 { "name", QuestionId },
                 { "id", QuestionId },
                 { "type", "file" },
-                { "accept", allowedFileType.Join(",") },
+                { "accept", string.Join(',', allowedFileType)},
                 { "max-file-size", appliedMaxFileSize },
-                { "onchange", "window.SMBCFrontend.ValidateSize(this)" }
+                { "data-module", "smbc-file-upload" }
             };
 
             if (DisplayAriaDescribedby)
-            {
                 properties.Add("aria-describedby", GetDescribedByAttributeValue());
-            }
 
             return properties;
         }
 
-        public override Task<string> RenderAsync(
-            IViewRender viewRender,
+        public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
-            IHostingEnvironment environment,
+            IWebHostEnvironment environment,
+            FormAnswers formAnswers,
             List<object> results = null)
         {
-            elementHelper.CurrentValue<string>(this, viewModel, page.PageSlug, guid, string.Empty);
+            elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, string.Empty);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
     }

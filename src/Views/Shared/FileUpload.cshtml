@@ -2,12 +2,14 @@
 @{
     var sizeValidationError = $"{Model.QuestionId}-fileSizeError";
     var elements = Model.GenerateElementProperties();
-    elements.Add("class", "govuk-file-upload");
+    elements.Add("class", "smbc-file-upload");
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
 
     <partial name="LabelH1" />
+
+    <partial name="InsetText" model="@Model.Properties.IAG" />
 
     <partial name="Hint" />
 

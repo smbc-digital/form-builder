@@ -11,24 +11,29 @@ namespace form_builder.Models.Elements
     public class Map : Element
     {
         public string MainJSFile => $"{Properties.Source}/main-latest.js";
+
         public string VendorJSFIle => $"{Properties.Source}/vendor-latest.js";
+
         public Map()
         {
             Type = EElementType.Map;
         }
 
-        public override Task<string> RenderAsync(
-            IViewRender viewRender,
+        public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
-            IHostingEnvironment environment,
+            IWebHostEnvironment environment,
+            FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Value = JsonConvert.SerializeObject(elementHelper.CurrentValue<object>(this, viewModel, page.PageSlug, guid));
+            Properties.Value = JsonConvert.SerializeObject(elementHelper.CurrentValue<object>(this, viewModel, formAnswers, page.PageSlug, guid));
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
+
+        public override string GetLabelText() => "Map";
     }
 }

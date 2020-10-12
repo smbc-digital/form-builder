@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using form_builder.Cache;
+using form_builder.Configuration;
+using form_builder.Middleware;
+using form_builder.ModelBinders.Providers;
+using form_builder.Utils.ServiceCollectionExtensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using form_builder.Extensions;
-using form_builder.Configuration;
+using Microsoft.Extensions.Hosting;
 using StockportGovUK.AspNetCore.Middleware.App;
-using StockportGovUK.NetStandard.Gateways;
-using form_builder.Cache;
-using form_builder.ModelBinders.Providers;
-using System.Globalization;
-using form_builder.Middleware;
 
 namespace form_builder
 {
@@ -21,9 +21,9 @@ namespace form_builder
     {
         public IConfiguration Configuration { get; }
 
-        public IHostingEnvironment HostingEnvironment { get; }
+        public IWebHostEnvironment HostingEnvironment { get; }
 
-        public Startup(IConfiguration configuration, IHostingEnvironment env)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
             HostingEnvironment = env;
@@ -32,15 +32,20 @@ namespace form_builder
         public void ConfigureServices(IServiceCollection services)
         {
             CultureInfo.CurrentCulture = new CultureInfo("en-GB");
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-GB");
+            services.AddControllersWithViews();
+            services.AddRazorPages();
+
             services
                 .ConfigureCookiePolicy()
                 .AddValidators()
+                .AddTagParsers()
                 .AddStorageProvider(Configuration)
                 .AddSchemaProvider(HostingEnvironment)
                 .AddTransformDataProvider(HostingEnvironment)
                 .AddAmazonS3Client(Configuration.GetSection("AmazonS3Configuration")["AccessKey"], Configuration.GetSection("AmazonS3Configuration")["SecretKey"])
                 .AddSesEmailConfiguration(Configuration.GetSection("Ses")["Accesskey"], Configuration.GetSection("Ses")["Secretkey"])
-                .AddGateways()
+                .AddGateways(Configuration)
                 .AddIOptionsConfiguration(Configuration)
                 .ConfigureAddressProviders()
                 .ConfigureOrganisationProviders()
@@ -49,28 +54,31 @@ namespace form_builder
                 .ConfigureDocumentCreationProviders()
                 .ConfigureEmailProviders(HostingEnvironment)
                 .AddHelpers()
+                .AddAttributes()
                 .AddServices()
                 .AddWorkflows()
                 .AddFactories()
-                .AddSession(_ => {
+                .AddAntiforgery(_ => _.Cookie.Name = ".formbuilder.antiforgery.v2")
+                .AddSession(_ =>
+                {
                     _.IdleTimeout = TimeSpan.FromMinutes(30);
                     _.Cookie.Path = "/";
+                    _.Cookie.Name = ".formbuilder.v2";
                 });
-                
+
             services.AddTransient<ICache, Cache.Cache>();
             services.Configure<SubmissionServiceConfiguration>(Configuration.GetSection("SubmissionServiceConfiguration"));
             services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
+
             services.AddMvc()
-                .AddMvcOptions(options => {
+                .AddMvcOptions(options =>
+                {
                     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                     options.ModelBinderProviders.Insert(0, new CustomFormFileModelBinderProvider());
-                })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
+                });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsEnvironment("local") || env.IsEnvironment("uitest"))
             {
@@ -87,12 +95,12 @@ namespace form_builder
             app.UseSession();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+                endpoints.MapControllerRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+                    pattern: "{controller=Home}/{action=Index}/{id?}")
+            );
         }
     }
 }

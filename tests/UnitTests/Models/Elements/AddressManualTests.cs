@@ -1,14 +1,16 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Moq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Models.Elements
@@ -17,7 +19,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
     {
         private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
-        private readonly Mock<IHostingEnvironment> _mockHostingEnv = new Mock<IHostingEnvironment>();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
         public AddressManualTests()
         {
@@ -36,13 +39,13 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithElement(element)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add(AddressManualConstants.POSTCODE, "sk11aa");
+            var viewModel = new Dictionary<string, dynamic> {{AddressManualConstants.POSTCODE, "sk11aa"}};
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
             //Act
             var result = await element.RenderAsync(
                 _mockIViewRender.Object,
@@ -51,11 +54,12 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 viewModel,
                 page,
                 schema,
-                _mockHostingEnv.Object);
+                _mockHostingEnv.Object,
+                formAnswers);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressManual"), It.IsAny<form_builder.Models.Elements.AddressManual>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-            _mockElementHelper.Verify(_ => _.CurrentValue<string>(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()), Times.Exactly(4));
+            _mockElementHelper.Verify(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>()), Times.Exactly(4));
         }
 
         [Fact]
@@ -81,6 +85,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
+            var formAnswers = new FormAnswers();
             //Act
             var result = await element.RenderAsync(
                 _mockIViewRender.Object,
@@ -89,8 +94,10 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 viewModel,
                 page,
                 schema,
-                _mockHostingEnv.Object, 
-                new List<object>());
+                _mockHostingEnv.Object,
+                formAnswers,
+            new List<object>()
+                );
 
             //Assert
             Assert.True(callbackElement.Properties.DisplayNoResultsIAG);

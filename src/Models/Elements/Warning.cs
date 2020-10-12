@@ -1,9 +1,10 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Models.Elements
 {
@@ -20,10 +21,12 @@ namespace form_builder.Models.Elements
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
-            IHostingEnvironment environment,
+            IWebHostEnvironment environment,
+            FormAnswers formAnswers,
             List<object> results = null)
         {
             elementHelper.CheckIfLabelAndTextEmpty(this);
+
             return viewRender.RenderAsync(Type.ToString(), this);
         }
     }

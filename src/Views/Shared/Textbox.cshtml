@@ -4,38 +4,35 @@
     var elements = Model.GenerateElementProperties();
     var baseCssClasses = "govuk-input";
 
-    switch(Model.Properties.Width)
+    switch (Model.Properties.Width)
     {
-        case ESize.Small: 
+        case ESize.Small:
             baseCssClasses += " govuk-input--width-3";
             break;
-            
-        case ESize.Medium: 
+
+        case ESize.Medium:
             baseCssClasses += " govuk-input--width-5";
             break;
 
-        case ESize.Large: 
+        case ESize.Large:
             baseCssClasses += " govuk-input--width-10";
             break;
-        
-        case ESize.ExtraLarge: 
+
+        case ESize.ExtraLarge:
             baseCssClasses += " govuk-input--width-20";
             break;
     }
 
-    if (!Model.IsValid)
-    {
-        elements.Add("class", $"{baseCssClasses} govuk-input--error");
-    }
-    else
-    {
-        elements.Add("class", baseCssClasses);
-    }
+    elements.Add("class", !Model.IsValid
+        ? $"{baseCssClasses} govuk-input--error"
+        : baseCssClasses);
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
 
     <partial name="LabelH1" />
+
+    <partial name="InsetText" model="@Model.Properties.IAG" />
 
     <partial name="Hint" />
 

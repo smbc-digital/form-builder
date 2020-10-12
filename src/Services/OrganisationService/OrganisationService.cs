@@ -1,4 +1,8 @@
-﻿using form_builder.Constants;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.ContentFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -8,10 +12,6 @@ using form_builder.Providers.Organisation;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace form_builder.Services.OrganisationService
 {
@@ -71,6 +71,7 @@ namespace form_builder.Services.OrganisationService
             if (currentPage.IsValid && organisationElement.Properties.Optional && string.IsNullOrEmpty(organisation))
             {
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+
                 return new ProcessRequestEntity
                 {
                     Page = currentPage
@@ -80,8 +81,7 @@ namespace form_builder.Services.OrganisationService
             if (!currentPage.IsValid)
             {
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
-
-                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, cachedSearchResults.ToList());
+                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, cachedSearchResults.ToList());
 
                 return new ProcessRequestEntity
                 {
@@ -117,6 +117,7 @@ namespace form_builder.Services.OrganisationService
             if (currentPage.IsValid && organisationElement.Properties.Optional && string.IsNullOrEmpty(organisation))
             {
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+
                 return new ProcessRequestEntity
                 {
                     Page = currentPage
@@ -125,7 +126,7 @@ namespace form_builder.Services.OrganisationService
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid);
+                var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers);
 
                 formModel.Path = currentPage.PageSlug;
                 formModel.FormName = baseForm.FormName;

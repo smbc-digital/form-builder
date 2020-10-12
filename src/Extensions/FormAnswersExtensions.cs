@@ -1,7 +1,7 @@
-﻿﻿using form_builder.Enum;
-using form_builder.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using form_builder.Enum;
+using form_builder.Models;
 
 namespace form_builder.Extensions
 {
@@ -22,17 +22,25 @@ namespace form_builder.Extensions
             string currentPageSlug,
             List<PageAnswers> reducedAnswers)
         {
+            var page = new Page();
             var currentAnswer = answers.Find(_ => _.PageSlug.Equals(currentPageSlug));
             if (currentAnswer == null)
                 return reducedAnswers;
 
-            var currentSchema = schema.Find(_ => _.PageSlug.Equals(currentPageSlug));
+            var currentSchema = schema.FindAll(_ => _.PageSlug.Equals(currentPageSlug));
             if (currentSchema == null)
                 return reducedAnswers;
 
+            page = currentSchema.Count > 1 
+                ? currentSchema.FirstOrDefault(page => page.CheckPageMeetsConditions(answersDictionary))
+                : currentSchema.FirstOrDefault();
+
+            if(page == null)
+               return reducedAnswers;
+
             reducedAnswers.Add(currentAnswer);
 
-            var behaviour = currentSchema.GetNextPage(answersDictionary);
+            var behaviour = page.GetNextPage(answersDictionary);
             if (behaviour.BehaviourType != EBehaviourType.GoToPage)
                 return reducedAnswers;
 
