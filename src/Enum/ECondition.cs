@@ -6,6 +6,7 @@
         EqualTo,
         Contains,
         IsNullOrEmpty,
+        IsFileUploadNullOrEmpty,
         IsBefore,
         IsAfter,
         GreaterThan,

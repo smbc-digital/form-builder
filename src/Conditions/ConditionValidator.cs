@@ -14,6 +14,7 @@ namespace form_builder.Conditions
             { ECondition.IsBefore, DateComparator.DateIsBefore },
             { ECondition.IsAfter, DateComparator.DateIsAfter },
             { ECondition.IsNullOrEmpty, StringComparator.IsNullOrEmpty },
+            { ECondition.IsFileUploadNullOrEmpty, FileUploadComparator.IsFileUploadNullOrEmpty },
             { ECondition.EqualTo, StringComparator.IsEqualTo },
             { ECondition.Contains, StringComparator.Contains },
             { ECondition.GreaterThan, IntegerComparator.IsGreaterThan },
