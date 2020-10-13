@@ -107,7 +107,7 @@ namespace form_builder.Services.PageService
 
             var formData = _distributedCache.GetString(sessionGuid);
 
-            if (formData == null && path != baseForm.FirstPageSlug)
+            if (formData == null && path != baseForm.FirstPageSlug && !baseForm.HasDocumentUpload)
                 return new ProcessPageEntity
                 {
                     ShouldRedirect = true,
