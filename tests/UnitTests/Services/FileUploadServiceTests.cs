@@ -411,5 +411,51 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal(JsonConvert.SerializeObject(expectedRouteValues), JsonConvert.SerializeObject(result.RouteValues));
             Assert.Null(result.Page);
         }
+
+        [Fact]
+        public async Task ProcessFile_ProcessSelectedFiles_ShouldSave_WhenMUltipleFileUpload_IsOptional_WithNoFiles_OnSubmit()
+        {
+
+            var _element = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId("fileUpload")
+                .WithOptional(true)
+                .Build();
+
+            var _page = new PageBuilder()
+                .WithElement(_element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var _schema = new FormSchemaBuilder()
+                .WithPage(_page)
+                .WithBaseUrl("baseUrl")
+                .Build();
+
+
+            // Arrange
+            var expectedRouteValues = new
+            {
+                form = "baseUrl",
+                path = "path"
+            };
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {
+                    "Submit", "Submit"
+                }
+            };
+
+            // Act
+            var result = await _service.ProcessFile(viewModel, _page, _schema, new Guid().ToString(),
+                "path", null, true);
+
+            // Assert
+            Assert.IsType<ProcessRequestEntity>(result);
+            Assert.False(result.RedirectToAction);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), null, true, true), Times.Once);
+        }
     }
 }
