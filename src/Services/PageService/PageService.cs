@@ -26,6 +26,7 @@ using form_builder.Workflows.ActionsWorkflow;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Expressions;
 using Newtonsoft.Json;
 
 namespace form_builder.Services.PageService
@@ -107,7 +108,7 @@ namespace form_builder.Services.PageService
 
             var formData = _distributedCache.GetString(sessionGuid);
 
-            if (formData == null && path != baseForm.FirstPageSlug && !baseForm.HasDocumentUpload)
+            if (formData == null && path != baseForm.FirstPageSlug && (!baseForm.HasDocumentUpload || path != FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH))
                 return new ProcessPageEntity
                 {
                     ShouldRedirect = true,
