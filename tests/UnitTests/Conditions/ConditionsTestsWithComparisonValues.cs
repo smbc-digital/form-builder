@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using form_builder.Conditions;
 using form_builder.Enum;
 using form_builder.Models;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Conditions
@@ -143,7 +144,7 @@ namespace form_builder_tests.UnitTests.Conditions
         }
 
         [Fact]
-        public void IsFile_Null_Or_Empty_Should_Return_True()
+        public void IsFileNullOrEmpty_Should_Return_True()
         {
             // Arrange
             var viewModel = new Dictionary<string, dynamic>
@@ -159,12 +160,25 @@ namespace form_builder_tests.UnitTests.Conditions
         }
 
         [Fact]
-        public void IsFile_Not_Null_Or_Empty_Should_Return_False()
+        public void IsFileNullOrEmpty_Should_Return_False()
         {
             // Arrange
+            var file = new List<FileUploadModel>
+            {
+                new FileUploadModel
+                {
+                    Key = "file-File-fileupload-cf03afbd-4b3d-48f0-a803-b252441aa93f",
+                    Content = null,
+                    TrustedOriginalFileName = "All shook up cast.jpg",
+                    UntrustedOriginalFileName = "All shook up cast.jpg",
+                    FileSize = 88717,
+                    FileName = null
+                }
+            };
+
             var viewModel = new Dictionary<string, dynamic>
             {
-                { "test-fileupload", "123456" }
+                { "test-fileupload", JsonConvert.SerializeObject(file) }
             };
 
             var condition1 = new Condition { ComparisonValue = "true", QuestionId = "test", ConditionType = ECondition.IsFileUploadNullOrEmpty };
