@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Enum;
@@ -67,8 +68,11 @@ namespace form_builder_tests.UnitTests.Cache
         public async Task TaskGetFromCacheOrDirectlyFromSchemaAsync_ShouldReturnDataWhenFoundInCache()
         {
             // Arrange
+
+            var _pages = new List<Page>();
+            var schema = new FormSchema() { Pages = _pages };
             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormSchema()));
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(schema));
 
             // Act
             var result = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>("testform", 10, ESchemaType.FormJson);
@@ -85,9 +89,11 @@ namespace form_builder_tests.UnitTests.Cache
         public async Task TaskGetFromCacheOrDirectlyFromSchemaAsync_ShouldCheckForData_InCache_Then_CallAndSetDataUsingSchema()
         {
             // Arrange
+            var _pages = new List<Page>();
+            var schema = new FormSchema() { Pages = _pages };
             var minutes = 10;
             _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
-                .ReturnsAsync(new FormSchema());
+                .ReturnsAsync(schema);
 
             // Act
             var result = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<FormSchema>("testform", minutes, ESchemaType.FormJson);
