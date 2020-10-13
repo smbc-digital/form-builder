@@ -141,5 +141,37 @@ namespace form_builder_tests.UnitTests.Conditions
             // Act & Assert
             Assert.True(conditionValidator.IsValid(condition1, viewModel));
         }
+
+        [Fact]
+        public void IsFile_Null_Or_Empty_Should_Return_True()
+        {
+            // Arrange
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { "test-fileupload", null }
+            };
+
+            var condition1 = new Condition { ComparisonValue = "true", QuestionId = "test", ConditionType = ECondition.IsFileUploadNullOrEmpty };
+            var conditionValidator = new ConditionValidator();
+
+            // Act & Assert
+            Assert.True(conditionValidator.IsValid(condition1, viewModel));
+        }
+
+        [Fact]
+        public void IsFile_Not_Null_Or_Empty_Should_Return_False()
+        {
+            // Arrange
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { "test-fileupload", "123456" }
+            };
+
+            var condition1 = new Condition { ComparisonValue = "true", QuestionId = "test", ConditionType = ECondition.IsFileUploadNullOrEmpty };
+            var conditionValidator = new ConditionValidator();
+
+            // Act & Assert
+            Assert.False(conditionValidator.IsValid(condition1, viewModel));
+        }
     }
 }
