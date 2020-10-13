@@ -8,10 +8,9 @@ namespace form_builder.Conditions
     {
         public static bool IsFileUploadNullOrEmpty(Condition condition, Dictionary<string, dynamic> viewModel)
         {
-            var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? bool.Parse(condition.ComparisonValue) : condition.IsNullOrEmpty;
-            var questionId = condition.QuestionId += FileUploadConstants.SUFFIX;
+            var questionId = $"{condition.QuestionId}{FileUploadConstants.SUFFIX}";
 
-            return viewModel.ContainsKey(questionId) && (viewModel[questionId] == null) == val;
+            return viewModel.ContainsKey(questionId) && (viewModel[questionId] == null) == bool.Parse(condition.ComparisonValue);
         }
     }
 }
