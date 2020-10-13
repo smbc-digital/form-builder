@@ -29,7 +29,7 @@ namespace form_builder.Models.Elements
 
             Properties.DocumentUploadUrl = elementHelper.GenerateDocumentUploadUrl(this, formSchema, formAnswers);
 
-            return viewRender.RenderAsync("DocumentUpload", this);
+            return viewRender.RenderAsync(Type.ToString(), this);
         }
     }
 }
