@@ -789,6 +789,52 @@ namespace form_builder_tests.UnitTests.Helpers
                 Times.Once);
         }
 
+        
+        [Fact]
+        public void SaveAnswers_ShouldSave_CurrentPageAnswer_WhenNoFilesSelected_And_PageAlreadyHasData_ForMultipleFileUpload()
+        {
+            // Arrange
+            var callbackValue = string.Empty;
+            var mockData = JsonConvert.SerializeObject(new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers 
+                    {
+                        PageSlug = "page-two",
+                        Answers = new List<Answers> 
+                        {
+                            new Answers 
+                            {
+                                QuestionId = "fileupload",
+                                Response = JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel() })
+                            }
+                        }
+                    }
+                }
+            });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(mockData);
+
+            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, string, CancellationToken>((x,y,z) => callbackValue = y);
+
+            var viewModel = new Dictionary<string, dynamic> { { "Path", "page-two" } };
+
+            // Act
+            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true, true);
+
+            // Arrange
+            _mockDistributedCache.Verify(
+                _ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+                Times.Once);
+            var result = JsonConvert.DeserializeObject<FormAnswers>(callbackValue);
+            Assert.Single(result.Pages);
+            Assert.Single(result.Pages.FirstOrDefault().Answers);
+        }
+
         [Fact]
         public void DuplicateIDs_ShouldThrowException_IfDuplicateQuestionIDsInJSON()
         {
