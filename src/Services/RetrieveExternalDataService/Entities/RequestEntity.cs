@@ -1,6 +1,6 @@
 ﻿namespace form_builder.Services.RetrieveExternalDataService.Entities
 {
-    public class ExternalDataEntity
+    public class RequestEntity
     {
         public bool IsPost { get; set; }
 
