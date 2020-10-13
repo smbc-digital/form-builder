@@ -566,7 +566,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ShouldGetTheRightStartPageUrl()
+        public async Task ProcessPage_ShouldGetTheRightStartPageUrl_IfNoDocumentUpload()
         {
             //Arrange
             var element = new ElementBuilder()
@@ -602,6 +602,59 @@ namespace form_builder_tests.UnitTests.Services
 
             //Act
             var result = await _service.ProcessPage("form", "page-one", "", new QueryCollection());
+
+            //Assert
+            Assert.Equal(viewModel.StartPageUrl, result.ViewModel.StartPageUrl);
+        }
+
+        [Fact]
+        public async Task ProcessPage_ShouldGetTheRightStartPageUrl_IfHasDocumentUpload_AndPathNotDocumentUpload()
+        {
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("test-textbox")
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId("file")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var documentUploadPage = new PageBuilder()
+                .WithElement(element2)
+                .WithPageSlug("document-upload")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithPage(documentUploadPage)
+                .WithBaseUrl("form")
+                .WithStartPageUrl("page-one")
+                .Build();
+
+            var viewModel = new FormBuilderViewModel
+            {
+                StartPageUrl = "https://www.test.com/form/page-one"
+            };
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(viewModel);
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            //Act
+            var result = await _service.ProcessPage("form", "fake-path", "", new QueryCollection());
 
             //Assert
             Assert.Equal(viewModel.StartPageUrl, result.ViewModel.StartPageUrl);
