@@ -1,7 +1,7 @@
 {
-  "name": "cypress-test",
+  "name": "form-builder-visual-tests",
   "version": "1.0.0",
-  "description": "If not you will need to;",
+  "description": "Formbuilder visual test suite",
   "main": "index.js",
   "scripts": {
     "start": "npm run cypress:open",
