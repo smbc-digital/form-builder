@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "form-builder", "src\form-builder.csproj", "{D2141371-AD95-4456-BCB6-DE6D575FC757}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "form-builder-tests-unit", "tests\form-builder-tests-unit.csproj", "{B0899AB2-6568-4C17-A26B-513B6F8F85F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "form-builder-tests-unit", "tests\unit-tests\form-builder-tests-unit.csproj", "{B0899AB2-6568-4C17-A26B-513B6F8F85F2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "form-builder-tests-ui", "form-builder-tests-ui\form-builder-tests-ui.csproj", "{DF407808-3D50-4C22-8CFF-22FEFA4F4568}"
 EndProject
