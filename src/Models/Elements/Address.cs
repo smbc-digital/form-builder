@@ -70,7 +70,7 @@ namespace form_builder.Models.Elements
                     {
                         Properties = Properties
                     };
-                    return await manualAddressElement.RenderAsync(viewRender, elementHelper, guid, viewModel, page, formSchema, environment, new FormAnswers(), results);
+                    return await manualAddressElement.RenderAsync(viewRender, elementHelper, guid, viewModel, page, formSchema, environment, formAnswers, results);
 
                 case LookUpConstants.Automatic:
                     IsSelect = true;
