@@ -64,13 +64,13 @@ namespace form_builder.Models.Elements
             switch (subPath as string)
             {
                 case LookUpConstants.Automatic:
-                    Properties.Value = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, string.Empty);
+                    Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
                     IsSelect = true;
                     ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
                                 ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
                                 : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
 
-                    var selectedOrganisation = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, OrganisationConstants.SELECT_SUFFIX);
+                    var selectedOrganisation = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, OrganisationConstants.SELECT_SUFFIX);
                     Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} organisations found", string.Empty) };
 
                     results?.ForEach(objectResult =>
@@ -88,7 +88,7 @@ namespace form_builder.Models.Elements
                     return await viewRender.RenderAsync("OrganisationSelect", this);
 
                 default:
-                    Properties.Value = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, string.Empty);
+                    Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
                     var test = await viewRender.RenderAsync("OrganisationSearch", this);
 
                     return test;

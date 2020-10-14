@@ -25,9 +25,9 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Hours = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, TimeConstants.HOURS_SUFFIX);
-            Properties.Minutes = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, TimeConstants.MINUTES_SUFFIX);
-            Properties.AmPm = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, TimeConstants.AM_PM_SUFFIX);
+            Properties.Hours = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, TimeConstants.HOURS_SUFFIX);
+            Properties.Minutes = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, TimeConstants.MINUTES_SUFFIX);
+            Properties.AmPm = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, TimeConstants.AM_PM_SUFFIX);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
 
