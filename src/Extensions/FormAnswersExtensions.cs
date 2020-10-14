@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models;
 
@@ -12,7 +14,7 @@ namespace form_builder.Extensions
                 answer.Pages,
                 answer.Pages.SelectMany(_ => _.Answers).ToDictionary(x => x.QuestionId, x => x.Response),
                 schema.Pages,
-                schema.FirstPageSlug,
+                !String.IsNullOrEmpty(answer.Path) && answer.Path.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH)  ? answer.Path : schema.FirstPageSlug,
                 new List<PageAnswers>());
 
         private static List<PageAnswers> RecursivelyReduceAnswers(

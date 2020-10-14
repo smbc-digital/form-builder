@@ -131,6 +131,7 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldReturn_False_ValidationResult_When_Single_File_InMultipleUpload_IsOverLimit()
         {
             // Arrange
+            var fileName = "test.jpg";
             var element = new ElementBuilder()
                 .WithType(EElementType.MultipleFileUpload)
                 .WithQuestionId("fileuploadquestion")
@@ -142,7 +143,7 @@ namespace form_builder_tests.UnitTests.Validators
                 { $"fileuploadquestion{FileUploadConstants.SUFFIX}", new List<DocumentModel> { 
                     new DocumentModel { FileSize = 1048576 } ,
                     new DocumentModel { FileSize = 1048576 },
-                    new DocumentModel { FileSize = 4048576 }
+                    new DocumentModel { FileSize = 4048576, FileName = fileName }
                 }}
             };
 
@@ -151,7 +152,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Equal($"The selected file must be smaller than 3MB", result.Message);
+            Assert.Equal($"{fileName} must be smaller than 3MB", result.Message);
         }
 
         [Fact]
