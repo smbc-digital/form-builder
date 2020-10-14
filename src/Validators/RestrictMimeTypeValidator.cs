@@ -66,14 +66,14 @@ namespace form_builder.Validators
 
             return element.Type == EElementType.FileUpload
                ? SingleFileUpload(allowedFileTypes, documentModel)
-               : MultiFileUpload(allowedFileTypes, invalidFiles);            
+               : MultiFileUpload(allowedFileTypes, invalidFiles, documentModel);            
         }
 
-        private ValidationResult MultiFileUpload(List<string> allowedFileTypes, List<MimeTypeFile> invalidFiles)
+        private ValidationResult MultiFileUpload(List<string> allowedFileTypes, List<MimeTypeFile> invalidFiles, List<DocumentModel> documentModel)
         {
             var fileTypesErrorMessage = allowedFileTypes.ToReadableFileType();
 
-            var validationMessage = invalidFiles.Count == 1
+            var validationMessage = documentModel.Count == 1
                 ? $"The selected file must be a {fileTypesErrorMessage}."
                 : invalidFiles.Select(_ => $"{_.File.FileName} must be a {fileTypesErrorMessage}.").Aggregate((curr, acc) => $"{acc} <br/> {curr}");
 
