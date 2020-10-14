@@ -12,7 +12,9 @@ describe('Address', () => {
   });
 
   it('Address Manual', () => {
-    cy.visit('https://localhost:5000/ui-address/page1/manual');
+    cy.visit('https://localhost:5000/ui-address');
+    cy.get('.govuk-input').type('sk11zz');
+    cy.get('.govuk-button').click();
     cy.matchImageSnapshot('addressManual');
   });
 });
