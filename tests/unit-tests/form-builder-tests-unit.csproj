@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\form-builder.csproj" />
+    <ProjectReference Include="..\..\src\form-builder.csproj" />
   </ItemGroup>
 
 </Project>
