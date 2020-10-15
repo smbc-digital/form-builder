@@ -107,10 +107,11 @@ namespace form_builder.Helpers.PageHelpers
                     answers.Add(new Answers { QuestionId = item.Key, Response = item.Value });
             }
 
+            if((files == null || !files.Any()) && currentPageAnswers.Answers != null && currentPageAnswers.Answers.Any() && isPageValid && appendMultipleFileUploadParts)
+                answers = currentPageAnswers.Answers;
+
             if (files != null && files.Any() && isPageValid)
-            {
                 answers = SaveFormFileAnswers(answers, files, appendMultipleFileUploadParts, currentPageAnswers);
-            }
 
             convertedAnswers.Pages?.Add(new PageAnswers
             {

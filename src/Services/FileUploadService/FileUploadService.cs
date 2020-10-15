@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.ContentFactory;
+using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
@@ -117,6 +118,9 @@ namespace form_builder.Services.FileUploadService
 
             if(currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files == null || !files.Any()) && modelStateIsValid)
             {
+                if(currentPage.Elements.Where(_ => _.Type.Equals(EElementType.MultipleFileUpload)).Any(_ => _.Properties.Optional))
+                    _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
+                    
                 return new ProcessRequestEntity
                 {
                     Page = currentPage

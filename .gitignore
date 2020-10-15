@@ -372,3 +372,6 @@ MigrationBackup/
 form-builder-tests-ui/Screenshots/
 
 src/DSL/
+
+#cypress videos
+tests/visual-tests/cypress/videos/
