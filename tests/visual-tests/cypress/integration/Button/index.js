@@ -1,5 +1,5 @@
-describe('Address', () => {
-    it('Address search', () => {
+describe('Button', () => {
+    it('Button', () => {
       cy.visit('ui-button');
       cy.matchImageSnapshot('button');
     });

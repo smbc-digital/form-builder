@@ -1,5 +1,5 @@
-describe('Address', () => {
-    it('Address search', () => {
+describe('Checkbox', () => {
+    it('Checkbox', () => {
       cy.visit('ui-checkbox');
       cy.matchImageSnapshot('checkbox');
     });
