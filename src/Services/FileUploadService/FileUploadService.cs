@@ -152,6 +152,21 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
+            if (!modelStateIsValid)
+            {
+                var newViewModel = new Dictionary<string, dynamic>();
+                newViewModel.Add("modelStateInvalid", null);
+
+                var formModel = await _pageFactory.Build(currentPage, newViewModel, baseForm, guid);
+
+                return new ProcessRequestEntity
+                {
+                    Page = currentPage,
+                    ViewModel = formModel,
+                    UseGeneratedViewModel = true
+                };
+            }
+
             return new ProcessRequestEntity
             {
                 RedirectToAction = true,
