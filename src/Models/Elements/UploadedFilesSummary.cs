@@ -28,19 +28,12 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            var currentMultiFileUpload = page.Elements.First(_ => _.Type.Equals(EElementType.MultipleFileUpload));
+            Properties.ClassName ??= "smbc-!-font-word-break";
 
-            var fileUploadElements = formSchema.Pages
-                .SelectMany(_ => _.ValidatableElements)
-                .Where(_ => _.Type == EElementType.MultipleFileUpload && _.Properties.QuestionId != currentMultiFileUpload.Properties.QuestionId)
-                .Select(_ => _.Properties.QuestionId)
-                .ToList();
-                
-            if(fileUploadElements.Any()) 
+            if(Properties.FileUploadQuestionIds.Any()) 
             {
-                Properties.ClassName = "";
-                fileUploadElements.ForEach((questionId) => {
-                    var model = elementHelper.CurrentValue<JArray>(questionId, viewModel, formAnswers, FileUploadConstants.SUFFIX);
+                Properties.FileUploadQuestionIds.ForEach((questionId) => {
+                    var model = elementHelper.CurrentValue<JArray>(questionId.ToLower(), viewModel, formAnswers, FileUploadConstants.SUFFIX);
 
                     if(model != null && model.Any()){
                         List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(model.ToString());

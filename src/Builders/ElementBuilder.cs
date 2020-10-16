@@ -324,5 +324,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithFileUploadQuestionIds(List<string> value)
+        {
+            _property.FileUploadQuestionIds = value;
+
+            return this;
+        }
     }
 }

@@ -568,5 +568,20 @@ namespace form_builder.Helpers.PageHelpers
 
             return answers;
         }
+
+        public void CheckUploadedFilesSummaryQuestionsIsSet(List<Page> pages)
+        {
+            var fileSummaryElements = pages.SelectMany(_ => _.Elements)
+                .Where(_ => _.Type.Equals(EElementType.UploadedFilesSummary))
+                .ToList();
+
+            if(fileSummaryElements.Any()){
+                fileSummaryElements.ForEach((element) => {
+                    if(!element.Properties.FileUploadQuestionIds.Any()){
+                        throw new ApplicationException("PageHelper:CheckUploadedFilesSummaryQuestionsIsSet, Uploaded files summary must have atleast one file questionId specified to display the list of uploaded files.");
+                    }
+                });
+            }
+        }
     }
 }
