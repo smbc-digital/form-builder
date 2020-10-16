@@ -33,7 +33,7 @@ namespace form_builder.Models.Elements
             if(Properties.FileUploadQuestionIds.Any()) 
             {
                 Properties.FileUploadQuestionIds.ForEach((questionId) => {
-                    var model = elementHelper.CurrentValue<JArray>(questionId.ToLower(), viewModel, formAnswers, FileUploadConstants.SUFFIX);
+                    var model = elementHelper.CurrentValue<JArray>(questionId, viewModel, formAnswers, FileUploadConstants.SUFFIX);
 
                     if(model != null && model.Any()){
                         List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(model.ToString());

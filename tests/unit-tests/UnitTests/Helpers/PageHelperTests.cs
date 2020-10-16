@@ -2355,6 +2355,31 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
+        public void CheckUploadedFilesSummaryQuestionsIsSet_ShouldThrowException_WhenElementDoNotContain_Required_Text()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.UploadedFilesSummary)
+                .WithPropertyText(string.Empty)
+                .WithFileUploadQuestionIds(new List<string>{ "" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(pages));
+
+            // Assert
+            Assert.Equal("PageHelper:CheckUploadedFilesSummaryQuestionsIsSet, Uploaded files summary text must not be empty.", result.Message);
+        }
+
+        [Fact]
         public void CheckUploadedFilesSummaryQuestionsIsSet_ShouldNot_ThrowException_WhenElement_Has_RequiredFileUpload_QuestionIds()
         {
             // Arrange

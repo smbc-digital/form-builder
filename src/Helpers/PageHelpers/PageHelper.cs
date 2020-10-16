@@ -577,9 +577,11 @@ namespace form_builder.Helpers.PageHelpers
 
             if(fileSummaryElements.Any()){
                 fileSummaryElements.ForEach((element) => {
-                    if(!element.Properties.FileUploadQuestionIds.Any()){
+                    if(string.IsNullOrEmpty(element.Properties.Text))
+                        throw new ApplicationException("PageHelper:CheckUploadedFilesSummaryQuestionsIsSet, Uploaded files summary text must not be empty.");
+
+                    if(!element.Properties.FileUploadQuestionIds.Any())
                         throw new ApplicationException("PageHelper:CheckUploadedFilesSummaryQuestionsIsSet, Uploaded files summary must have atleast one file questionId specified to display the list of uploaded files.");
-                    }
                 });
             }
         }
