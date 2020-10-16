@@ -38,7 +38,9 @@ namespace form_builder.Models.Elements
 
         public bool DisplayAriaDescribedby => DisplayHint || !IsValid; 
 
-        public bool IsValid => validationResult.IsValid; 
+        public bool IsValid => validationResult.IsValid;
+
+        public bool IsModelStateValid { get; set; } = true;
 
         public string ValidationMessage => validationResult.Message;
 

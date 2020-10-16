@@ -349,15 +349,9 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessFile_ProcessSelectedFiles_ShouldReturnCorrectProcessRequestEntity_IfFilesExistAndIsSubmittingButModelStateInvalid()
+        public async Task ProcessFile_ProcessSelectedFiles_ShouldReturnCorrectProcessRequestEntity_IfSubmittingWithModelStateInvalid()
         {
             // Arrange
-            var expectedRouteValues = new
-            {
-                form = "baseUrl",
-                path = "path"
-            };
-
             var viewModel = new Dictionary<string, dynamic>
             {
                 {
@@ -377,21 +371,30 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             Assert.IsType<ProcessRequestEntity>(result);
-            Assert.True(result.RedirectToAction);
-            Assert.Equal("Index", result.RedirectAction);
-            Assert.Equal(JsonConvert.SerializeObject(expectedRouteValues), JsonConvert.SerializeObject(result.RouteValues));
-            Assert.Null(result.Page);
+            Assert.False(result.RedirectToAction);
+            Assert.NotNull(result.Page);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), fileUpload, true, true), Times.Once);
         }
-
+       
         [Fact]
-        public async Task ProcessFile_ProcessSelectedFiles_ShouldReturnCorrectProcessRequestEntity_IfNoFilesExistAndIsSubmittingButModelStateInvalid()
+        public async Task ProcessFile_ProcessSelectedFiles_ShouldCallPageFactory_IfModelStateInvalid()
         {
             // Arrange
-            var expectedRouteValues = new
-            {
-                form = "baseUrl",
-                path = "path"
-            };
+            var element = new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithQuestionId("fileUpload")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithBaseUrl("baseUrl")
+                .Build();
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -401,15 +404,13 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             // Act
-            var result = await _service.ProcessFile(viewModel, _page, _schema, new Guid().ToString(),
-                "path", null, false);
+            var result = await _service.ProcessFile(viewModel, page, schema,
+                new Guid().ToString(), It.IsAny<string>(), null, false);
 
             // Assert
+            _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), null), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
-            Assert.True(result.RedirectToAction);
-            Assert.Equal("Index", result.RedirectAction);
-            Assert.Equal(JsonConvert.SerializeObject(expectedRouteValues), JsonConvert.SerializeObject(result.RouteValues));
-            Assert.Null(result.Page);
+            Assert.True(result.UseGeneratedViewModel);
         }
 
         [Fact]
