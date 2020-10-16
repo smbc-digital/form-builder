@@ -63,6 +63,7 @@ namespace form_builder.Models.Elements
             var currentAnswer = elementHelper.CurrentValue<JArray>(this, viewModel, formAnswers, page.PageSlug, guid, FileUploadConstants.SUFFIX);
 
             SubmitButtonText = SetSubmitButtonText(page);
+            IsModelStateValid = !viewModel.ContainsKey("modelStateInvalid");
 
             if(currentAnswer != null){
                 List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(currentAnswer.ToString());

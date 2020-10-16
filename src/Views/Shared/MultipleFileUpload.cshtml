@@ -11,6 +11,7 @@
         ? $"{baseCssClasses} govuk-input--error smbc-input--file-error "
         : baseCssClasses);
     var uploadButtonCss = Model.DisplaySubmitButton ? "govuk-button govuk-button--secondary" : "govuk-button";
+    var recaptchaClasses = Model.IsModelStateValid ? "g-recaptcha smbc-recaptcha" : "g-recaptcha smbc-recaptcha govuk-input--error";
 }
 
 <partial name="LabelH1" />
@@ -58,7 +59,7 @@
 
 @if (Model.CurrentFilesUploaded.Any() && Model.Properties.DisplayReCaptcha)
 {
-    <div class="g-recaptcha smbc-recaptcha" data-sitekey="@Config.Value.SiteKey"></div>
+    <div class="@recaptchaClasses" data-sitekey="@Config.Value.SiteKey"></div>
 }
 
 <button data-prevent-double-click="true"
