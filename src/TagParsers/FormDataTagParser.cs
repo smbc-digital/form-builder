@@ -18,7 +18,7 @@ namespace form_builder.TagParser
 
             page.Elements.Select((element) =>
             {
-                if (!string.IsNullOrEmpty(element.Properties.Text))
+                if (!string.IsNullOrEmpty(element.Properties?.Text))
                     element.Properties.Text = Parse(element.Properties.Text, answersDictionary, Regex);
                     
                 return element;
