@@ -1,0 +1,23 @@
+{
+  "name": "form-builder-visual-tests",
+  "version": "1.0.0",
+  "description": "Formbuilder visual test suite",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run cypress:open",
+    "cypress:open": "cypress open",
+    "cypress:run-chrome": "cypress run --browser chrome",
+    "cypress": "cypress run"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@cypress/mocha-teamcity-reporter": "^1.0.0",
+    "cypress": "^3.3.2",
+    "cypress-image-snapshot": "^3.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smbc-digital/form-builder.git"
+  }
+}

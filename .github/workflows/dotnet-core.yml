@@ -40,4 +40,4 @@ jobs:
       run: dotnet build ./src/form-builder.csproj --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test ./tests/form-builder-tests-unit.csproj
+      run: dotnet test ./tests/unit-tests/form-builder-tests-unit.csproj
