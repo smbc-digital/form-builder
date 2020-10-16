@@ -60,11 +60,6 @@
 @if (Model.CurrentFilesUploaded.Any() && Model.Properties.DisplayReCaptcha)
 {
     <div class="@recaptchaClasses" data-sitekey="@Config.Value.SiteKey"></div>
-    <noscript>
-        <p class="smbc-body">
-            You cannot use this form without javascript.
-        </p>
-    </noscript>
 }
 
 <button data-prevent-double-click="true"
