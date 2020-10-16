@@ -2337,6 +2337,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var pages = new List<Page>();
 
             var element = new ElementBuilder()
+                .WithPropertyText("label text")
                 .WithType(EElementType.UploadedFilesSummary)
                 .WithFileUploadQuestionIds(new List<string>())
                 .Build();
@@ -2387,6 +2388,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var element = new ElementBuilder()
                 .WithQuestionId("question")
+                .WithPropertyText("label text")
                 .WithType(EElementType.UploadedFilesSummary)
                 .WithFileUploadQuestionIds(new List<string>{ "question-one" })
                 .Build();
