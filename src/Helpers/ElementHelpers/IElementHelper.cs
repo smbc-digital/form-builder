@@ -6,9 +6,9 @@ namespace form_builder.Helpers.ElementHelpers
 {
     public interface IElementHelper
     {
-        string CurrentValue(Element element, Dictionary<string, dynamic> viewModel, FormAnswers answers, string pageSlug, string guid, string suffix = "");
+        string CurrentValue(string questionId, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string suffix = "");
 
-        T CurrentValue<T>(Element element, Dictionary<string, dynamic> viewModel, FormAnswers answers, string pageSlug, string guid, string suffix = "") where T : new();
+        T CurrentValue<T>(string questionId, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string suffix = "") where T : new();
         
         bool CheckForQuestionId(Element element);
         

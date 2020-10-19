@@ -29,7 +29,7 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Value = JsonConvert.SerializeObject(elementHelper.CurrentValue<object>(this, viewModel, formAnswers, page.PageSlug, guid));
+            Properties.Value = JsonConvert.SerializeObject(elementHelper.CurrentValue<object>(Properties.QuestionId, viewModel, formAnswers));
 
             return viewRender.RenderAsync(Type.ToString(), this);
         }

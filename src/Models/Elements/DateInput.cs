@@ -24,9 +24,9 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Day = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, "-day");
-            Properties.Month = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, "-month");
-            Properties.Year = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, "-year");
+            Properties.Day = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, "-day");
+            Properties.Month = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, "-month");
+            Properties.Year = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, "-year");
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckAllDateRestrictionsAreNotEnabled(this);

@@ -27,7 +27,7 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Value = elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, string.Empty);
+            Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
 
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
