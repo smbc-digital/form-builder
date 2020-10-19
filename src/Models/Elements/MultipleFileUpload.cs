@@ -60,7 +60,7 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            var currentAnswer = elementHelper.CurrentValue<JArray>(this, viewModel, formAnswers, page.PageSlug, guid, FileUploadConstants.SUFFIX);
+            var currentAnswer = elementHelper.CurrentValue<JArray>(Properties.QuestionId, viewModel, formAnswers, FileUploadConstants.SUFFIX);
 
             SubmitButtonText = SetSubmitButtonText(page);
             IsModelStateValid = !viewModel.ContainsKey("modelStateInvalid");
