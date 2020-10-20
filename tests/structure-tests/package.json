@@ -1,0 +1,22 @@
+{
+  "name": "form-builder-structure-tests",
+  "version": "1.0.0",
+  "description": "Formbuilder structure test suite",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run cypress:open",
+    "cypress:open": "cypress open",
+    "cypress:run-chrome": "cypress run --browser chrome",
+    "cypress": "cypress run"
+  },
+  "author": "Stockport Council",
+  "license": "ISC",
+  "devDependencies": {
+    "@cypress/snapshot": "^2.1.7",
+    "cypress": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smbc-digital/form-builder.git"
+  }
+}
