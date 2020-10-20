@@ -1,6 +1,6 @@
 describe('TimeInput', () => {
     it('TimeInput', () => {
       cy.visit('ui-time-input')
-        .toMatchingDOM()
+        .toMatchingDOM('govuk-form-group')
     });
   });

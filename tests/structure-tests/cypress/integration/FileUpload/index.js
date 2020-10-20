@@ -1,6 +1,6 @@
 describe('FileUpload', () => {
     it('FileUpload', () => {
       cy.visit('ui-file-upload')
-        .toMatchingDOM()
+        .toMatchingDOM('govuk-form-group')
     });
   });

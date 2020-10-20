@@ -12,6 +12,6 @@ describe('Summary', () => {
       cy.get('#whyApples').type('this is alot of text in this textbox which is being entered. stockport counitl ui test textbox');
 
       cy.get('.govuk-button').click()
-        .toMatchingDOM()
+        .toMatchingDOM('govuk-summary-list')
     });
   });

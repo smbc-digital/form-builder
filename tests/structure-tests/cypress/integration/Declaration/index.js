@@ -1,6 +1,6 @@
 describe('Declaration', () => {
     it('Declaration', () => {
       cy.visit('ui-declaration')
-        .toMatchingDOM()
+        .toMatchingDOM('govuk-form-group')
     });
   });

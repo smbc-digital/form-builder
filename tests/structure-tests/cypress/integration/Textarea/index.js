@@ -1,6 +1,6 @@
 describe('Textarea', () => {
     it('Textarea', () => {
       cy.visit('ui-textarea')
-        .toMatchingDOM()
+        .toMatchingDOM('govuk-form-group')
     });
   });

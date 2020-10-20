@@ -1,6 +1,6 @@
 describe('Select', () => {
     it('Select', () => {
       cy.visit('ui-select')
-        .toMatchingDOM()
+        .toMatchingDOM('govuk-form-group')
     });
   });

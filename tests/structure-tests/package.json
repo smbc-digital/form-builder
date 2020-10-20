@@ -9,11 +9,11 @@
     "cypress:run-chrome": "cypress run --browser chrome",
     "cypress": "cypress run"
   },
-  "author": "",
+  "author": "Stockport Council",
   "license": "ISC",
   "devDependencies": {
     "@cypress/snapshot": "^2.1.7",
-    "cypress": "^3.3.2"
+    "cypress": "^5.4.0"
   },
   "repository": {
     "type": "git",

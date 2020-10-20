@@ -1,6 +1,6 @@
 describe('Textbox', () => {
     it('Textbox', () => {
       cy.visit('ui-textbox')
-        .toMatchingDOM()
+        .toMatchingDOM('govuk-form-group')
     });
   });

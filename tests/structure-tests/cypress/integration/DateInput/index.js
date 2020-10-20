@@ -1,6 +1,6 @@
 describe('DateInput', () => {
     it('DateInput', () => {
       cy.visit('ui-date-input')
-        .toMatchingDOM()
+        .toMatchingDOM('govuk-form-group')
     });
   });
