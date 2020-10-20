@@ -9,11 +9,10 @@
     "cypress:run-chrome": "cypress run --browser chrome",
     "cypress": "cypress run"
   },
-  "author": "",
+  "author": "Stockport Council",
   "license": "ISC",
   "devDependencies": {
-    "@cypress/mocha-teamcity-reporter": "^1.0.0",
-    "cypress": "^3.3.2",
+    "cypress": "^5.4.0",
     "cypress-image-snapshot": "^3.1.1"
   },
   "repository": {

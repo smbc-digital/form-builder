@@ -163,8 +163,7 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             //Arrange
             _mockElementHelper
-                .Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(),
-                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(_ => _.CurrentValue(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
             var element = (form_builder.Models.Elements.Address)new ElementBuilder()
@@ -205,8 +204,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Address>(), null))
                 .Callback<string, Address, Dictionary<string, object>>((x, y, z) => callback = y);
 
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(),It.IsAny<FormAnswers>(),
-                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(),It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
             var pageSlug = "page-one";
@@ -2330,6 +2328,79 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(guid)),It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
             var callbackData = JsonConvert.DeserializeObject<FormAnswers>(callbackValue);
             Assert.Single(callbackData.AdditionalFormData);
+        }
+
+        [Fact]
+        public void CheckUploadedFilesSummaryQuestionsIsSet_ShouldThrowException_WhenElementDoNotContain_RequiredFileUpload_QuestionIds()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithPropertyText("label text")
+                .WithType(EElementType.UploadedFilesSummary)
+                .WithFileUploadQuestionIds(new List<string>())
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(pages));
+
+            // Assert
+            Assert.Equal("PageHelper:CheckUploadedFilesSummaryQuestionsIsSet, Uploaded files summary must have atleast one file questionId specified to display the list of uploaded files.", result.Message);
+        }
+
+        [Fact]
+        public void CheckUploadedFilesSummaryQuestionsIsSet_ShouldThrowException_WhenElementDoNotContain_Required_Text()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.UploadedFilesSummary)
+                .WithPropertyText(string.Empty)
+                .WithFileUploadQuestionIds(new List<string>{ "" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(pages));
+
+            // Assert
+            Assert.Equal("PageHelper:CheckUploadedFilesSummaryQuestionsIsSet, Uploaded files summary text must not be empty.", result.Message);
+        }
+
+        [Fact]
+        public void CheckUploadedFilesSummaryQuestionsIsSet_ShouldNot_ThrowException_WhenElement_Has_RequiredFileUpload_QuestionIds()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithQuestionId("question")
+                .WithPropertyText("label text")
+                .WithType(EElementType.UploadedFilesSummary)
+                .WithFileUploadQuestionIds(new List<string>{ "question-one" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            _pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(pages);
         }
     }
 }
