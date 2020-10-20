@@ -44,6 +44,8 @@ namespace form_builder.Helpers.PageHelpers
         void CheckAddressNoManualTextIsSet(List<Page> pages);
 
         void CheckForAnyConditionType(List<Page> pages);
+        
+        void CheckUploadedFilesSummaryQuestionsIsSet(List<Page> pages);
 
         List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload);
     }

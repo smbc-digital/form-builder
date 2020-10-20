@@ -51,7 +51,6 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            elementHelper.CurrentValue(this, viewModel, formAnswers, page.PageSlug, guid, string.Empty);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
 

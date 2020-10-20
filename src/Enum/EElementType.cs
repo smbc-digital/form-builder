@@ -39,6 +39,7 @@
         Map,
         PaymentSummary,
         MultipleFileUpload,
-        DocumentUpload
+        DocumentUpload,
+        UploadedFilesSummary
     }
 }

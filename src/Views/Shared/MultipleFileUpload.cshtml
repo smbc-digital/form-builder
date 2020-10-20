@@ -31,7 +31,7 @@
             @foreach (var file in Model.CurrentFilesUploaded)
             {
                 <tr class="govuk-table__row">
-                    <td class="govuk-table__cell smbc-table__cell--wrap smbc-!-width-90">@file</td>
+                    <td class="govuk-table__cell smbc-!-font-word-break smbc-!-width-90">@file</td>
                     <td class="govuk-table__cell smbc-!-width-10">
                         <button type="submit"
                                 name="@FileUploadConstants.FILE_TO_DELETE"

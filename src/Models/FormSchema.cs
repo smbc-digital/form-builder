@@ -79,6 +79,7 @@ namespace form_builder.Models
             pageHelper.CheckRenderConditionsValid(Pages);
             pageHelper.CheckAddressNoManualTextIsSet(Pages);
             pageHelper.CheckForAnyConditionType(Pages);
+            pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(Pages);
         }
 
         public bool IsAvailable(string environment)

@@ -44,19 +44,11 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData(EElementType.Textarea)]
         public void CurrentValue_ReturnsCurrentValueOfElement(EElementType elementType)
         {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithType(elementType)
-                .WithQuestionId("test-id")
-                .WithLabel("test-text")
-                .WithValue("this is the value")
-                .Build();
-
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-id", "this is the value");
 
             // Act
-            var result = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), "", "");
+            var result = _elementHelper.CurrentValue("test-id", viewModel, new FormAnswers());
 
             // Assert
             Assert.Equal("this is the value", result);
@@ -65,21 +57,13 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public void CurrentValue_ReturnsNoValueOfElement()
         {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithQuestionId("test-id")
-                .WithLabel("test-text")
-                .WithValue("this is the value")
-                .Build();
-
             var viewModel = new Dictionary<string, dynamic>
             {
                 {"test-id2", "this is the value"}
             };
 
             // Act
-            var result = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty);
+            var result = _elementHelper.CurrentValue("test-id", viewModel, new FormAnswers());
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -93,17 +77,10 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
 
-            var element = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithQuestionId("test-id")
-                .WithLabel("test-text")
-                .WithValue("this is the value")
-                .Build();
-
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty);
+            var result = _elementHelper.CurrentValue("test-id", viewModel, new FormAnswers(), string.Empty);
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -129,17 +106,10 @@ namespace form_builder_tests.UnitTests.Helpers
                 }
             };
 
-            var element = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithQuestionId("test-id")
-                .WithLabel("test-text")
-                .WithValue("this is the value")
-                .Build();
-
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue(element, viewModel, formAnswers, "test-slug", string.Empty);
+            var result = _elementHelper.CurrentValue("test-id", viewModel, formAnswers);
 
             // Assert
             Assert.Equal("this is the value", result);
@@ -161,17 +131,10 @@ namespace form_builder_tests.UnitTests.Helpers
                     }
                 }));
 
-            var element = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithQuestionId("test-id")
-                .WithLabel("test-text")
-                .WithValue("this is the value")
-                .Build();
-
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), "test-slug", string.Empty);
+            var result = _elementHelper.CurrentValue("test-id", viewModel, new FormAnswers());
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -560,23 +523,15 @@ namespace form_builder_tests.UnitTests.Helpers
             var monthId = questionId + "-month";
             var yearId = questionId + "-year";
 
-            var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
-                .WithQuestionId(questionId)
-                .WithDayValue("14")
-                .WithMonthValue("09")
-                .WithYearValue("2010")
-                .Build();
-
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add(dayId, "14");
             viewModel.Add(monthId, "09");
             viewModel.Add(yearId, "2010");
 
             // Act
-            var dayResult = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty, "-day");
-            var monthResult = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty, "-month");
-            var yearResult = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty, "-year");
+            var dayResult = _elementHelper.CurrentValue(questionId, viewModel, new FormAnswers(), "-day");
+            var monthResult = _elementHelper.CurrentValue(questionId, viewModel, new FormAnswers(), "-month");
+            var yearResult = _elementHelper.CurrentValue(questionId, viewModel, new FormAnswers(), "-year");
 
             // Assert
             Assert.Equal("14", dayResult);
@@ -588,19 +543,12 @@ namespace form_builder_tests.UnitTests.Helpers
         public void CurrentValue_ReturnsEmptyStringWhenNoQuestionIdFound()
         {
             // Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
-                .WithDayValue("14")
-                .WithMonthValue("09")
-                .WithYearValue("2010")
-                .Build();
-
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var dayResult = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty, "-day");
-            var monthResult = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty, "-month");
-            var yearResult = _elementHelper.CurrentValue(element, viewModel, new FormAnswers(), string.Empty, string.Empty, "-year");
+            var dayResult = _elementHelper.CurrentValue("question-id", viewModel, new FormAnswers(),"-day");
+            var monthResult = _elementHelper.CurrentValue("question-id", viewModel, new FormAnswers(), "-month");
+            var yearResult = _elementHelper.CurrentValue("question-id", viewModel, new FormAnswers(), "-year");
 
             // Assert
             Assert.Equal("", dayResult);

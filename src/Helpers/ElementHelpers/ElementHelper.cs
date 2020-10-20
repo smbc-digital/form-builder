@@ -34,41 +34,39 @@ namespace form_builder.Helpers.ElementHelpers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public string CurrentValue(Element element, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string pageSlug, string guid, string suffix = "")
+        public string CurrentValue(string questionId, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string suffix = "")
         {
             //Todo
             var defaultValue =  string.Empty;
 
-            return GetCurrentValueFromSavedAnswers<string>(defaultValue, element, viewmodel, answers, pageSlug, guid, suffix);
+            return GetCurrentValueFromSavedAnswers<string>(defaultValue, questionId, viewmodel, answers, suffix);
         }
 
-        public T CurrentValue<T>(Element element, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string pageSlug, string guid, string suffix = "") where T : new()
+        public T CurrentValue<T>(string questionId, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string suffix = "") where T : new()
         {
             //Todo
             var defaultValue = new T();
 
-            if (element.Type == EElementType.FileUpload)
-                return defaultValue;
-
-            return GetCurrentValueFromSavedAnswers<T>(defaultValue, element, viewmodel, answers, pageSlug, guid, suffix);
+            return GetCurrentValueFromSavedAnswers<T>(defaultValue, questionId, viewmodel, answers, suffix);
         }
 
-        private T GetCurrentValueFromSavedAnswers<T>(T defaultValue, Element element, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string pageSlug, string guid, string suffix)
+        private T GetCurrentValueFromSavedAnswers<T>(T defaultValue, string questionId, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string suffix)
         {
-            var currentValue = viewmodel.ContainsKey($"{element.Properties.QuestionId}{suffix}");
+            var currentValue = viewmodel.ContainsKey($"{questionId}{suffix}");
 
             if (!currentValue)
             {
-                var storedValue = answers.Pages?.FirstOrDefault(_ => _.PageSlug == pageSlug);
+                var storedValue = answers.Pages?.SelectMany(_ => _.Answers);
+
                 if (storedValue != null)
                 {
-                    var value = storedValue.Answers.FirstOrDefault(_ => _.QuestionId == $"{element.Properties.QuestionId}{suffix}");
+                    var value = storedValue.FirstOrDefault(_ => _.QuestionId == $"{questionId}{suffix}");
                     return value != null ? (T)value.Response : defaultValue;
                 }
                 return defaultValue;
             }
 
-            return viewmodel[$"{element.Properties.QuestionId}{suffix}"];
+            return viewmodel[$"{questionId}{suffix}"];
         }
 
         public bool CheckForLabel(Element element)
