@@ -1,7 +1,4 @@
-@using form_builder.Configuration
 @using form_builder.Constants
-@using Microsoft.Extensions.Options
-@inject IOptions<ReCaptchaConfiguration> Config
 @model form_builder.Models.Elements.MultipleFileUpload
 @{
     var sizeValidationError = $"{Model.QuestionId}-fileSizeError";
@@ -11,7 +8,6 @@
         ? $"{baseCssClasses} govuk-input--error smbc-input--file-error "
         : baseCssClasses);
     var uploadButtonCss = Model.DisplaySubmitButton ? "govuk-button govuk-button--secondary" : "govuk-button";
-    var recaptchaClasses = Model.IsModelStateValid ? "g-recaptcha smbc-recaptcha" : "g-recaptcha smbc-recaptcha govuk-input--error";
 }
 
 <partial name="LabelH1" />
@@ -59,7 +55,7 @@
 
 @if (Model.CurrentFilesUploaded.Any() && Model.Properties.DisplayReCaptcha)
 {
-    <div class="@recaptchaClasses" data-sitekey="@Config.Value.SiteKey"></div>
+    <partial name="Recaptcha" model="@Model.IsModelStateValid" />
 }
 
 <button data-prevent-double-click="true"
