@@ -373,5 +373,9 @@ form-builder-tests-ui/Screenshots/
 
 src/DSL/
 
-#cypress videos
+#cypress visual-tests
 tests/visual-tests/cypress/videos/
+
+#cypress structure-tests
+tests/structure-tests/cypress/videos/
+tests/structure-tests/cypress/screenshots/
