@@ -13,6 +13,7 @@ using form_builder.Cache;
 using form_builder.ModelBinders.Providers;
 using System.Globalization;
 using form_builder.Middleware;
+using Microsoft.AspNetCore.Http;
 
 namespace form_builder
 {
@@ -65,6 +66,12 @@ namespace form_builder
                     options.ModelBinderProviders.Insert(0, new CustomFormFileModelBinderProvider());
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                options.HttpsPort = 44360;
+            });
 
             services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
         }
