@@ -70,7 +70,7 @@ namespace form_builder
             services.AddHttpsRedirection(options =>
             {
                 options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                options.HttpsPort = 44360;
+                options.HttpsPort = 443;
             });
 
             services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
