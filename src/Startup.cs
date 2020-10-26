@@ -67,12 +67,6 @@ namespace form_builder
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddHttpsRedirection(options =>
-            {
-                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                options.HttpsPort = 443;
-            });
-
             services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
         }
 
