@@ -77,6 +77,12 @@ namespace form_builder
                     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                     options.ModelBinderProviders.Insert(0, new CustomFormFileModelBinderProvider());
                 });
+
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                options.HttpsPort = 44360;
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
