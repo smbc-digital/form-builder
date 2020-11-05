@@ -159,6 +159,7 @@ namespace form_builder.Helpers.PageHelpers
                         && element.Type != EElementType.Button
                         && element.Type != EElementType.HR
                         && element.Type != EElementType.UploadedFilesSummary
+                        && element.Type != EElementType.Warning
                         )
                     {
                         questionIds.Add(element.Properties.QuestionId);
