@@ -10,7 +10,7 @@ namespace form_builder.Providers.SchemaProvider
 
         FormSchema Get(string schemaName);
 
-        bool ValidateSchemaName();
+        bool ValidateSchemaName(string schemaName);
 
         Task<List<string>> IndexSchema();
     }

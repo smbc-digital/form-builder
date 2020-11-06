@@ -14,6 +14,8 @@ using form_builder.Constants;
 using Microsoft.Extensions.Logging;
 using Amazon.S3.Model;
 using System.Collections.Generic;
+using form_builder.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace form_builder.Providers.SchemaProvider
 {
@@ -24,14 +26,24 @@ namespace form_builder.Providers.SchemaProvider
         private readonly IConfiguration _configuration;
         private readonly ILogger<ISchemaProvider> _logger;
         private readonly IDistributedCacheWrapper _distributedCacheWrapper;
+        private readonly DistributedCacheConfiguration _distributedCacheConfiguration;
+        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
-        public S3FileSchemaProvider(IS3Gateway s3Service, IWebHostEnvironment environment, IDistributedCacheWrapper distributedCacheWrapper, IConfiguration configuration, ILogger<ISchemaProvider> logger)
+        public S3FileSchemaProvider(IS3Gateway s3Service, 
+            IWebHostEnvironment environment, 
+            IDistributedCacheWrapper distributedCacheWrapper,
+            IConfiguration configuration,
+            IOptions<DistributedCacheConfiguration> distributedCacheConfiguration,
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
+            ILogger<ISchemaProvider> logger)
         {
             _s3Gateway = s3Service;
             _environment = environment;
             _configuration = configuration;
             _logger = logger;
             _distributedCacheWrapper = distributedCacheWrapper;
+            _distributedCacheConfiguration = distributedCacheConfiguration.Value;
+            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
         public async Task<T> Get<T>(string schemaName)
@@ -66,8 +78,10 @@ namespace form_builder.Providers.SchemaProvider
 
         public async Task<List<string>> IndexSchema()
         {
-            var result = new ListObjectsV2Response();
+            if(!_distributedCacheConfiguration.UseDistributedCache)
+                return new List<string>();
 
+            var result = new ListObjectsV2Response();
             try
             {
                 result = await _s3Gateway.ListObjectsV2(_configuration["S3BucketKey"], $"{_environment.EnvironmentName.ToS3EnvPrefix()}/{_configuration["ApplicationVersion"]}");
@@ -79,14 +93,24 @@ namespace form_builder.Providers.SchemaProvider
             }
 
             var indexKeys = result.S3Objects.Select(_ => _.Key).ToList();
+            //Handle expiration time
             _ = _distributedCacheWrapper.SetStringAsync(CacheConstants.INDEX_SCHEMA, JsonConvert.SerializeObject(indexKeys));
             
             return indexKeys;
         }
 
-        public bool ValidateSchemaName()
+        public bool ValidateSchemaName(string schemaName)
         {
-            throw new NotImplementedException();
+            if(!_distributedCacheConfiguration.UseDistributedCache)
+                return true;
+
+            var cachedIndexSchema = _distributedCacheWrapper.GetString(CacheConstants.INDEX_SCHEMA);
+            
+            if(string.IsNullOrEmpty(cachedIndexSchema))
+                return true;
+
+            var indexSchema = JsonConvert.DeserializeObject<List<string>>(cachedIndexSchema);
+            return indexSchema.Any(_ => _.Contains(schemaName));
         }
     }
 }
