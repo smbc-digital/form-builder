@@ -260,14 +260,14 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
         public static IServiceCollection AddSchemaProvider(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
-            if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
-            {
-                services.AddSingleton<ISchemaProvider, LocalFileSchemaProvider>();
-            }
-            else
-            {
+            // if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
+            // {
+            //     services.AddSingleton<ISchemaProvider, LocalFileSchemaProvider>();
+            // }
+            // else
+            // {
                 services.AddSingleton<ISchemaProvider, S3FileSchemaProvider>();
-            }
+            // }
 
             return services;
         }

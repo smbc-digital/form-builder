@@ -11,7 +11,6 @@ namespace form_builder.Extensions
             switch (value)
             {
                 case "local":
-                    return "local";
                 case "uitest":
                 case "int":
                     return "Int";

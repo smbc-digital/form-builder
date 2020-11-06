@@ -8,5 +8,9 @@ namespace form_builder.Providers.SchemaProvider
         Task<T> Get<T>(string schemaName);
 
         FormSchema Get(string schemaName);
+
+        bool ValidateSchemaName();
+
+        Task IndexSchema();
     }
 }

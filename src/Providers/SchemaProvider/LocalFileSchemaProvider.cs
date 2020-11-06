@@ -18,6 +18,16 @@ namespace form_builder.Providers.SchemaProvider
             return Get<FormSchema>(schemaName);
         }
 
+        public async Task IndexSchema()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public bool ValidateSchemaName()
+        {
+            throw new System.NotImplementedException();
+        }
+
         async Task<T> ISchemaProvider.Get<T>(string schemaName)
         {
             var baseForm = System.IO.File.ReadAllText($@".\DSL\{schemaName}.json");

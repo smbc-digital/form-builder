@@ -1,13 +1,18 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Amazon.S3;
 using form_builder.Extensions;
 using form_builder.Gateways;
 using form_builder.Models;
+using form_builder.Providers.StorageProvider;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using form_builder.Constants;
+using Microsoft.Extensions.Logging;
+using Amazon.S3.Model;
 
 namespace form_builder.Providers.SchemaProvider
 {
@@ -16,12 +21,16 @@ namespace form_builder.Providers.SchemaProvider
         private readonly IS3Gateway _s3Gateway;
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<ISchemaProvider> _logger;
+        private readonly IDistributedCacheWrapper _distributedCacheWrapper;
 
-        public S3FileSchemaProvider(IS3Gateway s3Service, IWebHostEnvironment environment, IConfiguration configuration)
+        public S3FileSchemaProvider(IS3Gateway s3Service, IWebHostEnvironment environment, IDistributedCacheWrapper distributedCacheWrapper, IConfiguration configuration, ILogger<ISchemaProvider> logger)
         {
             _s3Gateway = s3Service;
             _environment = environment;
             _configuration = configuration;
+            _logger = logger;
+            _distributedCacheWrapper = distributedCacheWrapper;
         }
 
         public async Task<T> Get<T>(string schemaName)
@@ -50,6 +59,28 @@ namespace form_builder.Providers.SchemaProvider
         }
 
         public FormSchema Get(string schemaName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task IndexSchema()
+        {
+            var result = new ListObjectsV2Response();
+
+            try
+            {
+                result = await _s3Gateway.ListObjectsV2(_configuration["S3BucketKey"], $"{_environment.EnvironmentName.ToS3EnvPrefix()}/{_configuration["ApplicationVersion"]}");
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning($"S3FileSchemaProvider::IndexSchema, Failed to retrieve list of forms from s3, Exception: {e.Message}");
+            }
+
+            var indexKeys = result.S3Objects.Select(_ => _.Key).ToList();
+            _ = _distributedCacheWrapper.SetStringAsync(CacheConstants.INDEX_SCHEMA, JsonConvert.SerializeObject(indexKeys));
+        }
+
+        public bool ValidateSchemaName()
         {
             throw new NotImplementedException();
         }
