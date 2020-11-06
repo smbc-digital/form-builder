@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace form_builder.Controllers
 {
     [Route("[Controller]")]
+    [TokenAuthentication]
     public class SystemController : Controller
     {
         private ISchemaProvider _schemaProvider;
