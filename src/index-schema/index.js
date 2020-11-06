@@ -26,7 +26,7 @@ const getFormSchemas = (env, applicationVersion) =>
         })
     })
 
-const updateRedisEntryWithinApplication = () => {
+const updateCacheEntryWithinApplication = () => {
     var options = {
         host: 'localhost',
         port: '5000',
@@ -53,7 +53,7 @@ const updateRedisEntryWithinApplication = () => {
 
 async function init(env, applicationVersion) {
     var results = await getFormSchemas(env, applicationVersion)
-    await updateRedisEntryWithinApplication(results)
+    await updateCacheEntryWithinApplication(results)
 }
 
 init("Int", "v1")
