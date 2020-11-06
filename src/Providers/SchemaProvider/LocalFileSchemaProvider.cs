@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Models;
 using Newtonsoft.Json;
@@ -30,9 +31,9 @@ namespace form_builder.Providers.SchemaProvider
             return await Task.FromResult(JsonConvert.DeserializeObject<T>(baseForm));
         }
 
-        Task<List<string>> ISchemaProvider.IndexSchema()
+        public Task<List<string>> IndexSchema()
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult(System.IO.Directory.GetFiles($@".\DSL").ToList());
         }
     }
 }

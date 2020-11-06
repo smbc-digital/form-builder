@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Mvc;
 using form_builder.Providers.SchemaProvider;
 using Microsoft.Extensions.Logging;
@@ -12,7 +11,6 @@ namespace form_builder.Controllers
     public class SystemController : Controller
     {
         private ISchemaProvider _schemaProvider;
-
         private ILogger<SystemController> _logger;
 
         public SystemController(ILogger<SystemController> logger, ISchemaProvider schemaProvider)

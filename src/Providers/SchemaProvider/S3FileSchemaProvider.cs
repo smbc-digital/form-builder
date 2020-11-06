@@ -74,7 +74,7 @@ namespace form_builder.Providers.SchemaProvider
             }
             catch (Exception e)
             {
-                _logger.LogWarning($"S3FileSchemaProvider::IndexSchema, Failed to retrieve list of forms from s3, Exception: {e.Message}");
+                _logger.LogWarning($"S3FileSchemaProvider::IndexSchema, Failed to retrieve list of forms from s3 bucket {_environment.EnvironmentName.ToS3EnvPrefix()}/{_configuration["ApplicationVersion"]}, Exception: {e.Message}");
                 return new List<string>();
             }
 
