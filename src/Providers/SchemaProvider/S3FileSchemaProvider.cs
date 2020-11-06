@@ -79,7 +79,10 @@ namespace form_builder.Providers.SchemaProvider
         public async Task<List<string>> IndexSchema()
         {
             if(!_distributedCacheConfiguration.UseDistributedCache)
+            {
+                _logger.LogWarning($"S3FileSchemaProvider::IndexSchema, A request to index form schema was made but UseDistributedCache is disabled");
                 return new List<string>();
+            }
 
             var result = new ListObjectsV2Response();
             try
@@ -94,7 +97,7 @@ namespace form_builder.Providers.SchemaProvider
 
             var indexKeys = result.S3Objects.Select(_ => _.Key).ToList();
             //Handle expiration time
-            _ = _distributedCacheWrapper.SetStringAsync(CacheConstants.INDEX_SCHEMA, JsonConvert.SerializeObject(indexKeys));
+            _ = _distributedCacheWrapper.SetStringAsync(CacheConstants.INDEX_SCHEMA, JsonConvert.SerializeObject(indexKeys), _distributedCacheExpirationConfiguration.Index);
             
             return indexKeys;
         }
