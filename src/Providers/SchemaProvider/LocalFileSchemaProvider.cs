@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Models;
 using Newtonsoft.Json;
@@ -18,11 +19,6 @@ namespace form_builder.Providers.SchemaProvider
             return Get<FormSchema>(schemaName);
         }
 
-        public async Task IndexSchema()
-        {
-            throw new System.NotImplementedException();
-        }
-
         public bool ValidateSchemaName()
         {
             throw new System.NotImplementedException();
@@ -32,6 +28,11 @@ namespace form_builder.Providers.SchemaProvider
         {
             var baseForm = System.IO.File.ReadAllText($@".\DSL\{schemaName}.json");
             return await Task.FromResult(JsonConvert.DeserializeObject<T>(baseForm));
+        }
+
+        Task<List<string>> ISchemaProvider.IndexSchema()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

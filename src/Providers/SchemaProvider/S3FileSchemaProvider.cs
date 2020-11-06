@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using form_builder.Constants;
 using Microsoft.Extensions.Logging;
 using Amazon.S3.Model;
+using System.Collections.Generic;
 
 namespace form_builder.Providers.SchemaProvider
 {
@@ -63,7 +64,7 @@ namespace form_builder.Providers.SchemaProvider
             throw new NotImplementedException();
         }
 
-        public async Task IndexSchema()
+        public async Task<List<string>> IndexSchema()
         {
             var result = new ListObjectsV2Response();
 
@@ -78,6 +79,8 @@ namespace form_builder.Providers.SchemaProvider
 
             var indexKeys = result.S3Objects.Select(_ => _.Key).ToList();
             _ = _distributedCacheWrapper.SetStringAsync(CacheConstants.INDEX_SCHEMA, JsonConvert.SerializeObject(indexKeys));
+            
+            return indexKeys;
         }
 
         public bool ValidateSchemaName()
