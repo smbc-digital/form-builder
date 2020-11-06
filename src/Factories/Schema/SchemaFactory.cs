@@ -47,8 +47,6 @@ namespace form_builder.Factories.Schema
 
         public async Task<FormSchema> Build(string formKey)
         {
-            await _schemaProvider.IndexSchema();
-
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)
             {
                 var data = _distributedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}");

@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using form_builder.Providers.SchemaProvider;
 using Microsoft.Extensions.Logging;
 using StockportGovUK.AspNetCore.Attributes.TokenAuthentication;
+using System.Threading.Tasks;
 
 namespace form_builder.Controllers
 {
-    [TokenAuthentication]
-    [Route("{controller}")]
+    [Route("[Controller]")]
     public class SystemController : Controller
     {
         private ISchemaProvider _schemaProvider;
@@ -21,7 +21,8 @@ namespace form_builder.Controllers
         }
 
         [HttpPatch]
+        [IgnoreAntiforgeryToken]
         [Route("index-schemas")]
-        public IActionResult IndexSchemas() => Ok(_schemaProvider.IndexSchema());
+        public async Task<IActionResult> IndexSchemas() => Ok(await _schemaProvider.IndexSchema());
     }
 }
