@@ -1,9 +1,24 @@
 @model form_builder.Models.Elements.Warning
 
-<div class="govuk-warning-text">
-    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-    <strong class="govuk-warning-text__text">
-        <span class="govuk-warning-text__assistive">Warning</span>
-        @Html.Raw(Model.Properties.Text)
-    </strong>
-</div>
+@if (Model.Properties.NoScript)
+{
+    <noscript>
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                @Html.Raw(Model.Properties.Text)
+            </strong>
+        </div>
+    </noscript>
+}
+else
+{
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            @Html.Raw(Model.Properties.Text)
+        </strong>
+    </div>
+}
