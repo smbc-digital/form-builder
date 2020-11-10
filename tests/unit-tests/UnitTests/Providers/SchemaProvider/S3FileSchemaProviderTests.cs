@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Amazon.S3;
+using form_builder.Configuration;
 using form_builder.Gateways;
 using form_builder.Providers.SchemaProvider;
+using form_builder.Providers.StorageProvider;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -16,12 +20,16 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
         private readonly Mock<IS3Gateway> _mockS3Gateway = new Mock<IS3Gateway>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new Mock<IOptions<DistributedCacheConfiguration>>();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+        private readonly Mock<ILogger<ISchemaProvider>> _mockLogger = new Mock<ILogger<ISchemaProvider>>();
 
         public S3FileSchemaProviderTests()
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("uitest");
             _mockConfiguration.Setup(_ => _["S3BucketKey"]).Returns("forms-storage");
-            _s3Schema = new S3FileSchemaProvider(_mockS3Gateway.Object, _mockHostingEnv.Object, _mockConfiguration.Object);
+            _s3Schema = new S3FileSchemaProvider(_mockS3Gateway.Object, _mockHostingEnv.Object, _mockDistributedCacheWrapper.Object, _mockConfiguration.Object, _mockDistributedCacheConfiguration.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockLogger.Object);
         }
 
         [Fact]

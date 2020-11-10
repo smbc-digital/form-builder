@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Enum;
@@ -47,6 +48,9 @@ namespace form_builder.Factories.Schema
 
         public async Task<FormSchema> Build(string formKey)
         {
+            if(!_schemaProvider.ValidateSchemaName(formKey))
+                throw new ApplicationException($"SchemaFactory::Build, formkey {formKey} does not exist within the schema provider source");
+
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)
             {
                 var data = _distributedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}");

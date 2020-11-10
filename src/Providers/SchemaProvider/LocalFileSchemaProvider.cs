@@ -1,5 +1,10 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Configuration;
 using form_builder.Models;
+using form_builder.Providers.StorageProvider;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace form_builder.Providers.SchemaProvider
@@ -23,5 +28,9 @@ namespace form_builder.Providers.SchemaProvider
             var baseForm = System.IO.File.ReadAllText($@".\DSL\{schemaName}.json");
             return await Task.FromResult(JsonConvert.DeserializeObject<T>(baseForm));
         }
+
+        public Task<List<string>> IndexSchema() => Task.FromResult(System.IO.Directory.GetFiles($@".\DSL").ToList());
+
+        public bool ValidateSchemaName(string schemaName) => System.IO.Directory.GetFiles($@".\DSL").ToList().Any(_ => _.Contains(schemaName));
     }
 }
