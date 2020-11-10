@@ -7,5 +7,6 @@ namespace form_builder.Configuration
         public int FormJson { get; set; }
         public int FileUpload { get; set; }
         public int Document { get; set; }
+        public int Index { get; set; }
     }
 }

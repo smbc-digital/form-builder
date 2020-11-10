@@ -23,5 +23,16 @@ namespace form_builder.Gateways
 
             return await _s3client.GetObjectAsync(getRequest);
         }
+
+        public async Task<ListObjectsV2Response> ListObjectsV2(string bucketName, string prefix)
+        {
+            var listRequest = new ListObjectsV2Request
+            {
+                BucketName = bucketName,
+                Prefix = prefix
+            };
+
+            return await _s3client.ListObjectsV2Async(listRequest);
+        }
     }
 }
