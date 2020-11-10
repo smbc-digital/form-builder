@@ -4,6 +4,7 @@ using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.SimpleEmail;
 using form_builder.Attributes;
+using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.ContentFactory;
 using form_builder.Factories.Schema;
@@ -297,6 +298,15 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>("UseDistributedCache"));
             services.Configure<AwsSesKeysConfiguration>(configuration.GetSection("Ses"));
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection("ReCaptchaConfiguration"));
+            services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
+            services.Configure<TagManagerConfiguration>(TagManagerId => configuration.GetValue<string>("GoogleTagManagerId"));
+
+            return services;
+        }
+
+        public static IServiceCollection AddCache(this IServiceCollection services)
+        {
+            services.AddTransient<ICache, Cache.Cache>();
 
             return services;
         }
