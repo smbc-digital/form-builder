@@ -31,6 +31,6 @@ namespace form_builder.Providers.SchemaProvider
 
         public Task<List<string>> IndexSchema() => Task.FromResult(System.IO.Directory.GetFiles($@".\DSL").ToList());
 
-        public Task<bool> ValidateSchemaName(string schemaName) => Task.FromResult(System.IO.Directory.GetFiles($@".\DSL").ToList().Any(_ => _.Contains(schemaName)));
+        public bool ValidateSchemaName(string schemaName) => System.IO.Directory.GetFiles($@".\DSL").ToList().Any(_ => _.Contains(schemaName));
     }
 }
