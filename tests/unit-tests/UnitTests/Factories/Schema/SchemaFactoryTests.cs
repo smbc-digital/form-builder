@@ -63,7 +63,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             // Arrange
             _mockSchemaProvider
                 .Setup(_ => _.ValidateSchemaName(It.IsAny<string>()))
-                .Returns(true);
+                .ReturnsAsync(true);
 
             // Act
             await _schemaFactory.Build("form");
@@ -81,7 +81,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
 
             _mockSchemaProvider
                 .Setup(_ => _.ValidateSchemaName(It.IsAny<string>()))
-                .Returns(true);
+                .ReturnsAsync(true);
 
             _mockDistributedCache
                 .Setup(_ => _.GetString(It.IsAny<string>()))
@@ -142,7 +142,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
 
             _mockSchemaProvider
                 .Setup(_ => _.ValidateSchemaName(It.IsAny<string>()))
-                .Returns(true);
+                .ReturnsAsync(true);
 
             _mockSchemaProvider
                 .Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
@@ -203,7 +203,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
 
             _mockSchemaProvider
                 .Setup(_ => _.ValidateSchemaName(It.IsAny<string>()))
-                .Returns(true);
+                .ReturnsAsync(true);
 
             _mockSchemaProvider
                 .Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))

@@ -48,8 +48,8 @@ namespace form_builder.Factories.Schema
 
         public async Task<FormSchema> Build(string formKey)
         {
-            if(!_schemaProvider.ValidateSchemaName(formKey))
-                throw new ApplicationException($"SchemaFactory::Build, formkey {formKey} does not exist within the schema provider source");
+            if(!_schemaProvider.ValidateSchemaName(formKey).Result)
+                return null;
 
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)
             {

@@ -22,7 +22,7 @@
 
             <label class="govuk-label govuk-radios__label @strongLabel"
                    for="@Model.GetListItemId(i)">
-                @Html.Raw(Model.Properties.Options[i].Text)
+                @Model.Properties.Options[i].Text
             </label>
 
             @if (Model.Properties.Options[i].HasHint)
