@@ -103,6 +103,9 @@ namespace form_builder.Services.PageService
 
             var baseForm = await _schemaFactory.Build(form);
 
+            if (baseForm == null)
+                return null;
+
             if(!baseForm.IsAvailable(_environment.EnvironmentName))
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
 

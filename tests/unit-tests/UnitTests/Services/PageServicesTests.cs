@@ -327,9 +327,10 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessPage_ShouldCallSchemaFactory_ToGetFormSchema()
         {
             // Act
-            await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessPage("form", "page-one", "", new QueryCollection()));
+            var result = await _service.ProcessPage("form", "page-one", "", new QueryCollection());
 
             // Assert
+            Assert.Null(result);
             _mockSchemaFactory.Verify(_ => _.Build(It.IsAny<string>()), Times.Once);
         }
 

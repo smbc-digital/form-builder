@@ -9,5 +9,11 @@ namespace form_builder.Controllers
             Response.StatusCode = 500;
             return View();
         }
+
+        new public ActionResult NotFound()
+        {
+            Response.StatusCode = 500;
+            return View();
+        }
     }
 }

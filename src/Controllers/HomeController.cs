@@ -65,6 +65,10 @@ namespace form_builder.Controllers
         {
             var queryParamters = Request.Query;
             var response = await _pageService.ProcessPage(form, path, subPath, queryParamters);
+
+            if (response == null)
+                return RedirectToAction("Index", "Error");
+
             if (response.ShouldRedirect)
             {
                 var routeValuesDictionary = new RouteValueDictionaryBuilder()
