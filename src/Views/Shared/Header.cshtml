@@ -1,12 +1,13 @@
 ﻿@{
-    var displayHeading = !(bool)ViewData["IsError"];
-    var startPageUrl = string.Empty;
-
-    if (!string.IsNullOrWhiteSpace(Model?.StartPageUrl))
-    {
-        startPageUrl = Model.StartPageUrl;
-    }
+    var displayHeading = ViewData.Any(_ => _.Key == "IsError") 
+        ? (bool)ViewData["IsError"] 
+        : true;
+        
+    var startPageUrl = string.IsNullOrWhiteSpace(Model?.StartPageUrl) 
+        ? string.Empty 
+        : Model.StartPageUrl;
 }
+
 <header class="smbc-header" role="banner" data-module="govuk-header">
     <div class="smbc-header__container govuk-width-container">
         <div class="govuk-header__logo">
