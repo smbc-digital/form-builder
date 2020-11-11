@@ -101,17 +101,19 @@ namespace form_builder.Providers.SchemaProvider
             return indexKeys;
         }
 
-        public bool ValidateSchemaName(string schemaName)
+        public async Task<bool> ValidateSchemaName(string schemaName)
         {
             if(!_distributedCacheConfiguration.UseDistributedCache)
                 return true;
 
             var cachedIndexSchema = _distributedCacheWrapper.GetString(CacheConstants.INDEX_SCHEMA);
+            var indexSchema = new List<string>();
             
             if(string.IsNullOrEmpty(cachedIndexSchema))
-                return true;
+                indexSchema = await IndexSchema();
+            else
+                indexSchema = JsonConvert.DeserializeObject<List<string>>(cachedIndexSchema);
 
-            var indexSchema = JsonConvert.DeserializeObject<List<string>>(cachedIndexSchema);
             return indexSchema.Any(_ => _.Contains(schemaName));
         }
     }

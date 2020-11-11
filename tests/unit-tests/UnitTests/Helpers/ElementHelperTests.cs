@@ -39,8 +39,10 @@ namespace form_builder_tests.UnitTests.Helpers
                .Returns(new HostString("www.test.com"));
         }
 
-        [Fact]
-        public void CurrentValue_ReturnsCurrentValueOfElement()
+        [Theory]
+        [InlineData(EElementType.Textbox)]
+        [InlineData(EElementType.Textarea)]
+        public void CurrentValue_ReturnsCurrentValueOfElement(EElementType elementType)
         {
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-id", "this is the value");
