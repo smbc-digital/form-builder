@@ -1,5 +1,5 @@
 ﻿@{
-    var displayHeading = (string)ViewData["Title"] != "Error";
+    var displayHeading = !(bool)ViewData["IsError"];
     var startPageUrl = string.Empty;
 
     if (!string.IsNullOrWhiteSpace(Model?.StartPageUrl))
