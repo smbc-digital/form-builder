@@ -51,7 +51,7 @@ namespace form_builder.Controllers
             if(_hostingEnvironment.EnvironmentName.ToLower().Equals("prod"))
                 return Redirect("https://www.stockport.gov.uk");
 
-            return View("../Error/Index");
+            return RedirectToAction("Index", "Error");
         }
 
         [HttpGet]
