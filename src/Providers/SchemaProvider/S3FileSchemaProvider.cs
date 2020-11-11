@@ -96,6 +96,7 @@ namespace form_builder.Providers.SchemaProvider
             }
 
             var indexKeys = result.S3Objects.Select(_ => _.Key).ToList();
+            
             _ = _distributedCacheWrapper.SetStringAsync(CacheConstants.INDEX_SCHEMA, JsonConvert.SerializeObject(indexKeys), _distributedCacheExpirationConfiguration.Index);
             
             return indexKeys;

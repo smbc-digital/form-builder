@@ -10,9 +10,10 @@ namespace form_builder.Controllers
             return View();
         }
 
+        [Route("/not-found")]
         new public ActionResult NotFound()
         {
-            Response.StatusCode = 500;
+            Response.StatusCode = 404;
             return View();
         }
     }

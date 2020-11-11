@@ -67,7 +67,7 @@ namespace form_builder.Controllers
             var response = await _pageService.ProcessPage(form, path, subPath, queryParamters);
 
             if (response == null)
-                return RedirectToAction("Index", "Error");
+                return RedirectToAction("NotFound", "Error");
 
             if (response.ShouldRedirect)
             {
