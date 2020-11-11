@@ -1,5 +1,5 @@
 ﻿@{
-    var displayHeading = ViewData.Any(_ => _.Key == "IsError") 
+    var isError = ViewData.Any(_ => _.Key == "IsError") 
         ? (bool)ViewData["IsError"] 
         : true;
         
@@ -14,7 +14,7 @@
             <a href="https://www.stockport.gov.uk/" class="govuk-header__link smbc-header__link--homepage">STOCKPORT.GOV.UK</a>
         </div>
         <div class="govuk-header__content">
-            @if (displayHeading)
+            @if (!isError)
             {
                 <a href="@startPageUrl" class="govuk-header__link smbc-header__link--service-name">
                     @Model.FormName
