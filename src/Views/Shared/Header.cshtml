@@ -1,7 +1,7 @@
 ﻿@{
     var isError = ViewData.Any(_ => _.Key == "IsError") 
         ? (bool)ViewData["IsError"] 
-        : true;
+        : false;
         
     var startPageUrl = string.IsNullOrWhiteSpace(Model?.StartPageUrl) 
         ? string.Empty 
