@@ -15,9 +15,7 @@ using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Xunit;
@@ -78,20 +76,6 @@ namespace form_builder_tests.UnitTests.Controllers
             // Assert
             var redirectResult = Assert.IsType<RedirectResult>(result);
             Assert.Equal("https://www.stockport.gov.uk", redirectResult.Url);
-        }
-
-        [Fact]
-        public void Home_ShouldReturnErrorView_WhenNonProdEnv_ForHomeRoute()
-        {
-            // Arrange
-            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
-
-            // Act
-            var result = _homeController.Home();
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("../Error/Index", viewResult.ViewName);
         }
 
         [Fact]

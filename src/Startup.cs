@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Middleware;
 using form_builder.ModelBinders.Providers;
 using form_builder.Utils.ServiceCollectionExtensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,6 +57,7 @@ namespace form_builder
                 .AddServices()
                 .AddWorkflows()
                 .AddFactories()
+                .AddCache()
                 .AddAntiforgery(_ => _.Cookie.Name = ".formbuilder.antiforgery.v2")
                 .AddSession(_ =>
                 {
@@ -67,11 +66,8 @@ namespace form_builder
                     _.Cookie.Name = ".formbuilder.v2";
                 });
 
-            services.AddTransient<ICache, Cache.Cache>();
-            services.Configure<SubmissionServiceConfiguration>(Configuration.GetSection("SubmissionServiceConfiguration"));
-            services.AddTransient<ITagManagerConfiguration, TagManagerConfiguration>();
-
-            services.AddMvc()
+            services
+                .AddMvc()
                 .AddMvcOptions(options =>
                 {
                     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
@@ -87,17 +83,16 @@ namespace form_builder
             }
             else
             {
-                app.UseMiddleware<AppExceptionHandling>();
-                app.UseHsts();
+                app.UseMiddleware<AppExceptionHandling>()
+                    .UseHsts();
             }
 
-            app.UseMiddleware<HeaderConfiguration>();
-
-            app.UseSession();
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseRouting();
-            app.UseEndpoints(endpoints =>
+            app.UseMiddleware<HeaderConfiguration>()
+                .UseSession()
+                .UseHttpsRedirection()
+                .UseStaticFiles()
+                .UseRouting()
+                .UseEndpoints(endpoints =>
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}")

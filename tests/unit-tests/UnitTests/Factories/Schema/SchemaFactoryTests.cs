@@ -60,6 +60,11 @@ namespace form_builder_tests.UnitTests.Factories.Schema
         [Fact]
         public async Task Build_ShouldCallDistributedCache_When_CacheEnabled()
         {
+            // Arrange
+            _mockSchemaProvider
+                .Setup(_ => _.ValidateSchemaName(It.IsAny<string>()))
+                .ReturnsAsync(true);
+
             // Act
             await _schemaFactory.Build("form");
 
@@ -73,6 +78,10 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             // Arrange
             var formSchema = new FormSchemaBuilder()
                 .Build();
+
+            _mockSchemaProvider
+                .Setup(_ => _.ValidateSchemaName(It.IsAny<string>()))
+                .ReturnsAsync(true);
 
             _mockDistributedCache
                 .Setup(_ => _.GetString(It.IsAny<string>()))
@@ -132,6 +141,10 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .Build();
 
             _mockSchemaProvider
+                .Setup(_ => _.ValidateSchemaName(It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            _mockSchemaProvider
                 .Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
@@ -187,6 +200,10 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .WithPage(page)
                 .WithPage(page2)
                 .Build();
+
+            _mockSchemaProvider
+                .Setup(_ => _.ValidateSchemaName(It.IsAny<string>()))
+                .ReturnsAsync(true);
 
             _mockSchemaProvider
                 .Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))

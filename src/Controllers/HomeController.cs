@@ -51,7 +51,7 @@ namespace form_builder.Controllers
             if(_hostingEnvironment.EnvironmentName.ToLower().Equals("prod"))
                 return Redirect("https://www.stockport.gov.uk");
 
-            return View("../Error/Index");
+            return RedirectToAction("Index", "Error");
         }
 
         [HttpGet]
@@ -65,6 +65,10 @@ namespace form_builder.Controllers
         {
             var queryParamters = Request.Query;
             var response = await _pageService.ProcessPage(form, path, subPath, queryParamters);
+
+            if (response == null)
+                return RedirectToAction("NotFound", "Error");
+
             if (response.ShouldRedirect)
             {
                 var routeValuesDictionary = new RouteValueDictionaryBuilder()
