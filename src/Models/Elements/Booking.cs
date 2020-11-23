@@ -28,7 +28,9 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
+            Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
 
+            Appointments.Add(new SelectListItem("selet date", string.Empty));
             results.ForEach((objectResult) =>
             {
                 AvailabilityDayResponse appointment;

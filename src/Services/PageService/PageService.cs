@@ -177,7 +177,7 @@ namespace form_builder.Services.PageService
                 await _actionsWorkflow.Process(page.PageActions, null, form);
 
             if (page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
-                searchResults = ((IEnumerable<object>)await _bookingService.Get(null, page, baseForm, sessionGuid, path)).ToList();
+                searchResults = ((IEnumerable<object>)await _bookingService.Get(page,sessionGuid)).ToList();
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
 
@@ -225,6 +225,9 @@ namespace form_builder.Services.PageService
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
                 return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files, modelStateIsValid);
+
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.Booking))
+                return await _bookingService.ProcessBooking(viewModel, currentPage, baseForm, sessionGuid, path);
 
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 

@@ -1,4 +1,4 @@
-﻿using form_builder.Configuration;
+﻿using form_builder.Constants;
 using form_builder.ContentFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -7,16 +7,12 @@ using form_builder.Models;
 using form_builder.Providers.Booking;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
-using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace form_builder.Services.BookingService
@@ -24,12 +20,15 @@ namespace form_builder.Services.BookingService
     public interface IBookingService
     {
         Task<List<AvailabilityDayResponse>> Get(
+            Page currentPage,
+            string guid);
+
+        Task<ProcessRequestEntity> ProcessBooking(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,
             string guid,
             string path);
-
     }
 
     public class BookingService : IBookingService
@@ -51,14 +50,19 @@ namespace form_builder.Services.BookingService
         }
 
         public async Task<List<AvailabilityDayResponse>> Get(
-            Dictionary<string, dynamic> viewModel,
             Page currentPage,
-            FormSchema baseForm,
-            string guid,
-            string path)
+            string guid)
         {
+
             var bookingElement = currentPage.Elements.Where(_ => _.Type == EElementType.Booking)
                 .FirstOrDefault();
+
+            var searchResults = _distributedCache.GetString($"{bookingElement.Properties.AppointmentType}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}");
+
+            // Cached response stored 
+            if(!string.IsNullOrEmpty(searchResults))
+                return JsonConvert.DeserializeObject<List<AvailabilityDayResponse>>(searchResults);
+            
             var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
 
             var nextAvailability = await bookingProvider
@@ -80,10 +84,42 @@ namespace form_builder.Services.BookingService
                     AppointmentId = bookingElement.Properties.AppointmentType
               });
 
+            //Save appointmentTimes, need to append search month also to this + how long saved in cache.
+            _distributedCache.SetStringAsync($"{bookingElement.Properties.AppointmentType}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", JsonConvert.SerializeObject(appointmentTimes));
 
             // Return View
             return appointmentTimes;
         }
 
+        public async Task<ProcessRequestEntity> ProcessBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
+        {
+            // Process post request
+
+            // If page is valid, i.e. they have selected a Date then we can siply return the current page
+            // If page is not valid
+            // We need to repopulate the calendar from cached answers
+            if(!currentPage.IsValid)
+            {
+                var bookingElement = currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
+                var cachedResults = _distributedCache.GetString($"{bookingElement.Properties.AppointmentType}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}");
+
+                var convertedAnswers = JsonConvert.DeserializeObject<IEnumerable<object>>(cachedResults);
+                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null, convertedAnswers.ToList());
+
+                return new ProcessRequestEntity
+                {
+                    Page = currentPage,
+                    ViewModel = model
+                };
+            }
+
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+
+            //Return page if Valid.
+            return new ProcessRequestEntity
+            {
+                Page = currentPage
+            };
+        }
     }
 }

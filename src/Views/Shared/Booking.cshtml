@@ -2,6 +2,13 @@
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
 
-    <h1>Booking</h1>
+    <partial name="LabelH1" />
+
+    <partial name="InsetText" model="@Model.Properties.IAG" />
+
+    <partial name="Hint" />
+
+    <partial name="Error" />
+
     @Html.DropDownList(Model.QuestionId, Model.Appointments)
 </div>

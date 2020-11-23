@@ -74,22 +74,23 @@ namespace form_builder.Models
         }
 
         public IEnumerable<IElement> ValidatableElements => Elements.Where(element =>
-            element.Type == EElementType.Radio ||
-            element.Type == EElementType.Textarea ||
-            element.Type == EElementType.Select ||
-            element.Type == EElementType.Textbox ||
-            element.Type == EElementType.Checkbox ||
-            element.Type == EElementType.Declaration ||
             element.Type == EElementType.Address ||
             element.Type == EElementType.AddressManual ||
-            element.Type == EElementType.DateInput ||
-            element.Type == EElementType.TimeInput ||
+            element.Type == EElementType.Booking ||
+            element.Type == EElementType.Checkbox ||
             element.Type == EElementType.DatePicker ||
-            element.Type == EElementType.Street ||
-            element.Type == EElementType.Organisation ||
+            element.Type == EElementType.DateInput ||
+            element.Type == EElementType.Declaration ||
             element.Type == EElementType.FileUpload ||
+            element.Type == EElementType.Radio ||
+            element.Type == EElementType.Select ||
+            element.Type == EElementType.Street ||
+            element.Type == EElementType.Textarea ||
+            element.Type == EElementType.Textbox ||
+            element.Type == EElementType.TimeInput ||
+            element.Type == EElementType.Map ||
             element.Type == EElementType.MultipleFileUpload ||
-            element.Type == EElementType.Map
+            element.Type == EElementType.Organisation
         );
 
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
