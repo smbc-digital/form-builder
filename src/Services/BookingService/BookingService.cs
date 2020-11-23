@@ -53,7 +53,6 @@ namespace form_builder.Services.BookingService
             Page currentPage,
             string guid)
         {
-
             var bookingElement = currentPage.Elements.Where(_ => _.Type == EElementType.Booking)
                 .FirstOrDefault();
 
@@ -93,14 +92,32 @@ namespace form_builder.Services.BookingService
 
         public async Task<ProcessRequestEntity> ProcessBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
+            viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
+
+            // Handle check your booking via subpath not sure if i like this approach, might change
+            // to just a seperate page with an action on POST to call an endpoint, this will give
+            // move customisation but would require adding the endpoint within FormActions of the json.
+            switch (subPath)
+            {
+                case BookingConstants.CHECK_YOUR_BOOKING:
+                    return await ProcessCheckYourBooking(viewModel, currentPage, baseForm, guid, path);
+                default:
+                    return await ProcessDateAndTime(viewModel, currentPage, baseForm, guid, path);
+            }
+        }
+
+        private async Task<ProcessRequestEntity> ProcessDateAndTime(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path) 
+        {
+
             // Process post request
 
             // If page is valid, i.e. they have selected a Date then we can siply return the current page
             // If page is not valid
             // We need to repopulate the calendar from cached answers
+            var bookingElement = currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
+
             if(!currentPage.IsValid)
             {
-                var bookingElement = currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
                 var cachedResults = _distributedCache.GetString($"{bookingElement.Properties.AppointmentType}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}");
 
                 var convertedAnswers = JsonConvert.DeserializeObject<IEnumerable<object>>(cachedResults);
@@ -116,6 +133,30 @@ namespace form_builder.Services.BookingService
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
             //Return page if Valid.
+            if(!bookingElement.Properties.CheckYourBooking){
+                return new ProcessRequestEntity
+                {
+                    Page = currentPage
+                };
+            }
+
+            return new ProcessRequestEntity
+            {
+                RedirectToAction = true,
+                RedirectAction = "Index",
+                RouteValues = new
+                {
+                    form = baseForm.BaseURL,
+                    path,
+                    subPath = BookingConstants.CHECK_YOUR_BOOKING
+                }
+            };
+        }
+
+        private async Task<ProcessRequestEntity> ProcessCheckYourBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path) 
+        {
+            // Handle check your booking
+            // We dont actually need to do anything here
             return new ProcessRequestEntity
             {
                 Page = currentPage

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
@@ -28,22 +29,29 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
-
-            Appointments.Add(new SelectListItem("selet date", string.Empty));
-            results.ForEach((objectResult) =>
+            viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
+            switch (subPath as string)
             {
-                AvailabilityDayResponse appointment;
+                case BookingConstants.CHECK_YOUR_BOOKING:
+                    return viewRender.RenderAsync("CheckYourBooking", this);
+                default:
+                    Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
 
-                if ((objectResult as JObject) != null)
-                    appointment = (objectResult as JObject).ToObject<AvailabilityDayResponse>();
-                else
-                    appointment = objectResult as AvailabilityDayResponse;
+                    Appointments.Add(new SelectListItem("selet date", string.Empty));
+                    results.ForEach((objectResult) =>
+                    {
+                        AvailabilityDayResponse appointment;
 
-                Appointments.Add(new SelectListItem(appointment.Date.ToString(), appointment.Date.ToString()));
-            });
+                        if ((objectResult as JObject) != null)
+                            appointment = (objectResult as JObject).ToObject<AvailabilityDayResponse>();
+                        else
+                            appointment = objectResult as AvailabilityDayResponse;
 
-            return viewRender.RenderAsync(Type.ToString(), this);
+                        Appointments.Add(new SelectListItem(appointment.Date.ToString(), appointment.Date.ToString()));
+                    });
+
+                    return viewRender.RenderAsync(Type.ToString(), this);
+            }
         }
     }
 }

@@ -14,6 +14,7 @@ namespace form_builder.Validators
             if (element.Type == EElementType.DateInput || element.Type == EElementType.Map ||
                 element.Type == EElementType.TimeInput || element.Type == EElementType.DatePicker ||
                 element.Type == EElementType.MultipleFileUpload || element.Properties.Optional || 
+                element.Type == EElementType.Booking && viewModel.IsCheckYourBooking() ||
                 (element.Type == EElementType.Address && viewModel.IsManual()))
             {
                 return new ValidationResult
