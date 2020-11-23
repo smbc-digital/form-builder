@@ -1,6 +1,7 @@
 ﻿using form_builder.Configuration;
 using form_builder.ContentFactory;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.Booking;
@@ -49,27 +50,44 @@ namespace form_builder.Services.BookingService
             _pageFactory = pageFactory;
         }
 
-        public Task<ProcessRequestEntity> Get(
+        public async Task<ProcessRequestEntity> Get(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,
             string guid,
             string path)
         {
-            var bookingElement = currentPage.Elements.Where(_ => _.Type == EElementType.Booking).FirstOrDefault();
+            var bookingElement = currentPage.Elements.Where(_ => _.Type == EElementType.Booking)
+                .FirstOrDefault();
+            var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
 
-            AvailabilityDayResponse nextAvailability = await _bookingProviders.Get(bookingElement.Properties.AddressProvider).NextAvailability(new AvailabilityRequest());
+            var nextAvailability = await bookingProvider
+                .NextAvailability(new AvailabilityRequest{  
+                    StartDate = DateTime.Now, 
+                    EndDate = DateTime.Now.AddMonths(bookingElement.Properties.SearchPeriod),
+                    AppointmentId = bookingElement.Properties.AppointmentType
+                });
 
             // Is this next appointment within allowed timeframe
                 // If not ->
-                
+
+            var daysInMonth = DateTime.DaysInMonth(nextAvailability.Date.Year, nextAvailability.Date.Month);
+            var endDateSearch = new DateTime(nextAvailability.Date.Year, nextAvailability.Date.Month, daysInMonth, 23, 59, 59);
+
+            var appointmentTimes = await bookingProvider.GetAvailability(new AvailabilityRequest {
+                    StartDate = nextAvailability.Date,
+                    EndDate = endDateSearch,
+                    AppointmentId = bookingElement.Properties.AppointmentType
+              });
+
+
             // Get Availability from this nextAvailability Start DateTime
 
 
 
             // Return View
 
-            return Task.FromResult(new ProcessRequestEntity());
+            return new ProcessRequestEntity();
         }
 
     }

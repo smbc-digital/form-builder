@@ -50,6 +50,7 @@ namespace form_builder
                 .ConfigureOrganisationProviders()
                 .ConfigureStreetProviders()
                 .ConfigurePaymentProviders()
+                .ConfigureBookingProviders()
                 .ConfigureDocumentCreationProviders()
                 .ConfigureEmailProviders(HostingEnvironment)
                 .AddHelpers()

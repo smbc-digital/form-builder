@@ -1,10 +1,8 @@
-﻿using form_builder.Services.BookingService;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace form_builder.Providers.Booking
@@ -17,12 +15,13 @@ namespace form_builder.Providers.Booking
         {
             var response = new AvailabilityDayResponse()
             {
-                Date = DateTime.Now,
+                Date = DateTime.Now.AddDays(2),
                 AppointmentTimes = new List<AppointmentTime>()
             };
 
             return Task.FromResult(response);
-        }
+         }
+
         public Task<List<AvailabilityDayResponse>> GetAvailability(AvailabilityRequest request)
         {
             var availability = new List<AvailabilityDayResponse>();

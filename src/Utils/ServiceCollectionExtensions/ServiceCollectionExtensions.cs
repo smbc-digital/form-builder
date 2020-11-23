@@ -20,6 +20,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Mappers;
 using form_builder.Providers.Address;
+using form_builder.Providers.Booking;
 using form_builder.Providers.DocumentCreation;
 using form_builder.Providers.DocumentCreation.Generic;
 using form_builder.Providers.EmailProvider;
@@ -119,7 +120,6 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddHttpClient<IAddressServiceGateway, AddressServiceGateway>(configuration);
             services.AddHttpClient<IStreetServiceGateway, StreetServiceGateway>(configuration);
             services.AddHttpClient<IOrganisationServiceGateway, OrganisationServiceGateway>(configuration);
-            services.AddHttpClient<IBookingService, BookingService>();
 
             return services;
         }
@@ -181,6 +181,14 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             return services;
         }
 
+        public static IServiceCollection ConfigureBookingProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IBookingProvider, FakeBookingProvider>();
+
+            return services;
+        }
+
+
         public static IServiceCollection ConfigureOrganisationProviders(this IServiceCollection services)
         {
             services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
@@ -224,6 +232,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddSingleton<IAddressService, AddressService>();
+            services.AddSingleton<IBookingService, BookingService>();
             services.AddSingleton<IPageService, PageService>();
             services.AddSingleton<IStreetService, StreetService>();
             services.AddSingleton<ISubmitService, SubmitService>();

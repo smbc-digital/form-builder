@@ -14,6 +14,7 @@ using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
+using form_builder.Services.BookingService;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
@@ -45,6 +46,7 @@ namespace form_builder.Services.PageService
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IWebHostEnvironment _environment;
         private readonly IPayService _payService;
+        private readonly IBookingService _bookingService;
         private readonly IMappingService _mappingService;
         private readonly ISuccessPageFactory _successPageContentFactory;
         private readonly IPageFactory _pageContentFactory;
@@ -63,6 +65,7 @@ namespace form_builder.Services.PageService
             IWebHostEnvironment environment, 
             ISuccessPageFactory successPageFactory,
             IPageFactory pageFactory,
+            IBookingService bookingService,
             ISchemaFactory schemaFactory,
             IMappingService mappingService,
             IPayService payService,
@@ -74,6 +77,7 @@ namespace form_builder.Services.PageService
             _sessionHelper = sessionHelper;
             _streetService = streetService;
             _addressService = addressService;
+            _bookingService = bookingService;
             _organisationService = organisationService;
             _fileUploadService = fileUploadService;
             _distributedCache = distributedCache;
@@ -169,9 +173,10 @@ namespace form_builder.Services.PageService
             }
 
             if (page.HasPageActionsGetValues)
-            {
                 await _actionsWorkflow.Process(page.PageActions, null, form);
-            }
+
+            if(page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
+                await _bookingService.Get(null, page, baseForm, sessionGuid, path);
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
 
