@@ -31,6 +31,7 @@ using form_builder.Providers.Street;
 using form_builder.Providers.Transforms.Lookups;
 using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Services.AddressService;
+using form_builder.Services.BookingService;
 using form_builder.Services.DocumentService;
 using form_builder.Services.EmailService;
 using form_builder.Services.FileUploadService;
@@ -68,6 +69,13 @@ namespace form_builder.Utils.ServiceCollectionExtensions
     [ExcludeFromCodeCoverage]
     public static class ServiceCollectionExtensions
     {
+        public static IServiceCollection AddApis(this IServiceCollection services)
+        {
+            services.AddHttpClient<IBookingService, BookingService>();
+
+            return services;
+        }
+
         public static IServiceCollection AddValidators(this IServiceCollection services)
         {
             services.AddTransient<IElementValidator, RequiredElementValidator>();
@@ -300,6 +308,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection("ReCaptchaConfiguration"));
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
             services.Configure<TagManagerConfiguration>(TagManagerId => configuration.GetValue<string>("GoogleTagManagerId"));
+            services.Configure<BookingApiConfiguration>(configuration.GetSection("BookingApiConfiguration"));
 
             return services;
         }

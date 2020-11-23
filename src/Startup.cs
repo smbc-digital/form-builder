@@ -37,6 +37,7 @@ namespace form_builder
 
             services
                 .ConfigureCookiePolicy()
+                .AddApis()
                 .AddValidators()
                 .AddTagParsers()
                 .AddStorageProvider(Configuration)
