@@ -1,34 +1,76 @@
 ﻿@model form_builder.Models.Elements.Element
+@using form_builder.Enum;
+@{
+	var elements = Model.GenerateElementProperties();
+	var baseCssClasses = "govuk-input";
 
-<div class="govuk-radios">
-    @for (var i = 0; i < Model.Properties.Options.Count; i++)
-    {
+	switch (Model.Properties.Width)
+	{
+		case ESize.Small:
+			baseCssClasses += " govuk-input--width-3";
+			break;
 
-        var strongLabel = Model.Properties.Options[i].HasHint ? "govuk-label--s" : null;
+		case ESize.Medium:
+			baseCssClasses += " govuk-input--width-5";
+			break;
 
-        @if (Model.Properties.Options[i].HasDivider)
-        {
-            <div class="govuk-radios__divider">@Model.Properties.Options[i].Divider</div>
-        }
+		case ESize.Large:
+			baseCssClasses += " govuk-input--width-10";
+			break;
 
-        <div class="govuk-radios__item">
-            <input class="govuk-radios__input"
-                    type="radio"
-                    value="@Model.Properties.Options[i].Value"
-                    name="@Model.QuestionId"
-                    id="@Model.GetListItemId(i)"
-                    @(Model.Properties.Options[i].HasHint ? $"aria-describedby={Model.GetListItemHintId(i)}" : string.Empty)
-                    @(Model.Properties.Checked || Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty) />
+		case ESize.ExtraLarge:
+			baseCssClasses += " govuk-input--width-20";
+			break;
+	}
 
-            <label class="govuk-label govuk-radios__label @strongLabel"
-                   for="@Model.GetListItemId(i)">
-                @Html.Raw(Model.Properties.Options[i].Text)
-            </label>
+	elements.Add("class", !Model.IsValid
+		? $"{baseCssClasses} govuk-input--error"
+		: baseCssClasses);
+}
 
-            @if (Model.Properties.Options[i].HasHint)
-            {
-                <span class="govuk-hint govuk-radios__hint" id="@Model.GetListItemHintId(i)">@Html.Raw(Model.Properties.Options[i].Hint)</span>
-            }
-        </div>
-    }
+<div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+	@for (var i = 0; i < Model.Properties.Options.Count; i++)
+	{
+
+		var strongLabel = Model.Properties.Options[i].HasHint ? "govuk-label--s" : null;
+
+		@if (Model.Properties.Options[i].HasDivider)
+		{
+			<div class="govuk-radios__divider">@Model.Properties.Options[i].Divider</div>
+		}
+
+		<div class="govuk-radios__item">
+			<input class="govuk-radios__input"
+				   type="radio"
+				   value="@Model.Properties.Options[i].Value"
+				   name="@Model.QuestionId"
+				   id="@Model.GetListItemId(i)"
+				   @(Model.Properties.Options[i].HasHint ? $"aria-describedby={Model.GetListItemHintId(i)}" : string.Empty)
+				   @(Model.Properties.Checked || Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty)
+				   data-aria-controls="conditional-whatThings"/>
+
+			<label class="govuk-label govuk-radios__label @strongLabel"
+				   for="@Model.GetListItemId(i)">
+				@Html.Raw(Model.Properties.Options[i].Text)
+			</label>
+
+			@if (Model.Properties.Options[i].HasHint)
+			{
+				<span class="govuk-hint govuk-radios__hint" id="@Model.GetListItemHintId(i)">@Html.Raw(Model.Properties.Options[i].Hint)</span>
+			}
+
+			@if (Model.Properties.Options[i].HasConditionalElement)
+			{
+				<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-whatThings">
+					<div class="govuk-form-group">
+						<label class="govuk-label" for="contact-by-email">
+							@Model.Properties.Options[i].ConditionalElement.Label
+						</label>
+						@Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
+					</div>
+				</div>
+			}
+
+		</div>
+	}
 </div>

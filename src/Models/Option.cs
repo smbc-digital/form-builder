@@ -1,3 +1,5 @@
+using form_builder.Models.Elements;
+
 namespace form_builder.Models
 {
     public class Option
@@ -8,7 +10,11 @@ namespace form_builder.Models
 
         public string Hint { get; set; }
 
+        public Textbox ConditionalElement { get; set; }
+
         public bool HasHint => !string.IsNullOrEmpty(Hint);
+
+        public bool HasConditionalElement => !(ConditionalElement is null);
 
         public bool Checked { get; set; }
 
