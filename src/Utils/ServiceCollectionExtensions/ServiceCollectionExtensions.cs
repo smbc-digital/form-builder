@@ -69,13 +69,6 @@ namespace form_builder.Utils.ServiceCollectionExtensions
     [ExcludeFromCodeCoverage]
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddApis(this IServiceCollection services)
-        {
-            services.AddHttpClient<IBookingService, BookingService>();
-
-            return services;
-        }
-
         public static IServiceCollection AddValidators(this IServiceCollection services)
         {
             services.AddTransient<IElementValidator, RequiredElementValidator>();
@@ -126,6 +119,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddHttpClient<IAddressServiceGateway, AddressServiceGateway>(configuration);
             services.AddHttpClient<IStreetServiceGateway, StreetServiceGateway>(configuration);
             services.AddHttpClient<IOrganisationServiceGateway, OrganisationServiceGateway>(configuration);
+            services.AddHttpClient<IBookingService, BookingService>();
 
             return services;
         }
