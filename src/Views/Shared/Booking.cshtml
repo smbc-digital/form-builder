@@ -3,5 +3,5 @@
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
 
     <h1>Booking</h1>
-
+    @Html.DropDownList(Model.QuestionId, Model.Appointments)
 </div>

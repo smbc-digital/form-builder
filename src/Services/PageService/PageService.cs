@@ -29,6 +29,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Expressions;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.Booking.Response;
 
 namespace form_builder.Services.PageService
 {
@@ -53,16 +54,16 @@ namespace form_builder.Services.PageService
         private readonly IIncomingDataHelper _incomingDataHelper;
         private readonly IActionsWorkflow _actionsWorkflow;
         public PageService(
-            IEnumerable<IElementValidator> validators, 
-            IPageHelper pageHelper, 
-            ISessionHelper sessionHelper, 
+            IEnumerable<IElementValidator> validators,
+            IPageHelper pageHelper,
+            ISessionHelper sessionHelper,
             IAddressService addressService,
             IFileUploadService fileUploadService,
-            IStreetService streetService, 
-            IOrganisationService organisationService, 
-            IDistributedCacheWrapper distributedCache, 
-            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration, 
-            IWebHostEnvironment environment, 
+            IStreetService streetService,
+            IOrganisationService organisationService,
+            IDistributedCacheWrapper distributedCache,
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
+            IWebHostEnvironment environment,
             ISuccessPageFactory successPageFactory,
             IPageFactory pageFactory,
             IBookingService bookingService,
@@ -91,7 +92,7 @@ namespace form_builder.Services.PageService
             _incomingDataHelper = incomingDataHelper;
             _actionsWorkflow = actionsWorkflow;
         }
-        
+
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParamters)
         {
             if (string.IsNullOrEmpty(path))
@@ -110,7 +111,7 @@ namespace form_builder.Services.PageService
             if (baseForm == null)
                 return null;
 
-            if(!baseForm.IsAvailable(_environment.EnvironmentName))
+            if (!baseForm.IsAvailable(_environment.EnvironmentName))
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
 
             var formData = _distributedCache.GetString(sessionGuid);
@@ -150,7 +151,7 @@ namespace form_builder.Services.PageService
                 if (!string.IsNullOrEmpty(formData))
                     convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-                if(convertedAnswers.FormData.ContainsKey($"{path}{LookUpConstants.SearchResultsKeyPostFix}"))
+                if (convertedAnswers.FormData.ContainsKey($"{path}{LookUpConstants.SearchResultsKeyPostFix}"))
                     searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
             }
 
@@ -162,7 +163,7 @@ namespace form_builder.Services.PageService
                 page.Elements.First(_ => _.Type == EElementType.PaymentSummary).Properties.Value = paymentAmount.Settings.Amount;
             }
 
-            if(page.HasIncomingGetValues)
+            if (page.HasIncomingGetValues)
             {
                 var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
                 if (!string.IsNullOrEmpty(formData))
@@ -175,8 +176,8 @@ namespace form_builder.Services.PageService
             if (page.HasPageActionsGetValues)
                 await _actionsWorkflow.Process(page.PageActions, null, form);
 
-            if(page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
-                await _bookingService.Get(null, page, baseForm, sessionGuid, path);
+            if (page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
+                searchResults = ((IEnumerable<object>)await _bookingService.Get(null, page, baseForm, sessionGuid, path)).ToList();
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
 
@@ -195,7 +196,7 @@ namespace form_builder.Services.PageService
         {
             var baseForm = await _schemaFactory.Build(form);
 
-            if(!baseForm.IsAvailable(_environment.EnvironmentName))
+            if (!baseForm.IsAvailable(_environment.EnvironmentName))
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
 
             var currentPage = baseForm.GetPage(_pageHelper, path);
@@ -208,7 +209,7 @@ namespace form_builder.Services.PageService
             if (currentPage == null)
                 throw new NullReferenceException($"Current page '{path}' object could not be found.");
 
-            if(currentPage.HasIncomingPostValues)
+            if (currentPage.HasIncomingPostValues)
                 viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
             currentPage.Validate(viewModel, _validators);
@@ -224,7 +225,7 @@ namespace form_builder.Services.PageService
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
                 return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files, modelStateIsValid);
-            
+
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
             if (!currentPage.IsValid)
@@ -271,7 +272,7 @@ namespace form_builder.Services.PageService
 
             return currentPageResult.Page.GetNextPage(answers);
         }
-        
+
         public async Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType, FormSchema baseForm)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
@@ -292,15 +293,16 @@ namespace form_builder.Services.PageService
                     var formFileAnswerData = formAnswers.Pages.SelectMany(_ => _.Answers).FirstOrDefault(_ => _.QuestionId == $"{fileElement.Properties.QuestionId}{FileUploadConstants.SUFFIX}")?.Response ?? string.Empty;
                     List<FileUploadModel> convertedFileUploadAnswer = JsonConvert.DeserializeObject<List<FileUploadModel>>(formFileAnswerData.ToString());
 
-                    if(convertedFileUploadAnswer != null && convertedFileUploadAnswer.Any())
+                    if (convertedFileUploadAnswer != null && convertedFileUploadAnswer.Any())
                     {
-                        convertedFileUploadAnswer.ForEach((_) => {
+                        convertedFileUploadAnswer.ForEach((_) =>
+                        {
                             _distributedCache.Remove(_.Key);
                         });
                     }
                 });
 
-            if(baseForm.DocumentDownload)
+            if (baseForm.DocumentDownload)
                 await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(formAnswers), _distributedCacheExpirationConfiguration.Document);
 
             return await _successPageContentFactory.Build(form, baseForm, sessionGuid, formAnswers, behaviourType);

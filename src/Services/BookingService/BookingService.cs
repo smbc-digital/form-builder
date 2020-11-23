@@ -23,7 +23,7 @@ namespace form_builder.Services.BookingService
 {
     public interface IBookingService
     {
-        Task<ProcessRequestEntity> Get(
+        Task<List<AvailabilityDayResponse>> Get(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,
@@ -50,7 +50,7 @@ namespace form_builder.Services.BookingService
             _pageFactory = pageFactory;
         }
 
-        public async Task<ProcessRequestEntity> Get(
+        public async Task<List<AvailabilityDayResponse>> Get(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,
@@ -81,13 +81,8 @@ namespace form_builder.Services.BookingService
               });
 
 
-            // Get Availability from this nextAvailability Start DateTime
-
-
-
             // Return View
-
-            return new ProcessRequestEntity();
+            return appointmentTimes;
         }
 
     }
