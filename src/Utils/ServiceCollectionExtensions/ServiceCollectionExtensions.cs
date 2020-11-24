@@ -312,7 +312,6 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection("ReCaptchaConfiguration"));
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
             services.Configure<TagManagerConfiguration>(TagManagerId => configuration.GetValue<string>("GoogleTagManagerId"));
-            services.Configure<BookingApiConfiguration>(configuration.GetSection("BookingApiConfiguration"));
 
             return services;
         }

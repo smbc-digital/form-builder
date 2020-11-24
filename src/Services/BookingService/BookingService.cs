@@ -8,11 +8,13 @@ using form_builder.Models.Elements;
 using form_builder.Providers.Booking;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
+using form_builder.Utils.Extesions;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -54,15 +56,18 @@ namespace form_builder.Services.BookingService
             Page currentPage,
             string guid)
         {
-            var bookingElement = currentPage.Elements.Where(_ => _.Type == EElementType.Booking)
+            var bookingElement = currentPage.Elements
+                .Where(_ => _.Type == EElementType.Booking)
                 .FirstOrDefault();
 
-            var searchResults = _distributedCache.GetString($"{bookingElement.Properties.AppointmentType}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}");
+            var appointmentTimes = new List<AvailabilityDayResponse>();
 
-            // Cached response stored 
-            if(!string.IsNullOrEmpty(searchResults))
+            string cacheKey = $"{bookingElement.Properties.AppointmentType}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var searchResults = _distributedCache.GetString(cacheKey);
+
+            if (!string.IsNullOrEmpty(searchResults))
                 return JsonConvert.DeserializeObject<List<AvailabilityDayResponse>>(searchResults);
-            
+
             var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
 
             var nextAvailability = await bookingProvider
@@ -72,20 +77,21 @@ namespace form_builder.Services.BookingService
                     AppointmentId = bookingElement.Properties.AppointmentType
                 });
 
-            // Is this next appointment within allowed timeframe
-                // If not ->
+            // Is no next appointment within allowed timeframe
+            if (nextAvailability.Date < DateTime.Now)
+            {
+                await _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(appointmentTimes));
+                return appointmentTimes;
+            }
 
-            var daysInMonth = DateTime.DaysInMonth(nextAvailability.Date.Year, nextAvailability.Date.Month);
-            var endDateSearch = new DateTime(nextAvailability.Date.Year, nextAvailability.Date.Month, daysInMonth, 23, 59, 59);
-
-            var appointmentTimes = await bookingProvider.GetAvailability(new AvailabilityRequest {
+            appointmentTimes = await bookingProvider.GetAvailability(new AvailabilityRequest {
                     StartDate = nextAvailability.Date,
-                    EndDate = endDateSearch,
+                    EndDate = nextAvailability.Date.LastDayOfTheMonth(),
                     AppointmentId = bookingElement.Properties.AppointmentType
               });
 
-            //Save appointmentTimes, need to append search month also to this + how long saved in cache.
-            _distributedCache.SetStringAsync($"{bookingElement.Properties.AppointmentType}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", JsonConvert.SerializeObject(appointmentTimes));
+            //Save appointmentTimes, how long saved in cache.
+            await _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(appointmentTimes));
 
             // Return View
             return appointmentTimes;
@@ -112,7 +118,7 @@ namespace form_builder.Services.BookingService
 
             // Process post request
 
-            // If page is valid, i.e. they have selected a Date then we can siply return the current page
+            // If page is valid, i.e. they have selected a Date then we can simply return the current page
             // If page is not valid
             // We need to repopulate the calendar from cached answers
             var bookingElement = currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
