@@ -24,23 +24,36 @@ namespace form_builder.Providers.Booking
 
         public Task<List<AvailabilityDayResponse>> GetAvailability(AvailabilityRequest request)
         {
-            var availability = new List<AvailabilityDayResponse>();
             var todayDate = DateTime.Now;
-            availability.Add(new AvailabilityDayResponse() 
+            return Task.FromResult(new List<AvailabilityDayResponse>
             {
-                Date = new DateTime(todayDate.Year, todayDate.Month, todayDate.Day),
-                AppointmentTimes = new List<AppointmentTime>
+                new AvailabilityDayResponse() 
                 {
-                    new AppointmentTime 
+                    Date = new DateTime(todayDate.Year, todayDate.Month, todayDate.Day),
+                    AppointmentTimes = new List<AppointmentTime>
                     {
-                        StartTime = new TimeSpan(7, 0, 0),
-                        EndTime = new TimeSpan(17, 0, 0),
-                        Duration = new TimeSpan(10, 0, 0)
-                    }
+                        new AppointmentTime 
+                        {
+                            StartTime = new TimeSpan(7, 0, 0),
+                            EndTime = new TimeSpan(17, 0, 0),
+                            Duration = new TimeSpan(10, 0, 0)
+                        },
+                    },
+                },
+                new AvailabilityDayResponse() 
+                {
+                    Date = new DateTime(todayDate.Year, todayDate.Month, todayDate.Day).AddDays(1),
+                    AppointmentTimes = new List<AppointmentTime>
+                    {
+                        new AppointmentTime 
+                        {
+                            StartTime = new TimeSpan(7, 0, 0),
+                            EndTime = new TimeSpan(17, 0, 0),
+                            Duration = new TimeSpan(10, 0, 0)
+                        },
+                    },
                 }
             });
-
-            return Task.FromResult(availability);
         }
         public Task<Guid> Reserve(BookingRequest request)
         {

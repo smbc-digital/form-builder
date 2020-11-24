@@ -1,5 +1,6 @@
 @model form_builder.Models.Elements.Booking
 
+@Html.Hidden(@Model.BookingDateQuestionId, @Model.Properties.Value)
 <h1 class="govuk-heading-l">Check your booking</h1>
 <table class="govuk-table">
     <tr class="govuk-table__row">
