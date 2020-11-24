@@ -176,7 +176,7 @@ namespace form_builder.Services.PageService
             if (page.HasPageActionsGetValues)
                 await _actionsWorkflow.Process(page.PageActions, null, form);
 
-            if (page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)) && !subPath.Equals(BookingConstants.CHECK_YOUR_BOOKING))
+            if (page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
                 searchResults = ((IEnumerable<object>)await _bookingService.Get(page,sessionGuid)).ToList();
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);

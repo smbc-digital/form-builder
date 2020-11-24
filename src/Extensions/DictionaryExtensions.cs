@@ -53,22 +53,6 @@ namespace form_builder.Extensions
                             normalisedFormData.Add($"{item.Key}-description", organisationDetails[1]);
                         }
                     }
-                    else if (item.Key.EndsWith(BookingConstants.APPOINTMENT_DATE) && !string.IsNullOrEmpty(item.Value[0]))
-                    {
-                        var bookingDetails = item.Value[0].Split('|');
-                        if (!string.IsNullOrEmpty(bookingDetails[0]))
-                        {
-                            normalisedFormData.Add(item.Key, bookingDetails[0]);
-                        }
-                        if (!string.IsNullOrEmpty(bookingDetails[1]))
-                        {
-                            normalisedFormData.Add($"{item.Key}{BookingConstants.APPOINTMENT_FULL_DAY_START_TIME}", bookingDetails[1]);
-                        }
-                        if (!string.IsNullOrEmpty(bookingDetails[2]))
-                        {
-                            normalisedFormData.Add($"{item.Key}{BookingConstants.APPOINTMENT_FULL_DAY_END_TIME}", bookingDetails[2]);
-                        }
-                    }
                     else
                     {
                         normalisedFormData.Add(item.Key, item.Value[0]);

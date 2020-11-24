@@ -41,15 +41,15 @@ namespace form_builder.Validators
             }
 
             // Do we need to validate Date
-            // var date = viewModel[bookingElement.Properties.QuestionId];
-            // var isValidDate = DateTime.TryParse(date, out DateTime dateValue);
+            var date = viewModel[bookingElement.BookingDateQuestionId];
+            var isValidDate = DateTime.TryParse(date, out DateTime dateValue);
 
-            // if(!isValidDate){
-            //     return new ValidationResult
-            //     {
-            //         IsValid = false
-            //     };
-            // }
+            if(!isValidDate){
+                return new ValidationResult
+                {
+                    IsValid = false
+                };
+            }
 
             //Validate Time
 
