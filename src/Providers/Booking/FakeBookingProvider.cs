@@ -25,10 +25,18 @@ namespace form_builder.Providers.Booking
         public Task<List<AvailabilityDayResponse>> GetAvailability(AvailabilityRequest request)
         {
             var availability = new List<AvailabilityDayResponse>();
+            var today = DateTime.Now;
             availability.Add(new AvailabilityDayResponse() 
             {
                 Date = DateTime.Now,
-                AppointmentTimes = new List<AppointmentTime>()
+                AppointmentTimes = new List<AppointmentTime>
+                {
+                    new AppointmentTime 
+                    {
+                        StartTime = new TimeSpan(7, 0, 0),
+                        EndTime = new TimeSpan(17, 0, 0)
+                    }
+                }
             });
 
             return Task.FromResult(availability);

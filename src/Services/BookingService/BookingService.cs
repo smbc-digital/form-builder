@@ -4,6 +4,7 @@ using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Providers.Booking;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
@@ -140,6 +141,10 @@ namespace form_builder.Services.BookingService
                 };
             }
 
+            // How to handle if user goes back and forward in browser, 
+            // we do not want to resever the appointment again
+            await ReserveAppointment(bookingElement);
+
             return new ProcessRequestEntity
             {
                 RedirectToAction = true,
@@ -156,11 +161,22 @@ namespace form_builder.Services.BookingService
         private async Task<ProcessRequestEntity> ProcessCheckYourBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path) 
         {
             // Handle check your booking
-            // We dont actually need to do anything here
+            var bookingElement = currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
+            await ReserveAppointment(bookingElement);
+
             return new ProcessRequestEntity
             {
                 Page = currentPage
             };
+        }
+
+        private async Task ReserveAppointment(IElement bookingElement)
+        {
+            //Reserve appointment
+            //Needs
+            //User Data
+            //Selected DateTime.
+            var appointmentId = _bookingProviders.Get(bookingElement.Properties.BookingProvider).Reserve(new BookingRequest());
         }
     }
 }
