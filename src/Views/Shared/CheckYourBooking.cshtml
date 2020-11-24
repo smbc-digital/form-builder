@@ -1,8 +1,13 @@
-@model form_builder.Models.Elements.Element
+@model form_builder.Models.Elements.Booking
 
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-    <h1>Check your booking</h1>
-    <table>
-
-    </table>
-</div>
+<h1 class="govuk-heading-l">Check your booking</h1>
+<table class="govuk-table">
+    <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header">Date:</th>
+        <td class="govuk-table__cell">@Model.FormattedDateForCheckYourBooking</td>
+    </tr>
+    <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header">Time:</th>
+        <td class="govuk-table__cell">between 8am and 4pm</td>
+    </tr>
+</table>

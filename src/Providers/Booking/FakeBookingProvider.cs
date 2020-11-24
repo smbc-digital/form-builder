@@ -34,7 +34,8 @@ namespace form_builder.Providers.Booking
                     new AppointmentTime 
                     {
                         StartTime = new TimeSpan(7, 0, 0),
-                        EndTime = new TimeSpan(17, 0, 0)
+                        EndTime = new TimeSpan(17, 0, 0),
+                        Duration = new TimeSpan(10, 0, 0)
                     }
                 }
             });
