@@ -47,7 +47,7 @@
 				   id="@Model.GetListItemId(i)"
 				   @(Model.Properties.Options[i].HasHint ? $"aria-describedby={Model.GetListItemHintId(i)}" : string.Empty)
 				   @(Model.Properties.Checked || Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty)
-				   data-aria-controls="conditional-whatThings"/>
+				   data-aria-controls="conditional-whatThings-@i"/>
 
 			<label class="govuk-label govuk-radios__label @strongLabel"
 				   for="@Model.GetListItemId(i)">
@@ -61,7 +61,7 @@
 
 			@if (Model.Properties.Options[i].HasConditionalElement)
 			{
-				<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-whatThings">
+				<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-whatThings-@i">
 					<div class="govuk-form-group">
 						<label class="govuk-label" for="contact-by-email">
 							@Model.Properties.Options[i].ConditionalElement.Label
