@@ -62,11 +62,16 @@ namespace form_builder.Services.BookingService
 
             var appointmentTimes = new List<AvailabilityDayResponse>();
 
-            string cacheKey = $"{bookingElement.Properties.AppointmentType}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
-            var searchResults = _distributedCache.GetString(cacheKey);
+            var bookingSearchResultsKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var cachedAnswers = _distributedCache.GetString(guid);
 
-            if (!string.IsNullOrEmpty(searchResults))
-                return JsonConvert.DeserializeObject<List<AvailabilityDayResponse>>(searchResults);
+            if(cachedAnswers != null)
+            {
+                var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+
+                if (convertedAnswers.FormData.ContainsKey(bookingSearchResultsKey))
+                    return JsonConvert.DeserializeObject<List<AvailabilityDayResponse>>(convertedAnswers.FormData[bookingSearchResultsKey].ToString());
+            }
 
             var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
 
@@ -80,7 +85,7 @@ namespace form_builder.Services.BookingService
             // Is no next appointment within allowed timeframe
             if (nextAvailability.Date < DateTime.Now)
             {
-                await _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(appointmentTimes));
+                _pageHelper.SaveFormData(bookingSearchResultsKey, appointmentTimes, guid);
                 return appointmentTimes;
             }
 
@@ -90,10 +95,8 @@ namespace form_builder.Services.BookingService
                     AppointmentId = bookingElement.Properties.AppointmentType
               });
 
-            //Save appointmentTimes, how long saved in cache.
-            await _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(appointmentTimes));
+            _pageHelper.SaveFormData(bookingSearchResultsKey, appointmentTimes, guid);
 
-            // Return View
             return appointmentTimes;
         }
 
@@ -125,10 +128,14 @@ namespace form_builder.Services.BookingService
 
             if(!currentPage.IsValid)
             {
-                var cachedResults = _distributedCache.GetString($"{bookingElement.Properties.AppointmentType}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}");
+                var cachedAnswers = _distributedCache.GetString(guid);
 
-                var convertedAnswers = JsonConvert.DeserializeObject<IEnumerable<object>>(cachedResults);
-                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null, convertedAnswers.ToList());
+                var convertedAnswers = cachedAnswers == null
+                    ? new FormAnswers { Pages = new List<PageAnswers>() }
+                    : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+
+                var bookingSearchResults = (convertedAnswers.FormData[$"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}"] as IEnumerable<object>).ToList();
+                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null, bookingSearchResults);
 
                 return new ProcessRequestEntity
                 {
