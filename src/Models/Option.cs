@@ -10,7 +10,7 @@ namespace form_builder.Models
 
         public string Hint { get; set; }
 
-        public Textbox ConditionalElement { get; set; }
+        public Element ConditionalElement { get; set; }
 
         public bool HasHint => !string.IsNullOrEmpty(Hint);
 
