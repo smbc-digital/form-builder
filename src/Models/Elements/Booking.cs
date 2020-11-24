@@ -22,7 +22,7 @@ namespace form_builder.Models.Elements
         public List<SelectListItem> Appointments { get; set; } = new List<SelectListItem>();
 
         public string FormattedDateForCheckYourBooking => DateTime.Parse(Properties.Value).ToString("dddd dd MMMM yyyy");
-        public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {DateTime.Today.Add(SelectedBooking.AppointmentTimes.First().StartTime).ToString("hh:mm tt")} and {DateTime.Today.Add(SelectedBooking.AppointmentTimes.First().EndTime).ToString("hh:mm tt")}" : "NotFullDay";
+        public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {DateTime.Today.Add(SelectedBooking.AppointmentTimes.First().StartTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "").ToLower()} and {DateTime.Today.Add(SelectedBooking.AppointmentTimes.First().EndTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "")}" : "NotFullDay";
         public AvailabilityDayResponse SelectedBooking;
         public bool IsAppointmentFullDay => SelectedBooking.IsFullDayAppointment;
         public string BookingDateQuestionId => $"{Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}";
