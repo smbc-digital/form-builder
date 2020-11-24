@@ -19,6 +19,10 @@ namespace form_builder.Models.Elements
         }
         public List<SelectListItem> Appointments { get; set; } = new List<SelectListItem>();
 
+        public string BookingDateQuestionId => $"{Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}";
+        public string BookingTimeQuestionId => $"{Properties.QuestionId}{BookingConstants.APPOINTMENT_TIME}";
+        public string BookingAppointmentId => $"{Properties.QuestionId}{BookingConstants.APPOINTMENT_ID}";
+
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,

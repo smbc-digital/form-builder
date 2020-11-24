@@ -97,6 +97,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddTransient<IElementValidator, RestrictMimeTypeValidator>();
             services.AddTransient<IElementValidator, RestrictFileSizeValidator>();
             services.AddTransient<IElementValidator, RestrictCombinedFileSizeValidator>();
+            services.AddTransient<IElementValidator, BookingValidator>();
 
             return services;
         }
