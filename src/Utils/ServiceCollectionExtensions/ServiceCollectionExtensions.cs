@@ -59,6 +59,7 @@ using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Gateways.AddressService;
+using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Gateways.CivicaPay;
 using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
@@ -121,6 +122,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddHttpClient<IAddressServiceGateway, AddressServiceGateway>(configuration);
             services.AddHttpClient<IStreetServiceGateway, StreetServiceGateway>(configuration);
             services.AddHttpClient<IOrganisationServiceGateway, OrganisationServiceGateway>(configuration);
+            services.AddHttpClient<IBookingServiceGateway, BookingServiceGateway>(configuration);
 
             return services;
         }
@@ -185,6 +187,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         public static IServiceCollection ConfigureBookingProviders(this IServiceCollection services)
         {
             services.AddSingleton<IBookingProvider, FakeBookingProvider>();
+            services.AddSingleton<IBookingProvider, BookingProvider>();
 
             return services;
         }
