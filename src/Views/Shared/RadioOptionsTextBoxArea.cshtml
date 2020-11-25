@@ -1,0 +1,135 @@
+﻿@model form_builder.Models.Elements.Element
+
+	@using form_builder.Enum;
+	@{
+		var elements = Model.GenerateElementProperties();
+
+		var textAreaElementProperties = Model.GenerateElementProperties();
+		textAreaElementProperties.Add("class", !Model.IsValid
+			? "govuk-textarea govuk-js-character-count govuk-textarea--error"
+			: "govuk-textarea govuk-js-character-count");
+
+		var baseCssClasses = "govuk-input";
+
+		switch (Model.Properties.Width)
+		{
+			case ESize.Small:
+				baseCssClasses += " govuk-input--width-3";
+				break;
+
+			case ESize.Medium:
+				baseCssClasses += " govuk-input--width-5";
+				break;
+
+			case ESize.Large:
+				baseCssClasses += " govuk-input--width-10";
+				break;
+
+			case ESize.ExtraLarge:
+				baseCssClasses += " govuk-input--width-20";
+				break;
+		}
+
+		elements.Add("class", !Model.IsValid
+			? $"{baseCssClasses} govuk-input--error"
+			: baseCssClasses);
+	}
+
+	<div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+		@for (var i = 0; i < Model.Properties.Options.Count; i++)
+		{
+			var strongLabel = Model.Properties.Options[i].HasHint ? "govuk-label--s" : null;
+
+			@if (Model.Properties.Options[i].HasDivider)
+			{
+				<div class="govuk-radios__divider">@Model.Properties.Options[i].Divider</div>
+			}
+
+	<div class="govuk-radios__item">
+		<input class="govuk-radios__input"
+			   type="radio"
+			   value="@Model.Properties.Options[i].Value"
+			   name="@Model.QuestionId"
+			   id="@Model.GetListItemId(i)"
+			   @(Model.Properties.Options[i].HasHint ? $"aria-describedby={Model.GetListItemHintId(i)}" : string.Empty)
+			   @(Model.Properties.Checked || Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty)
+			   data-aria-controls="conditional-@i" />
+
+		<label class="govuk-label govuk-radios__label @strongLabel"
+			   for="@Model.GetListItemId(i)">
+			@Html.Raw(Model.Properties.Options[i].Text)
+		</label>
+
+		@if (Model.Properties.Options[i].HasHint)
+		{
+			<span class="govuk-hint govuk-radios__hint" id="@Model.GetListItemHintId(i)">@Html.Raw(Model.Properties.Options[i].Hint)</span>
+		}
+
+		@if (Model.Properties.Options[i].HasConditionalElement)
+		{
+			@if (@Model.Properties.Options[i].ConditionalElement.Type == EElementType.Textbox)
+			{
+				<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">  
+					<div class="govuk-form-group @(!Model.Properties.Options[i].ConditionalElement.IsValid ? "govuk-form-group--error" : string.Empty)">
+						<partial name="InsetText" model="@Model.Properties.IAG" />
+
+						<partial name="Hint" />
+						
+						@if (!Model.Properties.Options[i].ConditionalElement.IsValid)
+						{
+							var viewModel = new form_builder.ViewModels.ErrorViewModel
+							{
+								IsValid = Model.Properties.Options[i].ConditionalElement.IsValid,
+								Message = Model.Properties.Options[i].ConditionalElement.ValidationMessage,
+								Id = Model.Properties.Options[i].ConditionalElement.ErrorId
+							};
+
+							@if (!Model.Properties.Options[i].ConditionalElement.IsValid)
+							{
+								<span class="smbc-error-message">
+									<span class="govuk-visually-hidden">Error:</span>
+								</span>
+							}
+						}
+
+						<label class="govuk-label">
+							@Model.Properties.Options[i].ConditionalElement.Label
+						</label>
+						@Html.TextBox(Model.Properties.Options[i].ConditionalElement.QuestionId, Model.Properties.Options[i].ConditionalElement.Properties.Value, elements)
+					</div>
+				</div>
+			}
+
+			@if (@Model.Properties.Options[i].ConditionalElement.Type == EElementType.Textarea)
+			{
+				@if (@Model.Properties.Options[i].ConditionalElement.Properties.DisplayCharacterCount)
+				{
+					<div class="govuk-character-count govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i" data-module="govuk-character-count" data-maxlength="@Model.Properties.Options[i].ConditionalElement.Properties.MaxLength">
+						<div class="govuk-form-group">
+							<label class="govuk-label" for="contact-by-email">
+								@Model.Properties.Options[i].ConditionalElement.Label
+							</label>
+							@Html.TextArea(Model.Properties.Options[i].ConditionalElement.QuestionId, Model.Properties.Options[i].ConditionalElement.Properties.Value, textAreaElementProperties)
+						</div>
+						<span id=@Model.GetCustomItemId("info") class="govuk-hint govuk-character-count__message" aria-live="polite">
+							You can enter up to @Model.Properties.Options[i].ConditionalElement.Properties.MaxLength characters
+						</span>
+					</div>
+				}
+				else
+				{
+					<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i" data-maxlength="@Model.Properties.Options[i].ConditionalElement.Properties.MaxLength">
+						<div class="govuk-form-group">
+							<label class="govuk-label" for="contact-by-email">
+								@Model.Properties.Options[i].ConditionalElement.Label
+							</label>
+							@Html.TextArea(Model.Properties.Options[i].ConditionalElement.QuestionId, Model.Properties.Options[i].ConditionalElement.Properties.Value, textAreaElementProperties)
+						</div>
+					</div>
+				}
+			}
+		}
+
+	</div>
+		}
+	</div>
