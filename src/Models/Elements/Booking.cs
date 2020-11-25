@@ -19,13 +19,16 @@ namespace form_builder.Models.Elements
         {
             Type = EElementType.Booking;
         }
-        public List<SelectListItem> Appointments { get; set; } = new List<SelectListItem>();
-
+        public List<SelectListItem> SelectList { get; set; } = new List<SelectListItem>();
+        public List<AvailabilityDayResponse> Appointments { get; set; } = new List<AvailabilityDayResponse>();
         public string FormattedDateForCheckYourBooking => DateTime.Parse(Properties.Value).ToString("dddd dd MMMM yyyy");
         public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {DateTime.Today.Add(SelectedBooking.AppointmentTimes.First().StartTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "").ToLower()} and {DateTime.Today.Add(SelectedBooking.AppointmentTimes.First().EndTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "")}" : "NotFullDay";
         public AvailabilityDayResponse SelectedBooking;
-        public bool IsAppointmentFullDay => SelectedBooking.IsFullDayAppointment;
+        public bool IsSelectedAppointmentFullDay => SelectedBooking.IsFullDayAppointment;
+        public bool IsAppointmentTypeFullDay => Appointments.Any(_ => _.IsFullDayAppointment);
+        public string AppointmentTypeFullDayIAG => $"You can select a date for {FormName} but you can not select a time. We’ll be with you between {DateTime.Today.Add(Appointments.FirstOrDefault().AppointmentTimes.First().StartTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "").ToLower()} and {DateTime.Today.Add(Appointments.FirstOrDefault().AppointmentTimes.First().EndTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "").ToLower()}.";
         public string BookingDateQuestionId => $"{Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}";
+        public string FormName { get;set; }
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
@@ -39,7 +42,8 @@ namespace form_builder.Models.Elements
         {
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
             Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, BookingConstants.APPOINTMENT_DATE);
-
+            FormName = formSchema.FormName;
+            
             switch (subPath as string)
             {
                 case BookingConstants.CHECK_YOUR_BOOKING:
@@ -53,11 +57,13 @@ namespace form_builder.Models.Elements
         private void ConfigureDropDown(List<object> results)
         {
             var result = ConvertedAvailabilityDayResponse(results);
-            Appointments.Add(new SelectListItem("selet date", string.Empty));
+            Appointments = result;
+
+            SelectList.Add(new SelectListItem("selet date", string.Empty));
 
             result.ForEach(_ =>
             {
-                Appointments.Add(new SelectListItem(_.Date.ToString(), _.Date.ToString()));
+                SelectList.Add(new SelectListItem(_.Date.ToString(), _.Date.ToString()));
             });
         }
 
@@ -65,6 +71,7 @@ namespace form_builder.Models.Elements
         private AvailabilityDayResponse GetSelectedAppointment(List<object> results)
         {
             var result = ConvertedAvailabilityDayResponse(results);
+            Appointments = result;
 
             var selectedAppointment = result.FirstOrDefault(_ => _.Date.ToString().Equals(Properties.Value));
 

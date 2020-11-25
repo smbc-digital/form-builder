@@ -6,9 +6,15 @@
 
     <partial name="InsetText" model="@Model.Properties.IAG" />
 
+    @if (@Model.IsAppointmentTypeFullDay)
+    {
+        <partial name="InsetText" model="@Model.AppointmentTypeFullDayIAG" />
+    }
+
     <partial name="Hint" />
 
     <partial name="Error" />
 
-    @Html.DropDownList(Model.BookingDateQuestionId, Model.Appointments)
+
+    @Html.DropDownList(Model.BookingDateQuestionId, Model.SelectList)
 </div>
