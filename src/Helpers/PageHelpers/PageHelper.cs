@@ -296,7 +296,7 @@ namespace form_builder.Helpers.PageHelpers
             });
         }
 
-        public void SaveFormData(string key, object value, string guid)
+        public void SaveFormData(string key, object value, string guid, string formName)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -308,6 +308,8 @@ namespace form_builder.Helpers.PageHelpers
                 convertedAnswers.FormData.Remove(key);
 
             convertedAnswers.FormData.Add(key, value);
+            convertedAnswers.FormName = formName;
+
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 

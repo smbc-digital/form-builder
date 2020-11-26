@@ -27,8 +27,8 @@ namespace form_builder.Providers.Booking
             if(result.StatusCode.Equals(StatusCodes.Status404NotFound))
                 throw new BookingNoAvailabilityException($"BookingProvider::NextAvailability, BookingServiceGateway returned with 404 status code, no appointments availabel within the requested timeframe {request.StartDate} to {request.EndDate} for appointentId {request.AppointmentId}");
 
-            if(!result.StatusCode.Equals(StatusCodes.Status200OK))
-                throw new Exception("");
+            if(!result.IsSuccessStatusCode)
+                throw new Exception($"BookingProvider::NextAvailability, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
 
             return result.ResponseContent;
         }

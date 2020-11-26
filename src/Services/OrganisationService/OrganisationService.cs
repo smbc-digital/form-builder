@@ -162,7 +162,7 @@ namespace form_builder.Services.OrganisationService
                 }
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-                _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, guid);
+                _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, guid, baseForm.BaseURL);
             }
 
             return new ProcessRequestEntity

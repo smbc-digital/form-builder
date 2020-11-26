@@ -22,7 +22,8 @@ namespace form_builder.Services.BookingService
 {
     public interface IBookingService
     {
-        Task<List<AvailabilityDayResponse>> Get(
+        Task<List<object>> Get(
+            string formName,
             Page currentPage,
             string guid);
 
@@ -32,6 +33,12 @@ namespace form_builder.Services.BookingService
             FormSchema baseForm,
             string guid,
             string path);
+
+        Task ProcessMonthRequest(
+            DateTime requestedMonth, 
+            FormSchema baseForm, 
+            Page currentPage,
+            string guid);
     }
 
     public class BookingService : IBookingService
@@ -52,7 +59,8 @@ namespace form_builder.Services.BookingService
             _pageFactory = pageFactory;
         }
 
-        public async Task<List<AvailabilityDayResponse>> Get(
+        public async Task<List<object>> Get(
+            string baseUrl,
             Page currentPage,
             string guid)
         {
@@ -62,42 +70,56 @@ namespace form_builder.Services.BookingService
 
             var appointmentTimes = new List<AvailabilityDayResponse>();
 
-            var bookingSearchResultsKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
             var cachedAnswers = _distributedCache.GetString(guid);
 
-            if(cachedAnswers != null)
+            if (cachedAnswers != null)
             {
                 var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-                if (convertedAnswers.FormData.ContainsKey(bookingSearchResultsKey))
-                    return JsonConvert.DeserializeObject<List<AvailabilityDayResponse>>(convertedAnswers.FormData[bookingSearchResultsKey].ToString());
+                if (convertedAnswers.FormData.ContainsKey(bookingInformationCacheKey))
+                {
+                    var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
+                    return new List<object>{ cachedBookingInformation };
+                }
             }
 
             var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
 
             var nextAvailability = new AvailabilityDayResponse();
-            try {
+            try
+            {
                 nextAvailability = await bookingProvider
-                .NextAvailability(new AvailabilityRequest{  
-                    StartDate = DateTime.Now, 
+                .NextAvailability(new AvailabilityRequest
+                {
+                    StartDate = DateTime.Now,
                     EndDate = DateTime.Now.AddMonths(bookingElement.Properties.SearchPeriod),
                     AppointmentId = bookingElement.Properties.AppointmentType
                 });
-            } catch(BookingNoAvailabilityException e){
+            }
+            catch (BookingNoAvailabilityException)
+            {
                 // Booking Provider threw NoAvailabilityException 
                 // Appointment has no availabity within timeframe
                 // Navigate to the no appointments page.
             }
 
-            appointmentTimes = await bookingProvider.GetAvailability(new AvailabilityRequest {
-                    StartDate = nextAvailability.Date,
-                    EndDate = nextAvailability.Date.LastDayOfTheMonth(),
-                    AppointmentId = bookingElement.Properties.AppointmentType
-              });
+            appointmentTimes = await bookingProvider.GetAvailability(new AvailabilityRequest
+            {
+                StartDate = nextAvailability.Date,
+                EndDate = nextAvailability.Date.LastDayOfTheMonth(),
+                AppointmentId = bookingElement.Properties.AppointmentType
+            });
 
-            _pageHelper.SaveFormData(bookingSearchResultsKey, appointmentTimes, guid);
+            var bookingInformation = new BookingInformation
+            {
+                Appointents = appointmentTimes,
+                CurrentSearchedMonth = nextAvailability.Date
+            };
 
-            return appointmentTimes;
+            _pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, guid, baseUrl);
+
+            return new List<object>{ bookingInformation };
         }
 
         public async Task<ProcessRequestEntity> ProcessBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -116,17 +138,15 @@ namespace form_builder.Services.BookingService
             }
         }
 
-        private async Task<ProcessRequestEntity> ProcessDateAndTime(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path) 
+        private async Task<ProcessRequestEntity> ProcessDateAndTime(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
-
             // Process post request
-
             // If page is valid, i.e. they have selected a Date then we can simply return the current page
             // If page is not valid
             // We need to repopulate the calendar from cached answers
             var bookingElement = currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
 
-            if(!currentPage.IsValid)
+            if (!currentPage.IsValid)
             {
                 var cachedAnswers = _distributedCache.GetString(guid);
 
@@ -134,8 +154,9 @@ namespace form_builder.Services.BookingService
                     ? new FormAnswers { Pages = new List<PageAnswers>() }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-                var bookingSearchResults = (convertedAnswers.FormData[$"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}"] as IEnumerable<object>).ToList();
-                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null, bookingSearchResults);
+                var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[$"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}"].ToString());
+                var bookingInformation = new List<object> { cachedBookingInformation };
+                var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null, bookingInformation);
 
                 return new ProcessRequestEntity
                 {
@@ -147,7 +168,7 @@ namespace form_builder.Services.BookingService
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
             //Return page if Valid.
-            if(!bookingElement.Properties.CheckYourBooking)
+            if (!bookingElement.Properties.CheckYourBooking)
             {
                 await ReserveAppointment(bookingElement, viewModel, baseForm.BaseURL, path, guid);
 
@@ -172,7 +193,7 @@ namespace form_builder.Services.BookingService
             };
         }
 
-        private async Task<ProcessRequestEntity> ProcessCheckYourBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path) 
+        private async Task<ProcessRequestEntity> ProcessCheckYourBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
             // Handle check your booking
             var bookingElement = currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
@@ -201,12 +222,12 @@ namespace form_builder.Services.BookingService
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-            if(convertedAnswers.AdditionalFormData.ContainsKey(reservedBookingDate))
+            if (convertedAnswers.AdditionalFormData.ContainsKey(reservedBookingDate))
             {
                 var currentSelectedDate = (string)viewModel[$"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}"];
                 var previousltReserverAppointmentDate = convertedAnswers.AdditionalFormData[reservedBookingDate];
 
-                if(currentSelectedDate.Equals(previousltReserverAppointmentDate))
+                if (currentSelectedDate.Equals(previousltReserverAppointmentDate))
                     return;
             }
 
@@ -222,6 +243,40 @@ namespace form_builder.Services.BookingService
             _pageHelper.SaveNonQuestionAnswers(reservedBooking, baseUrl, path, guid);
 
         }
+        public async Task ProcessMonthRequest(DateTime requestedMonth, FormSchema baseForm, Page currentPage, string guid)
+        {
+            var bookingElement = currentPage.Elements
+                .Where(_ => _.Type == EElementType.Booking)
+                .FirstOrDefault();
 
+            if(requestedMonth > new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(bookingElement.Properties.SearchPeriod))
+                throw new SystemException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is after allowed search period");
+
+            if(requestedMonth < new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1))
+                throw new SystemException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is before today");
+
+            var bookingSearchResultsKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
+            .GetAvailability(new AvailabilityRequest
+            {
+                StartDate = requestedMonth,
+                EndDate = requestedMonth.Date.LastDayOfTheMonth(),
+                AppointmentId = bookingElement.Properties.AppointmentType
+            });
+
+            var bookingInformation = new BookingInformation
+            {
+                Appointents = appointmentTimes,
+                CurrentSearchedMonth = requestedMonth
+            };
+
+            _pageHelper.SaveFormData(bookingSearchResultsKey, bookingInformation, guid, baseForm.BaseURL);
+        }
+
+        public class BookingInformation
+        {
+            public DateTime CurrentSearchedMonth { get; set; }
+            public List<AvailabilityDayResponse> Appointents { get; set; }
+        }
     }
 }

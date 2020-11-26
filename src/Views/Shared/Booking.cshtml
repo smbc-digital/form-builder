@@ -15,6 +15,27 @@
 
     <partial name="Error" />
 
+    @if(@Model.DisplayPreviousMonthArrow){
+        <button type="submit"
+                name="MONTH_REQUEST"
+                value="@Model.PreviousSelectableMonth"
+                formaction="/booking/booking/page-one/month"
+                class="govuk-button smbc-button--link">
+            Previous Month
+        </button>
+    }
+   
+    <p class="smbc-body">@Model.CurrentSelectedMonthText</p>
+
+    @if(@Model.DisplayNextMonthArrow){
+        <button type="submit"
+                name="MONTH_REQUEST"
+                value="@Model.NextSelectableMonth"
+                formaction="/booking/booking/page-one/month"
+                class="govuk-button smbc-button--link">
+            Next Month
+        </button>
+    }
 
     @Html.DropDownList(Model.BookingDateQuestionId, Model.SelectList)
 </div>

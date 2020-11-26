@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using form_builder.Builders;
+using Microsoft.AspNetCore.Mvc;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using System;
@@ -15,7 +16,7 @@ namespace form_builder.Providers.Booking
         {
             var response = new AvailabilityDayResponse()
             {
-                Date = DateTime.Now.AddDays(2),
+                Date = DateTime.Now,
                 AppointmentTimes = new List<AppointmentTime>()
             };
 
@@ -25,35 +26,38 @@ namespace form_builder.Providers.Booking
         public Task<List<AvailabilityDayResponse>> GetAvailability(AvailabilityRequest request)
         {
             var todayDate = DateTime.Now;
-            return Task.FromResult(new List<AvailabilityDayResponse>
+            var response = new List<AvailabilityDayResponse>();
+            switch (request.StartDate.Month)
             {
-                new AvailabilityDayResponse() 
-                {
-                    Date = new DateTime(todayDate.Year, todayDate.Month, todayDate.Day),
-                    AppointmentTimes = new List<AppointmentTime>
-                    {
-                        new AppointmentTime 
-                        {
-                            StartTime = new TimeSpan(7, 0, 0),
-                            EndTime = new TimeSpan(17, 0, 0),
-                            Duration = new TimeSpan(10, 0, 0)
-                        },
-                    },
-                },
-                new AvailabilityDayResponse() 
-                {
-                    Date = new DateTime(todayDate.Year, todayDate.Month, todayDate.Day).AddDays(1),
-                    AppointmentTimes = new List<AppointmentTime>
-                    {
-                        new AppointmentTime 
-                        {
-                            StartTime = new TimeSpan(7, 0, 0),
-                            EndTime = new TimeSpan(17, 0, 0),
-                            Duration = new TimeSpan(10, 0, 0)
-                        },
-                    },
-                }
-            });
+                case 10:
+                    response = new AvailabilityDayResponseBuilder()
+                        .WithDay(new DateTime(2020, 10, 13), 1)
+                        .WithDay(new DateTime(2020, 10, 15), 1)
+                        .WithDay(new DateTime(2020, 10, 22), 1)
+                        .WithDay(new DateTime(2020, 10, 23), 1)
+                        .Build();
+                    break;
+                case 11:
+                    response = new AvailabilityDayResponseBuilder()
+                        .WithDay(new DateTime(2020, 11, 15), 1)
+                        .WithDay(new DateTime(2020, 11, 12), 1)
+                        .WithDay(new DateTime(2020, 11, 13), 1)
+                        .WithDay(new DateTime(2020, 11, 20), 1)
+                        .Build();
+                    break;
+                case 12:
+                    response = new AvailabilityDayResponseBuilder()
+                        .WithDay(new DateTime(2020, 12, 1), 1)
+                        .WithDay(new DateTime(2020, 12, 4), 1)
+                        .WithDay(new DateTime(2020, 12, 9), 1)
+                        .WithDay(new DateTime(2020, 12, 22), 1)
+                        .Build();
+                    break;
+                default:
+                    break;
+            }
+
+            return Task.FromResult(response);
         }
         public Task<Guid> Reserve(BookingRequest request)
         {
