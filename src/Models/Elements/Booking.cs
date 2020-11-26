@@ -23,6 +23,7 @@ namespace form_builder.Models.Elements
         public List<AvailabilityDayResponse> Appointments { get; set; } = new List<AvailabilityDayResponse>();
         public string FormattedDateForCheckYourBooking => DateTime.Parse(Properties.Value).ToString("dddd dd MMMM yyyy");
         public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {DateTime.Today.Add(SelectedBooking.AppointmentTimes.First().StartTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "").ToLower()} and {DateTime.Today.Add(SelectedBooking.AppointmentTimes.First().EndTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "")}" : "NotFullDay";
+
         public AvailabilityDayResponse SelectedBooking;
         public bool IsSelectedAppointmentFullDay => SelectedBooking.IsFullDayAppointment;
         public bool IsAppointmentTypeFullDay => Appointments.Any(_ => _.IsFullDayAppointment);

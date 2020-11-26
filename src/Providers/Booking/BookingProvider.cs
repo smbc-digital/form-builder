@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using form_builder.Exceptions;
 
 namespace form_builder.Providers.Booking
 {
@@ -21,6 +23,13 @@ namespace form_builder.Providers.Booking
         public async Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request)
         {
             var result = await _gateway.NextAvailability(request);
+
+            if(result.StatusCode.Equals(StatusCodes.Status404NotFound))
+                throw new BookingNoAvailabilityException($"BookingProvider::NextAvailability, BookingServiceGateway returned with 404 status code, no appointments availabel within the requested timeframe {request.StartDate} to {request.EndDate} for appointentId {request.AppointmentId}");
+
+            if(!result.StatusCode.Equals(StatusCodes.Status200OK))
+                throw new Exception("");
+
             return result.ResponseContent;
         }
 

@@ -14,7 +14,7 @@ using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using form_builder.Exceptions;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -75,18 +75,18 @@ namespace form_builder.Services.BookingService
 
             var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
 
-            var nextAvailability = await bookingProvider
+            var nextAvailability = new AvailabilityDayResponse();
+            try {
+                nextAvailability = await bookingProvider
                 .NextAvailability(new AvailabilityRequest{  
                     StartDate = DateTime.Now, 
                     EndDate = DateTime.Now.AddMonths(bookingElement.Properties.SearchPeriod),
                     AppointmentId = bookingElement.Properties.AppointmentType
                 });
-
-            // Is no next appointment within allowed timeframe
-            if (nextAvailability.Date < DateTime.Now)
-            {
-                _pageHelper.SaveFormData(bookingSearchResultsKey, appointmentTimes, guid);
-                return appointmentTimes;
+            } catch(BookingNoAvailabilityException e){
+                // Booking Provider threw NoAvailabilityException 
+                // Appointment has no availabity within timeframe
+                // Navigate to the no appointments page.
             }
 
             appointmentTimes = await bookingProvider.GetAvailability(new AvailabilityRequest {
