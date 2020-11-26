@@ -62,7 +62,7 @@
 
 			@if (Model.Properties.Options[i].HasConditionalElement)
 			{
-				@*@if (@Model.Properties.Options[i].ConditionalElement.Type == EElementType.Textbox)
+				@if (@Model.Properties.Options[i].ConditionalElement.Type == EElementType.Textbox)
 				{
 					<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
 						<div class="govuk-form-group @(!Model.Properties.Options[i].ConditionalElement.IsValid ? "govuk-form-group--error" : string.Empty)">
@@ -107,10 +107,89 @@
 								}
 							}
 
-							@Html.TextBox(Model.Properties.Options[i].ConditionalElement.QuestionId, Model.Properties.Options[i].ConditionalElement.Properties.Value, elements)
+							@{
+								var textboxElements = Model.Properties.Options[i].ConditionalElement.GenerateElementProperties();
+								textboxElements.Add("class", !Model.Properties.Options[i].ConditionalElement.IsValid
+											? $"{baseCssClasses} govuk-input--error"
+											: baseCssClasses);
+							}
+
+							@Html.TextBox(Model.Properties.Options[i].ConditionalElement.QuestionId, Model.Properties.Options[i].ConditionalElement.Properties.Value, textboxElements)
 						</div>
 					</div>
-				}*@
+				}
+
+				@if (@Model.Properties.Options[i].ConditionalElement.Type == EElementType.Textarea)
+				{
+					@if (@Model.Properties.Options[i].ConditionalElement.Properties.DisplayCharacterCount)
+					{
+						<div class="govuk-character-count govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i" data-module="govuk-character-count" data-maxlength="@Model.Properties.Options[i].ConditionalElement.Properties.MaxLength">
+							<div class="govuk-form-group">
+
+								<label class="govuk-label @(Model.Properties.Options[i].ConditionalElement.Properties.StrongLabel ? "govuk-label--m" : string.Empty)" for="@Model.Properties.Options[i].ConditionalElement.QuestionId">
+									@Model.Properties.Options[i].ConditionalElement.Label
+									@if (Model.Properties.Options[i].ConditionalElement.Properties.Optional && !Model.Properties.Options[i].ConditionalElement.Properties.HideOptionalText)
+									{
+										<span class="smbc-body">(optional)</span>
+									}
+								</label>
+
+								@if (!Model.Properties.Options[i].ConditionalElement.IsValid)
+								{
+									var viewModel = new form_builder.ViewModels.ErrorViewModel
+									{
+										IsValid = Model.Properties.Options[i].ConditionalElement.IsValid,
+										Message = Model.Properties.Options[i].ConditionalElement.ValidationMessage,
+										Id = Model.Properties.Options[i].ConditionalElement.ErrorId
+									};
+
+									<partial model=viewModel name="ErrorBase" />
+								}
+
+								@{var textAreaElementProperties = Model.Properties.Options[i].ConditionalElement.GenerateElementProperties();
+									textAreaElementProperties.Add("class", !Model.Properties.Options[i].ConditionalElement.IsValid
+									? "govuk-textarea govuk-js-character-count govuk-textarea--error"
+									: "govuk-textarea govuk-js-character-count");
+								}
+
+								@Html.TextArea(Model.Properties.Options[i].ConditionalElement.QuestionId, Model.Properties.Options[i].ConditionalElement.Properties.Value, textAreaElementProperties)
+							</div>
+							<span id=@Model.Properties.Options[i].ConditionalElement.GetCustomItemId("info") class="govuk-hint govuk-character-count__message" aria-live="polite">
+								You can enter up to @Model.Properties.Options[i].ConditionalElement.Properties.MaxLength characters
+							</span>
+						</div>
+					}
+					else
+					{
+						<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i" data-maxlength="@Model.Properties.Options[i].ConditionalElement.Properties.MaxLength">
+							<div class="govuk-form-group">
+								<label class="govuk-label @(Model.Properties.Options[i].ConditionalElement.Properties.StrongLabel ? "govuk-label--m" : string.Empty)" for="@Model.Properties.Options[i].ConditionalElement.QuestionId">
+									@Model.Properties.Options[i].ConditionalElement.Label
+								</label>
+
+								@if (!Model.Properties.Options[i].ConditionalElement.IsValid)
+								{
+									var viewModel = new form_builder.ViewModels.ErrorViewModel
+									{
+										IsValid = Model.Properties.Options[i].ConditionalElement.IsValid,
+										Message = Model.Properties.Options[i].ConditionalElement.ValidationMessage,
+										Id = Model.Properties.Options[i].ConditionalElement.ErrorId
+									};
+
+									<partial model=viewModel name="ErrorBase" />
+								}
+
+								@{var textAreaElementProperties = Model.Properties.Options[i].ConditionalElement.GenerateElementProperties();
+									textAreaElementProperties.Add("class", !Model.Properties.Options[i].ConditionalElement.IsValid
+									? "govuk-textarea govuk-js-character-count govuk-textarea--error"
+									: "govuk-textarea govuk-js-character-count");
+								}
+
+								@Html.TextArea(Model.Properties.Options[i].ConditionalElement.QuestionId, Model.Properties.Options[i].ConditionalElement.Properties.Value, textAreaElementProperties)
+							</div>
+						</div>
+					}
+				}
 
 			}
 
