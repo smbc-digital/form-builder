@@ -1,4 +1,5 @@
-﻿@model form_builder.Models.Elements.Element
+﻿@using form_builder.Helpers
+@model form_builder.Models.Elements.Element
 
 @using form_builder.Enum;
 @{
@@ -186,9 +187,82 @@
 								}
 
 								@Html.TextArea(Model.Properties.Options[i].ConditionalElement.QuestionId, Model.Properties.Options[i].ConditionalElement.Properties.Value, textAreaElementProperties)
+
+
+
 							</div>
 						</div>
 					}
+				}
+
+				@if (@Model.Properties.Options[i].ConditionalElement.Type == EElementType.DateInput)
+				{
+					<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
+						@{
+							var maxYear = DateTime.Now.Year + 100;
+							var inputClassesShort = "govuk-input govuk-date-input__input govuk-input--width-2";
+							var inputClassesLong = "govuk-input govuk-date-input__input govuk-input--width-4";
+							var labelClasses = "govuk-label";
+							if (Model.Properties.Options[i].ConditionalElement.Properties.StrongLabel)
+							{
+								labelClasses += " govuk-label--s";
+							}
+							else
+							{
+								labelClasses += " govuk-date-input__label";
+							}
+
+							if (!Model.Properties.Options[i].ConditionalElement.IsValid)
+							{
+								inputClassesShort += " govuk-input--error";
+								inputClassesLong += " govuk-input--error";
+							}
+						}
+						<div class="govuk-form-group @(!Model.Properties.Options[i].ConditionalElement.IsValid ? "govuk-form-group--error" : string.Empty)">
+							@Html.BeginFieldSet(Model.Properties.Options[i].ConditionalElement, new string[] { "govuk-fieldset" })
+
+							<label class="govuk-label @(Model.Properties.Options[i].ConditionalElement.Properties.StrongLabel ? "govuk-label--m" : string.Empty)" for="@Model.Properties.Options[i].ConditionalElement.QuestionId">
+								@Model.Properties.Options[i].ConditionalElement.Label
+							</label>
+
+							<partial name="InsetText" model="@Model.Properties.Options[i].ConditionalElement.Properties.IAG" />
+
+							<partial name="Hint" />
+
+							<partial model="Model.Properties.Options[i].ConditionalElement" name="Error" />
+
+							<div class="govuk-date-input">
+								<div class="govuk-date-input__item">
+									<div class="govuk-form-group">
+										<label class="@labelClasses" for=@Model.Properties.Options[i].ConditionalElement.GetCustomItemId("day")>
+											Day
+										</label>
+										@Html.TextBox(Model.Properties.Options[i].ConditionalElement.GetCustomItemId("day"), Model.Properties.Day, new { autocomplete = "bday-day", maxlength = "2", type = "number", @class = inputClassesShort })
+									</div>
+								</div>
+
+								<div class="govuk-date-input__item">
+									<div class="govuk-form-group">
+										<label class="@labelClasses" for=@Model.Properties.Options[i].ConditionalElement.GetCustomItemId("month")>
+											Month
+										</label>
+										@Html.TextBox(Model.Properties.Options[i].ConditionalElement.GetCustomItemId("month"), Model.Properties.Options[i].ConditionalElement.Properties.Month, new { autocomplete = "bday-month", maxlength = "2", type = "number", @class = inputClassesShort })
+									</div>
+								</div>
+
+								<div class="govuk-date-input__item">
+									<div class="govuk-form-group">
+										<label class="@labelClasses" for=@Model.Properties.Options[i].ConditionalElement.GetCustomItemId("year")>
+											Year
+										</label>
+										@Html.TextBox(Model.Properties.Options[i].ConditionalElement.GetCustomItemId("year"), Model.Properties.Options[i].ConditionalElement.Properties.Year, new { autocomplete = "bday-year", maxlength = "4", type = "number", @class = inputClassesLong, max = maxYear })
+									</div>
+								</div>
+							</div>
+							@Html.EndFieldSet()
+						</div>
+
+						</div>
 				}
 
 			}
