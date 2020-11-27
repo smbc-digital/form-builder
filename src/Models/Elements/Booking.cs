@@ -30,6 +30,8 @@ namespace form_builder.Models.Elements
         public string AppointmentTypeFullDayIAG => $"You can select a date for {FormName} but you can not select a time. We’ll be with you between {DateTime.Today.Add(Appointments.FirstOrDefault().AppointmentTimes.First().StartTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "").ToLower()} and {DateTime.Today.Add(Appointments.FirstOrDefault().AppointmentTimes.First().EndTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "").ToLower()}.";
         public string BookingDateQuestionId => $"{Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}";
         public DateTime CurrentSelectedMonth { get; set; }
+        public DateTime FirstAvailableMonth { get; set; }
+        public bool DisplayNextAvailableAppointmentIAG => FirstAvailableMonth.Date > DateTime.Now.Date && CurrentSelectedMonth.Month == FirstAvailableMonth.Month && CurrentSelectedMonth.Year == FirstAvailableMonth.Year;
         public string CurrentSelectedMonthText => $"{CurrentSelectedMonth:MMMMM yyyy}";
         public DateTime NextSelectableMonth => new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).AddMonths(1);
         public DateTime PreviousSelectableMonth => new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).AddMonths(-1);
@@ -69,6 +71,7 @@ namespace form_builder.Models.Elements
         {
             Appointments = results.Appointents;
             CurrentSelectedMonth = results.CurrentSearchedMonth;
+            FirstAvailableMonth = results.FirstAvailableMonth;
 
             SelectList.Add(new SelectListItem("selet date", string.Empty));
 

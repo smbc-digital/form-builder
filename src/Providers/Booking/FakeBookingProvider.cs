@@ -16,7 +16,7 @@ namespace form_builder.Providers.Booking
         {
             var response = new AvailabilityDayResponse()
             {
-                Date = DateTime.Now,
+                Date = DateTime.Now.AddMonths(1),
                 AppointmentTimes = new List<AppointmentTime>()
             };
 

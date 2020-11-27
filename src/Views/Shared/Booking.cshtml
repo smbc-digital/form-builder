@@ -11,6 +11,10 @@
         <partial name="InsetText" model="@Model.AppointmentTypeFullDayIAG" />
     }
 
+    @if(@Model.DisplayNextAvailableAppointmentIAG){
+         <partial name="InsetText" model="@Model.Properties.NextAvailableAppointment" />
+    }
+
     <partial name="Hint" />
 
     <partial name="Error" />

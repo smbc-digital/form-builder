@@ -8,5 +8,6 @@ namespace form_builder.Models.Properties.ElementProperties
         public int SearchPeriod = 12;
         public Guid AppointmentType { get; set; }
         public bool CheckYourBooking { get; set; }
+        public string NextAvailableAppointment { get; set; } = "This is the next available appointment";
     }
 }

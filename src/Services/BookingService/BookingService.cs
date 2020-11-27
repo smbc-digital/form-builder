@@ -114,7 +114,8 @@ namespace form_builder.Services.BookingService
             var bookingInformation = new BookingInformation
             {
                 Appointents = appointmentTimes,
-                CurrentSearchedMonth = nextAvailability.Date
+                CurrentSearchedMonth = nextAvailability.Date,
+                FirstAvailableMonth = nextAvailability.Date
             };
 
             _pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, guid, baseUrl);
@@ -245,14 +246,18 @@ namespace form_builder.Services.BookingService
         }
         public async Task ProcessMonthRequest(DateTime requestedMonth, FormSchema baseForm, Page currentPage, string guid)
         {
+            var currentDate = DateTime.Now;
             var bookingElement = currentPage.Elements
                 .Where(_ => _.Type == EElementType.Booking)
                 .FirstOrDefault();
 
-            if(requestedMonth > new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(bookingElement.Properties.SearchPeriod))
+            if(requestedMonth.Month == currentDate.Month && requestedMonth.Year == currentDate.Year)
+                requestedMonth = currentDate;
+
+            if(requestedMonth > new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(bookingElement.Properties.SearchPeriod))
                 throw new SystemException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is after allowed search period");
 
-            if(requestedMonth < new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1))
+            if(requestedMonth < currentDate)
                 throw new SystemException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is before today");
 
             var bookingSearchResultsKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
@@ -264,10 +269,16 @@ namespace form_builder.Services.BookingService
                 AppointmentId = bookingElement.Properties.AppointmentType
             });
 
+            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var cachedAnswers = _distributedCache.GetString(guid);
+            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+            var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
+
             var bookingInformation = new BookingInformation
             {
                 Appointents = appointmentTimes,
-                CurrentSearchedMonth = requestedMonth
+                CurrentSearchedMonth = requestedMonth,
+                FirstAvailableMonth = cachedBookingInformation.FirstAvailableMonth
             };
 
             _pageHelper.SaveFormData(bookingSearchResultsKey, bookingInformation, guid, baseForm.BaseURL);
@@ -276,6 +287,7 @@ namespace form_builder.Services.BookingService
         public class BookingInformation
         {
             public DateTime CurrentSearchedMonth { get; set; }
+            public DateTime FirstAvailableMonth { get; set; }
             public List<AvailabilityDayResponse> Appointents { get; set; }
         }
     }

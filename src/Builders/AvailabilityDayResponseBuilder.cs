@@ -18,7 +18,7 @@ namespace form_builder.Builders
                 appointmentTimes.Add(new AppointmentTime
                 {
                     StartTime = new TimeSpan(7, 0, 0),
-                    EndTime = new TimeSpan(7, 0, 0)
+                    EndTime = new TimeSpan(17, 30, 0)
                 });
             }
 
