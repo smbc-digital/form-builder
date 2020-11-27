@@ -15,6 +15,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
+using form_builder.Services.BookingService;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
@@ -44,6 +45,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IStreetService> _streetService = new Mock<IStreetService>();
         private readonly Mock<IAddressService> _addressService = new Mock<IAddressService>();
+        private readonly Mock<IBookingService> _bookingService = new Mock<IBookingService>();
         private readonly Mock<IFileUploadService> _fileUploadService = new Mock<IFileUploadService>();
         private readonly Mock<IOrganisationService> _organisationService = new Mock<IOrganisationService>();
         private readonly Mock<IDistributedCacheWrapper> _distributedCache = new Mock<IDistributedCacheWrapper>();
@@ -89,7 +91,7 @@ namespace form_builder_tests.UnitTests.Services
             });
 
             _service = new PageService(_validators.Object, _mockPageHelper.Object, _sessionHelper.Object, _addressService.Object, _fileUploadService.Object, _streetService.Object, _organisationService.Object, 
-            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object, _mockActionsWorkflow.Object);
+            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _bookingService.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object, _mockActionsWorkflow.Object);
         }
 
         [Fact]

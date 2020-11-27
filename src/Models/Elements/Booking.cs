@@ -40,6 +40,8 @@ namespace form_builder.Models.Elements
             ? true 
             : CurrentSelectedMonth.Month > DateTime.Now.Month;
 
+        public override string GetLabelText() => $"Booking{(Properties.Optional? " (optional)" : string.Empty)}";
+
         public string FormName { get; set; }
 
         public override Task<string> RenderAsync(IViewRender viewRender,

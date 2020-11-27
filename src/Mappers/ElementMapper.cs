@@ -68,7 +68,8 @@ namespace form_builder.Mappers
                 case EElementType.FileUpload:
                 case EElementType.MultipleFileUpload:
                     return GetFileUploadElementValue(key, formAnswers);
-
+                case EElementType.Booking:
+                    return GetBookingElementValue(key, formAnswers);
                 default:
                     if (element.Properties.Numeric)
                         return GetNumericElementValue(key, formAnswers);
@@ -153,6 +154,9 @@ namespace form_builder.Mappers
                         return addressValue.SelectedAddress;
                     var manualLine2Text = string.IsNullOrWhiteSpace(addressValue.AddressLine2) ? string.Empty : $",{addressValue.AddressLine2}";
                     return string.IsNullOrWhiteSpace(addressValue.AddressLine1) ? string.Empty : $"{addressValue.AddressLine1}{manualLine2Text},{addressValue.Town},{addressValue.Postcode}";
+                case EElementType.Booking:
+                    var bookingDate = (DateTime)value;
+                    return  bookingDate.Equals(DateTime.MinValue) ? string.Empty : bookingDate.Date.ToString("dd/MM/yyyy");
 
                 case EElementType.Street:
                     var streetValue = (Address)value;
@@ -196,6 +200,19 @@ namespace form_builder.Mappers
 
                 return listOfFiles;
             }
+
+            return null;
+        }
+
+        private DateTime? GetBookingElementValue(string key, FormAnswers formAnswers)
+        {
+            var answer = formAnswers.Pages.SelectMany(_ => _.Answers)
+                .FirstOrDefault(_ => _.QuestionId.Equals($"{key}{BookingConstants.APPOINTMENT_DATE}"));
+
+            var value = answer?.Response ?? string.Empty;
+
+            if (!string.IsNullOrEmpty(value))
+                return DateTime.Parse(value);
 
             return null;
         }
@@ -245,7 +262,6 @@ namespace form_builder.Mappers
         }
         private DateTime? GetDateInputElementValue(string key, FormAnswers formAnswers)
         {
-            dynamic dateObject = new ExpandoObject();
             var dateDayKey = $"{key}-day";
             var dateMonthKey = $"{key}-month";
             var dateYearKey = $"{key}-year";
