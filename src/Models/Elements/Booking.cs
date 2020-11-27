@@ -8,7 +8,6 @@ using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json.Linq;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using static form_builder.Services.BookingService.BookingService;
 
@@ -23,7 +22,7 @@ namespace form_builder.Models.Elements
         public List<SelectListItem> SelectList { get; set; } = new List<SelectListItem>();
         public List<AvailabilityDayResponse> Appointments { get; set; } = new List<AvailabilityDayResponse>();
         public string FormattedDateForCheckYourBooking => DateTime.Parse(Properties.Value).ToString("dddd dd MMMM yyyy");
-        public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {DateTime.Today.Add(SelectedBooking.AppointmentTimes.First().StartTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "").ToLower()} and {DateTime.Today.Add(SelectedBooking.AppointmentTimes.First().EndTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "")}" : "NotFullDay";
+        public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {AppointmentStartTime} and {AppointmentEndTime}" : "NotFullDay";
         public AvailabilityDayResponse SelectedBooking;
         public bool IsSelectedAppointmentFullDay => SelectedBooking.IsFullDayAppointment;
         public bool IsAppointmentTypeFullDay => Appointments.Any(_ => _.IsFullDayAppointment);
@@ -93,6 +92,12 @@ namespace form_builder.Models.Elements
 
             if (selectedAppointment == null)
                 throw new ApplicationException("Booking::RenderAsync, Unable to find selected appointment while attempting to generate check your booking view");
+
+            if (results.IsFullDayAppointment)
+            {
+                AppointmentStartTime = results.AppointmentStartTime;
+                AppointmentEndTime = results.AppointmentEndTime;
+            }
 
             return selectedAppointment;
         }
