@@ -35,8 +35,8 @@ namespace form_builder.Services.BookingService
             string path);
 
         Task ProcessMonthRequest(
-            DateTime requestedMonth, 
-            FormSchema baseForm, 
+            DateTime requestedMonth,
+            FormSchema baseForm,
             Page currentPage,
             string guid);
     }
@@ -80,7 +80,7 @@ namespace form_builder.Services.BookingService
                 if (convertedAnswers.FormData.ContainsKey(bookingInformationCacheKey))
                 {
                     var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
-                    return new List<object>{ cachedBookingInformation };
+                    return new List<object> { cachedBookingInformation };
                 }
             }
 
@@ -113,14 +113,27 @@ namespace form_builder.Services.BookingService
 
             var bookingInformation = new BookingInformation
             {
-                Appointents = appointmentTimes,
+                Appointments = appointmentTimes,
                 CurrentSearchedMonth = nextAvailability.Date,
-                FirstAvailableMonth = nextAvailability.Date
+                FirstAvailableMonth = nextAvailability.Date,
+                IsFullDayAppointment = nextAvailability.IsFullDayAppointment
             };
+
+            if (nextAvailability.IsFullDayAppointment)
+            {
+                var start = DateTime.Today.Add(nextAvailability.AppointmentTimes.First().StartTime);
+                var end = DateTime.Today.Add(nextAvailability.AppointmentTimes.First().EndTime);
+
+                string START_DATE_FORMAT = start.Minute > 0 ? "h:mmtt" :"htt";
+                string END_DATE_FORMAT = end.Minute > 0 ? "h:mmtt" : "htt";
+
+                bookingInformation.AppointmentStartTime = start.ToString(START_DATE_FORMAT).ToLower();
+                bookingInformation.AppointmentEndTime = end.ToString(END_DATE_FORMAT).ToLower();
+            }
 
             _pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, guid, baseUrl);
 
-            return new List<object>{ bookingInformation };
+            return new List<object> { bookingInformation };
         }
 
         public async Task<ProcessRequestEntity> ProcessBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -251,13 +264,13 @@ namespace form_builder.Services.BookingService
                 .Where(_ => _.Type == EElementType.Booking)
                 .FirstOrDefault();
 
-            if(requestedMonth.Month == currentDate.Month && requestedMonth.Year == currentDate.Year)
+            if (requestedMonth.Month == currentDate.Month && requestedMonth.Year == currentDate.Year)
                 requestedMonth = currentDate;
 
-            if(requestedMonth > new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(bookingElement.Properties.SearchPeriod))
+            if (requestedMonth > new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(bookingElement.Properties.SearchPeriod))
                 throw new SystemException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is after allowed search period");
 
-            if(requestedMonth < currentDate)
+            if (requestedMonth < currentDate)
                 throw new SystemException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is before today");
 
             var bookingSearchResultsKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
@@ -276,7 +289,7 @@ namespace form_builder.Services.BookingService
 
             var bookingInformation = new BookingInformation
             {
-                Appointents = appointmentTimes,
+                Appointments = appointmentTimes,
                 CurrentSearchedMonth = requestedMonth,
                 FirstAvailableMonth = cachedBookingInformation.FirstAvailableMonth
             };
@@ -288,7 +301,10 @@ namespace form_builder.Services.BookingService
         {
             public DateTime CurrentSearchedMonth { get; set; }
             public DateTime FirstAvailableMonth { get; set; }
-            public List<AvailabilityDayResponse> Appointents { get; set; }
+            public List<AvailabilityDayResponse> Appointments { get; set; }
+            public bool IsFullDayAppointment { get; set; }
+            public string AppointmentStartTime { get; set; }
+            public string AppointmentEndTime { get; set; }
         }
     }
 }

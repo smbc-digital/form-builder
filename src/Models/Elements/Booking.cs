@@ -8,7 +8,6 @@ using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json.Linq;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using static form_builder.Services.BookingService.BookingService;
 
@@ -23,11 +22,13 @@ namespace form_builder.Models.Elements
         public List<SelectListItem> SelectList { get; set; } = new List<SelectListItem>();
         public List<AvailabilityDayResponse> Appointments { get; set; } = new List<AvailabilityDayResponse>();
         public string FormattedDateForCheckYourBooking => DateTime.Parse(Properties.Value).ToString("dddd dd MMMM yyyy");
-        public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {DateTime.Today.Add(SelectedBooking.AppointmentTimes.First().StartTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "").ToLower()} and {DateTime.Today.Add(SelectedBooking.AppointmentTimes.First().EndTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "")}" : "NotFullDay";
+        public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {AppointmentStartTime} and {AppointmentEndTime}" : "NotFullDay";
         public AvailabilityDayResponse SelectedBooking;
         public bool IsSelectedAppointmentFullDay => SelectedBooking.IsFullDayAppointment;
         public bool IsAppointmentTypeFullDay => Appointments.Any(_ => _.IsFullDayAppointment);
-        public string AppointmentTypeFullDayIAG => $"You can select a date for {FormName} but you can not select a time. We’ll be with you between {DateTime.Today.Add(Appointments.FirstOrDefault().AppointmentTimes.First().StartTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "").ToLower()} and {DateTime.Today.Add(Appointments.FirstOrDefault().AppointmentTimes.First().EndTime).ToString("h:mm tt").Replace(" ", "").Replace(":00", "").ToLower()}.";
+        public string AppointmentStartTime { get; set; }
+        public string AppointmentEndTime { get; set; }
+        public string AppointmentTypeFullDayIAG => $"You can select a date for {FormName} but you can not select a time. We’ll be with you between {AppointmentStartTime} and {AppointmentEndTime}.";
         public string BookingDateQuestionId => $"{Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}";
         public DateTime CurrentSelectedMonth { get; set; }
         public DateTime FirstAvailableMonth { get; set; }
@@ -36,9 +37,7 @@ namespace form_builder.Models.Elements
         public DateTime NextSelectableMonth => new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).AddMonths(1);
         public DateTime PreviousSelectableMonth => new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).AddMonths(-1);
         public bool DisplayNextMonthArrow => NextSelectableMonth <= new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(Properties.SearchPeriod);
-        public bool DisplayPreviousMonthArrow => CurrentSelectedMonth.Year > DateTime.Now.Year 
-            ? true 
-            : CurrentSelectedMonth.Month > DateTime.Now.Month;
+        public bool DisplayPreviousMonthArrow => CurrentSelectedMonth > FirstAvailableMonth;
 
         public override string GetLabelText() => $"Booking{(Properties.Optional? " (optional)" : string.Empty)}";
 
@@ -71,9 +70,14 @@ namespace form_builder.Models.Elements
         }
         private void ConfigureDropDown(BookingInformation results)
         {
-            Appointments = results.Appointents;
+            Appointments = results.Appointments;
             CurrentSelectedMonth = results.CurrentSearchedMonth;
             FirstAvailableMonth = results.FirstAvailableMonth;
+            if (results.IsFullDayAppointment)
+            {
+                AppointmentStartTime = results.AppointmentStartTime;
+                AppointmentEndTime = results.AppointmentEndTime;
+            }
 
             SelectList.Add(new SelectListItem("selet date", string.Empty));
 
@@ -85,11 +89,17 @@ namespace form_builder.Models.Elements
 
         private AvailabilityDayResponse GetSelectedAppointment(BookingInformation results)
         {
-            Appointments = results.Appointents;
+            Appointments = results.Appointments;
             var selectedAppointment = Appointments.FirstOrDefault(_ => _.Date.ToString().Equals(Properties.Value));
 
             if (selectedAppointment == null)
                 throw new ApplicationException("Booking::RenderAsync, Unable to find selected appointment while attempting to generate check your booking view");
+
+            if (results.IsFullDayAppointment)
+            {
+                AppointmentStartTime = results.AppointmentStartTime;
+                AppointmentEndTime = results.AppointmentEndTime;
+            }
 
             return selectedAppointment;
         }

@@ -17,11 +17,18 @@ namespace form_builder.Providers.Booking
             var response = new AvailabilityDayResponse()
             {
                 Date = DateTime.Now.AddMonths(1),
-                AppointmentTimes = new List<AppointmentTime>()
+                AppointmentTimes = new List<AppointmentTime>
+                {
+                    new AppointmentTime
+                    {
+                        StartTime = new TimeSpan(7, 0, 0),
+                        EndTime = new TimeSpan(17, 30, 0)
+                    }
+                }
             };
 
             return Task.FromResult(response);
-         }
+        }
 
         public Task<List<AvailabilityDayResponse>> GetAvailability(AvailabilityRequest request)
         {
