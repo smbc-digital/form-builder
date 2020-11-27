@@ -38,9 +38,7 @@ namespace form_builder.Models.Elements
         public DateTime PreviousSelectableMonth => new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).AddMonths(-1);
         public bool DisplayNextMonthArrow => NextSelectableMonth <= new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(Properties.SearchPeriod);
         public bool DisplayPreviousMonthArrow => CurrentSelectedMonth > FirstAvailableMonth;
-
         public override string GetLabelText() => $"Booking{(Properties.Optional? " (optional)" : string.Empty)}";
-
         public string FormName { get; set; }
 
         public override Task<string> RenderAsync(IViewRender viewRender,
@@ -56,30 +54,36 @@ namespace form_builder.Models.Elements
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
             Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, BookingConstants.APPOINTMENT_DATE);
             FormName = formSchema.FormName;
-            var bookingInformation = (BookingInformation)results.First();
+            ConfigureBookingInformation(results);
 
             switch (subPath as string)
             {
                 case BookingConstants.CHECK_YOUR_BOOKING:
-                    SelectedBooking = GetSelectedAppointment(bookingInformation);
+                    SelectedBooking = GetSelectedAppointment();
                     return viewRender.RenderAsync("CheckYourBooking", this);
                 default:
-                    ConfigureDropDown(bookingInformation);
+                    ConfigureDropDown();
                     return viewRender.RenderAsync(Type.ToString(), this);
             }
         }
-        private void ConfigureDropDown(BookingInformation results)
-        {
-            Appointments = results.Appointments;
-            CurrentSelectedMonth = results.CurrentSearchedMonth;
-            FirstAvailableMonth = results.FirstAvailableMonth;
-            IsAppointmentTypeFullDay = results.IsFullDayAppointment;
-            if (results.IsFullDayAppointment)
-            {
-                AppointmentStartTime = results.AppointmentStartTime;
-                AppointmentEndTime = results.AppointmentEndTime;
-            }
 
+        private void ConfigureBookingInformation(List<object> results)
+        {
+            var bookingInformation = (BookingInformation)results.First();
+
+            Appointments = bookingInformation.Appointments;
+            CurrentSelectedMonth = bookingInformation.CurrentSearchedMonth;
+            FirstAvailableMonth = bookingInformation.FirstAvailableMonth;
+            IsAppointmentTypeFullDay = bookingInformation.IsFullDayAppointment;
+            if (bookingInformation.IsFullDayAppointment)
+            {
+                AppointmentStartTime = bookingInformation.AppointmentStartTime;
+                AppointmentEndTime = bookingInformation.AppointmentEndTime;
+            }
+        }
+
+        private void ConfigureDropDown()
+        {
             SelectList.Add(new SelectListItem("selet date", string.Empty));
 
             Appointments.ForEach(_ =>
@@ -88,19 +92,12 @@ namespace form_builder.Models.Elements
             });
         }
 
-        private AvailabilityDayResponse GetSelectedAppointment(BookingInformation results)
+        private AvailabilityDayResponse GetSelectedAppointment()
         {
-            Appointments = results.Appointments;
             var selectedAppointment = Appointments.FirstOrDefault(_ => _.Date.ToString().Equals(Properties.Value));
 
             if (selectedAppointment == null)
                 throw new ApplicationException("Booking::RenderAsync, Unable to find selected appointment while attempting to generate check your booking view");
-
-            if (results.IsFullDayAppointment)
-            {
-                AppointmentStartTime = results.AppointmentStartTime;
-                AppointmentEndTime = results.AppointmentEndTime;
-            }
 
             return selectedAppointment;
         }

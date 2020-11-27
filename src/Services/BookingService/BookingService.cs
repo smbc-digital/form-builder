@@ -124,8 +124,8 @@ namespace form_builder.Services.BookingService
                 var start = DateTime.Today.Add(nextAvailability.AppointmentTimes.First().StartTime);
                 var end = DateTime.Today.Add(nextAvailability.AppointmentTimes.First().EndTime);
 
-                string START_DATE_FORMAT = start.Minute > 0 ? "h:mmtt" :"htt";
-                string END_DATE_FORMAT = end.Minute > 0 ? "h:mmtt" : "htt";
+                var START_DATE_FORMAT = start.Minute > 0 ? "h:mmtt" :"htt";
+                var END_DATE_FORMAT = end.Minute > 0 ? "h:mmtt" : "htt";
 
                 bookingInformation.AppointmentStartTime = start.ToString(START_DATE_FORMAT).ToLower();
                 bookingInformation.AppointmentEndTime = end.ToString(END_DATE_FORMAT).ToLower();
