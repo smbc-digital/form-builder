@@ -8,6 +8,7 @@ using form_builder.Utils.ServiceCollectionExtensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -36,6 +37,7 @@ namespace form_builder
             services.AddRazorPages();
 
             services
+                .AddRazorViewEngineViewLocations()
                 .ConfigureCookiePolicy()
                 .AddValidators()
                 .AddTagParsers()

@@ -239,9 +239,9 @@ namespace form_builder.Services.BookingService
             if (convertedAnswers.AdditionalFormData.ContainsKey(reservedBookingDate))
             {
                 var currentSelectedDate = (string)viewModel[$"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}"];
-                var previousltReserverAppointmentDate = convertedAnswers.AdditionalFormData[reservedBookingDate];
+                var previouslyReservedAppointmentDate = convertedAnswers.AdditionalFormData[reservedBookingDate];
 
-                if (currentSelectedDate.Equals(previousltReserverAppointmentDate))
+                if (currentSelectedDate.Equals(previouslyReservedAppointmentDate))
                     return;
             }
 
@@ -257,6 +257,7 @@ namespace form_builder.Services.BookingService
             _pageHelper.SaveNonQuestionAnswers(reservedBooking, baseUrl, path, guid);
 
         }
+        
         public async Task ProcessMonthRequest(DateTime requestedMonth, FormSchema baseForm, Page currentPage, string guid)
         {
             var currentDate = DateTime.Now;
@@ -291,7 +292,10 @@ namespace form_builder.Services.BookingService
             {
                 Appointments = appointmentTimes,
                 CurrentSearchedMonth = requestedMonth,
-                FirstAvailableMonth = cachedBookingInformation.FirstAvailableMonth
+                FirstAvailableMonth = cachedBookingInformation.FirstAvailableMonth,
+                IsFullDayAppointment = cachedBookingInformation.IsFullDayAppointment,
+                AppointmentEndTime = cachedBookingInformation.AppointmentEndTime,
+                AppointmentStartTime = cachedBookingInformation.AppointmentStartTime
             };
 
             _pageHelper.SaveFormData(bookingSearchResultsKey, bookingInformation, guid, baseForm.BaseURL);

@@ -25,7 +25,7 @@ namespace form_builder.Models.Elements
         public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {AppointmentStartTime} and {AppointmentEndTime}" : "NotFullDay";
         public AvailabilityDayResponse SelectedBooking;
         public bool IsSelectedAppointmentFullDay => SelectedBooking.IsFullDayAppointment;
-        public bool IsAppointmentTypeFullDay => Appointments.Any(_ => _.IsFullDayAppointment);
+        public bool IsAppointmentTypeFullDay { get; set; }
         public string AppointmentStartTime { get; set; }
         public string AppointmentEndTime { get; set; }
         public string AppointmentTypeFullDayIAG => $"You can select a date for {FormName} but you can not select a time. We’ll be with you between {AppointmentStartTime} and {AppointmentEndTime}.";
@@ -73,6 +73,7 @@ namespace form_builder.Models.Elements
             Appointments = results.Appointments;
             CurrentSelectedMonth = results.CurrentSearchedMonth;
             FirstAvailableMonth = results.FirstAvailableMonth;
+            IsAppointmentTypeFullDay = results.IsFullDayAppointment;
             if (results.IsFullDayAppointment)
             {
                 AppointmentStartTime = results.AppointmentStartTime;
