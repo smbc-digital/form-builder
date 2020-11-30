@@ -588,5 +588,32 @@ namespace form_builder.Helpers.PageHelpers
                 });
             }
         }
+
+        public void CheckForBookingElement(List<Page> pages)
+        {
+            var bookingElements = pages.SelectMany(_ => _.ValidatableElements)
+                .Where(_ => _.Type.Equals(EElementType.Booking))
+                .ToList();
+
+            if(bookingElements.Any())
+            {
+                bookingElements.ForEach((booking) => {
+                    if(string.IsNullOrEmpty(booking.Properties.BookingProvider))
+                        throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a valid booking provider property.");
+
+                    if(string.IsNullOrEmpty(booking.Properties.AppointmentType.ToString() ?? string.Empty))
+                        throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.");
+                });
+
+                var additionalRequiredElements = pages.SelectMany(_ => _.ValidatableElements)
+                    .Where(_ => _.Properties.TargetMapping.ToLower().Equals("customer.firstname") 
+                        || _.Properties.TargetMapping.ToLower().Equals("customer.lastname") 
+                        || _.Properties.TargetMapping.ToLower().Equals("customer.email"))
+                    .ToList();
+
+                if(additionalRequiredElements.Count() != 3)
+                    throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires customer firstname/lastname/email for reservation");
+            }
+        }
     }
 }

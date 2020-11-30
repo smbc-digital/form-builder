@@ -80,6 +80,7 @@ namespace form_builder.Models
             pageHelper.CheckAddressNoManualTextIsSet(Pages);
             pageHelper.CheckForAnyConditionType(Pages);
             pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(Pages);
+            pageHelper.CheckForBookingElement(Pages);
         }
 
         public bool IsAvailable(string environment)
