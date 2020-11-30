@@ -47,7 +47,8 @@ namespace form_builder.Validators
             if(!isValidDate){
                 return new ValidationResult
                 {
-                    IsValid = false
+                    IsValid = false,
+                    Message = string.IsNullOrEmpty(bookingElement.Properties.CustomValidationMessage) ?  "You must select a date" : bookingElement.Properties.CustomValidationMessage
                 };
             }
 
