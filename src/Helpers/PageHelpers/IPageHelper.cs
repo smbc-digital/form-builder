@@ -46,6 +46,7 @@ namespace form_builder.Helpers.PageHelpers
         void CheckForAnyConditionType(List<Page> pages);
         
         void CheckUploadedFilesSummaryQuestionsIsSet(List<Page> pages);
+        void CheckForBookingElement(List<Page> pages);
 
         List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload);
     }
