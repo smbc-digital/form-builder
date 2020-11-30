@@ -179,12 +179,13 @@ namespace form_builder.Services.BookingService
                 };
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
             //Return page if Valid.
             if (!bookingElement.Properties.CheckYourBooking)
             {
                 await ReserveAppointment(bookingElement, viewModel, baseForm.BaseURL, path, guid);
+
+                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
                 return new ProcessRequestEntity
                 {
@@ -192,6 +193,7 @@ namespace form_builder.Services.BookingService
                 };
             }
 
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
             // How to handle if user goes back and forward in browser, 
             // we do not want to resever the appointment again
             return new ProcessRequestEntity
@@ -213,13 +215,15 @@ namespace form_builder.Services.BookingService
             var bookingElement = currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
             await ReserveAppointment(bookingElement, viewModel, baseForm.BaseURL, path, guid);
 
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+
             return new ProcessRequestEntity
             {
                 Page = currentPage
             };
         }
 
-        private async Task ReserveAppointment(IElement bookingElement, Dictionary<string, dynamic> viewModel, string baseUrl, string path, string guid)
+        private async Task<Guid> ReserveAppointment(IElement bookingElement, Dictionary<string, dynamic> viewModel, string baseUrl, string path, string guid)
         {
             //Reserve appointment
             //Needs
@@ -228,34 +232,31 @@ namespace form_builder.Services.BookingService
 
             // Get current info which reserve was done against, If it is different we need to resver this new appointment
             // else we continue as the appointment has already been reserved.
-            var cachedAnswers = _distributedCache.GetString(guid);
-            var reservedBookingId = $"{bookingElement.Properties.QuestionId}{BookingConstants.RESERVED_BOOKING_ID}";
-            var reservedBookingDate = $"{bookingElement.Properties.QuestionId}{BookingConstants.RESERVED_BOOKING_DATE}";
+            var reservedBookingId = $"{bookingElement.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}";
+            var reservedBookingDate = $"{bookingElement.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}";
+            var currentlySelectedBookingDate = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}";
 
-            var convertedAnswers = cachedAnswers == null
-                ? new FormAnswers { Pages = new List<PageAnswers>() }
-                : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-
-            if (convertedAnswers.AdditionalFormData.ContainsKey(reservedBookingDate))
+            //Check viewModel and verify not empty value
+            if (viewModel.ContainsKey(reservedBookingId) && !string.IsNullOrEmpty((string)viewModel[reservedBookingId]))
             {
-                var currentSelectedDate = (string)viewModel[$"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}"];
-                var previouslyReservedAppointmentDate = convertedAnswers.AdditionalFormData[reservedBookingDate];
+                var currentSelectedDate = (string)viewModel[currentlySelectedBookingDate];
+                var previouslyReservedAppointmentDate = (string)viewModel[reservedBookingDate];
 
                 if (currentSelectedDate.Equals(previouslyReservedAppointmentDate))
-                    return;
+                    return Guid.Parse(viewModel[reservedBookingId]);
             }
+
+            viewModel.Remove(reservedBookingId);
+            viewModel.Remove(reservedBookingDate);
 
             // Appointment date does not match or has not been reserved yet
             // we must reserve new appointment and save seleted reservation info.
-            var appointment = await _bookingProviders.Get(bookingElement.Properties.BookingProvider).Reserve(new BookingRequest());
+            var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider).Reserve(new BookingRequest());
 
-            var reservedBooking = new Dictionary<string, dynamic>
-            {
-                { reservedBookingId, appointment },
-                { reservedBookingDate, viewModel[$"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}"] }
-            };
-            _pageHelper.SaveNonQuestionAnswers(reservedBooking, baseUrl, path, guid);
+            viewModel.Add(reservedBookingDate, viewModel[currentlySelectedBookingDate]);
+            viewModel.Add(reservedBookingId, result);
 
+            return result;
         }
         
         public async Task ProcessMonthRequest(DateTime requestedMonth, FormSchema baseForm, Page currentPage, string guid)

@@ -38,8 +38,10 @@ namespace form_builder.Models.Elements
         public DateTime PreviousSelectableMonth => new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).AddMonths(-1);
         public bool DisplayNextMonthArrow => NextSelectableMonth <= new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(Properties.SearchPeriod);
         public bool DisplayPreviousMonthArrow => CurrentSelectedMonth > FirstAvailableMonth;
-        public override string GetLabelText() => $"Booking{(Properties.Optional? " (optional)" : string.Empty)}";
+        public override string GetLabelText() => $"Booking{(Properties.Optional ? " (optional)" : string.Empty)}";
         public string FormName { get; set; }
+        public string ReservedBookingId { get; set; }
+        public string ReservedBookingDate { get; set; }
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
@@ -53,6 +55,8 @@ namespace form_builder.Models.Elements
         {
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
             Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, BookingConstants.APPOINTMENT_DATE);
+            ReservedBookingId = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_ID}");
+            ReservedBookingDate = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_DATE}");
             FormName = formSchema.FormName;
             ConfigureBookingInformation(results);
 

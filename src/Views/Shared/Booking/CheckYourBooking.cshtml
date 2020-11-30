@@ -1,6 +1,10 @@
+@using form_builder.Constants;
 @model form_builder.Models.Elements.Booking
 
 @Html.Hidden(@Model.BookingDateQuestionId, @Model.Properties.Value)
+@Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_DATE), Model.ReservedBookingDate)
+@Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_ID), Model.ReservedBookingId)
+
 <h1 class="govuk-heading-l">Check your booking</h1>
 <table class="govuk-table">
     <tr class="govuk-table__row">

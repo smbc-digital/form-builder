@@ -1,6 +1,9 @@
+@using form_builder.Constants;
 @model form_builder.Models.Elements.Booking
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+    @Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_DATE), Model.ReservedBookingDate)
+    @Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_ID), Model.ReservedBookingId)
 
     <partial name="LabelH1" />
 
