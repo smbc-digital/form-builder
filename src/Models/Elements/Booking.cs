@@ -7,6 +7,8 @@ using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Models.Booking;
+using form_builder.Utils.Extesions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using StockportGovUK.NetStandard.Models.Booking.Response;
@@ -20,7 +22,7 @@ namespace form_builder.Models.Elements
         {
             Type = EElementType.Booking;
         }
-        public List<SelectListItem> SelectList { get; set; } = new List<SelectListItem>();
+        public List<CalendarDay> Calendar { get; set; } = new List<CalendarDay>();
         public List<AvailabilityDayResponse> Appointments { get; set; } = new List<AvailabilityDayResponse>();
         public string FormattedDateForCheckYourBooking => DateTime.Parse(Properties.Value).ToString("dddd dd MMMM yyyy");
         public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {AppointmentStartTime} and {AppointmentEndTime}" : "NotFullDay";
@@ -44,6 +46,7 @@ namespace form_builder.Models.Elements
         public string ReservedBookingId { get; set; }
         public string ReservedBookingDate { get; set; }
         public string MonthSelectionPostUrl { get; set; }
+        public override string QuestionId => BookingDateQuestionId;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
@@ -68,7 +71,7 @@ namespace form_builder.Models.Elements
                     SelectedBooking = GetSelectedAppointment();
                     return viewRender.RenderAsync("CheckYourBooking", this);
                 default:
-                    ConfigureDropDown();
+                    CreateCalendar();
                     MonthSelectionPostUrl = formSchema.BaseURL.ToBookingRequestedMonthUrl(page.PageSlug);
                     return viewRender.RenderAsync(Type.ToString(), this);
             }
@@ -89,14 +92,31 @@ namespace form_builder.Models.Elements
             }
         }
 
-        private void ConfigureDropDown()
+        private void CreateCalendar()
         {
-            SelectList.Add(new SelectListItem("selet date", string.Empty));
+            var dates = new List<CalendarDay>();
+            var daysInMonth = DateTime.DaysInMonth(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month);
+            var daysToAdd = new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).PreviousDaysInMonth();
 
-            Appointments.ForEach(_ =>
+            //Add empty days at start of month
+            for (int i = 0; i < daysToAdd; i++)
             {
-                SelectList.Add(new SelectListItem(_.Date.ToString(), _.Date.ToString()));
-            });
+                dates.Add(new CalendarDay{ IsDisabled = true, IsNotWithinCurrentSelectedMonth = true });
+            }
+
+            for (int i = 0; i < daysInMonth; i++)
+            {
+                var day = new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, i + 1);
+                var containsDay = Appointments.FirstOrDefault(_ => _.Date.Equals(day));
+                dates.Add(new CalendarDay{ Date = day, IsDisabled = containsDay == null });
+            }
+
+            //add empty days at end of month
+            for (int i = dates.Count + 1; i < 43; i++)
+            {
+                dates.Add(new CalendarDay{ IsDisabled = true, IsNotWithinCurrentSelectedMonth = true });
+            }
+            Calendar = dates;
         }
 
         private AvailabilityDayResponse GetSelectedAppointment()
@@ -108,5 +128,6 @@ namespace form_builder.Models.Elements
 
             return selectedAppointment;
         }
+
     }
 }

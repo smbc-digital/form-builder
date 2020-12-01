@@ -1,0 +1,38 @@
+@model form_builder.ViewModels.CalendarDayViewModel
+
+@{
+    var inputId = $"{Model.QuestionId}-{Model.Day.Date.Day}";
+    var disabledClass = "smbc-body smbc-date-disabled govuk-!-margin-bottom-0";
+}
+
+@if (Model.Day.IsDisabled)
+{
+    if (Model.Day.IsNotWithinCurrentSelectedMonth)
+    {
+        <td>
+            <label class="@disabledClass"></label>
+        </td>
+    }
+    else
+    {
+        <td>
+            <label class="@disabledClass">@Model.Day.Date.Day</label>
+        </td>
+    }
+}
+else
+{
+    <td>
+            <input type="radio"
+                value="@Model.Day.Date"
+                name="@Model.QuestionId"
+                id="@inputId" 
+                @(Model.CurrentValue.Equals(Model.Day.Date.ToString()) ? "checked" : string.Empty) />
+
+            <label class="smbc-body govuk-!-font-size-16 govuk-!-margin-bottom-0 govuk-!-margin-top-0"
+                   for="@inputId">
+                @Model.Day.Date.Day
+            </label>
+
+    </td>
+}

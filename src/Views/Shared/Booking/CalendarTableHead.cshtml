@@ -1,0 +1,30 @@
+@using form_builder.Constants
+@model form_builder.Models.Elements.Booking
+
+<thead class="smbc-calendar-border">
+    <tr>
+        <th colspan=2>
+            @if (@Model.DisplayPreviousMonthArrow)
+            {
+                <button type="submit" name="@BookingConstants.BOOKING_MONTH_REQUEST" value="@Model.PreviousSelectableMonth"
+                    formaction="@Model.MonthSelectionPostUrl" class="smbc-chevron-button smbc-chevron-button__left">
+                    <span class="smbc-calendar-chevron smbc-calendar-chevron__left govuk-!-font-weight-bold">@Html.Raw("<")</span>
+                </button>
+            }
+        </th>
+        <th colspan=3>
+            <h2
+                class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-20 govuk-!-margin-bottom-0 govuk-!-margin-top-0">
+                @Model.CurrentSelectedMonthText</h2>
+        </th>
+        <th colspan=2>
+            @if (@Model.DisplayNextMonthArrow)
+            {
+                <button type="submit" name="@BookingConstants.BOOKING_MONTH_REQUEST" value="@Model.NextSelectableMonth"
+                    formaction="@Model.MonthSelectionPostUrl" class="smbc-chevron-button smbc-chevron-button__right">
+                    <span class="smbc-calendar-chevron smbc-calendar-chevron__right govuk-!-font-weight-bold">></span>
+                </button>
+            }
+        </th>
+    </tr>
+</thead>

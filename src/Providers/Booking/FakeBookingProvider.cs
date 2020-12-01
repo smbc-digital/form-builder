@@ -38,26 +38,26 @@ namespace form_builder.Providers.Booking
             {
                 case 11:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2020, 10, 13), 1)
-                        .WithDay(new DateTime(2020, 10, 15), 1)
-                        .WithDay(new DateTime(2020, 10, 22), 1)
-                        .WithDay(new DateTime(2020, 10, 23), 1)
+                        .WithDay(new DateTime(2020, request.StartDate.Month, 13), 1)
+                        .WithDay(new DateTime(2020, request.StartDate.Month, 15), 1)
+                        .WithDay(new DateTime(2020, request.StartDate.Month, 22), 1)
+                        .WithDay(new DateTime(2020, request.StartDate.Month, 23), 1)
                         .Build();
                     break;
                 case 12:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2020, 11, 15), 1)
-                        .WithDay(new DateTime(2020, 11, 12), 1)
-                        .WithDay(new DateTime(2020, 11, 13), 1)
-                        .WithDay(new DateTime(2020, 11, 20), 1)
+                        .WithDay(new DateTime(2020, request.StartDate.Month, 15), 1)
+                        .WithDay(new DateTime(2020, request.StartDate.Month, 12), 1)
+                        .WithDay(new DateTime(2020, request.StartDate.Month, 13), 1)
+                        .WithDay(new DateTime(2020, request.StartDate.Month, 20), 1)
                         .Build();
                     break;
                 case 1:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2020, 12, 1), 1)
-                        .WithDay(new DateTime(2020, 12, 4), 1)
-                        .WithDay(new DateTime(2020, 12, 9), 1)
-                        .WithDay(new DateTime(2020, 12, 22), 1)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 1), 1)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 4), 1)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 9), 1)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 22), 1)
                         .Build();
                     break;
                 default:
