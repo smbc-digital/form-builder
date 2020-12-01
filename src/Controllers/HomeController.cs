@@ -105,7 +105,7 @@ namespace form_builder.Controllers
             if (currentPageResult.RedirectToAction && !string.IsNullOrWhiteSpace(currentPageResult.RedirectAction))
                 return RedirectToAction(currentPageResult.RedirectAction, currentPageResult.RouteValues ?? new { form, path });
 
-            if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
+            if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel || !currentPageResult.Page.Elements[0].Properties.Options[0].ConditionalElement.IsValid)
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
 
             if (currentPageResult.Page.HasPageActionsPostValues)
