@@ -24,9 +24,9 @@
 
     @if(@Model.DisplayPreviousMonthArrow){
         <button type="submit"
-                name="MONTH_REQUEST"
+                name="@BookingConstants.BOOKING_MONTH_REQUEST"
                 value="@Model.PreviousSelectableMonth"
-                formaction="/booking/booking/page-one/month"
+                formaction="@Model.MonthSelectionPostUrl"
                 class="govuk-button smbc-button--link">
             Previous Month
         </button>
@@ -36,9 +36,9 @@
 
     @if(@Model.DisplayNextMonthArrow){
         <button type="submit"
-                name="MONTH_REQUEST"
+                name="@BookingConstants.BOOKING_MONTH_REQUEST"
                 value="@Model.NextSelectableMonth"
-                formaction="/booking/booking/page-one/month"
+                formaction="@Model.MonthSelectionPostUrl"
                 class="govuk-button smbc-button--link">
             Next Month
         </button>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using Microsoft.AspNetCore.Hosting;
@@ -42,6 +43,7 @@ namespace form_builder.Models.Elements
         public string FormName { get; set; }
         public string ReservedBookingId { get; set; }
         public string ReservedBookingDate { get; set; }
+        public string MonthSelectionPostUrl { get; set; }
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
@@ -67,6 +69,7 @@ namespace form_builder.Models.Elements
                     return viewRender.RenderAsync("CheckYourBooking", this);
                 default:
                     ConfigureDropDown();
+                    MonthSelectionPostUrl = formSchema.BaseURL.ToBookingRequestedMonthUrl(page.PageSlug);
                     return viewRender.RenderAsync(Type.ToString(), this);
             }
         }

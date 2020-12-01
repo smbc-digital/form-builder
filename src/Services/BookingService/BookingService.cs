@@ -35,7 +35,7 @@ namespace form_builder.Services.BookingService
             string path);
 
         Task ProcessMonthRequest(
-            DateTime requestedMonth,
+            Dictionary<string, object> viewModel,
             FormSchema baseForm,
             Page currentPage,
             string guid);
@@ -259,8 +259,13 @@ namespace form_builder.Services.BookingService
             return result;
         }
         
-        public async Task ProcessMonthRequest(DateTime requestedMonth, FormSchema baseForm, Page currentPage, string guid)
+        public async Task ProcessMonthRequest(Dictionary<string, object> viewModel, FormSchema baseForm, Page currentPage, string guid)
         {
+            if(!viewModel.ContainsKey(BookingConstants.BOOKING_MONTH_REQUEST))
+                throw new ApplicationException("BookingService::ProcessMonthRequest, request for appointment did not contain requested month range");
+
+            var requestedMonth = DateTime.Parse(viewModel[BookingConstants.BOOKING_MONTH_REQUEST].ToString());
+
             var currentDate = DateTime.Now;
             var bookingElement = currentPage.Elements
                 .Where(_ => _.Type == EElementType.Booking)
@@ -270,10 +275,10 @@ namespace form_builder.Services.BookingService
                 requestedMonth = currentDate;
 
             if (requestedMonth > new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(bookingElement.Properties.SearchPeriod))
-                throw new SystemException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is after allowed search period");
+                throw new ApplicationException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is after allowed search period");
 
             if (requestedMonth < currentDate)
-                throw new SystemException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is before today");
+                throw new ApplicationException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is before today");
 
             var bookingSearchResultsKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
             var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)

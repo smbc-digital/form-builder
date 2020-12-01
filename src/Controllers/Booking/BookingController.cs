@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
@@ -46,7 +47,7 @@ namespace form_builder.Controllers
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
-            await _bookingService.ProcessMonthRequest(DateTime.Parse(viewModel["MONTH_REQUEST"].ToString()), baseForm, page, sessionGuid);
+            await _bookingService.ProcessMonthRequest(viewModel, baseForm, page, sessionGuid);
 
             var routeValuesDictionary = new RouteValueDictionaryBuilder()
                 .WithValue("path", path)
