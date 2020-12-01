@@ -66,8 +66,17 @@ namespace form_builder.Models
 			{
 				if (IsValidated)
 				{
-					return ValidatableElements.Where(element => !element.IsValid).Select(element => element.Properties);
-				}
+					IEnumerable<BaseProperty> invalidElements = ValidatableElements.Where(element => !element.IsValid && element.Type != EElementType.Radio).Select(element => element.Properties);
+					IEnumerable<BaseProperty> radioConditional = ValidatableElements.Where(element => element.Type == EElementType.Radio && element.Properties.Options.Where(option => option.HasConditionalElement).Any()).Select(element => element.Properties);
+					List<BaseProperty> invalidConditionalProperties = new List<BaseProperty>();
+				//	foreach  (Option option in radioConditional) {
+				//		if (!option.ConditionalElement.IsValid) {
+				//			invalidConditionalProperties.Add(option);
+
+				//		}
+    //                }
+				//	invalidElements.Append<BaseProperty>()
+				//}
 
 				throw new Exception("Model is not validated, please call Validate()");
 			}
@@ -102,9 +111,18 @@ namespace form_builder.Models
 
 		public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
 		{
-			ValidatableElements.ToList().ForEach(element => element.Validate(viewModel, form_builder));
+			//ValidatableElements.ToList().ForEach(element => element.Validate(viewModel, form_builder));
 
-			ValidatableElements.ToList().ForEach(element => element.Properties.Options[0].ConditionalElement.Validate(viewModel, form_builder));
+			ValidatableElements.ToList().ForEach(element => {
+				element.Validate(viewModel, form_builder);
+				if (element.Type == EElementType.Radio) {
+					foreach (Option option in element.Properties.Options) {
+						if (option.HasConditionalElement) {
+							option.ConditionalElement.Validate(viewModel, form_builder);
+                        }
+                    }
+                }
+			});
 
 			IsValidated = true;
 		}

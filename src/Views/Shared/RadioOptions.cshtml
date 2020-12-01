@@ -66,57 +66,52 @@
 				@if (@Model.Properties.Options[i].ConditionalElement.Type == EElementType.Textbox)
 				{
 					<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
-						<div class="govuk-form-group @(!Model.Properties.Options[i].ConditionalElement.IsValid ? "govuk-form-group--error" : string.Empty)">
+                        <div class="govuk-form-group @(!Model.Properties.Options[i].ConditionalElement.IsValid ? "govuk-form-group--error" : string.Empty)">
 
-							@if (!string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElement.Properties.Label))
-							{
-								<label class="govuk-label @(Model.Properties.Options[i].ConditionalElement.Properties.StrongLabel ? "govuk-label--m" : string.Empty)" for="@Model.Properties.Options[i].ConditionalElement.QuestionId">
-									@Model.Properties.Options[i].ConditionalElement.Properties.Label
-									@if (Model.Properties.Options[i].ConditionalElement.Properties.Optional && !Model.Properties.Options[i].ConditionalElement.Properties.HideOptionalText)
-									{
-										<span class="smbc-body">(optional)</span>
-									}
-								</label>
-							}
+                            @if (!string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElement.Properties.Label)) {
+                                <label class="govuk-label @(Model.Properties.Options[i].ConditionalElement.Properties.StrongLabel ? "govuk-label--m" : string.Empty)" for="@Model.Properties.Options[i].ConditionalElement.QuestionId">
+                                    @Model.Properties.Options[i].ConditionalElement.Properties.Label
+                                    @if (Model.Properties.Options[i].ConditionalElement.Properties.Optional && !Model.Properties.Options[i].ConditionalElement.Properties.HideOptionalText) {
+                                        <span class="smbc-body">(optional)</span>
+                                    }
+                                </label>
+                            }
 
-							@if (!string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElement.Properties.IAG))
-							{
-								<div class="govuk-inset-text">
-									@Html.Raw(Model.Properties.Options[i].ConditionalElement.Properties.IAG)
-								</div>
-							}
+                            @if (!string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElement.Properties.IAG)) {
+                                <div class="govuk-inset-text">
+                                    @Html.Raw(Model.Properties.Options[i].ConditionalElement.Properties.IAG)
+                                </div>
+                            }
 
-							@if (Model.Properties.Options[i].ConditionalElement.DisplayHint && !string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElement.Hint))
-							{
-								<span class="govuk-hint" id=@Model.Properties.Options[i].ConditionalElement.HintId>@Html.Raw(Model.Properties.Options[i].ConditionalElement.Hint)</span>
-							}
+                            @if (Model.Properties.Options[i].ConditionalElement.DisplayHint && !string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElement.Hint)) {
+                                <span class="govuk-hint" id=@Model.Properties.Options[i].ConditionalElement.HintId>@Html.Raw(Model.Properties.Options[i].ConditionalElement.Hint)</span>
+                            }
 
-							@if (!Model.Properties.Options[i].ConditionalElement.IsValid)
-							{
-								var viewModel = new form_builder.ViewModels.ErrorViewModel
-								{
-									IsValid = Model.Properties.Options[i].ConditionalElement.IsValid,
-									Message = Model.Properties.Options[i].ConditionalElement.ValidationMessage,
-									Id = Model.Properties.Options[i].ConditionalElement.ErrorId
-								};
+                            @if (!Model.Properties.Options[i].ConditionalElement.IsValid) {
+                                var viewModel = new form_builder.ViewModels.ErrorViewModel {
+                                    IsValid = Model.Properties.Options[i].ConditionalElement.IsValid,
+                                    Message = Model.Properties.Options[i].ConditionalElement.ValidationMessage,
+                                    Id = Model.Properties.Options[i].ConditionalElement.ErrorId
+                                };
 
-								@if (!Model.Properties.Options[i].ConditionalElement.IsValid)
-								{
-									<span class="smbc-error-message">
-										<span class="govuk-visually-hidden">Error:</span>
-									</span>
-								}
-							}
+                                @if (!Model.Properties.Options[i].ConditionalElement.IsValid) {
+                                    <span class="smbc-error-message">
+                                        <span class="govuk-visually-hidden">Error:</span>
+                                    </span>
 
-							@{
-								var textboxElements = Model.Properties.Options[i].ConditionalElement.GenerateElementProperties();
-								textboxElements.Add("class", !Model.Properties.Options[i].ConditionalElement.IsValid
-											? $"{baseCssClasses} govuk-input--error"
-											: baseCssClasses);
-							}
+                                    <partial model=viewModel name="ErrorBase" />
+                                }
+                            }
 
-							@Html.TextBox(Model.Properties.Options[i].ConditionalElement.QuestionId, Model.Properties.Options[i].ConditionalElement.Properties.Value, textboxElements)
-						</div>
+                            @{
+                                var textboxElements = Model.Properties.Options[i].ConditionalElement.GenerateElementProperties();
+                                textboxElements.Add("class", !Model.Properties.Options[i].ConditionalElement.IsValid
+                                            ? $"{baseCssClasses} govuk-input--error"
+                                            : baseCssClasses);
+                            }
+
+                            @Html.TextBox(Model.Properties.Options[i].ConditionalElement.QuestionId, Model.Properties.Options[i].ConditionalElement.Properties.Value, textboxElements)
+                        </div>
 					</div>
 				}
 
