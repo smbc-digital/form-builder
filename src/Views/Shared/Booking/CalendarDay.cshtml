@@ -10,13 +10,13 @@
     if (Model.Day.IsNotWithinCurrentSelectedMonth)
     {
         <td>
-            <label class="@disabledClass"></label>
+            <span class="@disabledClass"></span>
         </td>
     }
     else
     {
         <td>
-            <label class="@disabledClass">@Model.Day.Date.Day</label>
+            <span class="@disabledClass">@Model.Day.Date.Day</span>
         </td>
     }
 }
