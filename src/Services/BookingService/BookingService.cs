@@ -183,7 +183,7 @@ namespace form_builder.Services.BookingService
             //Return page if Valid.
             if (!bookingElement.Properties.CheckYourBooking)
             {
-                await ReserveAppointment(bookingElement, viewModel, baseForm.BaseURL, path, guid);
+                await ReserveAppointment(bookingElement, viewModel, baseForm.BaseURL, guid);
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
@@ -213,7 +213,7 @@ namespace form_builder.Services.BookingService
         {
             // Handle check your booking
             var bookingElement = currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
-            await ReserveAppointment(bookingElement, viewModel, baseForm.BaseURL, path, guid);
+            await ReserveAppointment(bookingElement, viewModel, baseForm.BaseURL, guid);
 
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
@@ -223,7 +223,7 @@ namespace form_builder.Services.BookingService
             };
         }
 
-        private async Task<Guid> ReserveAppointment(IElement bookingElement, Dictionary<string, dynamic> viewModel, string baseUrl, string path, string guid)
+        private async Task<Guid> ReserveAppointment(IElement bookingElement, Dictionary<string, dynamic> viewModel, string form, string guid)
         {
             // Get current info which reserve was done against, If it is different we need to resver this new appointment
             // else we continue as the appointment has already been reserved.
@@ -251,7 +251,7 @@ namespace form_builder.Services.BookingService
 
             // Appointment date does not match or has not been reserved yet
             // we must reserve new appointment and save seleted reservation info.
-            var bookingRequest = await _mappingService.MapBookingRequest(guid, bookingElement, viewModel);
+            var bookingRequest = await _mappingService.MapBookingRequest(guid, bookingElement, viewModel, form);
 
             var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider).Reserve(bookingRequest);
 

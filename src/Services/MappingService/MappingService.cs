@@ -17,14 +17,13 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
-using static form_builder.Services.BookingService.BookingService;
 
 namespace form_builder.Services.MappingService
 {
     public interface IMappingService
     {
         Task<MappingEntity> Map(string sessionGuid, string form);
-        Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel);
+        Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form);
     }
 
     public class MappingService : IMappingService
@@ -61,71 +60,50 @@ namespace form_builder.Services.MappingService
             };
         }
 
-        public async Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel)
+        public async Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form)
         {
             var baseForm = await _schemaFactory.Build(bookingElement.Properties.QuestionId);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
+            convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
+            convertedAnswers.FormName = form;
 
             return new BookingRequest
             {
                 AppointmentId = bookingElement.Properties.AppointmentType,
                 Customer = GetCustomerDetails(convertedAnswers, baseForm),
-                StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel)
+                StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form)
             };
         }
 
-        private DateTime GetStartDateTime(string formName, Dictionary<string, dynamic> viewModel)
+        private DateTime GetStartDateTime(string questionID, Dictionary<string, dynamic> viewModel, string form)
         {
-            var startDateTime = new DateTime();
+            var bookingDateKey = $"{questionID}{BookingConstants.APPOINTMENT_DATE}";
+            var appointmentTimeKey = $"{questionID}{BookingConstants.APPOINTMENT_TIME}";
 
-            var bookingDateKey = $"{formName}{BookingConstants.APPOINTMENT_DATE}";
-            var appointmentTimeKey = $"{formName}{BookingConstants.APPOINTMENT_TIME}";
-            if (viewModel.ContainsKey(bookingDateKey))
-            {
-                DateTime day = DateTime.Parse(viewModel[bookingDateKey]);
-                startDateTime = day;
+            if (!viewModel.ContainsKey(bookingDateKey))
+                throw new ApplicationException($"MappingService::GetStartDateTime, Booking request viewmodel for form {form} does not contain required booking start date");
 
-                if (viewModel.ContainsKey(appointmentTimeKey))
-                {
-                    DateTime time = DateTime.Parse(viewModel[appointmentTimeKey]);
-                    startDateTime = new DateTime(day.Year, day.Month, day.Day, time.Hour, time.Minute, time.Second);
-                }
-            }
-            // ELSE : no actual booking date for request
+            if (!viewModel.ContainsKey(appointmentTimeKey))
+                throw new ApplicationException($"MappingService::GetStartDateTime, Booking request viewmodel for form {form} does not contain required booking start time");
 
-            return startDateTime;
+            DateTime startDateTime = DateTime.Parse(viewModel[bookingDateKey]);
+            DateTime time = DateTime.Parse(viewModel[appointmentTimeKey]);
+
+            return new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day, time.Hour, time.Minute, time.Second);
         }
 
         private Customer GetCustomerDetails(FormAnswers formAnswers, FormSchema formSchema)
         {
             var data = new ExpandoObject() as IDictionary<string, dynamic>;
             formSchema.Pages.SelectMany(_ => _.ValidatableElements)
-                .Where(x => !string.IsNullOrEmpty(x.Properties.TargetMapping) && x.Properties.TargetMapping.StartsWith("customer."))
+                .Where(x => !string.IsNullOrEmpty(x.Properties.TargetMapping) && x.Properties.TargetMapping.ToLower().StartsWith("customer."))
                 .ToList()
                 .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
 
-            var newCustomer = new Customer();
-            data.TryGetValue("customer", out object customerObject);
-            if (customerObject != null)
-            {
-                var customer = (IDictionary<String, Object>)customerObject;
-                if (customer.ContainsKey("firstname") && customer.ContainsKey("lastname") && customer.ContainsKey("email"))
-                {
-                    newCustomer.Firstname = (string)customer["firstname"];
-                    newCustomer.Lastname = (string)customer["lastname"];
-                    newCustomer.Email = (string)customer["email"];
+            if(!data.ContainsKey("customer"))
+                throw new ApplicationException($"MappingService::GetCustomerDetails, Booking request form data for form {formSchema.BaseURL} does not contain required customer object");
 
-                    // Any additional data..?
-                    customer.TryGetValue("address", out object address);
-                    if (address != null)
-                        newCustomer.Address = (StockportGovUK.NetStandard.Models.Addresses.Address)address;
-
-                    if (customer.ContainsKey("phonenumber"))
-                        newCustomer.PhoneNumber = (string)customer["phonenumber"];
-                }
-            }
-
-            return newCustomer;
+            return JsonConvert.DeserializeObject<Customer>(JsonConvert.SerializeObject(data["customer"]));
         }
 
         private object CreatePostData(FormAnswers formAnswers, FormSchema formSchema)
