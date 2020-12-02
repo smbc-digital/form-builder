@@ -1,7 +1,6 @@
 @model form_builder.ViewModels.CalendarDayViewModel
 
 @{
-    var inputId = $"{Model.QuestionId}-{Model.Day.Date.Day}";
     var disabledClass = "smbc-body smbc-date-disabled govuk-!-margin-bottom-0";
 }
 
@@ -26,13 +25,16 @@ else
             <input type="radio"
                 value="@Model.Day.Date"
                 name="@Model.QuestionId"
-                id="@inputId" 
+                id="@Model.InputId" 
+                aria-describedby="@Model.GetCalendarHint()"
                 @(Model.Day.Checked ? "checked" : string.Empty) />
 
-            <label class="smbc-body govuk-!-font-size-16 govuk-!-margin-bottom-0 govuk-!-margin-top-0"
-                   for="@inputId">
+            <label aria-hidden="true" 
+                class="smbc-body govuk-!-font-size-16 govuk-!-margin-bottom-0 govuk-!-margin-top-0"
+                for="@Model.InputId">
                 @Model.Day.Date.Day
             </label>
 
+            <span class="govuk-visually-hidden" id="@Model.GetCalendarHint()">@Model.Day.Date.ToString("dddd dd MMMM")</span>
     </td>
 }
