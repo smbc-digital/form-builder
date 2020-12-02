@@ -8,6 +8,7 @@ namespace form_builder.Constants
         public const string APPOINTMENT_TIME = "-appointment-time";
         public const string CHECK_YOUR_BOOKING = "check-your-booking";
         public const string RESERVED_BOOKING_DATE = "ReservedDate";
+        public const string RESERVED_BOOKING_TIME = "ReservedTime";
         public const string RESERVED_BOOKING_ID = "ReservedAppointmentId";
         public const string BOOKING_MONTH_REQUEST = "BOOKING_MONTH_REQUEST";
     }

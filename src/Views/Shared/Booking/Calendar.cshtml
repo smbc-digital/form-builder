@@ -11,7 +11,11 @@
             <tr>
                 @foreach (var date in dates)
                 {
-                    var calendarDayModel = new CalendarDayViewModel { Day = date, QuestionId = Model.QuestionId, CurrentValue = Model.Properties.Value };
+                    var calendarDayModel = new CalendarDayViewModel
+                    {
+                        Day = date,
+                        QuestionId = Model.QuestionId
+                    };
                     <partial name="CalendarDay" model="@calendarDayModel" />
                 }
             </tr>

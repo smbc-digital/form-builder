@@ -27,7 +27,7 @@ else
                 value="@Model.Day.Date"
                 name="@Model.QuestionId"
                 id="@inputId" 
-                @(Model.CurrentValue.Equals(Model.Day.Date.ToString()) ? "checked" : string.Empty) />
+                @(Model.Day.Checked ? "checked" : string.Empty) />
 
             <label class="smbc-body govuk-!-font-size-16 govuk-!-margin-bottom-0 govuk-!-margin-top-0"
                    for="@inputId">

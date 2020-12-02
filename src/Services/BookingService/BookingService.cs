@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using form_builder.Exceptions;
 using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Services.MappingService;
+using System.Dynamic;
 
 namespace form_builder.Services.BookingService
 {
@@ -47,6 +49,7 @@ namespace form_builder.Services.BookingService
         private readonly IPageHelper _pageHelper;
         private readonly IEnumerable<IBookingProvider> _bookingProviders;
         private readonly IPageFactory _pageFactory;
+
         public BookingService(
             IDistributedCacheWrapper distributedCache,
             IPageHelper pageHelper,
@@ -121,14 +124,8 @@ namespace form_builder.Services.BookingService
 
             if (nextAvailability.IsFullDayAppointment)
             {
-                var start = DateTime.Today.Add(nextAvailability.AppointmentTimes.First().StartTime);
-                var end = DateTime.Today.Add(nextAvailability.AppointmentTimes.First().EndTime);
-
-                var START_DATE_FORMAT = start.Minute > 0 ? "h:mmtt" :"htt";
-                var END_DATE_FORMAT = end.Minute > 0 ? "h:mmtt" : "htt";
-
-                bookingInformation.AppointmentStartTime = start.ToString(START_DATE_FORMAT).ToLower();
-                bookingInformation.AppointmentEndTime = end.ToString(END_DATE_FORMAT).ToLower();
+                bookingInformation.AppointmentStartTime = DateTime.Today.Add(nextAvailability.AppointmentTimes.First().StartTime);
+                bookingInformation.AppointmentEndTime = DateTime.Today.Add(nextAvailability.AppointmentTimes.First().EndTime);
             }
 
             _pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, guid, baseUrl);
@@ -234,20 +231,25 @@ namespace form_builder.Services.BookingService
             // else we continue as the appointment has already been reserved.
             var reservedBookingId = $"{bookingElement.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}";
             var reservedBookingDate = $"{bookingElement.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}";
+            var reservedBookingTime = $"{bookingElement.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_TIME}";
             var currentlySelectedBookingDate = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}";
+            var currentlySelectedBookingTime = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TIME}";
 
             //Check viewModel and verify not empty value
             if (viewModel.ContainsKey(reservedBookingId) && !string.IsNullOrEmpty((string)viewModel[reservedBookingId]))
             {
                 var currentSelectedDate = (string)viewModel[currentlySelectedBookingDate];
+                var currentSelectedTime = (string)viewModel[currentlySelectedBookingTime];
                 var previouslyReservedAppointmentDate = (string)viewModel[reservedBookingDate];
+                var previouslyReservedAppointmentTime = (string)viewModel[reservedBookingTime];
 
-                if (currentSelectedDate.Equals(previouslyReservedAppointmentDate))
+                if (currentSelectedDate.Equals(previouslyReservedAppointmentDate) && currentSelectedTime.Equals(previouslyReservedAppointmentTime))
                     return Guid.Parse(viewModel[reservedBookingId]);
             }
 
             viewModel.Remove(reservedBookingId);
             viewModel.Remove(reservedBookingDate);
+            viewModel.Remove(reservedBookingTime);
 
             // Appointment date does not match or has not been reserved yet
             // we must reserve new appointment and save seleted reservation info.
@@ -313,8 +315,8 @@ namespace form_builder.Services.BookingService
             public DateTime FirstAvailableMonth { get; set; }
             public List<AvailabilityDayResponse> Appointments { get; set; }
             public bool IsFullDayAppointment { get; set; }
-            public string AppointmentStartTime { get; set; }
-            public string AppointmentEndTime { get; set; }
+            public DateTime AppointmentStartTime { get; set; }
+            public DateTime AppointmentEndTime { get; set; }
         }
     }
 }

@@ -10,6 +10,8 @@ namespace form_builder.Utils.Extesions
             return new DateTime(today.Date.Year, today.Date.Month, totalDays, 23, 59, 59);
         }
 
+        public static string ToTimeFormat(this DateTime value) => value.ToString(value.Minute > 0 ? "h:mmtt" :"htt");
+
         public static int PreviousDaysInMonth(this DateTime value) {
             switch (value.DayOfWeek)
             {
