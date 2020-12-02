@@ -67,16 +67,11 @@ namespace form_builder.Models
 				if (IsValidated)
 				{
 					IEnumerable<BaseProperty> invalidElements = ValidatableElements.Where(element => !element.IsValid && element.Type != EElementType.Radio).Select(element => element.Properties);
-					IEnumerable<BaseProperty> radioConditional = ValidatableElements.Where(element => element.Type == EElementType.Radio && element.Properties.Options.Where(option => option.HasConditionalElement).Any()).Select(element => element.Properties);
-					List<BaseProperty> invalidConditionalProperties = new List<BaseProperty>();
-				//	foreach  (Option option in radioConditional) {
-				//		if (!option.ConditionalElement.IsValid) {
-				//			invalidConditionalProperties.Add(option);
 
-				//		}
-    //                }
-				//	invalidElements.Append<BaseProperty>()
-				//}
+					// Check if Radio element or its relative conditional element is valid 
+					IEnumerable<BaseProperty> invalidRadioConditional = ValidatableElements.Where(element => element.Type == EElementType.Radio && (!element.IsValid || element.Properties.Options.Where(option => option.HasConditionalElement && !option.ConditionalElement.IsValid).Any())).Select(element => element.Properties);
+					return invalidElements.Concat(invalidRadioConditional);
+				}
 
 				throw new Exception("Model is not validated, please call Validate()");
 			}
@@ -117,7 +112,8 @@ namespace form_builder.Models
 				element.Validate(viewModel, form_builder);
 				if (element.Type == EElementType.Radio) {
 					foreach (Option option in element.Properties.Options) {
-						if (option.HasConditionalElement) {
+						KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key == "radButton" && value.Value == option.Value);
+						if (option.HasConditionalElement && !(optionValue.Key == null)) {
 							option.ConditionalElement.Validate(viewModel, form_builder);
                         }
                     }

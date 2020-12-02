@@ -222,7 +222,7 @@ namespace form_builder.Services.PageService
             
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
-            if (!currentPage.IsValid || !currentPage.Elements[0].Properties.Options[0].ConditionalElement.IsValid)
+            if (!currentPage.IsValid)
             {
                 var formModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, sessionGuid);
 
