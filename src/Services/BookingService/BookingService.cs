@@ -256,6 +256,7 @@ namespace form_builder.Services.BookingService
             var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider).Reserve(bookingRequest);
 
             viewModel.Add(reservedBookingDate, viewModel[currentlySelectedBookingDate]);
+            viewModel.Add(reservedBookingTime, viewModel[currentlySelectedBookingTime]);
             viewModel.Add(reservedBookingId, result);
 
             return result;

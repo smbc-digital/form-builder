@@ -8,6 +8,7 @@ using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
+using form_builder.Utils.Extesions;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
@@ -155,8 +156,8 @@ namespace form_builder.Mappers
                     var manualLine2Text = string.IsNullOrWhiteSpace(addressValue.AddressLine2) ? string.Empty : $",{addressValue.AddressLine2}";
                     return string.IsNullOrWhiteSpace(addressValue.AddressLine1) ? string.Empty : $"{addressValue.AddressLine1}{manualLine2Text},{addressValue.Town},{addressValue.Postcode}";
                 case EElementType.Booking:
-                    var bookingDate = (DateTime)value;
-                    return  bookingDate.Equals(DateTime.MinValue) ? string.Empty : bookingDate.Date.ToString("dd/MM/yyyy");
+                    var bookingValue = (Booking)value;
+                    return  bookingValue.Date.Equals(DateTime.MinValue) && bookingValue.StartTime.Equals(DateTime.MinValue) ? string.Empty : $"{bookingValue.Date.ToString("dddd dd MMMM yyyy")} at {bookingValue.StartTime.ToTimeFormat()}";
 
                 case EElementType.Street:
                     var streetValue = (Address)value;
@@ -204,17 +205,31 @@ namespace form_builder.Mappers
             return null;
         }
 
-        private DateTime? GetBookingElementValue(string key, FormAnswers formAnswers)
+        public class Booking 
         {
-            var answer = formAnswers.Pages.SelectMany(_ => _.Answers)
-                .FirstOrDefault(_ => _.QuestionId.Equals($"{key}{BookingConstants.APPOINTMENT_DATE}"));
+            public Guid Id {get;set;}
+            public DateTime Date {get;set;}
+            public DateTime StartTime {get;set;}
+        }
 
-            var value = answer?.Response ?? string.Empty;
+        private Booking? GetBookingElementValue(string key, FormAnswers formAnswers)
+        {
+            var bookingObject = new Booking();
 
-            if (!string.IsNullOrEmpty(value))
-                return DateTime.Parse(value);
+            var appointmentId = $"{key}-{BookingConstants.RESERVED_BOOKING_ID}";
+            var appointmentDate = $"{key}-{BookingConstants.RESERVED_BOOKING_DATE}";
+            var appointmentTime = $"{key}-{BookingConstants.RESERVED_BOOKING_TIME}";
 
-            return null;
+            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+                .Where(_ => _.QuestionId.Equals(appointmentId) || _.QuestionId.Equals(appointmentDate) ||
+                            _.QuestionId.Equals(appointmentTime))
+                .ToList();
+
+            bookingObject.Id = Guid.Parse(value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentId))?.Response) ?? Guid.Empty;
+            bookingObject.Date = DateTime.Parse(value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentDate))?.Response) ?? string.Empty;
+            bookingObject.StartTime = DateTime.Parse(value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentTime))?.Response) ?? string.Empty;
+
+            return bookingObject.IsEmpty() ? null : bookingObject;
         }
 
         private Address GetAddressElementValue(string key, FormAnswers formAnswers)
