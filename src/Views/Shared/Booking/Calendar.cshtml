@@ -1,7 +1,8 @@
 @using form_builder.ViewModels
 @model form_builder.Models.Elements.Booking
 
-<table class="smbc-table">
+<table summary="Appointment availability for @(Model.CurrentSelectedMonthText)" 
+        class="smbc-table">
     <partial name="CalendarTableHead" model="@Model" />
     <tbody class="smbc-table-body">
         <partial name="CalendarBodyHead" model="@Model" />
