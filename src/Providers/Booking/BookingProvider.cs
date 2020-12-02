@@ -24,7 +24,7 @@ namespace form_builder.Providers.Booking
         {
             var result = await _gateway.NextAvailability(request);
 
-            if(result.StatusCode.Equals(StatusCodes.Status404NotFound))
+            if(result.StatusCode.Equals(404))
                 throw new BookingNoAvailabilityException($"BookingProvider::NextAvailability, BookingServiceGateway returned with 404 status code, no appointments availabel within the requested timeframe {request.StartDate} to {request.EndDate} for appointentId {request.AppointmentId}");
 
             if(!result.IsSuccessStatusCode)

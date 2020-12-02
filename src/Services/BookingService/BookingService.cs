@@ -49,17 +49,20 @@ namespace form_builder.Services.BookingService
         private readonly IPageHelper _pageHelper;
         private readonly IEnumerable<IBookingProvider> _bookingProviders;
         private readonly IPageFactory _pageFactory;
+        private readonly IMappingService _mappingService;
 
         public BookingService(
             IDistributedCacheWrapper distributedCache,
             IPageHelper pageHelper,
             IEnumerable<IBookingProvider> bookingProviders,
-            IPageFactory pageFactory)
+            IPageFactory pageFactory,
+            IMappingService mappingService)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
             _bookingProviders = bookingProviders;
             _pageFactory = pageFactory;
+            _mappingService = mappingService;
         }
 
         public async Task<List<object>> Get(
@@ -222,11 +225,6 @@ namespace form_builder.Services.BookingService
 
         private async Task<Guid> ReserveAppointment(IElement bookingElement, Dictionary<string, dynamic> viewModel, string baseUrl, string path, string guid)
         {
-            //Reserve appointment
-            //Needs
-            //User Data
-            //Selected DateTime.
-
             // Get current info which reserve was done against, If it is different we need to resver this new appointment
             // else we continue as the appointment has already been reserved.
             var reservedBookingId = $"{bookingElement.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}";
@@ -253,7 +251,9 @@ namespace form_builder.Services.BookingService
 
             // Appointment date does not match or has not been reserved yet
             // we must reserve new appointment and save seleted reservation info.
-            var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider).Reserve(new BookingRequest());
+            var bookingRequest = await _mappingService.MapBookingRequest(guid, bookingElement, viewModel);
+
+            var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider).Reserve(bookingRequest);
 
             viewModel.Add(reservedBookingDate, viewModel[currentlySelectedBookingDate]);
             viewModel.Add(reservedBookingId, result);
