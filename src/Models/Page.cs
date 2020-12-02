@@ -112,7 +112,7 @@ namespace form_builder.Models
 				element.Validate(viewModel, form_builder);
 				if (element.Type == EElementType.Radio) {
 					foreach (Option option in element.Properties.Options) {
-						KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key == "radButton" && value.Value == option.Value);
+						KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key == element.Properties.QuestionId && value.Value == option.Value);
 						if (option.HasConditionalElement && !(optionValue.Key == null)) {
 							option.ConditionalElement.Validate(viewModel, form_builder);
                         }
