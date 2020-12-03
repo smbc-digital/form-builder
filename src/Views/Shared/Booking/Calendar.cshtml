@@ -2,9 +2,9 @@
 @model form_builder.Models.Elements.Booking
 
 <table summary="Appointment availability for @(Model.CurrentSelectedMonthText)" 
-        class="smbc-table">
+        class="smbc-calendar">
     <partial name="CalendarTableHead" model="@Model" />
-    <tbody class="smbc-table-body">
+    <tbody class="smbc-calendar-body">
         <partial name="CalendarBodyHead" model="@Model" />
         @for (int i = 0; i < Model.Calendar.Count; i += 7)
         {
