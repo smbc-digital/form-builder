@@ -1,6 +1,5 @@
 ﻿using form_builder.Builders;
 using form_builder.Exceptions;
-using Microsoft.AspNetCore.Mvc;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using System;
@@ -69,20 +68,6 @@ namespace form_builder.Providers.Booking
         public Task<Guid> Reserve(BookingRequest request)
         {
             return Task.FromResult(Guid.NewGuid());
-        }
-
-        public Task<IActionResult> HasAvailability(AvailabilityRequest request)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IActionResult> Confirm(ConfirmationRequest request)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<IActionResult> Cancel(Guid id)
-        {
-            throw new NotImplementedException();
         }
     }
 }

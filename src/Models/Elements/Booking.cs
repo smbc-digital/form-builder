@@ -11,7 +11,6 @@ using form_builder.Models.Booking;
 using form_builder.Utils.Extesions;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Booking.Response;
-using static form_builder.Services.BookingService.BookingService;
 
 namespace form_builder.Models.Elements
 {
