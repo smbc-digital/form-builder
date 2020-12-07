@@ -175,7 +175,20 @@ namespace form_builder.Services.PageService
                 await _actionsWorkflow.Process(page.PageActions, null, form);
 
             if (page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
-                searchResults = ((IEnumerable<object>)await _bookingService.Get(baseForm.BaseURL, page, sessionGuid)).ToList();
+            {
+                var bookingProcessEntity = await _bookingService.Get(baseForm.BaseURL, page, sessionGuid);
+
+                if (bookingProcessEntity.IsBookingInfoEmpty)
+                {
+                    return new ProcessPageEntity
+                    {
+                        ShouldRedirect = true,
+                        TargetPage = BookingConstants.NO_APPOINTMENT_AVAILABLE
+                    };
+                }
+
+                searchResults = bookingProcessEntity.BookingInfo;
+            }
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
 

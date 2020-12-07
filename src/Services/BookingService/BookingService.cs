@@ -19,12 +19,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Services.MappingService;
 using form_builder.Models.Booking;
+using System.Dynamic;
+using form_builder.Providers.Booking.Entities;
 
 namespace form_builder.Services.BookingService
 {
     public interface IBookingService
     {
-        Task<List<object>> Get(
+        Task<BookingProcessEntity> Get(
             string formName,
             Page currentPage,
             string guid);
@@ -65,7 +67,7 @@ namespace form_builder.Services.BookingService
             _mappingService = mappingService;
         }
 
-        public async Task<List<object>> Get(
+        public async Task<BookingProcessEntity> Get(
             string baseUrl,
             Page currentPage,
             string guid)
@@ -86,7 +88,8 @@ namespace form_builder.Services.BookingService
                 if (convertedAnswers.FormData.ContainsKey(bookingInformationCacheKey))
                 {
                     var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
-                    return new List<object> { cachedBookingInformation };
+                    var cachedInfo = new List<object> { cachedBookingInformation };
+                    return new BookingProcessEntity { BookingInfo = cachedInfo };
                 }
             }
 
@@ -107,7 +110,8 @@ namespace form_builder.Services.BookingService
             {
                 // Booking Provider threw NoAvailabilityException 
                 // Appointment has no availabity within timeframe
-                // Navigate to the no appointments page.
+                // Navigate to the no appointments page.                
+                return new BookingProcessEntity();
             }
 
             appointmentTimes = await bookingProvider.GetAvailability(new AvailabilityRequest
@@ -132,8 +136,8 @@ namespace form_builder.Services.BookingService
             }
 
             _pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, guid, baseUrl);
-
-            return new List<object> { bookingInformation };
+            var bookingInfo = new List<object> { bookingInformation };
+            return new BookingProcessEntity { BookingInfo = bookingInfo };
         }
 
         public async Task<ProcessRequestEntity> ProcessBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -244,10 +248,10 @@ namespace form_builder.Services.BookingService
 
             return result;
         }
-        
+
         public async Task ProcessMonthRequest(Dictionary<string, object> viewModel, FormSchema baseForm, Page currentPage, string guid)
         {
-            if(!viewModel.ContainsKey(BookingConstants.BOOKING_MONTH_REQUEST))
+            if (!viewModel.ContainsKey(BookingConstants.BOOKING_MONTH_REQUEST))
                 throw new ApplicationException("BookingService::ProcessMonthRequest, request for appointment did not contain requested month");
 
             var requestedMonth = DateTime.Parse(viewModel[BookingConstants.BOOKING_MONTH_REQUEST].ToString());

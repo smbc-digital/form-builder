@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using form_builder.Cache;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ElementHelpers;
@@ -604,6 +605,9 @@ namespace form_builder.Helpers.PageHelpers
                     if(string.IsNullOrEmpty(booking.Properties.AppointmentType.ToString() ?? string.Empty))
                         throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.");
                 });
+
+                if(pages.All(_ => _.PageSlug.Equals(BookingConstants.NO_APPOINTMENT_AVAILABLE)))
+                    throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element has no available appointment.");
 
                 var additionalRequiredElements = pages.SelectMany(_ => _.ValidatableElements)
                     .Where(_ => _.Properties != null && _.Properties.TargetMapping != null)

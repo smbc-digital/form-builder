@@ -61,13 +61,17 @@ namespace form_builder.Models.Elements
             List<object> results = null)
         {
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
-            ConfigureBookingInformation(results);
-            FormName = formSchema.FormName;
-            Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, BookingConstants.APPOINTMENT_DATE);
-            ReservedBookingId = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_ID}");
-            ReservedBookingDate = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_DATE}");
-            ReservedBookingTime =  IsAppointmentTypeFullDay ? AppointmentStartTime.ToString() : elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_TIME}");
-            AppointmentTime =  IsAppointmentTypeFullDay ? AppointmentStartTime.ToString() : elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_TIME}");
+
+            if (results != null)
+            {
+                ConfigureBookingInformation(results);
+                FormName = formSchema.FormName;
+                Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, BookingConstants.APPOINTMENT_DATE);
+                ReservedBookingId = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_ID}");
+                ReservedBookingDate = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_DATE}");
+                ReservedBookingTime = IsAppointmentTypeFullDay ? AppointmentStartTime.ToString() : elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_TIME}");
+                AppointmentTime = IsAppointmentTypeFullDay ? AppointmentStartTime.ToString() : elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_TIME}");
+            }           
 
             switch (subPath as string)
             {
