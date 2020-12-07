@@ -1,5 +1,4 @@
 ﻿using form_builder.Builders;
-using Microsoft.AspNetCore.Mvc;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using System;
@@ -60,6 +59,13 @@ namespace form_builder.Providers.Booking
                         .WithDay(new DateTime(2021, request.StartDate.Month, 22), 1)
                         .Build();
                     break;
+                case 2:
+                    response = new AvailabilityDayResponseBuilder()
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 21), 1)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 22), 1)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 23), 1)
+                        .Build();
+                    break;
                 default:
                     break;
             }
@@ -69,20 +75,6 @@ namespace form_builder.Providers.Booking
         public Task<Guid> Reserve(BookingRequest request)
         {
             return Task.FromResult(Guid.NewGuid());
-        }
-
-        public Task<IActionResult> HasAvailability(AvailabilityRequest request)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IActionResult> Confirm(ConfirmationRequest request)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<IActionResult> Cancel(Guid id)
-        {
-            throw new NotImplementedException();
         }
     }
 }
