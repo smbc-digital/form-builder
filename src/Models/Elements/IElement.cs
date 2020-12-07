@@ -36,6 +36,8 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null);
 
+        void SetUpElementValue(IElementHelper elementHelper, Dictionary<string, dynamic> viewModel, FormAnswers formAnswers);
+
         Dictionary<string, dynamic> GenerateElementProperties(string type = "");
 
         string GenerateFieldsetProperties();

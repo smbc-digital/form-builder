@@ -61,7 +61,12 @@
             }
 
             @if (Model.Properties.Options[i].HasConditionalElement) {
-                @if (@Model.Properties.Options[i].ConditionalElement.Type == EElementType.Textbox) {
+
+                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
+                    <partial model=Model.Properties.Options[i].ConditionalElement name="@Model.Properties.Options[i].ConditionalElement.Type" />
+                </div>
+
+                @*@if (@Model.Properties.Options[i].ConditionalElement.Type == EElementType.Textbox) {
                     <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
                         <partial model=Model.Properties.Options[i].ConditionalElement name="TextBox" />
                     </div>
@@ -86,7 +91,7 @@
 
 
                     </div>
-                }
+                }*@
 
             }
         }

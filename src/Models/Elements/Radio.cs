@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Helpers;
@@ -13,7 +14,7 @@ namespace form_builder.Models.Elements
         {
             Type = EElementType.Radio;
         }
-        public override Task<string> RenderAsync(IViewRender viewRender,
+        public async override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
             Dictionary<string, dynamic> viewModel,
@@ -29,7 +30,19 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForRadioOptions(this);
             elementHelper.ReCheckPreviousRadioOptions(this);
 
-            return viewRender.RenderAsync(Type.ToString(), this);
+            if (Properties.Options.Any(_ =>_.HasConditionalElement)) {
+                foreach (Option option in Properties.Options) {
+                    option.ConditionalElement.SetUpElementValue(elementHelper, viewModel,formAnswers);        
+                }
+            }
+
+            // Check radio element has condition element
+            // If doesn't -- do nothing
+            // If it does -- loop round options
+            // foreach option that has condition elelemt -- get current value if there is one
+            // set properties.value to current value of option
+
+            return await viewRender.RenderAsync(Type.ToString(), this);
         }
     }
 }

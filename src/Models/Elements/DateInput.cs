@@ -33,5 +33,11 @@ namespace form_builder.Models.Elements
 
             return viewRender.RenderAsync(Type.ToString(), this);
         }
+
+        public override void SetUpElementValue(IElementHelper elementHelper, Dictionary<string, dynamic> viewModel, FormAnswers formAnswers) {
+            Properties.Day = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, "-day");
+            Properties.Month = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, "-month");
+            Properties.Year = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, "-year");
+        }
     }
 }
