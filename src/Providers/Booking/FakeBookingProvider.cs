@@ -27,7 +27,6 @@ namespace form_builder.Providers.Booking
                     }
                 }
             };
-            throw new BookingNoAvailabilityException("No available appointment");
             return Task.FromResult(response);
         }
 
