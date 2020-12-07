@@ -18,7 +18,7 @@ using form_builder.Exceptions;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Services.MappingService;
-using System.Dynamic;
+using form_builder.Models.Booking;
 
 namespace form_builder.Services.BookingService
 {
@@ -140,9 +140,6 @@ namespace form_builder.Services.BookingService
         {
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
 
-            // Handle check your booking via subpath not sure if i like this approach, might change
-            // to just a seperate page with an action on POST to call an endpoint, this will give
-            // move customisation but would require adding the endpoint within FormActions of the json.
             switch (subPath)
             {
                 case BookingConstants.CHECK_YOUR_BOOKING:
@@ -154,10 +151,6 @@ namespace form_builder.Services.BookingService
 
         private async Task<ProcessRequestEntity> ProcessDateAndTime(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
-            // Process post request
-            // If page is valid, i.e. they have selected a Date then we can simply return the current page
-            // If page is not valid
-            // We need to repopulate the calendar from cached answers
             var bookingElement = currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
 
             if (!currentPage.IsValid)
@@ -179,8 +172,6 @@ namespace form_builder.Services.BookingService
                 };
             }
 
-
-            //Return page if Valid.
             if (!bookingElement.Properties.CheckYourBooking)
             {
                 await ReserveAppointment(bookingElement, viewModel, baseForm.BaseURL, guid);
@@ -194,8 +185,7 @@ namespace form_builder.Services.BookingService
             }
 
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-            // How to handle if user goes back and forward in browser, 
-            // we do not want to resever the appointment again
+
             return new ProcessRequestEntity
             {
                 RedirectToAction = true,
@@ -211,7 +201,6 @@ namespace form_builder.Services.BookingService
 
         private async Task<ProcessRequestEntity> ProcessCheckYourBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
-            // Handle check your booking
             var bookingElement = currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
             await ReserveAppointment(bookingElement, viewModel, baseForm.BaseURL, guid);
 
@@ -225,15 +214,12 @@ namespace form_builder.Services.BookingService
 
         private async Task<Guid> ReserveAppointment(IElement bookingElement, Dictionary<string, dynamic> viewModel, string form, string guid)
         {
-            // Get current info which reserve was done against, If it is different we need to resver this new appointment
-            // else we continue as the appointment has already been reserved.
             var reservedBookingId = $"{bookingElement.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}";
             var reservedBookingDate = $"{bookingElement.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}";
             var reservedBookingTime = $"{bookingElement.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_TIME}";
             var currentlySelectedBookingDate = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}";
             var currentlySelectedBookingTime = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TIME}";
 
-            //Check viewModel and verify not empty value
             if (viewModel.ContainsKey(reservedBookingId) && !string.IsNullOrEmpty((string)viewModel[reservedBookingId]))
             {
                 var currentSelectedDate = (string)viewModel[currentlySelectedBookingDate];
@@ -249,10 +235,7 @@ namespace form_builder.Services.BookingService
             viewModel.Remove(reservedBookingDate);
             viewModel.Remove(reservedBookingTime);
 
-            // Appointment date does not match or has not been reserved yet
-            // we must reserve new appointment and save seleted reservation info.
             var bookingRequest = await _mappingService.MapBookingRequest(guid, bookingElement, viewModel, form);
-
             var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider).Reserve(bookingRequest);
 
             viewModel.Add(reservedBookingDate, viewModel[currentlySelectedBookingDate]);
@@ -265,7 +248,7 @@ namespace form_builder.Services.BookingService
         public async Task ProcessMonthRequest(Dictionary<string, object> viewModel, FormSchema baseForm, Page currentPage, string guid)
         {
             if(!viewModel.ContainsKey(BookingConstants.BOOKING_MONTH_REQUEST))
-                throw new ApplicationException("BookingService::ProcessMonthRequest, request for appointment did not contain requested month range");
+                throw new ApplicationException("BookingService::ProcessMonthRequest, request for appointment did not contain requested month");
 
             var requestedMonth = DateTime.Parse(viewModel[BookingConstants.BOOKING_MONTH_REQUEST].ToString());
 
@@ -285,12 +268,12 @@ namespace form_builder.Services.BookingService
 
             var bookingSearchResultsKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
             var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
-            .GetAvailability(new AvailabilityRequest
-            {
-                StartDate = requestedMonth,
-                EndDate = requestedMonth.Date.LastDayOfTheMonth(),
-                AppointmentId = bookingElement.Properties.AppointmentType
-            });
+                .GetAvailability(new AvailabilityRequest
+                {
+                    StartDate = requestedMonth,
+                    EndDate = requestedMonth.Date.LastDayOfTheMonth(),
+                    AppointmentId = bookingElement.Properties.AppointmentType
+                });
 
             var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
             var cachedAnswers = _distributedCache.GetString(guid);
@@ -308,16 +291,6 @@ namespace form_builder.Services.BookingService
             };
 
             _pageHelper.SaveFormData(bookingSearchResultsKey, bookingInformation, guid, baseForm.BaseURL);
-        }
-
-        public class BookingInformation
-        {
-            public DateTime CurrentSearchedMonth { get; set; }
-            public DateTime FirstAvailableMonth { get; set; }
-            public List<AvailabilityDayResponse> Appointments { get; set; }
-            public bool IsFullDayAppointment { get; set; }
-            public DateTime AppointmentStartTime { get; set; }
-            public DateTime AppointmentEndTime { get; set; }
         }
     }
 }
