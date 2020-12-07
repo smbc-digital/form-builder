@@ -6,18 +6,12 @@
 
 @if (Model.Day.IsDisabled)
 {
-    if (Model.Day.IsNotWithinCurrentSelectedMonth)
-    {
-        <td class="smbc-calendar-cell smbc-date-disabled govuk-!-padding-0">
-            <span class="@disabledClass"></span>
-        </td>
-    }
-    else
-    {
-        <td class="smbc-calendar-cell smbc-date-disabled govuk-!-padding-0">
+    <td class="smbc-calendar-cell smbc-date-disabled govuk-!-padding-0">
+        @if(!Model.Day.IsNotWithinCurrentSelectedMonth)
+        {
             <span aria-hidden="true" class="@disabledClass">@Model.Day.Date.Day</span>
-        </td>
-    }
+        }
+    </td>
 }
 else
 {

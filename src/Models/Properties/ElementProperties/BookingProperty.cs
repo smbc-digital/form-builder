@@ -9,6 +9,6 @@ namespace form_builder.Models.Properties.ElementProperties
         public Guid AppointmentType { get; set; }
         public bool CheckYourBooking { get; set; }
         public string AppointmentTime { get; set; }
-        public string NextAvailableAppointment { get; set; } = "This is the next available appointment";
+        public string NextAvailableIAG { get; set; } = "This is the next available appointment";
     }
 }
