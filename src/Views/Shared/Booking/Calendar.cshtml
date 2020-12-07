@@ -1,25 +1,26 @@
 @using form_builder.ViewModels
 @model form_builder.Models.Elements.Booking
 
-<table summary="Appointment availability for @(Model.CurrentSelectedMonthText)" 
-        class="smbc-calendar">
-    <partial name="CalendarTableHead" model="@Model" />
-    <tbody class="smbc-calendar-body">
-        <partial name="CalendarBodyHead" model="@Model" />
-        @for (int i = 0; i < Model.Calendar.Count; i += 7)
-        {
-            var dates = Model.Calendar.Skip(i).Take(7);
-            <tr>
-                @foreach (var date in dates)
-                {
-                    var calendarDayModel = new CalendarDayViewModel
+<partial name="CalendarTableHead" model="@Model" />
+<div class="smbc-calendar-border smbc-calendar-border__body">
+    <table class="smbc-calendar" summary="Appointment availability for @(Model.CurrentSelectedMonthText)">
+        <tbody>
+            <partial name="CalendarBodyHead" model="@Model" />
+            @for (int i = 0; i < Model.Calendar.Count; i += 7)
+            {
+                var dates = Model.Calendar.Skip(i).Take(7);
+                <tr>
+                    @foreach (var date in dates)
                     {
-                        Day = date,
-                        QuestionId = Model.QuestionId
-                    };
-                    <partial name="CalendarDay" model="@calendarDayModel" />
-                }
-            </tr>
-        }
-    </tbody>
-</table>
+                        var calendarDayModel = new CalendarDayViewModel
+                        {
+                            Day = date,
+                            QuestionId = Model.QuestionId
+                        };
+                        <partial name="CalendarDay" model="@calendarDayModel" />
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
