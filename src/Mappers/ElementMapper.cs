@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
 using Organisation = StockportGovUK.NetStandard.Models.Verint.Organisation;
+using Booking = StockportGovUK.NetStandard.Models.Booking.Booking;
 
 namespace form_builder.Mappers
 {
@@ -205,12 +206,6 @@ namespace form_builder.Mappers
             return null;
         }
 
-        public class Booking 
-        {
-            public Guid Id {get;set;}
-            public DateTime Date {get;set;}
-            public DateTime StartTime {get;set;}
-        }
 
         private Booking? GetBookingElementValue(string key, FormAnswers formAnswers)
         {
