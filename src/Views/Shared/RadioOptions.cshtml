@@ -61,38 +61,15 @@
             }
 
             @if (Model.Properties.Options[i].HasConditionalElement) {
-
                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
                     <partial model=Model.Properties.Options[i].ConditionalElement name="@Model.Properties.Options[i].ConditionalElement.Type" />
                 </div>
+            }
 
-                @*@if (@Model.Properties.Options[i].ConditionalElement.Type == EElementType.Textbox) {
-                    <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
-                        <partial model=Model.Properties.Options[i].ConditionalElement name="TextBox" />
-                    </div>
-                }
-
-                @if (@Model.Properties.Options[i].ConditionalElement.Type == EElementType.Textarea) {
-
-                    @if (@Model.Properties.Options[i].ConditionalElement.Properties.DisplayCharacterCount) {
-                        <div class="govuk-character-count govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i" data-module="govuk-character-count" data-maxlength="@Model.Properties.Options[i].ConditionalElement.Properties.MaxLength">
-                            <partial model=Model.Properties.Options[i].ConditionalElement name="TextArea" />
-                        </div>
-                    } else {
-                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i" data-maxlength="@Model.Properties.Options[i].ConditionalElement.Properties.MaxLength">
-                            <partial model=Model.Properties.Options[i].ConditionalElement name="TextArea" />
-                        </div>
-                    }
-                }
-
-                @if (@Model.Properties.Options[i].ConditionalElement.Type == EElementType.DateInput) {
-                    <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
-                        <partial model=Model.Properties.Options[i].ConditionalElement name="DateInput" />
-
-
-                    </div>
-                }*@
-
+            @if (Model.Properties.Options[i].HasCondition) {
+                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
+                    ID=@Model.QuestionId VALUE=@Model.Properties.Options[i].Value
+                </div>
             }
         }
     </div>

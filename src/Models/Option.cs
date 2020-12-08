@@ -15,6 +15,7 @@ namespace form_builder.Models
         public bool HasHint => !string.IsNullOrEmpty(Hint);
 
         public bool HasConditionalElement => !(ConditionalElement is null);
+        public bool HasCondition { get; set; }
 
         public bool Checked { get; set; }
 

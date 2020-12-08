@@ -68,8 +68,8 @@ namespace form_builder.Helpers.PageHelpers
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
 
-            foreach (var element in page.Elements)
-                formModel.RawHTML += await element.RenderAsync(
+            foreach (var element in page.Elements) {
+                string html = await element.RenderAsync(
                     _viewRender,
                     _elementHelper,
                     guid,
@@ -80,7 +80,13 @@ namespace form_builder.Helpers.PageHelpers
                     formAnswers,
                     results
                     );
-
+                if (element.Properties.Conditional != null) {
+                    formModel.RawHTML = formModel.RawHTML.Replace($"ID={element.Properties.Conditional.parentId} VALUE={element.Properties.Conditional.optionValue}", html);
+                } else {
+                    formModel.RawHTML += html;
+                }
+                
+            }
             return formModel;
         }
 

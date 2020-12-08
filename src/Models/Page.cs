@@ -109,7 +109,18 @@ namespace form_builder.Models
 			//ValidatableElements.ToList().ForEach(element => element.Validate(viewModel, form_builder));
 
 			ValidatableElements.ToList().ForEach(element => {
-				element.Validate(viewModel, form_builder);
+
+				// Outer Block Validation
+				if (element.Properties.Conditional != null) {
+						KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key == element.Properties.Conditional.parentId && value.Value == element.Properties.Conditional.optionValue);
+					if (optionValue.Key != null) {
+						element.Validate(viewModel, form_builder);
+                    }
+				} else {
+					element.Validate(viewModel, form_builder);
+				}
+
+				// Inner Block Validation
 				if (element.Type == EElementType.Radio) {
 					foreach (Option option in element.Properties.Options) {
 						KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key == element.Properties.QuestionId && value.Value == option.Value);

@@ -32,15 +32,11 @@ namespace form_builder.Models.Elements
 
             if (Properties.Options.Any(_ =>_.HasConditionalElement)) {
                 foreach (Option option in Properties.Options) {
-                    option.ConditionalElement.SetUpElementValue(elementHelper, viewModel,formAnswers);        
+                    if (option.HasConditionalElement) {
+                        option.ConditionalElement.SetUpElementValue(elementHelper, viewModel, formAnswers);
+                    }           
                 }
             }
-
-            // Check radio element has condition element
-            // If doesn't -- do nothing
-            // If it does -- loop round options
-            // foreach option that has condition elelemt -- get current value if there is one
-            // set properties.value to current value of option
 
             return await viewRender.RenderAsync(Type.ToString(), this);
         }
