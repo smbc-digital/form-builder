@@ -31,7 +31,7 @@
 		: baseCssClasses);
 }
 
-    <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+    <div class="govuk-radios@(Model.Properties.Options.Any(_ => _.HasConditionalElement || _.HasCondition) ? " govuk-radios--conditional" : "")" data-module="govuk-radios">
         @for (var i = 0; i < Model.Properties.Options.Count; i++) {
             var strongLabel = Model.Properties.Options[i].HasHint ? "govuk-label--s" : null;
 
