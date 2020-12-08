@@ -1,5 +1,3 @@
-@using Microsoft.Extensions.Options;
-@using form_builder.Configuration;
 @inject IOptions<TagManagerConfiguration> configuration
 
 @if (!string.IsNullOrEmpty(configuration.Value.TagManagerId))

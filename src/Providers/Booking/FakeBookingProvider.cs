@@ -1,5 +1,4 @@
 ﻿using form_builder.Builders;
-using form_builder.Exceptions;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using System;
@@ -31,7 +30,6 @@ namespace form_builder.Providers.Booking
 
         public Task<List<AvailabilityDayResponse>> GetAvailability(AvailabilityRequest request)
         {
-            var todayDate = DateTime.Now;
             var response = new List<AvailabilityDayResponse>();
             switch (request.StartDate.Month)
             {
