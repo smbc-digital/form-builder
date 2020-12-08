@@ -178,7 +178,7 @@ namespace form_builder.Services.PageService
             {
                 var bookingProcessEntity = await _bookingService.Get(baseForm.BaseURL, page, sessionGuid);
 
-                if (bookingProcessEntity.IsBookingInfoEmpty)
+                if (bookingProcessEntity.BookingHasNoAvailableAppointments)
                 {
                     return new ProcessPageEntity
                     {

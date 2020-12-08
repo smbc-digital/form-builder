@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace form_builder.Providers.Booking.Entities
 {
     public class BookingProcessEntity
     {
         public List<object> BookingInfo { get; set; }
-
-        public bool IsBookingInfoEmpty => BookingInfo == null;
+        public bool BookingHasNoAvailableAppointments { get; set; }
     }
 }

@@ -108,10 +108,7 @@ namespace form_builder.Services.BookingService
             }
             catch (BookingNoAvailabilityException)
             {
-                // Booking Provider threw NoAvailabilityException 
-                // Appointment has no availabity within timeframe
-                // Navigate to the no appointments page.                
-                return new BookingProcessEntity();
+                return new BookingProcessEntity{ BookingHasNoAvailableAppointments = true };
             }
 
             appointmentTimes = await bookingProvider.GetAvailability(new AvailabilityRequest

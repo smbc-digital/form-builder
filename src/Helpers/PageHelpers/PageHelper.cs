@@ -606,8 +606,8 @@ namespace form_builder.Helpers.PageHelpers
                         throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.");
                 });
 
-                if(pages.Any(_ => _.PageSlug.Reverse().Equals(BookingConstants.NO_APPOINTMENT_AVAILABLE)))
-                    throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element has no available appointment.");
+                if(!pages.Any(_ => _.PageSlug.ToLower().Equals(BookingConstants.NO_APPOINTMENT_AVAILABLE)))
+                    throw new ApplicationException($"PageHelper:CheckForBookingElement, Form contains booking element but is missing required page with slug {BookingConstants.NO_APPOINTMENT_AVAILABLE}.");
 
                 var additionalRequiredElements = pages.SelectMany(_ => _.ValidatableElements)
                     .Where(_ => _.Properties != null && _.Properties.TargetMapping != null)
