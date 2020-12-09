@@ -19,8 +19,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Services.MappingService;
 using form_builder.Models.Booking;
-using System.Dynamic;
-using form_builder.Providers.Booking.Entities;
+using form_builder.Services.BookingService.Entities;
+using Microsoft.Extensions.Options;
+using form_builder.Configuration;
 
 namespace form_builder.Services.BookingService
 {
@@ -52,19 +53,22 @@ namespace form_builder.Services.BookingService
         private readonly IEnumerable<IBookingProvider> _bookingProviders;
         private readonly IPageFactory _pageFactory;
         private readonly IMappingService _mappingService;
+        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
         public BookingService(
             IDistributedCacheWrapper distributedCache,
             IPageHelper pageHelper,
             IEnumerable<IBookingProvider> bookingProviders,
             IPageFactory pageFactory,
-            IMappingService mappingService)
+            IMappingService mappingService,
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
             _bookingProviders = bookingProviders;
             _pageFactory = pageFactory;
             _mappingService = mappingService;
+            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
         public async Task<BookingProcessEntity> Get(
@@ -95,41 +99,32 @@ namespace form_builder.Services.BookingService
 
             var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
 
-            var nextAvailability = new AvailabilityDayResponse();
-            try
+            var nextAvailability = await RetrieveNextAvailability(bookingElement, bookingProvider);
+
+            if(nextAvailability.BookingHasNoAvailableAppointments)
             {
-                nextAvailability = await bookingProvider
-                .NextAvailability(new AvailabilityRequest
-                {
-                    StartDate = DateTime.Now,
-                    EndDate = DateTime.Now.AddMonths(bookingElement.Properties.SearchPeriod),
-                    AppointmentId = bookingElement.Properties.AppointmentType
-                });
-            }
-            catch (BookingNoAvailabilityException)
-            {
-                return new BookingProcessEntity{ BookingHasNoAvailableAppointments = true };
+                return new BookingProcessEntity { BookingHasNoAvailableAppointments = true };
             }
 
             appointmentTimes = await bookingProvider.GetAvailability(new AvailabilityRequest
             {
-                StartDate = nextAvailability.Date,
-                EndDate = nextAvailability.Date.LastDayOfTheMonth(),
+                StartDate = nextAvailability.DayResponse.Date,
+                EndDate = nextAvailability.DayResponse.Date.LastDayOfTheMonth(),
                 AppointmentId = bookingElement.Properties.AppointmentType
             });
 
             var bookingInformation = new BookingInformation
             {
                 Appointments = appointmentTimes,
-                CurrentSearchedMonth = nextAvailability.Date,
-                FirstAvailableMonth = nextAvailability.Date,
-                IsFullDayAppointment = nextAvailability.IsFullDayAppointment
+                CurrentSearchedMonth = nextAvailability.DayResponse.Date,
+                FirstAvailableMonth = nextAvailability.DayResponse.Date,
+                IsFullDayAppointment = nextAvailability.DayResponse.IsFullDayAppointment
             };
 
-            if (nextAvailability.IsFullDayAppointment)
+            if (nextAvailability.DayResponse.IsFullDayAppointment)
             {
-                bookingInformation.AppointmentStartTime = DateTime.Today.Add(nextAvailability.AppointmentTimes.First().StartTime);
-                bookingInformation.AppointmentEndTime = DateTime.Today.Add(nextAvailability.AppointmentTimes.First().EndTime);
+                bookingInformation.AppointmentStartTime = DateTime.Today.Add(nextAvailability.DayResponse.AppointmentTimes.First().StartTime);
+                bookingInformation.AppointmentEndTime = DateTime.Today.Add(nextAvailability.DayResponse.AppointmentTimes.First().EndTime);
             }
 
             _pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, guid, baseUrl);
@@ -148,6 +143,42 @@ namespace form_builder.Services.BookingService
                 default:
                     return await ProcessDateAndTime(viewModel, currentPage, baseForm, guid, path);
             }
+        }
+
+        private async Task<BoookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider) 
+        {
+            var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{bookingElement.Properties.AppointmentType}";
+            var bookingNextAvailabilityCachedResponse = _distributedCache.GetString(bookingNextAvailabilityCachedKey);
+
+            var nextAvailability = new AvailabilityDayResponse();
+            var result = new BoookingNextAvailabilityEntity();
+            if (bookingNextAvailabilityCachedResponse != null)
+            {
+                return JsonConvert.DeserializeObject<BoookingNextAvailabilityEntity>(bookingNextAvailabilityCachedResponse);
+            }
+            else
+            {
+                try
+                {
+                    nextAvailability = await bookingProvider
+                    .NextAvailability(new AvailabilityRequest
+                    {
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddMonths(bookingElement.Properties.SearchPeriod),
+                        AppointmentId = bookingElement.Properties.AppointmentType
+                    });
+                }
+                catch (BookingNoAvailabilityException)
+                {
+                    result = new BoookingNextAvailabilityEntity { BookingHasNoAvailableAppointments = true };
+                    _ = _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, Newtonsoft.Json.JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.BookingNoAppointmentsAvailable);
+                    return result;
+                }
+            }
+
+            result = new BoookingNextAvailabilityEntity{ DayResponse = nextAvailability };
+            _ = _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, Newtonsoft.Json.JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.Booking);
+            return result;
         }
 
         private async Task<ProcessRequestEntity> ProcessDateAndTime(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)

@@ -1,4 +1,5 @@
 ﻿using form_builder.Builders;
+using form_builder.Exceptions;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using System;
@@ -13,6 +14,9 @@ namespace form_builder.Providers.Booking
 
         public Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request)
         {
+            if(request.AppointmentId.Equals(Guid.Empty))
+                throw new BookingNoAvailabilityException("FakeProvider, no available appointments");
+                
             var response = new AvailabilityDayResponse()
             {
                 Date = DateTime.Now.AddMonths(1),
