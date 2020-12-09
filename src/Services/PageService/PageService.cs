@@ -12,6 +12,7 @@ using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
 using form_builder.Services.FileUploadService;
@@ -219,7 +220,9 @@ namespace form_builder.Services.PageService
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
                 return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files, modelStateIsValid);
-            
+
+            currentPage.Elements.RemoveUnusedConditionalElements(viewModel);
+
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
             if (!currentPage.IsValid)

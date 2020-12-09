@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using form_builder.Conditions;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Models.Actions;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
@@ -106,31 +107,9 @@ namespace form_builder.Models
 
 		public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
 		{
-			//ValidatableElements.ToList().ForEach(element => element.Validate(viewModel, form_builder));
-
-			ValidatableElements.ToList().ForEach(element => {
-
-				// Outer Block Validation
-				if (element.Properties.Conditional != null) {
-						KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key == element.Properties.Conditional.parentId && value.Value == element.Properties.Conditional.optionValue);
-					if (optionValue.Key != null) {
-						element.Validate(viewModel, form_builder);
-                    }
-				} else {
-					element.Validate(viewModel, form_builder);
-				}
-
-				// Inner Block Validation
-				if (element.Type == EElementType.Radio) {
-					foreach (Option option in element.Properties.Options) {
-						KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key == element.Properties.QuestionId && value.Value == option.Value);
-						if (option.HasConditionalElement && !(optionValue.Key == null)) {
-							option.ConditionalElement.Validate(viewModel, form_builder);
-                        }
-                    }
-                }
+			ValidatableElements.IncludedRequiredConditionalElements(viewModel).ForEach(element => {
+				element.Validate(viewModel, form_builder);
 			});
-
 			IsValidated = true;
 		}
 
