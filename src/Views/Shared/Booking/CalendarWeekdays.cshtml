@@ -1,16 +1,15 @@
-@{
-    var daysOfWeek = new string[7] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
-}
 
 <tr>
-    @foreach (var item in daysOfWeek)
+    @foreach (var item in new DayOfWeek[7] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday })
     {
-        <th scope="col" class="smbc-calendar-cell smbc-calendar-weekdays govuk-!-padding-0">
-            <p aria-hidden="true"
-                class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0 govuk-!-margin-top-0">
-                @item.Substring(0, 1)
+        <th scope="col" class="smbc-calendar__weekdays">
+
+            <p aria-hidden="true" class="smbc-calendar__weekdays__text">
+                @item.ToString().Substring(0, 1)
             </p>
+
             <span class="govuk-visually-hidden">@item</span>
+
         </th>
     }
 </tr>

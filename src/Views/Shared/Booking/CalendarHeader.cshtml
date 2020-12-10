@@ -1,31 +1,33 @@
 @model form_builder.Models.Elements.Booking
 
-<div class="smbc-calendar-border smbc-calendar-border__header">
-    <div class="smbc-calendar-header">
-        @if (@Model.DisplayPreviousMonthArrow)
-        {
-            <button class="smbc-chevron-button smbc-chevron-button__left govuk-!-padding-0" 
-                name="@BookingConstants.BOOKING_MONTH_REQUEST" 
+<div class="smbc-calendar__header">
+
+    @if (@Model.DisplayPreviousMonthArrow)
+    {
+        <button class="smbc-calendar__header__button"
+                name="@BookingConstants.BOOKING_MONTH_REQUEST"
                 value="@Model.PreviousSelectableMonth"
                 formaction="@Model.MonthSelectionPostUrl">
-                <div class="smbc-chevron-hover govuk-!-padding-0">
-                    <span class="smbc-chevron"></span>
-                </div>
-            </button>
-        }
-        <p class="govuk-body smbc-calendar-header-text govuk-!-font-weight-bold govuk-!-margin-bottom-0 govuk-!-margin-top-0">
-            @Model.CurrentSelectedMonthText
-        </p>
-        @if (@Model.DisplayNextMonthArrow)
-        {
-            <button class="smbc-chevron-button smbc-chevron-button__right govuk-!-padding-0"
-                name="@BookingConstants.BOOKING_MONTH_REQUEST" 
+            <span class="smbc-calendar__header__chevron smbc-calendar__header__chevron--left"></span>
+        </button>
+    }
+    else
+    {
+        <button class="smbc-calendar__header__button smbc-calendar__header__button--disabled"></button>
+    }
+
+    <p class="smbc-body smbc-calendar__header__text">
+        @Model.CurrentSelectedMonthText
+    </p>
+
+    @if (@Model.DisplayNextMonthArrow)
+    {
+        <button class="smbc-calendar__header__button"
+                name="@BookingConstants.BOOKING_MONTH_REQUEST"
                 value="@Model.NextSelectableMonth"
                 formaction="@Model.MonthSelectionPostUrl">
-                <div class="smbc-chevron-hover govuk-!-padding-0">
-                    <span class="smbc-chevron"></span>
-                </div>
-            </button>
-        }
-    </div>
+            <span class="smbc-calendar__header__chevron smbc-calendar__header__chevron--right"></span>
+        </button>
+    }
+
 </div>
