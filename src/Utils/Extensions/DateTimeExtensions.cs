@@ -11,7 +11,7 @@ namespace form_builder.Utils.Extesions
         }
 
         public static string ToTimeFormat(this DateTime value) => value.ToString(value.Minute > 0 ? "h:mmtt" :"htt").ToLower();
-        public static string ToFullDateFormat(this DateTime value) => value.ToString("dddd dd MMMM yyyy");
+        public static string ToFullDateFormat(this DateTime value) => value.ToString("dddd d MMMM yyyy");
 
         public static int PreviousDaysInMonth(this DateTime value) {
             switch (value.DayOfWeek)
