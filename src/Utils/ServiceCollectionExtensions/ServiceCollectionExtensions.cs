@@ -108,6 +108,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         {
             services.AddTransient<ITagParser, FormAnswerTagParser>();
             services.AddTransient<ITagParser, FormDataTagParser>();
+            services.AddTransient<ITagParser, ButtonTagParser>();
 
             return services;
         }

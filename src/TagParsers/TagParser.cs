@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using form_builder.Extensions;
@@ -41,6 +42,24 @@ namespace form_builder.TagParser
                 replacementText.Remove(match.Index - 2, match.Length + 4);
                 replacementText.Insert(match.Index - 2, questionValue);
                 return Parse(replacementText.ToString(), answersDictionary, regex);
+            }
+
+            return value;
+        }
+
+        
+        public string Parse(string value, Regex regex, string data, Func<string[], string> formatContent)
+        {
+            var match = regex.Match(value);
+            if (match.Success)
+            {
+                var splitMatch = match.Value.Split(":");
+                var content = splitMatch.Skip(1).Take(splitMatch.Length - 1).ToArray();
+
+                var replacementText = new StringBuilder(value);
+                replacementText.Remove(match.Index - 2, match.Length + 4);
+                replacementText.Insert(match.Index - 2, formatContent(content));
+                return Parse(replacementText.ToString(), regex, data, formatContent);
             }
 
             return value;
