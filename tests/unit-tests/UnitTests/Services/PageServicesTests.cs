@@ -404,7 +404,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPage("form", requestPath, "", new QueryCollection()));
-            Assert.Equal($"Requested path '{requestPath}' object could not be found.", result.Message);
+            Assert.Equal($"Requested path '{requestPath}' object could not be found for form 'form'", result.Message);
         }
 
         [Fact]

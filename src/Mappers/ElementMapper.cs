@@ -220,9 +220,15 @@ namespace form_builder.Mappers
                             _.QuestionId.Equals(appointmentTime))
                 .ToList();
 
-            bookingObject.Id = Guid.Parse(value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentId))?.Response) ?? Guid.Empty;
-            bookingObject.Date = DateTime.Parse(value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentDate))?.Response) ?? string.Empty;
-            bookingObject.StartTime = DateTime.Parse(value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentTime))?.Response) ?? string.Empty;
+            if(!value.Any())
+                return null;
+
+            var bookingId = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentId))?.Response;
+            var bookingDate = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentDate))?.Response;
+            var bookingStartTime = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentTime))?.Response;
+            bookingObject.Id = bookingId != null ? Guid.Parse(bookingId) : Guid.Empty;
+            bookingObject.Date = bookingDate != null ? DateTime.Parse(bookingDate) : DateTime.MinValue;
+            bookingObject.StartTime = bookingStartTime != null ? DateTime.Parse(bookingStartTime) : DateTime.MinValue;
 
             return bookingObject.IsEmpty() ? null : bookingObject;
         }

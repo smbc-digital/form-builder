@@ -2,14 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using form_builder.TagParser;
+using Moq;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
 {
     public class TagParserTests
     {
+        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new Mock<IEnumerable<IFormatter>>();
         private Regex _regex => new Regex("(?<={{)TEST:.*?(?=}})");
-        private TagParser _tagParser = new TagParser();
+        private TagParser _tagParser;
+
+        public TagParserTests(){
+            _tagParser = new TagParser(_mockFormatters.Object);
+        }
 
         [Fact]
         public void Parse_ShouldThrowException_WhenQuestionValue_IsNotWithinAnswers()

@@ -6,9 +6,11 @@ using form_builder.Enum;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
+using form_builder.Utils.Extesions;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
+using StockportGovUK.NetStandard.Models.Booking;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Xunit;
 
@@ -543,11 +545,12 @@ namespace form_builder_tests.UnitTests.Mappers
 
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnDateTime_WhenElementIsBooking()
+        public void GetAnswerValue_ShouldReturnBookingModel_WhenElementIsBooking()
         {
             // Arrange
             var questionId = "testbookingId";
-            var dateTime = DateTime.Now.ToString();
+            var dateTime = DateTime.Now;
+            var startTime = DateTime.Today.Add(new TimeSpan(22, 0, 0));
             var element = new ElementBuilder()
                   .WithQuestionId(questionId)
                   .WithType(EElementType.Booking)
@@ -559,11 +562,8 @@ namespace form_builder_tests.UnitTests.Mappers
                 {
                     new PageAnswers {
                         Answers = new List<Answers> {
-                            new Answers
-                            {
-                                QuestionId = $"{questionId}{BookingConstants.APPOINTMENT_DATE}",
-                                Response = dateTime
-                            }
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = dateTime.ToString() }, 
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_TIME}", Response = dateTime.ToString() } 
                         }
                     }
                 }
@@ -573,8 +573,7 @@ namespace form_builder_tests.UnitTests.Mappers
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
-            var dateTimeResult = Assert.IsType<DateTime>(result);
-            Assert.Equal(dateTime, dateTimeResult.ToString());
+            var dateTimeResult = Assert.IsType<Booking>(result);
         }
         
         
@@ -1198,8 +1197,16 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var questionId = "test-bookingID";
+            var time = new TimeSpan(4, 30, 0);
             var date = DateTime.Now;
-            var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}{BookingConstants.APPOINTMENT_DATE}", Response = date.ToString() } } } } };
+            var startTime = DateTime.Today.Add(time);
+            var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> 
+                { 
+                    new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = date.ToString() }, 
+                    new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_TIME}", Response = startTime.ToString() } 
+                }
+            }
+            }};
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
@@ -1210,7 +1217,7 @@ namespace form_builder_tests.UnitTests.Mappers
             var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
-            Assert.Equal($"{date.Date:dd/MM/yyyy}", result);
+            Assert.Equal($"{date.ToFullDateFormat()} at 4:30am", result);
         }
 
         [Fact]
@@ -1219,7 +1226,7 @@ namespace form_builder_tests.UnitTests.Mappers
             // Arrange
             var questionId = "test-bookingID";
             var date = DateTime.MinValue;
-            var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}{BookingConstants.APPOINTMENT_DATE}", Response = date.ToString() } } } } };
+            var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = date.ToString() } } } } };
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)

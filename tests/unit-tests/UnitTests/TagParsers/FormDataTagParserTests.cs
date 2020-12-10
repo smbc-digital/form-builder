@@ -5,13 +5,20 @@ using form_builder.Enum;
 using form_builder.Models;
 using form_builder.TagParser;
 using form_builder_tests.Builders;
+using Moq;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
 {
     public class FormDataTagParserTests
     {
-        private FormDataTagParser _tagParser = new FormDataTagParser();
+        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new Mock<IEnumerable<IFormatter>>();
+        private FormDataTagParser _tagParser;
+
+        public FormDataTagParserTests()
+        {
+            _tagParser = new FormDataTagParser(_mockFormatters.Object);
+        }
 
         [Theory]
         [InlineData("{{FORMDATA:firstname}}")]
