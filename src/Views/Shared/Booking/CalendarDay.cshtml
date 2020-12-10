@@ -1,34 +1,24 @@
 @model form_builder.ViewModels.CalendarDayViewModel
 
-@{
-    var disabledClass = "smbc-body govuk-!-margin-bottom-0";
-}
-
 @if (Model.Day.IsDisabled)
 {
-    <td class="smbc-calendar-cell smbc-date-disabled govuk-!-padding-0">
+    <td class="smbc-calendar__cell smbc-calendar__cell--disabled">
         @if(!Model.Day.IsNotWithinCurrentSelectedMonth)
         {
-            <span aria-hidden="true" class="@disabledClass">@Model.Day.Date.Day</span>
+            <span aria-hidden="true" class="smbc-calendar__label smbc-calendar__label--disabled">@Model.Day.Date.Day</span>
         }
     </td>
 }
 else
 {
-    <td class="smbc-calendar-cell govuk-!-padding-0">
-            <input type="radio"
-                value="@Model.Day.Date"
-                name="@Model.QuestionId"
-                id="@Model.InputId" 
-                aria-describedby="@Model.GetCalendarHint()"
-                @(Model.Day.Checked ? "checked" : string.Empty) />
+    <td class="smbc-calendar__cell">
 
-            <label aria-hidden="true" 
-                class="smbc-body govuk-!-margin-bottom-0"
-                for="@Model.InputId">
-                @Model.Day.Date.Day
-            </label>
+        <input type="radio" class="smbc-calendar__input" value="@Model.Day.Date" name="@Model.QuestionId" id="@Model.InputId" aria-describedby="@Model.GetCalendarHint()" @(Model.Day.Checked ? "checked" : string.Empty) />
 
-            <span class="govuk-visually-hidden" id="@Model.GetCalendarHint()">@Model.Day.Date.ToString("dddd dd MMMM")</span>
+        <label aria-hidden="true" class="smbc-calendar__label" for="@Model.InputId">
+            @Model.Day.Date.Day
+        </label>
+
+        <span class="govuk-visually-hidden" id="@Model.GetCalendarHint()">@Model.Day.Date.ToString("dddd dd MMMM")</span>
     </td>
 }
