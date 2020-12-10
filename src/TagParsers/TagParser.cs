@@ -15,13 +15,32 @@ namespace form_builder.TagParser
                 var splitMatch = match.Value.Split(":");
                 var questionId = splitMatch[1];
 
-                if(!answersDictionary.ContainsKey(questionId))
+                var dateTimeFormat = string.Empty;
+                if (splitMatch.Length > 2)
+                    dateTimeFormat = splitMatch[2];
+
+                if (!answersDictionary.ContainsKey(questionId))
                     throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is not stored within answers, Match value: {match.Value}");
 
                 var questionValue = (string)answersDictionary[questionId];
 
                 if (string.IsNullOrEmpty(questionValue))
                     throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is null or empty, Match value: {match.Value}");
+
+                if (!string.IsNullOrEmpty(dateTimeFormat))
+                {
+                    var dateTime = System.DateTime.Parse(questionValue);
+                    switch (dateTimeFormat)
+                    {
+                        case "time-only":
+                            questionValue = dateTime.Minute > 0 ? dateTime.ToString("h:mmtt").ToLower() : dateTime.ToString("htt").ToLower();
+                            break;
+
+                        case "full-date":
+                            questionValue = dateTime.ToString("dddd dd MMMM yyyy");
+                            break;
+                    }
+                }
 
                 var replacementText = new StringBuilder(value);
                 replacementText.Remove(match.Index - 2, match.Length + 4);
