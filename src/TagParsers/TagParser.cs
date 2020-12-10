@@ -2,11 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using form_builder.Extensions;
 
 namespace form_builder.TagParser
 {
     public class TagParser
     {
+        private readonly IEnumerable<IFormatter> _formatters;
+        public TagParser(IEnumerable<IFormatter> formatters)
+        {
+            _formatters = formatters;
+        }
+
         public string Parse(string value, Dictionary<string, object> answersDictionary, Regex regex)
         {
             var match = regex.Match(value);
@@ -15,9 +22,9 @@ namespace form_builder.TagParser
                 var splitMatch = match.Value.Split(":");
                 var questionId = splitMatch[1];
 
-                var dateTimeFormat = string.Empty;
+                var format = string.Empty;
                 if (splitMatch.Length > 2)
-                    dateTimeFormat = splitMatch[2];
+                    format = splitMatch[2];
 
                 if (!answersDictionary.ContainsKey(questionId))
                     throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is not stored within answers, Match value: {match.Value}");
@@ -27,20 +34,8 @@ namespace form_builder.TagParser
                 if (string.IsNullOrEmpty(questionValue))
                     throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is null or empty, Match value: {match.Value}");
 
-                if (!string.IsNullOrEmpty(dateTimeFormat))
-                {
-                    var dateTime = System.DateTime.Parse(questionValue);
-                    switch (dateTimeFormat)
-                    {
-                        case "time-only":
-                            questionValue = dateTime.Minute > 0 ? dateTime.ToString("h:mmtt").ToLower() : dateTime.ToString("htt").ToLower();
-                            break;
-
-                        case "full-date":
-                            questionValue = dateTime.ToString("dddd dd MMMM yyyy");
-                            break;
-                    }
-                }
+                if (!string.IsNullOrEmpty(format))
+                    questionValue = _formatters.Get(format).Parse(questionValue);
 
                 var replacementText = new StringBuilder(value);
                 replacementText.Remove(match.Index - 2, match.Length + 4);

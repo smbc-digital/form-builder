@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using form_builder.Models;
@@ -6,7 +7,7 @@ namespace form_builder.TagParser
 {
     public class FormDataTagParser : TagParser, ITagParser
     {
-        public FormDataTagParser() : base()
+        public FormDataTagParser(IEnumerable<IFormatter> formatters) : base(formatters)
         {
         }
 

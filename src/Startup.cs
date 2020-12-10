@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using form_builder.Configuration;
 using form_builder.Middleware;
 using form_builder.ModelBinders.Providers;
 using form_builder.Utils.ServiceCollectionExtensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -54,6 +52,7 @@ namespace form_builder
                 .ConfigurePaymentProviders()
                 .ConfigureBookingProviders()
                 .ConfigureDocumentCreationProviders()
+                .ConfigureFormatters()
                 .ConfigureEmailProviders(HostingEnvironment)
                 .AddHelpers()
                 .AddAttributes()

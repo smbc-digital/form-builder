@@ -210,6 +210,14 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             return services;
         }
 
+        public static IServiceCollection ConfigureFormatters(this IServiceCollection services)
+        {
+            services.AddSingleton<IFormatter, FullDateFormatter>();
+            services.AddSingleton<IFormatter, TimeOnlyFormatter>();
+
+            return services;
+        }
+
         public static IServiceCollection ConfigurePaymentProviders(this IServiceCollection services)
         {
             services.AddSingleton<IPaymentProvider, CivicaPayProvider>();

@@ -158,7 +158,7 @@ namespace form_builder.Mappers
                     return string.IsNullOrWhiteSpace(addressValue.AddressLine1) ? string.Empty : $"{addressValue.AddressLine1}{manualLine2Text},{addressValue.Town},{addressValue.Postcode}";
                 case EElementType.Booking:
                     var bookingValue = (Booking)value;
-                    return  bookingValue.Date.Equals(DateTime.MinValue) && bookingValue.StartTime.Equals(DateTime.MinValue) ? string.Empty : $"{bookingValue.Date.ToString("dddd dd MMMM yyyy")} at {bookingValue.StartTime.ToTimeFormat()}";
+                    return  bookingValue.Date.Equals(DateTime.MinValue) && bookingValue.StartTime.Equals(DateTime.MinValue) ? string.Empty : $"{bookingValue.Date.ToFullDateFormat()} at {bookingValue.StartTime.ToTimeFormat()}";
 
                 case EElementType.Street:
                     var streetValue = (Address)value;
