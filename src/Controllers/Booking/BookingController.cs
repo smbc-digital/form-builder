@@ -42,7 +42,7 @@ namespace form_builder.Controllers
 
             var page = baseForm.GetPage(_pageHelper, path);
             if (page == null)
-                throw new ApplicationException($"Requested path '{path}' object could not be found.");
+                throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
 

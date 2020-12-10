@@ -137,7 +137,7 @@ namespace form_builder.Services.PageService
 
             var page = baseForm.GetPage(_pageHelper, path);
             if (page == null)
-                throw new ApplicationException($"Requested path '{path}' object could not be found.");
+                throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
             await baseForm.ValidateFormSchema(_pageHelper, form, path);
 

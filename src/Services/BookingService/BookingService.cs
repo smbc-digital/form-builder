@@ -171,13 +171,13 @@ namespace form_builder.Services.BookingService
                 catch (BookingNoAvailabilityException)
                 {
                     result = new BoookingNextAvailabilityEntity { BookingHasNoAvailableAppointments = true };
-                    _ = _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, Newtonsoft.Json.JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.BookingNoAppointmentsAvailable);
+                    _ = _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.BookingNoAppointmentsAvailable);
                     return result;
                 }
             }
 
             result = new BoookingNextAvailabilityEntity{ DayResponse = nextAvailability };
-            _ = _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, Newtonsoft.Json.JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.Booking);
+            _ = _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.Booking);
             return result;
         }
 
