@@ -22,7 +22,7 @@ namespace form_builder.Validators
             var bookingElement = (Booking)element;
 
             //Validate Date
-            var containsBookingDate = viewModel.ContainsKey(bookingElement.BookingDateQuestionId); 
+            var containsBookingDate = viewModel.ContainsKey(bookingElement.DateQuestionId); 
 
             if(!containsBookingDate && element.Properties.Optional)
             {
@@ -40,8 +40,7 @@ namespace form_builder.Validators
                 };
             }
 
-            // Do we need to validate Date
-            var date = viewModel[bookingElement.BookingDateQuestionId];
+            var date = viewModel[bookingElement.TimeQuestionId];
             var isValidDate = DateTime.TryParse(date, out DateTime dateValue);
 
             if(!isValidDate){

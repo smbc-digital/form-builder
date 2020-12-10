@@ -3,12 +3,12 @@
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
     @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
 
-    @Html.Hidden($"{Model.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Model.ReservedBookingDate)
-    @Html.Hidden($"{Model.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_TIME}", Model.ReservedBookingTime)
-    @Html.Hidden($"{Model.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}", Model.ReservedBookingId)
+    @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_DATE), Model.ReservedBookingDate)
+    @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_TIME), Model.ReservedBookingTime)
+    @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_ID), Model.ReservedBookingId)
     @if (@Model.IsAppointmentTypeFullDay)
     {
-        @Html.Hidden(Model.BookingTimeQuestionId, Model.AppointmentTime)
+        @Html.Hidden(@Model.GetCustomItemId(BookingConstants.APPOINTMENT_TIME), Model.AppointmentTime)
     }
 
     <partial name="LegendH1" />

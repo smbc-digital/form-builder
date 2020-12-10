@@ -5,14 +5,14 @@ using form_builder.Models;
 
 namespace form_builder.TagParser
 {
-    public class ButtonTagParser : TagParser, ITagParser, ISimpleTagParser
-    {        
-        public ButtonTagParser(IEnumerable<IFormatter> formatters) : base(formatters)
+    public class LinkTagParser : TagParser, ITagParser, ISimpleTagParser
+    {
+        public LinkTagParser(IEnumerable<IFormatter> formatters) : base(formatters)
         {
         }
 
-        public Regex Regex => new Regex("(?<={{)BUTTON:.*?(?=}})", RegexOptions.Compiled);
-        public string _htmlContent => "<a rel='noreferrer noopener' target='_blank' href='https://{0}' class='govuk-button'>{1}</a>";
+        public Regex Regex => new Regex("(?<={{)LINK:.*?(?=}})", RegexOptions.Compiled);
+        public string _htmlContent => "<a rel='noreferrer noopener' target='_blank' href='https://{0}'>{1}</a>";
 
         public Page Parse(Page page, FormAnswers formAnswers)
         {

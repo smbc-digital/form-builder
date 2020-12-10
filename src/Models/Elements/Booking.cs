@@ -25,15 +25,12 @@ namespace form_builder.Models.Elements
         public string FormattedDateForCheckYourBooking => DateTime.Parse(Properties.Value).ToFullDateFormat();
         public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {AppointmentStartTime.ToTimeFormat()} and {AppointmentEndTime.ToTimeFormat()}" : "NotFullDay";
         public AvailabilityDayResponse SelectedBooking;
-        public bool IsSelectedAppointmentFullDay => SelectedBooking.IsFullDayAppointment;
         public bool IsAppointmentTypeFullDay { get; set; }
         public DateTime AppointmentStartTime { get; set; }
         public DateTime AppointmentEndTime { get; set; }
-        public string AppointmentTypeFullDayIAG => $"You can select a date for {FormName} but you can not select a time. We’ll be with you between {AppointmentStartTime.ToTimeFormat()} and {AppointmentEndTime.ToTimeFormat()}.";
-        public string BookingDateQuestionId => $"{Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}";
-        public string BookingTimeQuestionId => $"{Properties.QuestionId}{BookingConstants.APPOINTMENT_TIME}";
         public DateTime CurrentSelectedMonth { get; set; }
         public DateTime FirstAvailableMonth { get; set; }
+        public string AppointmentTypeFullDayIAG => $"You can select a date for {FormName} but you can not select a time. We’ll be with you between {AppointmentStartTime.ToTimeFormat()} and {AppointmentEndTime.ToTimeFormat()}.";
         public bool DisplayNextAvailableAppointmentIAG => FirstAvailableMonth.Date > DateTime.Now.Date && CurrentSelectedMonth.Month == FirstAvailableMonth.Month && CurrentSelectedMonth.Year == FirstAvailableMonth.Year;
         public string CurrentSelectedMonthText => $"{CurrentSelectedMonth:MMMMM yyyy}";
         public DateTime NextSelectableMonth => new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).AddMonths(1);
@@ -47,7 +44,11 @@ namespace form_builder.Models.Elements
         public string ReservedBookingTime { get; set; }
         public string AppointmentTime { get; set; }
         public string MonthSelectionPostUrl { get; set; }
-        public override string QuestionId => BookingDateQuestionId;
+        public string DateQuestionId => $"{Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}";
+        public string TimeQuestionId => $"{Properties.QuestionId}-{BookingConstants.APPOINTMENT_TIME}";
+        public string ReservedDateQuestionId => $"{Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}";
+        public string ReservedTimeQuestionId => $"{Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_TIME}";
+        public string ReservedIdQuestionId => $"{Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}";
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
@@ -63,11 +64,11 @@ namespace form_builder.Models.Elements
 
             ConfigureBookingInformation(results);
             FormName = formSchema.FormName;
-            Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, BookingConstants.APPOINTMENT_DATE);
-            ReservedBookingId = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_ID}");
-            ReservedBookingDate = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_DATE}");
-            ReservedBookingTime = IsAppointmentTypeFullDay ? AppointmentStartTime.ToString() : elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_TIME}");
-            AppointmentTime = IsAppointmentTypeFullDay ? AppointmentStartTime.ToString() : elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{BookingConstants.RESERVED_BOOKING_TIME}");                      
+            Properties.Value = elementHelper.CurrentValue(DateQuestionId, viewModel, formAnswers);
+            ReservedBookingId = elementHelper.CurrentValue(ReservedIdQuestionId, viewModel, formAnswers);
+            ReservedBookingDate = elementHelper.CurrentValue(ReservedDateQuestionId, viewModel, formAnswers);
+            ReservedBookingTime = IsAppointmentTypeFullDay ? AppointmentStartTime.ToString() : elementHelper.CurrentValue(ReservedTimeQuestionId, viewModel, formAnswers);
+            AppointmentTime = IsAppointmentTypeFullDay ? AppointmentStartTime.ToString() : elementHelper.CurrentValue(TimeQuestionId, viewModel, formAnswers);                      
 
             switch (subPath as string)
             {
@@ -102,7 +103,6 @@ namespace form_builder.Models.Elements
             var daysInMonth = DateTime.DaysInMonth(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month);
             var daysToAdd = new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).PreviousDaysInMonth();
 
-            //Add empty days at start of month
             for (int i = 0; i < daysToAdd; i++)
             {
                 dates.Add(new CalendarDay{ IsDisabled = true, IsNotWithinCurrentSelectedMonth = true });
@@ -115,7 +115,6 @@ namespace form_builder.Models.Elements
                 dates.Add(new CalendarDay{ Date = day, IsDisabled = containsDay == null, Checked = containsDay != null && Properties.Value.Equals(day.Date.ToString())});
             }
 
-            //add empty days at end of month
             for (int i = dates.Count + 1; i < 43; i++)
             {
                 dates.Add(new CalendarDay{ IsDisabled = true, IsNotWithinCurrentSelectedMonth = true });
@@ -128,7 +127,7 @@ namespace form_builder.Models.Elements
             var selectedAppointment = Appointments.FirstOrDefault(_ => _.Date.ToString().Equals(Properties.Value));
 
             if (selectedAppointment == null)
-                throw new ApplicationException("Booking::RenderAsync, Unable to find selected appointment while attempting to generate check your booking view");
+                throw new ApplicationException("Booking::GetSelectedAppointment, Unable to find selected appointment while attempting to generate check your booking view");
 
             return selectedAppointment;
         }

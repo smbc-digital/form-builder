@@ -183,7 +183,7 @@ namespace form_builder.Services.BookingService
 
         private async Task<ProcessRequestEntity> ProcessDateAndTime(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
-            var bookingElement = currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
+            var bookingElement = (Booking) currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
 
             if (!currentPage.IsValid)
             {
@@ -233,7 +233,7 @@ namespace form_builder.Services.BookingService
 
         private async Task<ProcessRequestEntity> ProcessCheckYourBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
-            var bookingElement = currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
+            var bookingElement = (Booking) currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
             await ReserveAppointment(bookingElement, viewModel, baseForm.BaseURL, guid);
 
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
@@ -244,13 +244,13 @@ namespace form_builder.Services.BookingService
             };
         }
 
-        private async Task<Guid> ReserveAppointment(IElement bookingElement, Dictionary<string, dynamic> viewModel, string form, string guid)
+        private async Task<Guid> ReserveAppointment(Booking bookingElement, Dictionary<string, dynamic> viewModel, string form, string guid)
         {
-            var reservedBookingId = $"{bookingElement.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}";
-            var reservedBookingDate = $"{bookingElement.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}";
-            var reservedBookingTime = $"{bookingElement.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_TIME}";
-            var currentlySelectedBookingDate = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_DATE}";
-            var currentlySelectedBookingTime = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TIME}";
+            var reservedBookingId = bookingElement.ReservedIdQuestionId;
+            var reservedBookingDate = bookingElement.ReservedDateQuestionId;
+            var reservedBookingTime = bookingElement.ReservedTimeQuestionId;
+            var currentlySelectedBookingDate = bookingElement.DateQuestionId;
+            var currentlySelectedBookingTime = bookingElement.TimeQuestionId;
 
             if (viewModel.ContainsKey(reservedBookingId) && !string.IsNullOrEmpty((string)viewModel[reservedBookingId]))
             {
