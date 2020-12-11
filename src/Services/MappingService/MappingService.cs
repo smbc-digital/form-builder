@@ -62,7 +62,7 @@ namespace form_builder.Services.MappingService
 
         public async Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form)
         {
-            var baseForm = await _schemaFactory.Build(bookingElement.Properties.QuestionId);
+            var baseForm = await _schemaFactory.Build(form);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
             convertedAnswers.FormName = form;
