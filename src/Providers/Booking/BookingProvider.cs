@@ -40,7 +40,7 @@ namespace form_builder.Providers.Booking
             var result = await _gateway.GetAvailability(request);
 
             if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
-                throw new BookingNoAvailabilityException($"BookingProvider::GetAvailability, BookingServiceGateway received a bad request, Request:{Newtonsoft.Json.JsonConvert.SerializeObject(request)}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+                throw new ApplicationException($"BookingProvider::GetAvailability, BookingServiceGateway received a bad request, Request:{Newtonsoft.Json.JsonConvert.SerializeObject(request)}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
 
             if (result.StatusCode.Equals(HttpStatusCode.NotFound))
                 throw new ApplicationException($"BookingProvider::GetAvailability, BookingServiceGateway returned 404 status code, booking with id {request.AppointmentId} cannot be found");
