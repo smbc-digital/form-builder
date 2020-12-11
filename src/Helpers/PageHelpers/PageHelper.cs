@@ -602,7 +602,7 @@ namespace form_builder.Helpers.PageHelpers
                     if(string.IsNullOrEmpty(booking.Properties.BookingProvider))
                         throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a valid booking provider property.");
 
-                    if(string.IsNullOrEmpty(booking.Properties.AppointmentType.ToString() ?? string.Empty))
+                    if(booking.Properties.AppointmentType == Guid.Empty)
                         throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.");
                 });
 
