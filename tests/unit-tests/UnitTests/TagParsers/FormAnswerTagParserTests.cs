@@ -12,12 +12,25 @@ namespace form_builder_tests.UnitTests.Services
 {
     public class FormAnswerTagParserTests
     {
-        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new Mock<IEnumerable<IFormatter>>();
+        private readonly IEnumerable<IFormatter> _formatters;
+        private readonly Mock<IFormatter> _mockFormatter = new Mock<IFormatter>();
+        private readonly Mock<IFormatter> _mockFormatterTwo = new Mock<IFormatter>();
+        
         private FormAnswerTagParser _tagParser;
 
         public FormAnswerTagParserTests()
         {
-            _tagParser = new FormAnswerTagParser(_mockFormatters.Object);
+            _mockFormatter.Setup(_ => _.FormatterrName).Returns("testformatter");
+            _mockFormatter.Setup(_ => _.Parse(It.IsAny<string>())).Returns("FAKE-FORMATTED-VALUE");
+            _mockFormatterTwo.Setup(_ => _.FormatterrName).Returns("anothertestformatter");
+            _mockFormatterTwo.Setup(_ => _.Parse(It.IsAny<string>())).Returns("ANOTHER-FORMATTER");
+            _formatters = new List<IFormatter>
+            {
+                _mockFormatter.Object,
+                _mockFormatterTwo.Object
+            };
+
+            _tagParser = new FormAnswerTagParser(_formatters);
         }
 
         [Theory]
@@ -153,6 +166,122 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = _tagParser.Parse(page, formAnswers);
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+        }
+
+        
+        [Fact]
+        public void Parse_ShouldCallFormatter_WhenProvided()
+        {
+            var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
+
+             var element = new ElementBuilder()
+                .WithType(EElementType.P)
+                .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}}")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers 
+                    {
+                        Answers = new List<Answers> 
+                        {
+                            new Answers 
+                            {
+                                QuestionId = "firstname",
+                                Response = "value"
+                            }    
+                        }     
+                    }
+                }
+            };
+
+            var result = _tagParser.Parse(page, formAnswers);
+            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
+        }
+
+
+        [Fact]
+        public void Parse_ShouldCall_Multiple_Formatters_WhenProvided()
+        {
+            var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE ANOTHER-FORMATTER";
+
+             var element = new ElementBuilder()
+                .WithType(EElementType.P)
+                .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}} {{QUESTION:firstname:anothertestformatter}}")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers 
+                    {
+                        Answers = new List<Answers> 
+                        {
+                            new Answers 
+                            {
+                                QuestionId = "firstname",
+                                Response = "value"
+                            }    
+                        }     
+                    }
+                }
+            };
+
+            var result = _tagParser.Parse(page, formAnswers);
+            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
+            _mockFormatterTwo.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
+        }
+
+
+
+        [Fact]
+        public void Parse_ShouldCall_Same_Formatter_MultipleTimes()
+        {
+            var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE FAKE-FORMATTED-VALUE";
+
+             var element = new ElementBuilder()
+                .WithType(EElementType.P)
+                .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}} {{QUESTION:firstname:testformatter}}")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers 
+                    {
+                        Answers = new List<Answers> 
+                        {
+                            new Answers 
+                            {
+                                QuestionId = "firstname",
+                                Response = "value"
+                            }    
+                        }     
+                    }
+                }
+            };
+
+            var result = _tagParser.Parse(page, formAnswers);
+            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Exactly(2));
         }
     }
 }
