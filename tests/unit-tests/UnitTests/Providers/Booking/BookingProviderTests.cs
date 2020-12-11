@@ -87,7 +87,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         }
         
         [Fact]
-        public async Task GetAvailability_ShouldReturnDayResponse_OnSuccessfullyCall()
+        public async Task GetAvailability_ShouldReturn_ListOfDayResponse_OnSuccessfullyCall()
         {
             var request = new AvailabilityRequest();
 
@@ -141,7 +141,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         }
 
         [Fact]
-        public async Task Reserve_ShouldReturnDayResponse_OnSuccessfullyCall()
+        public async Task Reserve_ShouldReturn_Guid_OnSuccessfullyCall()
         {
             var request = new BookingRequest();
 
