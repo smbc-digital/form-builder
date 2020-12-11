@@ -14,7 +14,7 @@ namespace form_builder.Providers.Booking
 
         public Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request)
         {
-            if(request.AppointmentId.Equals(Guid.Empty))
+            if(request.AppointmentId.Equals(Guid.Parse("00000000-0000-0000-0000-000000000001")))
                 throw new BookingNoAvailabilityException("FakeProvider, no available appointments");
                 
             var response = new AvailabilityDayResponse()
