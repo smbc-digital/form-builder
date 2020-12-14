@@ -302,6 +302,33 @@ namespace form_builder.Helpers.PageHelpers
             });
         }
 
+        public void CheckConditionalElementsAreValid(List<Page> pages, string formName) {
+            var radioWithConditionals = pages.Where(_ => _.Elements != null)
+                .SelectMany(_ => _.ValidatableElements)
+                .Where(_ => _.Type == EElementType.Radio)
+                .Where(_ => _.Properties.Options.Any(_ => _.HasConditionalElement))
+                .ToList();
+
+            var conditionalElementIds = pages.Where(_ => _.Elements != null)
+                .SelectMany(_ => _.ValidatableElements)
+                .Where(_ => _.Properties.isConditionalElement)
+                .Select(_ => _.Properties.QuestionId)
+                .ToList();
+
+            foreach (var radio in radioWithConditionals) {
+                foreach(var option in radio.Properties.Options) {
+                    if (option.HasConditionalElement && !conditionalElementIds.Contains(option.ConditionalElementId))
+                        throw new ApplicationException($"The provided json '{formName}' does not contain a conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}'");
+                    else
+                        conditionalElementIds.Remove(option.ConditionalElementId);
+                }
+            }
+
+            if (conditionalElementIds.Count > 0) 
+                throw new ApplicationException($"The provided json '{formName}' has conditional elements '{String.Join(", ", conditionalElementIds)}' not assigned to radio options");
+    
+        }
+
         public void SaveFormData(string key, object value, string guid)
         {
             var formData = _distributedCache.GetString(guid);
