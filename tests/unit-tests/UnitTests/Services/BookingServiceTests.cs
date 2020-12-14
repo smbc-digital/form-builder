@@ -12,11 +12,13 @@ using form_builder.Exceptions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Models.Booking;
+using form_builder.Models.Elements;
 using form_builder.Providers.Booking;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.BookingService;
 using form_builder.Services.BookingService.Entities;
 using form_builder.Services.MappingService;
+using form_builder.Services.PageService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -368,6 +370,221 @@ namespace form_builder_tests.UnitTests.Services
             _bookingProvider.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.Is<string>(_ => _.Equals("guid")), It.Is<string>(_ => _.Equals("base-form"))), Times.Once);
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessBooking_Should_Process_CheckYourBookingPage_And_ReserveBooking()
+        {
+            var appointmentTypeGuid = new Guid();
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(appointmentTypeGuid)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("base-form")
+                .Build();
+
+            var model = new Dictionary<string, object>{
+                { LookUpConstants.SubPathViewModelKey, BookingConstants.CHECK_YOUR_BOOKING },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", DateTime.Now.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_TIME}", DateTime.Now.ToString() }
+            };
+
+            await _service.ProcessBooking(model, page,formSchema,"guid", "path");
+
+            _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
+            _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
+        }
+
+
+        [Fact]
+        public async Task ProcessBooking_Should_Return_CurrentPageEntity_When_CheckYourBooking_Property_IsFalse_AndReserve_Appointment()
+        {
+            var appointmentTypeGuid = new Guid();
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(appointmentTypeGuid)
+                .WithCheckYourBooking(false)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("base-form")
+                .Build();
+
+            var model = new Dictionary<string, object>{
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", DateTime.Now.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_TIME}", DateTime.Now.ToString() }
+            };
+
+            var result = await _service.ProcessBooking(model, page,formSchema,"guid", "path");
+
+            _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
+            _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, object>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
+            Assert.IsType<ProcessRequestEntity>(result);
+        }
+
+        [Fact]
+        public async Task ProcessBooking_Should_Return_CurrentPage_When_CheckYourBooking_IsTrue()
+        {
+            var appointmentTypeGuid = new Guid();
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(appointmentTypeGuid)
+                .WithCheckYourBooking(true)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("base-form")
+                .Build();
+
+            var model = new Dictionary<string, object>{
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", DateTime.Now.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_TIME}", DateTime.Now.ToString() }
+            };
+
+            var result = await _service.ProcessBooking(model, page,formSchema,"guid", "path");
+
+            _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Never);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
+            _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, object>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
+            Assert.IsType<ProcessRequestEntity>(result);
+            Assert.Equal("Index", result.RedirectAction);
+            Assert.True(result.RedirectToAction);
+        }
+
+        [Fact]
+        public async Task ProcessBooking_Should_NotCall_BookingProvider_WhenReservedDateAndTime_IsSame_AsCurrentSelectedDateTime()
+        {
+            var appointmentTypeGuid = new Guid();
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(appointmentTypeGuid)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("base-form")
+                .Build();
+
+            var model = new Dictionary<string, object>{
+                { LookUpConstants.SubPathViewModelKey, BookingConstants.CHECK_YOUR_BOOKING },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", DateTime.Now.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_TIME}", DateTime.Now.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}", Guid.NewGuid().ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}", DateTime.Now.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_TIME}", DateTime.Now.ToString() },
+            };
+
+            await _service.ProcessBooking(model, page,formSchema,"guid", "path");
+
+            _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Never);
+            _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Never);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessBooking_Should_Call_BookingProvider_Whe_SelectedDate_IsDifferent_To_ReservedDateAndTime()
+        {
+            var appointmentTypeGuid = new Guid();
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(appointmentTypeGuid)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("base-form")
+                .Build();
+
+            var model = new Dictionary<string, object>{
+                { LookUpConstants.SubPathViewModelKey, BookingConstants.CHECK_YOUR_BOOKING },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", DateTime.Now.AddDays(1).ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_TIME}", DateTime.Now.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}", Guid.NewGuid().ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}", DateTime.Now.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_TIME}", DateTime.Now.ToString() },
+            };
+
+            await _service.ProcessBooking(model, page,formSchema,"guid", "path");
+
+           _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
+            _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
+        }
+
+        
+        [Fact]
+        public async Task ProcessBooking_Should_Call_BookingProvider_Whe_SelectedTime_IsDifferent_To_ReservedDateAndTime()
+        {
+            var appointmentTypeGuid = new Guid();
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(appointmentTypeGuid)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("base-form")
+                .Build();
+
+            var model = new Dictionary<string, object>{
+                { LookUpConstants.SubPathViewModelKey, BookingConstants.CHECK_YOUR_BOOKING },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", DateTime.Now.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_TIME}", DateTime.Now.AddHours(1).ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}", Guid.NewGuid().ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}", DateTime.Now.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_TIME}", DateTime.Now.ToString() },
+            };
+
+            await _service.ProcessBooking(model, page,formSchema,"guid", "path");
+
+            _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
+            _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
         }
     }
 }

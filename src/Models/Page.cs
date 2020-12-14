@@ -93,9 +93,9 @@ namespace form_builder.Models
             element.Type == EElementType.Organisation
         );
 
-        public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
+        public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators)
         {
-            ValidatableElements.ToList().ForEach(element => element.Validate(viewModel, form_builder));
+            ValidatableElements.ToList().ForEach(element => element.Validate(viewModel, validators));
             IsValidated = true;
         }
 

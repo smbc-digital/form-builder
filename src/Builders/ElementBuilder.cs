@@ -345,5 +345,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithCheckYourBooking(bool value)
+        {
+            _property.CheckYourBooking = value;
+
+            return this;
+        }
     }
 }
