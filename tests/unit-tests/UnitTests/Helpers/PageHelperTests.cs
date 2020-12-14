@@ -1326,6 +1326,114 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
+        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIsFoundInJson() {
+            // Arrange
+            var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
+            var element1 = new ElementBuilder()
+                .WithType(EElementType.Radio)
+                .WithQuestionId("radio")
+                .WithLabel("First name")
+                .WithOptions(new List<Option> { option1 })
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("conditionalQuestion1")
+                .WithLabel("First name")
+                .WithConditionalElement(true)
+                .Build();
+
+            var page1 = new PageBuilder()
+                .WithElement(element1)
+                .WithElement(element2)
+                .Build();
+
+            var pages = new List<Page> { page1 };
+
+            // Act & Assert
+            _pageHelper.CheckConditionalElementsAreValid(pages, "form");
+        }
+
+        [Fact]
+        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIdIsBlankInJson() {
+            // Arrange
+            var option1 = new Option { ConditionalElementId = "", Value = "Value1" };
+            var element1 = new ElementBuilder()
+                .WithType(EElementType.Radio)
+                .WithQuestionId("radio")
+                .WithLabel("First name")
+                .WithOptions(new List<Option> { option1 })
+                .Build();
+
+            var page1 = new PageBuilder()
+                .WithElement(element1)
+                .Build();
+
+            var pages = new List<Page> { page1 };
+
+            // Act & Assert
+            _pageHelper.CheckConditionalElementsAreValid(pages, "form");
+        }
+
+        [Fact]
+        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementNotFoundInJson() {
+            // Arrange
+            var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
+            var element1 = new ElementBuilder()
+                .WithType(EElementType.Radio)
+                .WithQuestionId("radio")
+                .WithLabel("First name")
+                .WithOptions(new List<Option> { option1 })
+                .Build();
+
+            var page1 = new PageBuilder()
+                .WithElement(element1)
+                .Build();
+
+            var pages = new List<Page> { page1 };
+
+            // Act & Assert
+            Assert.Throws<ApplicationException>(() => _pageHelper.CheckConditionalElementsAreValid(pages, "form"));
+        }
+
+        [Fact]
+        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenTooManyConditionalElementsFoundInJson() {
+            // Arrange
+            var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
+            var element1 = new ElementBuilder()
+                .WithType(EElementType.Radio)
+                .WithQuestionId("radio")
+                .WithLabel("First name")
+                .WithOptions(new List<Option> { option1 })
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("conditionalQuestion1")
+                .WithLabel("First name")
+                .WithConditionalElement(true)
+                .Build();
+
+            var element3 = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("conditionalQuestion2")
+                .WithLabel("First name")
+                .WithConditionalElement(true)
+                .Build();
+
+            var page1 = new PageBuilder()
+                .WithElement(element1)
+                .WithElement(element2)
+                .WithElement(element3)
+                .Build();
+
+            var pages = new List<Page> { page1 };
+
+            // Act & Assert
+            Assert.Throws<ApplicationException>(() => _pageHelper.CheckConditionalElementsAreValid(pages, "form"));
+        }
+
+        [Fact]
         public void CheckForDocumentDownload_ShouldThrowApplicationException_WhenFormSchemaContains_NoDocumentTypes_WhenDocumentDownload_True()
         {
             // Arrange

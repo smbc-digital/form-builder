@@ -317,7 +317,7 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var radio in radioWithConditionals) {
                 foreach(var option in radio.Properties.Options) {
-                    if (option.HasConditionalElement && !conditionalElementIds.Contains(option.ConditionalElementId))
+                    if ((option.HasConditionalElement && !string.IsNullOrEmpty(option.ConditionalElementId)) && (!conditionalElementIds.Contains(option.ConditionalElementId)))
                         throw new ApplicationException($"The provided json '{formName}' does not contain a conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}'");
                     else
                         conditionalElementIds.Remove(option.ConditionalElementId);

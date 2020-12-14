@@ -67,7 +67,7 @@
                 </div>
             }
 
-            @if (Model.Properties.Options[i].ConditionalElementId != null) {
+            @if (!string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElementId)) {
                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
                     ID=@Model.Properties.Options[i].ConditionalElementId
                 </div>
