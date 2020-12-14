@@ -3,4 +3,4 @@
     var OpenInTab = Model.Properties.OpenInTab ? "target='_blank'" : "";
 }
 
-<a href='@Model.Properties.Url' rel='noreferrer noopener' @OpenInTab class='govuk-button'>@Model.Properties.Text</a>
+<a href='@Model.Properties.Url' rel='noreferrer noopener' @OpenInTab class='@Model.Properties.ClassName'>@Model.Properties.Text</a>
