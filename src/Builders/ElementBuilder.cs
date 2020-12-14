@@ -331,5 +331,25 @@ namespace form_builder.Builders
 
             return this;
         }
+        public ElementBuilder WithClassName(string value)
+        {
+            _property.ClassName = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithOpenInTab(bool value)
+        {
+            _property.OpenInTab = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithUrl(string value)
+        {
+            _property.Url = value;
+
+            return this;
+        }
     }
 }
