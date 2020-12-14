@@ -221,7 +221,7 @@ namespace form_builder.Services.PageService
             if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
                 return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files, modelStateIsValid);
 
-            currentPage.Elements.RemoveUnusedConditionalElements(viewModel);
+            //currentPage.Elements.RemoveUnusedConditionalElements(viewModel); TODO -- possibly redundant
 
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 

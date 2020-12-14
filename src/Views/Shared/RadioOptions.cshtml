@@ -31,7 +31,7 @@
 		: baseCssClasses);
 }
 
-    <div class="govuk-radios@(Model.Properties.Options.Any(_ => _.HasConditionalElement || _.HasCondition) ? " govuk-radios--conditional" : "")" data-module="govuk-radios">
+    <div class="govuk-radios@(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? " govuk-radios--conditional" : "")" data-module="govuk-radios">
         @for (var i = 0; i < Model.Properties.Options.Count; i++) {
             var strongLabel = Model.Properties.Options[i].HasHint ? "govuk-label--s" : null;
 
@@ -60,15 +60,16 @@
                 <span class="govuk-hint govuk-radios__hint" id="@Model.GetListItemHintId(i)">@Html.Raw(Model.Properties.Options[i].Hint)</span>
             }
 
-            @if (Model.Properties.Options[i].HasConditionalElement) {
+            //TODO -- Possibly redundant
+            @if (Model.Properties.Options[i].HasConditionalElement && Model.Properties.Options[i].ConditionalElement != null) {
                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
                     <partial model=Model.Properties.Options[i].ConditionalElement name="@Model.Properties.Options[i].ConditionalElement.Type" />
                 </div>
             }
 
-            @if (Model.Properties.Options[i].HasCondition) {
+            @if (Model.Properties.Options[i].ConditionalElementId != null) {
                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
-                    ID=@Model.QuestionId VALUE=@Model.Properties.Options[i].Value
+                    ID=@Model.Properties.Options[i].ConditionalElementId
                 </div>
             }
         }

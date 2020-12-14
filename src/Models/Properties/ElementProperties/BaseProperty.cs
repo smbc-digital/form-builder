@@ -64,6 +64,6 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public bool HideOptionalText { get;set; }
 
-        public Conditional Conditional { get; set; }
+        public bool isConditionalElement { get; set; } = false;
     }
 }

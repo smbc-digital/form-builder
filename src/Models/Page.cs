@@ -67,11 +67,11 @@ namespace form_builder.Models
 			{
 				if (IsValidated)
 				{
-					IEnumerable<BaseProperty> invalidElements = ValidatableElements.Where(element => !element.IsValid && element.Type != EElementType.Radio).Select(element => element.Properties);
+					IEnumerable<BaseProperty> invalidElements = ValidatableElements.Where(element => !element.IsValid).Select(element => element.Properties);
 
 					// Check if Radio element or its relative conditional element is valid 
-					IEnumerable<BaseProperty> invalidRadioConditional = ValidatableElements.Where(element => element.Type == EElementType.Radio && (!element.IsValid || element.Properties.Options.Where(option => option.HasConditionalElement && !option.ConditionalElement.IsValid).Any())).Select(element => element.Properties);
-					return invalidElements.Concat(invalidRadioConditional);
+					//IEnumerable<BaseProperty> invalidRadioConditional = ValidatableElements.Where(element => element.Type == EElementType.Radio && (!element.IsValid || element.Properties.Options.Where(option => option.HasConditionalElement && !option.ConditionalElement.IsValid).Any())).Select(element => element.Properties);
+					return invalidElements;
 				}
 
 				throw new Exception("Model is not validated, please call Validate()");
@@ -107,7 +107,11 @@ namespace form_builder.Models
 
 		public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
 		{
-			ValidatableElements.IncludedRequiredConditionalElements(viewModel).ForEach(element => {
+			//ValidatableElements.IncludedRequiredConditionalElements(viewModel).ForEach(element => {
+			//	element.Validate(viewModel, form_builder);
+			//});
+
+			ValidatableElements.RemoveUnusedConditionalElements(viewModel).ForEach(element => {
 				element.Validate(viewModel, form_builder);
 			});
 			IsValidated = true;

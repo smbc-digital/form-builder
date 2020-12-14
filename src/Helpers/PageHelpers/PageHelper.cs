@@ -80,8 +80,8 @@ namespace form_builder.Helpers.PageHelpers
                     formAnswers,
                     results
                     );
-                if (element.Properties.Conditional != null) {
-                    formModel.RawHTML = formModel.RawHTML.Replace($"ID={element.Properties.Conditional.parentId} VALUE={element.Properties.Conditional.optionValue}", html);
+                if (element.Properties.isConditionalElement) {
+                    formModel.RawHTML = formModel.RawHTML.Replace($"ID={element.Properties.QuestionId}", html);
                 } else {
                     formModel.RawHTML += html;
                 }
