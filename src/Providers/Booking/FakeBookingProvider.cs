@@ -16,7 +16,21 @@ namespace form_builder.Providers.Booking
         {
             if(request.AppointmentId.Equals(Guid.Parse("00000000-0000-0000-0000-000000000001")))
                 throw new BookingNoAvailabilityException("FakeProvider, no available appointments");
-                
+
+            if(request.AppointmentId.Equals(Guid.Parse("00000000-0000-0000-0000-000000000002"))) //ui-test response
+                return Task.FromResult(new AvailabilityDayResponse()
+                {
+                    Date = new DateTime(2021, 2, 1),
+                    AppointmentTimes = new List<AppointmentTime>
+                    {
+                        new AppointmentTime
+                        {
+                            StartTime = new TimeSpan(7, 0, 0),
+                            EndTime = new TimeSpan(17, 30, 0)
+                        }
+                    }
+                });
+
             var response = new AvailabilityDayResponse()
             {
                 Date = DateTime.Now.AddMonths(1),
@@ -34,6 +48,11 @@ namespace form_builder.Providers.Booking
 
         public Task<List<AvailabilityDayResponse>> GetAvailability(AvailabilityRequest request)
         {
+            if(request.AppointmentId.Equals(Guid.Parse("00000000-0000-0000-0000-000000000002"))) //ui-test response
+                return Task.FromResult(new AvailabilityDayResponseBuilder()
+                        .WithDay(new DateTime(2021, 2, 1), 1)
+                        .Build());
+
             var response = new List<AvailabilityDayResponse>();
             switch (request.StartDate.Month)
             {
