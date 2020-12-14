@@ -54,14 +54,14 @@ namespace form_builder_tests.UnitTests.Controllers
         public async void Index_Should_Throw_ApplicationException_InvalidForm()
         {
             // Arrange
-            const string formName = "invalid";
+            const string form = "invalid";
             const string path = "irrelevant";
             var viewModel = new Dictionary<string, string[]>();
 
             try
             {
                 // Act
-                var result = await _bookingController.Index(formName, path, viewModel);
+                var result = await _bookingController.Index(form, path, viewModel);
             }
             catch (Exception ex)
             {
@@ -74,14 +74,14 @@ namespace form_builder_tests.UnitTests.Controllers
         public async void Index_Should_Throw_ApplicationException_InvalidPath()
         {
             // Arrange
-            const string formName = "valid";
+            const string form = "valid";
             const string path = "invalid";
             var viewModel = new Dictionary<string, string[]>();
 
             try
             {
                 // Act
-                var result = await _bookingController.Index(formName, path, viewModel);
+                var result = await _bookingController.Index(form, path, viewModel);
             }
             catch (Exception ex)
             {
@@ -91,20 +91,26 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async void Index_Should_RedirectTo_HomeController_Index()
+        public async void Index_Should_RedirectTo_HomeController_Index_WithRouteValues()
         {
             // Arrange
-            const string formName = "valid";
+            const string form = "valid";
             const string path = "valid";
             var viewModel = new Dictionary<string, string[]>();
 
             // Act
-            var result = await _bookingController.Index(formName, path, viewModel);
+            var result = await _bookingController.Index(form, path, viewModel);
 
             // Assert
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            redirectResult.RouteValues.TryGetValue(nameof(form), out var formName);
+            redirectResult.RouteValues.TryGetValue(nameof(path), out var pathName);
+
             Assert.Equal("Home", redirectResult.ControllerName);
             Assert.Equal("Index", redirectResult.ActionName);
+
+            Assert.Equal(form, formName);
+            Assert.Equal(path, pathName);
         }
     }
 }
