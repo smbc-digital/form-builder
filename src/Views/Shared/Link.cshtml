@@ -1,0 +1,6 @@
+﻿@model form_builder.Models.Elements.Element
+@{
+    var OpenInTab = Model.Properties.OpenInTab ? "target='_blank'" : "";
+}
+
+<a href='@Model.Properties.Url' rel='noreferrer noopener' @OpenInTab class='govuk-button'>@Model.Properties.Text</a>

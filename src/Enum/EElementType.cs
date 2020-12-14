@@ -40,6 +40,7 @@
         PaymentSummary,
         MultipleFileUpload,
         DocumentUpload,
-        UploadedFilesSummary
+        UploadedFilesSummary,
+        Link
     }
 }
