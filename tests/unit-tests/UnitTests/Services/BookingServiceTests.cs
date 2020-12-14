@@ -234,5 +234,140 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal(DateTime.Today.Add(endTime), bookingInfo.AppointmentEndTime);
             Assert.Single(bookingInfo.Appointments);
         }
+
+        [Fact]
+        public async Task ProcessMonthRequest_ShouldThrow_ApplicationException_WhenViewModelDoes_NotContainRequestedMonth()
+        {
+            // Act
+            var guid = Guid.NewGuid();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(guid)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("base-form")
+                .Build();
+
+            // Assert
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(new Dictionary<string, object>(), formSchema, page, "guid"));
+
+            _bookingProvider.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Never);
+            _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
+            Assert.Equal("BookingService::ProcessMonthRequest, request for appointment did not contain requested month", result.Message);
+        }
+
+        [Fact]
+        public async Task ProcessMonthRequest_ShouldThrow_ApplicationException_When_RequestedMonth_IsGreater_ThenAllowedSearchPeriod()
+        {
+            // Act
+            var guid = Guid.NewGuid();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(guid)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("base-form")
+                .Build();
+
+            var model = new Dictionary<string, object>{
+                { BookingConstants.BOOKING_MONTH_REQUEST, DateTime.Now.AddYears(1).AddMonths(1).ToString() }
+            };
+
+            // Assert
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(model, formSchema, page, "guid"));
+
+            _bookingProvider.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Never);
+            _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
+            Assert.Equal("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is after allowed search period", result.Message);
+        }
+
+        [Fact]
+        public async Task ProcessMonthRequest_ShouldThrow_ApplicationException_When_RequestedMonth_IsBefore_Today()
+        {
+            // Act
+            var guid = Guid.NewGuid();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(guid)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("base-form")
+                .Build();
+
+            var model = new Dictionary<string, object>{
+                { BookingConstants.BOOKING_MONTH_REQUEST, DateTime.Now.AddMonths(-1).ToString() }
+            };
+
+            // Assert
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(model, formSchema, page, "guid"));
+
+            _bookingProvider.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Never);
+            _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
+            Assert.Equal("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is before today", result.Message);
+        }
+
+        [Fact]
+        public async Task ProcessMonthRequest_ShouldCall_BookingProvider_AndSaveUpdatedBooking_Information()
+        {
+            var bookingInformationCacheKey = $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var guid = Guid.NewGuid();
+            _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new AvailabilityDayResponse() });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>{ {bookingInformationCacheKey, new BookingInformation() }}} ));
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(guid)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("base-form")
+                .Build();
+
+            var model = new Dictionary<string, object>{
+                { BookingConstants.BOOKING_MONTH_REQUEST, DateTime.Now.ToString() }
+            };
+
+            await _service.ProcessMonthRequest(model, formSchema, page, "guid");
+
+            _bookingProvider.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.Is<string>(_ => _.Equals("guid")), It.Is<string>(_ => _.Equals("base-form"))), Times.Once);
+            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+        }
     }
 }
