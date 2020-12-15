@@ -29,16 +29,6 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForLabel(this);
             elementHelper.CheckForRadioOptions(this);
             elementHelper.ReCheckPreviousRadioOptions(this);
-
-            // TODO -- possibly redundant
-            //if (Properties.Options.Any(_ =>_.HasConditionalElement)) {
-            //    foreach (Option option in Properties.Options) {
-            //        if (option.HasConditionalElement && option.ConditionalElement != null) {
-            //            option.ConditionalElement.SetUpElementValue(elementHelper, viewModel, formAnswers);
-            //        }           
-            //    }
-            //}
-
             return await viewRender.RenderAsync(Type.ToString(), this);
         }
     }

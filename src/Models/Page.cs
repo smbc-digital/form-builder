@@ -107,10 +107,6 @@ namespace form_builder.Models
 
 		public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
 		{
-			//ValidatableElements.IncludedRequiredConditionalElements(viewModel).ForEach(element => {
-			//	element.Validate(viewModel, form_builder);
-			//});
-
 			ValidatableElements.RemoveUnusedConditionalElements(viewModel).ForEach(element => {
 				element.Validate(viewModel, form_builder);
 			});
