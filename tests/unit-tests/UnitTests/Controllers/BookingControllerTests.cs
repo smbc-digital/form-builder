@@ -6,6 +6,7 @@ using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
+using form_builder.Models;
 using form_builder.Services.BookingService;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Http;
@@ -58,16 +59,9 @@ namespace form_builder_tests.UnitTests.Controllers
             const string path = "irrelevant";
             var viewModel = new Dictionary<string, string[]>();
 
-            try
-            {
-                // Act
-                var result = await _bookingController.Index(form, path, viewModel);
-            }
-            catch (Exception ex)
-            {
-                // Assert
-                Assert.IsType<ApplicationException>(ex);
-            }
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.Index(form, path, viewModel));
+            Assert.Equal($"Requested form '{form}' could not be found.", result.Message);
+            _bookingService.Verify(_ => _.ProcessMonthRequest(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<Page>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -78,16 +72,10 @@ namespace form_builder_tests.UnitTests.Controllers
             const string path = "invalid";
             var viewModel = new Dictionary<string, string[]>();
 
-            try
-            {
-                // Act
-                var result = await _bookingController.Index(form, path, viewModel);
-            }
-            catch (Exception ex)
-            {
-                // Assert
-                Assert.IsType<ApplicationException>(ex);
-            }
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.Index(form, path, viewModel));
+            Assert.Equal($"Requested path '{path}' object could not be found for form '{form}'", result.Message);
+            _bookingService.Verify(_ => _.ProcessMonthRequest(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<Page>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -111,6 +99,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             Assert.Equal(form, formName);
             Assert.Equal(path, pathName);
+            _bookingService.Verify(_ => _.ProcessMonthRequest(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<Page>(), It.IsAny<string>()), Times.Once);
         }
     }
 }
