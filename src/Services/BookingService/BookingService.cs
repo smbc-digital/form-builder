@@ -116,8 +116,8 @@ namespace form_builder.Services.BookingService
             var bookingInformation = new BookingInformation
             {
                 Appointments = appointmentTimes,
-                CurrentSearchedMonth = nextAvailability.DayResponse.Date,
-                FirstAvailableMonth = nextAvailability.DayResponse.Date,
+                CurrentSearchedMonth = new DateTime(nextAvailability.DayResponse.Date.Year, nextAvailability.DayResponse.Date.Month, 1),
+                FirstAvailableMonth = new DateTime(nextAvailability.DayResponse.Date.Year, nextAvailability.DayResponse.Date.Month, 1),
                 IsFullDayAppointment = nextAvailability.DayResponse.IsFullDayAppointment
             };
 

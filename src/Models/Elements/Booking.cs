@@ -36,7 +36,7 @@ namespace form_builder.Models.Elements
         public DateTime NextSelectableMonth => new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).AddMonths(1);
         public DateTime PreviousSelectableMonth => new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).AddMonths(-1);
         public bool DisplayNextMonthArrow => NextSelectableMonth <= new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(Properties.SearchPeriod);
-        public bool DisplayPreviousMonthArrow => CurrentSelectedMonth > FirstAvailableMonth;
+        public bool DisplayPreviousMonthArrow => new DateTime(CurrentSelectedMonth.Date.Year, CurrentSelectedMonth.Date.Month, 1) > FirstAvailableMonth;
         public override string GetLabelText() => $"Booking{(Properties.Optional ? " (optional)" : string.Empty)}";
         public string FormName { get; set; }
         public string ReservedBookingId { get; set; }
