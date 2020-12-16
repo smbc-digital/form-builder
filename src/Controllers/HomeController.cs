@@ -164,7 +164,7 @@ namespace form_builder.Controllers
                 FormName = result.FormName,
                 StartPageUrl = result.StartPageUrl,
                 FeedbackPhase = result.FeedbackPhase,
-                FeedbackFormUrl = result.FeedbackFormUrl,
+                FeedbackForm = result.FeedbackFormUrl,
                 PageTitle = result.PageTitle,
                 BannerTitle = result.BannerTitle,
                 LeadingParagraph = result.LeadingParagraph,
