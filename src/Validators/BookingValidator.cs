@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models.Elements;
@@ -21,7 +22,6 @@ namespace form_builder.Validators
 
             var bookingElement = (Booking)element;
 
-            //Validate Date
             var containsBookingDate = viewModel.ContainsKey(bookingElement.DateQuestionId); 
 
             if(!containsBookingDate && element.Properties.Optional)
@@ -36,22 +36,21 @@ namespace form_builder.Validators
             {
                 return new ValidationResult
                 {
+                    Message = string.IsNullOrEmpty(bookingElement.Properties.CustomValidationMessage) ?  ValidationConstants.BOOKING_DATE_EMPTY : bookingElement.Properties.CustomValidationMessage,
                     IsValid = false
                 };
             }
 
-            var date = viewModel[bookingElement.TimeQuestionId];
+            var date = viewModel[bookingElement.DateQuestionId];
             var isValidDate = DateTime.TryParse(date, out DateTime dateValue);
 
             if(!isValidDate){
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = string.IsNullOrEmpty(bookingElement.Properties.CustomValidationMessage) ?  "You must select a date" : bookingElement.Properties.CustomValidationMessage
+                    Message = string.IsNullOrEmpty(bookingElement.Properties.CustomValidationMessage) ?  ValidationConstants.BOOKING_DATE_EMPTY : bookingElement.Properties.CustomValidationMessage
                 };
             }
-
-            //Validate Time
 
             return new ValidationResult
             {
