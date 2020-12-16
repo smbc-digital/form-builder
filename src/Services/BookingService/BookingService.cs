@@ -71,10 +71,7 @@ namespace form_builder.Services.BookingService
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
-        public async Task<BookingProcessEntity> Get(
-            string baseUrl,
-            Page currentPage,
-            string guid)
+        public async Task<BookingProcessEntity> Get(string baseUrl, Page currentPage, string guid)
         {
             var bookingElement = currentPage.Elements
                 .Where(_ => _.Type == EElementType.Booking)
@@ -249,6 +246,7 @@ namespace form_builder.Services.BookingService
             var reservedBookingId = bookingElement.ReservedIdQuestionId;
             var reservedBookingDate = bookingElement.ReservedDateQuestionId;
             var reservedBookingTime = bookingElement.ReservedTimeQuestionId;
+
             var currentlySelectedBookingDate = bookingElement.DateQuestionId;
             var currentlySelectedBookingTime = bookingElement.TimeQuestionId;
 

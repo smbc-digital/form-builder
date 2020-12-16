@@ -9,6 +9,7 @@
     @if (@Model.IsAppointmentTypeFullDay)
     {
         @Html.Hidden(@Model.GetCustomItemId(BookingConstants.APPOINTMENT_TIME), Model.AppointmentTime)
+        @Html.Hidden(@Model.GetCustomItemId(BookingConstants.APPOINTMENT_TIME_END), Model.AppointmentEndTime)
     }
 
     <partial name="LegendH1" />

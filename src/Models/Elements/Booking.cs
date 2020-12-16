@@ -16,10 +16,7 @@ namespace form_builder.Models.Elements
 {
     public class Booking : Element
     {
-        public Booking()
-        {
-            Type = EElementType.Booking;
-        }
+        public Booking() => Type = EElementType.Booking;
         public List<CalendarDay> Calendar { get; set; } = new List<CalendarDay>();
         public List<AvailabilityDayResponse> Appointments { get; set; } = new List<AvailabilityDayResponse>();
         public string FormattedDateForCheckYourBooking => DateTime.Parse(Properties.Value).ToFullDateFormat();
