@@ -1,4 +1,5 @@
 ﻿@using form_builder.Helpers
+@using form_builder.Constants;
 @model form_builder.Models.Elements.Element
 
 @using form_builder.Enum;
@@ -60,16 +61,9 @@
                 <span class="govuk-hint govuk-radios__hint" id="@Model.GetListItemHintId(i)">@Html.Raw(Model.Properties.Options[i].Hint)</span>
             }
 
-            //TODO -- Possibly redundant
-            @if (Model.Properties.Options[i].HasConditionalElement && Model.Properties.Options[i].ConditionalElement != null) {
-                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
-                    <partial model=Model.Properties.Options[i].ConditionalElement name="@Model.Properties.Options[i].ConditionalElement.Type" />
-                </div>
-            }
-
             @if (!string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElementId)) {
                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
-                    ID=@Model.Properties.Options[i].ConditionalElementId
+                    @SystemConstants.ConditionalElementQueryString@Model.Properties.Options[i].ConditionalElementId
                 </div>
             }
         }

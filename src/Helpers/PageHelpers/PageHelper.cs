@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using form_builder.Cache;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ElementHelpers;
@@ -81,7 +82,7 @@ namespace form_builder.Helpers.PageHelpers
                     results
                     );
                 if (element.Properties.isConditionalElement) {
-                    formModel.RawHTML = formModel.RawHTML.Replace($"ID={element.Properties.QuestionId}", html);
+                    formModel.RawHTML = formModel.RawHTML.Replace(SystemConstants.ConditionalElementQueryString + element.Properties.QuestionId, html);
                 } else {
                     formModel.RawHTML += html;
                 }

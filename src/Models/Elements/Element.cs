@@ -117,9 +117,5 @@ namespace form_builder.Models.Elements
         private bool DisplayOptional => Properties.Optional;
 
         public virtual string GetLabelText() => $"{Properties.Label}{(Properties.Optional ? " (optional)" : string.Empty)}";
-
-        public virtual void SetUpElementValue(IElementHelper elementHelper, Dictionary<string, dynamic> viewModel, FormAnswers formAnswers) =>
-            Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
-
     }
 }
