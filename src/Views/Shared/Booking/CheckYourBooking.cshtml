@@ -5,6 +5,7 @@
 @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_DATE), Model.ReservedBookingDate)
 @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_TIME), Model.ReservedBookingTime)
 @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_ID), Model.ReservedBookingId)
+@Html.Hidden(@Model.GetCustomItemId(BookingConstants.APPOINTMENT_TIME_END), Model.AppointmentEndTime)
 
 <h1 class="govuk-heading-l">Check your booking</h1>
 <table class="govuk-table">

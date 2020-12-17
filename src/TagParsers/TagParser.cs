@@ -10,10 +10,7 @@ namespace form_builder.TagParser
     public class TagParser
     {
         private readonly IEnumerable<IFormatter> _formatters;
-        public TagParser(IEnumerable<IFormatter> formatters)
-        {
-            _formatters = formatters;
-        }
+        public TagParser(IEnumerable<IFormatter> formatters) => _formatters = formatters;
 
         public string Parse(string value, Dictionary<string, object> answersDictionary, Regex regex)
         {
