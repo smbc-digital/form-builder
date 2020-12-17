@@ -1434,6 +1434,38 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
+        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementIsPlacedOnAnotherPageInJson() {
+            // Arrange
+            var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
+            var element1 = new ElementBuilder()
+                .WithType(EElementType.Radio)
+                .WithQuestionId("radio")
+                .WithLabel("First name")
+                .WithOptions(new List<Option> { option1 })
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("conditionalQuestion1")
+                .WithLabel("First name")
+                .WithConditionalElement(true)
+                .Build();
+
+            var page1 = new PageBuilder()
+                .WithElement(element1)
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithElement(element2)
+                .Build();
+
+            var pages = new List<Page> { page1, page2 };
+
+            // Act & Assert
+            Assert.Throws<ApplicationException>(() => _pageHelper.CheckConditionalElementsAreValid(pages, "form"));
+        }
+
+        [Fact]
         public void CheckForDocumentDownload_ShouldThrowApplicationException_WhenFormSchemaContains_NoDocumentTypes_WhenDocumentDownload_True()
         {
             // Arrange

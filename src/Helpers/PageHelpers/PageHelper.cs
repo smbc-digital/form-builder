@@ -82,7 +82,7 @@ namespace form_builder.Helpers.PageHelpers
                     results
                     );
                 if (element.Properties.isConditionalElement) {
-                    formModel.RawHTML = formModel.RawHTML.Replace(SystemConstants.ConditionalElementQueryString + element.Properties.QuestionId, html);
+                    formModel.RawHTML = formModel.RawHTML.Replace(SystemConstants.ConditionalElementReplacementString + element.Properties.QuestionId, html);
                 } else {
                     formModel.RawHTML += html;
                 }
@@ -310,23 +310,32 @@ namespace form_builder.Helpers.PageHelpers
                 .Where(_ => _.Properties.Options.Any(_ => _.HasConditionalElement))
                 .ToList();
 
-            var conditionalElementIds = pages.Where(_ => _.Elements != null)
+            var conditionalElements = pages.Where(_ => _.Elements != null)
                 .SelectMany(_ => _.ValidatableElements)
                 .Where(_ => _.Properties.isConditionalElement)
-                .Select(_ => _.Properties.QuestionId)
                 .ToList();
 
             foreach (var radio in radioWithConditionals) {
-                foreach(var option in radio.Properties.Options) {
-                    if ((option.HasConditionalElement && !string.IsNullOrEmpty(option.ConditionalElementId)) && (!conditionalElementIds.Contains(option.ConditionalElementId)))
+                foreach (var option in radio.Properties.Options) {                    
+                    if (
+                        option.HasConditionalElement &&
+                        !string.IsNullOrEmpty(option.ConditionalElementId) &&
+                        !conditionalElements.Any(_ => _.Properties.QuestionId == option.ConditionalElementId))
                         throw new ApplicationException($"The provided json '{formName}' does not contain a conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}'");
+
+                    else if (
+                        option.HasConditionalElement && 
+                        !string.IsNullOrEmpty(option.ConditionalElementId) && 
+                        !pages.Any(page => page.ValidatableElements.Contains(radio) && page.ValidatableElements.Any(_ => _.Properties.QuestionId == option.ConditionalElementId && _.Properties.isConditionalElement)))
+                        throw new ApplicationException($"The provided json '{formName}' contains the conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}' on a different page to the radio element");
+
                     else
-                        conditionalElementIds.Remove(option.ConditionalElementId);
+                        conditionalElements.Remove(conditionalElements.FirstOrDefault(_ => _.Properties.QuestionId == option.ConditionalElementId));
                 }
             }
 
-            if (conditionalElementIds.Count > 0) 
-                throw new ApplicationException($"The provided json '{formName}' has conditional elements '{String.Join(", ", conditionalElementIds)}' not assigned to radio options");
+            if (conditionalElements.Count > 0) 
+                throw new ApplicationException($"The provided json '{formName}' has conditional elements '{String.Join(", ", conditionalElements.Select(_ => _.Properties.QuestionId))}' not assigned to radio options");
     
         }
 

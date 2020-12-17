@@ -14,6 +14,6 @@ namespace form_builder.Constants
 
         public static readonly string CaseReferenceQueryString = "?caseReference=";
 
-        public static readonly string ConditionalElementQueryString = "?conditionalElement=";
+        public static readonly string ConditionalElementReplacementString = "ElementId=";
     }
 }
