@@ -13,7 +13,7 @@ namespace form_builder.TagParser
 
         public Page Parse(Page page, FormAnswers formAnswers)
         {
-            var answersDictionary = formAnswers.Pages?.SelectMany(_ => _.Answers).ToDictionary(x => x.QuestionId, x => x.Response);
+            var answersDictionary = formAnswers.Pages?.SelectMany(x => x.Answers).ToDictionary(x => x.QuestionId, x => x.Response);
 
             page.Elements.Select((element) =>
             {

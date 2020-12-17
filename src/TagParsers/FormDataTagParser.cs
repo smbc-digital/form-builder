@@ -7,9 +7,7 @@ namespace form_builder.TagParser
 {
     public class FormDataTagParser : TagParser, ITagParser
     {
-        public FormDataTagParser(IEnumerable<IFormatter> formatters) : base(formatters)
-        {
-        }
+        public FormDataTagParser(IEnumerable<IFormatter> formatters) : base(formatters) { }
 
         public Regex Regex => new Regex("(?<={{)FORMDATA:.*?(?=}})", RegexOptions.Compiled);
 
