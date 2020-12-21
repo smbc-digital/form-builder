@@ -26,6 +26,7 @@
         DocumentUpload,
         FileUpload,
         InlineAlert,
+        Link,
         Map,
         MultipleFileUpload,
         Numeric,

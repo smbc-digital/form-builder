@@ -9,7 +9,7 @@ namespace form_builder.ViewModels
 
         public string FeedbackPhase { get; set; }
 
-        public string FeedbackFormUrl { get; set; }
+        public string FeedbackForm { get; set; }
 
         public FormAnswers FormAnswers {get; set;}
         public string Reference { get; set; }
