@@ -8,8 +8,9 @@
     ViewData["Breadcrumbs"] = Model.BreadCrumbs;
 }
 
-@using (Html.BeginForm("Index", "Home", FormMethod.Post, new { autocomplete = "on", novalidate = "novalidate", enctype = "multipart/form-data" }))
+@using (Html.BeginForm("Index", "Home", new {}, FormMethod.Post, false, new { autocomplete = "on", novalidate = "novalidate", enctype = "multipart/form-data" }) )
 {
+    @Html.AntiForgeryToken()
     @Html.Raw(Model.RawHTML)
     @Html.HiddenFor(_ => _.Path)
 }
