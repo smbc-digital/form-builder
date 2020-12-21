@@ -85,7 +85,7 @@ namespace form_builder.Models.Elements
                     return viewRender.RenderAsync("CheckYourBooking", this);
                 default:
                     CreateCalendar();
-                    MonthSelectionPostUrl = formSchema.BaseURL.ToBookingRequestedMonthUrl(page.PageSlug);
+                    MonthSelectionPostUrl = formSchema.BaseURL.ToBookingRequestedMonthUrl(page.PageSlug, environment.EnvironmentName.Equals("local"));
                     return viewRender.RenderAsync(Type.ToString(), this);
             }
         }
