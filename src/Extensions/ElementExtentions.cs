@@ -15,7 +15,7 @@ namespace form_builder.Extensions {
             if (!radioElements.Any())
                 return listOfElemets;
 
-            foreach (Element element in elements) {
+            foreach (Element element in radioElements) {
                 foreach (Option option in element.Properties.Options) {
                     KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key == element.Properties.QuestionId && value.Value == option.Value);
                     if (option.ConditionalElementId != null && optionValue.Key == null) {
