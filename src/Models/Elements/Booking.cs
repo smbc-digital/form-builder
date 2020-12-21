@@ -38,13 +38,17 @@ namespace form_builder.Models.Elements
         public string FormName { get; set; }
         public string ReservedBookingId { get; set; }
         public string ReservedBookingDate { get; set; }
-        public string ReservedBookingTime { get; set; }
-        public string AppointmentTime { get; set; }
+        public string ReservedBookingStartTime { get; set; }
+        public string ReservedBookingEndTime { get; set; }
+        public string StartAppointmentTime { get; set; }
+        public string EndAppointmentTime { get; set; }
         public string MonthSelectionPostUrl { get; set; }
         public string DateQuestionId => $"{Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}";
-        public string TimeQuestionId => $"{Properties.QuestionId}-{BookingConstants.APPOINTMENT_TIME}";
+        public string StartTimeQuestionId => $"{Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}";
+        public string EndTimeQuestionId => $"{Properties.QuestionId}-{BookingConstants.APPOINTMENT_END_TIME}";
         public string ReservedDateQuestionId => $"{Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}";
-        public string ReservedTimeQuestionId => $"{Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_TIME}";
+        public string ReservedStartTimeQuestionId => $"{Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}";
+        public string ReservedEndTimeQuestionId => $"{Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}";
         public string ReservedIdQuestionId => $"{Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}";
 
         public override Task<string> RenderAsync(IViewRender viewRender,
@@ -64,8 +68,10 @@ namespace form_builder.Models.Elements
             Properties.Value = elementHelper.CurrentValue(DateQuestionId, viewModel, formAnswers);
             ReservedBookingId = elementHelper.CurrentValue(ReservedIdQuestionId, viewModel, formAnswers);
             ReservedBookingDate = elementHelper.CurrentValue(ReservedDateQuestionId, viewModel, formAnswers);
-            ReservedBookingTime = IsAppointmentTypeFullDay ? AppointmentStartTime.ToString() : elementHelper.CurrentValue(ReservedTimeQuestionId, viewModel, formAnswers);
-            AppointmentTime = IsAppointmentTypeFullDay ? AppointmentStartTime.ToString() : elementHelper.CurrentValue(TimeQuestionId, viewModel, formAnswers);                      
+            ReservedBookingStartTime = IsAppointmentTypeFullDay ? AppointmentStartTime.ToString() : elementHelper.CurrentValue(ReservedStartTimeQuestionId, viewModel, formAnswers);
+            ReservedBookingEndTime = IsAppointmentTypeFullDay ? AppointmentEndTime.ToString() : elementHelper.CurrentValue(ReservedEndTimeQuestionId, viewModel, formAnswers);
+            StartAppointmentTime = IsAppointmentTypeFullDay ? AppointmentStartTime.ToString() : elementHelper.CurrentValue(StartTimeQuestionId, viewModel, formAnswers);                      
+            EndAppointmentTime = IsAppointmentTypeFullDay ? AppointmentEndTime.ToString() : elementHelper.CurrentValue(EndTimeQuestionId, viewModel, formAnswers);                      
 
             switch (subPath as string)
             {

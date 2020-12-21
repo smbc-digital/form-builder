@@ -78,7 +78,7 @@ namespace form_builder.Services.MappingService
         private DateTime GetStartDateTime(string questionID, Dictionary<string, dynamic> viewModel, string form)
         {
             var bookingDateKey = $"{questionID}-{BookingConstants.APPOINTMENT_DATE}";
-            var appointmentTimeKey = $"{questionID}-{BookingConstants.APPOINTMENT_TIME}";
+            var appointmentTimeKey = $"{questionID}-{BookingConstants.APPOINTMENT_START_TIME}";
 
             if (!viewModel.ContainsKey(bookingDateKey))
                 throw new ApplicationException($"MappingService::GetStartDateTime, Booking request viewmodel for form {form} does not contain required booking start date");

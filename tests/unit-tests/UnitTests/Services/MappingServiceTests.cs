@@ -579,7 +579,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var viewModel = new Dictionary<string, object> { 
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", startDate.ToString() },
-                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_TIME}", startTime.ToString() }
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", startTime.ToString() }
             };
 
             // Act
@@ -624,7 +624,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             var viewModel = new Dictionary<string, object> { 
-                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_TIME}", startTime.ToString() }
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", startTime.ToString() }
             };
 
             // Act
@@ -703,7 +703,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var viewModel = new Dictionary<string, object> { 
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", startDate.ToString() },
-                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_TIME}", startTime.ToString() }
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", startTime.ToString() }
             };
 
              // Act

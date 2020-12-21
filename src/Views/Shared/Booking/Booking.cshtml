@@ -4,12 +4,13 @@
     @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
 
     @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_DATE), Model.ReservedBookingDate)
-    @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_TIME), Model.ReservedBookingTime)
+    @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_START_TIME), Model.ReservedBookingStartTime)
+    @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_END_TIME), Model.ReservedBookingEndTime)
     @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_ID), Model.ReservedBookingId)
     @if (@Model.IsAppointmentTypeFullDay)
     {
-        @Html.Hidden(@Model.GetCustomItemId(BookingConstants.APPOINTMENT_TIME), Model.AppointmentTime)
-        @Html.Hidden(@Model.GetCustomItemId(BookingConstants.APPOINTMENT_TIME_END), Model.AppointmentEndTime)
+        @Html.Hidden(@Model.GetCustomItemId(BookingConstants.APPOINTMENT_START_TIME), Model.AppointmentStartTime)
+        @Html.Hidden(@Model.GetCustomItemId(BookingConstants.APPOINTMENT_END_TIME), Model.AppointmentEndTime)
     }
 
     <partial name="LegendH1" />

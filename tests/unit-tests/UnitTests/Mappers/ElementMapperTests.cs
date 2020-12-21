@@ -563,7 +563,7 @@ namespace form_builder_tests.UnitTests.Mappers
                     new PageAnswers {
                         Answers = new List<Answers> {
                             new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = dateTime.ToString() }, 
-                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_TIME}", Response = dateTime.ToString() } 
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = dateTime.ToString() } 
                         }
                     }
                 }
@@ -1203,7 +1203,7 @@ namespace form_builder_tests.UnitTests.Mappers
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> 
                 { 
                     new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = date.ToString() }, 
-                    new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_TIME}", Response = startTime.ToString() } 
+                    new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = startTime.ToString() } 
                 }
             }
             }};

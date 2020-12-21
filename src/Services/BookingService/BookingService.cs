@@ -99,9 +99,7 @@ namespace form_builder.Services.BookingService
             var nextAvailability = await RetrieveNextAvailability(bookingElement, bookingProvider);
 
             if(nextAvailability.BookingHasNoAvailableAppointments)
-            {
                 return new BookingProcessEntity { BookingHasNoAvailableAppointments = true };
-            }
 
             appointmentTimes = await bookingProvider.GetAvailability(new AvailabilityRequest
             {
@@ -245,31 +243,37 @@ namespace form_builder.Services.BookingService
         {
             var reservedBookingId = bookingElement.ReservedIdQuestionId;
             var reservedBookingDate = bookingElement.ReservedDateQuestionId;
-            var reservedBookingTime = bookingElement.ReservedTimeQuestionId;
+            var reservedBookingStartTime = bookingElement.ReservedStartTimeQuestionId;
+            var reservedBookingEndTime = bookingElement.ReservedEndTimeQuestionId;
 
             var currentlySelectedBookingDate = bookingElement.DateQuestionId;
-            var currentlySelectedBookingTime = bookingElement.TimeQuestionId;
+            var currentlySelectedBookingStartTime = bookingElement.StartTimeQuestionId;
+            var currentlySelectedBookingEndTime = bookingElement.EndTimeQuestionId;
 
             if (viewModel.ContainsKey(reservedBookingId) && !string.IsNullOrEmpty((string)viewModel[reservedBookingId]))
             {
                 var currentSelectedDate = (string)viewModel[currentlySelectedBookingDate];
-                var currentSelectedTime = (string)viewModel[currentlySelectedBookingTime];
+                var currentSelectedStartTime = (string)viewModel[currentlySelectedBookingStartTime];
+                var currentSelectedEndTime = (string)viewModel[currentlySelectedBookingEndTime];
                 var previouslyReservedAppointmentDate = (string)viewModel[reservedBookingDate];
-                var previouslyReservedAppointmentTime = (string)viewModel[reservedBookingTime];
+                var previouslyReservedAppointmentStartTime = (string)viewModel[reservedBookingStartTime];
+                var previouslyReservedAppointmentEndTime = (string)viewModel[reservedBookingEndTime];
 
-                if (currentSelectedDate.Equals(previouslyReservedAppointmentDate) && currentSelectedTime.Equals(previouslyReservedAppointmentTime))
+                if (currentSelectedDate.Equals(previouslyReservedAppointmentDate) && currentSelectedStartTime.Equals(previouslyReservedAppointmentStartTime) && currentSelectedEndTime.Equals(previouslyReservedAppointmentEndTime))
                     return Guid.Parse(viewModel[reservedBookingId]);
             }
 
             viewModel.Remove(reservedBookingId);
             viewModel.Remove(reservedBookingDate);
-            viewModel.Remove(reservedBookingTime);
+            viewModel.Remove(reservedBookingStartTime);
+            viewModel.Remove(reservedBookingEndTime);
 
             var bookingRequest = await _mappingService.MapBookingRequest(guid, bookingElement, viewModel, form);
             var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider).Reserve(bookingRequest);
 
             viewModel.Add(reservedBookingDate, viewModel[currentlySelectedBookingDate]);
-            viewModel.Add(reservedBookingTime, viewModel[currentlySelectedBookingTime]);
+            viewModel.Add(reservedBookingStartTime, viewModel[currentlySelectedBookingStartTime]);
+            viewModel.Add(reservedBookingEndTime, viewModel[currentlySelectedBookingEndTime]);
             viewModel.Add(reservedBookingId, result);
 
             return result;
