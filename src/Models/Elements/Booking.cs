@@ -65,7 +65,12 @@ namespace form_builder.Models.Elements
 
             ConfigureBookingInformation(results);
             FormName = formSchema.FormName;
+            
             Properties.Value = elementHelper.CurrentValue(DateQuestionId, viewModel, formAnswers);
+
+            if(string.IsNullOrEmpty(Properties.Value) && !DisplayPreviousMonthArrow)
+                Properties.Value = Appointments.OrderBy(_ => _.Date).FirstOrDefault()?.Date.ToString();
+
             ReservedBookingId = elementHelper.CurrentValue(ReservedIdQuestionId, viewModel, formAnswers);
             ReservedBookingDate = elementHelper.CurrentValue(ReservedDateQuestionId, viewModel, formAnswers);
             ReservedBookingStartTime = IsAppointmentTypeFullDay ? AppointmentStartTime.ToString() : elementHelper.CurrentValue(ReservedStartTimeQuestionId, viewModel, formAnswers);

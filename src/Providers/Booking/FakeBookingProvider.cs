@@ -80,6 +80,14 @@ namespace form_builder.Providers.Booking
                         .WithDay(new DateTime(2021, request.StartDate.Month, 22), 1)
                         .Build();
                     break;
+                case 2:
+                    response = new AvailabilityDayResponseBuilder()
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 4), 1)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 5), 1)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 6), 1)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 7), 1)
+                        .Build();
+                    break;
                 default:
                     break;
             }

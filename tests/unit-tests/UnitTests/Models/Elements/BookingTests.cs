@@ -11,7 +11,6 @@ using form_builder.Models.Booking;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Moq;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using Xunit;
@@ -290,5 +289,129 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.True(bookignElement.IsAppointmentTypeFullDay);
         }
 
+        
+        [Fact]
+        public async Task RenderAsync_Should_SelectFirstAvailableDay_WhenOnFirstAvailableMonth_AndNoDateCurrentlySelected()
+        {
+            //Arrange
+            var date = DateTime.Now;
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(Guid.NewGuid())
+                .WithCheckYourBooking(true)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            var bookignInfo = new List<object>
+            {
+                new BookingInformation{
+                    Appointments = new List<AvailabilityDayResponse>
+                    {
+                        new AvailabilityDayResponse 
+                        {
+                            AppointmentTimes = new List<AppointmentTime> 
+                            {
+                                new AppointmentTime 
+                                {
+                                    StartTime = new TimeSpan(5, 0, 0),
+                                    EndTime= new TimeSpan(17, 0, 0),
+                                }
+                            },
+                            Date = date
+                        }
+                    }
+                }
+            };
+            var formAnswers = new FormAnswers();
+            //Act
+            var result = await element.RenderAsync(
+                _mockIViewRender.Object,
+                _mockElementHelper.Object,
+                string.Empty,
+                viewModel,
+                page,
+                schema,
+                _mockHostingEnv.Object,
+                formAnswers, 
+                bookignInfo);
+
+            //Assert
+            var bookignElement = Assert.IsType<Booking>(element);
+            Assert.NotNull(bookignElement.Properties.Value);
+            Assert.Equal(date.ToString(), bookignElement.Properties.Value);
+        }
+
+        [Fact]
+        public async Task RenderAsync_Should_Not_SelectFirstAvailableDay_WhenValue_IsNull_AndNotOn_FirstAvailableMonth()
+        {
+            //Arrange
+            var date = DateTime.Now;
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(Guid.NewGuid())
+                .WithCheckYourBooking(true)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            var bookignInfo = new List<object>
+            {
+                new BookingInformation{
+                    Appointments = new List<AvailabilityDayResponse>
+                    {
+                        new AvailabilityDayResponse
+                        {
+                            AppointmentTimes = new List<AppointmentTime>
+                            {
+                                new AppointmentTime
+                                {
+                                    StartTime = new TimeSpan(5, 0, 0),
+                                    EndTime= new TimeSpan(17, 0, 0),
+                                }
+                            },
+                            Date = date
+                        }
+                    },
+                    CurrentSearchedMonth = DateTime.Now.AddMonths(1)
+                }
+            };
+            var formAnswers = new FormAnswers();
+            //Act
+            var result = await element.RenderAsync(
+                _mockIViewRender.Object,
+                _mockElementHelper.Object,
+                string.Empty,
+                viewModel,
+                page,
+                schema,
+                _mockHostingEnv.Object,
+                formAnswers,
+                bookignInfo);
+
+            //Assert
+            var bookignElement = Assert.IsType<Booking>(element);
+            Assert.Null(bookignElement.Properties.Value);
+        }
     }
 }
