@@ -8,10 +8,12 @@ using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
+using form_builder.Utils.Extesions;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
 using Organisation = StockportGovUK.NetStandard.Models.Verint.Organisation;
+using Booking = StockportGovUK.NetStandard.Models.Booking.Booking;
 
 namespace form_builder.Mappers
 {
@@ -68,7 +70,8 @@ namespace form_builder.Mappers
                 case EElementType.FileUpload:
                 case EElementType.MultipleFileUpload:
                     return GetFileUploadElementValue(key, formAnswers);
-
+                case EElementType.Booking:
+                    return GetBookingElementValue(key, formAnswers);
                 default:
                     if (element.Properties.Numeric)
                         return GetNumericElementValue(key, formAnswers);
@@ -153,6 +156,9 @@ namespace form_builder.Mappers
                         return addressValue.SelectedAddress;
                     var manualLine2Text = string.IsNullOrWhiteSpace(addressValue.AddressLine2) ? string.Empty : $",{addressValue.AddressLine2}";
                     return string.IsNullOrWhiteSpace(addressValue.AddressLine1) ? string.Empty : $"{addressValue.AddressLine1}{manualLine2Text},{addressValue.Town},{addressValue.Postcode}";
+                case EElementType.Booking:
+                    var bookingValue = (Booking)value;
+                    return  bookingValue.Date.Equals(DateTime.MinValue) && bookingValue.StartTime.Equals(DateTime.MinValue) ? string.Empty : $"{bookingValue.Date.ToFullDateFormat()} at {bookingValue.StartTime.ToTimeFormat()}";
 
                 case EElementType.Street:
                     var streetValue = (Address)value;
@@ -200,6 +206,36 @@ namespace form_builder.Mappers
             return null;
         }
 
+
+        private Booking? GetBookingElementValue(string key, FormAnswers formAnswers)
+        {
+            var bookingObject = new Booking();
+
+            var appointmentId = $"{key}-{BookingConstants.RESERVED_BOOKING_ID}";
+            var appointmentDate = $"{key}-{BookingConstants.RESERVED_BOOKING_DATE}";
+            var appointmentStartTime = $"{key}-{BookingConstants.RESERVED_BOOKING_START_TIME}";
+            var appointmentEndTime = $"{key}-{BookingConstants.RESERVED_BOOKING_END_TIME}";
+
+            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+                .Where(_ => _.QuestionId.Equals(appointmentId) || _.QuestionId.Equals(appointmentDate) ||
+                            _.QuestionId.Equals(appointmentStartTime) || _.QuestionId.Equals(appointmentEndTime))
+                .ToList();
+
+            if(!value.Any())
+                return null;
+
+            var bookingId = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentId))?.Response;
+            var bookingDate = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentDate))?.Response;
+            var bookingStartTime = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentStartTime))?.Response;
+            var bookingEndTime = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentEndTime))?.Response;
+            bookingObject.Id = bookingId != null ? Guid.Parse(bookingId) : Guid.Empty;
+            bookingObject.Date = bookingDate != null ? DateTime.Parse(bookingDate) : DateTime.MinValue;
+            bookingObject.StartTime = bookingStartTime != null ? DateTime.Parse(bookingStartTime) : DateTime.MinValue;
+            bookingObject.EndTime = bookingEndTime != null ? DateTime.Parse(bookingEndTime) : DateTime.MinValue;
+
+            return bookingObject.IsEmpty() ? null : bookingObject;
+        }
+
         private Address GetAddressElementValue(string key, FormAnswers formAnswers)
         {
             var addressObject = new Address();
@@ -245,7 +281,6 @@ namespace form_builder.Mappers
         }
         private DateTime? GetDateInputElementValue(string key, FormAnswers formAnswers)
         {
-            dynamic dateObject = new ExpandoObject();
             var dateDayKey = $"{key}-day";
             var dateMonthKey = $"{key}-month";
             var dateYearKey = $"{key}-year";

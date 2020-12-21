@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
@@ -13,6 +15,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
 
 namespace form_builder.Services.MappingService
@@ -20,6 +23,7 @@ namespace form_builder.Services.MappingService
     public interface IMappingService
     {
         Task<MappingEntity> Map(string sessionGuid, string form);
+        Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form);
     }
 
     public class MappingService : IMappingService
@@ -30,7 +34,7 @@ namespace form_builder.Services.MappingService
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
         public MappingService(IDistributedCacheWrapper distributedCache,
-            IElementMapper elementMapper, 
+            IElementMapper elementMapper,
             ISchemaFactory schemaFactory,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
@@ -56,6 +60,52 @@ namespace form_builder.Services.MappingService
             };
         }
 
+        public async Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form)
+        {
+            var baseForm = await _schemaFactory.Build(form);
+            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
+            convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
+            convertedAnswers.FormName = form;
+
+            return new BookingRequest
+            {
+                AppointmentId = bookingElement.Properties.AppointmentType,
+                Customer = GetCustomerDetails(convertedAnswers, baseForm),
+                StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form)
+            };
+        }
+
+        private DateTime GetStartDateTime(string questionID, Dictionary<string, dynamic> viewModel, string form)
+        {
+            var bookingDateKey = $"{questionID}-{BookingConstants.APPOINTMENT_DATE}";
+            var appointmentTimeKey = $"{questionID}-{BookingConstants.APPOINTMENT_START_TIME}";
+
+            if (!viewModel.ContainsKey(bookingDateKey))
+                throw new ApplicationException($"MappingService::GetStartDateTime, Booking request viewmodel for form {form} does not contain required booking start date");
+
+            if (!viewModel.ContainsKey(appointmentTimeKey))
+                throw new ApplicationException($"MappingService::GetStartDateTime, Booking request viewmodel for form {form} does not contain required booking start time");
+
+            DateTime startDateTime = DateTime.Parse(viewModel[bookingDateKey]);
+            DateTime time = DateTime.Parse(viewModel[appointmentTimeKey]);
+
+            return new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day, time.Hour, time.Minute, time.Second);
+        }
+
+        private Customer GetCustomerDetails(FormAnswers formAnswers, FormSchema formSchema)
+        {
+            var data = new ExpandoObject() as IDictionary<string, dynamic>;
+            formSchema.Pages.SelectMany(_ => _.ValidatableElements)
+                .Where(x => !string.IsNullOrEmpty(x.Properties.TargetMapping) && x.Properties.TargetMapping.ToLower().StartsWith("customer."))
+                .ToList()
+                .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
+
+            if(!data.ContainsKey("customer"))
+                throw new ApplicationException($"MappingService::GetCustomerDetails, Booking request form data for form {formSchema.BaseURL} does not contain required customer object");
+
+            return JsonConvert.DeserializeObject<Customer>(JsonConvert.SerializeObject(data["customer"]));
+        }
+
         private object CreatePostData(FormAnswers formAnswers, FormSchema formSchema)
         {
             var data = new ExpandoObject() as IDictionary<string, dynamic>;
@@ -64,7 +114,7 @@ namespace form_builder.Services.MappingService
                 .ToList()
                 .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
 
-            if(formAnswers.AdditionalFormData.Any())
+            if (formAnswers.AdditionalFormData.Any())
                 data = AddNonQuestionAnswers(data, formAnswers.AdditionalFormData);
 
             return data;
@@ -88,7 +138,7 @@ namespace form_builder.Services.MappingService
                     return obj;
                 }
 
-                if(answerValue != null)
+                if (answerValue != null)
                     obj.Add(splitTargets[0], answerValue);
 
                 return obj;
@@ -113,18 +163,18 @@ namespace form_builder.Services.MappingService
 
             if (obj.TryGetValue(target, out objectValue))
             {
-                var files = (List<File>) objectValue;
+                var files = (List<File>)objectValue;
                 if (value != null)
                 {
                     obj.Remove(target);
-                    files.AddRange((List<File>) value);
+                    files.AddRange((List<File>)value);
                     obj.Add(target, files);
                 }
 
                 return obj;
             }
             else
-            {            
+            {
                 if (value != null)
                 {
                     obj.Add(target, (List<File>)value);

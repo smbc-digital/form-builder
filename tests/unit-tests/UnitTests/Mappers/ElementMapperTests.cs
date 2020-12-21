@@ -6,9 +6,11 @@ using form_builder.Enum;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
+using form_builder.Utils.Extesions;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
+using StockportGovUK.NetStandard.Models.Booking;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Xunit;
 
@@ -541,6 +543,68 @@ namespace form_builder_tests.UnitTests.Mappers
             Assert.Equal("im a street", type.SelectedAddress);
         }
 
+
+        [Fact]
+        public void GetAnswerValue_ShouldReturnBookingModel_WhenElementIsBooking()
+        {
+            // Arrange
+            var questionId = "testbookingId";
+            var dateTime = DateTime.Now;
+            var startTime = DateTime.Today.Add(new TimeSpan(22, 0, 0));
+            var element = new ElementBuilder()
+                  .WithQuestionId(questionId)
+                  .WithType(EElementType.Booking)
+                  .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = dateTime.ToString() }, 
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = dateTime.ToString() } 
+                        }
+                    }
+                }
+            };
+
+            // Act
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+
+            // Assert
+            var dateTimeResult = Assert.IsType<Booking>(result);
+        }
+        
+        
+        [Fact]
+        public void GetAnswerValue_ShouldReturnNull_WhenElementIsBooking_AndValueNotFound()
+        {
+            // Arrange
+            var dateTime = DateTime.Now.ToString();
+            var element = new ElementBuilder()
+                  .WithQuestionId("testbookingId")
+                  .WithType(EElementType.Booking)
+                  .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers>()
+                    }
+                }
+            };
+
+            // Act
+            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+
+            // Assert
+            Assert.Null(result);
+        }
+        
+
         [Fact]
         public void GetAnswerValue_ShouldReturnOrganisation_WhenElementIsOrganisation()
         {
@@ -676,9 +740,9 @@ namespace form_builder_tests.UnitTests.Mappers
                             {
                                 QuestionId = "fileUpload_fileUploadTestKey-fileupload",
                                 Response = JsonConvert.SerializeObject(new List<FileUploadModel>
-                                { 
-                                    new FileUploadModel{  UntrustedOriginalFileName ="file1.txt",  TrustedOriginalFileName = "file1.txt", Key = "datakeyfile1" }, 
-                                    new FileUploadModel{  UntrustedOriginalFileName ="file2.txt", TrustedOriginalFileName = "file2.txt", Key = "datakeyfile2"  } 
+                                {
+                                    new FileUploadModel{  UntrustedOriginalFileName ="file1.txt",  TrustedOriginalFileName = "file1.txt", Key = "datakeyfile1" },
+                                    new FileUploadModel{  UntrustedOriginalFileName ="file2.txt", TrustedOriginalFileName = "file2.txt", Key = "datakeyfile2"  }
                                 })
                             }
                         }
@@ -823,6 +887,7 @@ namespace form_builder_tests.UnitTests.Mappers
             Assert.Equal("3", resultData.Hours.ToString());
             Assert.Equal(elementMinutes, resultData.Minutes.ToString());
         }
+        
 
         [Fact]
         public void Map_ShouldReturnExpandoObject_WhenFormContains_MultipleValidatableElementsWithTargetMapping_WithValues()
@@ -1040,7 +1105,7 @@ namespace form_builder_tests.UnitTests.Mappers
             // Arrange
             var questionId = "test-questionID";
             var labelText = "Evidence file";
-            var value = new List<FileUploadModel>{new FileUploadModel { TrustedOriginalFileName = "your_upload_file.txt" }};
+            var value = new List<FileUploadModel> { new FileUploadModel { TrustedOriginalFileName = "your_upload_file.txt" } };
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-fileupload", Response = Newtonsoft.Json.JsonConvert.SerializeObject(value) } } } } };
 
             var element = new ElementBuilder()
@@ -1062,7 +1127,7 @@ namespace form_builder_tests.UnitTests.Mappers
             // Arrange
             var questionId = "test-questionID";
             var labelText = "Evidence file";
-            var value = new List<FileUploadModel>{new FileUploadModel { TrustedOriginalFileName = "your_upload_file.txt" }, new FileUploadModel { TrustedOriginalFileName = "filetwo.jpg" }};
+            var value = new List<FileUploadModel> { new FileUploadModel { TrustedOriginalFileName = "your_upload_file.txt" }, new FileUploadModel { TrustedOriginalFileName = "filetwo.jpg" } };
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-fileupload", Response = Newtonsoft.Json.JsonConvert.SerializeObject(value) } } } } };
 
             var element = new ElementBuilder()
@@ -1126,5 +1191,54 @@ namespace form_builder_tests.UnitTests.Mappers
             // Assert
             Assert.Equal($"{hour}:{min} {amPm}", result);
         }
+
+        [Fact]
+        public void GetAnswerStringValue_ShouldGenerateCorrectValue_ForBooking()
+        {
+            // Arrange
+            var questionId = "test-bookingID";
+            var time = new TimeSpan(4, 30, 0);
+            var date = DateTime.Now;
+            var startTime = DateTime.Today.Add(time);
+            var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> 
+                { 
+                    new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = date.ToString() }, 
+                    new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = startTime.ToString() } 
+                }
+            }
+            }};
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId(questionId)
+                .Build();
+
+            // Act
+            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+
+            // Assert
+            Assert.Equal($"{date.ToFullDateFormat()} at 4:30am", result);
+        }
+
+        [Fact]
+        public void GetAnswerStringValue_ShouldGenerateCorrectValue_ForBooking_WhenDateTime_IsMinValue()
+        {
+            // Arrange
+            var questionId = "test-bookingID";
+            var date = DateTime.MinValue;
+            var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = date.ToString() } } } } };
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId(questionId)
+                .Build();
+
+            // Act
+            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+
+            // Assert
+            Assert.Equal(string.Empty, result);
+        }
+
     }
 }

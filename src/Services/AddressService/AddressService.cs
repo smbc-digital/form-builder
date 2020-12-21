@@ -221,7 +221,7 @@ namespace form_builder.Services.AddressService
                 }
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-                _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", addressResults, guid);
+                _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", addressResults, guid, baseForm.BaseURL);
             }
 
             if (!addressResults.Any() && !addressElement.Properties.DisableManualAddress)

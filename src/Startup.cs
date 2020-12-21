@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using form_builder.Configuration;
 using form_builder.Middleware;
 using form_builder.ModelBinders.Providers;
 using form_builder.Utils.ServiceCollectionExtensions;
@@ -36,6 +35,7 @@ namespace form_builder
             services.AddRazorPages();
 
             services
+                .AddRazorViewEngineViewLocations()
                 .ConfigureCookiePolicy()
                 .AddValidators()
                 .AddTagParsers()
@@ -50,7 +50,9 @@ namespace form_builder
                 .ConfigureOrganisationProviders()
                 .ConfigureStreetProviders()
                 .ConfigurePaymentProviders()
+                .ConfigureBookingProviders()
                 .ConfigureDocumentCreationProviders()
+                .ConfigureFormatters()
                 .ConfigureEmailProviders(HostingEnvironment)
                 .AddHelpers()
                 .AddAttributes()

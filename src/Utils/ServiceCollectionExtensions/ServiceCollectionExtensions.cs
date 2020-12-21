@@ -20,6 +20,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Mappers;
 using form_builder.Providers.Address;
+using form_builder.Providers.Booking;
 using form_builder.Providers.DocumentCreation;
 using form_builder.Providers.DocumentCreation.Generic;
 using form_builder.Providers.EmailProvider;
@@ -31,6 +32,7 @@ using form_builder.Providers.Street;
 using form_builder.Providers.Transforms.Lookups;
 using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Services.AddressService;
+using form_builder.Services.BookingService;
 using form_builder.Services.DocumentService;
 using form_builder.Services.EmailService;
 using form_builder.Services.FileUploadService;
@@ -51,12 +53,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Gateways.AddressService;
+using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Gateways.CivicaPay;
 using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
@@ -95,6 +99,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddTransient<IElementValidator, RestrictMimeTypeValidator>();
             services.AddTransient<IElementValidator, RestrictFileSizeValidator>();
             services.AddTransient<IElementValidator, RestrictCombinedFileSizeValidator>();
+            services.AddTransient<IElementValidator, BookingValidator>();
 
             return services;
         }
@@ -103,6 +108,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         {
             services.AddTransient<ITagParser, FormAnswerTagParser>();
             services.AddTransient<ITagParser, FormDataTagParser>();
+            services.AddTransient<ITagParser, LinkTagParser>();
 
             return services;
         }
@@ -118,6 +124,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddHttpClient<IAddressServiceGateway, AddressServiceGateway>(configuration);
             services.AddHttpClient<IStreetServiceGateway, StreetServiceGateway>(configuration);
             services.AddHttpClient<IOrganisationServiceGateway, OrganisationServiceGateway>(configuration);
+            services.AddHttpClient<IBookingServiceGateway, BookingServiceGateway>(configuration);
 
             return services;
         }
@@ -179,6 +186,15 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             return services;
         }
 
+        public static IServiceCollection ConfigureBookingProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IBookingProvider, FakeBookingProvider>();
+            services.AddSingleton<IBookingProvider, BookingProvider>();
+
+            return services;
+        }
+
+
         public static IServiceCollection ConfigureOrganisationProviders(this IServiceCollection services)
         {
             services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
@@ -191,6 +207,14 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         {
             services.AddSingleton<IStreetProvider, FakeStreetProvider>();
             services.AddSingleton<IStreetProvider, ServiceStreetProvider>();
+
+            return services;
+        }
+
+        public static IServiceCollection ConfigureFormatters(this IServiceCollection services)
+        {
+            services.AddSingleton<IFormatter, FullDateFormatter>();
+            services.AddSingleton<IFormatter, TimeOnlyFormatter>();
 
             return services;
         }
@@ -222,6 +246,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddSingleton<IAddressService, AddressService>();
+            services.AddSingleton<IBookingService, BookingService>();
             services.AddSingleton<IPageService, PageService>();
             services.AddSingleton<IStreetService, StreetService>();
             services.AddSingleton<ISubmitService, SubmitService>();
@@ -339,6 +364,17 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
             services.AddDataProtection().SetApplicationName("formbuilder");
             services.AddSingleton<IDistributedCacheWrapper, DistributedCacheWrapper>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddRazorViewEngineViewLocations(this IServiceCollection services)
+        {
+            services.Configure<RazorViewEngineOptions>(o =>
+            {
+                o.ViewLocationFormats.Add("/Views/Shared/Booking/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Address/{0}" + RazorViewEngine.ViewExtension);
+            });
 
             return services;
         }

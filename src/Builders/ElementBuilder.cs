@@ -200,6 +200,20 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithBookingProvider(string value)
+        {
+            _property.BookingProvider = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithAppointmentType(Guid value)
+        {
+            _property.AppointmentType = value;
+
+            return this;
+        }
+        
         public ElementBuilder WithNumeric(bool value)
         {
             _property.Numeric = value;
@@ -331,6 +345,14 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithCheckYourBooking(bool value)
+        {
+            _property.CheckYourBooking = value;
+
+            return this;
+        }
+
         public ElementBuilder WithClassName(string value)
         {
             _property.ClassName = value;

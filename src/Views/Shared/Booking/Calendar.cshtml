@@ -1,0 +1,33 @@
+@model form_builder.Models.Elements.Booking
+
+<div class="smbc-calendar">
+
+    <partial name="CalendarHeader" model="@Model" />
+
+    <table class="smbc-calendar__body" summary="Appointment availability for @(Model.CurrentSelectedMonthText)">
+        <tbody>
+
+            <partial name="CalendarWeekdays" model="@Model" />
+
+            @for (int i = 0; i < Model.Calendar.Count; i += 7)
+            {
+                var dates = Model.Calendar.Skip(i).Take(7);
+
+                <tr>
+                    @foreach (var date in dates)
+                    {
+                        var calendarDayModel = new CalendarDayViewModel
+                        {
+                            Day = date,
+                            QuestionId = Model.DateQuestionId
+                        };
+
+                        <partial name="CalendarDay" model="@calendarDayModel" />
+                    }
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+</div>

@@ -15,6 +15,8 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
+using form_builder.Services.BookingService;
+using form_builder.Services.BookingService.Entities;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
@@ -44,6 +46,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IStreetService> _streetService = new Mock<IStreetService>();
         private readonly Mock<IAddressService> _addressService = new Mock<IAddressService>();
+        private readonly Mock<IBookingService> _bookingService = new Mock<IBookingService>();
         private readonly Mock<IFileUploadService> _fileUploadService = new Mock<IFileUploadService>();
         private readonly Mock<IOrganisationService> _organisationService = new Mock<IOrganisationService>();
         private readonly Mock<IDistributedCacheWrapper> _distributedCache = new Mock<IDistributedCacheWrapper>();
@@ -89,7 +92,7 @@ namespace form_builder_tests.UnitTests.Services
             });
 
             _service = new PageService(_validators.Object, _mockPageHelper.Object, _sessionHelper.Object, _addressService.Object, _fileUploadService.Object, _streetService.Object, _organisationService.Object, 
-            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object, _mockActionsWorkflow.Object);
+            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _bookingService.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object, _mockActionsWorkflow.Object);
         }
 
         [Fact]
@@ -402,7 +405,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPage("form", requestPath, "", new QueryCollection()));
-            Assert.Equal($"Requested path '{requestPath}' object could not be found.", result.Message);
+            Assert.Equal($"Requested path '{requestPath}' object could not be found for form 'form'", result.Message);
         }
 
         [Fact]
@@ -1211,6 +1214,83 @@ namespace form_builder_tests.UnitTests.Services
             Assert.IsType<ProcessPageEntity>(result);
             _mockIncomingDataHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>(), It.IsAny<FormAnswers>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveNonQuestionAnswers(It.IsAny<Dictionary<string, object>>(), It.Is<string>(_ => _ == "form"), It.Is<string>(_ => _ == "page-one"),It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessRequest_ShouldRedirect_WhenBookingService_ReturnsEntity_WithNoAppointments()
+        {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _bookingService.Setup(_ => _.Get(It.IsAny<string>(), It.IsAny<Page>(), It.IsAny<string>()))
+                .ReturnsAsync(new BookingProcessEntity{ BookingHasNoAvailableAppointments = true });
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("test-id")
+                .WithPropertyText("test-text")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            // Act
+            var result = await _service.ProcessPage("form", "page-one", "", new QueryCollection());
+
+            // Assert
+            Assert.IsType<ProcessPageEntity>(result);
+            Assert.True(result.ShouldRedirect);
+            Assert.Equal(BookingConstants.NO_APPOINTMENT_AVAILABLE, result.TargetPage);
+            _bookingService.Verify(_ => _.Get(It.IsAny<string>(),It.IsAny<Page>(), It.IsAny<string>()), Times.Once);
+        }
+        
+        [Fact]
+        public async Task ProcessRequest_ShouldCall_BookingService_WhenPAge_ContainsBookingElement()
+        {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel());
+            _bookingService.Setup(_ => _.ProcessBooking(It.IsAny<Dictionary<string, dynamic>>(),  It.IsAny<Page>(),  It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new ProcessRequestEntity());
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("test-question")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { "Guid", Guid.NewGuid().ToString() }   
+            };
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            var result = await _service.ProcessRequest("form", "page-one", viewModel, null, true);
+
+            _bookingService.Verify(_ => _.ProcessBooking(It.IsAny<Dictionary<string, dynamic>>(),  It.IsAny<Page>(),  It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            Assert.IsType<ProcessRequestEntity>(result);
         }
     }
 }

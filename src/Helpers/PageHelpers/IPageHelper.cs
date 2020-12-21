@@ -29,7 +29,7 @@ namespace form_builder.Helpers.PageHelpers
         
         void CheckForAcceptedFileUploadFileTypes(List<Page> pages, string formName);
         
-        void SaveFormData(string key, object value, string guid);
+        void SaveFormData(string key, object value, string guid, string formName);
         
         void SaveNonQuestionAnswers(Dictionary<string, object> values, string form, string path, string guid);
 
@@ -46,6 +46,7 @@ namespace form_builder.Helpers.PageHelpers
         void CheckForAnyConditionType(List<Page> pages);
         
         void CheckUploadedFilesSummaryQuestionsIsSet(List<Page> pages);
+        void CheckForBookingElement(List<Page> pages);
 
         List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload);
     }

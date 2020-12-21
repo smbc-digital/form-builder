@@ -66,6 +66,13 @@ namespace form_builder.Models.Elements
             if (element.Any(_ => _.Type == EElementType.Organisation) && viewModel.IsInitial())
                 return ButtonConstants.ORG_SEARCH_TEXT;
 
+            if(element.Any(_ => _.Type == EElementType.Booking)){
+                var bookingElement = element.FirstOrDefault(_ => _.Type == EElementType.Booking);
+                 
+                if(bookingElement.Properties.CheckYourBooking && !viewModel.IsCheckYourBooking()) 
+                    return string.IsNullOrEmpty(Properties.Text) ? ButtonConstants.NEXTSTEP_TEXT : Properties.Text;
+            }
+
             if (page.Behaviours.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay))
                 return string.IsNullOrEmpty(Properties.Text) ? ButtonConstants.SUBMIT_TEXT : Properties.Text;
 

@@ -2402,5 +2402,104 @@ namespace form_builder_tests.UnitTests.Helpers
             // Act
             _pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(pages);
         }
+
+        [Fact]
+        public void CheckForBookingElement_Throw_ApplicationException_WhenForm_DoenotContain_RequiredCustomerFields()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithBookingProvider("Fake")
+                .WithAppointmentType(Guid.NewGuid())
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var appointment = new PageBuilder()
+                .WithPageSlug(BookingConstants.NO_APPOINTMENT_AVAILABLE)
+                .Build();
+
+            pages.Add(page);
+            pages.Add(appointment);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
+            Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires customer firstname/lastname/email elements for reservation", result.Message);
+        }
+
+        [Fact]
+        public void CheckForBookingElement_Throw_ApplicationException_WhenForm_DoenotContain_Required_NoAppointmentsPage()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithBookingProvider("Fake")
+                .WithAppointmentType(Guid.NewGuid())
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
+            Assert.Equal($"PageHelper:CheckForBookingElement, Form contains booking element but is missing required page with slug {BookingConstants.NO_APPOINTMENT_AVAILABLE}.", result.Message);
+        }
+        
+        [Fact]
+        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_DoesNotContains_AppointmentType()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithBookingProvider("Fake")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
+            Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.", result.Message);
+        }
+                
+        [Fact]
+        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_DoesNotContains_BookingProvider()
+        {
+             // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithAppointmentType(Guid.NewGuid())
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
+            Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires a valid booking provider property.", result.Message);
+        }
     }
 }

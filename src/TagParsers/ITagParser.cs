@@ -8,4 +8,10 @@ namespace form_builder.TagParser
         Regex Regex { get; }
         Page Parse(Page formSchema, FormAnswers formAnswers);
     }
+
+    public interface ISimpleTagParser
+    {
+        string FormatContent(string[] values);
+        string _htmlContent { get; }
+    }
 }
