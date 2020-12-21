@@ -7,6 +7,7 @@ using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Models.Properties.ActionProperties;
 using form_builder.Services.MappingService.Entities;
+using form_builder.TagParser;
 using form_builder_tests.Builders;
 using Moq;
 using Xunit;
@@ -16,6 +17,7 @@ namespace form_builder_tests.UnitTests.Helpers
     public class ActionHelperTests
     {
         private readonly IActionHelper _actionHelper;
+        private readonly IEnumerable<IFormatter> _formatters;
 
         private readonly MappingEntity _mappingEntity = new MappingEntityBuilder()
             .WithFormAnswers(new FormAnswers
@@ -70,10 +72,7 @@ namespace form_builder_tests.UnitTests.Helpers
             })
             .Build();
 
-        public ActionHelperTests()
-        {
-            _actionHelper = new ActionHelper();
-        }
+        public ActionHelperTests() => _actionHelper = new ActionHelper(_formatters);
 
         [Fact]
         public void GenerateUrl_ShouldGenerateCorrectGetUrl_PathParameters()

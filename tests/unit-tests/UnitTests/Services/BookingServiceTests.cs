@@ -116,8 +116,8 @@ namespace form_builder_tests.UnitTests.Services
             var listOfObjects = Assert.IsType<List<object>>(result.BookingInfo);
             var bookingInfo = Assert.IsType<BookingInformation>(listOfObjects.First());
             Assert.False(bookingInfo.IsFullDayAppointment);
-            Assert.Equal(date, bookingInfo.CurrentSearchedMonth);
-            Assert.Equal(date, bookingInfo.FirstAvailableMonth);
+            Assert.Equal(date.Month, bookingInfo.CurrentSearchedMonth.Month);
+            Assert.Equal(date.Month, bookingInfo.FirstAvailableMonth.Month);
             Assert.Single(bookingInfo.Appointments);
 
             _bookingProvider.Verify(_ => _.NextAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
