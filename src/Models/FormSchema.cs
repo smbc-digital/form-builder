@@ -73,6 +73,7 @@ namespace form_builder.Models
             pageHelper.CheckSubmitSlugsHaveAllProperties(Pages, form);
             await pageHelper.CheckForPaymentConfiguration(Pages, form);
             pageHelper.CheckForAcceptedFileUploadFileTypes(Pages, form);
+            pageHelper.CheckConditionalElementsAreValid(Pages, form);
             pageHelper.CheckForDocumentDownload(this);
             pageHelper.CheckForIncomingFormDataValues(Pages);
             pageHelper.CheckForPageActions(this);

@@ -13,5 +13,7 @@ namespace form_builder.Constants
         public static readonly int OneMBInBinaryBytes = 1048576;
 
         public static readonly string CaseReferenceQueryString = "?caseReference=";
+
+        public static readonly string ConditionalElementReplacementString = "ElementId=";
     }
 }

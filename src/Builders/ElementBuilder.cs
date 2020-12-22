@@ -373,5 +373,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithConditionalElement(bool value) 
+        {
+            _property.isConditionalElement = value;
+
+            return this;
+        }
     }
 }
