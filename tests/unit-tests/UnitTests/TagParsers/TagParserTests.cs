@@ -13,9 +13,7 @@ namespace form_builder_tests.UnitTests.Services
         private Regex _regex => new Regex("(?<={{)TEST:.*?(?=}})");
         private TagParser _tagParser;
 
-        public TagParserTests(){
-            _tagParser = new TagParser(_mockFormatters.Object);
-        }
+        public TagParserTests() =>_tagParser = new TagParser(_mockFormatters.Object);
 
         [Fact]
         public void Parse_ShouldThrowException_WhenQuestionValue_IsNotWithinAnswers()
