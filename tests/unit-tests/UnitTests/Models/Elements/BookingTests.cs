@@ -209,6 +209,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.Equal(DateTime.Today.AddMonths(-1), bookignElement.FirstAvailableMonth);
             Assert.Equal(DateTime.Today, bookignElement.CurrentSelectedMonth);
             Assert.False(bookignElement.IsAppointmentTypeFullDay);
+            Assert.False(bookignElement.DisplayInsetText);
+            Assert.Equal(string.Empty, bookignElement.InsetText);
         }
 
         [Fact]
@@ -287,6 +289,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.Equal(DateTime.Today.AddHours(-1), bookignElement.AppointmentStartTime);
             Assert.Equal(DateTime.Today.AddHours(1), bookignElement.AppointmentEndTime);
             Assert.True(bookignElement.IsAppointmentTypeFullDay);
+            Assert.True(bookignElement.DisplayInsetText);
+            Assert.Equal("You can select a date for form Name but you can not select a time. We’ll be with you between 11pm and 1am.", bookignElement.InsetText);
         }
 
         

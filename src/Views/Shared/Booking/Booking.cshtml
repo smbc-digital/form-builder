@@ -17,14 +17,9 @@
 
     <partial name="InsetText" model="@Model.Properties.IAG" />
 
-    @if (@Model.IsAppointmentTypeFullDay)
+    @if (@Model.DisplayInsetText)
     {
-        <partial name="InsetText" model="@Model.AppointmentTypeFullDayIAG" />
-    }
-
-    @if (@Model.DisplayNextAvailableAppointmentIAG)
-    {
-        <partial name="InsetText" model="@Model.Properties.NextAvailableIAG" />
+        <partial name="InsetText" model="@Model.InsetText" />
     }
 
     <partial name="Hint" />
