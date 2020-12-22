@@ -1,5 +1,9 @@
 @model form_builder.Models.Elements.Booking
 
+@{
+    var combinedIag = $"{Model.Properties.NextAvailableIAG} {Model.AppointmentTypeFullDayIAG}";
+}
+
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
     @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
 
@@ -17,12 +21,15 @@
 
     <partial name="InsetText" model="@Model.Properties.IAG" />
 
-    @if (@Model.IsAppointmentTypeFullDay)
+    @if (@Model.IsAppointmentTypeFullDay && @Model.DisplayNextAvailableAppointmentIAG)
+    {
+        <partial name="InsetText" model="@combinedIag" />
+    }
+    else if (@Model.IsAppointmentTypeFullDay && !@Model.DisplayNextAvailableAppointmentIAG)
     {
         <partial name="InsetText" model="@Model.AppointmentTypeFullDayIAG" />
     }
-
-    @if (@Model.DisplayNextAvailableAppointmentIAG)
+    else if (!@Model.IsAppointmentTypeFullDay && @Model.DisplayNextAvailableAppointmentIAG)
     {
         <partial name="InsetText" model="@Model.Properties.NextAvailableIAG" />
     }
