@@ -29,6 +29,8 @@ namespace form_builder.Models.Elements
         public DateTime FirstAvailableMonth { get; set; }
         public string AppointmentTypeFullDayIAG => $"You can select a date for {FormName} but you can not select a time. We’ll be with you between {AppointmentStartTime.ToTimeFormat()} and {AppointmentEndTime.ToTimeFormat()}.";
         public bool DisplayNextAvailableAppointmentIAG => FirstAvailableMonth.Date > DateTime.Now.Date && CurrentSelectedMonth.Month == FirstAvailableMonth.Month && CurrentSelectedMonth.Year == FirstAvailableMonth.Year;
+        public string InsetText => SetInsetText();
+        public bool DisplayInsetText => InsetText.Length > 0;
         public string CurrentSelectedMonthText => $"{CurrentSelectedMonth:MMMMM yyyy}";
         public DateTime NextSelectableMonth => new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).AddMonths(1);
         public DateTime PreviousSelectableMonth => new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).AddMonths(-1);
@@ -140,5 +142,18 @@ namespace form_builder.Models.Elements
             return selectedAppointment;
         }
 
+        private string SetInsetText()
+        {
+            if(IsAppointmentTypeFullDay && DisplayNextAvailableAppointmentIAG)
+                return $"{Properties.NextAvailableIAG} {AppointmentTypeFullDayIAG}";
+            
+            if (IsAppointmentTypeFullDay && !DisplayNextAvailableAppointmentIAG)
+                return AppointmentTypeFullDayIAG;
+            
+            if (!IsAppointmentTypeFullDay && DisplayNextAvailableAppointmentIAG)
+                return Properties.NextAvailableIAG;
+
+            return string.Empty;
+        }
     }
 }
