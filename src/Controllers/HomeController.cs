@@ -106,7 +106,7 @@ namespace form_builder.Controllers
                 return RedirectToAction(currentPageResult.RedirectAction, currentPageResult.RouteValues ?? new { form, path });
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
-                return View(currentPageResult.ViewName, currentPageResult.ViewModel);
+                    return View(currentPageResult.ViewName, currentPageResult.ViewModel);
 
             if (currentPageResult.Page.HasPageActionsPostValues)
                 await _actionsWorkflow.Process(currentPageResult.Page.PageActions.Where(_ => _.Properties.HttpActionType == EHttpActionType.Post).ToList(), null, form);

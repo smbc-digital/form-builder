@@ -69,8 +69,8 @@ namespace form_builder.Helpers.PageHelpers
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
 
-            foreach (var element in page.Elements)
-                formModel.RawHTML += await element.RenderAsync(
+            foreach (var element in page.Elements) {
+                string html = await element.RenderAsync(
                     _viewRender,
                     _elementHelper,
                     guid,
@@ -81,7 +81,13 @@ namespace form_builder.Helpers.PageHelpers
                     formAnswers,
                     results
                     );
-
+                if (element.Properties.isConditionalElement) {
+                    formModel.RawHTML = formModel.RawHTML.Replace(SystemConstants.ConditionalElementReplacementString + element.Properties.QuestionId, html);
+                } else {
+                    formModel.RawHTML += html;
+                }
+                
+            }
             return formModel;
         }
 
@@ -295,6 +301,42 @@ namespace form_builder.Helpers.PageHelpers
                         throw new ApplicationException($"PageHelper::CheckForAcceptedFileUploadFileTypes, Allowed file type in FileUpload element {_.Properties.QuestionId} must have a valid extension which begins with a ., e.g. .png");
                 });
             });
+        }
+
+        public void CheckConditionalElementsAreValid(List<Page> pages, string formName) {
+            var radioWithConditionals = pages.Where(_ => _.Elements != null)
+                .SelectMany(_ => _.ValidatableElements)
+                .Where(_ => _.Type == EElementType.Radio)
+                .Where(_ => _.Properties.Options.Any(_ => _.HasConditionalElement))
+                .ToList();
+
+            var conditionalElements = pages.Where(_ => _.Elements != null)
+                .SelectMany(_ => _.ValidatableElements)
+                .Where(_ => _.Properties.isConditionalElement)
+                .ToList();
+
+            foreach (var radio in radioWithConditionals) {
+                foreach (var option in radio.Properties.Options) {                    
+                    if (
+                        option.HasConditionalElement &&
+                        !string.IsNullOrEmpty(option.ConditionalElementId) &&
+                        !conditionalElements.Any(_ => _.Properties.QuestionId == option.ConditionalElementId))
+                        throw new ApplicationException($"The provided json '{formName}' does not contain a conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}'");
+
+                    else if (
+                        option.HasConditionalElement && 
+                        !string.IsNullOrEmpty(option.ConditionalElementId) && 
+                        !pages.Any(page => page.ValidatableElements.Contains(radio) && page.ValidatableElements.Any(_ => _.Properties.QuestionId == option.ConditionalElementId && _.Properties.isConditionalElement)))
+                        throw new ApplicationException($"The provided json '{formName}' contains the conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}' on a different page to the radio element");
+
+                    else
+                        conditionalElements.Remove(conditionalElements.FirstOrDefault(_ => _.Properties.QuestionId == option.ConditionalElementId));
+                }
+            }
+
+            if (conditionalElements.Count > 0) 
+                throw new ApplicationException($"The provided json '{formName}' has conditional elements '{String.Join(", ", conditionalElements.Select(_ => _.Properties.QuestionId))}' not assigned to radio options");
+    
         }
 
         public void SaveFormData(string key, object value, string guid, string formName)
