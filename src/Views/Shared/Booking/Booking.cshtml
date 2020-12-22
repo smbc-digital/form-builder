@@ -1,7 +1,26 @@
 @model form_builder.Models.Elements.Booking
 
 @{
-    var combinedIag = $"{Model.Properties.NextAvailableIAG} {Model.AppointmentTypeFullDayIAG}";
+    var displayInsetText = false;
+    var insetText = string.Empty;
+
+    @if (@Model.IsAppointmentTypeFullDay && @Model.DisplayNextAvailableAppointmentIAG)
+    {
+        insetText = $"{Model.Properties.NextAvailableIAG} {Model.AppointmentTypeFullDayIAG}";
+    }
+    else if (@Model.IsAppointmentTypeFullDay && !@Model.DisplayNextAvailableAppointmentIAG)
+    {
+        insetText = Model.AppointmentTypeFullDayIAG;
+    }
+    else if (!@Model.IsAppointmentTypeFullDay && @Model.DisplayNextAvailableAppointmentIAG)
+    {
+        insetText = Model.Properties.NextAvailableIAG;       
+    }
+
+    if (insetText.Length > 0)
+    {
+        displayInsetText = true;
+    }
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
@@ -21,17 +40,9 @@
 
     <partial name="InsetText" model="@Model.Properties.IAG" />
 
-    @if (@Model.IsAppointmentTypeFullDay && @Model.DisplayNextAvailableAppointmentIAG)
+    @if (displayInsetText)
     {
-        <partial name="InsetText" model="@combinedIag" />
-    }
-    else if (@Model.IsAppointmentTypeFullDay && !@Model.DisplayNextAvailableAppointmentIAG)
-    {
-        <partial name="InsetText" model="@Model.AppointmentTypeFullDayIAG" />
-    }
-    else if (!@Model.IsAppointmentTypeFullDay && @Model.DisplayNextAvailableAppointmentIAG)
-    {
-        <partial name="InsetText" model="@Model.Properties.NextAvailableIAG" />
+        <partial name="InsetText" model="@insetText" />
     }
 
     <partial name="Hint" />
