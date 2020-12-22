@@ -8,10 +8,7 @@ namespace form_builder.Providers.EmailProvider
     public class FakeEmailProvider : IEmailProvider
     {
         private readonly ILogger<FakeEmailProvider> _logger;
-        public FakeEmailProvider(ILogger<FakeEmailProvider> logger)
-        {
-            _logger = logger;
-        }
+        public FakeEmailProvider(ILogger<FakeEmailProvider> logger) => _logger = logger;
 
         public async Task<HttpStatusCode> SendEmail(EmailMessage emailMessage)
         {

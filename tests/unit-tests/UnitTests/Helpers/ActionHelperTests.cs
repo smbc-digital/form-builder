@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Helpers.ActionsHelpers;
@@ -16,6 +17,13 @@ namespace form_builder_tests.UnitTests.Helpers
 {
     public class ActionHelperTests
     {
+        private const string validResponse = "ValidResponse";
+        private const string validVariableQuestionId = "validVariableQuestionId";
+        private const string validVariableQuestionIdInBraces = "{{validVariableQuestionId}}";
+        private const string invalidVariableQuestionIdInBraces = "{{invalidVariableQuestionId}}";
+        private const string contentWithValidVariableQuestionIdInBraces = "Some text with a {{validVariableQuestionId}}.";
+        private const string contentWithInvalidVariableQuestionIdInBraces = "Some text with a {{invalidVariableQuestionId}}";
+
         private readonly IActionHelper _actionHelper;
         private readonly IEnumerable<IFormatter> _formatters;
 
@@ -45,6 +53,11 @@ namespace form_builder_tests.UnitTests.Helpers
                                 {
                                     Response = "testResponse.email@test.com",
                                     QuestionId = "emailQuestion"
+                                },
+                                new Answers
+                                {
+                                    Response = validResponse,
+                                    QuestionId = validVariableQuestionId
                                 }
                             },
                             PageSlug = "page-one"
@@ -66,7 +79,7 @@ namespace form_builder_tests.UnitTests.Helpers
             {
                 Properties = new BaseActionProperty
                 {
-                    To = "email.test@test.com, {{emailQuestion}}",
+                    To = "email.test@test.com, {{emailQuestion}}"
                 },
                 Type = EActionType.UserEmail
             })
@@ -115,6 +128,22 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Assert
             Assert.Equal("testResponse.email@test.com,email.test@test.com,", result);
+        }
+
+        [Theory]
+        [InlineData(contentWithValidVariableQuestionIdInBraces)]
+        [InlineData(contentWithInvalidVariableQuestionIdInBraces)]
+        public void GetEmailContent_ShouldReturnContent_WithQuestionResponse_Or_EmptyString(string content)
+        {
+            // Arrange
+            var action = _formSchema.FormActions.FirstOrDefault();
+            action.Properties.Content = content;
+
+            // Act
+            var result = _actionHelper.GetEmailContent(action, _mappingEntity.FormAnswers);
+
+            // Assert
+            Assert.True(result.Contains(validResponse) && !result.Contains(validVariableQuestionIdInBraces) || !result.Contains(invalidVariableQuestionIdInBraces));
         }
     }
 }

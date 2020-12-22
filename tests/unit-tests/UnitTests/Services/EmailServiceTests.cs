@@ -30,22 +30,16 @@ namespace form_builder_tests.UnitTests.Services
 
         public EmailServiceTests()
         {
-
             var emailProviderItems = new List<IEmailProvider> { _mockEmailProvider.Object };
             _mockEmailProviders.Setup(m => m.GetEnumerator()).Returns(() => emailProviderItems.GetEnumerator());
 
             _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("sessionGuid");
 
-            var formData = JsonConvert.SerializeObject(new FormAnswers
-            { Path = "page-one", Pages = new List<PageAnswers>() });
+            var formData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(formData);
 
-            _emailService = new EmailService(
-              _mockSessionHelper.Object,
-              _mockDistributedCache.Object,
-              _mockEmailProviders.Object,
-              _mockActionHelper.Object);
+            _emailService = new EmailService(_mockSessionHelper.Object, _mockDistributedCache.Object, _mockEmailProviders.Object, _mockActionHelper.Object);
         }
 
         [Fact]
@@ -98,22 +92,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task Process_ShouldCall_ActionHelper_IfTypeIsUserEmail()
-        {
-            // Arrange
-              var action = new ActionBuilder()
-                .WithActionType(EActionType.UserEmail)
-                .Build();
-
-            // Act
-            await _emailService.Process(new List<IAction>{ action });
-
-            // Assert
-            _mockActionHelper.Verify(_ => _.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task Process_ShouldCall_EmailProvider_IfTypeIsUserEmail()
+        public async Task Process_ShouldCall_IfTypeIsUserEmail_EmailProvider()
         {
             // Arrange
              var action = new ActionBuilder()
@@ -125,6 +104,34 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             _mockEmailProvider.Verify(_ => _.SendEmail(It.IsAny<EmailMessage>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Process_ShouldCall_IfTypeIsUserEmail_GetEmailToAddresses()
+        {
+            // Arrange
+            var action = new ActionBuilder()
+              .WithActionType(EActionType.UserEmail)
+              .Build();
+
+            // Act
+            await _emailService.Process(new List<IAction> { action });
+
+            // Assert
+            _mockActionHelper.Verify(_ => _.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Process_ShouldCall_IfTypeIsUserEmail_GetEmailContent()
+        {
+            // Arrange
+            var action = new ActionBuilder().WithActionType(EActionType.UserEmail).Build();
+
+            // Act
+            await _emailService.Process(new List<IAction> { action });
+
+            // Assert
+            _mockActionHelper.Verify(_ => _.GetEmailContent(It.IsAny<IAction>(), It.IsAny<FormAnswers>()), Times.Once);
         }
     }
 }
