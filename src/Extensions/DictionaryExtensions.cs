@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using form_builder.Constants;
 
 namespace form_builder.Extensions
@@ -63,6 +65,41 @@ namespace form_builder.Extensions
                     normalisedFormData.Add(item.Key, string.Join(",", item.Value));
                 }
             }
+
+            normalisedFormData = CleanUpBookingTimes(normalisedFormData);
+
+            return normalisedFormData;
+        }
+
+        private static Dictionary<string,object> CleanUpBookingTimes(Dictionary<string,object> normalisedFormData)
+        {
+            if(!normalisedFormData.Any(_ => _.Key.EndsWith(BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX)))
+                return normalisedFormData;
+
+            var dateValue = normalisedFormData.FirstOrDefault(_ => _.Key.EndsWith($"-{BookingConstants.APPOINTMENT_DATE}"));
+
+            if(dateValue.Value == null)
+                return normalisedFormData;
+
+            DateTime.TryParse((string)dateValue.Value, out DateTime parsedDate);
+
+            var selectedTimePeriodKey = $"{parsedDate.Day}{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}";
+            var selectedTimePeriod = normalisedFormData[selectedTimePeriodKey];
+            var selectedTimeKey = $"{dateValue.Key}-{parsedDate.Day}-{selectedTimePeriod}";
+
+            if(!normalisedFormData.ContainsKey(selectedTimeKey))
+            {
+                //remove keys
+                //set time as null
+            }
+
+            var selectedTime = (string) normalisedFormData[selectedTimeKey];
+
+            var test = normalisedFormData.Where(_ => !_.Key.EndsWith($"{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}"))
+                .Where(_ => !_.Key.EndsWith("-Afternoon") && !_.Key.EndsWith("-Morning"))
+                .ToDictionary(x => x.Key, x => (dynamic)x.Value);
+            
+            test.Add($"{dateValue.Key}-{BookingConstants.APPOINTMENT_START_TIME}", DateTime.Today.Add(TimeSpan.Parse(selectedTime)));
 
             return normalisedFormData;
         }

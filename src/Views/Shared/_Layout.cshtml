@@ -15,7 +15,8 @@
     <meta name="theme-color" content="#006666">
     <link rel="shortcut icon" type="image/png" href="~/assets/images/favicon-sg.png" media="print" />
     <title>@ViewData["PageTitle"] - @ViewData["Title"] - Stockport Council</title>
-    <link href="https://design-system.stockport.gov.uk/int/1/smbc-frontend.min.css" rel="stylesheet" />
+    @* <link href="https://design-system.stockport.gov.uk/int/1/smbc-frontend.min.css" rel="stylesheet" /> *@
+    <link href="~/smbc-frontend.min.css" rel="stylesheet" />
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <partial name="TagManagerHead" />
 </head>
@@ -66,7 +67,7 @@
     </div>
 
     <partial name="Footer" />
-    <script type="text/javascript" src="https://design-system.stockport.gov.uk/int/1/smbc-frontend.min.js"></script>
+    <script type="text/javascript" src="~/smbc-frontend.min.js"></script>
     <script>window.GOVUKFrontend.initAll()</script>
     <script>window.SMBCFrontend.initAll()</script>
 </body>

@@ -1,0 +1,34 @@
+@using form_builder.Utils.Extesions
+@model form_builder.ViewModels.TimePeriodViewModel
+@{
+    var additional = Model.AppointmentTimes.Count % 3;
+}
+
+@functions{
+    public string GetClass(int value){
+        switch(value % 3){
+            case 0: 
+                return "smbc-time__time__label--left";
+            case 1: 
+                return "smbc-time__time__label--centre";
+            default:
+                return "smbc-time__time__label--right";
+        }
+    }
+}
+
+<div class="smbc-time__body smbc-time__body__conditional smbc-time__body__conditional--hidden" id="@Model.Id">
+    @for (int i = 0; i < Model.AppointmentTimes.Count; i++)
+    {
+        var time = Model.AppointmentTimes[i].StartTime;
+        <div class="smbc-time__time">
+            <input class="smbc-time__time__input" type='radio' value="@time" name='@Model.Id' id="@Model.Value(time)"/>
+            <label class="smbc-time__time__label @GetClass(i)" for="@Model.Value(time)">@Model.Value(time).ToTimeFormat()</label>
+        </div>
+    }
+    @for (int i = 0; i < additional; i++)
+    {
+        <div class="smbc-time__time">
+        </div>
+    }
+</div>

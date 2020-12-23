@@ -10,15 +10,16 @@ namespace form_builder.Builders
 
         public List<AvailabilityDayResponse> Build() => _response;
 
-        public AvailabilityDayResponseBuilder WithDay(DateTime date, int appointments)
+        public AvailabilityDayResponseBuilder WithDay(DateTime date, int appointments, bool IsFullDayAppointment)
         {
             var appointmentTimes = new List<AppointmentTime>();
             for (int i = 0; i < appointments; i++)
             {
+                var startTime = StartTime(IsFullDayAppointment);
                 appointmentTimes.Add(new AppointmentTime
                 {
-                    StartTime = new TimeSpan(7, 0, 0),
-                    EndTime = new TimeSpan(17, 30, 0)
+                    StartTime = startTime,
+                    EndTime = EndTime(IsFullDayAppointment, startTime)
                 });
             }
 
@@ -29,5 +30,8 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        private TimeSpan StartTime(bool isFullDay) => isFullDay ? new TimeSpan(7, 0, 0) : new TimeSpan(new Random().Next(9, 17), 0, 0);
+        private TimeSpan EndTime(bool isFullDay, TimeSpan startTime) => isFullDay ? new TimeSpan(17, 30, 0) : new TimeSpan(new Random().Next(startTime.Hours, 18), 0, 0);
     }
 }
