@@ -66,5 +66,7 @@ namespace form_builder.Providers.Booking
 
             return result.ResponseContent;
         }
+
+        // GetLocation
     }
 }

@@ -179,16 +179,16 @@ namespace form_builder.Services.BookingService
         private async Task<ProcessRequestEntity> ProcessDateAndTime(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
             var bookingElement = (Booking) currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
+            var cachedAnswers = _distributedCache.GetString(guid);
+
+            var convertedAnswers = cachedAnswers == null
+                ? new FormAnswers { Pages = new List<PageAnswers>() }
+                : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+
+            var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[$"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}"].ToString());
 
             if (!currentPage.IsValid)
             {
-                var cachedAnswers = _distributedCache.GetString(guid);
-
-                var convertedAnswers = cachedAnswers == null
-                    ? new FormAnswers { Pages = new List<PageAnswers>() }
-                    : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-
-                var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[$"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}"].ToString());
                 var bookingInformation = new List<object> { cachedBookingInformation };
                 var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null, bookingInformation);
 
@@ -198,6 +198,10 @@ namespace form_builder.Services.BookingService
                     ViewModel = model
                 };
             }
+
+            // Make call to BookingProvider to get Location
+            // Get CustomerAddress if needed _mappingService.MapAddress().ToString()
+            viewModel.Add("Location", "Result from above call");
 
             if (!bookingElement.Properties.CheckYourBooking)
             {
