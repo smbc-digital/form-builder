@@ -1,17 +1,11 @@
-@model form_builder.Models.Elements.Booking
+@model form_builder.ViewModels.TimeAvailabilityViewModel
 
-@{
-    var days = Model.Appointments.Where(_ => _.HasAvailableAppointment);
+@foreach (var day in  Model.TimesAvailability)
+{
+    var timeHeaderModel = new TimeHeaderViewModel {  Date = day.Date, AmId = day.MorningAppointments.Id, PmId = day.AfternoonAppointments.Id, Checked = ETimePeriod.Morning };
+    <div class="smbc-time smbc-time__conditional smbc-time__conditional--hidden" id="@day.TimeSelectionIdForConditionalReveal" data-module="smbc-time">
+        <partial name="TimeHeader" model="@timeHeaderModel" />
+        <partial name="TimePeriod" model="@day.MorningAppointments" />
+        <partial name="TimePeriod" model="@day.AfternoonAppointments" />
+    </div>
 }
-
-    @foreach (var day in days)
-    {
-        var amModel = new TimePeriodViewModel { AppointmentTimes = day.AppointmentTimes.Where(_ => _.StartTime.Hours < 12).ToList(), QuestionId = Model.DateQuestionId, Date = day.Date, TimePeriod = ETimePeriod.Morning };
-        var pmModel = new TimePeriodViewModel { AppointmentTimes = day.AppointmentTimes.Where(_ => _.StartTime.Hours >= 12).ToList(), QuestionId = Model.DateQuestionId, Date = day.Date, TimePeriod = ETimePeriod.Afternoon };
-        var timeHeaderModel = new TimeHeaderViewModel {  Date = day.Date, AmId = amModel.Id, PmId = pmModel.Id, Id = Model.DateQuestionId, Checked = ETimePeriod.Morning };
-        <div class="smbc-time smbc-time__conditional smbc-time__conditional--hidden" id="@Model.DateQuestionId-@day.Date.Day-conditional" data-module="smbc-time">
-            <partial name="TimeHeader" model="@timeHeaderModel" />
-            <partial name="TimePeriod" model="@amModel" />
-            <partial name="TimePeriod" model="@pmModel" />
-        </div>
-    }

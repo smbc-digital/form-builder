@@ -28,5 +28,13 @@
 
     <partial name="Calendar" model="@Model" />
     @Html.EndFieldSet()
-    <partial name="Time" model="@Model"/>
+
+    @if (!@Model.IsAppointmentTypeFullDay)
+    {
+        var viewModel = new TimeAvailabilityViewModel {
+            TimesAvailability = Model.Times
+        };
+        <partial name="Time" model="@viewModel"/>
+    }
+
 </div>

@@ -1,7 +1,7 @@
 @using form_builder.Utils.Extesions
-@model form_builder.ViewModels.TimePeriodViewModel
+@model form_builder.Models.Time.TimePeriod
 @{
-    var additional = Model.AppointmentTimes.Count % 3;
+    var additionalMorning = Model.Appointments.Count % 3;
 }
 
 @functions{
@@ -18,17 +18,22 @@
 }
 
 <div class="smbc-time__body smbc-time__body__conditional smbc-time__body__conditional--hidden" id="@Model.Id">
-    @for (int i = 0; i < Model.AppointmentTimes.Count; i++)
-    {
-        var time = Model.AppointmentTimes[i].StartTime;
-        <div class="smbc-time__time">
-            <input class="smbc-time__time__input" type='radio' value="@time" name='@Model.Id' id="@Model.Value(time)"/>
-            <label class="smbc-time__time__label @GetClass(i)" for="@Model.Value(time)">@Model.Value(time).ToTimeFormat()</label>
-        </div>
-    }
-    @for (int i = 0; i < additional; i++)
-    {
-        <div class="smbc-time__time">
-        </div>
+    @if(!Model.HasAppointments){
+        <p class="smbc-body">No appointments in the @Model.TimeOfDay</p>
+    } else {
+            @for (int i = 0; i < Model.Appointments.Count; i++)
+            {
+                var startTime = Model.Appointments[i].StartTime;
+                var endTime = Model.Appointments[i].EndTime;
+                <div class="smbc-time__time">
+                    <input class="smbc-time__time__input" type='radio' value="@startTime|@endTime" name='@Model.Id' id="@Model.Value(startTime)"/>
+                    <label class="smbc-time__time__label @GetClass(i)" for="@Model.Value(startTime)">@Model.Value(startTime).ToTimeFormat()</label>
+                </div>
+            }
+            @for (int i = 1; i < additionalMorning; i++)
+            {
+                <div class="smbc-time__time">
+                </div>
+            }
     }
 </div>

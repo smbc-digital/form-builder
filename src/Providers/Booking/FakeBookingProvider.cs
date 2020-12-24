@@ -132,7 +132,7 @@ namespace form_builder.Providers.Booking
             var response = new List<AvailabilityDayResponse>();
             switch (request.StartDate.Month)
             {
-                case 11:
+                case 12:
                     response = new AvailabilityDayResponseBuilder()
                         .WithDay(new DateTime(2020, request.StartDate.Month, 13), 3, false)
                         .WithDay(new DateTime(2020, request.StartDate.Month, 15), 6, false)
@@ -140,20 +140,17 @@ namespace form_builder.Providers.Booking
                         .WithDay(new DateTime(2020, request.StartDate.Month, 23), 3, false)
                         .Build();
                     break;
-                case 12:
-                    response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 15), 1, false)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 12), 0, false)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 13), 2, false)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 20), 3, false)
-                        .Build();
-                    break;
                 case 1:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 1), 5, false)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 4), 6, false)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 9), 4, false)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 22), 2, false)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 15), 1, false)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 12), 0, false)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 13), 2, false)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 20), 3, false)
+                        .Build();
+                    break;
+                case 2:
+                    response = new AvailabilityDayResponseBuilder()
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 1), 0, false)
                         .Build();
                     break;
                 default:

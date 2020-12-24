@@ -8,7 +8,9 @@ using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models.Booking;
+using form_builder.Models.Time;
 using form_builder.Utils.Extesions;
+using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 
@@ -18,9 +20,10 @@ namespace form_builder.Models.Elements
     {
         public Booking() => Type = EElementType.Booking;
         public List<CalendarDay> Calendar { get; set; } = new List<CalendarDay>();
+        public List<TimeAvailability> Times { get; set; } = new List<TimeAvailability>();
         public List<AvailabilityDayResponse> Appointments { get; set; } = new List<AvailabilityDayResponse>();
         public string FormattedDateForCheckYourBooking => DateTime.Parse(Properties.Value).ToFullDateFormat();
-        public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {AppointmentStartTime.ToTimeFormat()} and {AppointmentEndTime.ToTimeFormat()}" : "NotFullDay";
+        public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {AppointmentStartTime.ToTimeFormat()} and {AppointmentEndTime.ToTimeFormat()}" : $"{AppointmentStartTime.ToTimeFormat()} to {AppointmentEndTime.ToTimeFormat()}";
         public AvailabilityDayResponse SelectedBooking;
         public bool IsAppointmentTypeFullDay { get; set; }
         public DateTime AppointmentStartTime { get; set; }
@@ -87,6 +90,7 @@ namespace form_builder.Models.Elements
                     return viewRender.RenderAsync("CheckYourBooking", this);
                 default:
                     CreateCalendar();
+                    CreateTimeAvailability();
                     MonthSelectionPostUrl = formSchema.BaseURL.ToBookingRequestedMonthUrl(page.PageSlug, environment.EnvironmentName.Equals("local"));
                     return viewRender.RenderAsync(Type.ToString(), this);
             }
@@ -100,8 +104,8 @@ namespace form_builder.Models.Elements
             CurrentSelectedMonth = bookingInformation.CurrentSearchedMonth;
             FirstAvailableMonth = bookingInformation.FirstAvailableMonth;
             IsAppointmentTypeFullDay = bookingInformation.IsFullDayAppointment;
-            if (bookingInformation.IsFullDayAppointment)
-            {
+
+            if(bookingInformation.IsFullDayAppointment){
                 AppointmentStartTime = bookingInformation.AppointmentStartTime;
                 AppointmentEndTime = bookingInformation.AppointmentEndTime;
             }
@@ -132,12 +136,49 @@ namespace form_builder.Models.Elements
             Calendar = dates;
         }
 
+        private void CreateTimeAvailability()
+        {
+            if(IsAppointmentTypeFullDay)
+                return;
+
+            var days = Appointments.Where(_ => _.HasAvailableAppointment);
+
+            if(!days.Any())
+            {
+                //Handle when there are not appointments for the given period
+                return;
+            }
+
+            var t = days.Select((day) => new TimeAvailability {
+                Date = day.Date,
+                MorningAppointments  = new TimePeriod {
+                    Appointments =  day.AppointmentTimes.Where(_ => _.StartTime.Hours <  12).ToList(),
+                    TimeQuestionId = StartTimeQuestionId,
+                    TimeOfDay = ETimePeriod.Morning,
+                    Date = day.Date
+                },
+                AfternoonAppointments  = new TimePeriod {
+                    Appointments =  day.AppointmentTimes.Where(_ => _.StartTime.Hours >=  12).ToList(),
+                    TimeQuestionId = StartTimeQuestionId,
+                    TimeOfDay = ETimePeriod.Afternoon,
+                    Date = day.Date
+                },
+                CurrentSelectedValue = StartAppointmentTime,
+                TimeQuestionId = StartTimeQuestionId,
+                DateQuestionId = DateQuestionId
+            }).ToList();
+            Times = t;
+        }
+
         private AvailabilityDayResponse GetSelectedAppointment()
         {
             var selectedAppointment = Appointments.FirstOrDefault(_ => _.Date.ToString().Equals(Properties.Value));
 
             if (selectedAppointment == null)
                 throw new ApplicationException("Booking::GetSelectedAppointment, Unable to find selected appointment while attempting to generate check your booking view");
+
+            AppointmentStartTime = DateTime.Parse(StartAppointmentTime);
+            AppointmentEndTime =  DateTime.Parse(EndAppointmentTime);
 
             return selectedAppointment;
         }
