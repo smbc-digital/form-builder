@@ -11,13 +11,16 @@ namespace form_builder.Providers.Booking
     public class FakeBookingProvider : IBookingProvider
     {
         public string ProviderName { get => "Fake"; }
+        private static string BOOKING_UI_TEST => "00000000-0000-0000-0000-000000000002";
+        private static string BOOKING_WITH_NO_AVAILABILITY => "00000000-0000-0000-0000-000000000001";
+        private static string BOOKING_NON_FULL_DAY_APPOINTMENT => "00000000-0000-0000-0000-000000000003";
 
         public Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request)
         {
-            if(request.AppointmentId.Equals(Guid.Parse("00000000-0000-0000-0000-000000000001")))
+            if(request.AppointmentId.Equals(Guid.Parse(BOOKING_WITH_NO_AVAILABILITY)))
                 throw new BookingNoAvailabilityException("FakeProvider, no available appointments");
 
-            if(request.AppointmentId.Equals(Guid.Parse("00000000-0000-0000-0000-000000000002"))) //ui-test response
+            if(request.AppointmentId.Equals(Guid.Parse(BOOKING_UI_TEST)))
                 return Task.FromResult(new AvailabilityDayResponse()
                 {
                     Date = new DateTime(2021, 2, 1),
@@ -31,7 +34,7 @@ namespace form_builder.Providers.Booking
                     }
                 });
 
-            if(request.AppointmentId.Equals(Guid.Parse("00000000-0000-0000-0000-000000000003")))
+            if(request.AppointmentId.Equals(Guid.Parse(BOOKING_NON_FULL_DAY_APPOINTMENT)))
                 return NextAvailability_ForNonFullDayAppointment(request);
 
             return NextAvailability_ForFullDayAppointment(request);
@@ -39,12 +42,12 @@ namespace form_builder.Providers.Booking
 
         public Task<List<AvailabilityDayResponse>> GetAvailability(AvailabilityRequest request)
         {
-            if(request.AppointmentId.Equals(Guid.Parse("00000000-0000-0000-0000-000000000002"))) //ui-test response
+            if(request.AppointmentId.Equals(Guid.Parse(BOOKING_UI_TEST)))
                 return Task.FromResult(new AvailabilityDayResponseBuilder()
                         .WithDay(new DateTime(2021, 2, 1), 1, true)
                         .Build());
 
-            if(request.AppointmentId.Equals(Guid.Parse("00000000-0000-0000-0000-000000000003")))
+            if(request.AppointmentId.Equals(Guid.Parse(BOOKING_NON_FULL_DAY_APPOINTMENT)))
                 return GetAvailability_ForNonFullDayAppointment(request);
 
             return GetAvailability_ForFullDayAppointment(request);
