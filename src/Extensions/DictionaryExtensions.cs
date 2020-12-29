@@ -93,7 +93,7 @@ namespace form_builder.Extensions
             if(timeValue.Value == null)
             {
                 normalisedFormData.Where(_ => !_.Key.EndsWith($"{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}"))
-                    .Where(_ => !_.Key.EndsWith("-Afternoon") && !_.Key.EndsWith("-Morning"))
+                    .Where(_ => !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_MORNING}") && !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_AFTERNOON}"))
                     .ToDictionary(x => x.Key, x => (dynamic)x.Value);
                 normalisedFormData.Add($"{bookingId}{BookingConstants.APPOINTMENT_START_TIME}", "");
 
@@ -103,7 +103,7 @@ namespace form_builder.Extensions
             var selectedTime = timeValue.Value.ToString().Split('|');
 
             normalisedFormData = normalisedFormData.Where(_ => !_.Key.EndsWith($"{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}"))
-                .Where(_ => !_.Key.EndsWith("-Afternoon") && !_.Key.EndsWith("-Morning"))
+                .Where(_ => !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_MORNING}") && !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_AFTERNOON}"))
                 .ToDictionary(x => x.Key, x => (dynamic)x.Value);
             
             var parseStartTimeResult = DateTime.TryParse(selectedTime[0], out DateTime parsedStartTime);

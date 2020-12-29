@@ -2,11 +2,25 @@
 
 <div class="smbc-time__header">
     <div class="smbc-time__period">
-        <input class="smbc-time__period__input" @(Model.Checked == ETimePeriod.Morning ? "checked" : string.Empty) type='radio' value='Morning' name='@Model.Date.Day@BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX' id='morning-@Model.AmId' data-aria-controls="@Model.AmId"/>
-        <label class="smbc-time__period__label smbc-time__period__label--left" for='morning-@Model.AmId'>Morning</label>
+        <input class="smbc-time__period__input" 
+            @(Model.SelectedTimePeriod == ETimePeriod.Morning ? "checked" : string.Empty) 
+            type='radio' 
+            value='@BookingConstants.APPOINTMENT_TIME_OF_DAY_MORNING' 
+            name='@Model.Date.Day@BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX' 
+            id='morning-@Model.DataAriaControlsIdForMorning' 
+            data-aria-controls="@Model.DataAriaControlsIdForMorning"
+        />
+        <label class="smbc-time__period__label smbc-time__period__label--left" for='morning-@Model.DataAriaControlsIdForMorning'>@BookingConstants.APPOINTMENT_TIME_OF_DAY_MORNING</label>
     </div>
     <div class="smbc-time__period">
-        <input class="smbc-time__period__input" @(Model.Checked == ETimePeriod.Afternoon ? "checked" : string.Empty) type='radio' value='Afternoon' name='@Model.Date.Day@BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX' id='afternoon-@Model.PmId' data-aria-controls="@Model.PmId" />
-        <label class="smbc-time__period__label smbc-time__period__label--right" for='afternoon-@Model.PmId'>Afternoon</label>
+        <input class="smbc-time__period__input" 
+            @(Model.SelectedTimePeriod == ETimePeriod.Afternoon ? "checked" : string.Empty) 
+            type='radio' 
+            value='@BookingConstants.APPOINTMENT_TIME_OF_DAY_AFTERNOON' 
+            name='@Model.Date.Day@BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX' 
+            id='afternoon-@Model.DataAriaControlsIdForEvening' 
+            data-aria-controls="@Model.DataAriaControlsIdForEvening" 
+        />
+        <label class="smbc-time__period__label smbc-time__period__label--right" for='afternoon-@Model.DataAriaControlsIdForEvening'>@BookingConstants.APPOINTMENT_TIME_OF_DAY_AFTERNOON</label>
     </div>
 </div>

@@ -4,19 +4,6 @@
     var additionalDivs = Model.Appointments.Count % 3;
 }
 
-@functions{
-    public string GetClass(int value){
-        switch(value % 3){
-            case 0: 
-                return "smbc-time__time__label--left";
-            case 1: 
-                return "smbc-time__time__label--centre";
-            default:
-                return "smbc-time__time__label--right";
-        }
-    }
-}
-
 <div class="smbc-time__body smbc-time__body__conditional smbc-time__body__conditional--hidden" id="@Model.Id">
     @if(!Model.HasAppointments){
         <partial name="TimePeriodNoAppointments" model="@($"No appointments in the {Model.TimeOfDay}")" />
@@ -33,7 +20,7 @@
                         value="@Model.Value(startTime)|@Model.Value(endTime)" 
                         name='@Model.Id' 
                         id="@Model.Value(startTime)"/>
-                    <label class="smbc-time__time__label @GetClass(i)" for="@Model.Value(startTime)">@Model.Value(startTime).ToTimeFormat()</label>
+                    <label class="smbc-time__time__label @Model.GetClassNameForDivsPosition(i)" for="@Model.Value(startTime)">@Model.Value(startTime).ToTimeFormat()</label>
                 </div>
             }
             @for (int i = 1; i < additionalDivs; i++)

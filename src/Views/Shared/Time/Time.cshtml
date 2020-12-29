@@ -1,8 +1,13 @@
-@model form_builder.ViewModels.TimeAvailabilityViewModel
+@model List<form_builder.Models.Time.TimeAvailability>
 
-@foreach (var day in  Model.TimesAvailability)
+@foreach (var day in  Model)
 {
-    var timeHeaderModel = new TimeHeaderViewModel {  Date = day.Date, AmId = day.MorningAppointments.Id, PmId = day.AfternoonAppointments.Id, Checked = day.TimePeriodCurrentlySelected };
+    var timeHeaderModel = new TimeHeaderViewModel {  
+        Date = day.Date, DataAriaControlsIdForMorning = day.MorningAppointments.Id,
+        DataAriaControlsIdForEvening = day.AfternoonAppointments.Id,
+        SelectedTimePeriod = day.TimePeriodCurrentlySelected
+    };
+
     <div class="smbc-time smbc-time__conditional smbc-time__conditional--hidden" id="@day.TimeSelectionIdForConditionalReveal" data-module="smbc-time">
         <partial name="TimeHeader" model="@timeHeaderModel" />
         <partial name="TimePeriod" model="@day.MorningAppointments" />

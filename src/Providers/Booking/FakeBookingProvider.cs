@@ -145,10 +145,10 @@ namespace form_builder.Providers.Booking
                     break;
                 case 1:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 15), 1, false)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 15), 3, false)
                         .WithDay(new DateTime(2021, request.StartDate.Month, 12), 1, false)
                         .WithDay(new DateTime(2021, request.StartDate.Month, 13), 2, false)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 20), 3, false)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 20), 8, false)
                         .Build();
                     break;
                 case 2:

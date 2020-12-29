@@ -149,7 +149,7 @@ namespace form_builder.Models.Elements
                 return;
             }
 
-            var t = days.Select((day) => {
+            Times = days.Select((day) => {
                 var morningAppointments = day.AppointmentTimes.Where(_ => _.StartTime.Hours <  12).ToList();
                 var afternoonAppointments = day.AppointmentTimes.Where(_ => _.StartTime.Hours >=  12).ToList();
                 return new TimeAvailability {
@@ -172,9 +172,7 @@ namespace form_builder.Models.Elements
                     TimeQuestionId = StartTimeQuestionId,
                     DateQuestionId = DateQuestionId
                 };
-            }
-            ).ToList();
-            Times = t;
+            }).ToList();
         }
 
         private AvailabilityDayResponse GetSelectedAppointment()
