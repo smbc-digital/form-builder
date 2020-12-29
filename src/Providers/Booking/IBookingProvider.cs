@@ -13,5 +13,6 @@ namespace form_builder.Providers.Booking
         Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request);
         Task<List<AvailabilityDayResponse>> GetAvailability(AvailabilityRequest request);
         Task<Guid> Reserve(BookingRequest request);
+        Task<string> GetLocation(LocationRequest request);
     }
 }

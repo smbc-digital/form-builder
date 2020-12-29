@@ -410,6 +410,11 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessBooking_Should_Return_CurrentPageEntity_When_CheckYourBooking_Property_IsFalse_AndReserve_Appointment()
         {
+            var bookingInfo = new BookingInformation();
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object> { { $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", bookingInfo } } }));
+
             var appointmentTypeGuid = new Guid();
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
@@ -429,6 +434,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             var model = new Dictionary<string, object>{
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", DateTime.Now.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", DateTime.Now.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", DateTime.Now.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_END_TIME}", DateTime.Now.ToString() },
@@ -438,7 +444,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
-            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
+            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, object>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
             Assert.IsType<ProcessRequestEntity>(result);
         }
@@ -446,6 +452,11 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessBooking_Should_Return_CurrentPage_When_CheckYourBooking_IsTrue()
         {
+            var bookingInfo = new BookingInformation();
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object> { { $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", bookingInfo } } }));
+
             var appointmentTypeGuid = new Guid();
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
@@ -465,6 +476,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             var model = new Dictionary<string, object>{
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", DateTime.Now.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", DateTime.Now.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", DateTime.Now.ToString() }
             };
@@ -472,8 +484,9 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.ProcessBooking(model, page,formSchema,"guid", "path");
 
             _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Never);
+            _bookingProvider.Verify(_ => _.GetLocation(It.IsAny<LocationRequest>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
-            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
+            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, object>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
             Assert.IsType<ProcessRequestEntity>(result);
             Assert.Equal("Index", result.RedirectAction);
@@ -521,7 +534,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessBooking_Should_Call_BookingProvider_Whe_SelectedDate_IsDifferent_To_ReservedDateAndTime()
+        public async Task ProcessBooking_Should_Call_BookingProvider_When_SelectedDate_IsDifferent_To_ReservedDateAndTime()
         {
             var appointmentTypeGuid = new Guid();
             var element = new ElementBuilder()
@@ -562,7 +575,7 @@ namespace form_builder_tests.UnitTests.Services
 
         
         [Fact]
-        public async Task ProcessBooking_Should_Call_BookingProvider_Whe_SelectedStartTime_IsDifferent_To_ReservedDateAndTime()
+        public async Task ProcessBooking_Should_Call_BookingProvider_When_SelectedStartTime_IsDifferent_To_ReservedDateAndTime()
         {
             var appointmentTypeGuid = new Guid();
             var element = new ElementBuilder()
@@ -601,8 +614,8 @@ namespace form_builder_tests.UnitTests.Services
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
         }
 
-                [Fact]
-        public async Task ProcessBooking_Should_Call_BookingProvider_Whe_SelectedEndTime_IsDifferent_To_ReservedDateAndTime()
+        [Fact]
+        public async Task ProcessBooking_Should_Call_BookingProvider_When_SelectedEndTime_IsDifferent_To_ReservedDateAndTime()
         {
             var appointmentTypeGuid = new Guid();
             var element = new ElementBuilder()

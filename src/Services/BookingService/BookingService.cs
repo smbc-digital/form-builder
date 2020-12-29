@@ -199,9 +199,14 @@ namespace form_builder.Services.BookingService
                 };
             }
 
-            // Make call to BookingProvider to get Location
-            // Get CustomerAddress if needed _mappingService.MapAddress().ToString()
-            viewModel.Add("Location", "Result from above call");
+            var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
+            var location = await bookingProvider.GetLocation(new LocationRequest 
+            { 
+                AppointmentId = bookingElement.Properties.AppointmentType,
+                OptionalResources = null
+            });
+
+            viewModel.Add("Location", location);
 
             if (!bookingElement.Properties.CheckYourBooking)
             {
