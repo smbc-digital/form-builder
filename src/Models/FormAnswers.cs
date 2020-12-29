@@ -23,5 +23,7 @@ namespace form_builder.Models
         public Dictionary<string, object> AdditionalFormData { get; set; } = new Dictionary<string, object>();
 
         public List<PageAnswers> Pages { get; set; }
+
+        public string AppointmentLocation { get; set; }
     }
 }

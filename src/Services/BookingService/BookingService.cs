@@ -206,7 +206,7 @@ namespace form_builder.Services.BookingService
                 OptionalResources = null
             });
 
-            viewModel.Add("Location", location);
+            viewModel.Add(bookingElement.AppointmentLocation, location);
 
             if (!bookingElement.Properties.CheckYourBooking)
             {
