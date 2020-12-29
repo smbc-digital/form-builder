@@ -26,7 +26,13 @@
                 var startTime = Model.Appointments[i].StartTime;
                 var endTime = Model.Appointments[i].EndTime;
                 <div class="smbc-time__time">
-                    <input class="smbc-time__time__input" type='radio' value="@startTime|@endTime" name='@Model.Id' id="@Model.Value(startTime)"/>
+                    <input 
+                        class="smbc-time__time__input" 
+                        type='radio' 
+                        @(Model.CurrentValue == @Model.Value(startTime).ToString() ? "checked" : string.Empty)  
+                        value="@Model.Value(startTime)|@Model.Value(endTime)" 
+                        name='@Model.Id' 
+                        id="@Model.Value(startTime)"/>
                     <label class="smbc-time__time__label @GetClass(i)" for="@Model.Value(startTime)">@Model.Value(startTime).ToTimeFormat()</label>
                 </div>
             }

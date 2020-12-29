@@ -88,12 +88,16 @@ namespace form_builder.Extensions
             var selectedTimeKey = $"-{parsedDate.Day}-{selectedTimePeriod}";
 
             var timeValue = normalisedFormData.FirstOrDefault(_ => _.Key.EndsWith(selectedTimeKey));
+            var bookingId = dateValue.Key.Remove(dateValue.Key.Length - BookingConstants.APPOINTMENT_DATE.Length, BookingConstants.APPOINTMENT_DATE.Length);
 
             if(timeValue.Value == null)
             {
-                return normalisedFormData.Where(_ => !_.Key.EndsWith($"{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}"))
+                normalisedFormData.Where(_ => !_.Key.EndsWith($"{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}"))
                     .Where(_ => !_.Key.EndsWith("-Afternoon") && !_.Key.EndsWith("-Morning"))
                     .ToDictionary(x => x.Key, x => (dynamic)x.Value);
+                normalisedFormData.Add($"{bookingId}{BookingConstants.APPOINTMENT_START_TIME}", "");
+
+                return normalisedFormData;
             }
 
             var selectedTime = timeValue.Value.ToString().Split('|');
@@ -102,13 +106,12 @@ namespace form_builder.Extensions
                 .Where(_ => !_.Key.EndsWith("-Afternoon") && !_.Key.EndsWith("-Morning"))
                 .ToDictionary(x => x.Key, x => (dynamic)x.Value);
             
-            var parseStartTimeResult = TimeSpan.TryParse(selectedTime[0], out TimeSpan parsedStartTime);
-            var parseEndTimeResult = TimeSpan.TryParse(selectedTime[1], out TimeSpan parsedEndTime);
+            var parseStartTimeResult = DateTime.TryParse(selectedTime[0], out DateTime parsedStartTime);
+            var parseEndTimeResult = DateTime.TryParse(selectedTime[1], out DateTime parsedEndTime);
 
-            var bookingId = timeValue.Key.Remove(timeValue.Key.Length - (selectedTimeKey.Length + BookingConstants.APPOINTMENT_START_TIME.Length), selectedTimeKey.Length + BookingConstants.APPOINTMENT_START_TIME.Length);
             if(parseStartTimeResult && parseEndTimeResult){
-                normalisedFormData.Add($"{bookingId}{BookingConstants.APPOINTMENT_START_TIME}", DateTime.Today.Add(parsedStartTime).ToString());
-                normalisedFormData.Add($"{bookingId}{BookingConstants.APPOINTMENT_END_TIME}", DateTime.Today.Add(parsedEndTime).ToString());
+                normalisedFormData.Add($"{bookingId}{BookingConstants.APPOINTMENT_START_TIME}", parsedStartTime.ToString());
+                normalisedFormData.Add($"{bookingId}{BookingConstants.APPOINTMENT_END_TIME}", parsedEndTime.ToString());
             }
 
             return normalisedFormData;

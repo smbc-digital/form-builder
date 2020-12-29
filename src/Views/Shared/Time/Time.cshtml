@@ -2,7 +2,7 @@
 
 @foreach (var day in  Model.TimesAvailability)
 {
-    var timeHeaderModel = new TimeHeaderViewModel {  Date = day.Date, AmId = day.MorningAppointments.Id, PmId = day.AfternoonAppointments.Id, Checked = ETimePeriod.Morning };
+    var timeHeaderModel = new TimeHeaderViewModel {  Date = day.Date, AmId = day.MorningAppointments.Id, PmId = day.AfternoonAppointments.Id, Checked = day.TimePeriodCurrentlySelected };
     <div class="smbc-time smbc-time__conditional smbc-time__conditional--hidden" id="@day.TimeSelectionIdForConditionalReveal" data-module="smbc-time">
         <partial name="TimeHeader" model="@timeHeaderModel" />
         <partial name="TimePeriod" model="@day.MorningAppointments" />

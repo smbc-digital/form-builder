@@ -15,9 +15,8 @@ namespace form_builder.Models.Time
         public string TimeSelectionIdForConditionalReveal => $"{DateQuestionId}-{Date.Day}-conditional";
         public string TimeQuestionId { get; set; }
         public string DateQuestionId { get; set; }
-        public string IsTimePeriodCurrentlySelected { get; set; }
+        public ETimePeriod TimePeriodCurrentlySelected { get; set; }
         public ETimePeriod SelectedTimePeriod { get; set; }
-        public string TimePeriodId(ETimePeriod time) => $"{TimeQuestionId}-{Date.Day}-{time}";
     }
 
     public class TimePeriod
@@ -26,7 +25,8 @@ namespace form_builder.Models.Time
         public List<AppointmentTime> Appointments { get; set; }
         public bool HasAppointments => Appointments.Any();
         public DateTime Date { get; set; }
-        public string TimeQuestionId {get;set;}
+        public string CurrentValue { get; set; }
+        public string TimeQuestionId { get; set; }
         public string Id => $"{TimeQuestionId}-{Date.Day}-{TimeOfDay}";
         public DateTime Value(TimeSpan time) => Date.Add(time);
     }

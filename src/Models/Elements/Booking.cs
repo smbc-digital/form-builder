@@ -149,24 +149,31 @@ namespace form_builder.Models.Elements
                 return;
             }
 
-            var t = days.Select((day) => new TimeAvailability {
-                Date = day.Date,
-                MorningAppointments  = new TimePeriod {
-                    Appointments =  day.AppointmentTimes.Where(_ => _.StartTime.Hours <  12).ToList(),
+            var t = days.Select((day) => {
+                var morningAppointments = day.AppointmentTimes.Where(_ => _.StartTime.Hours <  12).ToList();
+                var afternoonAppointments = day.AppointmentTimes.Where(_ => _.StartTime.Hours >=  12).ToList();
+                return new TimeAvailability {
+                    Date = day.Date,
+                    MorningAppointments  = new TimePeriod {
+                        Appointments =  morningAppointments,
+                        TimeQuestionId = StartTimeQuestionId,
+                        TimeOfDay = ETimePeriod.Morning,
+                        Date = day.Date,
+                        CurrentValue = Properties.Value.Equals(day.Date.ToString()) && !string.IsNullOrEmpty(StartAppointmentTime) ? DateTime.Parse(StartAppointmentTime).ToString() : string.Empty
+                    },
+                    AfternoonAppointments  = new TimePeriod {
+                        Appointments =  afternoonAppointments,
+                        TimeQuestionId = StartTimeQuestionId,
+                        TimeOfDay = ETimePeriod.Afternoon,
+                        Date = day.Date,
+                        CurrentValue = Properties.Value.Equals(day.Date.ToString()) && !string.IsNullOrEmpty(StartAppointmentTime) ? DateTime.Parse(StartAppointmentTime).ToString() : string.Empty
+                    },
+                    TimePeriodCurrentlySelected = Properties.Value.Equals(day.Date.ToString()) && !string.IsNullOrEmpty(StartAppointmentTime) && Properties.Value.Equals(DateTime.Parse(StartAppointmentTime).Date.ToString()) ? DateTime.Parse(StartAppointmentTime).Hour >= 12 ? ETimePeriod.Afternoon : ETimePeriod.Morning : morningAppointments.Any() ? ETimePeriod.Morning : ETimePeriod.Afternoon,
                     TimeQuestionId = StartTimeQuestionId,
-                    TimeOfDay = ETimePeriod.Morning,
-                    Date = day.Date
-                },
-                AfternoonAppointments  = new TimePeriod {
-                    Appointments =  day.AppointmentTimes.Where(_ => _.StartTime.Hours >=  12).ToList(),
-                    TimeQuestionId = StartTimeQuestionId,
-                    TimeOfDay = ETimePeriod.Afternoon,
-                    Date = day.Date
-                },
-                CurrentSelectedValue = StartAppointmentTime,
-                TimeQuestionId = StartTimeQuestionId,
-                DateQuestionId = DateQuestionId
-            }).ToList();
+                    DateQuestionId = DateQuestionId
+                };
+            }
+            ).ToList();
             Times = t;
         }
 
