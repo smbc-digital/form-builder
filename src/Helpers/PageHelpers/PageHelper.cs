@@ -634,33 +634,33 @@ namespace form_builder.Helpers.PageHelpers
 
         public void CheckForBookingElement(List<Page> pages)
         {
-            // var bookingElements = pages.SelectMany(_ => _.ValidatableElements)
-            //     .Where(_ => _.Type.Equals(EElementType.Booking))
-            //     .ToList();
+            var bookingElements = pages.SelectMany(_ => _.ValidatableElements)
+                .Where(_ => _.Type.Equals(EElementType.Booking))
+                .ToList();
 
-            // if(bookingElements.Any())
-            // {
-            //     bookingElements.ForEach((booking) => {
-            //         if(string.IsNullOrEmpty(booking.Properties.BookingProvider))
-            //             throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a valid booking provider property.");
+            if(bookingElements.Any())
+            {
+                bookingElements.ForEach((booking) => {
+                    if(string.IsNullOrEmpty(booking.Properties.BookingProvider))
+                        throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a valid booking provider property.");
 
-            //         if(booking.Properties.AppointmentType == Guid.Empty)
-            //             throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.");
-            //     });
+                    if(booking.Properties.AppointmentType == Guid.Empty)
+                        throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.");
+                });
 
-            //     if(!pages.Any(_ => _.PageSlug.ToLower().Equals(BookingConstants.NO_APPOINTMENT_AVAILABLE)))
-            //         throw new ApplicationException($"PageHelper:CheckForBookingElement, Form contains booking element but is missing required page with slug {BookingConstants.NO_APPOINTMENT_AVAILABLE}.");
+                if(!pages.Any(_ => _.PageSlug.ToLower().Equals(BookingConstants.NO_APPOINTMENT_AVAILABLE)))
+                    throw new ApplicationException($"PageHelper:CheckForBookingElement, Form contains booking element but is missing required page with slug {BookingConstants.NO_APPOINTMENT_AVAILABLE}.");
 
-            //     var additionalRequiredElements = pages.SelectMany(_ => _.ValidatableElements)
-            //         .Where(_ => _.Properties != null && _.Properties.TargetMapping != null)
-            //         .Where(_ => _.Properties.TargetMapping.ToLower().Equals("customer.firstname") 
-            //             || _.Properties.TargetMapping.ToLower().Equals("customer.lastname") 
-            //             || _.Properties.TargetMapping.ToLower().Equals("customer.email"))
-            //         .ToList();
+                var additionalRequiredElements = pages.SelectMany(_ => _.ValidatableElements)
+                    .Where(_ => _.Properties != null && _.Properties.TargetMapping != null)
+                    .Where(_ => _.Properties.TargetMapping.ToLower().Equals("customer.firstname") 
+                        || _.Properties.TargetMapping.ToLower().Equals("customer.lastname") 
+                        || _.Properties.TargetMapping.ToLower().Equals("customer.email"))
+                    .ToList();
 
-            //     if(additionalRequiredElements.Count() != 3)
-            //         throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires customer firstname/lastname/email elements for reservation");
-            // }
+                if(additionalRequiredElements.Count() != 3)
+                    throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires customer firstname/lastname/email elements for reservation");
+            }
         }
     }
 }

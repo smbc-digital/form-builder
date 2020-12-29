@@ -79,7 +79,15 @@ namespace form_builder_tests.UnitTests.Models.Elements
         {
             //Arrange
             var key = $"bookingQuestion-{BookingConstants.APPOINTMENT_DATE}";
+            var keyStart = $"bookingQuestion-{BookingConstants.APPOINTMENT_START_TIME}";
+            var keyEnd = $"bookingQuestion-{BookingConstants.APPOINTMENT_END_TIME}";
             _mockElementHelper.Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(key)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
+                .Returns(DateTime.Today.ToString());
+
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(keyStart)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
+                .Returns(DateTime.Today.ToString());
+
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(keyEnd)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns(DateTime.Today.ToString());
 
             var element = new ElementBuilder()
@@ -98,6 +106,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
             {
                 { LookUpConstants.SubPathViewModelKey, BookingConstants.CHECK_YOUR_BOOKING },
                 { key, DateTime.Today.ToString() },
+                { keyStart, DateTime.Today.ToString() },
+                { keyEnd, DateTime.Today.ToString() },
             };
 
             var schema = new FormSchemaBuilder()
@@ -290,7 +300,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.Equal(DateTime.Today.AddHours(1), bookignElement.AppointmentEndTime);
             Assert.True(bookignElement.IsAppointmentTypeFullDay);
             Assert.True(bookignElement.DisplayInsetText);
-            Assert.Equal("You can select a date for form Name but you can not select a time. We’ll be with you between 11pm and 1am.", bookignElement.InsetText);
+            Assert.Equal("You can select a date for form Name but you can not select a time. We'll be with you between 11pm and 1am.", bookignElement.InsetText);
         }
 
         
