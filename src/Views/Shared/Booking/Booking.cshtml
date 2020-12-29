@@ -27,7 +27,6 @@
     <partial name="Error" />
 
     <partial name="Calendar" model="@Model" />
-    @Html.EndFieldSet()
 
     @if (!@Model.IsAppointmentTypeFullDay)
     {
@@ -37,4 +36,5 @@
         <partial name="Time" model="@viewModel"/>
     }
 
+    @Html.EndFieldSet()
 </div>
