@@ -1,7 +1,7 @@
 @using form_builder.Utils.Extesions
 @model form_builder.Models.Time.TimePeriod
 @{
-    var additionalMorning = Model.Appointments.Count % 3;
+    var additionalDivs = Model.Appointments.Count % 3;
 }
 
 @functions{
@@ -19,7 +19,7 @@
 
 <div class="smbc-time__body smbc-time__body__conditional smbc-time__body__conditional--hidden" id="@Model.Id">
     @if(!Model.HasAppointments){
-        <p class="smbc-body">No appointments in the @Model.TimeOfDay</p>
+        <partial name="TimePeriodNoAppointments" model="@($"No appointments in the {Model.TimeOfDay}")" />
     } else {
             @for (int i = 0; i < Model.Appointments.Count; i++)
             {
@@ -36,7 +36,7 @@
                     <label class="smbc-time__time__label @GetClass(i)" for="@Model.Value(startTime)">@Model.Value(startTime).ToTimeFormat()</label>
                 </div>
             }
-            @for (int i = 1; i < additionalMorning; i++)
+            @for (int i = 1; i < additionalDivs; i++)
             {
                 <div class="smbc-time__time">
                 </div>
