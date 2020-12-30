@@ -484,7 +484,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.ProcessBooking(model, page,formSchema,"guid", "path");
 
             _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Never);
-            _bookingProvider.Verify(_ => _.GetLocation(It.IsAny<LocationRequest>()), Times.Once);
+            _bookingProvider.Verify(_ => _.GetLocation(It.IsAny<LocationRequest>()), Times.Never);
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, object>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
