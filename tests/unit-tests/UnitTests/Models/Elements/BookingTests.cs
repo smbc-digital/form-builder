@@ -302,7 +302,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.True(bookignElement.DisplayInsetText);
             Assert.Equal("You can select a date for form Name but you can not select a time. We’ll be with you between 11pm and 1am.", bookignElement.InsetText);
         }
-
         
         [Fact]
         public async Task RenderAsync_Should_SelectFirstAvailableDay_WhenOnFirstAvailableMonth_AndNoDateCurrentlySelected()
