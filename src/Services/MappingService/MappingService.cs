@@ -25,7 +25,6 @@ namespace form_builder.Services.MappingService
     {
         Task<MappingEntity> Map(string sessionGuid, string form);
         Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form);
-        Task<Address> MapAddress(string sessionGuid, string form);
     }
 
     public class MappingService : IMappingService
@@ -75,17 +74,6 @@ namespace form_builder.Services.MappingService
                 Customer = GetCustomerDetails(convertedAnswers, baseForm),
                 StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form)
             };
-        }
-
-        public async Task<Address> MapAddress(string sessionGuid, string form)
-        {
-            var baseForm = await _schemaFactory.Build(form);
-            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
-            convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
-            convertedAnswers.FormName = form;
-
-            var customer = GetCustomerDetails(convertedAnswers, baseForm);
-            return customer.Address;
         }
 
         private DateTime GetStartDateTime(string questionID, Dictionary<string, dynamic> viewModel, string form)
