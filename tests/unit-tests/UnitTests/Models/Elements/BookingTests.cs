@@ -300,7 +300,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.Equal(DateTime.Today.AddHours(1), bookignElement.AppointmentEndTime);
             Assert.True(bookignElement.IsAppointmentTypeFullDay);
             Assert.True(bookignElement.DisplayInsetText);
-            Assert.Equal("You can select a date for form Name but you can not select a time. We'll be with you between 11pm and 1am.", bookignElement.InsetText);
+            Assert.Equal("You can select a date for form Name but you can not select a time. We’ll be with you between 11pm and 1am.", bookignElement.InsetText);
         }
 
         
@@ -407,7 +407,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                             Date = date
                         }
                     },
-                    CurrentSearchedMonth = DateTime.Now.AddMonths(1)
+                    CurrentSearchedMonth = DateTime.Now.AddMonths(1),
+                    IsFullDayAppointment = true
                 }
             };
             var formAnswers = new FormAnswers();
