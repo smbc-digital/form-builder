@@ -179,7 +179,7 @@ namespace form_builder.Services.BookingService
         private async Task<ProcessRequestEntity> ProcessDateAndTime(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
             var bookingElement = (Booking) currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
-
+            
             if (!currentPage.IsValid)
             {
                 var cachedAnswers = _distributedCache.GetString(guid);
@@ -276,6 +276,14 @@ namespace form_builder.Services.BookingService
             viewModel.Add(reservedBookingEndTime, viewModel[currentlySelectedBookingEndTime]);
             viewModel.Add(reservedBookingId, result);
 
+            var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
+            var location = await bookingProvider.GetLocation(new LocationRequest
+            {
+                AppointmentId = bookingElement.Properties.AppointmentType,
+                OptionalResources = null
+            });
+
+            viewModel.Add(bookingElement.AppointmentLocation, location);
             return result;
         }
 
