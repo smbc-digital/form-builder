@@ -199,15 +199,6 @@ namespace form_builder.Services.BookingService
                 };
             }
 
-            var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
-            var location = await bookingProvider.GetLocation(new LocationRequest 
-            { 
-                AppointmentId = bookingElement.Properties.AppointmentType,
-                OptionalResources = null
-            });
-
-            viewModel.Add(bookingElement.AppointmentLocation, location);
-
             if (!bookingElement.Properties.CheckYourBooking)
             {
                 await ReserveAppointment(bookingElement, viewModel, baseForm.BaseURL, guid);
@@ -285,6 +276,14 @@ namespace form_builder.Services.BookingService
             viewModel.Add(reservedBookingEndTime, viewModel[currentlySelectedBookingEndTime]);
             viewModel.Add(reservedBookingId, result);
 
+            var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
+            var location = await bookingProvider.GetLocation(new LocationRequest
+            {
+                AppointmentId = bookingElement.Properties.AppointmentType,
+                OptionalResources = null
+            });
+
+            viewModel.Add(bookingElement.AppointmentLocation, location);
             return result;
         }
 
