@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using form_builder.Enum;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 
 namespace form_builder.ViewModels
@@ -17,12 +18,5 @@ namespace form_builder.ViewModels
         public DateTime Value(TimeSpan time) {
             return Date.Add(time);
         }
-    }
-
-    public enum ETimePeriod
-    {
-        Unknown,
-        Morning,
-        Afternoon
     }
 }

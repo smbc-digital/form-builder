@@ -1,4 +1,5 @@
 using System;
+using form_builder.Enum;
 
 namespace form_builder.ViewModels
 {
