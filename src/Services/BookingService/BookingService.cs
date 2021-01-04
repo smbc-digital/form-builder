@@ -248,6 +248,7 @@ namespace form_builder.Services.BookingService
             var reservedBookingDate = bookingElement.ReservedDateQuestionId;
             var reservedBookingStartTime = bookingElement.ReservedStartTimeQuestionId;
             var reservedBookingEndTime = bookingElement.ReservedEndTimeQuestionId;
+            var reservedBookingLocation = bookingElement.AppointmentLocation;            
 
             var currentlySelectedBookingDate = bookingElement.DateQuestionId;
             var currentlySelectedBookingStartTime = bookingElement.StartTimeQuestionId;
@@ -287,7 +288,15 @@ namespace form_builder.Services.BookingService
                 OptionalResources = null
             });
 
-            viewModel.Add(bookingElement.AppointmentLocation, location);
+            if (location == null)
+            {
+                viewModel.Add(reservedBookingLocation, _mappingService.MapAddress(guid, form).ToString());
+            }
+            else
+            {
+                viewModel.Add(reservedBookingLocation, location);
+            }
+
             return result;
         }
 

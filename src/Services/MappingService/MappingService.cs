@@ -17,6 +17,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
+using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
 
 namespace form_builder.Services.MappingService
 {
@@ -24,6 +25,7 @@ namespace form_builder.Services.MappingService
     {
         Task<MappingEntity> Map(string sessionGuid, string form);
         Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form);
+        Task<Address> MapAddress(string sessionGuid, string form);
     }
 
     public class MappingService : IMappingService
@@ -74,6 +76,17 @@ namespace form_builder.Services.MappingService
                 StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form),
                 OptionalResources = bookingElement.Properties.OptionalResources
             };
+        }
+
+        public async Task<Address> MapAddress(string sessionGuid, string form)
+        {
+            var baseForm = await _schemaFactory.Build(form);
+            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
+            convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
+            convertedAnswers.FormName = form;
+
+            var customer = GetCustomerDetails(convertedAnswers, baseForm);
+            return customer.Address;
         }
 
         private DateTime GetStartDateTime(string questionID, Dictionary<string, dynamic> viewModel, string form)
