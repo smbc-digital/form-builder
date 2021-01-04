@@ -22,9 +22,11 @@ using form_builder.Services.PageService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.Extensions.Options;
 using Moq;
+using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using Xunit;
+using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -49,6 +51,13 @@ namespace form_builder_tests.UnitTests.Services
             {
                 _bookingProvider.Object
             };
+
+            _mockMappingService
+                .Setup(expression: _ => _.MapAddress(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new Address
+                {
+                    SelectedAddress = "Address"
+                });
 
             _service = new BookingService(
               _mockDistributedCache.Object,
@@ -650,7 +659,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}", Guid.NewGuid().ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", date.ToString() },
-                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}", date.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}", date.ToString() }
             };
 
             await _service.ProcessBooking(model, page,formSchema,"guid", "path");

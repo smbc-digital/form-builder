@@ -48,26 +48,19 @@ namespace form_builder.Services.MappingService
 
         public async Task<MappingEntity> Map(string sessionGuid, string form)
         {
-            var baseForm = await _schemaFactory.Build(form);
-            var formData = _distributedCache.GetString(sessionGuid);
-            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-            convertedAnswers.FormName = form;
-            convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
+            var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
 
             return new MappingEntity
             {
                 Data = CreatePostData(convertedAnswers, baseForm),
                 BaseForm = baseForm,
-                FormAnswers = convertedAnswers,
+                FormAnswers = convertedAnswers
             };
         }
 
         public async Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form)
         {
-            var baseForm = await _schemaFactory.Build(form);
-            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
-            convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
-            convertedAnswers.FormName = form;
+            var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
 
             return new BookingRequest
             {
@@ -80,13 +73,20 @@ namespace form_builder.Services.MappingService
 
         public async Task<Address> MapAddress(string sessionGuid, string form)
         {
+            var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
+
+            var customer = GetCustomerDetails(convertedAnswers, baseForm);
+            return customer.Address;
+        }
+
+        private async Task<(FormAnswers convertedAnswers, FormSchema baseForm)> GetFormAnswers(string form, string sessionGuid)
+        {
             var baseForm = await _schemaFactory.Build(form);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
             convertedAnswers.FormName = form;
 
-            var customer = GetCustomerDetails(convertedAnswers, baseForm);
-            return customer.Address;
+            return (convertedAnswers, baseForm);
         }
 
         private DateTime GetStartDateTime(string questionID, Dictionary<string, dynamic> viewModel, string form)

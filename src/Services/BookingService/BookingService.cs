@@ -288,9 +288,10 @@ namespace form_builder.Services.BookingService
                 OptionalResources = null
             });
 
-            if (location == null)
+            if (string.IsNullOrEmpty(location))
             {
-                viewModel.Add(reservedBookingLocation, _mappingService.MapAddress(guid, form).ToString());
+                var address = await _mappingService.MapAddress(guid, form);
+                viewModel.Add(reservedBookingLocation, address.ToStringWithoutPlaceRef());
             }
             else
             {
