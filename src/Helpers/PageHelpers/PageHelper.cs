@@ -646,6 +646,17 @@ namespace form_builder.Helpers.PageHelpers
 
                     if(booking.Properties.AppointmentType == Guid.Empty)
                         throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.");
+
+                    if(booking.Properties.OptionalResources.Any())
+                    {
+                        booking.Properties.OptionalResources.ForEach(resource => {
+                            if(resource.Quantity <= 0)
+                                throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element optional resouces are invalid, cannot have a quantity less than 0");
+
+                            if(resource.ResourceId.Equals(Guid.Empty))
+                                throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element optional resouces are invalid, ResourceId cannot be an empty Guid.");
+                        });
+                    }
                 });
 
                 if(!pages.Any(_ => _.PageSlug.ToLower().Equals(BookingConstants.NO_APPOINTMENT_AVAILABLE)))
@@ -657,7 +668,7 @@ namespace form_builder.Helpers.PageHelpers
                         || _.Properties.TargetMapping.ToLower().Equals("customer.lastname") 
                         || _.Properties.TargetMapping.ToLower().Equals("customer.email"))
                     .ToList();
-
+                    
                 if(additionalRequiredElements.Count() != 3)
                     throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires customer firstname/lastname/email elements for reservation");
             }

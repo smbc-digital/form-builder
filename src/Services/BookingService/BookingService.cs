@@ -105,7 +105,8 @@ namespace form_builder.Services.BookingService
             {
                 StartDate = nextAvailability.DayResponse.Date,
                 EndDate = nextAvailability.DayResponse.Date.LastDayOfTheMonth(),
-                AppointmentId = bookingElement.Properties.AppointmentType
+                AppointmentId = bookingElement.Properties.AppointmentType,
+                OptionalResources = bookingElement.Properties.OptionalResources
             });
 
             var bookingInformation = new BookingInformation
@@ -142,7 +143,8 @@ namespace form_builder.Services.BookingService
 
         private async Task<BoookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider) 
         {
-            var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{bookingElement.Properties.AppointmentType}";
+            var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{bookingElement.Properties.AppointmentType}{bookingElement.Properties.OptionalResources.CreateKeyFromResources()}";
+            var OptionalResources = bookingElement.Properties.OptionalResources.Select(_ => _.Quantity);
             var bookingNextAvailabilityCachedResponse = _distributedCache.GetString(bookingNextAvailabilityCachedKey);
 
             var nextAvailability = new AvailabilityDayResponse();
@@ -160,7 +162,8 @@ namespace form_builder.Services.BookingService
                     {
                         StartDate = DateTime.Now,
                         EndDate = DateTime.Now.AddMonths(bookingElement.Properties.SearchPeriod),
-                        AppointmentId = bookingElement.Properties.AppointmentType
+                        AppointmentId = bookingElement.Properties.AppointmentType,
+                        OptionalResources = bookingElement.Properties.OptionalResources
                     });
                 }
                 catch (BookingNoAvailabilityException)
@@ -269,7 +272,8 @@ namespace form_builder.Services.BookingService
             viewModel.Remove(reservedBookingEndTime);
 
             var bookingRequest = await _mappingService.MapBookingRequest(guid, bookingElement, viewModel, form);
-            var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider).Reserve(bookingRequest);
+            var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
+                .Reserve(bookingRequest);
 
             viewModel.Add(reservedBookingDate, viewModel[currentlySelectedBookingDate]);
             viewModel.Add(reservedBookingStartTime, viewModel[currentlySelectedBookingStartTime]);
@@ -314,7 +318,8 @@ namespace form_builder.Services.BookingService
                 {
                     StartDate = requestedMonth,
                     EndDate = requestedMonth.Date.LastDayOfTheMonth(),
-                    AppointmentId = bookingElement.Properties.AppointmentType
+                    AppointmentId = bookingElement.Properties.AppointmentType,
+                    OptionalResources = bookingElement.Properties.OptionalResources
                 });
 
             var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";

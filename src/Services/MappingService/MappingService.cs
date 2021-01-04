@@ -71,7 +71,8 @@ namespace form_builder.Services.MappingService
             {
                 AppointmentId = bookingElement.Properties.AppointmentType,
                 Customer = GetCustomerDetails(convertedAnswers, baseForm),
-                StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form)
+                StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form),
+                OptionalResources = bookingElement.Properties.OptionalResources
             };
         }
 

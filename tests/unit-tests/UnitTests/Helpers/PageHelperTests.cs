@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.Booking.Request;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Helpers
@@ -2640,6 +2641,56 @@ namespace form_builder_tests.UnitTests.Helpers
             // Act
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
             Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires a valid booking provider property.", result.Message);
+        }
+
+        [Fact]
+        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_Contains_EmptyGuid_ForOptionalResources()
+        {
+             // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithBookingProvider("TestProvider")
+                .WithAppointmentType(Guid.NewGuid())
+                .WithBookingResource(new BookingResource{ ResourceId = Guid.Empty, Quantity = 1 })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
+            Assert.Equal("PageHelper:CheckForBookingElement, Booking element optional resouces are invalid, ResourceId cannot be an empty Guid.", result.Message);
+        }
+
+                [Fact]
+        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_Contains_ZeroQuantity_ForOptionalResources()
+        {
+             // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithAppointmentType(Guid.NewGuid())
+                .WithBookingProvider("TestProvider")
+                .WithBookingResource(new BookingResource{ ResourceId = Guid.NewGuid(), Quantity = 0 })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
+            Assert.Equal("PageHelper:CheckForBookingElement, Booking element optional resouces are invalid, cannot have a quantity less than 0", result.Message);
         }
     }
 }

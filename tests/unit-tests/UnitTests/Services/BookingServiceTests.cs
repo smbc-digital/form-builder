@@ -127,6 +127,52 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task Get_Should_Save_NextAvailability_InCache_Using_Valid_Key_With_OptionalResources_WhenSupplied()
+        {
+            var guid = Guid.NewGuid();
+            var date = DateTime.Today.AddDays(-2);
+            var bookingResourceId =  Guid.NewGuid();
+            var bookingResourceQuantity = 3;
+
+            _bookingProvider.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new AvailabilityDayResponse { Date = date });
+
+            _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new AvailabilityDayResponse() });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers{ FormData = new Dictionary<string, object>() }));
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(guid)
+                .WithBookingResource(new BookingResource{ ResourceId = bookingResourceId, Quantity = bookingResourceQuantity })
+                .Build();
+            
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var result = await _service.Get("form", page, "guid");
+            
+            Assert.IsType<BookingProcessEntity>(result);
+            Assert.False(result.BookingHasNoAvailableAppointments);
+            var listOfObjects = Assert.IsType<List<object>>(result.BookingInfo);
+            var bookingInfo = Assert.IsType<BookingInformation>(listOfObjects.First());
+            Assert.False(bookingInfo.IsFullDayAppointment);
+            Assert.Equal(new DateTime(date.Year, date.Month, 1), bookingInfo.CurrentSearchedMonth);
+            Assert.Equal(new DateTime(date.Year, date.Month, 1), bookingInfo.FirstAvailableMonth);
+            Assert.Single(bookingInfo.Appointments);
+
+            _bookingProvider.Verify(_ => _.NextAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
+            _bookingProvider.Verify(_ => _.GetAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-{guid}-{bookingResourceQuantity}{bookingResourceId}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.Booking)), It.IsAny<CancellationToken>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveFormData(It.Is<string>(_ => _.Equals($"{element.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}")), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
         public async Task Get_Should_Call_NextAvailability_Only_WhenProvider_Throws_BookingNoAvailabilityException()
         {
             var guid = Guid.NewGuid();
