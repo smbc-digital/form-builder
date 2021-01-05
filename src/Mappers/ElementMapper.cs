@@ -215,10 +215,12 @@ namespace form_builder.Mappers
             var appointmentDate = $"{key}-{BookingConstants.RESERVED_BOOKING_DATE}";
             var appointmentStartTime = $"{key}-{BookingConstants.RESERVED_BOOKING_START_TIME}";
             var appointmentEndTime = $"{key}-{BookingConstants.RESERVED_BOOKING_END_TIME}";
+            var appointmentLocation = $"{key}-{BookingConstants.APPOINTMENT_LOCATION}";
 
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId.Equals(appointmentId) || _.QuestionId.Equals(appointmentDate) ||
-                            _.QuestionId.Equals(appointmentStartTime) || _.QuestionId.Equals(appointmentEndTime))
+                            _.QuestionId.Equals(appointmentStartTime) || _.QuestionId.Equals(appointmentEndTime) ||
+                            _.QuestionId.Equals(appointmentLocation))
                 .ToList();
 
             if(!value.Any())
@@ -228,10 +230,12 @@ namespace form_builder.Mappers
             var bookingDate = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentDate))?.Response;
             var bookingStartTime = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentStartTime))?.Response;
             var bookingEndTime = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentEndTime))?.Response;
+            var bookingLocation = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentLocation))?.Response;
             bookingObject.Id = bookingId != null ? Guid.Parse(bookingId) : Guid.Empty;
             bookingObject.Date = bookingDate != null ? DateTime.Parse(bookingDate) : DateTime.MinValue;
             bookingObject.StartTime = bookingStartTime != null ? DateTime.Parse(bookingStartTime) : DateTime.MinValue;
             bookingObject.EndTime = bookingEndTime != null ? DateTime.Parse(bookingEndTime) : DateTime.MinValue;
+            bookingObject.Location = bookingLocation;
 
             return bookingObject.IsEmpty() ? null : bookingObject;
         }
