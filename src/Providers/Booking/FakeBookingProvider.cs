@@ -135,15 +135,15 @@ namespace form_builder.Providers.Booking
             var response = new List<AvailabilityDayResponse>();
             switch (request.StartDate.Month)
             {
-                case 12:
+                case 2:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 13), 3, false)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 15), 6, false)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 22), 2, false)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 23), 3, false)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 13), 3, false)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 15), 6, false)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 22), 2, false)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 23), 3, false)
                         .Build();
                     break;
-                case 1:
+                case 3:
                     response = new AvailabilityDayResponseBuilder()
                         .WithDay(new DateTime(2021, request.StartDate.Month, 15), 3, false)
                         .WithDay(new DateTime(2021, request.StartDate.Month, 12), 1, false)
@@ -151,7 +151,7 @@ namespace form_builder.Providers.Booking
                         .WithDay(new DateTime(2021, request.StartDate.Month, 20), 8, false)
                         .Build();
                     break;
-                case 2:
+                case 4:
                     response = new AvailabilityDayResponseBuilder()
                         .WithDay(new DateTime(2021, request.StartDate.Month, 1), 0, false)
                         .Build();
