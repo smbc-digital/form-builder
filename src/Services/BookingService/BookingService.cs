@@ -291,11 +291,11 @@ namespace form_builder.Services.BookingService
             if (string.IsNullOrEmpty(location))
             {
                 var address = await _mappingService.MapAddress(guid, form);
-                viewModel.Add(reservedBookingLocation, address.ToStringWithoutPlaceRef());
+                viewModel.Add(reservedBookingLocation, address.ToStringWithoutPlaceRef().ConvertAddressToTitleCase());
             }
             else
             {
-                viewModel.Add(reservedBookingLocation, location);
+                viewModel.Add(reservedBookingLocation, location.ConvertAddressToTitleCase());
             }
 
             return result;
