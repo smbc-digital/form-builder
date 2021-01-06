@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using StockportGovUK.NetStandard.Models.Booking.Request;
 
 namespace form_builder.Models.Properties.ElementProperties
 {
@@ -10,5 +12,6 @@ namespace form_builder.Models.Properties.ElementProperties
         public bool CheckYourBooking { get; set; }
         public string AppointmentTime { get; set; }
         public string NextAvailableIAG { get; set; } = "This is the next available appointment.";
+        public List<BookingResource> OptionalResources { get;set; } =  new List<BookingResource>();
     }
 }

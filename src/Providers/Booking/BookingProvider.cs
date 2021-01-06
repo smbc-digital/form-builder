@@ -66,5 +66,21 @@ namespace form_builder.Providers.Booking
 
             return result.ResponseContent;
         }
+
+        public async Task<string> GetLocation(LocationRequest request)
+        {
+            var result = await _gateway.GetLocation(request);
+
+            if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
+                throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGaBookingProvider::GetLocation, BookingServiceGateway returned 404 status code, booking with idteway received a bad request, Request:{Newtonsoft.Json.JsonConvert.SerializeObject(request)}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+
+            if (result.StatusCode.Equals(HttpStatusCode.NotFound))
+                throw new ApplicationException($" {request.AppointmentId} cannot be found");
+
+            if (!result.IsSuccessStatusCode)
+                throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+
+            return result.ResponseContent;
+        }
     }
 }

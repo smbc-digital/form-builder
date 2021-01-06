@@ -29,6 +29,9 @@ namespace form_builder_tests.UnitTests.Providers.Booking
             _mockBookingServiceGateway.Setup(_ => _.Reserve(It.IsAny<BookingRequest>()))
                 .ReturnsAsync(new HttpResponse<Guid>{ StatusCode = System.Net.HttpStatusCode.OK, IsSuccessStatusCode = true, ResponseContent = Guid.Empty });
 
+            _mockBookingServiceGateway.Setup(_ => _.GetLocation(It.IsAny<LocationRequest>()))
+                .ReturnsAsync(new HttpResponse<string> { StatusCode = System.Net.HttpStatusCode.OK, IsSuccessStatusCode = true, ResponseContent = String.Empty });
+
             _bookigProvider = new BookingProvider(_mockBookingServiceGateway.Object);
         }
 
@@ -192,6 +195,31 @@ namespace form_builder_tests.UnitTests.Providers.Booking
 
             _mockBookingServiceGateway.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
             Assert.StartsWith("BookingProvider::Reserve, BookingServiceGateway returned with non success status code of InternalServerError, Response: ", result.Message);
+        }
+
+        [Fact]
+        public async Task GetLocation_ShouldReturnLocationResponse_OnSuccessfulCall()
+        {
+            var request = new LocationRequest();
+
+            var result = await _bookigProvider.GetLocation(request);
+
+            _mockBookingServiceGateway.Verify(_ => _.GetLocation(It.IsAny<LocationRequest>()), Times.Once);
+            Assert.IsType<string>(result);
+        }
+
+        [Fact]
+        public async Task GetLocation_Should_Throw_NotFoundExceptionn_WhenAppointmentNotAvailable()
+        {
+            _mockBookingServiceGateway.Setup(_ => _.GetLocation(It.IsAny<LocationRequest>()))
+                .ReturnsAsync(new HttpResponse<string> { StatusCode = System.Net.HttpStatusCode.NotFound, IsSuccessStatusCode = false });
+
+            var request = new LocationRequest();
+
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookigProvider.GetLocation(request));
+
+            _mockBookingServiceGateway.Verify(_ => _.GetLocation(It.IsAny<LocationRequest>()), Times.Once);
+            Assert.Contains("cannot be found", result.Message);
         }
     }
 }

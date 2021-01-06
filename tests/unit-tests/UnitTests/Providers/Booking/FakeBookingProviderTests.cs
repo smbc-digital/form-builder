@@ -57,5 +57,15 @@ namespace form_builder_tests.UnitTests.Providers.Booking
 
             Assert.IsType<Guid>(result);
         }
+
+        [Fact]
+        public async Task GetLocation_ShouldReturnStringLocation()
+        {
+            var request = new LocationRequest { AppointmentId = Guid.NewGuid() };
+
+            var result = await _bookigProvider.GetLocation(request);
+
+            Assert.IsType<string>(result);
+        }
     }
 }

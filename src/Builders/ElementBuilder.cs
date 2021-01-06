@@ -6,6 +6,7 @@ using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
+using StockportGovUK.NetStandard.Models.Booking.Request;
 
 namespace form_builder.Builders
 {
@@ -214,6 +215,17 @@ namespace form_builder.Builders
             return this;
         }
         
+        public ElementBuilder WithBookingResource(BookingResource value)
+        {
+             if (_property.OptionalResources == null)
+                _property.OptionalResources = new List<BookingResource>();
+
+            _property.OptionalResources.Add(value);
+
+            return this;
+        }
+        
+
         public ElementBuilder WithNumeric(bool value)
         {
             _property.Numeric = value;

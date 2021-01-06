@@ -162,5 +162,10 @@ namespace form_builder.Providers.Booking
 
             return Task.FromResult(response);
         }
+
+        public Task<string> GetLocation(LocationRequest request)
+        {
+            return Task.FromResult("Test, Test St, Stockport SK1 3UR");
+        }
     }
 }

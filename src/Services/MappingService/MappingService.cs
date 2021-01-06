@@ -17,6 +17,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
+using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
 
 namespace form_builder.Services.MappingService
 {
@@ -24,6 +25,7 @@ namespace form_builder.Services.MappingService
     {
         Task<MappingEntity> Map(string sessionGuid, string form);
         Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form);
+        Task<Address> MapAddress(string sessionGuid, string form);
     }
 
     public class MappingService : IMappingService
@@ -46,33 +48,45 @@ namespace form_builder.Services.MappingService
 
         public async Task<MappingEntity> Map(string sessionGuid, string form)
         {
-            var baseForm = await _schemaFactory.Build(form);
-            var formData = _distributedCache.GetString(sessionGuid);
-            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-            convertedAnswers.FormName = form;
-            convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
+            var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
 
             return new MappingEntity
             {
                 Data = CreatePostData(convertedAnswers, baseForm),
                 BaseForm = baseForm,
-                FormAnswers = convertedAnswers,
+                FormAnswers = convertedAnswers
             };
         }
 
         public async Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form)
+        {
+            var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
+
+            return new BookingRequest
+            {
+                AppointmentId = bookingElement.Properties.AppointmentType,
+                Customer = GetCustomerDetails(convertedAnswers, baseForm),
+                StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form),
+                OptionalResources = bookingElement.Properties.OptionalResources
+            };
+        }
+
+        public async Task<Address> MapAddress(string sessionGuid, string form)
+        {
+            var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
+
+            var customer = GetCustomerDetails(convertedAnswers, baseForm);
+            return customer.Address;
+        }
+
+        private async Task<(FormAnswers convertedAnswers, FormSchema baseForm)> GetFormAnswers(string form, string sessionGuid)
         {
             var baseForm = await _schemaFactory.Build(form);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
             convertedAnswers.FormName = form;
 
-            return new BookingRequest
-            {
-                AppointmentId = bookingElement.Properties.AppointmentType,
-                Customer = GetCustomerDetails(convertedAnswers, baseForm),
-                StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form)
-            };
+            return (convertedAnswers, baseForm);
         }
 
         private DateTime GetStartDateTime(string questionID, Dictionary<string, dynamic> viewModel, string form)

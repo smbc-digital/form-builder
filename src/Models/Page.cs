@@ -134,7 +134,7 @@ namespace form_builder.Models
 					return behaviour;
 			}
 
-			throw new Exception("Page::GetNextPage, There was a problem whilst processing behaviors");
+			throw new ApplicationException($"Page::GetNextPage, There was a problem whilst processing behaviors for page '{PageSlug}'");
 		}
 
 		public bool CheckPageMeetsConditions(Dictionary<string, dynamic> answers)

@@ -17,5 +17,6 @@ namespace form_builder.Constants
         public const string APPOINTMENT_TIME_OF_DAY_SUFFIX = "-time-of-day";
         public const string APPOINTMENT_TIME_OF_DAY_MORNING = "Morning";
         public const string APPOINTMENT_TIME_OF_DAY_AFTERNOON = "Afternoon";
+        public const string APPOINTMENT_LOCATION = "appointment-location";
     }
 }

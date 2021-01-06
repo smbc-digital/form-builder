@@ -54,6 +54,7 @@ namespace form_builder.Models.Elements
         public string ReservedStartTimeQuestionId => $"{Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}";
         public string ReservedEndTimeQuestionId => $"{Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}";
         public string ReservedIdQuestionId => $"{Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}";
+        public string AppointmentLocation => $"{Properties.QuestionId}-{BookingConstants.APPOINTMENT_LOCATION}";
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
