@@ -248,11 +248,13 @@ namespace form_builder.Services.BookingService
             var reservedBookingDate = bookingElement.ReservedDateQuestionId;
             var reservedBookingStartTime = bookingElement.ReservedStartTimeQuestionId;
             var reservedBookingEndTime = bookingElement.ReservedEndTimeQuestionId;
-            var reservedBookingLocation = bookingElement.AppointmentLocation;            
 
             var currentlySelectedBookingDate = bookingElement.DateQuestionId;
             var currentlySelectedBookingStartTime = bookingElement.StartTimeQuestionId;
             var currentlySelectedBookingEndTime = bookingElement.EndTimeQuestionId;
+
+            var location = await GetReservedBookingLocation(bookingElement, form, guid);
+            viewModel.Add(bookingElement.AppointmentLocation, location);
 
             if (viewModel.ContainsKey(reservedBookingId) && !string.IsNullOrEmpty((string)viewModel[reservedBookingId]))
             {
@@ -263,8 +265,8 @@ namespace form_builder.Services.BookingService
                 var previouslyReservedAppointmentStartTime = (string)viewModel[reservedBookingStartTime];
                 var previouslyReservedAppointmentEndTime = (string)viewModel[reservedBookingEndTime];
 
-                if (currentSelectedDate.Equals(previouslyReservedAppointmentDate) && currentSelectedStartTime.Equals(previouslyReservedAppointmentStartTime) && currentSelectedEndTime.Equals(previouslyReservedAppointmentEndTime))
-                    return Guid.Parse(viewModel[reservedBookingId]);
+                if (currentSelectedDate.Equals(previouslyReservedAppointmentDate) && currentSelectedStartTime.Equals(previouslyReservedAppointmentStartTime) && currentSelectedEndTime.Equals(previouslyReservedAppointmentEndTime))                
+                    return Guid.Parse(viewModel[reservedBookingId]);                
             }
 
             viewModel.Remove(reservedBookingId);
@@ -281,6 +283,11 @@ namespace form_builder.Services.BookingService
             viewModel.Add(reservedBookingEndTime, viewModel[currentlySelectedBookingEndTime]);
             viewModel.Add(reservedBookingId, result);
 
+            return result;
+        }
+
+        private async Task<string> GetReservedBookingLocation(Booking bookingElement, string form, string guid)
+        {
             var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
             var location = await bookingProvider.GetLocation(new LocationRequest
             {
@@ -291,14 +298,12 @@ namespace form_builder.Services.BookingService
             if (string.IsNullOrEmpty(location))
             {
                 var address = await _mappingService.MapAddress(guid, form);
-                viewModel.Add(reservedBookingLocation, address.ToStringWithoutPlaceRef().ConvertAddressToTitleCase());
+                return address.ToStringWithoutPlaceRef().ConvertAddressToTitleCase();
             }
             else
             {
-                viewModel.Add(reservedBookingLocation, location.ConvertAddressToTitleCase());
+                return location.ConvertAddressToTitleCase();
             }
-
-            return result;
         }
 
         public async Task ProcessMonthRequest(Dictionary<string, object> viewModel, FormSchema baseForm, Page currentPage, string guid)
