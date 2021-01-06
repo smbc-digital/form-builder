@@ -8,6 +8,7 @@ using form_builder.Extensions;
 using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models.Booking;
+using form_builder.Models.Time;
 using form_builder.Utils.Extesions;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Booking.Response;
@@ -18,9 +19,10 @@ namespace form_builder.Models.Elements
     {
         public Booking() => Type = EElementType.Booking;
         public List<CalendarDay> Calendar { get; set; } = new List<CalendarDay>();
+        public List<TimeAvailability> Times { get; set; } = new List<TimeAvailability>();
         public List<AvailabilityDayResponse> Appointments { get; set; } = new List<AvailabilityDayResponse>();
         public string FormattedDateForCheckYourBooking => DateTime.Parse(Properties.Value).ToFullDateFormat();
-        public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {AppointmentStartTime.ToTimeFormat()} and {AppointmentEndTime.ToTimeFormat()}" : "NotFullDay";
+        public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {AppointmentStartTime.ToTimeFormat()} and {AppointmentEndTime.ToTimeFormat()}" : $"{AppointmentStartTime.ToTimeFormat()} to {AppointmentEndTime.ToTimeFormat()}";
         public AvailabilityDayResponse SelectedBooking;
         public bool IsAppointmentTypeFullDay { get; set; }
         public DateTime AppointmentStartTime { get; set; }
@@ -88,6 +90,7 @@ namespace form_builder.Models.Elements
                     return viewRender.RenderAsync("CheckYourBooking", this);
                 default:
                     CreateCalendar();
+                    CreateTimeAvailability();
                     MonthSelectionPostUrl = formSchema.BaseURL.ToBookingRequestedMonthUrl(page.PageSlug, environment.EnvironmentName.Equals("local"));
                     return viewRender.RenderAsync(Type.ToString(), this);
             }
@@ -101,8 +104,8 @@ namespace form_builder.Models.Elements
             CurrentSelectedMonth = bookingInformation.CurrentSearchedMonth;
             FirstAvailableMonth = bookingInformation.FirstAvailableMonth;
             IsAppointmentTypeFullDay = bookingInformation.IsFullDayAppointment;
-            if (bookingInformation.IsFullDayAppointment)
-            {
+
+            if(bookingInformation.IsFullDayAppointment){
                 AppointmentStartTime = bookingInformation.AppointmentStartTime;
                 AppointmentEndTime = bookingInformation.AppointmentEndTime;
             }
@@ -133,12 +136,51 @@ namespace form_builder.Models.Elements
             Calendar = dates;
         }
 
+        private void CreateTimeAvailability()
+        {
+            if(IsAppointmentTypeFullDay)
+                return;
+
+            var days = Appointments.Where(_ => _.HasAvailableAppointment);
+
+            if(!days.Any())
+                return;
+
+            Times = days.Select((day) => {
+                var morningAppointments = day.AppointmentTimes.Where(_ => _.StartTime.Hours <  12).ToList();
+                var afternoonAppointments = day.AppointmentTimes.Where(_ => _.StartTime.Hours >=  12).ToList();
+                return new TimeAvailability {
+                    Date = day.Date,
+                    MorningAppointments  = new TimePeriod {
+                        Appointments =  morningAppointments,
+                        TimeQuestionId = StartTimeQuestionId,
+                        TimeOfDay = ETimePeriod.Morning,
+                        Date = day.Date,
+                        CurrentValue = Properties.Value.Equals(day.Date.ToString()) && !string.IsNullOrEmpty(StartAppointmentTime) ? DateTime.Parse(StartAppointmentTime).ToString() : string.Empty
+                    },
+                    AfternoonAppointments  = new TimePeriod {
+                        Appointments =  afternoonAppointments,
+                        TimeQuestionId = StartTimeQuestionId,
+                        TimeOfDay = ETimePeriod.Afternoon,
+                        Date = day.Date,
+                        CurrentValue = Properties.Value.Equals(day.Date.ToString()) && !string.IsNullOrEmpty(StartAppointmentTime) ? DateTime.Parse(StartAppointmentTime).ToString() : string.Empty
+                    },
+                    TimePeriodCurrentlySelected = Properties.Value.Equals(day.Date.ToString()) && !string.IsNullOrEmpty(StartAppointmentTime) && Properties.Value.Equals(DateTime.Parse(StartAppointmentTime).Date.ToString()) ? DateTime.Parse(StartAppointmentTime).Hour >= 12 ? ETimePeriod.Afternoon : ETimePeriod.Morning : morningAppointments.Any() ? ETimePeriod.Morning : ETimePeriod.Afternoon,
+                    TimeQuestionId = StartTimeQuestionId,
+                    DateQuestionId = DateQuestionId
+                };
+            }).ToList();
+        }
+
         private AvailabilityDayResponse GetSelectedAppointment()
         {
             var selectedAppointment = Appointments.FirstOrDefault(_ => _.Date.ToString().Equals(Properties.Value));
 
             if (selectedAppointment == null)
                 throw new ApplicationException("Booking::GetSelectedAppointment, Unable to find selected appointment while attempting to generate check your booking view");
+
+            AppointmentStartTime = DateTime.Parse(StartAppointmentTime);
+            AppointmentEndTime =  DateTime.Parse(EndAppointmentTime);
 
             return selectedAppointment;
         }

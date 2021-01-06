@@ -130,21 +130,21 @@ namespace form_builder.Services.BookingService
 
         public async Task<ProcessRequestEntity> ProcessBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
+            var bookingElement = (Booking) currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
 
             switch (subPath)
             {
                 case BookingConstants.CHECK_YOUR_BOOKING:
-                    return await ProcessCheckYourBooking(viewModel, currentPage, baseForm, guid, path);
+                    return await ProcessCheckYourBooking(viewModel, currentPage, baseForm, guid, path, bookingElement);
                 default:
-                    return await ProcessDateAndTime(viewModel, currentPage, baseForm, guid, path);
+                    return await ProcessDateAndTime(viewModel, currentPage, baseForm, guid, path, bookingElement);
             }
         }
 
         private async Task<BoookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider) 
         {
             var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{bookingElement.Properties.AppointmentType}{bookingElement.Properties.OptionalResources.CreateKeyFromResources()}";
-            var OptionalResources = bookingElement.Properties.OptionalResources.Select(_ => _.Quantity);
             var bookingNextAvailabilityCachedResponse = _distributedCache.GetString(bookingNextAvailabilityCachedKey);
 
             var nextAvailability = new AvailabilityDayResponse();
@@ -179,10 +179,8 @@ namespace form_builder.Services.BookingService
             return result;
         }
 
-        private async Task<ProcessRequestEntity> ProcessDateAndTime(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
+        private async Task<ProcessRequestEntity> ProcessDateAndTime(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path, Booking element)
         {
-            var bookingElement = (Booking) currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
-            
             if (!currentPage.IsValid)
             {
                 var cachedAnswers = _distributedCache.GetString(guid);
@@ -191,7 +189,7 @@ namespace form_builder.Services.BookingService
                     ? new FormAnswers { Pages = new List<PageAnswers>() }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-                var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[$"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}"].ToString());
+                var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[$"{element.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}"].ToString());
                 var bookingInformation = new List<object> { cachedBookingInformation };
                 var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null, bookingInformation);
 
@@ -202,9 +200,9 @@ namespace form_builder.Services.BookingService
                 };
             }
 
-            if (!bookingElement.Properties.CheckYourBooking)
+            if (!element.Properties.CheckYourBooking)
             {
-                await ReserveAppointment(bookingElement, viewModel, baseForm.BaseURL, guid);
+                await ReserveAppointment(element, viewModel, baseForm.BaseURL, guid);
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
@@ -229,11 +227,9 @@ namespace form_builder.Services.BookingService
             };
         }
 
-        private async Task<ProcessRequestEntity> ProcessCheckYourBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
+        private async Task<ProcessRequestEntity> ProcessCheckYourBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path, Booking element)
         {
-            var bookingElement = (Booking) currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
-            await ReserveAppointment(bookingElement, viewModel, baseForm.BaseURL, guid);
-
+            await ReserveAppointment(element, viewModel, baseForm.BaseURL, guid);
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
             return new ProcessRequestEntity
@@ -292,7 +288,7 @@ namespace form_builder.Services.BookingService
             var location = await bookingProvider.GetLocation(new LocationRequest
             {
                 AppointmentId = bookingElement.Properties.AppointmentType,
-                OptionalResources = null
+                OptionalResources = bookingElement.Properties.OptionalResources
             });
 
             if (string.IsNullOrEmpty(location))

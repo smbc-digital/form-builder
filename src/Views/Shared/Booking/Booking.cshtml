@@ -1,6 +1,6 @@
 @model form_builder.Models.Elements.Booking
 
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)" data-module="smbc-calendar">
     @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
 
     @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_DATE), Model.ReservedBookingDate)
@@ -27,5 +27,11 @@
     <partial name="Error" />
 
     <partial name="Calendar" model="@Model" />
+
+    @if (!@Model.IsAppointmentTypeFullDay)
+    {
+        <partial name="Time" model="@Model.Times"/>
+    }
+
     @Html.EndFieldSet()
 </div>

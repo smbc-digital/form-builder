@@ -79,7 +79,10 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("question")
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {$"question-{BookingConstants.APPOINTMENT_START_TIME}", "01/01/2000"}
+            };
 
             // Act
             var result = _validator.Validate(element, viewModel);
@@ -90,7 +93,7 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
-        public void Validate_ShouldReturnFalse_When_DateTime_IsInvalid()
+        public void Validate_ShouldReturnFalse_When_Date_IsInvalid()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -100,7 +103,8 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>
             {
-                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", "not-a-date" }
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", "not-a-date" },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", "01/01/2000T13:00:00" }
             };
 
             // Act
@@ -111,9 +115,53 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.Equal(ValidationConstants.BOOKING_DATE_EMPTY, result.Message);
         }
         
+        [Fact]
+        public void Validate_ShouldReturnFalse_When_Time_IsInvalid()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("question")
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", "01/01/2000" },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", "not a time" }
+            };
+
+            // Act
+            var result = _validator.Validate(element, viewModel);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Equal(ValidationConstants.BOOKING_TIME_EMPTY, result.Message);
+        }
         
         [Fact]
-        public void Validate_ShouldReturn_AndUseCustomer_ErrorMessage()
+        public void Validate_ShouldReturnFalse_When_Time_Is_NotSupplied()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("question")
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", "01/01/2000" }
+            };
+
+            // Act
+            var result = _validator.Validate(element, viewModel);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Equal(ValidationConstants.BOOKING_TIME_EMPTY, result.Message);
+        }
+
+        [Fact]
+        public void Validate_ShouldReturn_And_UseCustom_ErrorMessage()
         {
             // Arrange
             var customeMessage = "customer validation message";
@@ -132,10 +180,9 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.False(result.IsValid);
             Assert.Equal(customeMessage, result.Message);
         }
-        
 
         [Fact]
-        public void Validate_ShouldReturnTrue_WhenDateIsValid_AndRequired()
+        public void Validate_ShouldReturnTrue_WhenDate_AndTime_IsValid_AndRequired()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -145,7 +192,9 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>
             {
-                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", DateTime.Today.ToString() }
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", DateTime.Today.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", DateTime.Today.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_END_TIME}", DateTime.Today.ToString() }
             };
 
             // Act

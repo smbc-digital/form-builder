@@ -1217,7 +1217,7 @@ namespace form_builder_tests.UnitTests.Mappers
             var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
-            Assert.Equal($"{date.ToFullDateFormat()} at 4:30am", result);
+            Assert.Equal($"{date.ToFullDateFormat()} at 4:30am to 12am", result);
         }
 
         [Fact]

@@ -14,6 +14,9 @@ namespace form_builder.Constants
         public const string RESERVED_BOOKING_ID = "reserved-appointment-id";
         public const string BOOKING_MONTH_REQUEST = "month-request";
         public const string NO_APPOINTMENT_AVAILABLE = "no-appointment-available";
+        public const string APPOINTMENT_TIME_OF_DAY_SUFFIX = "-time-of-day";
+        public const string APPOINTMENT_TIME_OF_DAY_MORNING = "Morning";
+        public const string APPOINTMENT_TIME_OF_DAY_AFTERNOON = "Afternoon";
         public const string APPOINTMENT_LOCATION = "appointment-location";
     }
 }

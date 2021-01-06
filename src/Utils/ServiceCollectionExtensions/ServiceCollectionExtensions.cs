@@ -374,6 +374,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             {
                 o.ViewLocationFormats.Add("/Views/Shared/Booking/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/Address/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Time/{0}" + RazorViewEngine.ViewExtension);
             });
 
             return services;

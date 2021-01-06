@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
@@ -9,6 +10,7 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
 using form_builder.Models.Booking;
 using form_builder.Models.Elements;
+using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
@@ -79,7 +81,15 @@ namespace form_builder_tests.UnitTests.Models.Elements
         {
             //Arrange
             var key = $"bookingQuestion-{BookingConstants.APPOINTMENT_DATE}";
+            var keyStart = $"bookingQuestion-{BookingConstants.APPOINTMENT_START_TIME}";
+            var keyEnd = $"bookingQuestion-{BookingConstants.APPOINTMENT_END_TIME}";
             _mockElementHelper.Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(key)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
+                .Returns(DateTime.Today.ToString());
+
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(keyStart)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
+                .Returns(DateTime.Today.ToString());
+
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(keyEnd)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns(DateTime.Today.ToString());
 
             var element = new ElementBuilder()
@@ -98,6 +108,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
             {
                 { LookUpConstants.SubPathViewModelKey, BookingConstants.CHECK_YOUR_BOOKING },
                 { key, DateTime.Today.ToString() },
+                { keyStart, DateTime.Today.ToString() },
+                { keyEnd, DateTime.Today.ToString() },
             };
 
             var schema = new FormSchemaBuilder()
@@ -290,9 +302,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.Equal(DateTime.Today.AddHours(1), bookignElement.AppointmentEndTime);
             Assert.True(bookignElement.IsAppointmentTypeFullDay);
             Assert.True(bookignElement.DisplayInsetText);
-            Assert.Equal("You can select a date for form Name but you can not select a time. We’ll be with you between 11pm and 1am.", bookignElement.InsetText);
+            Assert.Equal("You can select a date for form Name but you can not select a time. Weâ€™ll be with you between 11pm and 1am.", bookignElement.InsetText);
         }
-
         
         [Fact]
         public async Task RenderAsync_Should_SelectFirstAvailableDay_WhenOnFirstAvailableMonth_AndNoDateCurrentlySelected()
@@ -397,7 +408,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                             Date = date
                         }
                     },
-                    CurrentSearchedMonth = DateTime.Now.AddMonths(1)
+                    CurrentSearchedMonth = DateTime.Now.AddMonths(1),
+                    IsFullDayAppointment = true
                 }
             };
             var formAnswers = new FormAnswers();
@@ -416,6 +428,146 @@ namespace form_builder_tests.UnitTests.Models.Elements
             //Assert
             var bookignElement = Assert.IsType<Booking>(element);
             Assert.Null(bookignElement.Properties.Value);
+        }
+
+        
+        [Fact]
+        public async Task RenderAsync_Should_Create_Times_When_On_CalendarJourney_WhenAppointentIsNot_FullDay()
+        {
+            //Arrange
+            var date = DateTime.Now;
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(Guid.NewGuid())
+                .WithCheckYourBooking(true)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            var bookignInfo = new List<object>
+            {
+                new BookingInformation{
+                    Appointments = new List<AvailabilityDayResponse>
+                    {
+                        new AvailabilityDayResponse 
+                        {
+                            AppointmentTimes = new List<AppointmentTime> 
+                            {
+                                new AppointmentTime 
+                                {
+                                    StartTime = new TimeSpan(13, 0, 0),
+                                    EndTime= new TimeSpan(14, 0, 0),
+                                },
+                                new AppointmentTime 
+                                {
+                                    StartTime = new TimeSpan(3, 0, 0),
+                                    EndTime= new TimeSpan(4, 0, 0),
+                                },
+                                new AppointmentTime 
+                                {
+                                    StartTime = new TimeSpan(9, 0, 0),
+                                    EndTime= new TimeSpan(10, 0, 0),
+                                }
+                            },
+                            Date = date
+                        }
+                    }
+                }
+            };
+            var formAnswers = new FormAnswers();
+            //Act
+            var result = await element.RenderAsync(
+                _mockIViewRender.Object,
+                _mockElementHelper.Object,
+                string.Empty,
+                viewModel,
+                page,
+                schema,
+                _mockHostingEnv.Object,
+                formAnswers, 
+                bookignInfo);
+
+            //Assert
+            var bookignElement = Assert.IsType<Booking>(element);
+            Assert.Single(bookignElement.Times);
+            Assert.Equal(bookignElement.Times.First().MorningAppointments.Appointments.Count, 2);
+            Assert.Single(bookignElement.Times.First().AfternoonAppointments.Appointments);
+            Assert.Equal(bookignElement.Times.First().TimePeriodCurrentlySelected, ETimePeriod.Morning);
+        }
+
+        
+        [Fact]
+        public async Task RenderAsync_Should_Select_Afternoon_WhenNoMorningAppointments_AsTimePeriod_CurrentlySelected()
+        {
+            //Arrange
+            var date = DateTime.Now;
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(Guid.NewGuid())
+                .WithCheckYourBooking(true)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .Build();
+
+            var bookignInfo = new List<object>
+            {
+                new BookingInformation{
+                    Appointments = new List<AvailabilityDayResponse>
+                    {
+                        new AvailabilityDayResponse 
+                        {
+                            AppointmentTimes = new List<AppointmentTime> 
+                            {
+                                new AppointmentTime 
+                                {
+                                    StartTime = new TimeSpan(13, 0, 0),
+                                    EndTime= new TimeSpan(14, 0, 0),
+                                }
+                            },
+                            Date = date
+                        }
+                    }
+                }
+            };
+            var formAnswers = new FormAnswers();
+            //Act
+            var result = await element.RenderAsync(
+                _mockIViewRender.Object,
+                _mockElementHelper.Object,
+                string.Empty,
+                viewModel,
+                page,
+                schema,
+                _mockHostingEnv.Object,
+                formAnswers, 
+                bookignInfo);
+
+            //Assert
+            var bookignElement = Assert.IsType<Booking>(element);
+            Assert.Single(bookignElement.Times);
+            Assert.Empty(bookignElement.Times.First().MorningAppointments.Appointments);
+            Assert.Single(bookignElement.Times.First().AfternoonAppointments.Appointments);
+            Assert.Equal(bookignElement.Times.First().TimePeriodCurrentlySelected, ETimePeriod.Afternoon);
         }
     }
 }

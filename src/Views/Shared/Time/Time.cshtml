@@ -1,0 +1,19 @@
+@model List<form_builder.Models.Time.TimeAvailability>
+
+@foreach (var day in  Model)
+{
+    var timeHeaderModel = new TimeHeaderViewModel {  
+        Date = day.Date, DataAriaControlsIdForMorning = day.MorningAppointments.Id,
+        DataAriaControlsIdForAfternoon = day.AfternoonAppointments.Id,
+        SelectedTimePeriod = day.TimePeriodCurrentlySelected
+    };
+
+    <div class="smbc-time smbc-time__conditional smbc-time__conditional--hidden" id="@day.TimeSelectionIdForConditionalReveal" data-module="smbc-time">
+        <noscript>
+            <h3 class="govuk-heading-m"> @timeHeaderModel.DateTextForNoScript</h3>
+        </noscript>
+        <partial name="TimeHeader" model="@timeHeaderModel" />
+        <partial name="TimePeriod" model="@day.MorningAppointments" />
+        <partial name="TimePeriod" model="@day.AfternoonAppointments" />
+    </div>
+}

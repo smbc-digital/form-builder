@@ -130,23 +130,19 @@ namespace form_builder.Mappers
                     var convertTime = (TimeSpan)value;
                     var date = DateTime.Today.Add(convertTime);
                     return date.ToString("hh:mm tt");
-
                 case EElementType.DatePicker:
                 case EElementType.DateInput:
                     var convertDateTime = (DateTime)value;
                     return convertDateTime.Date.ToString("dd/MM/yyyy");
-
                 case EElementType.Select:
                 case EElementType.Radio:
                     var selectValue = question.Properties.Options.FirstOrDefault(_ => _.Value == value.ToString());
                     return selectValue?.Text ?? string.Empty;
-
                 case EElementType.Checkbox:
                     var answerCheckbox = string.Empty;
                     var list = (List<string>)value;
                     list.ForEach((answersCheckbox) => answerCheckbox += $" {question.Properties.Options.FirstOrDefault(_ => _.Value == answersCheckbox)?.Text ?? string.Empty},");
                     return answerCheckbox.EndsWith(",") ? answerCheckbox.Remove(answerCheckbox.Length - 1).Trim() : answerCheckbox.Trim();
-
                 case EElementType.Organisation:
                     var orgValue = (Organisation)value;
                     return !string.IsNullOrEmpty(orgValue.Name) ? orgValue.Name : string.Empty;
@@ -158,8 +154,7 @@ namespace form_builder.Mappers
                     return string.IsNullOrWhiteSpace(addressValue.AddressLine1) ? string.Empty : $"{addressValue.AddressLine1}{manualLine2Text},{addressValue.Town},{addressValue.Postcode}";
                 case EElementType.Booking:
                     var bookingValue = (Booking)value;
-                    return  bookingValue.Date.Equals(DateTime.MinValue) && bookingValue.StartTime.Equals(DateTime.MinValue) ? string.Empty : $"{bookingValue.Date.ToFullDateFormat()} at {bookingValue.StartTime.ToTimeFormat()}";
-
+                    return  bookingValue.Date.Equals(DateTime.MinValue) && bookingValue.StartTime.Equals(DateTime.MinValue) ? string.Empty : $"{bookingValue.Date.ToFullDateFormat()} at {bookingValue.StartTime.ToTimeFormat()} to {bookingValue.EndTime.ToTimeFormat()}";
                 case EElementType.Street:
                     var streetValue = (Address)value;
                     return string.IsNullOrEmpty(streetValue.PlaceRef) && string.IsNullOrEmpty(streetValue.SelectedAddress) ? string.Empty : streetValue.SelectedAddress;
