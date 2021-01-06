@@ -144,10 +144,7 @@ namespace form_builder.Models.Elements
             var days = Appointments.Where(_ => _.HasAvailableAppointment);
 
             if(!days.Any())
-            {
-                //Handle when there are not appointments for the given period
                 return;
-            }
 
             Times = days.Select((day) => {
                 var morningAppointments = day.AppointmentTimes.Where(_ => _.StartTime.Hours <  12).ToList();
