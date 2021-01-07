@@ -9,11 +9,15 @@
     };
 
     <div class="smbc-time smbc-time__conditional smbc-time__conditional--hidden" id="@day.TimeSelectionIdForConditionalReveal" data-module="smbc-time">
-        <noscript>
-            <h3 class="govuk-heading-m"> @timeHeaderModel.DateTextForNoScript</h3>
-        </noscript>
         <partial name="TimeHeader" model="@timeHeaderModel" />
         <partial name="TimePeriod" model="@day.MorningAppointments" />
         <partial name="TimePeriod" model="@day.AfternoonAppointments" />
     </div>
+    <noscript>
+        <div class="smbc-time smbc-time__conditional">
+            <h3 class="govuk-heading-m"> @timeHeaderModel.DateTextForNoScript</h3>
+            <partial name="TimePeriodNoJS" model="@day.MorningAppointments" />
+            <partial name="TimePeriodNoJS" model="@day.AfternoonAppointments" />
+        </div>
+    </noscript>
 }

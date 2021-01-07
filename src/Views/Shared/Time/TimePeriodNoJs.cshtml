@@ -1,0 +1,32 @@
+@using form_builder.Utils.Extesions
+@model form_builder.Models.Time.TimePeriod
+@{
+    var additionalDivs = Model.Appointments.Count % 3;
+}
+
+<div class="smbc-time__body smbc-time__body__conditional smbc-time__body__conditional--hidden">
+    @if(!Model.HasAppointments){
+        <partial name="TimePeriodNoAppointments" model="@($"No appointments in the {Model.TimeOfDay}")" />
+    } else {
+            @for (int i = 0; i < Model.Appointments.Count; i++)
+            {
+                var startTime = Model.Appointments[i].StartTime;
+                var endTime = Model.Appointments[i].EndTime;
+                <div class="smbc-time__time">
+                    <input 
+                        class="smbc-time__time__input" 
+                        type='radio' 
+                        @(Model.CurrentValue == @Model.Value(startTime).ToString() ? "checked" : string.Empty)  
+                        value="@Model.Value(startTime)|@Model.Value(endTime)" 
+                        name='@Model.NoJSId' 
+                        id="@Model.Value(startTime)-full-time-period"/>
+                    <label class="smbc-time__time__label @Model.GetClassNameForDivsPosition(i)" for="@Model.Value(startTime)-full-time-period">@Model.Value(startTime).ToTimeFormat()</label>
+                </div>
+            }
+            @for (int i = 1; i < additionalDivs; i++)
+            {
+                <div class="smbc-time__time">
+                </div>
+            }
+    }
+</div>
