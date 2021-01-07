@@ -55,6 +55,7 @@ namespace form_builder.Models.Elements
         public string ReservedEndTimeQuestionId => $"{Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}";
         public string ReservedIdQuestionId => $"{Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}";
         public string AppointmentLocation => $"{Properties.QuestionId}-{BookingConstants.APPOINTMENT_LOCATION}";
+        public string NoTimeForBookingType => Properties.NoAvailableTimeForBookingType;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
@@ -156,14 +157,16 @@ namespace form_builder.Models.Elements
                         TimeQuestionId = StartTimeQuestionId,
                         TimeOfDay = ETimePeriod.Morning,
                         Date = day.Date,
-                        CurrentValue = Properties.Value.Equals(day.Date.ToString()) && !string.IsNullOrEmpty(StartAppointmentTime) ? DateTime.Parse(StartAppointmentTime).ToString() : string.Empty
+                        CurrentValue = Properties.Value.Equals(day.Date.ToString()) && !string.IsNullOrEmpty(StartAppointmentTime) ? DateTime.Parse(StartAppointmentTime).ToString() : string.Empty,
+                        BookingType = NoTimeForBookingType
                     },
                     AfternoonAppointments  = new TimePeriod {
                         Appointments =  afternoonAppointments,
                         TimeQuestionId = StartTimeQuestionId,
                         TimeOfDay = ETimePeriod.Afternoon,
                         Date = day.Date,
-                        CurrentValue = Properties.Value.Equals(day.Date.ToString()) && !string.IsNullOrEmpty(StartAppointmentTime) ? DateTime.Parse(StartAppointmentTime).ToString() : string.Empty
+                        CurrentValue = Properties.Value.Equals(day.Date.ToString()) && !string.IsNullOrEmpty(StartAppointmentTime) ? DateTime.Parse(StartAppointmentTime).ToString() : string.Empty,
+                        BookingType = NoTimeForBookingType
                     },
                     TimePeriodCurrentlySelected = Properties.Value.Equals(day.Date.ToString()) && !string.IsNullOrEmpty(StartAppointmentTime) && Properties.Value.Equals(DateTime.Parse(StartAppointmentTime).Date.ToString()) ? DateTime.Parse(StartAppointmentTime).Hour >= 12 ? ETimePeriod.Afternoon : ETimePeriod.Morning : morningAppointments.Any() ? ETimePeriod.Morning : ETimePeriod.Afternoon,
                     TimeQuestionId = StartTimeQuestionId,
