@@ -1,7 +1,7 @@
 @model form_builder.Models.Time.TimePeriod
 
 @{
-    <p class="smbc-body">@Model</p> var timeOfDay = @Model.TimeOfDay.ToString().ToLower();
+    var timeOfDay = @Model.TimeOfDay.ToString().ToLower();
 }
 <div class="govuk-warning-text">
     <span class="govuk-warning-text__icon govuk-!-margin-top-6" aria-hidden="true">!</span>
