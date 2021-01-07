@@ -25,7 +25,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private const string contentWithInvalidVariableQuestionIdInBraces = "Some text with a {{invalidVariableQuestionId}}";
 
         private readonly IActionHelper _actionHelper;
-        private readonly IEnumerable<IFormatter> _formatters;
+        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new Mock<IEnumerable<IFormatter>>();
 
         private readonly MappingEntity _mappingEntity = new MappingEntityBuilder()
             .WithFormAnswers(new FormAnswers
@@ -85,7 +85,7 @@ namespace form_builder_tests.UnitTests.Helpers
             })
             .Build();
 
-        public ActionHelperTests() => _actionHelper = new ActionHelper(_formatters);
+        public ActionHelperTests() => _actionHelper = new ActionHelper(_mockFormatters.Object);
 
         [Fact]
         public void GenerateUrl_ShouldGenerateCorrectGetUrl_PathParameters()

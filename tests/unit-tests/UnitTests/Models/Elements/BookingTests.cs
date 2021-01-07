@@ -10,7 +10,6 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Models;
 using form_builder.Models.Booking;
 using form_builder.Models.Elements;
-using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
@@ -54,16 +53,19 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var bookignInfo = new List<object>
             {
-                new BookingInformation{
+                new BookingInformation
+                {
                     Appointments = new List<AvailabilityDayResponse>()
                 }
             };
+
             var formAnswers = new FormAnswers();
+
             //Act
             var result = await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
-                "",
+                string.Empty,
                 viewModel,
                 page,
                 schema,
@@ -75,7 +77,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "Booking"), It.IsAny<Booking>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
-
         [Fact]
         public async Task RenderAsync_ShouldCallViewRenderWithCorrectPartial_When_CheckYourBooking()
         {
@@ -83,13 +84,17 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var key = $"bookingQuestion-{BookingConstants.APPOINTMENT_DATE}";
             var keyStart = $"bookingQuestion-{BookingConstants.APPOINTMENT_START_TIME}";
             var keyEnd = $"bookingQuestion-{BookingConstants.APPOINTMENT_END_TIME}";
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(key)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
+
+            _mockElementHelper
+                .Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(key)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns(DateTime.Today.ToString());
 
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(keyStart)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
+            _mockElementHelper
+                .Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(keyStart)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns(DateTime.Today.ToString());
 
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(keyEnd)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
+            _mockElementHelper
+                .Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(keyEnd)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns(DateTime.Today.ToString());
 
             var element = new ElementBuilder()
@@ -118,7 +123,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var bookignInfo = new List<object>
             {
-                new BookingInformation{
+                new BookingInformation
+                {
                     Appointments = new List<AvailabilityDayResponse>
                     {
                         new AvailabilityDayResponse {
@@ -129,11 +135,12 @@ namespace form_builder_tests.UnitTests.Models.Elements
             };
 
             var formAnswers = new FormAnswers();
+
             //Act
             var result = await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
-                "",
+                string.Empty,
                 viewModel,
                 page,
                 schema,
@@ -153,7 +160,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var baseUrl = "form-base";
             var pageUrl = "test-page-url";
             var key = $"bookingQuestion-{BookingConstants.APPOINTMENT_DATE}";
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(key)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
+
+            _mockElementHelper
+                .Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(key)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns(DateTime.Today.ToString());
 
              var element = new ElementBuilder()
@@ -178,7 +187,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var bookignInfo = new List<object>
             {
-                new BookingInformation{
+                new BookingInformation
+                {
                     Appointments = new List<AvailabilityDayResponse>
                     {
                         new AvailabilityDayResponse {
@@ -200,11 +210,12 @@ namespace form_builder_tests.UnitTests.Models.Elements
             };
 
             var formAnswers = new FormAnswers();
+
             //Act
             var result = await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
-                "",
+                string.Empty,
                 viewModel,
                 page,
                 schema,
@@ -257,7 +268,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var bookignInfo = new List<object>
             {
-                new BookingInformation{
+                new BookingInformation
+                {
                     Appointments = new List<AvailabilityDayResponse>
                     {
                         new AvailabilityDayResponse {
@@ -279,11 +291,12 @@ namespace form_builder_tests.UnitTests.Models.Elements
             };
 
             var formAnswers = new FormAnswers();
+
             //Act
             var result = await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
-                "",
+                string.Empty,
                 viewModel,
                 page,
                 schema,
@@ -291,7 +304,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 formAnswers, 
                 bookignInfo);
 
-             //Assert
+            //Assert
             var bookignElement = Assert.IsType<Booking>(element);
             Assert.NotNull(bookignElement.SelectedBooking);
             Assert.NotEmpty(bookignElement.Appointments);
@@ -330,7 +343,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var bookignInfo = new List<object>
             {
-                new BookingInformation{
+                new BookingInformation
+                {
                     Appointments = new List<AvailabilityDayResponse>
                     {
                         new AvailabilityDayResponse 
@@ -349,8 +363,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 }
             };
             var formAnswers = new FormAnswers();
+            
             //Act
-            var result = await element.RenderAsync(
+            await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 string.Empty,
@@ -392,7 +407,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var bookignInfo = new List<object>
             {
-                new BookingInformation{
+                new BookingInformation
+                {
                     Appointments = new List<AvailabilityDayResponse>
                     {
                         new AvailabilityDayResponse
@@ -413,8 +429,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 }
             };
             var formAnswers = new FormAnswers();
+            
             //Act
-            var result = await element.RenderAsync(
+            await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 string.Empty,
@@ -456,7 +473,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var bookignInfo = new List<object>
             {
-                new BookingInformation{
+                new BookingInformation
+                {
                     Appointments = new List<AvailabilityDayResponse>
                     {
                         new AvailabilityDayResponse 
@@ -485,8 +503,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 }
             };
             var formAnswers = new FormAnswers();
+
             //Act
-            var result = await element.RenderAsync(
+            await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 string.Empty,
@@ -500,12 +519,11 @@ namespace form_builder_tests.UnitTests.Models.Elements
             //Assert
             var bookignElement = Assert.IsType<Booking>(element);
             Assert.Single(bookignElement.Times);
-            Assert.Equal(bookignElement.Times.First().MorningAppointments.Appointments.Count, 2);
+            Assert.Equal(2, bookignElement.Times.First().MorningAppointments.Appointments.Count);
             Assert.Single(bookignElement.Times.First().AfternoonAppointments.Appointments);
-            Assert.Equal(bookignElement.Times.First().TimePeriodCurrentlySelected, ETimePeriod.Morning);
+            Assert.Equal(ETimePeriod.Morning, bookignElement.Times.First().TimePeriodCurrentlySelected);
         }
 
-        
         [Fact]
         public async Task RenderAsync_Should_Select_Afternoon_WhenNoMorningAppointments_AsTimePeriod_CurrentlySelected()
         {
@@ -531,7 +549,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var bookignInfo = new List<object>
             {
-                new BookingInformation{
+                new BookingInformation
+                {
                     Appointments = new List<AvailabilityDayResponse>
                     {
                         new AvailabilityDayResponse 
@@ -550,8 +569,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 }
             };
             var formAnswers = new FormAnswers();
+
             //Act
-            var result = await element.RenderAsync(
+            await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 string.Empty,
@@ -567,7 +587,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.Single(bookignElement.Times);
             Assert.Empty(bookignElement.Times.First().MorningAppointments.Appointments);
             Assert.Single(bookignElement.Times.First().AfternoonAppointments.Appointments);
-            Assert.Equal(bookignElement.Times.First().TimePeriodCurrentlySelected, ETimePeriod.Afternoon);
+            Assert.Equal(ETimePeriod.Afternoon, bookignElement.Times.First().TimePeriodCurrentlySelected);
         }
     }
 }

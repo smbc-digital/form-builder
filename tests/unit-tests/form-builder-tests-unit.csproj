@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>form_builder_tests</RootNamespace>
-
     <IsPackable>false</IsPackable>
+    <NoWarn>CS8632</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

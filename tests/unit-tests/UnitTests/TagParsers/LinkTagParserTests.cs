@@ -12,13 +12,12 @@ namespace form_builder_tests.UnitTests.Services
 {
     public class LinkTagParserTests
     {
-        private readonly IEnumerable<IFormatter> _formatters;
-        private readonly Mock<IFormatter> _mockFormatter = new Mock<IFormatter>();
-        private LinkTagParser _tagParser;
+        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new Mock<IEnumerable<IFormatter>>();
+        private readonly LinkTagParser _tagParser;
 
         public LinkTagParserTests()
         {
-            _tagParser = new LinkTagParser(_formatters);
+            _tagParser = new LinkTagParser(_mockFormatters.Object);
         }
 
         [Theory]
