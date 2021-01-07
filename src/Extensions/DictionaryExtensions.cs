@@ -73,12 +73,12 @@ namespace form_builder.Extensions
         
         private static Dictionary<string,object> CleanUpBookingTimes(Dictionary<string,object> normalisedFormData)
         {
-            if(!normalisedFormData.Any(_ => _.Key.EndsWith(BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX)))
+            if (!normalisedFormData.Any(_ => _.Key.EndsWith(BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX)))
                 return normalisedFormData;
 
             var appointmentDate = normalisedFormData.FirstOrDefault(_ => _.Key.EndsWith($"-{BookingConstants.APPOINTMENT_DATE}"));
 
-            if(appointmentDate.Value == null)
+            if (appointmentDate.Value == null)
                 return normalisedFormData;
 
             DateTime.TryParse((string)appointmentDate.Value, out DateTime parsedDate);
@@ -88,10 +88,13 @@ namespace form_builder.Extensions
             var selectedTimeKey = $"-{parsedDate.Day}-{selectedTimePeriod}";
             var selectedTimeNoJsKey = $"-{parsedDate.Day}-{BookingConstants.APPOINTMENT_FULL_TIME_OF_DAY_SUFFIX}";
 
-            var timeValue = normalisedFormData.FirstOrDefault(_ => _.Key.EndsWith(selectedTimeKey) || _.Key.EndsWith(selectedTimeNoJsKey));
+            var timeValue = normalisedFormData.FirstOrDefault(_ => _.Key.EndsWith(selectedTimeNoJsKey));
+            if (timeValue.Value == null)
+                timeValue = normalisedFormData.FirstOrDefault(_ => _.Key.EndsWith(selectedTimeKey));
+
             var bookingElementId = appointmentDate.Key.Remove(appointmentDate.Key.Length - BookingConstants.APPOINTMENT_DATE.Length, BookingConstants.APPOINTMENT_DATE.Length);
 
-            if(timeValue.Value == null)
+            if (timeValue.Value == null)
             {
                 normalisedFormData.Where(_ => !_.Key.EndsWith($"{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}"))
                     .Where(_ => !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_MORNING}") && !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_AFTERNOON}"))
