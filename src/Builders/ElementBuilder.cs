@@ -392,5 +392,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithNoAvailableTimeForBookingType(string value)
+        {
+            _property.NoAvailableTimeForBookingType = value;
+
+            return this;
+        }
     }
 }
