@@ -86,8 +86,9 @@ namespace form_builder.Extensions
             var selectedTimePeriodKey = $"{parsedDate.Day}{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}";
             var selectedTimePeriod = normalisedFormData[selectedTimePeriodKey];
             var selectedTimeKey = $"-{parsedDate.Day}-{selectedTimePeriod}";
+            var selectedTimeNoJsKey = $"-{parsedDate.Day}-{BookingConstants.APPOINTMENT_FULL_TIME_OF_DAY_SUFFIX}";
 
-            var timeValue = normalisedFormData.FirstOrDefault(_ => _.Key.EndsWith(selectedTimeKey));
+            var timeValue = normalisedFormData.FirstOrDefault(_ => _.Key.EndsWith(selectedTimeKey) || _.Key.EndsWith(selectedTimeNoJsKey));
             var bookingElementId = appointmentDate.Key.Remove(appointmentDate.Key.Length - BookingConstants.APPOINTMENT_DATE.Length, BookingConstants.APPOINTMENT_DATE.Length);
 
             if(timeValue.Value == null)
