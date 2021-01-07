@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Utils.Extesions;
 using form_builder.ViewModels;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 
@@ -18,6 +19,8 @@ namespace form_builder.Models.Time
         public string TimeQuestionId { get; set; }
         public string Id => $"{TimeQuestionId}-{Date.Day}-{TimeOfDay}";
         public DateTime Value(TimeSpan time) => Date.Add(time);
+        public string GetTimeInputHint(int position) => $"{TimeQuestionId}-{position}-{TimeOfDay}-{Date.Day}-hint";
+        public string ToFullDateFormat(TimeSpan time) => Value(time).ToFullDateWithTimeFormat();
         public string NoJSId => $"{TimeQuestionId}-{Date.Day}-{BookingConstants.APPOINTMENT_FULL_TIME_OF_DAY_SUFFIX}";
         public string GetClassNameForDivsPosition(int value){
             switch(value % 3){
