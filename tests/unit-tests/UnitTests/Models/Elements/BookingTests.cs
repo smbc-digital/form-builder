@@ -459,6 +459,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithQuestionId("bookingQuestion")
                 .WithAppointmentType(Guid.NewGuid())
                 .WithCheckYourBooking(true)
+                .WithNoAvailableTimeForBookingType("test")
                 .Build();
 
             var page = new PageBuilder()
@@ -522,6 +523,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.Equal(2, bookignElement.Times.First().MorningAppointments.Appointments.Count);
             Assert.Single(bookignElement.Times.First().AfternoonAppointments.Appointments);
             Assert.Equal(ETimePeriod.Morning, bookignElement.Times.First().TimePeriodCurrentlySelected);
+            Assert.Equal("test", bookignElement.Times.First().MorningAppointments.BookingType);
         }
 
         [Fact]
@@ -535,6 +537,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithQuestionId("bookingQuestion")
                 .WithAppointmentType(Guid.NewGuid())
                 .WithCheckYourBooking(true)
+                .WithNoAvailableTimeForBookingType("test2")
                 .Build();
 
             var page = new PageBuilder()
@@ -588,6 +591,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.Empty(bookignElement.Times.First().MorningAppointments.Appointments);
             Assert.Single(bookignElement.Times.First().AfternoonAppointments.Appointments);
             Assert.Equal(ETimePeriod.Afternoon, bookignElement.Times.First().TimePeriodCurrentlySelected);
+            Assert.Equal("test2", bookignElement.Times.First().MorningAppointments.BookingType);
         }
     }
 }
