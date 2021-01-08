@@ -710,6 +710,52 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task FinalisePageJourney_ShouldThrow_ApplicationException_WhenNoSessionGuid()
+        {
+            // Arrange
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+
+            var page = new PageBuilder()
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema));
+
+            // Assert
+            Assert.Equal("PageService::FinalisePageJourney: Session has expired",result.Message);
+        }
+
+
+        [Fact]
+        public async Task FinalisePageJourney_ShouldThrow_ApplicationException_When_SessionData_IsNull()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+
+            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns((string)null);
+
+            var page = new PageBuilder()
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema));
+
+            // Assert
+            Assert.Equal("PageService::FinalisePageJourney: Session data is null",result.Message);
+        }
+
+        [Fact]
         public async Task FinalisePageJourney_ShouldDeleteFileUpload_CacheEntries()
         {
             // Arrange
@@ -879,7 +925,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task FinalisePageJourney_ShouldNotError_WhenFileUPload_DataIsNull()
+        public async Task FinalisePageJourney_ShouldNotError_WhenFileUpload_DataIsNull()
         {
             // Arrange
             var guid = Guid.NewGuid();

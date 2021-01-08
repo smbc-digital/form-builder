@@ -293,9 +293,13 @@ namespace form_builder.Services.PageService
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (string.IsNullOrEmpty(sessionGuid))
-                throw new Exception("PageService::FinalisePageJourney: Session has expired");
+                throw new ApplicationException("PageService::FinalisePageJourney: Session has expired");
 
             var formData = _distributedCache.GetString(sessionGuid);
+
+            if(formData == null)
+                throw new ApplicationException("PageService::FinalisePageJourney: Session data is null");
+
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             var formFileUploadElements = baseForm.Pages.SelectMany(_ => _.Elements)
