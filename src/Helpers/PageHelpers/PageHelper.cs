@@ -311,7 +311,7 @@ namespace form_builder.Helpers.PageHelpers
                 .ToList();
 
             var conditionalElements = pages.Where(_ => _.Elements != null)
-                .SelectMany(_ => _.ValidatableElements)
+                .SelectMany(_ => _.Elements)
                 .Where(_ => _.Properties.isConditionalElement)
                 .ToList();
 
@@ -326,7 +326,7 @@ namespace form_builder.Helpers.PageHelpers
                     else if (
                         option.HasConditionalElement && 
                         !string.IsNullOrEmpty(option.ConditionalElementId) && 
-                        !pages.Any(page => page.ValidatableElements.Contains(radio) && page.ValidatableElements.Any(_ => _.Properties.QuestionId == option.ConditionalElementId && _.Properties.isConditionalElement)))
+                        !pages.Any(page => page.ValidatableElements.Contains(radio) && page.Elements.Any(_ => _.Properties.QuestionId == option.ConditionalElementId && _.Properties.isConditionalElement)))
                         throw new ApplicationException($"The provided json '{formName}' contains the conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}' on a different page to the radio element");
 
                     else
