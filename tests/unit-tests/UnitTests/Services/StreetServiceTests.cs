@@ -272,11 +272,12 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessStreet_Application_ShouldThrowApplicationException_WhenStreetProvider_ThrowsException()
         {
             _streetProvider.Setup(_ => _.SearchAsync(It.IsAny<string>())).Throws<Exception>();
+            var fakeStreetProvider = EStreetProvider.Fake.ToString();
 
             var element = new ElementBuilder()
                .WithType(EElementType.Street)
                .WithQuestionId("street")
-               .WithStreetProvider(EStreetProvider.Fake.ToString())
+               .WithStreetProvider(fakeStreetProvider)
                .Build();
 
             var page = new PageBuilder()
@@ -299,7 +300,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessStreet(viewModel, page, schema, "", "page-one"));
             _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
-            Assert.StartsWith($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup, Exception: ", result.Message);
+            Assert.StartsWith($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup on Provider '{fakeStreetProvider}' with searchterm 'streetname' Exception:", result.Message);
         }
     }
 }

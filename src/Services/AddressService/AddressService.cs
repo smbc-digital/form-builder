@@ -212,12 +212,11 @@ namespace form_builder.Services.AddressService
             {
                 try
                 {
-                    var searchResult = await _addressProviders.Get(addressElement.Properties.AddressProvider).SearchAsync(postcode);
-                    addressResults = searchResult.ToList<object>();
+                    addressResults = (await _addressProviders.Get(addressElement.Properties.AddressProvider).SearchAsync(postcode)).ToList<object>();
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException($"AddressController: An exception has occured while attempting to perform postcode lookup", e);
+                    throw new ApplicationException($"AddressService::ProcessSearchAddress, An exception has occured while attempting to perform postcode lookup on Provider '{addressElement.Properties.AddressProvider}' with searchterm '{postcode}' Exception:", e);
                 }
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
