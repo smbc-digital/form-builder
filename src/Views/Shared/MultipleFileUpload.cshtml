@@ -1,4 +1,4 @@
-@model form_builder.Models.Elements.MultipleFileUpload
+@model MultipleFileUpload
 @{
     var sizeValidationError = $"{Model.QuestionId}-fileSizeError";
     var elements = Model.GenerateElementProperties();
@@ -10,7 +10,8 @@
 }
 
 <partial name="LabelH1" />
-<partial name="InsetText" model="@Model.Properties.IAG" />
+
+<partial name="InsetText" model="Model.Properties.IAG" />
 
 <p class="smbc-body">You can upload @Model.AllowFileTypeText.</p>
 <p class="smbc-body">The maximum individual file size is @Model.MaxFileSizeText.</p>
@@ -54,7 +55,7 @@
 
 @if (Model.CurrentFilesUploaded.Any() && Model.Properties.DisplayReCaptcha)
 {
-    <partial name="Recaptcha" model="@Model.IsModelStateValid" />
+    <partial name="Recaptcha" model="Model.IsModelStateValid" />
 }
 
 <button data-prevent-double-click="true"

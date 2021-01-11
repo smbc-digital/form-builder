@@ -1,4 +1,4 @@
-﻿@model form_builder.Models.Elements.Organisation
+﻿@model Organisation
 @{
     var elementProperties = Model.GenerateElementProperties("Select");
 
@@ -6,7 +6,7 @@
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-    @Html.Hidden(@Model.OrganisationSearchQuestionId, @Model.Properties.Value)
+    @Html.Hidden(Model.OrganisationSearchQuestionId, Model.Properties.Value)
 
     @if (Model.Properties.LabelAsH1)
     {
@@ -25,5 +25,5 @@
 
     <partial name="Error" />
 
-    @Html.DropDownList(@Model.QuestionId, @Model.Items, elementProperties)
+    @Html.DropDownList(Model.QuestionId, Model.Items, elementProperties)
 </div>

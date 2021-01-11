@@ -1,4 +1,4 @@
-﻿@model form_builder.Models.Elements.Organisation
+﻿@model Organisation
 @{
     var elementProperties = Model.GenerateElementProperties();
     elementProperties.Add("class", $"govuk-input govuk-input--width-20 {(Model.IsValid ? string.Empty : "govuk-input--error")}");

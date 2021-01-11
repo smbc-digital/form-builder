@@ -1,4 +1,4 @@
-﻿@model form_builder.Models.Elements.Textarea
+﻿@model Textarea
 @{
     var elementProperties = Model.GenerateElementProperties();
     elementProperties.Add("class", !Model.IsValid
@@ -12,7 +12,7 @@
         <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
             <partial name="LabelH1" />
 
-            <partial name="InsetText" model="@Model.Properties.IAG" />
+            <partial name="InsetText" model="Model.Properties.IAG" />
 
             <partial name="Hint" />
 
@@ -31,7 +31,7 @@ else
     <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
         <partial name="LabelH1" />
 
-        <partial name="InsetText" model="@Model.Properties.IAG" />
+        <partial name="InsetText" model="Model.Properties.IAG" />
 
         <partial name="Hint" />
 

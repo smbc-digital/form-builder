@@ -1,11 +1,11 @@
-﻿@model form_builder.Models.Elements.Element
+﻿@model Element
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
     @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
 
     <partial name="LegendH1" />
 
-    <partial name="InsetText" model="@Model.Properties.IAG" />
+    <partial name="InsetText" model="Model.Properties.IAG" />
 
     <partial name="Hint" />
 

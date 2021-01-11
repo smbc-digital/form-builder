@@ -1,4 +1,4 @@
-﻿@model form_builder.Models.Elements.Element
+﻿@model Element
 @{
     var maxYear = DateTime.Now.Year + 100;
     var inputClassesShort = "govuk-input govuk-date-input__input govuk-input--width-2";
@@ -25,7 +25,7 @@
 
     <partial name="LegendH1" />
 
-    <partial name="InsetText" model="@Model.Properties.IAG" />
+    <partial name="InsetText" model="Model.Properties.IAG" />
 
     <partial name="Hint" />
 

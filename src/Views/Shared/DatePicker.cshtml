@@ -1,4 +1,4 @@
-﻿@model form_builder.Models.Elements.Element
+﻿@model Element
 @{
     var elements = Model.GenerateElementProperties();
     elements.Add("class", !Model.IsValid ? "govuk-input govuk-input--width-10 govuk-input--error" : "govuk-input govuk-input--width-10");
@@ -8,7 +8,7 @@
 
     <partial name="LabelH1" />
 
-    <partial name="InsetText" model="@Model.Properties.IAG" />
+    <partial name="InsetText" model="Model.Properties.IAG" />
 
     <partial name="Hint" />
 

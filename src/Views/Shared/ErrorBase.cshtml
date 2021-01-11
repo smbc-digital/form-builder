@@ -1,7 +1,7 @@
-@model form_builder.ViewModels.ErrorViewModel
+@model ErrorViewModel
 @if (!Model.IsValid)
 {
     <span class="smbc-error-message" id="@Model.Id">
-        <span class="govuk-visually-hidden">Error:</span>@Html.Raw(@Model.Message) 
+        <span class="govuk-visually-hidden">Error:</span>@Html.Raw(Model.Message) 
     </span>
 }
