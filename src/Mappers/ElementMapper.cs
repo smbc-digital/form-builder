@@ -30,10 +30,7 @@ namespace form_builder.Mappers
     {
         private readonly IDistributedCacheWrapper _distributedCacheWrapper;
 
-        public ElementMapper(IDistributedCacheWrapper distributedCacheWrapper)
-        {
-            _distributedCacheWrapper = distributedCacheWrapper;
-        }
+        public ElementMapper(IDistributedCacheWrapper distributedCacheWrapper) => _distributedCacheWrapper = distributedCacheWrapper;
 
         public T GetAnswerValue<T>(IElement element, FormAnswers formAnswers) => (T)GetAnswerValue(element, formAnswers);
 

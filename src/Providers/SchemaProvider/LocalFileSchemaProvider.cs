@@ -19,10 +19,7 @@ namespace form_builder.Providers.SchemaProvider
             return obj;
         }
 
-        public FormSchema Get(string schemaName)
-        {
-            return Get<FormSchema>(schemaName);
-        }
+        public FormSchema Get(string schemaName) => Get<FormSchema>(schemaName);
 
         async Task<T> ISchemaProvider.Get<T>(string schemaName)
         {
