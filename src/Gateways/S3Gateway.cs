@@ -8,10 +8,7 @@ namespace form_builder.Gateways
     {
         private readonly IAmazonS3 _s3client;
 
-        public S3Gateway(IAmazonS3 s3client)
-        {
-            _s3client = s3client;
-        }
+        public S3Gateway(IAmazonS3 s3client) => _s3client = s3client;
 
         public async Task<GetObjectResponse> GetObject(string bucketName, string key)
         {

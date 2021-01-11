@@ -11,11 +11,7 @@ namespace form_builder.Providers.EmailProvider
     public class AwsSesProvider : IEmailProvider
     {
         private readonly IAmazonSimpleEmailService _emailService;
-
-        public AwsSesProvider(IAmazonSimpleEmailService emailService)
-        {
-            _emailService = emailService;
-        }
+        public AwsSesProvider(IAmazonSimpleEmailService emailService) => _emailService = emailService;
 
         public async Task<HttpStatusCode> SendEmail(EmailMessage emailMessage)
         {

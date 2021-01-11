@@ -13,10 +13,8 @@ namespace form_builder.Factories.Transform.ReusableElements
     {
         private readonly IReusableElementTransformDataProvider _reusableElementTransformDataProvider;
 
-        public ReusableElementSchemaTransformFactory(IReusableElementTransformDataProvider reusableElementTransformDataProvider)
-        {
+        public ReusableElementSchemaTransformFactory(IReusableElementTransformDataProvider reusableElementTransformDataProvider) =>
             _reusableElementTransformDataProvider = reusableElementTransformDataProvider;
-        }
 
         public async Task<FormSchema> Transform(FormSchema formSchema)
         {

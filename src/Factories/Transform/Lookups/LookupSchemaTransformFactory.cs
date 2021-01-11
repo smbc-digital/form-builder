@@ -12,10 +12,7 @@ namespace form_builder.Factories.Transform.Lookups
     {
         private readonly ILookupTransformDataProvider _lookupTransformDataProvider;
 
-        public LookupSchemaTransformFactory(ILookupTransformDataProvider lookupTransformDataProvider)
-        {
-            _lookupTransformDataProvider = lookupTransformDataProvider;
-        }
+        public LookupSchemaTransformFactory(ILookupTransformDataProvider lookupTransformDataProvider) => _lookupTransformDataProvider = lookupTransformDataProvider;
 
 
         public FormSchema Transform(FormSchema formSchema)

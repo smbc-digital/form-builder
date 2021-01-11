@@ -13,11 +13,7 @@ namespace form_builder.Providers.Booking
     {
         public string ProviderName { get => "SMBC"; }
         private readonly IBookingServiceGateway _gateway;
-
-        public BookingProvider(IBookingServiceGateway gateway)
-        {
-            _gateway = gateway;
-        }
+        public BookingProvider(IBookingServiceGateway gateway) => _gateway = gateway;
 
         public async Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request)
         {

@@ -14,10 +14,7 @@ namespace form_builder.Helpers.DocumentCreation
     public class DocumentCreationHelper : IDocumentCreationHelper
     {
         private readonly IElementMapper _elementMapper;
-        public DocumentCreationHelper(IElementMapper elementMapper)
-        {
-            _elementMapper = elementMapper;
-        }
+        public DocumentCreationHelper(IElementMapper elementMapper) => _elementMapper = elementMapper;
         
         public List<string> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema)
         {
