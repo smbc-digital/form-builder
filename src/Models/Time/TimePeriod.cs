@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Utils.Extesions;
-using form_builder.ViewModels;
+using form_builder.Utils.Extensions;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 
 namespace form_builder.Models.Time

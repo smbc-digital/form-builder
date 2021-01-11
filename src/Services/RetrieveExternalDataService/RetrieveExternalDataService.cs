@@ -17,6 +17,11 @@ using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Services.RetrieveExternalDataService
 {
+    public interface IRetrieveExternalDataService
+    {
+        Task Process(List<IAction> actions, FormSchema formSchema, string formName);
+    }
+
     public class RetrieveExternalDataService : IRetrieveExternalDataService
     {
         private readonly IGateway _gateway;

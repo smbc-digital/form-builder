@@ -1,6 +1,6 @@
 using System;
 
-namespace form_builder.Utils.Extesions
+namespace form_builder.Utils.Extensions
 {
     public static class DateTimeExtensions
     {

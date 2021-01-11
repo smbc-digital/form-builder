@@ -9,7 +9,7 @@ using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Models.Booking;
 using form_builder.Models.Time;
-using form_builder.Utils.Extesions;
+using form_builder.Utils.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 

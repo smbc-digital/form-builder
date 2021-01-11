@@ -3,12 +3,13 @@ using System.Linq;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Models;
-using form_builder.TagParser;
+using form_builder.TagParsers;
+using form_builder.TagParsers.Formatters;
 using form_builder_tests.Builders;
 using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Services
+namespace form_builder_tests.UnitTests.TagParsers
 {
     public class FormAnswerTagParserTests
     {
@@ -20,9 +21,9 @@ namespace form_builder_tests.UnitTests.Services
 
         public FormAnswerTagParserTests()
         {
-            _mockFormatter.Setup(_ => _.FormatterrName).Returns("testformatter");
+            _mockFormatter.Setup(_ => _.FormatterName).Returns("testformatter");
             _mockFormatter.Setup(_ => _.Parse(It.IsAny<string>())).Returns("FAKE-FORMATTED-VALUE");
-            _mockFormatterTwo.Setup(_ => _.FormatterrName).Returns("anothertestformatter");
+            _mockFormatterTwo.Setup(_ => _.FormatterName).Returns("anothertestformatter");
             _mockFormatterTwo.Setup(_ => _.Parse(It.IsAny<string>())).Returns("ANOTHER-FORMATTER");
             _formatters = new List<IFormatter>
             {

@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using form_builder.Models;
 
-namespace form_builder.TagParser
+namespace form_builder.TagParsers
 {
     public interface ITagParser
     {
