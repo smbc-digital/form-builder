@@ -5,7 +5,7 @@ using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
-using form_builder.TagParser;
+using form_builder.TagParsers;
 using form_builder.ViewModels;
 using Newtonsoft.Json;
 

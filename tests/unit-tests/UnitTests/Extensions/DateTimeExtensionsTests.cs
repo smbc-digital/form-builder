@@ -1,5 +1,5 @@
 using System;
-using form_builder.Utils.Extesions;
+using form_builder.Utils.Extensions;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Extensions

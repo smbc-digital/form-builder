@@ -1,10 +1,11 @@
-using form_builder.Utils.Extesions;
+using form_builder.Utils.Extensions;
 
-namespace form_builder.TagParser
+namespace form_builder.TagParsers.Formatters
 {
     public class FullDateFormatter : IFormatter
     {
-        public string FormatterrName { get => "full-date"; }
+        public string FormatterName => "full-date";
+
         public string Parse(string value)
         {
             var dateTime = System.DateTime.Parse(value);

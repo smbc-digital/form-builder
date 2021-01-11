@@ -1,8 +1,8 @@
 using System;
-using form_builder.TagParser;
+using form_builder.TagParsers.Formatters;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Services
+namespace form_builder_tests.UnitTests.TagParsers.Formatters
 {
     public class TimeOnlyFormatterTests
     {
