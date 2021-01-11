@@ -5,9 +5,7 @@
 }
 
 <div class="smbc-time__body smbc-time__body__conditional smbc-time__body__conditional--hidden">
-    @if(!Model.HasAppointments){
-        <partial name="TimePeriodNoAppointments" model="@Model" />
-    } else {
+    @if(Model.HasAppointments){
             @for (int i = 0; i < Model.Appointments.Count; i++)
             {
                 var startTime = Model.Appointments[i].StartTime;
