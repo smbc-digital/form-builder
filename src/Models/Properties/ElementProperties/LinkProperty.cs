@@ -4,5 +4,6 @@
     {
         public string Url { get; set; }
         public bool OpenInTab { get; set; } = true;
+        public bool DisplayRightChevron { get; set; } = false;
     }
 }
