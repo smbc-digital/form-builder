@@ -1,8 +1,9 @@
-@model List<form_builder.Models.Time.TimeAvailability>
+@model List<TimeAvailability>
 
 @foreach (var day in  Model)
 {
-    var timeHeaderModel = new TimeHeaderViewModel {  
+    var timeHeaderModel = new TimeHeaderViewModel 
+    {  
         Date = day.Date, DataAriaControlsIdForMorning = day.MorningAppointments.Id,
         DataAriaControlsIdForAfternoon = day.AfternoonAppointments.Id,
         SelectedTimePeriod = day.TimePeriodCurrentlySelected

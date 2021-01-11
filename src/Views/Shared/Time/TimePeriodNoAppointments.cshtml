@@ -1,13 +1,12 @@
-@model form_builder.Models.Time.TimePeriod
+@model TimePeriod
 
 @{
-    var timeOfDay = @Model.TimeOfDay.ToString().ToLower();
-    var typeOfDay = timeOfDay.Equals("morning") ? "afternoon" : "morning";
+    var timeOfDay = Model.TimeOfDay.ToString().ToLower();
 }
 <div class="govuk-warning-text">
     <span class="govuk-warning-text__icon govuk-!-margin-top-6" aria-hidden="true">!</span>
     <strong class="govuk-warning-text__text govuk-!-margin-left-4">
         <span class="govuk-warning-text__assistive">Warning</span>
-        There are no available @timeOfDay @Model.BookingType.ToLower() on this date, please select a @typeOfDay time slot or a different date
+        There are no available @timeOfDay @Model.BookingType.ToLower() on this date, please select a @(timeOfDay.Equals("morning") ? "afternoon" : "morning") time slot or a different date
     </strong>
 </div> 

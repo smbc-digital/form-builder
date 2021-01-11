@@ -1,4 +1,4 @@
-﻿@model form_builder.Models.Elements.Address
+﻿@model Address
 @{
     var elementProperties = Model.GenerateElementProperties("Select");
     elementProperties.Add("class", Model.IsValid ? "govuk-select" : "govuk-select govuk-select--error");
