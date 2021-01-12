@@ -8,7 +8,7 @@ using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Models.Properties.ActionProperties;
 using form_builder.Services.MappingService.Entities;
-using form_builder.TagParser;
+using form_builder.TagParsers.Formatters;
 using form_builder_tests.Builders;
 using Moq;
 using Xunit;

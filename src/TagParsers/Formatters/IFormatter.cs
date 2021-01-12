@@ -1,8 +1,8 @@
-namespace form_builder.TagParser
+namespace form_builder.TagParsers.Formatters
 {
     public interface IFormatter
     {
-        string FormatterrName { get; }
+        string FormatterName { get; }
         string Parse(string value);
     }
 }

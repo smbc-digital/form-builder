@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
@@ -17,6 +16,11 @@ using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Services.ValidateService
 {
+    public interface IValidateService
+    {
+        Task Process(List<IAction> actions, FormSchema formSchema, string formName);
+    }
+
     public class ValidateService : IValidateService
     {
         private readonly IGateway _gateway;

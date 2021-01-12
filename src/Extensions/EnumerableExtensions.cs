@@ -4,7 +4,7 @@ using form_builder.Providers.Address;
 using form_builder.Providers.Booking;
 using form_builder.Providers.Organisation;
 using form_builder.Providers.Street;
-using form_builder.TagParser;
+using form_builder.TagParsers.Formatters;
 
 namespace form_builder.Extensions
 {
@@ -23,6 +23,6 @@ namespace form_builder.Extensions
             value.Single(_ => _.ProviderName == providerName);
 
         public static IFormatter Get(this IEnumerable<IFormatter> value, string formatterrName) =>
-            value.Single(_ => _.FormatterrName == formatterrName);
+            value.Single(_ => _.FormatterName == formatterrName);
     }
 }
