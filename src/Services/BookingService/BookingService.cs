@@ -1,5 +1,4 @@
 ﻿using form_builder.Constants;
-using form_builder.ContentFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
@@ -22,30 +21,10 @@ using form_builder.Models.Booking;
 using form_builder.Services.BookingService.Entities;
 using Microsoft.Extensions.Options;
 using form_builder.Configuration;
+using form_builder.ContentFactory.PageFactory;
 
 namespace form_builder.Services.BookingService
 {
-    public interface IBookingService
-    {
-        Task<BookingProcessEntity> Get(
-            string formName,
-            Page currentPage,
-            string guid);
-
-        Task<ProcessRequestEntity> ProcessBooking(
-            Dictionary<string, dynamic> viewModel,
-            Page currentPage,
-            FormSchema baseForm,
-            string guid,
-            string path);
-
-        Task ProcessMonthRequest(
-            Dictionary<string, object> viewModel,
-            FormSchema baseForm,
-            Page currentPage,
-            string guid);
-    }
-
     public class BookingService : IBookingService
     {
         private readonly IDistributedCacheWrapper _distributedCache;

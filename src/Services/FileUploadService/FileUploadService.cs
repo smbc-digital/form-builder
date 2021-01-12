@@ -4,7 +4,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Constants;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
@@ -14,20 +14,6 @@ using Newtonsoft.Json;
 
 namespace form_builder.Services.FileUploadService
 {
-    public interface IFileUploadService
-    {
-        Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload);
-
-        Task<ProcessRequestEntity> ProcessFile(
-            Dictionary<string, dynamic> viewModel,
-            Page currentPage,
-            FormSchema baseForm,
-            string guid,
-            string path,
-            IEnumerable<CustomFormFile> files,
-            bool modelStateIsValid);
-    }
-
     public class FileUploadService : IFileUploadService
     {
         private readonly IDistributedCacheWrapper _distributedCache;

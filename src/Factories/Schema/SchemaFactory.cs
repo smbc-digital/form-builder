@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Enum;
@@ -14,11 +13,6 @@ using Newtonsoft.Json;
 
 namespace form_builder.Factories.Schema
 {
-    public interface ISchemaFactory
-    {
-        Task<FormSchema> Build(string formKey);
-    }
-
     public class SchemaFactory : ISchemaFactory
     {
         private readonly IDistributedCacheWrapper _distributedCache;

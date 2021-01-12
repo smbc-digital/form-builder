@@ -17,15 +17,6 @@ using Booking = StockportGovUK.NetStandard.Models.Booking.Booking;
 
 namespace form_builder.Mappers
 {
-    public interface IElementMapper
-    {
-        T GetAnswerValue<T>(IElement element, FormAnswers formAnswers);
-
-        object GetAnswerValue(IElement element, FormAnswers formAnswers);
-
-        string GetAnswerStringValue(IElement question, FormAnswers formAnswers);
-    }
-
     public class ElementMapper : IElementMapper
     {
         private readonly IDistributedCacheWrapper _distributedCacheWrapper;

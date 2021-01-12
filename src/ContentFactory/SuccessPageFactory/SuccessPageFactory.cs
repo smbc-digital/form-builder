@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -9,13 +10,8 @@ using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 
-namespace form_builder.ContentFactory
+namespace form_builder.ContentFactory.SuccessPageFactory
 {
-    public interface ISuccessPageFactory
-    {
-        Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType);
-    }
-
     public class SuccessPageFactory : ISuccessPageFactory
     {
         private readonly IPageHelper _pageHelper;

@@ -9,12 +9,9 @@ using form_builder.TagParsers;
 using form_builder.ViewModels;
 using Newtonsoft.Json;
 
-namespace form_builder.ContentFactory
+namespace form_builder.ContentFactory.PageFactory
 {
-    public interface IPageFactory
-    {
-        Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers = null, List<object> results = null);
-    }
+
 
     public class PageFactory : IPageFactory
     {

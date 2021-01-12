@@ -6,11 +6,6 @@ using form_builder.Models;
 
 namespace form_builder.Helpers.DocumentCreation
 {
-    public interface IDocumentCreationHelper
-    {
-        List<string> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema);
-    }
-
     public class DocumentCreationHelper : IDocumentCreationHelper
     {
         private readonly IElementMapper _elementMapper;

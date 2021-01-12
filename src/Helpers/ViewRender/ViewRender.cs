@@ -11,12 +11,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 
-namespace form_builder.Helpers
+namespace form_builder.Helpers.ViewRender
 {
-    public interface IViewRender
-    {
-        Task<string> RenderAsync<TModel>(string viewName, TModel model, Dictionary<string, dynamic> viewData = null);
-    }
     public class ViewRender : IViewRender
     {
         private readonly IRazorViewEngine _viewEngine;

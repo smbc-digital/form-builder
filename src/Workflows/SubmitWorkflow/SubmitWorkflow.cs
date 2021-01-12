@@ -4,13 +4,8 @@ using form_builder.Helpers.Session;
 using form_builder.Services.MappingService;
 using form_builder.Services.SubmitService;
 
-namespace form_builder.Workflows
+namespace form_builder.Workflows.SubmitWorkflow
 {
-    public interface ISubmitWorkflow
-    {
-        Task<string> Submit(string form);
-    }
-
     public class SubmitWorkflow : ISubmitWorkflow
     {
         private readonly ISubmitService _submitService;

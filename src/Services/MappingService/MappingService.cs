@@ -21,13 +21,6 @@ using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
 
 namespace form_builder.Services.MappingService
 {
-    public interface IMappingService
-    {
-        Task<MappingEntity> Map(string sessionGuid, string form);
-        Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form);
-        Task<Address> MapAddress(string sessionGuid, string form);
-    }
-
     public class MappingService : IMappingService
     {
         private readonly IDistributedCacheWrapper _distributedCache;

@@ -10,10 +10,6 @@ using Newtonsoft.Json;
 
 namespace form_builder.Cache
 {
-    public interface ICache
-    {
-        Task<T> GetFromCacheOrDirectlyFromSchemaAsync<T>(string cacheKey, int minutes, ESchemaType type);
-    }
     public class Cache : ICache
     {
         private readonly IDistributedCacheWrapper _distributedCache;
