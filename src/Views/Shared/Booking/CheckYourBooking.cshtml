@@ -1,14 +1,12 @@
 @model Booking
 
-@{
-    Html.Hidden(Model.DateQuestionId, Model.Properties.Value);
-    Html.Hidden(Model.StartTimeQuestionId, Model.StartAppointmentTime);
-    Html.Hidden(Model.EndTimeQuestionId, Model.EndAppointmentTime);
-    Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_ID), Model.ReservedBookingId);
-    Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_DATE), Model.ReservedBookingDate);
-    Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_START_TIME), Model.ReservedBookingStartTime);
-    Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_END_TIME), Model.ReservedBookingEndTime);
-}
+@Html.Hidden(Model.DateQuestionId, Model.Properties.Value)
+@Html.Hidden(Model.StartTimeQuestionId, Model.StartAppointmentTime)
+@Html.Hidden(Model.EndTimeQuestionId, Model.EndAppointmentTime)
+@Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_ID), Model.ReservedBookingId)
+@Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_DATE), Model.ReservedBookingDate)
+@Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_START_TIME), Model.ReservedBookingStartTime)
+@Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_END_TIME), Model.ReservedBookingEndTime)
 
 <h1 class="govuk-heading-l">Check your booking</h1>
 <table class="govuk-table">

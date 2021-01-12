@@ -16,8 +16,9 @@
     var postcodeElementProperties = Model.GeneratePostcodeElementProperties();
     postcodeElementProperties.Add("class", Model.IsPostcodeValid ? $"{inputClass} govuk-input--width-10" : $"{invalidInputClasses} govuk-input--width-10");
 
-    Html.Hidden(Model.GetCustomItemId("postcode"), Model.Properties.Value);
 }
+
+@Html.Hidden(Model.GetCustomItemId("postcode"), Model.Properties.Value)
 
 <fieldset class="govuk-fieldset" @Model.GenerateFieldsetProperties()>
     <partial name="LegendH1" />
