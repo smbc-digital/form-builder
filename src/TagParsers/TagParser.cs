@@ -45,7 +45,7 @@ namespace form_builder.TagParsers
             return value;
         }
 
-        
+
         public string Parse(string value, Regex regex, string data, Func<string[], string> formatContent)
         {
             var match = regex.Match(value);

@@ -3,7 +3,7 @@
     public class EmailMessage
     {
         public string Subject { get; }
-        
+
         public string Body { get; }
 
         public string FromEmail { get; }

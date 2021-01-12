@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Constants;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
@@ -86,7 +85,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 formAnswers);
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("StreetSearch")),It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("StreetSearch")), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
     }
 }

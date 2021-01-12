@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json.Linq;
@@ -22,16 +22,16 @@ namespace form_builder.Models.Elements
 
         public string StreetSelectQuestionId => $"{Properties.QuestionId}{StreetConstants.SELECT_SUFFIX}";
 
-        private bool IsSelect { get; set; } = false; 
+        private bool IsSelect { get; set; } = false;
 
-        public override string  Hint => IsSelect ? Properties.SelectHint : base.Hint;
+        public override string Hint => IsSelect ? Properties.SelectHint : base.Hint;
 
         public override bool DisplayHint => !string.IsNullOrEmpty(Hint);
 
-        public override string  QuestionId => IsSelect ? StreetSelectQuestionId : StreetSearchQuestionId;
+        public override string QuestionId => IsSelect ? StreetSelectQuestionId : StreetSearchQuestionId;
 
         public string ChangeHeader => "Street:";
-        
+
         public override string Label
         {
             get
@@ -78,7 +78,8 @@ namespace form_builder.Models.Elements
                     var searchSuffix = results?.Count == 1 ? "street found" : "streets found";
                     Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} {searchSuffix}", string.Empty) };
 
-                    results?.ForEach((objectResult) => {
+                    results?.ForEach((objectResult) =>
+                    {
                         AddressSearchResult searchResult;
 
                         if (objectResult as JObject != null)
@@ -109,9 +110,9 @@ namespace form_builder.Models.Elements
             if (DisplayAriaDescribedby)
                 elementProperties.Add("aria-describedby", GetDescribedByAttributeValue());
 
-            if(string.IsNullOrEmpty(type))
+            if (string.IsNullOrEmpty(type))
                 elementProperties.Add("maxlength", Properties.MaxLength);
- 
+
             return elementProperties;
         }
     }

@@ -72,7 +72,7 @@ namespace form_builder.Services.AddressService
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
-                
+
                 var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, cachedSearchResults.ToList());
 
                 return new ProcessRequestEntity
@@ -133,7 +133,7 @@ namespace form_builder.Services.AddressService
             if (!currentPage.IsValid)
             {
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
-                
+
                 var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, cachedSearchResults.ToList());
 
                 return new ProcessRequestEntity

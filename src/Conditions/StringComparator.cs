@@ -23,7 +23,7 @@ namespace form_builder.Conditions
         public static bool Contains(Condition condition, Dictionary<string, dynamic> viewModel)
         {
             var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? condition.ComparisonValue.ToLower() : condition.CheckboxContains.ToLower();
-            
+
             return viewModel.ContainsKey(condition.QuestionId) && viewModel[condition.QuestionId].ToLower().Contains(val);
         }
 

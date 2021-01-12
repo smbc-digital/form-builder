@@ -37,7 +37,7 @@ namespace form_builder.Helpers.IncomingDataHelper
             {
                 var containsValue = queryData.ContainsKey(_.Name);
 
-                if(!containsValue && formAnswers.AdditionalFormData.ContainsKey(_.QuestionId))
+                if (!containsValue && formAnswers.AdditionalFormData.ContainsKey(_.QuestionId))
                     return;
 
                 if (!_.Optional && !containsValue)
@@ -46,7 +46,7 @@ namespace form_builder.Helpers.IncomingDataHelper
                 if (!containsValue) return;
 
                 dynamic value = queryCollection[_.Name];
-                if(_.Base64Encoded)
+                if (_.Base64Encoded)
                     value = Encoding.UTF8.GetString(Convert.FromBase64String(value));
 
                 formData = RecursiveCheckAndCreate(_.QuestionId, value, formData);

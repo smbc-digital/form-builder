@@ -25,9 +25,9 @@ namespace form_builder.Services.StreetService
         private readonly IPageFactory _pageFactory;
 
         public StreetService(
-            IDistributedCacheWrapper distributedCache, 
-            IEnumerable<IStreetProvider> streetProviders, 
-            IPageHelper pageHelper, 
+            IDistributedCacheWrapper distributedCache,
+            IEnumerable<IStreetProvider> streetProviders,
+            IPageHelper pageHelper,
             IPageFactory pageFactory)
         {
             _distributedCache = distributedCache;
@@ -40,7 +40,7 @@ namespace form_builder.Services.StreetService
         {
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
 
-            switch(subPath as string)
+            switch (subPath as string)
             {
                 case LookUpConstants.Automatic:
                     return await ProccessAutomaticStreet(viewModel, currentPage, baseForm, guid, path);
@@ -146,7 +146,7 @@ namespace form_builder.Services.StreetService
                 searchResults = (convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>).ToList();
             }
             else
-            { 
+            {
                 try
                 {
                     searchResults = (await _streetProviders.Get(streetElement.Properties.StreetProvider).SearchAsync(street)).ToList<object>();

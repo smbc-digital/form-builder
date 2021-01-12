@@ -34,14 +34,14 @@ namespace form_builder.Services.PayService
         private readonly IPageHelper _pageHelper;
 
         public PayService(
-            IEnumerable<IPaymentProvider> paymentProviders, 
+            IEnumerable<IPaymentProvider> paymentProviders,
             ILogger<PayService> logger,
             IGateway gateway,
             ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            ISessionHelper sessionHelper, 
-            IMappingService mappingService, 
-            IWebHostEnvironment hostingEnvironment, 
+            ISessionHelper sessionHelper,
+            IMappingService mappingService,
+            IWebHostEnvironment hostingEnvironment,
             IPageHelper pageHelper)
         {
             _gateway = gateway;
@@ -127,12 +127,12 @@ namespace form_builder.Services.PayService
                 var paymentSummary = page.Elements.FirstOrDefault(_ => _.Type == EElementType.PaymentSummary);
                 if (paymentSummary == null)
                     throw new Exception($"PayService::CalculateAmountAsync, No payment summary element found for {formData.BaseForm.FormName} within page {page.PageSlug}");
-                
+
                 var postUrl = paymentSummary.Properties.CalculationSlugs.FirstOrDefault(_ =>
                     _.Environment.ToLower().Equals(_hostingEnvironment.EnvironmentName.ToLower()));
 
                 if (postUrl?.URL == null || postUrl.AuthToken == null)
-                    throw  new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
+                    throw new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
 
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
                 var response = await _gateway.PostAsync(postUrl.URL, formData.Data);
@@ -142,7 +142,7 @@ namespace form_builder.Services.PayService
 
                 if (response.Content == null)
                     throw new ApplicationException($"PayService::CalculateAmountAsync, Gateway {postUrl.URL} responded with null content");
-                
+
                 var content = await response.Content.ReadAsStringAsync();
 
                 if (string.IsNullOrWhiteSpace(content))

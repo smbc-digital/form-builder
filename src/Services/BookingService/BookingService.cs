@@ -1,27 +1,27 @@
-﻿using form_builder.Constants;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using form_builder.Configuration;
+using form_builder.Constants;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
+using form_builder.Exceptions;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Models.Booking;
 using form_builder.Models.Elements;
 using form_builder.Providers.Booking;
 using form_builder.Providers.StorageProvider;
+using form_builder.Services.BookingService.Entities;
+using form_builder.Services.MappingService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Utils.Extensions;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
-using System;
-using System.Collections.Generic;
-using form_builder.Exceptions;
-using System.Linq;
-using System.Threading.Tasks;
-using form_builder.Services.MappingService;
-using form_builder.Models.Booking;
-using form_builder.Services.BookingService.Entities;
-using Microsoft.Extensions.Options;
-using form_builder.Configuration;
-using form_builder.ContentFactory.PageFactory;
 
 namespace form_builder.Services.BookingService
 {
@@ -77,7 +77,7 @@ namespace form_builder.Services.BookingService
 
             var nextAvailability = await RetrieveNextAvailability(bookingElement, bookingProvider);
 
-            if(nextAvailability.BookingHasNoAvailableAppointments)
+            if (nextAvailability.BookingHasNoAvailableAppointments)
                 return new BookingProcessEntity { BookingHasNoAvailableAppointments = true };
 
             appointmentTimes = await bookingProvider.GetAvailability(new AvailabilityRequest
@@ -109,7 +109,7 @@ namespace form_builder.Services.BookingService
 
         public async Task<ProcessRequestEntity> ProcessBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
         {
-            var bookingElement = (Booking) currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
+            var bookingElement = (Booking)currentPage.Elements.First(_ => _.Type.Equals(EElementType.Booking));
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
 
             switch (subPath)
@@ -121,7 +121,7 @@ namespace form_builder.Services.BookingService
             }
         }
 
-        private async Task<BoookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider) 
+        private async Task<BoookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider)
         {
             var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{bookingElement.Properties.AppointmentType}{bookingElement.Properties.OptionalResources.CreateKeyFromResources()}";
             var bookingNextAvailabilityCachedResponse = _distributedCache.GetString(bookingNextAvailabilityCachedKey);
@@ -153,7 +153,7 @@ namespace form_builder.Services.BookingService
                 }
             }
 
-            result = new BoookingNextAvailabilityEntity{ DayResponse = nextAvailability };
+            result = new BoookingNextAvailabilityEntity { DayResponse = nextAvailability };
             _ = _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.Booking);
             return result;
         }
@@ -240,8 +240,8 @@ namespace form_builder.Services.BookingService
                 var previouslyReservedAppointmentStartTime = (string)viewModel[reservedBookingStartTime];
                 var previouslyReservedAppointmentEndTime = (string)viewModel[reservedBookingEndTime];
 
-                if (currentSelectedDate.Equals(previouslyReservedAppointmentDate) && currentSelectedStartTime.Equals(previouslyReservedAppointmentStartTime) && currentSelectedEndTime.Equals(previouslyReservedAppointmentEndTime))                
-                    return Guid.Parse(viewModel[reservedBookingId]);                
+                if (currentSelectedDate.Equals(previouslyReservedAppointmentDate) && currentSelectedStartTime.Equals(previouslyReservedAppointmentStartTime) && currentSelectedEndTime.Equals(previouslyReservedAppointmentEndTime))
+                    return Guid.Parse(viewModel[reservedBookingId]);
             }
 
             viewModel.Remove(reservedBookingId);

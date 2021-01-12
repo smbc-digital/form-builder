@@ -34,7 +34,7 @@ namespace form_builder.Cache
             {
                 var data = _distributedCache.GetString($"{type.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{cacheKey}");
 
-                if(data == null)
+                if (data == null)
                 {
                     result = await _schemaProvider.Get<T>($"{prefix}{cacheKey}");
 
@@ -46,7 +46,7 @@ namespace form_builder.Cache
 
                 return JsonConvert.DeserializeObject<T>(data);
             }
-            
+
             return await _schemaProvider.Get<T>($"{prefix}{cacheKey}");
         }
     }

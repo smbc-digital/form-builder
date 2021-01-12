@@ -1,10 +1,10 @@
-﻿using form_builder.Builders;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using form_builder.Builders;
 using form_builder.Exceptions;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace form_builder.Providers.Booking
 {
@@ -17,10 +17,10 @@ namespace form_builder.Providers.Booking
 
         public Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request)
         {
-            if(request.AppointmentId.Equals(Guid.Parse(BOOKING_WITH_NO_AVAILABILITY)))
+            if (request.AppointmentId.Equals(Guid.Parse(BOOKING_WITH_NO_AVAILABILITY)))
                 throw new BookingNoAvailabilityException("FakeProvider, no available appointments");
 
-            if(request.AppointmentId.Equals(Guid.Parse(BOOKING_UI_TEST)))
+            if (request.AppointmentId.Equals(Guid.Parse(BOOKING_UI_TEST)))
                 return Task.FromResult(new AvailabilityDayResponse()
                 {
                     Date = new DateTime(2021, 2, 1),
@@ -34,7 +34,7 @@ namespace form_builder.Providers.Booking
                     }
                 });
 
-            if(request.AppointmentId.Equals(Guid.Parse(BOOKING_NON_FULL_DAY_APPOINTMENT)))
+            if (request.AppointmentId.Equals(Guid.Parse(BOOKING_NON_FULL_DAY_APPOINTMENT)))
                 return NextAvailability_ForNonFullDayAppointment(request);
 
             return NextAvailability_ForFullDayAppointment(request);
@@ -42,12 +42,12 @@ namespace form_builder.Providers.Booking
 
         public Task<List<AvailabilityDayResponse>> GetAvailability(AvailabilityRequest request)
         {
-            if(request.AppointmentId.Equals(Guid.Parse(BOOKING_UI_TEST)))
+            if (request.AppointmentId.Equals(Guid.Parse(BOOKING_UI_TEST)))
                 return Task.FromResult(new AvailabilityDayResponseBuilder()
                         .WithDay(new DateTime(2021, 2, 1), 1, true)
                         .Build());
 
-            if(request.AppointmentId.Equals(Guid.Parse(BOOKING_NON_FULL_DAY_APPOINTMENT)))
+            if (request.AppointmentId.Equals(Guid.Parse(BOOKING_NON_FULL_DAY_APPOINTMENT)))
                 return GetAvailability_ForNonFullDayAppointment(request);
 
             return GetAvailability_ForFullDayAppointment(request);
@@ -58,11 +58,11 @@ namespace form_builder.Providers.Booking
             return Task.FromResult(Guid.NewGuid());
         }
 
-        private Task<AvailabilityDayResponse> NextAvailability_ForFullDayAppointment(AvailabilityRequest request) => 
+        private Task<AvailabilityDayResponse> NextAvailability_ForFullDayAppointment(AvailabilityRequest request) =>
         Task.FromResult(new AvailabilityDayResponse()
-            {
-                Date = DateTime.Now.AddMonths(1),
-                AppointmentTimes = new List<AppointmentTime>
+        {
+            Date = DateTime.Now.AddMonths(1),
+            AppointmentTimes = new List<AppointmentTime>
                 {
                     new AppointmentTime
                     {
@@ -70,9 +70,9 @@ namespace form_builder.Providers.Booking
                         EndTime = new TimeSpan(17, 30, 0)
                     }
                 }
-            });
+        });
 
-        private Task<AvailabilityDayResponse> NextAvailability_ForNonFullDayAppointment(AvailabilityRequest request) => 
+        private Task<AvailabilityDayResponse> NextAvailability_ForNonFullDayAppointment(AvailabilityRequest request) =>
         Task.FromResult(new AvailabilityDayResponse()
         {
             Date = DateTime.Now.AddMonths(1),

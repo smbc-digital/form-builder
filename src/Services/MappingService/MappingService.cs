@@ -107,7 +107,7 @@ namespace form_builder.Services.MappingService
                 .ToList()
                 .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
 
-            if(!data.ContainsKey("customer"))
+            if (!data.ContainsKey("customer"))
                 throw new ApplicationException($"MappingService::GetCustomerDetails, Booking request form data for form {formSchema.BaseURL} does not contain required customer object");
 
             return JsonConvert.DeserializeObject<Customer>(JsonConvert.SerializeObject(data["customer"]));

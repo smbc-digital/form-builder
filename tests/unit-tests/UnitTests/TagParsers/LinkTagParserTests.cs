@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.TagParsers
             var url = "www.stockport.gov.uk";
             var linkText = "link text";
             var expectValue = string.Format(_tagParser._htmlContent, url, linkText);
-            Assert.Equal(expectValue, _tagParser.FormatContent(new string[2]{url,linkText}));
+            Assert.Equal(expectValue, _tagParser.FormatContent(new string[2] { url, linkText }));
         }
 
 
@@ -63,7 +63,7 @@ namespace form_builder_tests.UnitTests.TagParsers
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-            
+
             var formAnswers = new FormAnswers();
 
             var result = _tagParser.Parse(page, formAnswers);
@@ -82,7 +82,7 @@ namespace form_builder_tests.UnitTests.TagParsers
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-            
+
             var formAnswers = new FormAnswers();
 
             var result = _tagParser.Parse(page, formAnswers);
@@ -93,12 +93,12 @@ namespace form_builder_tests.UnitTests.TagParsers
         [Fact]
         public void Parse_ShouldReturn_UpdatedText_WithReplacedValue()
         {
-            var expectedString = $"this link {_tagParser.FormatContent(new string [2]{"www.stockport.gov", "text"})} should be replaced";
+            var expectedString = $"this link {_tagParser.FormatContent(new string[2] { "www.stockport.gov", "text" })} should be replaced";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this link {{LINK:www.stockport.gov:text}} should be replaced")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this link {{LINK:www.stockport.gov:text}} should be replaced")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)

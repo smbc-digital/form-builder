@@ -21,7 +21,7 @@ namespace form_builder.Services.FileUploadService
         private readonly IPageHelper _pageHelper;
 
         public FileUploadService(IDistributedCacheWrapper distributedCache,
-            IPageFactory pageFactory, 
+            IPageFactory pageFactory,
             IPageHelper pageHelper)
         {
             _distributedCache = distributedCache;
@@ -39,7 +39,7 @@ namespace form_builder.Services.FileUploadService
                 {
                     viewModel.Add(group.Key, group.Select(_ => new DocumentModel
                     {
-                        Content =_.Base64EncodedContent, 
+                        Content = _.Base64EncodedContent,
                         FileSize = _.Length,
                         FileName = WebUtility.HtmlEncode(_.UntrustedOriginalFileName)
                     }).ToList());
@@ -57,15 +57,15 @@ namespace form_builder.Services.FileUploadService
             IEnumerable<CustomFormFile> files,
             bool modelStateIsValid)
         {
-            return viewModel.ContainsKey(FileUploadConstants.FILE_TO_DELETE) 
-                ? RemoveFile(viewModel, baseForm, path, guid) 
+            return viewModel.ContainsKey(FileUploadConstants.FILE_TO_DELETE)
+                ? RemoveFile(viewModel, baseForm, path, guid)
                 : await ProcessSelectedFiles(viewModel, currentPage, baseForm, guid, path, files, modelStateIsValid);
         }
 
         private ProcessRequestEntity RemoveFile(
             Dictionary<string, dynamic> viewModel,
             FormSchema baseForm,
-            string path, 
+            string path,
             string sessionGuid)
         {
             var cachedAnswers = _distributedCache.GetString(sessionGuid);
@@ -116,18 +116,18 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            if(currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files == null || !files.Any()) && modelStateIsValid)
+            if (currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files == null || !files.Any()) && modelStateIsValid)
             {
-                if(currentPage.Elements.Where(_ => _.Type.Equals(EElementType.MultipleFileUpload)).Any(_ => _.Properties.Optional))
+                if (currentPage.Elements.Where(_ => _.Type.Equals(EElementType.MultipleFileUpload)).Any(_ => _.Properties.Optional))
                     _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
-                    
+
                 return new ProcessRequestEntity
                 {
                     Page = currentPage
                 };
             }
 
-            if(!viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files == null || !files.Any()))
+            if (!viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files == null || !files.Any()))
             {
                 return new ProcessRequestEntity
                 {
@@ -177,6 +177,6 @@ namespace form_builder.Services.FileUploadService
                     path
                 }
             };
-        }     
+        }
     }
 }

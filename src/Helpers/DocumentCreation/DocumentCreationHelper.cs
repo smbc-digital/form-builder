@@ -10,7 +10,7 @@ namespace form_builder.Helpers.DocumentCreation
     {
         private readonly IElementMapper _elementMapper;
         public DocumentCreationHelper(IElementMapper elementMapper) => _elementMapper = elementMapper;
-        
+
         public List<string> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema)
         {
             var summaryBuilder = new SummaryAnswerBuilder();
@@ -20,7 +20,8 @@ namespace form_builder.Helpers.DocumentCreation
                 .SelectMany(_ => _.ValidatableElements)
                 .ToList();
 
-            formSchemaQuestions.ForEach(question => {
+            formSchemaQuestions.ForEach(question =>
+            {
                 var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
 
                 summaryBuilder.Add(question.GetLabelText(), answer, question.Type);

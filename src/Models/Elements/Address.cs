@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json.Linq;
@@ -45,7 +45,7 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public override string GetLabelText() => $"Address{(Properties.Optional? " (optional)" : string.Empty)}";
+        public override string GetLabelText() => $"Address{(Properties.Optional ? " (optional)" : string.Empty)}";
 
         public Address()
         {
@@ -87,7 +87,7 @@ namespace form_builder.Models.Elements
                     var selectedAddress = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, AddressConstants.SELECT_SUFFIX);
                     var searchSuffix = results?.Count == 1 ? "address found" : "addresses found";
                     Items = new List<SelectListItem> { new SelectListItem($"{results.Count} {searchSuffix}", string.Empty) };
-                    
+
                     results.ForEach((objectResult) =>
                     {
                         AddressSearchResult searchResult;

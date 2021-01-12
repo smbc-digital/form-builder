@@ -55,21 +55,22 @@ namespace form_builder.ContentFactory.SuccessPageFactory
 
             if (baseForm.DocumentDownload)
             {
-                    baseForm.DocumentType.ForEach((docType) => {
-                        var element = new ElementBuilder()
-                            .WithType(EElementType.DocumentDownload)
-                            .WithLabel($"Download {docType} document")
-                            .WithSource($"/v2/document/Summary/{docType}/{sessionGuid}")
-                            .WithDocumentType(docType)
-                            .Build();
+                baseForm.DocumentType.ForEach((docType) =>
+                {
+                    var element = new ElementBuilder()
+                        .WithType(EElementType.DocumentDownload)
+                        .WithLabel($"Download {docType} document")
+                        .WithSource($"/v2/document/Summary/{docType}/{sessionGuid}")
+                        .WithDocumentType(docType)
+                        .Build();
 
-                        page.Elements.Add(element);
-                    });
-                    var successIndex = baseForm.Pages.IndexOf(page);    
-                    baseForm.Pages[successIndex] = page;
+                    page.Elements.Add(element);
+                });
+                var successIndex = baseForm.Pages.IndexOf(page);
+                baseForm.Pages[successIndex] = page;
             }
 
-            var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(),baseForm, sessionGuid, formAnswers);
+            var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid, formAnswers);
 
             return new SuccessPageEntity
             {
@@ -108,7 +109,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                 .WithType(EElementType.H2)
                 .WithPropertyText("What happens next")
                 .Build();
-                
+
             var pElement3 = new ElementBuilder()
                 .WithType(EElementType.P)
                 .WithPropertyText("Content author: You should include information that is helpful to the user about what they need to do next.")

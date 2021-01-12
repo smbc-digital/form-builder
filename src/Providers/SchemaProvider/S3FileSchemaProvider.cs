@@ -1,21 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Amazon.S3;
+using Amazon.S3.Model;
+using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Extensions;
 using form_builder.Gateways;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using form_builder.Constants;
 using Microsoft.Extensions.Logging;
-using Amazon.S3.Model;
-using System.Collections.Generic;
-using form_builder.Configuration;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace form_builder.Providers.SchemaProvider
 {
@@ -29,8 +29,8 @@ namespace form_builder.Providers.SchemaProvider
         private readonly DistributedCacheConfiguration _distributedCacheConfiguration;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
-        public S3FileSchemaProvider(IS3Gateway s3Service, 
-            IWebHostEnvironment environment, 
+        public S3FileSchemaProvider(IS3Gateway s3Service,
+            IWebHostEnvironment environment,
             IDistributedCacheWrapper distributedCacheWrapper,
             IConfiguration configuration,
             IOptions<DistributedCacheConfiguration> distributedCacheConfiguration,
@@ -78,7 +78,7 @@ namespace form_builder.Providers.SchemaProvider
 
         public async Task<List<string>> IndexSchema()
         {
-            if(!_distributedCacheConfiguration.UseDistributedCache)
+            if (!_distributedCacheConfiguration.UseDistributedCache)
             {
                 _logger.LogWarning($"S3FileSchemaProvider::IndexSchema, A request to index form schema was made but UseDistributedCache is disabled");
                 return new List<string>();
@@ -96,21 +96,21 @@ namespace form_builder.Providers.SchemaProvider
             }
 
             var indexKeys = result.S3Objects.Select(_ => _.Key).ToList();
-            
+
             _ = _distributedCacheWrapper.SetStringAsync(CacheConstants.INDEX_SCHEMA, JsonConvert.SerializeObject(indexKeys), _distributedCacheExpirationConfiguration.Index);
-            
+
             return indexKeys;
         }
 
         public async Task<bool> ValidateSchemaName(string schemaName)
         {
-            if(!_distributedCacheConfiguration.UseDistributedCache)
+            if (!_distributedCacheConfiguration.UseDistributedCache)
                 return true;
 
             var cachedIndexSchema = _distributedCacheWrapper.GetString(CacheConstants.INDEX_SCHEMA);
             var indexSchema = new List<string>();
-            
-            if(string.IsNullOrEmpty(cachedIndexSchema))
+
+            if (string.IsNullOrEmpty(cachedIndexSchema))
                 indexSchema = await IndexSchema();
             else
                 indexSchema = JsonConvert.DeserializeObject<List<string>>(cachedIndexSchema);

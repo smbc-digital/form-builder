@@ -28,7 +28,8 @@ namespace form_builder.ContentFactory.PageFactory
 
         public async Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers = null, List<object> results = null)
         {
-            if(formAnswers == null){
+            if (formAnswers == null)
+            {
                 var cachedAnswers = _distributedCache.GetString(sessionGuid);
 
                 formAnswers = cachedAnswers == null
@@ -37,7 +38,7 @@ namespace form_builder.ContentFactory.PageFactory
             }
 
             _tagParsers.ToList().ForEach(_ => _.Parse(page, formAnswers));
-            
+
             var result = await _pageHelper.GenerateHtml(page, viewModel, baseForm, sessionGuid, formAnswers, results);
             result.Path = page.PageSlug;
             result.FormName = baseForm.FormName;

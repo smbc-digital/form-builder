@@ -123,7 +123,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithData(new object())
                 .Build();
 
-            var paymentProviderItems = new List<IPaymentProvider> {_paymentProvider.Object};
+            var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
             _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
             _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
             _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testForm"))
@@ -361,7 +361,7 @@ namespace form_builder_tests.UnitTests.Services
             }).Build();
 
             // Act
-            await Assert.ThrowsAsync<Exception>( () => _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page));
+            await Assert.ThrowsAsync<Exception>(() => _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page));
         }
 
         [Fact]
