@@ -377,6 +377,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
                 o.ViewLocationFormats.Add("/Views/Shared/Booking/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/Breadcrumbs/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/ChangeSearch/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Chevron/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/Cookie/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/DateInput/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/DatePicker/{0}" + RazorViewEngine.ViewExtension);
