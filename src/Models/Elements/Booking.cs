@@ -11,6 +11,7 @@ using form_builder.Models.Booking;
 using form_builder.Models.Time;
 using form_builder.Utils.Extensions;
 using Microsoft.AspNetCore.Hosting;
+using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 
 namespace form_builder.Models.Elements
@@ -21,7 +22,9 @@ namespace form_builder.Models.Elements
         public List<CalendarDay> Calendar { get; set; } = new List<CalendarDay>();
         public List<TimeAvailability> Times { get; set; } = new List<TimeAvailability>();
         public List<AvailabilityDayResponse> Appointments { get; set; } = new List<AvailabilityDayResponse>();
+        [JsonIgnore]
         public string FormattedDateForCheckYourBooking => DateTime.Parse(Properties.Value).ToFullDateFormat();
+        [JsonIgnore]
         public string FormattedTimeForCheckYourBooking => SelectedBooking.IsFullDayAppointment ? $"between {AppointmentStartTime.ToTimeFormat()} and {AppointmentEndTime.ToTimeFormat()}" : $"{AppointmentStartTime.ToTimeFormat()} to {AppointmentEndTime.ToTimeFormat()}";
         public AvailabilityDayResponse SelectedBooking;
         public bool IsAppointmentTypeFullDay { get; set; }
@@ -34,9 +37,13 @@ namespace form_builder.Models.Elements
         public string InsetText => SetInsetText();
         public bool DisplayInsetText => InsetText.Length > 0;
         public string CurrentSelectedMonthText => $"{CurrentSelectedMonth:MMMMM yyyy}";
+        [JsonIgnore]
         public DateTime NextSelectableMonth => new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).AddMonths(1);
+        [JsonIgnore]
         public DateTime PreviousSelectableMonth => new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, 1).AddMonths(-1);
+        [JsonIgnore]
         public bool DisplayNextMonthArrow => NextSelectableMonth <= new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(Properties.SearchPeriod);
+        [JsonIgnore]
         public bool DisplayPreviousMonthArrow => new DateTime(CurrentSelectedMonth.Date.Year, CurrentSelectedMonth.Date.Month, 1) > FirstAvailableMonth;
         public override string GetLabelText() => $"Booking{(Properties.Optional ? " (optional)" : string.Empty)}";
         public string FormName { get; set; }
