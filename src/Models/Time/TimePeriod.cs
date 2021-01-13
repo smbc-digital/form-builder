@@ -22,11 +22,13 @@ namespace form_builder.Models.Time
         public string ToFullDateFormat(TimeSpan time) => Value(time).ToFullDateWithTimeFormat();
         public string NoJSId => $"{TimeQuestionId}-{Date.Day}-{BookingConstants.APPOINTMENT_FULL_TIME_OF_DAY_SUFFIX}";
         public string BookingType { get; set; }
-        public string GetClassNameForDivsPosition(int value){
-            switch(value % 3){
-                case 0: 
+        public string GetClassNameForDivsPosition(int value)
+        {
+            switch (value % 3)
+            {
+                case 0:
                     return "smbc-time__time__label--left";
-                case 1: 
+                case 1:
                     return "smbc-time__time__label--centre";
                 default:
                     return "smbc-time__time__label--right";

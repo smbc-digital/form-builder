@@ -66,7 +66,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _service = new MappingService( _mockDistrubutedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockDistributedCacheExpirationConfiguration.Object);
+            _service = new MappingService(_mockDistrubutedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockDistributedCacheExpirationConfiguration.Object);
         }
 
         [Fact]
@@ -337,7 +337,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.NotNull(fiveObject.six);
         }
 
-        
+
         [Theory]
         [InlineData(EElementType.FileUpload)]
         [InlineData(EElementType.MultipleFileUpload)]
@@ -381,7 +381,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Empty(castResultsData);
         }
 
-                
+
         [Theory]
         [InlineData(EElementType.FileUpload)]
         [InlineData(EElementType.MultipleFileUpload)]
@@ -421,7 +421,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(null);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(new List<File>{ new File()});
+                .Returns(new List<File> { new File() });
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -480,13 +480,13 @@ namespace form_builder_tests.UnitTests.Services
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "file"), It.IsAny<FormAnswers>()))
-                .Returns(new List<File>{new File()});
+                .Returns(new List<File> { new File() });
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filetwo"), It.IsAny<FormAnswers>()))
                 .Returns(null);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filethree"), It.IsAny<FormAnswers>()))
-                .Returns(new List<File>{new File()});
+                .Returns(new List<File> { new File() });
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -495,7 +495,7 @@ namespace form_builder_tests.UnitTests.Services
             var resultData = Assert.IsType<ExpandoObject>(result.Data);
             dynamic castResultsData = resultData;
 
-            Assert.Equal(2,castResultsData.file.Count);
+            Assert.Equal(2, castResultsData.file.Count);
             Assert.NotNull(castResultsData);
             Assert.NotNull(castResultsData.file);
         }
@@ -508,7 +508,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Textbox)
                 .WithQuestionId("textbox")
                 .Build();
-                
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithValidatedModel(true)
@@ -526,7 +526,7 @@ namespace form_builder_tests.UnitTests.Services
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
                    Pages = new List<PageAnswers>(),
-                   AdditionalFormData = new Dictionary<string, object>{ { "additional", "answerData" }}
+                   AdditionalFormData = new Dictionary<string, object> { { "additional", "answerData" } }
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "textbox"), It.IsAny<FormAnswers>()))
@@ -577,7 +577,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithAppointmentType(bookingGuid)
                 .Build();
 
-            var viewModel = new Dictionary<string, object> { 
+            var viewModel = new Dictionary<string, object> {
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", startDate.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", startTime.ToString() }
             };
@@ -623,7 +623,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithAppointmentType(bookingGuid)
                 .Build();
 
-            var viewModel = new Dictionary<string, object> { 
+            var viewModel = new Dictionary<string, object> {
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", startTime.ToString() }
             };
 
@@ -664,7 +664,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithAppointmentType(bookingGuid)
                 .Build();
 
-             var viewModel = new Dictionary<string, object> { 
+            var viewModel = new Dictionary<string, object> {
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", startDate.ToString() }
             };
 
@@ -701,12 +701,12 @@ namespace form_builder_tests.UnitTests.Services
                 .WithAppointmentType(bookingGuid)
                 .Build();
 
-            var viewModel = new Dictionary<string, object> { 
+            var viewModel = new Dictionary<string, object> {
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", startDate.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", startTime.ToString() }
             };
 
-             // Act
+            // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.MapBookingRequest("guid", element, viewModel, "testform"));
 
             // Assert

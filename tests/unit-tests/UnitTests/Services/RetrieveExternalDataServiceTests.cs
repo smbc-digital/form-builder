@@ -21,7 +21,6 @@ using Microsoft.AspNetCore.Hosting;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
 using Xunit;
-using Action = form_builder.Models.Actions.Action;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -102,16 +101,16 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_Should_NotCallGatewayToUpdateHeader_IfNoAuthTokenProvided()
         {
             // Arrange
-             var action = new ActionBuilder()
-                .WithActionType(EActionType.RetrieveExternalData)
-                .WithPageActionSlug(new PageActionSlug
-                {
-                    URL = "www.test.com",
-                    AuthToken = string.Empty,
-                    Environment = "local"
-                })
-                .WithTargetQuestionId("targetId")
-                .Build();
+            var action = new ActionBuilder()
+               .WithActionType(EActionType.RetrieveExternalData)
+               .WithPageActionSlug(new PageActionSlug
+               {
+                   URL = "www.test.com",
+                   AuthToken = string.Empty,
+                   Environment = "local"
+               })
+               .WithTargetQuestionId("targetId")
+               .Build();
 
             var actions = new List<IAction>
             {

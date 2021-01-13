@@ -1,10 +1,10 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-using form_builder.Validators;
-using System.Collections.Generic;
-using Xunit;
+﻿using System.Collections.Generic;
 using form_builder.Builders;
 using form_builder.Constants;
+using form_builder.Enum;
+using form_builder.Models;
+using form_builder.Validators;
+using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
 {
@@ -45,7 +45,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("fileUpload")
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{ $"fileUpload{FileUploadConstants.SUFFIX}", null}};
+            var viewModel = new Dictionary<string, dynamic> { { $"fileUpload{FileUploadConstants.SUFFIX}", null } };
 
             // Act
             var result = _validator.Validate(element, viewModel);

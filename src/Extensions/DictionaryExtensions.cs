@@ -7,11 +7,11 @@ namespace form_builder.Extensions
 {
     public static class DictionaryExtensions
     {
-        public static Dictionary<string,object> ToNormaliseDictionary(this Dictionary<string, string[]> formData, string subPath)
+        public static Dictionary<string, object> ToNormaliseDictionary(this Dictionary<string, string[]> formData, string subPath)
         {
             var normalisedFormData = new Dictionary<string, dynamic>();
             normalisedFormData.Add(LookUpConstants.SubPathViewModelKey, subPath);
-            
+
             foreach (var item in formData)
             {
                 if (item.Key.EndsWith(FileUploadConstants.SUFFIX))
@@ -70,8 +70,8 @@ namespace form_builder.Extensions
 
             return normalisedFormData;
         }
-        
-        private static Dictionary<string,object> CleanUpBookingTimes(Dictionary<string,object> normalisedFormData)
+
+        private static Dictionary<string, object> CleanUpBookingTimes(Dictionary<string, object> normalisedFormData)
         {
             if (!normalisedFormData.Any(_ => _.Key.EndsWith(BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX)))
                 return normalisedFormData;
@@ -109,11 +109,12 @@ namespace form_builder.Extensions
             normalisedFormData = normalisedFormData.Where(_ => !_.Key.EndsWith($"{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}"))
                 .Where(_ => !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_MORNING}") && !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_AFTERNOON}"))
                 .ToDictionary(x => x.Key, x => (dynamic)x.Value);
-            
+
             var parseStartTimeResult = DateTime.TryParse(selectedTime[0], out DateTime parsedStartTime);
             var parseEndTimeResult = DateTime.TryParse(selectedTime[1], out DateTime parsedEndTime);
 
-            if(parseStartTimeResult && parseEndTimeResult){
+            if (parseStartTimeResult && parseEndTimeResult)
+            {
                 normalisedFormData.Add($"{bookingElementId}{BookingConstants.APPOINTMENT_START_TIME}", parsedStartTime.ToString());
                 normalisedFormData.Add($"{bookingElementId}{BookingConstants.APPOINTMENT_END_TIME}", parsedEndTime.ToString());
             }

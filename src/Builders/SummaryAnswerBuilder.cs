@@ -9,8 +9,9 @@ namespace form_builder.Builders.Document
         private List<string> _data = new List<string>();
         private List<string> _filesData = new List<string>();
 
-        public void Add(string question, string answer, EElementType type){
-            if(string.IsNullOrWhiteSpace(answer))
+        public void Add(string question, string answer, EElementType type)
+        {
+            if (string.IsNullOrWhiteSpace(answer))
                 return;
 
             if (type == EElementType.FileUpload || type == EElementType.MultipleFileUpload)
@@ -19,7 +20,8 @@ namespace form_builder.Builders.Document
                 _data.Add($"{question}: {answer}");
         }
 
-        public List<string> Build(){
+        public List<string> Build()
+        {
             if (!_filesData.Any()) return _data;
 
             _data.Add(string.Empty);

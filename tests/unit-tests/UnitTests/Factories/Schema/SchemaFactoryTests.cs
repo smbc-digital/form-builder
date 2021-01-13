@@ -154,7 +154,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
 
             // Act
             await _schemaFactory.Build("form");
-            
+
             // Assert
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             _mockLookupSchemaFactory.Verify(_ => _.Transform(It.IsAny<FormSchema>()), Times.Once);

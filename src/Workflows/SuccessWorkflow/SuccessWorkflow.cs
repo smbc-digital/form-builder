@@ -6,13 +6,8 @@ using form_builder.Services.PageService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Workflows.ActionsWorkflow;
 
-namespace form_builder.Workflows
+namespace form_builder.Workflows.SuccessWorkflow
 {
-    public interface ISuccessWorkflow
-    {
-        Task<SuccessPageEntity> Process(EBehaviourType behaviourType, string form);
-    }
-
     public class SuccessWorkflow : ISuccessWorkflow
     {
         private readonly IPageService _pageService;

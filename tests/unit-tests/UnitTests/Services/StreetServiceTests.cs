@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
@@ -28,7 +28,7 @@ namespace form_builder_tests.UnitTests.Services
 
         public StreetServiceTests()
         {
-             _streetProvider.Setup(_ => _.ProviderName).Returns("Fake");
+            _streetProvider.Setup(_ => _.ProviderName).Returns("Fake");
             _streetProviders = new List<IStreetProvider>
             {
                 _streetProvider.Object
@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.Services
                 },
                 FormData = new Dictionary<string, object>
                 {
-                    { "page-one-search-results" , new List<object>() } 
+                    { "page-one-search-results" , new List<object>() }
                 }
             };
 
@@ -174,7 +174,7 @@ namespace form_builder_tests.UnitTests.Services
                         PageSlug = "page-one"
                     }
                 },
-                FormData = new Dictionary<string, object> 
+                FormData = new Dictionary<string, object>
                 {
                     {"page-one-search-results", new List<object>{ }}
                 }
@@ -212,7 +212,7 @@ namespace form_builder_tests.UnitTests.Services
             _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
-        
+
         [Fact]
         public async Task ProcessStreet_Should_Call_StreetProvider_When_SearchTerm_IsDifferent()
         {

@@ -23,7 +23,8 @@ namespace form_builder.Builders
                 });
             }
 
-            _response.Add(new AvailabilityDayResponse {
+            _response.Add(new AvailabilityDayResponse
+            {
                 AppointmentTimes = appointmentTimes,
                 Date = date
             });

@@ -60,7 +60,7 @@ namespace form_builder_tests.UnitTests.TagParsers
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-            
+
             var formAnswers = new FormAnswers();
 
             var result = _tagParser.Parse(page, formAnswers);
@@ -79,7 +79,7 @@ namespace form_builder_tests.UnitTests.TagParsers
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-            
+
             var formAnswers = new FormAnswers();
 
             var result = _tagParser.Parse(page, formAnswers);
@@ -92,10 +92,10 @@ namespace form_builder_tests.UnitTests.TagParsers
         {
             var expectedString = "this value testfirstname should be replaced with name question";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with name question")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with name question")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -103,7 +103,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var formAnswers = new FormAnswers
             {
-                AdditionalFormData = new Dictionary<string, object> 
+                AdditionalFormData = new Dictionary<string, object>
                 {
                     { "firstname", "testfirstname"}
                 }
@@ -115,13 +115,13 @@ namespace form_builder_tests.UnitTests.TagParsers
 
         [Fact]
         public void Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
-         {
+        {
             var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with firstname and this {{FORMDATA:lastname}} with lastname")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with firstname and this {{FORMDATA:lastname}} with lastname")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -129,7 +129,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var formAnswers = new FormAnswers
             {
-                AdditionalFormData = new Dictionary<string, object> 
+                AdditionalFormData = new Dictionary<string, object>
                 {
                     { "firstname", "testfirstname"},
                     { "lastname", "testlastname"}
@@ -140,16 +140,16 @@ namespace form_builder_tests.UnitTests.TagParsers
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
         }
 
-        
+
         [Fact]
         public void Parse_ShouldCallFormatter_WhenProvided()
         {
-             var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
+            var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value should be formatted: {{FORMDATA:firstname:testformatter}}")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value should be formatted: {{FORMDATA:firstname:testformatter}}")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -157,7 +157,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var formAnswers = new FormAnswers
             {
-                AdditionalFormData = new Dictionary<string, object> 
+                AdditionalFormData = new Dictionary<string, object>
                 {
                     { "firstname", "testfirstname"}
                 }

@@ -11,12 +11,6 @@ using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Services.SubmitService
 {
-    public interface ISubmitService
-    {
-        Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
-        Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
-
-    }
     public class SubmitService : ISubmitService
     {
         private readonly IGateway _gateway;
@@ -29,9 +23,9 @@ namespace form_builder.Services.SubmitService
 
 
         public SubmitService(
-            IGateway gateway, 
-            IPageHelper pageHelper, 
-            IWebHostEnvironment environment, 
+            IGateway gateway,
+            IPageHelper pageHelper,
+            IWebHostEnvironment environment,
             IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration)
         {
             _gateway = gateway;
@@ -42,10 +36,10 @@ namespace form_builder.Services.SubmitService
 
         public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
-            if(_submissionServiceConfiguration.FakeSubmission)
+            if (_submissionServiceConfiguration.FakeSubmission)
             {
                 _pageHelper.SaveCaseReference(sessionGuid, "123456");
-                return "123456"; 
+                return "123456";
             }
             var reference = string.Empty;
 

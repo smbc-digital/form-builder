@@ -1,7 +1,9 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Enum;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
@@ -9,8 +11,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Models.Elements
@@ -28,7 +28,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.UploadedFilesSummary)
-                .WithFileUploadQuestionIds(new List<string>{ "fileone", "file-two" })
+                .WithFileUploadQuestionIds(new List<string> { "fileone", "file-two" })
                 .Build();
 
             var page = new PageBuilder()
@@ -56,14 +56,14 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("UploadedFilesSummary")), It.IsAny<UploadedFilesSummary>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-            _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.Is<string>(_ => _.Equals("fileone")), It.IsAny<Dictionary<string, dynamic>>(),  It.IsAny<FormAnswers>(),It.IsAny<string>()), Times.Once);
-            _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.Is<string>(_ => _.Equals("file-two")), It.IsAny<Dictionary<string, dynamic>>(),  It.IsAny<FormAnswers>(),It.IsAny<string>()), Times.Once);
+            _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.Is<string>(_ => _.Equals("fileone")), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()), Times.Once);
+            _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.Is<string>(_ => _.Equals("file-two")), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()), Times.Once);
         }
 
-         [Fact]
+        [Fact]
         public async Task RenderAsync_Should_PopulateListItems_Values()
         {
-            var currentAnswer = new List<FileUploadModel>{ new FileUploadModel { TrustedOriginalFileName = "test.jpg" } };
+            var currentAnswer = new List<FileUploadModel> { new FileUploadModel { TrustedOriginalFileName = "test.jpg" } };
             var callback = new UploadedFilesSummary();
 
             _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<UploadedFilesSummary>(), It.IsAny<Dictionary<string, object>>()))
@@ -75,7 +75,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.UploadedFilesSummary)
-                .WithFileUploadQuestionIds(new List<string>{ "fileone", "file-two" })
+                .WithFileUploadQuestionIds(new List<string> { "fileone", "file-two" })
                 .Build();
 
             var page = new PageBuilder()
@@ -108,7 +108,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         [Fact]
         public async Task RenderAsync_Should_PopulateListItems_WhenValueIsNotNull_OrEmpty()
         {
-            var currentAnswer = new List<FileUploadModel>{ new FileUploadModel { TrustedOriginalFileName = "test.jpg" } };
+            var currentAnswer = new List<FileUploadModel> { new FileUploadModel { TrustedOriginalFileName = "test.jpg" } };
             var currentAnswerTwo = new List<FileUploadModel>();
             var callback = new UploadedFilesSummary();
 
@@ -124,7 +124,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             //Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.UploadedFilesSummary)
-                .WithFileUploadQuestionIds(new List<string>{ "fileone", "file-two" })
+                .WithFileUploadQuestionIds(new List<string> { "fileone", "file-two" })
                 .Build();
 
             var page = new PageBuilder()

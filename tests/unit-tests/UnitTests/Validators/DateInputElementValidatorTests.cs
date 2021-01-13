@@ -45,8 +45,8 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.Equal("Check the date and try again", result.Message);
         }
 
-       [Fact]
-       public void Validate_ShouldCheckDateIsNotValid()
+        [Fact]
+        public void Validate_ShouldCheckDateIsNotValid()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -67,8 +67,8 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.Equal("Check the date and try again", result.Message);
         }
 
-       [Fact]
-       public void Validate_ShouldReturnFalse_WhenYearIsGreaterThanMax()
+        [Fact]
+        public void Validate_ShouldReturnFalse_WhenYearIsGreaterThanMax()
         {
             // Arrange
             var element = new ElementBuilder()

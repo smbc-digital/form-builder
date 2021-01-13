@@ -14,7 +14,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         private Regex _regex => new Regex("(?<={{)TEST:.*?(?=}})");
         private TagParser _tagParser;
 
-        public TagParserTests() =>_tagParser = new TagParser(_mockFormatters.Object);
+        public TagParserTests() => _tagParser = new TagParser(_mockFormatters.Object);
 
         [Fact]
         public void Parse_ShouldThrowException_WhenQuestionValue_IsNotWithinAnswers()
@@ -26,7 +26,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         [Fact]
         public void Parse_ShouldThrowException_WhenQuestionValue_IsNullOrEmpty()
         {
-            var answers = new Dictionary<string, object>() 
+            var answers = new Dictionary<string, object>()
             {
                 { "question", string.Empty}
             };
@@ -35,6 +35,6 @@ namespace form_builder_tests.UnitTests.TagParsers
             Assert.Equal("FormAnswerTagParser::Parse, replacement value for quetionId question is null or empty, Match value: TEST:question", result.Message);
         }
 
-        
+
     }
 }

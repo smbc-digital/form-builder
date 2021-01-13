@@ -15,8 +15,8 @@ namespace form_builder.Models.Actions
                 .SendEmail(
                     new EmailMessage(
                         Properties.Subject,
-                        actionHelper.GetEmailContent(this, formAnswers), 
-                        Properties.From, 
+                        actionHelper.GetEmailContent(this, formAnswers),
+                        Properties.From,
                         actionHelper.GetEmailToAddresses(this, formAnswers)));
         }
     }

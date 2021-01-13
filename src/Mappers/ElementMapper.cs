@@ -12,20 +12,11 @@ using form_builder.Utils.Extensions;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
-using Organisation = StockportGovUK.NetStandard.Models.Verint.Organisation;
 using Booking = StockportGovUK.NetStandard.Models.Booking.Booking;
+using Organisation = StockportGovUK.NetStandard.Models.Verint.Organisation;
 
 namespace form_builder.Mappers
 {
-    public interface IElementMapper
-    {
-        T GetAnswerValue<T>(IElement element, FormAnswers formAnswers);
-
-        object GetAnswerValue(IElement element, FormAnswers formAnswers);
-
-        string GetAnswerStringValue(IElement question, FormAnswers formAnswers);
-    }
-
     public class ElementMapper : IElementMapper
     {
         private readonly IDistributedCacheWrapper _distributedCacheWrapper;
@@ -151,7 +142,7 @@ namespace form_builder.Mappers
                     return string.IsNullOrWhiteSpace(addressValue.AddressLine1) ? string.Empty : $"{addressValue.AddressLine1}{manualLine2Text},{addressValue.Town},{addressValue.Postcode}";
                 case EElementType.Booking:
                     var bookingValue = (Booking)value;
-                    return  bookingValue.Date.Equals(DateTime.MinValue) && bookingValue.StartTime.Equals(DateTime.MinValue) ? string.Empty : $"{bookingValue.Date.ToFullDateFormat()} at {bookingValue.StartTime.ToTimeFormat()} to {bookingValue.EndTime.ToTimeFormat()}";
+                    return bookingValue.Date.Equals(DateTime.MinValue) && bookingValue.StartTime.Equals(DateTime.MinValue) ? string.Empty : $"{bookingValue.Date.ToFullDateFormat()} at {bookingValue.StartTime.ToTimeFormat()} to {bookingValue.EndTime.ToTimeFormat()}";
                 case EElementType.Street:
                     var streetValue = (Address)value;
                     return string.IsNullOrEmpty(streetValue.PlaceRef) && string.IsNullOrEmpty(streetValue.SelectedAddress) ? string.Empty : streetValue.SelectedAddress;
@@ -215,7 +206,7 @@ namespace form_builder.Mappers
                             _.QuestionId.Equals(appointmentLocation))
                 .ToList();
 
-            if(!value.Any())
+            if (!value.Any())
                 return null;
 
             var bookingId = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentId))?.Response;
