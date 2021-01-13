@@ -1,24 +1,50 @@
 @model List<TimeAvailability>
 
-@foreach (var day in  Model)
+@{
+    var noScriptDays = new List<TimePeriod>();
+}
+
+@foreach (var day in Model)
 {
-    var timeHeaderModel = new TimeHeaderViewModel 
-    {  
-        Date = day.Date, DataAriaControlsIdForMorning = day.MorningAppointments.Id,
+    var timeHeaderModel = new TimeHeaderViewModel
+    {
+        Date = day.Date,
+        DataAriaControlsIdForMorning = day.MorningAppointments.Id,
         DataAriaControlsIdForAfternoon = day.AfternoonAppointments.Id,
         SelectedTimePeriod = day.TimePeriodCurrentlySelected
     };
 
+    var fullDay = new TimePeriod { Appointments = new List<AppointmentTime>() };
+    if (day.MorningAppointments.Appointments.Any())
+        fullDay.Appointments.AddRange(day.MorningAppointments.Appointments);
+
+    if (day.AfternoonAppointments.Appointments.Any())
+        fullDay.Appointments.AddRange(day.AfternoonAppointments.Appointments);
+
+    if (fullDay.Appointments.Any())
+    {
+        fullDay.TimeQuestionId = Model.First().TimeQuestionId;
+        noScriptDays.Add(fullDay);
+    }
+
     <div class="smbc-time smbc-time__conditional smbc-time__conditional--hidden" id="@day.TimeSelectionIdForConditionalReveal" data-module="smbc-time">
-        <partial name="TimeHeader" model="@timeHeaderModel" />
-        <partial name="TimePeriod" model="@day.MorningAppointments" />
-        <partial name="TimePeriod" model="@day.AfternoonAppointments" />
+        <partial name="TimeHeader" model="timeHeaderModel" />
+        <partial name="TimePeriod" model="day.MorningAppointments" />
+        <partial name="TimePeriod" model="day.AfternoonAppointments" />
     </div>
+}
+
+@if (noScriptDays.Any())
+{
     <noscript>
-        <div class="smbc-time smbc-time__conditional">
-            <h3 class="govuk-heading-m"> @timeHeaderModel.DateTextForNoScript</h3>
-            <partial name="TimePeriodNoJS" model="@day.MorningAppointments" />
-            <partial name="TimePeriodNoJS" model="@day.AfternoonAppointments" />
-        </div>
+        <fieldset class="govuk-fieldset">
+            @foreach (var day in noScriptDays)
+            {
+                <div class="smbc-time smbc-time__conditional">
+                    <h3 class="govuk-heading-m"> @day.Date.ToFullDateFormat()</h3>
+                    <partial name="TimePeriodNoJS" model="day" />
+                </div>
+            }
+        </fieldset>
     </noscript>
 }
