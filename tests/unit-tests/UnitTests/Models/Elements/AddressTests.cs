@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Constants;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
@@ -77,7 +77,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                     LookUpConstants.Automatic}
             };
 
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(),It.IsAny<string>()))
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
             var schema = new FormSchemaBuilder()
@@ -99,7 +99,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 new List<object>());
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"),It.IsAny<form_builder.Models.Elements.Address>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<form_builder.Models.Elements.Address>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             //Arrange
             var callback = new Address();
 
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(),It.IsAny<string>()))
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
             _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Address>(), null))
@@ -132,7 +132,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 {LookUpConstants.SubPathViewModelKey,
                     LookUpConstants.Automatic}
             };
-          
+
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
                 .WithBaseUrl(baseUrl)

@@ -5,7 +5,7 @@ using form_builder.Models;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.SubmitService;
-using form_builder.Workflows;
+using form_builder.Workflows.SubmitWorkflow;
 using Moq;
 using Xunit;
 

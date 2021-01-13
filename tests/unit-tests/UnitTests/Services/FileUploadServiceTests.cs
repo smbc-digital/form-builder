@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -148,8 +148,8 @@ namespace form_builder_tests.UnitTests.Services
             var callbackCacheProvider = string.Empty;
             var cachedAnswers =
                 "{\"FormName\":\"file-upload\",\"Path\":\"page-one\",\"CaseReference\":null,\"StartPageUrl\":null,\"FormData\":{},\"AdditionalFormData\":{},\"Pages\":[{\"PageSlug\":\"page-one\",\"Answers\":[{\"QuestionId\":\"fileUpload-fileupload\",\"Response\":[{\"Key\":\"file-fileUpload-fileupload-b3df0129-c527-4fb8-8cd6-e35e622116f6\",\"TrustedOriginalFileName\":\"SMBC.png\",\"UntrustedOriginalFileName\":\"SMBC.png\",\"Content\":null,\"FileSize\":26879,\"FileName\":null}]}]}]}";
-            
-            var updatedAnswers = 
+
+            var updatedAnswers =
                 "{\"FormName\":\"file-upload\",\"Path\":\"page-one\",\"CaseReference\":null,\"StartPageUrl\":null,\"FormData\":{},\"AdditionalFormData\":{},\"Pages\":[{\"PageSlug\":\"page-one\",\"Answers\":[{\"QuestionId\":\"fileUpload-fileupload\",\"Response\":[]}]}]}";
 
             var viewModel = new Dictionary<string, dynamic>
@@ -375,7 +375,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.NotNull(result.Page);
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), fileUpload, true, true), Times.Once);
         }
-       
+
         [Fact]
         public async Task ProcessFile_ProcessSelectedFiles_ShouldCallPageFactory_IfModelStateInvalid()
         {

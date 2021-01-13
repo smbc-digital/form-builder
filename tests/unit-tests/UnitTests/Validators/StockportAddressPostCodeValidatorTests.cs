@@ -1,7 +1,7 @@
-﻿using form_builder.Builders;
+﻿using System.Collections.Generic;
+using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Validators;
-using System.Collections.Generic;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
@@ -9,7 +9,7 @@ namespace form_builder_tests.UnitTests.Validators
     public class StockportAddressPostCodeValidatorTests
     {
         private readonly StockportAddressPostcodeElementValidator _stockportPostcodeValidator = new StockportAddressPostcodeElementValidator();
-        
+
         [Fact]
         public void Validate_ShouldReturnTrue_WhenDoesNotPostcode()
         {
@@ -57,7 +57,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithStockportPostcode(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"testaddress-postcode", "Elephant"}};
+            var viewModel = new Dictionary<string, dynamic> { { "testaddress-postcode", "Elephant" } };
 
             // Act
             var result = _stockportPostcodeValidator.Validate(element, viewModel);

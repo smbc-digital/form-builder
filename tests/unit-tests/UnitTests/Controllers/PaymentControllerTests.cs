@@ -4,7 +4,7 @@ using form_builder.Exceptions;
 using form_builder.Helpers.Session;
 using form_builder.Services.MappingService;
 using form_builder.Services.PayService;
-using form_builder.Workflows;
+using form_builder.Workflows.SuccessWorkflow;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -28,7 +28,7 @@ namespace form_builder_tests.UnitTests.Controllers
         public async Task HandlePaymentResponse_ShouldCallService_AndRedirectToSuccessAction()
         {
             // Arrange
-            _payService.Setup(_ => _.ProcessPaymentResponse(It.IsAny<string>(),It.IsAny<string>(),  It.IsAny<string>()))
+            _payService.Setup(_ => _.ProcessPaymentResponse(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync("1234");
 
             // Act
@@ -44,7 +44,7 @@ namespace form_builder_tests.UnitTests.Controllers
         public async Task HandlePaymentResponse_Should_RedirectToFailureAction_WhenPaymentFailureException()
         {
             // Arrange
-            _payService.Setup(_ => _.ProcessPaymentResponse(It.IsAny<string>(),It.IsAny<string>(), It.IsAny<string>()))
+            _payService.Setup(_ => _.ProcessPaymentResponse(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Throws(new PaymentFailureException("payment failure"));
 
             // Act
@@ -60,7 +60,7 @@ namespace form_builder_tests.UnitTests.Controllers
         public async Task HandlePaymentResponse_Should_RedirectToDeclinedAction_WhenPaymentDeclinedException()
         {
             // Arrange
-            _payService.Setup(_ => _.ProcessPaymentResponse(It.IsAny<string>(),It.IsAny<string>(), It.IsAny<string>()))
+            _payService.Setup(_ => _.ProcessPaymentResponse(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Throws(new PaymentDeclinedException("payment declined"));
 
             // Act

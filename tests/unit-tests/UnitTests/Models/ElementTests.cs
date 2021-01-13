@@ -268,9 +268,9 @@ namespace form_builder_tests.UnitTests.Models
                             .WithQuestionId(questionId)
                             .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{questionId, "test"}};
+            var viewModel = new Dictionary<string, dynamic> { { questionId, "test" } };
             element.Validate(viewModel, _validators.Object);
-            
+
             // Act
             var result = element.GetDescribedByAttributeValue();
 
@@ -290,7 +290,7 @@ namespace form_builder_tests.UnitTests.Models
                             .WithHint("hint")
                             .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{questionId, "test"}};
+            var viewModel = new Dictionary<string, dynamic> { { questionId, "test" } };
             element.Validate(viewModel, _validators.Object);
 
             // Act

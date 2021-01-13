@@ -9,10 +9,10 @@ using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
+using form_builder.Helpers.ViewRender;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ActionProperties;
@@ -205,7 +205,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Address>(), null))
                 .Callback<string, Address, Dictionary<string, object>>((x, y, z) => callback = y);
 
-            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(),It.IsAny<FormAnswers>(), It.IsAny<string>()))
+            _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
             var pageSlug = "page-one";
@@ -343,7 +343,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var formAnswers = new FormAnswers();
             //Act
-            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty , formAnswers);
+            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers);
 
             //Assert
             _mockIViewRender.Verify(
@@ -788,7 +788,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 Times.Once);
         }
 
-        
+
         [Fact]
         public void SaveAnswers_ShouldSave_CurrentPageAnswer_WhenNoFilesSelected_And_PageAlreadyHasData_ForMultipleFileUpload()
         {
@@ -799,12 +799,12 @@ namespace form_builder_tests.UnitTests.Helpers
                 Path = "page-one",
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
                         PageSlug = "page-two",
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = "fileupload",
                                 Response = JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel() })
@@ -818,7 +818,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Returns(mockData);
 
             _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .Callback<string, string, CancellationToken>((x,y,z) => callbackValue = y);
+                .Callback<string, string, CancellationToken>((x, y, z) => callbackValue = y);
 
             var viewModel = new Dictionary<string, dynamic> { { "Path", "page-two" } };
 
@@ -1327,7 +1327,8 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIsFoundInJson() {
+        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIsFoundInJson()
+        {
             // Arrange
             var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
             var element1 = new ElementBuilder()
@@ -1356,7 +1357,8 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIdIsBlankInJson() {
+        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIdIsBlankInJson()
+        {
             // Arrange
             var option1 = new Option { ConditionalElementId = "", Value = "Value1" };
             var element1 = new ElementBuilder()
@@ -1377,7 +1379,8 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementNotFoundInJson() {
+        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementNotFoundInJson()
+        {
             // Arrange
             var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
             var element1 = new ElementBuilder()
@@ -1398,7 +1401,8 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenTooManyConditionalElementsFoundInJson() {
+        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenTooManyConditionalElementsFoundInJson()
+        {
             // Arrange
             var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
             var element1 = new ElementBuilder()
@@ -1435,7 +1439,8 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementIsPlacedOnAnotherPageInJson() {
+        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementIsPlacedOnAnotherPageInJson()
+        {
             // Arrange
             var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
             var element1 = new ElementBuilder()
@@ -2273,7 +2278,7 @@ namespace form_builder_tests.UnitTests.Helpers
             // Arrange                                        
             var questionId = "fileUpload_FileQuestionId";
             var file = new List<CustomFormFile>();
-            file.Add( new CustomFormFile("abc", questionId, 0, "replace-me.txt"));
+            file.Add(new CustomFormFile("abc", questionId, 0, "replace-me.txt"));
 
             var page = new PageAnswers
             {
@@ -2284,7 +2289,7 @@ namespace form_builder_tests.UnitTests.Helpers
                     new Answers { QuestionId = "Item2", Response = JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel()}) }
                 }
             };
-          
+
             // Act
             var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, false, page);
 
@@ -2308,7 +2313,10 @@ namespace form_builder_tests.UnitTests.Helpers
             fileUpload.Add(
               new FileUploadModel
               {
-                  Key = currentAnswerKey, TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"), UntrustedOriginalFileName = "replace-me.txt", FileSize = 0
+                  Key = currentAnswerKey,
+                  TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
+                  UntrustedOriginalFileName = "replace-me.txt",
+                  FileSize = 0
               }
             );
 
@@ -2319,7 +2327,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 {
                     new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(fileUpload) }
                 }
-            };            
+            };
 
             // Act
             var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
@@ -2370,7 +2378,7 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.StartsWith($"file-{questionId}-", itemData[0].Key);
         }
 
-        
+
         [Fact]
         public void SaveFormFileAnswer_ShouldSave_Files_InDistributedCache()
         {
@@ -2415,10 +2423,10 @@ namespace form_builder_tests.UnitTests.Helpers
             fileUpload.Add(
             new FileUploadModel
             {
-                  Key = questionId,
-                  TrustedOriginalFileName = WebUtility.HtmlEncode("existingfiletwo.txt"),
-                  UntrustedOriginalFileName = "existingfiletwo.txt",
-                  FileSize = 0
+                Key = questionId,
+                TrustedOriginalFileName = WebUtility.HtmlEncode("existingfiletwo.txt"),
+                UntrustedOriginalFileName = "existingfiletwo.txt",
+                FileSize = 0
             });
 
             var page = new PageAnswers
@@ -2448,7 +2456,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Assert
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x.Equals(guid))), Times.Never);
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(guid)),It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(guid)), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -2457,16 +2465,16 @@ namespace form_builder_tests.UnitTests.Helpers
             // Arrange
             var callbackValue = string.Empty;
             var guid = "12345";
-            var data = new Dictionary<string, object>{ { "test", "value" }};
-            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(),It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .Callback<string, string, CancellationToken>((x,y,z) => callbackValue = y);
+            var data = new Dictionary<string, object> { { "test", "value" } };
+            _mockDistributedCache.Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, string, CancellationToken>((x, y, z) => callbackValue = y);
 
             // Act
-            _pageHelper.SaveNonQuestionAnswers(data, "form", "path",guid);
+            _pageHelper.SaveNonQuestionAnswers(data, "form", "path", guid);
 
             // Assert
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x.Equals(guid))), Times.Once);
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(guid)),It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(guid)), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
             var callbackData = JsonConvert.DeserializeObject<FormAnswers>(callbackValue);
             Assert.Single(callbackData.AdditionalFormData);
         }
@@ -2505,7 +2513,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var element = new ElementBuilder()
                 .WithType(EElementType.UploadedFilesSummary)
                 .WithPropertyText(string.Empty)
-                .WithFileUploadQuestionIds(new List<string>{ "" })
+                .WithFileUploadQuestionIds(new List<string> { "" })
                 .Build();
 
             var page = new PageBuilder()
@@ -2531,7 +2539,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithQuestionId("question")
                 .WithPropertyText("label text")
                 .WithType(EElementType.UploadedFilesSummary)
-                .WithFileUploadQuestionIds(new List<string>{ "question-one" })
+                .WithFileUploadQuestionIds(new List<string> { "question-one" })
                 .Build();
 
             var page = new PageBuilder()
@@ -2596,7 +2604,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
             Assert.Equal($"PageHelper:CheckForBookingElement, Form contains booking element but is missing required page with slug {BookingConstants.NO_APPOINTMENT_AVAILABLE}.", result.Message);
         }
-        
+
         [Fact]
         public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_DoesNotContains_AppointmentType()
         {
@@ -2619,11 +2627,11 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
             Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.", result.Message);
         }
-                
+
         [Fact]
         public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_DoesNotContains_BookingProvider()
         {
-             // Arrange
+            // Arrange
             var pages = new List<Page>();
 
             var element = new ElementBuilder()
@@ -2646,7 +2654,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_Contains_EmptyGuid_ForOptionalResources()
         {
-             // Arrange
+            // Arrange
             var pages = new List<Page>();
 
             var element = new ElementBuilder()
@@ -2654,7 +2662,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithQuestionId("booking")
                 .WithBookingProvider("TestProvider")
                 .WithAppointmentType(Guid.NewGuid())
-                .WithBookingResource(new BookingResource{ ResourceId = Guid.Empty, Quantity = 1 })
+                .WithBookingResource(new BookingResource { ResourceId = Guid.Empty, Quantity = 1 })
                 .Build();
 
             var page = new PageBuilder()
@@ -2668,10 +2676,10 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal("PageHelper:CheckForBookingElement, Booking element optional resouces are invalid, ResourceId cannot be an empty Guid.", result.Message);
         }
 
-                [Fact]
+        [Fact]
         public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_Contains_ZeroQuantity_ForOptionalResources()
         {
-             // Arrange
+            // Arrange
             var pages = new List<Page>();
 
             var element = new ElementBuilder()
@@ -2679,7 +2687,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithQuestionId("booking")
                 .WithAppointmentType(Guid.NewGuid())
                 .WithBookingProvider("TestProvider")
-                .WithBookingResource(new BookingResource{ ResourceId = Guid.NewGuid(), Quantity = 0 })
+                .WithBookingResource(new BookingResource { ResourceId = Guid.NewGuid(), Quantity = 0 })
                 .Build();
 
             var page = new PageBuilder()

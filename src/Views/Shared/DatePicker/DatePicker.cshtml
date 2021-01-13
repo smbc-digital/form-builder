@@ -1,0 +1,18 @@
+﻿@model Element
+@{
+    var elements = Model.GenerateElementProperties();
+    elements.Add("class", !Model.IsValid ? "govuk-input govuk-input--width-10 govuk-input--error" : "govuk-input govuk-input--width-10");
+}
+
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+
+    <partial name="LabelH1" />
+
+    <partial name="InsetText" model="Model.Properties.IAG" />
+
+    <partial name="Hint" />
+
+    <partial name="Error" />
+
+    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
+</div>

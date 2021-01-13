@@ -12,11 +12,6 @@ using Newtonsoft.Json;
 
 namespace form_builder.Services.EmailService
 {
-    public interface IEmailService
-    {
-        Task Process(List<IAction> actions);
-    }
-
     public class EmailService : IEmailService
     {
         private readonly ISessionHelper _sessionHelper;

@@ -22,7 +22,7 @@ namespace form_builder_tests.UnitTests.Extensions
         {
             var guid = Guid.NewGuid();
             var quantity = 2;
-            var result = new List<BookingResource>{ new BookingResource { Quantity = quantity, ResourceId = guid } }.CreateKeyFromResources();
+            var result = new List<BookingResource> { new BookingResource { Quantity = quantity, ResourceId = guid } }.CreateKeyFromResources();
 
             Assert.Equal($"-{quantity}{guid}", result);
         }

@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Controllers
         {
             _mockDocumentWorkflow.Setup(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<Guid>()))
                 .ThrowsAsync(new DocumentExpiredException("an exception"));
-            
+
             var result = await _controller.Summary(EDocumentType.Txt, Guid.NewGuid());
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
@@ -49,7 +49,7 @@ namespace form_builder_tests.UnitTests.Controllers
         {
             _mockDocumentWorkflow.Setup(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<Guid>()))
                 .ReturnsAsync(new byte[0]);
-            
+
             var result = await _controller.Summary(EDocumentType.Txt, Guid.NewGuid());
 
             var fileContentResult = Assert.IsType<FileContentResult>(result);

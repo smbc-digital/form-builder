@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Enum;
@@ -14,11 +13,6 @@ using Newtonsoft.Json;
 
 namespace form_builder.Factories.Schema
 {
-    public interface ISchemaFactory
-    {
-        Task<FormSchema> Build(string formKey);
-    }
-
     public class SchemaFactory : ISchemaFactory
     {
         private readonly IDistributedCacheWrapper _distributedCache;
@@ -48,19 +42,19 @@ namespace form_builder.Factories.Schema
 
         public async Task<FormSchema> Build(string formKey)
         {
-            if(!_schemaProvider.ValidateSchemaName(formKey).Result)
+            if (!_schemaProvider.ValidateSchemaName(formKey).Result)
                 return null;
 
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)
             {
                 var data = _distributedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}");
 
-                if(data != null)
+                if (data != null)
                     return JsonConvert.DeserializeObject<FormSchema>(data);
             }
 
             var formSchema = await _schemaProvider.Get<FormSchema>(formKey);
-            
+
             formSchema = await _reusableElementSchemaFactory.Transform(formSchema);
             formSchema = _lookupSchemaFactory.Transform(formSchema);
 

@@ -29,7 +29,7 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.True(result.IsValid);
         }
 
-        
+
         [Theory]
         [InlineData(EElementType.FileUpload)]
         [InlineData(EElementType.MultipleFileUpload)]
@@ -50,7 +50,7 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.True(result.IsValid);
         }
 
-                
+
         [Theory]
         [InlineData(EElementType.FileUpload)]
         [InlineData(EElementType.MultipleFileUpload)]
@@ -140,7 +140,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>
             {
-                { $"fileuploadquestion{FileUploadConstants.SUFFIX}", new List<DocumentModel> { 
+                { $"fileuploadquestion{FileUploadConstants.SUFFIX}", new List<DocumentModel> {
                     new DocumentModel { FileSize = 1048576 } ,
                     new DocumentModel { FileSize = 1048576 },
                     new DocumentModel { FileSize = 4048576, FileName = fileName }
@@ -167,7 +167,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>
             {
-                { $"fileuploadquestion{FileUploadConstants.SUFFIX}", new List<DocumentModel> { 
+                { $"fileuploadquestion{FileUploadConstants.SUFFIX}", new List<DocumentModel> {
                     new DocumentModel { FileSize = 4048576, FileName = "file1.txt" },
                     new DocumentModel { FileSize = 1048576, FileName = "file2.txt" },
                     new DocumentModel { FileSize = 4048576, FileName = "file3.txt" }

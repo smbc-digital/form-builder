@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;

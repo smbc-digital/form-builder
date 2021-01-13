@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
@@ -56,16 +56,16 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("MultipleFileUpload")), It.IsAny<MultipleFileUpload>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-            _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(),  It.IsAny<FormAnswers>(),It.IsAny<string>()), Times.Once);
+            _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
         public async Task RenderAsync_ShouldSet_CurrentValue_WhenPageHelper_DoesNotReturnNull()
         {
-            var currentAnswer = new List<FileUploadModel>{ new FileUploadModel() };
-            
+            var currentAnswer = new List<FileUploadModel> { new FileUploadModel() };
+
             var callBackValue = new MultipleFileUpload();
-            _mockElementHelper.Setup(_ => _.CurrentValue<JArray>(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(),  It.IsAny<FormAnswers>(), It.IsAny<string>()))
+            _mockElementHelper.Setup(_ => _.CurrentValue<JArray>(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns(JArray.FromObject(currentAnswer));
 
             _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<MultipleFileUpload>(), It.IsAny<Dictionary<string, dynamic>>()))
@@ -101,7 +101,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("MultipleFileUpload")), It.IsAny<MultipleFileUpload>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-            _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(),  It.IsAny<FormAnswers>(), It.IsAny<string>()), Times.Once);
+            _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()), Times.Once);
             Assert.NotEmpty(callBackValue.CurrentFilesUploaded);
             Assert.Single(callBackValue.CurrentFilesUploaded);
         }

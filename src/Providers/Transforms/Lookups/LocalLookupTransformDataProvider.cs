@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace form_builder.Providers.Transforms.Lookups
 {
-    public class LocalLookupTransformDataProvider :  ILookupTransformDataProvider
+    public class LocalLookupTransformDataProvider : ILookupTransformDataProvider
 
     {
         public async Task<T> Get<T>(string name)

@@ -29,7 +29,7 @@ namespace form_builder.Services.PageService.Entities
 
         public bool DisplayBreadcrumbs { get; set; }
 
-        public List<Breadcrumb> Breadcrumbs {get;set;}
+        public List<Breadcrumb> Breadcrumbs { get; set; }
 
     }
 }

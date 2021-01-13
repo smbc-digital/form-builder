@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -45,7 +44,7 @@ namespace form_builder.Validators
 
             var value = viewModel[$"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"];
             var isValid = true;
-            
+
             if (!AddressConstants.STOCKPORT_POSTCODE_REGEX.Match(value).Success)
             {
                 isValid = false;
