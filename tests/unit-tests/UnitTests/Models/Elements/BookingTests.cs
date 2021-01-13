@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using form_builder.Models;
 using form_builder.Models.Booking;
 using form_builder.Models.Elements;
@@ -33,13 +33,13 @@ namespace form_builder_tests.UnitTests.Models.Elements
         public async Task RenderAsync_ShouldCallViewRenderWithCorrectPartial_When_CalendarView()
         {
             //Arrange
-             var element = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithBookingProvider("testBookingProvider")
-                .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(Guid.NewGuid())
-                .WithCheckYourBooking(true)
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.Booking)
+               .WithBookingProvider("testBookingProvider")
+               .WithQuestionId("bookingQuestion")
+               .WithAppointmentType(Guid.NewGuid())
+               .WithCheckYourBooking(true)
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -70,7 +70,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 page,
                 schema,
                 _mockHostingEnv.Object,
-                formAnswers, 
+                formAnswers,
                 bookignInfo);
 
             //Assert
@@ -145,14 +145,14 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 page,
                 schema,
                 _mockHostingEnv.Object,
-                formAnswers, 
+                formAnswers,
                 bookignInfo);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "CheckYourBooking"), It.IsAny<Booking>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
-        
+
         [Fact]
         public async Task RenderAsync_Should_GenerateCorrectModel_Properties_ForCalendar_Page()
         {
@@ -165,13 +165,13 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Setup(_ => _.CurrentValue(It.Is<string>(_ => _.Equals(key)), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns(DateTime.Today.ToString());
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithBookingProvider("testBookingProvider")
-                .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(Guid.NewGuid())
-                .WithCheckYourBooking(true)
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.Booking)
+               .WithBookingProvider("testBookingProvider")
+               .WithQuestionId("bookingQuestion")
+               .WithAppointmentType(Guid.NewGuid())
+               .WithCheckYourBooking(true)
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -220,7 +220,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 page,
                 schema,
                 _mockHostingEnv.Object,
-                formAnswers, 
+                formAnswers,
                 bookignInfo);
 
             //Assert
@@ -301,7 +301,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 page,
                 schema,
                 _mockHostingEnv.Object,
-                formAnswers, 
+                formAnswers,
                 bookignInfo);
 
             //Assert
@@ -317,7 +317,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.True(bookignElement.DisplayInsetText);
             Assert.Equal("You can select a date for form Name but you can not select a time. We’ll be with you between 11pm and 1am.", bookignElement.InsetText);
         }
-        
+
         [Fact]
         public async Task RenderAsync_Should_SelectFirstAvailableDay_WhenOnFirstAvailableMonth_AndNoDateCurrentlySelected()
         {
@@ -347,11 +347,11 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 {
                     Appointments = new List<AvailabilityDayResponse>
                     {
-                        new AvailabilityDayResponse 
+                        new AvailabilityDayResponse
                         {
-                            AppointmentTimes = new List<AppointmentTime> 
+                            AppointmentTimes = new List<AppointmentTime>
                             {
-                                new AppointmentTime 
+                                new AppointmentTime
                                 {
                                     StartTime = new TimeSpan(5, 0, 0),
                                     EndTime= new TimeSpan(17, 0, 0),
@@ -363,7 +363,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 }
             };
             var formAnswers = new FormAnswers();
-            
+
             //Act
             await element.RenderAsync(
                 _mockIViewRender.Object,
@@ -373,7 +373,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 page,
                 schema,
                 _mockHostingEnv.Object,
-                formAnswers, 
+                formAnswers,
                 bookignInfo);
 
             //Assert
@@ -429,7 +429,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 }
             };
             var formAnswers = new FormAnswers();
-            
+
             //Act
             await element.RenderAsync(
                 _mockIViewRender.Object,
@@ -447,7 +447,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.Null(bookignElement.Properties.Value);
         }
 
-        
+
         [Fact]
         public async Task RenderAsync_Should_Create_Times_When_On_CalendarJourney_WhenAppointentIsNot_FullDay()
         {
@@ -478,21 +478,21 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 {
                     Appointments = new List<AvailabilityDayResponse>
                     {
-                        new AvailabilityDayResponse 
+                        new AvailabilityDayResponse
                         {
-                            AppointmentTimes = new List<AppointmentTime> 
+                            AppointmentTimes = new List<AppointmentTime>
                             {
-                                new AppointmentTime 
+                                new AppointmentTime
                                 {
                                     StartTime = new TimeSpan(13, 0, 0),
                                     EndTime= new TimeSpan(14, 0, 0),
                                 },
-                                new AppointmentTime 
+                                new AppointmentTime
                                 {
                                     StartTime = new TimeSpan(3, 0, 0),
                                     EndTime= new TimeSpan(4, 0, 0),
                                 },
-                                new AppointmentTime 
+                                new AppointmentTime
                                 {
                                     StartTime = new TimeSpan(9, 0, 0),
                                     EndTime= new TimeSpan(10, 0, 0),
@@ -514,7 +514,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 page,
                 schema,
                 _mockHostingEnv.Object,
-                formAnswers, 
+                formAnswers,
                 bookignInfo);
 
             //Assert
@@ -556,11 +556,11 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 {
                     Appointments = new List<AvailabilityDayResponse>
                     {
-                        new AvailabilityDayResponse 
+                        new AvailabilityDayResponse
                         {
-                            AppointmentTimes = new List<AppointmentTime> 
+                            AppointmentTimes = new List<AppointmentTime>
                             {
-                                new AppointmentTime 
+                                new AppointmentTime
                                 {
                                     StartTime = new TimeSpan(13, 0, 0),
                                     EndTime= new TimeSpan(14, 0, 0),
@@ -582,7 +582,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 page,
                 schema,
                 _mockHostingEnv.Object,
-                formAnswers, 
+                formAnswers,
                 bookignInfo);
 
             //Assert

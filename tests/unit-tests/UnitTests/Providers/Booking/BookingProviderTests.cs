@@ -21,13 +21,13 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         public BookingProviderTests()
         {
             _mockBookingServiceGateway.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new HttpResponse<AvailabilityDayResponse>{ StatusCode = System.Net.HttpStatusCode.OK, IsSuccessStatusCode = true, ResponseContent = new AvailabilityDayResponse() });
+                .ReturnsAsync(new HttpResponse<AvailabilityDayResponse> { StatusCode = System.Net.HttpStatusCode.OK, IsSuccessStatusCode = true, ResponseContent = new AvailabilityDayResponse() });
 
             _mockBookingServiceGateway.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new HttpResponse<List<AvailabilityDayResponse>>{ StatusCode = System.Net.HttpStatusCode.OK, IsSuccessStatusCode = true, ResponseContent = new List<AvailabilityDayResponse>() });
-                
+                .ReturnsAsync(new HttpResponse<List<AvailabilityDayResponse>> { StatusCode = System.Net.HttpStatusCode.OK, IsSuccessStatusCode = true, ResponseContent = new List<AvailabilityDayResponse>() });
+
             _mockBookingServiceGateway.Setup(_ => _.Reserve(It.IsAny<BookingRequest>()))
-                .ReturnsAsync(new HttpResponse<Guid>{ StatusCode = System.Net.HttpStatusCode.OK, IsSuccessStatusCode = true, ResponseContent = Guid.Empty });
+                .ReturnsAsync(new HttpResponse<Guid> { StatusCode = System.Net.HttpStatusCode.OK, IsSuccessStatusCode = true, ResponseContent = Guid.Empty });
 
             _mockBookingServiceGateway.Setup(_ => _.GetLocation(It.IsAny<LocationRequest>()))
                 .ReturnsAsync(new HttpResponse<string> { StatusCode = System.Net.HttpStatusCode.OK, IsSuccessStatusCode = true, ResponseContent = String.Empty });
@@ -50,7 +50,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         public async Task NextAvailability_Should_Throw_ApplicationException_OnBadRequest()
         {
             _mockBookingServiceGateway.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new HttpResponse<AvailabilityDayResponse>{ StatusCode = System.Net.HttpStatusCode.BadRequest, IsSuccessStatusCode = false });
+                .ReturnsAsync(new HttpResponse<AvailabilityDayResponse> { StatusCode = System.Net.HttpStatusCode.BadRequest, IsSuccessStatusCode = false });
 
             var request = new AvailabilityRequest();
 
@@ -64,7 +64,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         public async Task NextAvailability_Should_Throw_BookingNoAvailabilityException_WhenResponse_IsNotFound()
         {
             _mockBookingServiceGateway.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new HttpResponse<AvailabilityDayResponse>{ StatusCode = System.Net.HttpStatusCode.NotFound, IsSuccessStatusCode = false });
+                .ReturnsAsync(new HttpResponse<AvailabilityDayResponse> { StatusCode = System.Net.HttpStatusCode.NotFound, IsSuccessStatusCode = false });
 
             var request = new AvailabilityRequest();
 
@@ -73,13 +73,13 @@ namespace form_builder_tests.UnitTests.Providers.Booking
             _mockBookingServiceGateway.Verify(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()), Times.Once);
             Assert.StartsWith("BookingProvider::NextAvailability, BookingServiceGateway returned with 404 status code, no appointments available within the requested timeframe", result.Message);
         }
-        
-        
+
+
         [Fact]
         public async Task NextAvailability_Should_Throw_BookingNoAvailabilityException_WhenResponse_IsNotSuccessful()
         {
             _mockBookingServiceGateway.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new HttpResponse<AvailabilityDayResponse>{ StatusCode = System.Net.HttpStatusCode.InternalServerError, IsSuccessStatusCode = false });
+                .ReturnsAsync(new HttpResponse<AvailabilityDayResponse> { StatusCode = System.Net.HttpStatusCode.InternalServerError, IsSuccessStatusCode = false });
 
             var request = new AvailabilityRequest();
 
@@ -88,7 +88,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
             _mockBookingServiceGateway.Verify(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()), Times.Once);
             Assert.StartsWith("BookingProvider::NextAvailability, BookingServiceGateway returned with non success status code of InternalServerError, Response: ", result.Message);
         }
-        
+
         [Fact]
         public async Task GetAvailability_ShouldReturn_ListOfDayResponse_OnSuccessfullyCall()
         {
@@ -104,7 +104,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         public async Task GetAvailability_Should_Throw_ApplicationException_OnBadRequest()
         {
             _mockBookingServiceGateway.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new HttpResponse<List<AvailabilityDayResponse>>{ StatusCode = System.Net.HttpStatusCode.BadRequest, IsSuccessStatusCode = false });
+                .ReturnsAsync(new HttpResponse<List<AvailabilityDayResponse>> { StatusCode = System.Net.HttpStatusCode.BadRequest, IsSuccessStatusCode = false });
 
             var request = new AvailabilityRequest();
 
@@ -118,7 +118,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         public async Task GetAvailability_Should_Throw_ApplicationException_WhenBookingType_CannotBeFound()
         {
             _mockBookingServiceGateway.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new HttpResponse<List<AvailabilityDayResponse>>{ StatusCode = System.Net.HttpStatusCode.NotFound, IsSuccessStatusCode = false });
+                .ReturnsAsync(new HttpResponse<List<AvailabilityDayResponse>> { StatusCode = System.Net.HttpStatusCode.NotFound, IsSuccessStatusCode = false });
 
             var request = new AvailabilityRequest();
 
@@ -127,13 +127,13 @@ namespace form_builder_tests.UnitTests.Providers.Booking
             _mockBookingServiceGateway.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Once);
             Assert.StartsWith("BookingProvider::GetAvailability, BookingServiceGateway returned 404 status code, booking with id ", result.Message);
         }
-        
-        
+
+
         [Fact]
         public async Task GetAvailability_Should_Throw_BookingNoAvailabilityException_WhenResponse_IsNotSuccessful()
         {
             _mockBookingServiceGateway.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new HttpResponse<List<AvailabilityDayResponse>>{ StatusCode = System.Net.HttpStatusCode.InternalServerError, IsSuccessStatusCode = false });
+                .ReturnsAsync(new HttpResponse<List<AvailabilityDayResponse>> { StatusCode = System.Net.HttpStatusCode.InternalServerError, IsSuccessStatusCode = false });
 
             var request = new AvailabilityRequest();
 
@@ -158,7 +158,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         public async Task Reserve_Should_Throw_ApplicationException_OnBadRequest()
         {
             _mockBookingServiceGateway.Setup(_ => _.Reserve(It.IsAny<BookingRequest>()))
-                .ReturnsAsync(new HttpResponse<Guid>{ StatusCode = System.Net.HttpStatusCode.BadRequest, IsSuccessStatusCode = false });
+                .ReturnsAsync(new HttpResponse<Guid> { StatusCode = System.Net.HttpStatusCode.BadRequest, IsSuccessStatusCode = false });
 
             var request = new BookingRequest();
 
@@ -172,7 +172,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         public async Task Reserve_Should_Throw_ApplicationException_WhenBookingType_CannotBeFound()
         {
             _mockBookingServiceGateway.Setup(_ => _.Reserve(It.IsAny<BookingRequest>()))
-                .ReturnsAsync(new HttpResponse<Guid>{ StatusCode = System.Net.HttpStatusCode.NotFound, IsSuccessStatusCode = false });
+                .ReturnsAsync(new HttpResponse<Guid> { StatusCode = System.Net.HttpStatusCode.NotFound, IsSuccessStatusCode = false });
 
             var request = new BookingRequest();
 
@@ -181,13 +181,13 @@ namespace form_builder_tests.UnitTests.Providers.Booking
             _mockBookingServiceGateway.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
             Assert.StartsWith("BookingProvider::Reserve, BookingServiceGateway returned 404 status code, booking with id ", result.Message);
         }
-        
-        
+
+
         [Fact]
         public async Task Reserve_Should_Throw_BookingNoAvailabilityException_WhenResponse_IsNotSuccessful()
         {
             _mockBookingServiceGateway.Setup(_ => _.Reserve(It.IsAny<BookingRequest>()))
-                .ReturnsAsync(new HttpResponse<Guid>{ StatusCode = System.Net.HttpStatusCode.InternalServerError, IsSuccessStatusCode = false });
+                .ReturnsAsync(new HttpResponse<Guid> { StatusCode = System.Net.HttpStatusCode.InternalServerError, IsSuccessStatusCode = false });
 
             var request = new BookingRequest();
 

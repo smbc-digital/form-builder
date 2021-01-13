@@ -94,7 +94,8 @@ namespace form_builder.Factories.Transform.ReusableElements
 
             substitutions
                 .ToList()
-                .ForEach(_ => {
+                .ForEach(_ =>
+                {
                     formSchema.Pages[_.PageIndex].Elements[_.OriginalElementIndex] = _.SubstituteElement;
                 });
 

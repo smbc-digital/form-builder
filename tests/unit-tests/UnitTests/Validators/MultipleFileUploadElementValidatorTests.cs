@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -6,7 +7,6 @@ using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.Validators;
 using Moq;
-using System.Collections.Generic;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
@@ -71,7 +71,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("fileUpload")
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();            
+            var viewModel = new Dictionary<string, dynamic>();
 
             // Act
             var result = _fileUploadElementValidatorTest.Validate(element, viewModel);
@@ -128,6 +128,6 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.True(result.IsValid);
-        }      
+        }
     }
 }

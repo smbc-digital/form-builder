@@ -13,14 +13,14 @@ namespace form_builder.TagParsers
         public Regex Regex => new Regex("(?<={{)FORMDATA:.*?(?=}})", RegexOptions.Compiled);
 
         public Page Parse(Page page, FormAnswers formAnswers)
-        {   
+        {
             var answersDictionary = formAnswers.AdditionalFormData;
 
             page.Elements.Select((element) =>
             {
                 if (!string.IsNullOrEmpty(element.Properties?.Text))
                     element.Properties.Text = Parse(element.Properties.Text, answersDictionary, Regex);
-                    
+
                 return element;
             }).ToList();
 

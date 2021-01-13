@@ -42,7 +42,8 @@ namespace form_builder.Providers.StorageProvider
 
         public Task SetStringAsync(string key, string value, CancellationToken token = default)
         {
-            var distributedCacheOptions = new DistributedCacheEntryOptions {
+            var distributedCacheOptions = new DistributedCacheEntryOptions
+            {
                 AbsoluteExpiration = DateTime.Now.AddMinutes(_distributedCacheExpirationConfiguration.UserData)
             };
 
@@ -51,7 +52,8 @@ namespace form_builder.Providers.StorageProvider
 
         public Task SetStringAsync(string key, string value, int expiration, CancellationToken token = default)
         {
-            var distributedCacheOptions = new DistributedCacheEntryOptions {
+            var distributedCacheOptions = new DistributedCacheEntryOptions
+            {
                 AbsoluteExpiration = DateTime.Now.AddMinutes(expiration)
             };
 

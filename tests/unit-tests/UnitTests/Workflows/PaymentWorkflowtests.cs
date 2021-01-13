@@ -5,7 +5,7 @@ using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.PayService;
 using form_builder.Services.SubmitService;
-using form_builder.Workflows;
+using form_builder.Workflows.PaymentWorkflow;
 using Moq;
 using Xunit;
 

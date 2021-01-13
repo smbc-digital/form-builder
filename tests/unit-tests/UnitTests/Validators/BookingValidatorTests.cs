@@ -73,7 +73,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldReturnFalse_When_ViewModel_DoesNotContainValue()
         {
-             // Arrange
+            // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("question")
@@ -114,7 +114,7 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.False(result.IsValid);
             Assert.Equal(ValidationConstants.BOOKING_DATE_EMPTY, result.Message);
         }
-        
+
         [Fact]
         public void Validate_ShouldReturnFalse_When_Time_IsInvalid()
         {
@@ -137,7 +137,7 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.False(result.IsValid);
             Assert.Equal(ValidationConstants.BOOKING_TIME_EMPTY, result.Message);
         }
-        
+
         [Fact]
         public void Validate_ShouldReturnFalse_When_Time_Is_NotSupplied()
         {

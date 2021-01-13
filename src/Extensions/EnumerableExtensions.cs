@@ -10,7 +10,7 @@ namespace form_builder.Extensions
 {
     public static class EnumerableExtensions
     {
-        public static IAddressProvider Get(this IEnumerable<IAddressProvider> value, string providerName) => 
+        public static IAddressProvider Get(this IEnumerable<IAddressProvider> value, string providerName) =>
             value.Single(_ => _.ProviderName == providerName);
 
         public static IBookingProvider Get(this IEnumerable<IBookingProvider> value, string providerName) =>

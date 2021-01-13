@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Models.Elements
@@ -21,8 +21,8 @@ namespace form_builder.Models.Elements
         {
             var allowedFileType = Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
             var convertedMaxFileSize = Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes;
-            var appliedMaxFileSize = convertedMaxFileSize > 0 && convertedMaxFileSize < SystemConstants.DefaultMaxFileSize 
-                                ? convertedMaxFileSize 
+            var appliedMaxFileSize = convertedMaxFileSize > 0 && convertedMaxFileSize < SystemConstants.DefaultMaxFileSize
+                                ? convertedMaxFileSize
                                 : SystemConstants.DefaultMaxFileSize;
 
             var properties = new Dictionary<string, dynamic>

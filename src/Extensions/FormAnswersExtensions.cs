@@ -14,7 +14,7 @@ namespace form_builder.Extensions
                 answer.Pages,
                 answer.Pages.SelectMany(_ => _.Answers).ToDictionary(x => x.QuestionId, x => x.Response),
                 schema.Pages,
-                !String.IsNullOrEmpty(answer.Path) && answer.Path.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH)  ? answer.Path : schema.FirstPageSlug,
+                !String.IsNullOrEmpty(answer.Path) && answer.Path.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH) ? answer.Path : schema.FirstPageSlug,
                 new List<PageAnswers>());
 
         private static List<PageAnswers> RecursivelyReduceAnswers(
@@ -33,12 +33,12 @@ namespace form_builder.Extensions
             if (currentSchema == null)
                 return reducedAnswers;
 
-            page = currentSchema.Count > 1 
+            page = currentSchema.Count > 1
                 ? currentSchema.FirstOrDefault(page => page.CheckPageMeetsConditions(answersDictionary))
                 : currentSchema.FirstOrDefault();
 
-            if(page == null)
-               return reducedAnswers;
+            if (page == null)
+                return reducedAnswers;
 
             reducedAnswers.Add(currentAnswer);
 

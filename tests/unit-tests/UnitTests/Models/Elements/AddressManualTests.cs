@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
@@ -39,7 +39,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithElement(element)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{AddressManualConstants.POSTCODE, "sk11aa"}};
+            var viewModel = new Dictionary<string, dynamic> { { AddressManualConstants.POSTCODE, "sk11aa" } };
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -59,7 +59,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressManual"), It.IsAny<form_builder.Models.Elements.AddressManual>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-            _mockElementHelper.Verify(_ => _.CurrentValue(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(),It.IsAny<string>()), Times.Exactly(4));
+            _mockElementHelper.Verify(_ => _.CurrentValue(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()), Times.Exactly(4));
         }
 
         [Fact]

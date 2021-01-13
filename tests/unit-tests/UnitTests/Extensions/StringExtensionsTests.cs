@@ -40,7 +40,7 @@ namespace form_builder_tests.UnitTests.Extensions
         {
             // Act & Assert
             var result = value.ToMaxSpecifiedStringLengthForFileName(length);
-            Assert.Equal(expected ,result);
+            Assert.Equal(expected, result);
             Assert.Equal(length, result.Length);
         }
 

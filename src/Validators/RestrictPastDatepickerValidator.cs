@@ -10,7 +10,7 @@ namespace form_builder.Validators
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
             if (!element.Properties.RestrictPastDate
-                || element.Type != EElementType.DatePicker 
+                || element.Type != EElementType.DatePicker
                 || element.Properties.Optional)
             {
                 return new ValidationResult
@@ -36,7 +36,7 @@ namespace form_builder.Validators
 
             var date = DateTime.Today;
             var dateOutput = DateTime.Parse(value);
-            
+
             if (dateOutput < date && element.Properties.RestrictPastDate)
             {
                 return new ValidationResult

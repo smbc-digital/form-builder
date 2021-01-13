@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
                 .Returns(new HostString("www.test.com"));
 
             _mockCivicaPayGateway.Setup(_ => _.CreateImmediateBasketAsync(It.IsAny<CreateImmediateBasketRequest>()))
-                .ReturnsAsync(new HttpResponse<CreateImmediateBasketResponse>{ StatusCode = HttpStatusCode.OK, ResponseContent = new CreateImmediateBasketResponse {  BasketReference = "testRef", BasketToken = "testBasketToken" } });
+                .ReturnsAsync(new HttpResponse<CreateImmediateBasketResponse> { StatusCode = HttpStatusCode.OK, ResponseContent = new CreateImmediateBasketResponse { BasketReference = "testRef", BasketToken = "testBasketToken" } });
 
             _civicaPayConfig.Setup(_ => _.Value).Returns(new CivicaPaymentConfiguration { CustomerId = "testId", ApiPassword = "test" });
 
@@ -46,9 +46,9 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
         [Fact]
         public async Task GeneratePaymentUrl_ShouldCallCivicaPayGateway()
         {
-            var caseRef =  "caseRef";
+            var caseRef = "caseRef";
 
-            await _civicaPayProvider.GeneratePaymentUrl("form", "page", caseRef, "0101010-1010101", new PaymentInformation{ FormName = "form", Settings = new Settings() });
+            await _civicaPayProvider.GeneratePaymentUrl("form", "page", caseRef, "0101010-1010101", new PaymentInformation { FormName = "form", Settings = new Settings() });
 
             _mockCivicaPayGateway.Verify(_ => _.CreateImmediateBasketAsync(It.IsAny<CreateImmediateBasketRequest>()), Times.Once);
             _mockCivicaPayGateway.Verify(_ => _.GetPaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.Is<string>(x => x == caseRef)), Times.Once);
@@ -59,9 +59,9 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
         public async Task GeneratePaymentUrl_ShouldThrowException_WhenCivicaPayGatewayResponse_IsNotHttpOk()
         {
             _mockCivicaPayGateway.Setup(_ => _.CreateImmediateBasketAsync(It.IsAny<CreateImmediateBasketRequest>()))
-                .ReturnsAsync(new HttpResponse<CreateImmediateBasketResponse>{ StatusCode = HttpStatusCode.InternalServerError });
+                .ReturnsAsync(new HttpResponse<CreateImmediateBasketResponse> { StatusCode = HttpStatusCode.InternalServerError });
 
-            var result = await Assert.ThrowsAsync<Exception>(() => _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation{ FormName = "form", Settings = new Settings() }));
+            var result = await Assert.ThrowsAsync<Exception>(() => _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = "form", Settings = new Settings() }));
 
             Assert.StartsWith("CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code InternalServerError, HttpResponse: ", result.Message);
         }
@@ -72,7 +72,7 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
             _mockCivicaPayGateway.Setup(_ => _.GetPaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("12345");
 
-            var result = await _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation{ FormName = "form", Settings = new Settings() });
+            var result = await _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = "form", Settings = new Settings() });
 
             Assert.IsType<string>(result);
             Assert.NotNull(result);

@@ -18,7 +18,7 @@ namespace form_builder.ModelBinders
 
             if (formFiles == null || !formFiles.Any())
                 return;
-            
+
             var list = new List<CustomFormFile>();
             foreach (var formFile in formFiles)
             {

@@ -4,7 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
+using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
@@ -12,7 +13,6 @@ using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
-using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
@@ -297,7 +297,7 @@ namespace form_builder.Services.PageService
 
             var formData = _distributedCache.GetString(sessionGuid);
 
-            if(formData == null)
+            if (formData == null)
                 throw new ApplicationException("PageService::FinalisePageJourney: Session data is null");
 
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);

@@ -16,11 +16,6 @@ using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Services.ValidateService
 {
-    public interface IValidateService
-    {
-        Task Process(List<IAction> actions, FormSchema formSchema, string formName);
-    }
-
     public class ValidateService : IValidateService
     {
         private readonly IGateway _gateway;
@@ -65,10 +60,10 @@ namespace form_builder.Services.ValidateService
                 if (!string.IsNullOrEmpty(submitSlug.AuthToken))
                     _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
 
-                response = await _gateway.GetAsync(entity.Url);                        
+                response = await _gateway.GetAsync(entity.Url);
 
                 if (!response.IsSuccessStatusCode)
-                    throw new ApplicationException($"ValidateService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");             
+                    throw new ApplicationException($"ValidateService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
             }
         }
     }

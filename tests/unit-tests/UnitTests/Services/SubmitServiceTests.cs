@@ -33,7 +33,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns("local");
 
             _mockIOptions.Setup(_ => _.Value)
-                .Returns(new SubmissionServiceConfiguration 
+                .Returns(new SubmissionServiceConfiguration
                 {
                     FakePaymentSubmission = false
                 });

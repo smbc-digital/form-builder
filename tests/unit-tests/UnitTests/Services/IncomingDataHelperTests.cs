@@ -292,7 +292,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithBehaviour(behaviour)
                 .WithIncomingValue(incomingValue)
                 .Build();
-                
+
             // Act
             var result = _helper.AddIncomingFormDataValues(page, new QueryCollection(), new FormAnswers());
 
@@ -434,7 +434,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.True(result.ContainsKey("test"));
             Assert.True(result.ContainsValue("123456Test"));
         }
-        
+
         [Fact]
         public void AddIncomingFormDataValues_Get_ShouldCheckIfData_IsAlreadyStored_IfNotIn_QueryParameters()
         {
