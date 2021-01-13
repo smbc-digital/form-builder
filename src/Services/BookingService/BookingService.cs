@@ -324,10 +324,11 @@ namespace form_builder.Services.BookingService
                 throw new ApplicationException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is before today");
 
             var bookingSearchResultsKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+
             var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
                 .GetAvailability(new AvailabilityRequest
                 {
-                    StartDate = requestedMonth,
+                    StartDate = requestedMonth.Date,
                     EndDate = requestedMonth.Date.LastDayOfTheMonth(),
                     AppointmentId = bookingElement.Properties.AppointmentType,
                     OptionalResources = bookingElement.Properties.OptionalResources
