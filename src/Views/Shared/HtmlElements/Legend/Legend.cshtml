@@ -1,0 +1,15 @@
+﻿@model Element
+@{
+    var tag = Model.Properties.LegendAsH1 ? "h1" : "label";
+    var text = ViewData["Label"] ?? @Model.Properties.Label;
+    var questionIdPrefix = (string)ViewData["QuestionIdPrefix"] ?? string.Empty;
+}
+
+<legend>
+    <@Html.Raw(tag) @Model.WriteHtmlForAndClassAttribute(questionIdPrefix)>@text</@Html.Raw(tag)>
+
+    @if (Model.Properties.Optional)
+    {
+        <span class="smbc-body">(optional)</span>
+    }
+</legend>

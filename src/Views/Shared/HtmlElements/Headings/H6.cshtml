@@ -1,0 +1,17 @@
+﻿@model Element
+@{
+    var cssClass = "govuk-heading-s";
+    switch (Model.Properties.Size)
+    {
+        case ESize.ExtraLarge:
+            cssClass = "govuk-heading-xl";
+            break;
+        case ESize.Large:
+            cssClass = "govuk-heading-l";
+            break;
+        case ESize.Medium:
+            cssClass = "govuk-heading-m";
+            break;
+    }
+}
+<h6 class="@cssClass">@Model.Properties.Text</h6>

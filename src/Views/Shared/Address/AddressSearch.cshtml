@@ -1,4 +1,4 @@
-@model form_builder.Models.Elements.Address
+@model Address
 @{
     var elementProperties = Model.GenerateElementProperties();
     elementProperties.Add("class", $"govuk-input govuk-input--width-10 {(Model.IsValid ? string.Empty : "govuk-input--error")}");
@@ -6,9 +6,10 @@
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-    @if (@Model.Properties.StockportPostcode == true)
+
+    @if (Model.Properties.StockportPostcode == true)
     {
-        <partial name="InsetText" model="@Model.Properties.AddressIAG" />
+        <partial name="InsetText" model="Model.Properties.AddressIAG" />
     }
 
     <partial name="LabelH1" />

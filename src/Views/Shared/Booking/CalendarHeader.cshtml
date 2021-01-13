@@ -1,8 +1,8 @@
-@model form_builder.Models.Elements.Booking
+@model Booking
 
 <div class="smbc-calendar__header">
 
-    @if (@Model.DisplayPreviousMonthArrow)
+    @if (Model.DisplayPreviousMonthArrow)
     {
         <button class="smbc-calendar__header__button"
                 name="@BookingConstants.BOOKING_MONTH_REQUEST"
@@ -20,7 +20,7 @@
         @Model.CurrentSelectedMonthText
     </p>
 
-    @if (@Model.DisplayNextMonthArrow)
+    @if (Model.DisplayNextMonthArrow)
     {
         <button class="smbc-calendar__header__button"
                 name="@BookingConstants.BOOKING_MONTH_REQUEST"
