@@ -1,0 +1,9 @@
+﻿@model List<Breadcrumb>
+<div class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile">
+    <ol class="govuk-breadcrumbs__list">
+        @foreach (var breadCrumb in Model)
+        {
+            <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="@breadCrumb.Url">@breadCrumb.Text</a></li>
+        }
+    </ol>
+</div>

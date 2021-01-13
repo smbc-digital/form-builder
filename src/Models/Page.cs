@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using form_builder.Conditions;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Models.Actions;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
@@ -66,7 +67,8 @@ namespace form_builder.Models
             {
                 if (IsValidated)
                 {
-                    return ValidatableElements.Where(element => !element.IsValid).Select(element => element.Properties);
+                    IEnumerable<BaseProperty> invalidElements = ValidatableElements.Where(element => !element.IsValid).Select(element => element.Properties);
+                    return invalidElements;
                 }
 
                 throw new Exception("Model is not validated, please call Validate()");
@@ -74,27 +76,39 @@ namespace form_builder.Models
         }
 
         public IEnumerable<IElement> ValidatableElements => Elements.Where(element =>
-            element.Type == EElementType.Radio ||
+                element.Type == EElementType.Address ||
+                element.Type == EElementType.AddressManual ||
+                element.Type == EElementType.Booking ||
+                element.Type == EElementType.Checkbox ||
+                element.Type == EElementType.DatePicker ||
+                element.Type == EElementType.DateInput ||
+                element.Type == EElementType.Declaration ||
+                element.Type == EElementType.FileUpload ||
+                element.Type == EElementType.Radio ||
+                element.Type == EElementType.Select ||
+                element.Type == EElementType.Street ||
+                element.Type == EElementType.Textarea ||
+                element.Type == EElementType.Textbox ||
+                element.Type == EElementType.TimeInput ||
+                element.Type == EElementType.Map ||
+                element.Type == EElementType.MultipleFileUpload ||
+                element.Type == EElementType.Organisation
+        );
+
+        public IEnumerable<IElement> ValidatableElementsConditional => Elements.Where(element =>
             element.Type == EElementType.Textarea ||
             element.Type == EElementType.Select ||
             element.Type == EElementType.Textbox ||
-            element.Type == EElementType.Checkbox ||
-            element.Type == EElementType.Declaration ||
-            element.Type == EElementType.Address ||
-            element.Type == EElementType.AddressManual ||
             element.Type == EElementType.DateInput ||
-            element.Type == EElementType.TimeInput ||
-            element.Type == EElementType.DatePicker ||
-            element.Type == EElementType.Street ||
-            element.Type == EElementType.Organisation ||
-            element.Type == EElementType.FileUpload ||
-            element.Type == EElementType.MultipleFileUpload ||
-            element.Type == EElementType.Map
+            element.Type == EElementType.TimeInput
         );
 
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
         {
-            ValidatableElements.ToList().ForEach(element => element.Validate(viewModel, form_builder));
+            ValidatableElements.RemoveUnusedConditionalElements(viewModel).ForEach(element =>
+            {
+                element.Validate(viewModel, form_builder);
+            });
             IsValidated = true;
         }
 

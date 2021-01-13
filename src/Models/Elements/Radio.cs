@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Enum;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Models.Elements
@@ -13,7 +13,7 @@ namespace form_builder.Models.Elements
         {
             Type = EElementType.Radio;
         }
-        public override Task<string> RenderAsync(IViewRender viewRender,
+        public async override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
             Dictionary<string, dynamic> viewModel,
@@ -28,8 +28,7 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForLabel(this);
             elementHelper.CheckForRadioOptions(this);
             elementHelper.ReCheckPreviousRadioOptions(this);
-
-            return viewRender.RenderAsync(Type.ToString(), this);
+            return await viewRender.RenderAsync(Type.ToString(), this);
         }
     }
 }

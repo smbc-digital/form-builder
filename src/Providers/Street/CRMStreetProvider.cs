@@ -10,11 +10,7 @@ namespace form_builder.Providers.Street
         public string ProviderName => "CRMStreet";
 
         private readonly IVerintServiceGateway _verintServiceGateway;
-
-        public CRMStreetProvider(IVerintServiceGateway verintServiceGateway)
-        {
-            _verintServiceGateway = verintServiceGateway;
-        }
+        public CRMStreetProvider(IVerintServiceGateway verintServiceGateway) => _verintServiceGateway = verintServiceGateway;
 
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string street)
         {

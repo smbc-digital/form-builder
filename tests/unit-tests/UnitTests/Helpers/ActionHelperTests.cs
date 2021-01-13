@@ -7,6 +7,7 @@ using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Models.Properties.ActionProperties;
 using form_builder.Services.MappingService.Entities;
+using form_builder.TagParsers.Formatters;
 using form_builder_tests.Builders;
 using Moq;
 using Xunit;
@@ -15,7 +16,15 @@ namespace form_builder_tests.UnitTests.Helpers
 {
     public class ActionHelperTests
     {
+        private const string validResponse = "ValidResponse";
+        private const string validVariableQuestionId = "validVariableQuestionId";
+        private const string validVariableQuestionIdInBraces = "{{validVariableQuestionId}}";
+        private const string invalidVariableQuestionIdInBraces = "{{invalidVariableQuestionId}}";
+        private const string contentWithValidVariableQuestionIdInBraces = "Some text with a {{validVariableQuestionId}}.";
+        private const string contentWithInvalidVariableQuestionIdInBraces = "Some text with a {{invalidVariableQuestionId}}";
+
         private readonly IActionHelper _actionHelper;
+        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new Mock<IEnumerable<IFormatter>>();
 
         private readonly MappingEntity _mappingEntity = new MappingEntityBuilder()
             .WithFormAnswers(new FormAnswers
@@ -43,6 +52,11 @@ namespace form_builder_tests.UnitTests.Helpers
                                 {
                                     Response = "testResponse.email@test.com",
                                     QuestionId = "emailQuestion"
+                                },
+                                new Answers
+                                {
+                                    Response = validResponse,
+                                    QuestionId = validVariableQuestionId
                                 }
                             },
                             PageSlug = "page-one"
@@ -64,16 +78,13 @@ namespace form_builder_tests.UnitTests.Helpers
             {
                 Properties = new BaseActionProperty
                 {
-                    To = "email.test@test.com, {{emailQuestion}}",
+                    To = "email.test@test.com, {{emailQuestion}}"
                 },
                 Type = EActionType.UserEmail
             })
             .Build();
 
-        public ActionHelperTests()
-        {
-            _actionHelper = new ActionHelper();
-        }
+        public ActionHelperTests() => _actionHelper = new ActionHelper(_mockFormatters.Object);
 
         [Fact]
         public void GenerateUrl_ShouldGenerateCorrectGetUrl_PathParameters()
@@ -116,6 +127,22 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Assert
             Assert.Equal("testResponse.email@test.com,email.test@test.com,", result);
+        }
+
+        [Theory]
+        [InlineData(contentWithValidVariableQuestionIdInBraces)]
+        [InlineData(contentWithInvalidVariableQuestionIdInBraces)]
+        public void GetEmailContent_ShouldReturnContent_WithQuestionResponse_Or_EmptyString(string content)
+        {
+            // Arrange
+            var action = _formSchema.FormActions.FirstOrDefault();
+            action.Properties.Content = content;
+
+            // Act
+            var result = _actionHelper.GetEmailContent(action, _mappingEntity.FormAnswers);
+
+            // Assert
+            Assert.True(result.Contains(validResponse) && !result.Contains(validVariableQuestionIdInBraces) || !result.Contains(invalidVariableQuestionIdInBraces));
         }
     }
 }

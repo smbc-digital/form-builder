@@ -24,7 +24,7 @@ namespace form_builder.Conditions
             { ECondition.EndsWith, StringComparator.EndsWith }
         };
 
-        public bool IsValid(Condition condition, Dictionary<string, dynamic> viewModel) 
+        public bool IsValid(Condition condition, Dictionary<string, dynamic> viewModel)
         {
             if (condition.ConditionType.Equals(ECondition.Any))
                 return AnyNumberOfConditionsIsValid(condition, viewModel);
@@ -39,10 +39,10 @@ namespace form_builder.Conditions
 
             foreach (var con in condition.Conditions)
             {
-                if(ConditionList[con.ConditionType](con, viewModel))
+                if (ConditionList[con.ConditionType](con, viewModel))
                     isValidCount++;
 
-                if(isValidCount >= targetConditionCount)
+                if (isValidCount >= targetConditionCount)
                     break;
             }
 

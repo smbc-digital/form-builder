@@ -12,11 +12,7 @@ namespace form_builder.Providers.Organisation
         public string ProviderName => "CRM";
 
         private readonly IOrganisationServiceGateway _organisationServiceGateway;
-
-        public ServiceOrganisationProvider(IOrganisationServiceGateway organisationServiceGateway)
-        {
-            _organisationServiceGateway = organisationServiceGateway;
-        }
+        public ServiceOrganisationProvider(IOrganisationServiceGateway organisationServiceGateway) => _organisationServiceGateway = organisationServiceGateway;
 
         public async Task<IEnumerable<OrganisationSearchResult>> SearchAsync(string organisation)
         {

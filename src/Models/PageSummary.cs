@@ -4,7 +4,7 @@ namespace form_builder.Models
 {
     public class PageSummary
     {
-        public string  PageTitle {get;set;}
+        public string PageTitle { get; set; }
 
         public string PageSlug { get; set; }
 

@@ -8,30 +8,20 @@ using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
+using form_builder.Utils.Extensions;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
+using Booking = StockportGovUK.NetStandard.Models.Booking.Booking;
 using Organisation = StockportGovUK.NetStandard.Models.Verint.Organisation;
 
 namespace form_builder.Mappers
 {
-    public interface IElementMapper
-    {
-        T GetAnswerValue<T>(IElement element, FormAnswers formAnswers);
-
-        object GetAnswerValue(IElement element, FormAnswers formAnswers);
-
-        string GetAnswerStringValue(IElement question, FormAnswers formAnswers);
-    }
-
     public class ElementMapper : IElementMapper
     {
         private readonly IDistributedCacheWrapper _distributedCacheWrapper;
 
-        public ElementMapper(IDistributedCacheWrapper distributedCacheWrapper)
-        {
-            _distributedCacheWrapper = distributedCacheWrapper;
-        }
+        public ElementMapper(IDistributedCacheWrapper distributedCacheWrapper) => _distributedCacheWrapper = distributedCacheWrapper;
 
         public T GetAnswerValue<T>(IElement element, FormAnswers formAnswers) => (T)GetAnswerValue(element, formAnswers);
 
@@ -68,7 +58,8 @@ namespace form_builder.Mappers
                 case EElementType.FileUpload:
                 case EElementType.MultipleFileUpload:
                     return GetFileUploadElementValue(key, formAnswers);
-
+                case EElementType.Booking:
+                    return GetBookingElementValue(key, formAnswers);
                 default:
                     if (element.Properties.Numeric)
                         return GetNumericElementValue(key, formAnswers);
@@ -127,23 +118,19 @@ namespace form_builder.Mappers
                     var convertTime = (TimeSpan)value;
                     var date = DateTime.Today.Add(convertTime);
                     return date.ToString("hh:mm tt");
-
                 case EElementType.DatePicker:
                 case EElementType.DateInput:
                     var convertDateTime = (DateTime)value;
                     return convertDateTime.Date.ToString("dd/MM/yyyy");
-
                 case EElementType.Select:
                 case EElementType.Radio:
                     var selectValue = question.Properties.Options.FirstOrDefault(_ => _.Value == value.ToString());
                     return selectValue?.Text ?? string.Empty;
-
                 case EElementType.Checkbox:
                     var answerCheckbox = string.Empty;
                     var list = (List<string>)value;
                     list.ForEach((answersCheckbox) => answerCheckbox += $" {question.Properties.Options.FirstOrDefault(_ => _.Value == answersCheckbox)?.Text ?? string.Empty},");
                     return answerCheckbox.EndsWith(",") ? answerCheckbox.Remove(answerCheckbox.Length - 1).Trim() : answerCheckbox.Trim();
-
                 case EElementType.Organisation:
                     var orgValue = (Organisation)value;
                     return !string.IsNullOrEmpty(orgValue.Name) ? orgValue.Name : string.Empty;
@@ -153,7 +140,9 @@ namespace form_builder.Mappers
                         return addressValue.SelectedAddress;
                     var manualLine2Text = string.IsNullOrWhiteSpace(addressValue.AddressLine2) ? string.Empty : $",{addressValue.AddressLine2}";
                     return string.IsNullOrWhiteSpace(addressValue.AddressLine1) ? string.Empty : $"{addressValue.AddressLine1}{manualLine2Text},{addressValue.Town},{addressValue.Postcode}";
-
+                case EElementType.Booking:
+                    var bookingValue = (Booking)value;
+                    return bookingValue.Date.Equals(DateTime.MinValue) && bookingValue.StartTime.Equals(DateTime.MinValue) ? string.Empty : $"{bookingValue.Date.ToFullDateFormat()} at {bookingValue.StartTime.ToTimeFormat()} to {bookingValue.EndTime.ToTimeFormat()}";
                 case EElementType.Street:
                     var streetValue = (Address)value;
                     return string.IsNullOrEmpty(streetValue.PlaceRef) && string.IsNullOrEmpty(streetValue.SelectedAddress) ? string.Empty : streetValue.SelectedAddress;
@@ -198,6 +187,40 @@ namespace form_builder.Mappers
             }
 
             return null;
+        }
+
+
+        private Booking? GetBookingElementValue(string key, FormAnswers formAnswers)
+        {
+            var bookingObject = new Booking();
+
+            var appointmentId = $"{key}-{BookingConstants.RESERVED_BOOKING_ID}";
+            var appointmentDate = $"{key}-{BookingConstants.RESERVED_BOOKING_DATE}";
+            var appointmentStartTime = $"{key}-{BookingConstants.RESERVED_BOOKING_START_TIME}";
+            var appointmentEndTime = $"{key}-{BookingConstants.RESERVED_BOOKING_END_TIME}";
+            var appointmentLocation = $"{key}-{BookingConstants.APPOINTMENT_LOCATION}";
+
+            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+                .Where(_ => _.QuestionId.Equals(appointmentId) || _.QuestionId.Equals(appointmentDate) ||
+                            _.QuestionId.Equals(appointmentStartTime) || _.QuestionId.Equals(appointmentEndTime) ||
+                            _.QuestionId.Equals(appointmentLocation))
+                .ToList();
+
+            if (!value.Any())
+                return null;
+
+            var bookingId = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentId))?.Response;
+            var bookingDate = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentDate))?.Response;
+            var bookingStartTime = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentStartTime))?.Response;
+            var bookingEndTime = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentEndTime))?.Response;
+            var bookingLocation = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentLocation))?.Response;
+            bookingObject.Id = bookingId != null ? Guid.Parse(bookingId) : Guid.Empty;
+            bookingObject.Date = bookingDate != null ? DateTime.Parse(bookingDate) : DateTime.MinValue;
+            bookingObject.StartTime = bookingStartTime != null ? DateTime.Parse(bookingStartTime) : DateTime.MinValue;
+            bookingObject.EndTime = bookingEndTime != null ? DateTime.Parse(bookingEndTime) : DateTime.MinValue;
+            bookingObject.Location = bookingLocation;
+
+            return bookingObject.IsEmpty() ? null : bookingObject;
         }
 
         private Address GetAddressElementValue(string key, FormAnswers formAnswers)
@@ -245,7 +268,6 @@ namespace form_builder.Mappers
         }
         private DateTime? GetDateInputElementValue(string key, FormAnswers formAnswers)
         {
-            dynamic dateObject = new ExpandoObject();
             var dateDayKey = $"{key}-day";
             var dateMonthKey = $"{key}-month";
             var dateYearKey = $"{key}-year";

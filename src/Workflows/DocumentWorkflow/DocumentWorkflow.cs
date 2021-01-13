@@ -11,11 +11,6 @@ using Newtonsoft.Json;
 
 namespace form_builder.Workflows.DocumentWorkflow
 {
-    public interface IDocumentWorkflow
-    {
-        Task<byte[]> GenerateSummaryDocumentAsync(EDocumentType documentType, Guid id);
-    }
-
     public class DocumentWorkflow : IDocumentWorkflow
     {
         private IDocumentSummaryService _documentSummaryService;

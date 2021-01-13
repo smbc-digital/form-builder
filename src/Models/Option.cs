@@ -9,6 +9,9 @@ namespace form_builder.Models
         public string Hint { get; set; }
 
         public bool HasHint => !string.IsNullOrEmpty(Hint);
+        public string ConditionalElementId { get; set; }
+
+        public bool HasConditionalElement => !(ConditionalElementId is null);
 
         public bool Checked { get; set; }
 

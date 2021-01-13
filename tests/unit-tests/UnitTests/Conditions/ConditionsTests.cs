@@ -118,7 +118,7 @@ namespace form_builder_tests.UnitTests.Conditions
 
             var condition1 = new Condition { IsAfter = 10, Unit = EDateUnit.Day, ComparisonDate = "Today", QuestionId = "test", ConditionType = ECondition.IsAfter };
             var conditionValidator = new ConditionValidator();
-            
+
             // Act & Assert
             Assert.False(conditionValidator.IsValid(condition1, viewModel));
         }

@@ -1,0 +1,34 @@
+@model TimePeriod
+
+<div class="smbc-time__body smbc-time__body__conditional smbc-time__body__conditional--hidden">
+    @if (!Model.HasAppointments)
+    {
+        <partial name="TimePeriodNoAppointments" model="Model" />
+    }
+    else
+    {
+        for (int i = 0; i < Model.Appointments.Count; i++)
+        {
+            var startTime = Model.Appointments[i].StartTime;
+            var endTime = Model.Appointments[i].EndTime;
+            <div class="smbc-time__time">
+                <input class="smbc-time__time__input"
+                       type='radio'
+                       @(Model.CurrentValue == Model.Value(startTime).ToString() ? "checked" : string.Empty)
+                       value="@Model.Value(startTime)|@Model.Value(endTime)"
+                       name='@Model.NoJSId'
+                       aria-describedby="@Model.GetTimeInputHint(i)"
+                       id="@Model.Value(startTime)-full-time-period" />
+                <label aria-hidden="true" class="smbc-time__time__label @Model.GetClassNameForDivsPosition(i)" for="@Model.Value(startTime)-full-time-period">
+                    @Model.Value(startTime).ToTimeFormat()
+                </label>
+                <span class="govuk-visually-hidden" id="@Model.GetTimeInputHint(i)">@Model.ToFullDateFormat(startTime)</span>
+            </div>
+        }
+
+        for (int i = 1; i < Model.Appointments.Count % 3; i++)
+        {
+            <div class="smbc-time__time"></div>
+        }
+    }
+</div>

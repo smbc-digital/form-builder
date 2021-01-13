@@ -59,8 +59,8 @@ namespace form_builder.Validators
                     return new ValidationResult
                     {
                         IsValid = false,
-                        Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage) 
-                            ? element.Properties.UpperLimitValidationMessage 
+                        Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage)
+                            ? element.Properties.UpperLimitValidationMessage
                             : $"Year must be less than or equal to {maxYear}"
                     };
                 }
@@ -70,7 +70,7 @@ namespace form_builder.Validators
             {
                 IsValid = isValidDate,
                 Message = isValidDate
-                    ? string.Empty 
+                    ? string.Empty
                     : !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidDate) ? element.Properties.ValidationMessageInvalidDate : "Check the date and try again"
             };
         }

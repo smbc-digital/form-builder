@@ -11,13 +11,13 @@ namespace form_builder.Models.Actions
 
         public override async Task Process(IActionHelper actionHelper, IEmailProvider emailProvider, FormAnswers formAnswers)
         {
-            var emailMessage = new EmailMessage(
-                              this.Properties.Subject,
-                              this.Properties.Content,
-                              this.Properties.From,
-                              actionHelper.GetEmailToAddresses(this, formAnswers));
-
-            await emailProvider.SendEmail(emailMessage);
+            await emailProvider
+                .SendEmail(
+                    new EmailMessage(
+                        Properties.Subject,
+                        actionHelper.GetEmailContent(this, formAnswers),
+                        Properties.From,
+                        actionHelper.GetEmailToAddresses(this, formAnswers)));
         }
     }
 }

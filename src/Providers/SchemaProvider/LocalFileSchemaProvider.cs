@@ -2,10 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Configuration;
 using form_builder.Models;
-using form_builder.Providers.StorageProvider;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace form_builder.Providers.SchemaProvider
@@ -19,10 +16,7 @@ namespace form_builder.Providers.SchemaProvider
             return obj;
         }
 
-        public FormSchema Get(string schemaName)
-        {
-            return Get<FormSchema>(schemaName);
-        }
+        public FormSchema Get(string schemaName) => Get<FormSchema>(schemaName);
 
         async Task<T> ISchemaProvider.Get<T>(string schemaName)
         {

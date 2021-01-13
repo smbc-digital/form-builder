@@ -11,7 +11,7 @@ namespace form_builder.ViewModels
 
         public string FeedbackForm { get; set; }
 
-        public FormAnswers FormAnswers {get; set;}
+        public FormAnswers FormAnswers { get; set; }
         public string Reference { get; set; }
 
         public string PageContent { get; set; }
@@ -30,6 +30,6 @@ namespace form_builder.ViewModels
 
         public bool DisplayBreadcrumbs { get; set; }
 
-        public List<Breadcrumb> Breadcrumbs{get; set;}
+        public List<Breadcrumb> Breadcrumbs { get; set; }
     }
 }

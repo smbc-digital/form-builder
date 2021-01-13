@@ -40,7 +40,7 @@ namespace form_builder_tests.UnitTests.Extensions
         {
             // Act & Assert
             var result = value.ToMaxSpecifiedStringLengthForFileName(length);
-            Assert.Equal(expected ,result);
+            Assert.Equal(expected, result);
             Assert.Equal(length, result.Length);
         }
 
@@ -55,6 +55,17 @@ namespace form_builder_tests.UnitTests.Extensions
             var result = value.ToMaxSpecifiedStringLengthForFileName(10);
             Assert.Equal(value, result);
             Assert.True(result.Length <= 10);
+        }
+
+        [Theory]
+        [InlineData("pageone", true, "/booking/test-form/pageone/month")]
+        [InlineData("pagetwo", false, "/v2/booking/test-form/pagetwo/month")]
+        public void ToBookingRequestedMonthUrl_ShouldReturnValidUrl_ForEnvs(string page, bool isLocal, string expectedValue)
+        {
+            var formName = "test-form";
+            // Act & Assert
+            var result = formName.ToBookingRequestedMonthUrl(page, isLocal);
+            Assert.Equal(expectedValue, result);
         }
     }
 }

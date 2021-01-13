@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using form_builder.Configuration;
 using form_builder.Middleware;
 using form_builder.ModelBinders.Providers;
 using form_builder.Utils.ServiceCollectionExtensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +37,7 @@ namespace form_builder
             services.AddRazorPages();
 
             services
+                .AddRazorViewEngineViewLocations()
                 .ConfigureCookiePolicy()
                 .AddValidators()
                 .AddTagParsers()
@@ -50,7 +52,9 @@ namespace form_builder
                 .ConfigureOrganisationProviders()
                 .ConfigureStreetProviders()
                 .ConfigurePaymentProviders()
+                .ConfigureBookingProviders()
                 .ConfigureDocumentCreationProviders()
+                .ConfigureFormatters()
                 .ConfigureEmailProviders(HostingEnvironment)
                 .AddHelpers()
                 .AddAttributes()
@@ -73,10 +77,26 @@ namespace form_builder
                     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                     options.ModelBinderProviders.Insert(0, new CustomFormFileModelBinderProvider());
                 });
+
+            services.Configure<ForwardedHeadersOptions>(options =>
+                {
+                    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+
+                    options.KnownNetworks.Clear();
+                    options.KnownProxies.Clear();
+                });
+
+            services.AddHttpsRedirection(options =>
+                {
+                    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                    options.HttpsPort = 443;
+                });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseForwardedHeaders();
+
             if (env.IsEnvironment("local") || env.IsEnvironment("uitest"))
             {
                 app.UseDeveloperExceptionPage();

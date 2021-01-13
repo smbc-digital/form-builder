@@ -7,10 +7,7 @@ namespace form_builder.Middleware
     {
         private readonly RequestDelegate _next;
 
-        public HeaderConfiguration(RequestDelegate next)
-        {
-            _next = next;
-        }
+        public HeaderConfiguration(RequestDelegate next) => _next = next;
 
         // TODO: Move these header values to config!
         public async Task Invoke(HttpContext context)

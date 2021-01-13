@@ -8,7 +8,7 @@ namespace form_builder.Services.FileUploadService
     public interface IFileUploadService
     {
         Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload);
-        
+
         Task<ProcessRequestEntity> ProcessFile(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,

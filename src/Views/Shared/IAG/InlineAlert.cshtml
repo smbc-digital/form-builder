@@ -1,0 +1,13 @@
+﻿@model Element
+
+<section class="govuk-inset-text">
+    @if (!string.IsNullOrEmpty(Model.Properties.Label))
+    {
+        <h2 class="govuk-heading-l">@Model.Properties.Label</h2>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.Properties.Text))
+    {
+        <p class="smbc-body">@Html.Raw(Model.Properties.Text)</p>
+    }
+</section>

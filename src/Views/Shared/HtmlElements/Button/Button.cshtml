@@ -1,0 +1,12 @@
+﻿@model Button
+
+
+<button data-prevent-double-click="true"
+        @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
+        class="govuk-button @Model.Properties.ClassName"
+        id="@Model.Properties.ButtonId"
+        @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)
+        data-module="govuk-button">
+    @Model.Properties.Text
+</button>
+

@@ -212,7 +212,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             Assert.True(result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.Optional);
         }
 
-        
+
         [Fact]
         public async Task Transform_ShouldCall_TransformDataProvider_And_ShouldUpdate_MaxLength_WhenSupplied()
         {

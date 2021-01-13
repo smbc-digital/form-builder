@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Constants;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
@@ -15,10 +15,7 @@ using Newtonsoft.Json;
 
 namespace form_builder.Services.OrganisationService
 {
-    public interface IOrganisationService
-    {
-        Task<ProcessRequestEntity> ProcessOrganisation(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path);
-    }
+
 
     public class OrganisationService : IOrganisationService
     {
@@ -162,7 +159,7 @@ namespace form_builder.Services.OrganisationService
                 }
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-                _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, guid);
+                _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, guid, baseForm.BaseURL);
             }
 
             return new ProcessRequestEntity

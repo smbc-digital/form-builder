@@ -7,7 +7,6 @@ using form_builder.Controllers.Document;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Attributes
@@ -27,8 +26,8 @@ namespace form_builder.Attributes
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var formData = (IDictionary<string, string[]>) context.ActionArguments["formData"];
-            if (context.ActionArguments["path"].Equals("document-upload") && formData != null && formData.ContainsKey("Submit"))
+            var formData = (IDictionary<string, string[]>)context.ActionArguments["formData"];
+            if (context.ActionArguments["path"].Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH) && formData != null && formData.ContainsKey("Submit"))
             {
                 await DoReCaptchaValidation(context);
             }
@@ -71,7 +70,7 @@ namespace form_builder.Attributes
             });
 
             var response = await _gateway.PostAsync(_configuration.ApiVerificationEndpoint, request, false);
-            
+
             if (response.Content == null)
             {
                 AddModelError(context, "Unable To Read Response From Server");

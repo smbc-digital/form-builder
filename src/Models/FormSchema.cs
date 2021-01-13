@@ -12,13 +12,13 @@ namespace form_builder.Models
     public class FormSchema
     {
         public string FormName { get; set; }
-        
+
         public string BaseURL { get; set; }
 
         public string StartPageUrl { get; set; }
-        
+
         public string FirstPageSlug { get; set; }
-        
+
         public string FeedbackForm { get; set; }
 
         public string FeedbackPhase { get; set; }
@@ -28,7 +28,7 @@ namespace form_builder.Models
         public List<Page> Pages { get; set; }
 
         public List<IAction> FormActions { get; set; } = new List<IAction>();
-        
+
         public List<EnvironmentAvailability> EnvironmentAvailabilities { get; set; }
 
         public bool DocumentDownload { get; set; }
@@ -55,7 +55,7 @@ namespace form_builder.Models
 
                 return page;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new ApplicationException($"Requested path '{path}' object could not be found or was not unique.", ex);
             }
@@ -73,6 +73,7 @@ namespace form_builder.Models
             pageHelper.CheckSubmitSlugsHaveAllProperties(Pages, form);
             await pageHelper.CheckForPaymentConfiguration(Pages, form);
             pageHelper.CheckForAcceptedFileUploadFileTypes(Pages, form);
+            pageHelper.CheckConditionalElementsAreValid(Pages, form);
             pageHelper.CheckForDocumentDownload(this);
             pageHelper.CheckForIncomingFormDataValues(Pages);
             pageHelper.CheckForPageActions(this);
@@ -80,6 +81,7 @@ namespace form_builder.Models
             pageHelper.CheckAddressNoManualTextIsSet(Pages);
             pageHelper.CheckForAnyConditionType(Pages);
             pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(Pages);
+            pageHelper.CheckForBookingElement(Pages);
         }
 
         public bool IsAvailable(string environment)

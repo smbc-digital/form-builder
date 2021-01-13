@@ -6,6 +6,7 @@ using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
+using StockportGovUK.NetStandard.Models.Booking.Request;
 
 namespace form_builder.Builders
 {
@@ -200,6 +201,31 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithBookingProvider(string value)
+        {
+            _property.BookingProvider = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithAppointmentType(Guid value)
+        {
+            _property.AppointmentType = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithBookingResource(BookingResource value)
+        {
+            if (_property.OptionalResources == null)
+                _property.OptionalResources = new List<BookingResource>();
+
+            _property.OptionalResources.Add(value);
+
+            return this;
+        }
+
+
         public ElementBuilder WithNumeric(bool value)
         {
             _property.Numeric = value;
@@ -245,7 +271,7 @@ namespace form_builder.Builders
         public ElementBuilder WithUpperLimitValidationMessage(string message)
         {
             _property.UpperLimitValidationMessage = message;
-            
+
             return this;
         }
 
@@ -303,7 +329,7 @@ namespace form_builder.Builders
 
             return this;
         }
-        
+
         public ElementBuilder WithCustomValidationMessage(string value)
         {
             _property.CustomValidationMessage = value;
@@ -331,6 +357,14 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithCheckYourBooking(bool value)
+        {
+            _property.CheckYourBooking = value;
+
+            return this;
+        }
+
         public ElementBuilder WithClassName(string value)
         {
             _property.ClassName = value;
@@ -348,6 +382,20 @@ namespace form_builder.Builders
         public ElementBuilder WithUrl(string value)
         {
             _property.Url = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithConditionalElement(bool value)
+        {
+            _property.isConditionalElement = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithNoAvailableTimeForBookingType(string value)
+        {
+            _property.NoAvailableTimeForBookingType = value;
 
             return this;
         }

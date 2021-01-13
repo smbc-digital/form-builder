@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
@@ -28,7 +28,7 @@ namespace form_builder_tests.UnitTests.Services
 
         public StreetServiceTests()
         {
-             _streetProvider.Setup(_ => _.ProviderName).Returns("Fake");
+            _streetProvider.Setup(_ => _.ProviderName).Returns("Fake");
             _streetProviders = new List<IStreetProvider>
             {
                 _streetProvider.Object
@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.Services
                 },
                 FormData = new Dictionary<string, object>
                 {
-                    { "page-one-search-results" , new List<object>() } 
+                    { "page-one-search-results" , new List<object>() }
                 }
             };
 
@@ -174,7 +174,7 @@ namespace form_builder_tests.UnitTests.Services
                         PageSlug = "page-one"
                     }
                 },
-                FormData = new Dictionary<string, object> 
+                FormData = new Dictionary<string, object>
                 {
                     {"page-one-search-results", new List<object>{ }}
                 }
@@ -209,10 +209,10 @@ namespace form_builder_tests.UnitTests.Services
 
             _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
             _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Never);
-            _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>()), Times.Never);
+            _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
-        
+
         [Fact]
         public async Task ProcessStreet_Should_Call_StreetProvider_When_SearchTerm_IsDifferent()
         {
@@ -265,18 +265,19 @@ namespace form_builder_tests.UnitTests.Services
 
             _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
-            _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>()), Times.Once);
+            _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
         public async Task ProcessStreet_Application_ShouldThrowApplicationException_WhenStreetProvider_ThrowsException()
         {
             _streetProvider.Setup(_ => _.SearchAsync(It.IsAny<string>())).Throws<Exception>();
+            var fakeStreetProvider = EStreetProvider.Fake.ToString();
 
             var element = new ElementBuilder()
                .WithType(EElementType.Street)
                .WithQuestionId("street")
-               .WithStreetProvider(EStreetProvider.Fake.ToString())
+               .WithStreetProvider(fakeStreetProvider)
                .Build();
 
             var page = new PageBuilder()
@@ -299,7 +300,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessStreet(viewModel, page, schema, "", "page-one"));
             _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
-            Assert.StartsWith($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup, Exception: ", result.Message);
+            Assert.StartsWith($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup on Provider '{fakeStreetProvider}' with searchterm 'streetname' Exception:", result.Message);
         }
     }
 }

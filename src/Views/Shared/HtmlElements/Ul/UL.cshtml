@@ -1,0 +1,8 @@
+﻿@model Element
+
+<ul class="govuk-list govuk-list--bullet @Model.Properties.ClassName">
+    @foreach (var li in Model.Properties.ListItems)
+    {
+        <li>@Html.Raw(li)</li>
+    }
+</ul>

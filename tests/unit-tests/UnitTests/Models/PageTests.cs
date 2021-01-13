@@ -134,7 +134,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour2)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "wrongValue"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "wrongValue" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -161,7 +161,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour2)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "value"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "value" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -195,7 +195,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour3)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "pear"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "pear" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -295,7 +295,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour2)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "wrongValue"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "wrongValue" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -322,7 +322,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour2)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "value"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "value" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -356,7 +356,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour3)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "berry"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "berry" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -391,7 +391,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour3)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "berry,apple"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "berry,apple" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -431,7 +431,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour4)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "pear"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "pear" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -472,7 +472,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour4)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "berry"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "berry" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -499,7 +499,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour2)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "apple"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "apple" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -526,7 +526,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour2)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "apple"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "apple" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -559,7 +559,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour3)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "pear"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "pear" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -589,7 +589,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour2)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "pear"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "pear" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -620,7 +620,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour2)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "apple"}, {"data", "berry"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "apple" }, { "data", "berry" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -742,7 +742,7 @@ namespace form_builder_tests.UnitTests.Models
 
             // Act
             var result = page.GetNextPage(new Dictionary<string, dynamic>
-            { 
+            {
                 { "testDate-year",DateTime.Today.Year.ToString() },
                 { "testDate-month", DateTime.Today.Month.ToString() },
                 { "testDate-day", DateTime.Today.Day.ToString() } }
@@ -861,7 +861,7 @@ namespace form_builder_tests.UnitTests.Models
             // Act
             var result = page.GetNextPage(
            new Dictionary<string, dynamic> { { "testDate", futureDate.ToString() } });
-            
+
             // Assert
             Assert.Equal("more-than", result.PageSlug);
         }
@@ -884,7 +884,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour2)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "value"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "value" } };
 
             // Act
             var result = page.GetNextPage(viewModel);
@@ -911,7 +911,7 @@ namespace form_builder_tests.UnitTests.Models
                 .WithBehaviour(behaviour2)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"test", "value"}};
+            var viewModel = new Dictionary<string, dynamic> { { "test", "value" } };
 
             // Act
             var result = page.GetNextPage(viewModel);

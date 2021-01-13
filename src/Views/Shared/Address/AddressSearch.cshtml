@@ -1,0 +1,22 @@
+@model Address
+@{
+    var elementProperties = Model.GenerateElementProperties();
+    elementProperties.Add("class", $"govuk-input govuk-input--width-10 {(Model.IsValid ? string.Empty : "govuk-input--error")}");
+    elementProperties.Add("autocomplete", "postal-code");
+}
+
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+
+    @if (Model.Properties.StockportPostcode == true)
+    {
+        <partial name="InsetText" model="Model.Properties.AddressIAG" />
+    }
+
+    <partial name="LabelH1" />
+
+    <partial name="Hint" />
+
+    <partial name="Error" />
+
+    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elementProperties)
+</div>

@@ -6,10 +6,12 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using form_builder.Cache;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.Session;
+using form_builder.Helpers.ViewRender;
 using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Models.Elements;
@@ -69,7 +71,8 @@ namespace form_builder.Helpers.PageHelpers
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
 
             foreach (var element in page.Elements)
-                formModel.RawHTML += await element.RenderAsync(
+            {
+                string html = await element.RenderAsync(
                     _viewRender,
                     _elementHelper,
                     guid,
@@ -80,7 +83,16 @@ namespace form_builder.Helpers.PageHelpers
                     formAnswers,
                     results
                     );
+                if (element.Properties.isConditionalElement)
+                {
+                    formModel.RawHTML = formModel.RawHTML.Replace(SystemConstants.ConditionalElementReplacementString + element.Properties.QuestionId, html);
+                }
+                else
+                {
+                    formModel.RawHTML += html;
+                }
 
+            }
             return formModel;
         }
 
@@ -107,7 +119,7 @@ namespace form_builder.Helpers.PageHelpers
                     answers.Add(new Answers { QuestionId = item.Key, Response = item.Value });
             }
 
-            if((files == null || !files.Any()) && currentPageAnswers.Answers != null && currentPageAnswers.Answers.Any() && isPageValid && appendMultipleFileUploadParts)
+            if ((files == null || !files.Any()) && currentPageAnswers.Answers != null && currentPageAnswers.Answers.Any() && isPageValid && appendMultipleFileUploadParts)
                 answers = currentPageAnswers.Answers;
 
             if (files != null && files.Any() && isPageValid)
@@ -296,7 +308,46 @@ namespace form_builder.Helpers.PageHelpers
             });
         }
 
-        public void SaveFormData(string key, object value, string guid)
+        public void CheckConditionalElementsAreValid(List<Page> pages, string formName)
+        {
+            var radioWithConditionals = pages.Where(_ => _.Elements != null)
+                .SelectMany(_ => _.ValidatableElements)
+                .Where(_ => _.Type == EElementType.Radio)
+                .Where(_ => _.Properties.Options.Any(_ => _.HasConditionalElement))
+                .ToList();
+
+            var conditionalElements = pages.Where(_ => _.Elements != null)
+                .SelectMany(_ => _.Elements)
+                .Where(_ => _.Properties.isConditionalElement)
+                .ToList();
+
+            foreach (var radio in radioWithConditionals)
+            {
+                foreach (var option in radio.Properties.Options)
+                {
+                    if (
+                        option.HasConditionalElement &&
+                        !string.IsNullOrEmpty(option.ConditionalElementId) &&
+                        !conditionalElements.Any(_ => _.Properties.QuestionId == option.ConditionalElementId))
+                        throw new ApplicationException($"The provided json '{formName}' does not contain a conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}'");
+
+                    if (
+                        option.HasConditionalElement && 
+                        !string.IsNullOrEmpty(option.ConditionalElementId) && 
+                        !pages.Any(page => page.ValidatableElements.Contains(radio) && page.Elements.Any(_ => _.Properties.QuestionId == option.ConditionalElementId && _.Properties.isConditionalElement)))
+                        throw new ApplicationException($"The provided json '{formName}' contains the conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}' on a different page to the radio element");
+
+                    
+                    conditionalElements.Remove(conditionalElements.FirstOrDefault(_ => _.Properties.QuestionId == option.ConditionalElementId));
+                }
+            }
+
+            if (conditionalElements.Count > 0)
+                throw new ApplicationException($"The provided json '{formName}' has conditional elements '{String.Join(", ", conditionalElements.Select(_ => _.Properties.QuestionId))}' not assigned to radio options");
+
+        }
+
+        public void SaveFormData(string key, object value, string guid, string formName)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -308,12 +359,14 @@ namespace form_builder.Helpers.PageHelpers
                 convertedAnswers.FormData.Remove(key);
 
             convertedAnswers.FormData.Add(key, value);
+            convertedAnswers.FormName = formName;
+
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
         public void SaveNonQuestionAnswers(Dictionary<string, object> values, string form, string path, string guid)
         {
-            if(!values.Any())
+            if (!values.Any())
                 return;
 
             var formData = _distributedCache.GetString(guid);
@@ -325,9 +378,10 @@ namespace form_builder.Helpers.PageHelpers
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-            values.ToList().ForEach((_) => {
-            if (convertedAnswers.AdditionalFormData.ContainsKey(_.Key))
-                convertedAnswers.AdditionalFormData.Remove(_.Key);
+            values.ToList().ForEach((_) =>
+            {
+                if (convertedAnswers.AdditionalFormData.ContainsKey(_.Key))
+                    convertedAnswers.AdditionalFormData.Remove(_.Key);
 
                 convertedAnswers.AdditionalFormData.Add(_.Key, _.Value);
             });
@@ -359,7 +413,7 @@ namespace form_builder.Helpers.PageHelpers
                     .ToList()
                     .ForEach(x => x.IncomingValues.ForEach(_ =>
                         {
-                             if (_.HttpActionType.Equals(EHttpActionType.Unknown))
+                            if (_.HttpActionType.Equals(EHttpActionType.Unknown))
                                 throw new Exception("PageHelper::CheckForIncomingFormDataValues, EHttpActionType cannot be unknwon, set to Get or Post");
 
                             if (string.IsNullOrEmpty(_.QuestionId) || string.IsNullOrEmpty(_.Name))
@@ -471,7 +525,7 @@ namespace form_builder.Helpers.PageHelpers
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = !string.IsNullOrEmpty(formData)
                 ? JsonConvert.DeserializeObject<FormAnswers>(formData)
-                : new FormAnswers {Pages = new List<PageAnswers>()};
+                : new FormAnswers { Pages = new List<PageAnswers>() };
 
             var answers = convertedAnswers.Pages.SelectMany(_ => _.Answers).ToDictionary(_ => _.QuestionId, _ => _.Response);
 
@@ -486,7 +540,8 @@ namespace form_builder.Helpers.PageHelpers
                 .Where(_ => _.Properties.DisableManualAddress)
                 .ToList();
 
-            addressElements.ForEach(element => {
+            addressElements.ForEach(element =>
+            {
                 if (string.IsNullOrWhiteSpace(element.Properties.NoManualAddressDetailText))
                     throw new ApplicationException("AddressElement:DisableManualAddress set to true, NoManualAddressDetailText must have value");
             });
@@ -528,10 +583,11 @@ namespace form_builder.Helpers.PageHelpers
             {
                 var fileUploadModel = new List<FileUploadModel>();
                 var filsToAdd = file.ToList();
-                if(isMultipleFileUploadElementType)
+                if (isMultipleFileUploadElementType)
                 {
                     var data = currentAnswersForFileUpload.Answers?.FirstOrDefault(_ => _.QuestionId.Equals(file.Key))?.Response;
-                    if(data != null){
+                    if (data != null)
+                    {
                         List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(data.ToString());
                         fileUploadModel.AddRange(response);
                         filsToAdd = filsToAdd.Where(_ => !response.Any(x => WebUtility.HtmlEncode(_.UntrustedOriginalFileName) == x.TrustedOriginalFileName)).ToList();
@@ -544,7 +600,7 @@ namespace form_builder.Helpers.PageHelpers
 
                 for (int i = 0; i < fileContent.Count; i++)
                 {
-                     _distributedCache.SetStringAsync(keys[i], JsonConvert.SerializeObject(fileContent[i]), _distributedCacheExpirationConfiguration.FileUpload);
+                    _distributedCache.SetStringAsync(keys[i], JsonConvert.SerializeObject(fileContent[i]), _distributedCacheExpirationConfiguration.FileUpload);
                 }
 
                 fileUploadModel.AddRange(filsToAdd.Select((_, index) => new FileUploadModel
@@ -576,14 +632,60 @@ namespace form_builder.Helpers.PageHelpers
                 .Where(_ => _.Type.Equals(EElementType.UploadedFilesSummary))
                 .ToList();
 
-            if(fileSummaryElements.Any()){
-                fileSummaryElements.ForEach((element) => {
-                    if(string.IsNullOrEmpty(element.Properties.Text))
+            if (fileSummaryElements.Any())
+            {
+                fileSummaryElements.ForEach((element) =>
+                {
+                    if (string.IsNullOrEmpty(element.Properties.Text))
                         throw new ApplicationException("PageHelper:CheckUploadedFilesSummaryQuestionsIsSet, Uploaded files summary text must not be empty.");
 
-                    if(!element.Properties.FileUploadQuestionIds.Any())
+                    if (!element.Properties.FileUploadQuestionIds.Any())
                         throw new ApplicationException("PageHelper:CheckUploadedFilesSummaryQuestionsIsSet, Uploaded files summary must have atleast one file questionId specified to display the list of uploaded files.");
                 });
+            }
+        }
+
+        public void CheckForBookingElement(List<Page> pages)
+        {
+            var bookingElements = pages.SelectMany(_ => _.ValidatableElements)
+                .Where(_ => _.Type.Equals(EElementType.Booking))
+                .ToList();
+
+            if (bookingElements.Any())
+            {
+                bookingElements.ForEach((booking) =>
+                {
+                    if (string.IsNullOrEmpty(booking.Properties.BookingProvider))
+                        throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a valid booking provider property.");
+
+                    if (booking.Properties.AppointmentType == Guid.Empty)
+                        throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.");
+
+                    if (booking.Properties.OptionalResources.Any())
+                    {
+                        booking.Properties.OptionalResources.ForEach(resource =>
+                        {
+                            if (resource.Quantity <= 0)
+                                throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element optional resouces are invalid, cannot have a quantity less than 0");
+
+                            if (resource.ResourceId.Equals(Guid.Empty))
+                                throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element optional resouces are invalid, ResourceId cannot be an empty Guid.");
+                        });
+                    }
+                });
+
+                if (!pages.Any(_ => _.PageSlug.ToLower().Equals(BookingConstants.NO_APPOINTMENT_AVAILABLE)))
+                    throw new ApplicationException($"PageHelper:CheckForBookingElement, Form contains booking element but is missing required page with slug {BookingConstants.NO_APPOINTMENT_AVAILABLE}.");
+
+                var additionalRequiredElements = pages.SelectMany(_ => _.ValidatableElements)
+                    .Where(_ => _.Properties != null && _.Properties.TargetMapping != null)
+                    .Where(_ => _.Properties.TargetMapping.ToLower().Equals("customer.firstname")
+                        || _.Properties.TargetMapping.ToLower().Equals("customer.lastname")
+                        || _.Properties.TargetMapping.ToLower().Equals("customer.email"))
+                    .ToList();
+
+                if (additionalRequiredElements.Count() != 3)
+                    throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires customer firstname/lastname/email elements for reservation");
             }
         }
     }

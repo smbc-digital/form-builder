@@ -3,13 +3,12 @@ using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
@@ -28,7 +27,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var callback = new Button();
             _mockIViewRender
                 .Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Button>(), It.IsAny<Dictionary<string, dynamic>>()))
-                .Callback<string, Button, Dictionary<string, dynamic>>((a,b,c) => callback = b);
+                .Callback<string, Button, Dictionary<string, dynamic>>((a, b, c) => callback = b);
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Button)
@@ -53,7 +52,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var viewModel = new Dictionary<string, dynamic>();
 
             //Act
-            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema,  _mockHostingEnv.Object, formAnswers);
+            await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, formAnswers);
 
             //Assert
             Assert.Equal(ButtonConstants.ADDRESS_SEARCH_TEXT, callback.Properties.Text);
@@ -242,7 +241,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.False(callback.Properties.DisableOnClick);
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Button")), It.IsAny<Button>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
-        
+
         [Fact]
         public async Task RenderAsync_ShouldDisableButton_OnClick_WhenPropertyIsEnabled()
         {

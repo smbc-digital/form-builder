@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using form_builder.Validators;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
@@ -74,7 +74,7 @@ namespace form_builder.Models.Elements
         }
 
         public override string GenerateFieldsetProperties() =>
-            !string.IsNullOrWhiteSpace(Properties.AddressManualHint) 
+            !string.IsNullOrWhiteSpace(Properties.AddressManualHint)
                 ? $"aria-describedby = {Properties.QuestionId}-hint"
                 : string.Empty;
 
@@ -114,7 +114,7 @@ namespace form_builder.Models.Elements
             {
                 var value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, $"-{AddressManualConstants.POSTCODE}");
                 Properties.AddressManualAddressPostcode = string.IsNullOrEmpty(value) ? Properties.Value : value;
-            }   
+            }
         }
 
         public override async Task<string> RenderAsync(IViewRender viewRender,

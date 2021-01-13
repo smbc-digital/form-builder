@@ -6,20 +6,22 @@ using Amazon.SimpleEmail;
 using form_builder.Attributes;
 using form_builder.Cache;
 using form_builder.Configuration;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
+using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Factories.Schema;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Gateways;
-using form_builder.Helpers;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.DocumentCreation;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
+using form_builder.Helpers.ViewRender;
 using form_builder.Mappers;
 using form_builder.Providers.Address;
+using form_builder.Providers.Booking;
 using form_builder.Providers.DocumentCreation;
 using form_builder.Providers.DocumentCreation.Generic;
 using form_builder.Providers.EmailProvider;
@@ -31,6 +33,7 @@ using form_builder.Providers.Street;
 using form_builder.Providers.Transforms.Lookups;
 using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Services.AddressService;
+using form_builder.Services.BookingService;
 using form_builder.Services.DocumentService;
 using form_builder.Services.EmailService;
 using form_builder.Services.FileUploadService;
@@ -42,21 +45,26 @@ using form_builder.Services.RetrieveExternalDataService;
 using form_builder.Services.StreetService;
 using form_builder.Services.SubmitService;
 using form_builder.Services.ValidateService;
-using form_builder.TagParser;
+using form_builder.TagParsers;
+using form_builder.TagParsers.Formatters;
 using form_builder.Validators;
-using form_builder.Workflows;
 using form_builder.Workflows.ActionsWorkflow;
 using form_builder.Workflows.DocumentWorkflow;
+using form_builder.Workflows.PaymentWorkflow;
+using form_builder.Workflows.SubmitWorkflow;
+using form_builder.Workflows.SuccessWorkflow;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Gateways.AddressService;
+using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Gateways.CivicaPay;
 using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
@@ -95,6 +103,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddTransient<IElementValidator, RestrictMimeTypeValidator>();
             services.AddTransient<IElementValidator, RestrictFileSizeValidator>();
             services.AddTransient<IElementValidator, RestrictCombinedFileSizeValidator>();
+            services.AddTransient<IElementValidator, BookingValidator>();
 
             return services;
         }
@@ -103,6 +112,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         {
             services.AddTransient<ITagParser, FormAnswerTagParser>();
             services.AddTransient<ITagParser, FormDataTagParser>();
+            services.AddTransient<ITagParser, LinkTagParser>();
 
             return services;
         }
@@ -118,6 +128,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddHttpClient<IAddressServiceGateway, AddressServiceGateway>(configuration);
             services.AddHttpClient<IStreetServiceGateway, StreetServiceGateway>(configuration);
             services.AddHttpClient<IOrganisationServiceGateway, OrganisationServiceGateway>(configuration);
+            services.AddHttpClient<IBookingServiceGateway, BookingServiceGateway>(configuration);
 
             return services;
         }
@@ -179,6 +190,15 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             return services;
         }
 
+        public static IServiceCollection ConfigureBookingProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IBookingProvider, FakeBookingProvider>();
+            services.AddSingleton<IBookingProvider, BookingProvider>();
+
+            return services;
+        }
+
+
         public static IServiceCollection ConfigureOrganisationProviders(this IServiceCollection services)
         {
             services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
@@ -191,6 +211,14 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         {
             services.AddSingleton<IStreetProvider, FakeStreetProvider>();
             services.AddSingleton<IStreetProvider, ServiceStreetProvider>();
+
+            return services;
+        }
+
+        public static IServiceCollection ConfigureFormatters(this IServiceCollection services)
+        {
+            services.AddSingleton<IFormatter, FullDateFormatter>();
+            services.AddSingleton<IFormatter, TimeOnlyFormatter>();
 
             return services;
         }
@@ -222,6 +250,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddSingleton<IAddressService, AddressService>();
+            services.AddSingleton<IBookingService, BookingService>();
             services.AddSingleton<IPageService, PageService>();
             services.AddSingleton<IStreetService, StreetService>();
             services.AddSingleton<ISubmitService, SubmitService>();
@@ -339,6 +368,57 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
             services.AddDataProtection().SetApplicationName("formbuilder");
             services.AddSingleton<IDistributedCacheWrapper, DistributedCacheWrapper>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddRazorViewEngineViewLocations(this IServiceCollection services)
+        {
+            services.Configure<RazorViewEngineOptions>(o =>
+            {
+                o.ViewLocationFormats.Add("/Views/Shared/Address/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Booking/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Breadcrumbs/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/ChangeSearch/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Chevron/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Cookie/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/DateInput/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/DatePicker/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Declaration/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Document/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Error/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/FileUpload/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Button/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Footer/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Header/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Headings/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Hr/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Img/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Inputs/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Inputs/Checkbox/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Inputs/Radio/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Label/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Legend/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Link/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Ol/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/P/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Select/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Textarea/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Textbox/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Ul/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/IAG/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Map/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Numeric/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Organisation/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Payment/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Recaptcha/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Street/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Tagmanager/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Time/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/TimeInput/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Warning/{0}" + RazorViewEngine.ViewExtension);
+            });
 
             return services;
         }

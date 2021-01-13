@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Mappers;
@@ -15,6 +17,7 @@ using form_builder_tests.Builders;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Xunit;
 
@@ -63,7 +66,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _service = new MappingService( _mockDistrubutedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockDistributedCacheExpirationConfiguration.Object);
+            _service = new MappingService(_mockDistrubutedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockDistributedCacheExpirationConfiguration.Object);
         }
 
         [Fact]
@@ -334,7 +337,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.NotNull(fiveObject.six);
         }
 
-        
+
         [Theory]
         [InlineData(EElementType.FileUpload)]
         [InlineData(EElementType.MultipleFileUpload)]
@@ -378,7 +381,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Empty(castResultsData);
         }
 
-                
+
         [Theory]
         [InlineData(EElementType.FileUpload)]
         [InlineData(EElementType.MultipleFileUpload)]
@@ -418,7 +421,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(null);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(new List<File>{ new File()});
+                .Returns(new List<File> { new File() });
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -477,13 +480,13 @@ namespace form_builder_tests.UnitTests.Services
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "file"), It.IsAny<FormAnswers>()))
-                .Returns(new List<File>{new File()});
+                .Returns(new List<File> { new File() });
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filetwo"), It.IsAny<FormAnswers>()))
                 .Returns(null);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filethree"), It.IsAny<FormAnswers>()))
-                .Returns(new List<File>{new File()});
+                .Returns(new List<File> { new File() });
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -492,7 +495,7 @@ namespace form_builder_tests.UnitTests.Services
             var resultData = Assert.IsType<ExpandoObject>(result.Data);
             dynamic castResultsData = resultData;
 
-            Assert.Equal(2,castResultsData.file.Count);
+            Assert.Equal(2, castResultsData.file.Count);
             Assert.NotNull(castResultsData);
             Assert.NotNull(castResultsData.file);
         }
@@ -505,7 +508,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Textbox)
                 .WithQuestionId("textbox")
                 .Build();
-                
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithValidatedModel(true)
@@ -523,7 +526,7 @@ namespace form_builder_tests.UnitTests.Services
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
                    Pages = new List<PageAnswers>(),
-                   AdditionalFormData = new Dictionary<string, object>{ { "additional", "answerData" }}
+                   AdditionalFormData = new Dictionary<string, object> { { "additional", "answerData" } }
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "textbox"), It.IsAny<FormAnswers>()))
@@ -540,6 +543,174 @@ namespace form_builder_tests.UnitTests.Services
             Assert.NotNull(castResultsData.textbox);
             Assert.NotNull(castResultsData.additional);
             Assert.Equal("answerData", castResultsData.additional);
+        }
+
+        [Fact]
+        public async Task MapBookingRequest_ShouldReturn_ValidBookingRequest()
+        {
+            // Arrange
+            var bookingGuid = Guid.NewGuid();
+            var startDate = DateTime.Now.AddDays(-2);
+            var startTime = DateTime.Today.Add(new TimeSpan(1, 0, 0));
+            var expectedValue = startDate.Date.Add(startTime.TimeOfDay);
+            var customerFirstnameElement = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithTargetMapping("customer.firstname")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(customerFirstnameElement)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithAppointmentType(bookingGuid)
+                .Build();
+
+            var viewModel = new Dictionary<string, object> {
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", startDate.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", startTime.ToString() }
+            };
+
+            // Act
+            var result = await _service.MapBookingRequest("guid", element, viewModel, "form");
+
+            // Assert
+            Assert.IsType<BookingRequest>(result);
+            Assert.Equal(bookingGuid, result.AppointmentId);
+            Assert.Equal(expectedValue, result.StartDateTime);
+            _mockSchemaFactory.Verify(_ => _.Build(It.IsAny<string>()), Times.Once);
+            _mockElementMapper.Verify(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task MapBookingRequest_Should_ThrowApplicationException_WhenAppointmentDate_NotFoundInViewModel()
+        {
+            // Arrange
+            var bookingGuid = Guid.NewGuid();
+            var startTime = DateTime.Today.Add(new TimeSpan(1, 0, 0));
+            var customerFirstnameElement = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithTargetMapping("customer.firstname")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(customerFirstnameElement)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithAppointmentType(bookingGuid)
+                .Build();
+
+            var viewModel = new Dictionary<string, object> {
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", startTime.ToString() }
+            };
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.MapBookingRequest("guid", element, viewModel, "testform"));
+
+            // Assert
+            Assert.Equal("MappingService::GetStartDateTime, Booking request viewmodel for form testform does not contain required booking start date", result.Message);
+        }
+
+        [Fact]
+        public async Task MapBookingRequest_Should_ThrowApplicationException_WhenAppointmentTime_NotFoundInViewModel()
+        {
+            // Arrange
+            var bookingGuid = Guid.NewGuid();
+            var startDate = DateTime.Now.AddDays(-2);
+            var customerFirstnameElement = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithTargetMapping("customer.firstname")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(customerFirstnameElement)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithAppointmentType(bookingGuid)
+                .Build();
+
+            var viewModel = new Dictionary<string, object> {
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", startDate.ToString() }
+            };
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.MapBookingRequest("guid", element, viewModel, "testform"));
+
+            // Assert
+            Assert.Equal("MappingService::GetStartDateTime, Booking request viewmodel for form testform does not contain required booking start time", result.Message);
+        }
+
+        [Fact]
+        public async Task MapBookingRequest_Should_ThrowApplicationException_WhenCustomerObject_IsNotFound()
+        {
+            // Arrange
+            var bookingGuid = Guid.NewGuid();
+            var startDate = DateTime.Now.AddDays(-2);
+            var startTime = DateTime.Today.Add(new TimeSpan(1, 0, 0));
+
+            var page = new PageBuilder()
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithAppointmentType(bookingGuid)
+                .Build();
+
+            var viewModel = new Dictionary<string, object> {
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", startDate.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", startTime.ToString() }
+            };
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.MapBookingRequest("guid", element, viewModel, "testform"));
+
+            // Assert
+            Assert.Equal("MappingService::GetCustomerDetails, Booking request form data for form base-url does not contain required customer object", result.Message);
         }
     }
 }

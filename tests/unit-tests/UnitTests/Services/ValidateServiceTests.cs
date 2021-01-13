@@ -1,4 +1,10 @@
-﻿using form_builder.Enum;
+﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using form_builder.Enum;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
@@ -13,14 +19,7 @@ using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Xunit;
-using Action = form_builder.Models.Actions.Action;
 
 namespace form_builder_tests.UnitTests.Services
 {

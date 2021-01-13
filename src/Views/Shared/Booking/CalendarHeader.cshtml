@@ -1,0 +1,37 @@
+@model Booking
+
+<div class="smbc-calendar__header">
+
+    @if (Model.DisplayPreviousMonthArrow)
+    {
+        <button class="smbc-calendar__header__button"
+                name="@BookingConstants.BOOKING_MONTH_REQUEST"
+                value="@Model.PreviousSelectableMonth"
+                formaction="@Model.MonthSelectionPostUrl">
+            <span class="smbc-calendar__header__chevron smbc-calendar__header__chevron--left"></span>
+        </button>
+    }
+    else
+    {
+        <button type="button" class="smbc-calendar__header__button smbc-calendar__header__button--disabled" disabled></button>
+    }
+
+    <p class="smbc-body smbc-calendar__header__text">
+        @Model.CurrentSelectedMonthText
+    </p>
+
+    @if (Model.DisplayNextMonthArrow)
+    {
+        <button class="smbc-calendar__header__button"
+                name="@BookingConstants.BOOKING_MONTH_REQUEST"
+                value="@Model.NextSelectableMonth"
+                formaction="@Model.MonthSelectionPostUrl">
+            <span class="smbc-calendar__header__chevron smbc-calendar__header__chevron--right"></span>
+        </button>
+    }
+    else
+    {
+        <button type="button" class="smbc-calendar__header__button smbc-calendar__header__button--disabled" disabled></button>
+    }
+
+</div>

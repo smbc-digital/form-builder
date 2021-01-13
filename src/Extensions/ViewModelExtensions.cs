@@ -15,5 +15,9 @@ namespace form_builder.Extensions
 
         public static bool IsInitial(this Dictionary<string, dynamic> dictionary)
             => !(dictionary.IsAutomatic() || dictionary.IsManual());
+
+        public static bool IsCheckYourBooking(this Dictionary<string, dynamic> dictionary)
+            => dictionary.ContainsKey(LookUpConstants.SubPathViewModelKey)
+            && dictionary[LookUpConstants.SubPathViewModelKey] == BookingConstants.CHECK_YOUR_BOOKING;
     }
 }

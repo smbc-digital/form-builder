@@ -8,5 +8,7 @@ namespace form_builder.Configuration
         public int FileUpload { get; set; }
         public int Document { get; set; }
         public int Index { get; set; }
+        public int Booking { get; set; }
+        public int BookingNoAppointmentsAvailable { get; set; }
     }
 }

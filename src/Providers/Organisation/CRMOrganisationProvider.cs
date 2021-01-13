@@ -10,11 +10,7 @@ namespace form_builder.Providers.Organisation
         public string ProviderName => "CRM";
 
         private readonly IVerintServiceGateway _verintServiceGateway;
-
-        public CRMOrganisationProvider(IVerintServiceGateway verintServiceGateway)
-        {
-            _verintServiceGateway = verintServiceGateway;
-        }
+        public CRMOrganisationProvider(IVerintServiceGateway verintServiceGateway) => _verintServiceGateway = verintServiceGateway;
 
         public async Task<IEnumerable<OrganisationSearchResult>> SearchAsync(string organisation)
         {
