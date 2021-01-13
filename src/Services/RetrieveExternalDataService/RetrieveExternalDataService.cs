@@ -17,11 +17,6 @@ using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Services.RetrieveExternalDataService
 {
-    public interface IRetrieveExternalDataService
-    {
-        Task Process(List<IAction> actions, FormSchema formSchema, string formName);
-    }
-
     public class RetrieveExternalDataService : IRetrieveExternalDataService
     {
         private readonly IGateway _gateway;
@@ -32,11 +27,11 @@ namespace form_builder.Services.RetrieveExternalDataService
         private readonly IWebHostEnvironment _environment;
 
         public RetrieveExternalDataService(
-            IGateway gateway, 
-            ISessionHelper sessionHelper, 
-            IDistributedCacheWrapper distributedCache, 
-            IMappingService mappingService, 
-            IActionHelper actionHelper, 
+            IGateway gateway,
+            ISessionHelper sessionHelper,
+            IDistributedCacheWrapper distributedCache,
+            IMappingService mappingService,
+            IActionHelper actionHelper,
             IWebHostEnvironment environment)
         {
             _gateway = gateway;
@@ -46,7 +41,7 @@ namespace form_builder.Services.RetrieveExternalDataService
             _actionHelper = actionHelper;
             _environment = environment;
         }
- 
+
         public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
         {
             var answers = new List<Answers>();

@@ -16,7 +16,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         private readonly IEnumerable<IFormatter> _formatters;
         private readonly Mock<IFormatter> _mockFormatter = new Mock<IFormatter>();
         private readonly Mock<IFormatter> _mockFormatterTwo = new Mock<IFormatter>();
-        
+
         private FormAnswerTagParser _tagParser;
 
         public FormAnswerTagParserTests()
@@ -65,7 +65,7 @@ namespace form_builder_tests.UnitTests.TagParsers
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-            
+
             var formAnswers = new FormAnswers();
 
             var result = _tagParser.Parse(page, formAnswers);
@@ -84,7 +84,7 @@ namespace form_builder_tests.UnitTests.TagParsers
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-            
+
             var formAnswers = new FormAnswers();
 
             var result = _tagParser.Parse(page, formAnswers);
@@ -97,10 +97,10 @@ namespace form_builder_tests.UnitTests.TagParsers
         {
             var expectedString = "this value testfirstname should be replaced with name question";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value {{QUESTION:firstname}} should be replaced with name question")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value {{QUESTION:firstname}} should be replaced with name question")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -110,16 +110,16 @@ namespace form_builder_tests.UnitTests.TagParsers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = "firstname",
                                 Response = "testfirstname"
-                            }    
-                        }     
+                            }
+                        }
                     }
                 }
             };
@@ -133,10 +133,10 @@ namespace form_builder_tests.UnitTests.TagParsers
         {
             var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value {{QUESTION:firstname}} should be replaced with firstname and this {{QUESTION:lastname}} with lastname")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value {{QUESTION:firstname}} should be replaced with firstname and this {{QUESTION:lastname}} with lastname")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -146,9 +146,9 @@ namespace form_builder_tests.UnitTests.TagParsers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
                             new Answers
                             {
@@ -159,8 +159,8 @@ namespace form_builder_tests.UnitTests.TagParsers
                             {
                                 QuestionId = "lastname",
                                 Response = "testlastname"
-                            }   
-                        }     
+                            }
+                        }
                     }
                 }
             };
@@ -169,16 +169,16 @@ namespace form_builder_tests.UnitTests.TagParsers
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
         }
 
-        
+
         [Fact]
         public void Parse_ShouldCallFormatter_WhenProvided()
         {
             var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}}")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}}")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -188,16 +188,16 @@ namespace form_builder_tests.UnitTests.TagParsers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = "firstname",
                                 Response = "value"
-                            }    
-                        }     
+                            }
+                        }
                     }
                 }
             };
@@ -213,10 +213,10 @@ namespace form_builder_tests.UnitTests.TagParsers
         {
             var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE ANOTHER-FORMATTER";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}} {{QUESTION:firstname:anothertestformatter}}")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}} {{QUESTION:firstname:anothertestformatter}}")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -226,16 +226,16 @@ namespace form_builder_tests.UnitTests.TagParsers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = "firstname",
                                 Response = "value"
-                            }    
-                        }     
+                            }
+                        }
                     }
                 }
             };
@@ -253,10 +253,10 @@ namespace form_builder_tests.UnitTests.TagParsers
         {
             var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE FAKE-FORMATTED-VALUE";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}} {{QUESTION:firstname:testformatter}}")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}} {{QUESTION:firstname:testformatter}}")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -266,16 +266,16 @@ namespace form_builder_tests.UnitTests.TagParsers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = "firstname",
                                 Response = "value"
-                            }    
-                        }     
+                            }
+                        }
                     }
                 }
             };

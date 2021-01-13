@@ -62,7 +62,7 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public string IAG { get; set; }
 
-        public bool HideOptionalText { get;set; }
+        public bool HideOptionalText { get; set; }
 
         public bool isConditionalElement { get; set; } = false;
     }

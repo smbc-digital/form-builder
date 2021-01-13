@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Constants;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
@@ -15,16 +15,6 @@ using Newtonsoft.Json;
 
 namespace form_builder.Services.AddressService
 {
-    public interface IAddressService
-    {
-        Task<ProcessRequestEntity> ProcessAddress(
-            Dictionary<string, dynamic> viewModel,
-            Page currentPage,
-            FormSchema baseForm,
-            string guid,
-            string path);
-    }
-
     public class AddressService : IAddressService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
@@ -82,7 +72,7 @@ namespace form_builder.Services.AddressService
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
-                
+
                 var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, cachedSearchResults.ToList());
 
                 return new ProcessRequestEntity
@@ -143,7 +133,7 @@ namespace form_builder.Services.AddressService
             if (!currentPage.IsValid)
             {
                 var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
-                
+
                 var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, cachedSearchResults.ToList());
 
                 return new ProcessRequestEntity

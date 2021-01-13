@@ -11,7 +11,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            if (element.Type != EElementType.Booking || 
+            if (element.Type != EElementType.Booking ||
                 (element.Type == EElementType.Booking && viewModel.IsCheckYourBooking()))
             {
                 return new ValidationResult
@@ -22,10 +22,10 @@ namespace form_builder.Validators
 
             var bookingElement = (Booking)element;
 
-            var containsBookingDate = viewModel.ContainsKey(bookingElement.DateQuestionId); 
-            var containsBookingStartTime = viewModel.ContainsKey(bookingElement.StartTimeQuestionId); 
+            var containsBookingDate = viewModel.ContainsKey(bookingElement.DateQuestionId);
+            var containsBookingStartTime = viewModel.ContainsKey(bookingElement.StartTimeQuestionId);
 
-            if(!containsBookingDate && !containsBookingStartTime && element.Properties.Optional)
+            if (!containsBookingDate && !containsBookingStartTime && element.Properties.Optional)
             {
                 return new ValidationResult
                 {
@@ -33,7 +33,7 @@ namespace form_builder.Validators
                 };
             }
 
-            if(!containsBookingDate)
+            if (!containsBookingDate)
             {
                 return new ValidationResult
                 {
@@ -45,7 +45,8 @@ namespace form_builder.Validators
             var date = viewModel[bookingElement.DateQuestionId];
             var isValidDate = DateTime.TryParse(date, out DateTime dateValue);
 
-            if(!isValidDate){
+            if (!isValidDate)
+            {
                 return new ValidationResult
                 {
                     Message = ValidationMessage(isValidDate, containsBookingStartTime, element.Properties.CustomValidationMessage),
@@ -58,10 +59,10 @@ namespace form_builder.Validators
 
         private ValidationResult VerifyStartAndEndTime(Booking element, Dictionary<string, dynamic> viewModel, bool isDateValid)
         {
-            var containsBookingStartTime = viewModel.ContainsKey(element.StartTimeQuestionId); 
-            var containsBookingEndTime = viewModel.ContainsKey(element.EndTimeQuestionId); 
+            var containsBookingStartTime = viewModel.ContainsKey(element.StartTimeQuestionId);
+            var containsBookingEndTime = viewModel.ContainsKey(element.EndTimeQuestionId);
 
-            if(!containsBookingStartTime || !containsBookingEndTime)
+            if (!containsBookingStartTime || !containsBookingEndTime)
             {
                 return new ValidationResult
                 {
@@ -75,7 +76,8 @@ namespace form_builder.Validators
             var isValidStartTime = DateTime.TryParse(startTime, out DateTime startTimeValue);
             var isValidEndTime = DateTime.TryParse(endTime, out DateTime endTimeValue);
 
-            if(!isValidStartTime || !isValidEndTime){
+            if (!isValidStartTime || !isValidEndTime)
+            {
                 return new ValidationResult
                 {
                     Message = ValidationMessage(isDateValid, false, element.Properties.CustomValidationMessage),
@@ -91,13 +93,13 @@ namespace form_builder.Validators
 
         private string ValidationMessage(bool isDateValid, bool isTimeValid, string customValidationMessage)
         {
-            if(!isDateValid && !isTimeValid)
-                return string.IsNullOrEmpty(customValidationMessage) ?  ValidationConstants.BOOKING_DATE_AND_TIME_EMPTY : customValidationMessage;
+            if (!isDateValid && !isTimeValid)
+                return string.IsNullOrEmpty(customValidationMessage) ? ValidationConstants.BOOKING_DATE_AND_TIME_EMPTY : customValidationMessage;
 
-            if(!isTimeValid)
-                return string.IsNullOrEmpty(customValidationMessage) ?  ValidationConstants.BOOKING_TIME_EMPTY : customValidationMessage;
+            if (!isTimeValid)
+                return string.IsNullOrEmpty(customValidationMessage) ? ValidationConstants.BOOKING_TIME_EMPTY : customValidationMessage;
 
-            return string.IsNullOrEmpty(customValidationMessage) ?  ValidationConstants.BOOKING_DATE_EMPTY : customValidationMessage;
+            return string.IsNullOrEmpty(customValidationMessage) ? ValidationConstants.BOOKING_DATE_EMPTY : customValidationMessage;
         }
     }
 }

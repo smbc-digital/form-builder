@@ -5,13 +5,8 @@ using form_builder.Services.MappingService;
 using form_builder.Services.PayService;
 using form_builder.Services.SubmitService;
 
-namespace form_builder.Workflows
+namespace form_builder.Workflows.PaymentWorkflow
 {
-    public interface IPaymentWorkflow
-    {
-        Task<string> Submit(string form, string path);
-    }
-
     public class PaymentWorkflow : IPaymentWorkflow
     {
         private readonly ISubmitService _submitService;

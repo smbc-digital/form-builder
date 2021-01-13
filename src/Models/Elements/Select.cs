@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Enum;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Models.Elements
@@ -23,7 +23,7 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel,formAnswers);
+            Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.ReSelectPreviousSelectedOptions(this);

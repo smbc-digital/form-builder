@@ -50,7 +50,7 @@ namespace form_builder.Extensions
 
         public static string ToMaxSpecifiedStringLengthForFileName(this string value, int length)
         {
-            if(value.Length <= length)
+            if (value.Length <= length)
                 return value;
 
             var extension = Path.GetExtension(value);

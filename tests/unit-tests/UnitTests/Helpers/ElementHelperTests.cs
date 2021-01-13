@@ -544,7 +544,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var dayResult = _elementHelper.CurrentValue("question-id", viewModel, new FormAnswers(),"-day");
+            var dayResult = _elementHelper.CurrentValue("question-id", viewModel, new FormAnswers(), "-day");
             var monthResult = _elementHelper.CurrentValue("question-id", viewModel, new FormAnswers(), "-month");
             var yearResult = _elementHelper.CurrentValue("question-id", viewModel, new FormAnswers(), "-year");
 
@@ -629,10 +629,10 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void GenerateQuestionAndAnswersList_ShouldReturnFormSummary_WhenDataHas_PreviousAnswers() 
+        public void GenerateQuestionAndAnswersList_ShouldReturnFormSummary_WhenDataHas_PreviousAnswers()
         {
-             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers{ Pages = new List<PageAnswers> { new PageAnswers{ PageSlug = "page-one", Answers = new List<Answers>{ new Answers { QuestionId = "question", Response = "test answer" } } } } }));
+            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+               .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" } } } } }));
 
             var Behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -653,7 +653,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithPage(page)
                 .Build();
 
-            var result = _elementHelper.GenerateQuestionAndAnswersList("12345",formSchema); 
+            var result = _elementHelper.GenerateQuestionAndAnswersList("12345", formSchema);
 
             Assert.NotEmpty(result);
             Assert.Single(result);

@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -19,7 +19,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.MultipleFileUpload;
         }
 
-        public string AllowFileTypeText { get { return Properties.AllowedFileTypes?.ToReadableFileType() ?? SystemConstants.AcceptedMimeTypes.ToReadableFileType();} }
+        public string AllowFileTypeText { get { return Properties.AllowedFileTypes?.ToReadableFileType() ?? SystemConstants.AcceptedMimeTypes.ToReadableFileType(); } }
         public string MaxFileSizeText { get { return $"{(Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes == 0 ? SystemConstants.DefaultMaxFileSize.ToReadableMaxFileSize() : Properties.MaxFileSize)}MB"; } }
         public string MaxCombinedFileSizeText { get { return $"{(Properties.MaxCombinedFileSize == 0 ? SystemConstants.DefaultMaxCombinedFileSize.ToReadableMaxFileSize() : Properties.MaxCombinedFileSize)}MB"; } }
         public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
@@ -65,7 +65,8 @@ namespace form_builder.Models.Elements
             SubmitButtonText = SetSubmitButtonText(page);
             IsModelStateValid = !viewModel.ContainsKey("modelStateInvalid");
 
-            if(currentAnswer != null){
+            if (currentAnswer != null)
+            {
                 List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(currentAnswer.ToString());
                 CurrentFilesUploaded = response.Select(_ => _.TrustedOriginalFileName).ToList();
             }

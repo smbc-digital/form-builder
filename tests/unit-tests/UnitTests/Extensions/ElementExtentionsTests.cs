@@ -1,23 +1,24 @@
-﻿using form_builder.Builders;
+﻿using System.Collections.Generic;
+using form_builder.Builders;
 using form_builder.Enum;
-using form_builder.Models.Elements;
 using form_builder.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
-using System.Linq;
 using form_builder.Models;
+using form_builder.Models.Elements;
+using Xunit;
 
-namespace form_builder_tests.UnitTests.Extensions {
-    public class ElementExtentionsTests {
+namespace form_builder_tests.UnitTests.Extensions
+{
+    public class ElementExtentionsTests
+    {
 
-        public ElementExtentionsTests() {
+        public ElementExtentionsTests()
+        {
 
         }
 
         [Fact]
-        public void RemoveUnusedConditionalElements_ViewModelShouldContainLessElementsWhenElementsContainMultipleConditionals() {
+        public void RemoveUnusedConditionalElements_ViewModelShouldContainLessElementsWhenElementsContainMultipleConditionals()
+        {
             List<IElement> elements = new List<IElement>();
             var conditionalElement1 = new ElementBuilder()
                 .WithType(EElementType.Textbox)
@@ -31,7 +32,7 @@ namespace form_builder_tests.UnitTests.Extensions {
                 .WithValue("Conditonal Answer 2")
                 .WithConditionalElement(true)
                 .Build();
-            var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };    
+            var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
             var option2 = new Option { ConditionalElementId = "conditionalQuestion2", Value = "Value2" };
             var listOfOptions = new List<Option> { option1, option2 };
             var element1 = new ElementBuilder()
@@ -51,7 +52,8 @@ namespace form_builder_tests.UnitTests.Extensions {
         }
 
         [Fact]
-        public void RemoveUnusedConditionalElements_ShouldKeepOriginalViewModelWhenNoCoditionalElementsInList() {
+        public void RemoveUnusedConditionalElements_ShouldKeepOriginalViewModelWhenNoCoditionalElementsInList()
+        {
             List<IElement> elements = new List<IElement>();
             var viewModel = new Dictionary<string, dynamic> { { "testQuestion", "Value" } };
             var element1 = new ElementBuilder()

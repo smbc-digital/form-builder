@@ -3,7 +3,7 @@ namespace form_builder.Validators
     public class ValidationResult
     {
         public ValidationResult()
-        {   
+        {
             IsValid = true;
             Message = string.Empty;
         }

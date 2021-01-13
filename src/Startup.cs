@@ -96,7 +96,7 @@ namespace form_builder
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseForwardedHeaders();
-            
+
             if (env.IsEnvironment("local") || env.IsEnvironment("uitest"))
             {
                 app.UseDeveloperExceptionPage();

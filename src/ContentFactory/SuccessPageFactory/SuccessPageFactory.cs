@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -9,13 +10,8 @@ using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 
-namespace form_builder.ContentFactory
+namespace form_builder.ContentFactory.SuccessPageFactory
 {
-    public interface ISuccessPageFactory
-    {
-        Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType);
-    }
-
     public class SuccessPageFactory : ISuccessPageFactory
     {
         private readonly IPageHelper _pageHelper;
@@ -59,21 +55,22 @@ namespace form_builder.ContentFactory
 
             if (baseForm.DocumentDownload)
             {
-                    baseForm.DocumentType.ForEach((docType) => {
-                        var element = new ElementBuilder()
-                            .WithType(EElementType.DocumentDownload)
-                            .WithLabel($"Download {docType} document")
-                            .WithSource($"/v2/document/Summary/{docType}/{sessionGuid}")
-                            .WithDocumentType(docType)
-                            .Build();
+                baseForm.DocumentType.ForEach((docType) =>
+                {
+                    var element = new ElementBuilder()
+                        .WithType(EElementType.DocumentDownload)
+                        .WithLabel($"Download {docType} document")
+                        .WithSource($"/v2/document/Summary/{docType}/{sessionGuid}")
+                        .WithDocumentType(docType)
+                        .Build();
 
-                        page.Elements.Add(element);
-                    });
-                    var successIndex = baseForm.Pages.IndexOf(page);    
-                    baseForm.Pages[successIndex] = page;
+                    page.Elements.Add(element);
+                });
+                var successIndex = baseForm.Pages.IndexOf(page);
+                baseForm.Pages[successIndex] = page;
             }
 
-            var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(),baseForm, sessionGuid, formAnswers);
+            var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid, formAnswers);
 
             return new SuccessPageEntity
             {
@@ -112,7 +109,7 @@ namespace form_builder.ContentFactory
                 .WithType(EElementType.H2)
                 .WithPropertyText("What happens next")
                 .Build();
-                
+
             var pElement3 = new ElementBuilder()
                 .WithType(EElementType.P)
                 .WithPropertyText("Content author: You should include information that is helpful to the user about what they need to do next.")

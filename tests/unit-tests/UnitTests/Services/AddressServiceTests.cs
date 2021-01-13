@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders, _mockPageContentFactory.Object);
         }
-        
+
         [Fact]
         public async Task ProcessAddress_ShouldCallAddressProvider_WhenCorrectJourney()
         {
@@ -67,7 +67,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Address)
                 .WithQuestionId(questionId)
-                .WithAddressProvider("testAddressProvider")               
+                .WithAddressProvider("testAddressProvider")
                 .Build();
 
             var page = new PageBuilder()
@@ -218,7 +218,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Throws<Exception>();
 
             var testAddressProvider = "testAddressProvider";
-            
+
             var element = new ElementBuilder()
                 .WithType(EElementType.Address)
                 .WithAddressProvider(testAddressProvider)

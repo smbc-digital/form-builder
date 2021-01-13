@@ -23,15 +23,15 @@ namespace form_builder.Validators
 
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            if(element.Type != EElementType.MultipleFileUpload)
+            if (element.Type != EElementType.MultipleFileUpload)
                 return new ValidationResult { IsValid = true };
 
-            if(element.Properties.Optional && viewModel.ContainsKey(ButtonConstants.SUBMIT))
+            if (element.Properties.Optional && viewModel.ContainsKey(ButtonConstants.SUBMIT))
                 return new ValidationResult { IsValid = true };
 
             var key = $"{ element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
             var isValid = false;
-            
+
             List<DocumentModel> value = viewModel.ContainsKey(key)
                 ? viewModel[key]
                 : null;

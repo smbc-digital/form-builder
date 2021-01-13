@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using form_builder.Enum;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Html;
 
@@ -34,7 +34,7 @@ namespace form_builder.Models.Elements
 
             htmlContent.AppendHtmlLine($"<p class=\"smbc-body\">The cost is &pound{paymentSummaryElement.Properties.Value}</p>");
             htmlContent.AppendHtmlLine("<p class=\"smbc-body\">Use the button below to continue to our payments page where you&#39;ll need your credit or debit card details.</p>");
-            
+
             using (var writer = new StringWriter())
             {
                 htmlContent.WriteTo(writer, HtmlEncoder.Default);

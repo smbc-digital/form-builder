@@ -10,8 +10,10 @@ using form_builder.Models;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
 using form_builder.ViewModels;
-using form_builder.Workflows;
 using form_builder.Workflows.ActionsWorkflow;
+using form_builder.Workflows.PaymentWorkflow;
+using form_builder.Workflows.SubmitWorkflow;
+using form_builder.Workflows.SuccessWorkflow;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,8 +33,8 @@ namespace form_builder.Controllers
             ISubmitWorkflow submitWorkflow,
             IPaymentWorkflow paymentWorkflow,
             IFileUploadService fileUploadService,
-            IWebHostEnvironment hostingEnvironment, 
-            IActionsWorkflow actionsWorkflow, 
+            IWebHostEnvironment hostingEnvironment,
+            IActionsWorkflow actionsWorkflow,
             ISuccessWorkflow successWorkflow)
         {
             _pageService = pageService;
@@ -48,7 +50,7 @@ namespace form_builder.Controllers
         [Route("/")]
         public IActionResult Home()
         {
-            if(_hostingEnvironment.EnvironmentName.ToLower().Equals("prod"))
+            if (_hostingEnvironment.EnvironmentName.ToLower().Equals("prod"))
                 return Redirect("https://www.stockport.gov.uk");
 
             return RedirectToAction("Index", "Error");
@@ -106,7 +108,7 @@ namespace form_builder.Controllers
                 return RedirectToAction(currentPageResult.RedirectAction, currentPageResult.RouteValues ?? new { form, path });
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
-                    return View(currentPageResult.ViewName, currentPageResult.ViewModel);
+                return View(currentPageResult.ViewName, currentPageResult.ViewModel);
 
             if (currentPageResult.Page.HasPageActionsPostValues)
                 await _actionsWorkflow.Process(currentPageResult.Page.PageActions.Where(_ => _.Properties.HttpActionType == EHttpActionType.Post).ToList(), null, form);
@@ -133,7 +135,7 @@ namespace form_builder.Controllers
                 case EBehaviourType.SubmitAndPay:
                     var result = await _paymentWorkflow.Submit(form, path);
                     return Redirect(result);
-                    
+
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
             }
@@ -156,8 +158,9 @@ namespace form_builder.Controllers
         public async Task<IActionResult> Success(string form)
         {
             var result = await _successWorkflow.Process(EBehaviourType.SubmitForm, form);
-            
-            var success = new SuccessViewModel {
+
+            var success = new SuccessViewModel
+            {
                 Reference = result.CaseReference,
                 PageContent = result.HtmlContent,
                 FormAnswers = result.FormAnswers,
