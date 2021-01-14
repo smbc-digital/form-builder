@@ -243,6 +243,7 @@ namespace form_builder_tests.UnitTests.Models
             Assert.Equal(EBehaviourType.SubmitAndPay, result.BehaviourType);
         }
 
+
         [Fact]
         public void GetNextPage_ShouldThrowException_WhenNoConditions_Match()
         {
