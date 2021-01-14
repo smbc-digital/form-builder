@@ -1,5 +1,4 @@
 @model List<TimeAvailability>
-
 @{
     var noScriptDays = new List<TimePeriod>();
 }
@@ -14,7 +13,13 @@
         SelectedTimePeriod = day.TimePeriodCurrentlySelected
     };
 
-    var fullDay = new TimePeriod { Appointments = new List<AppointmentTime>() };
+    var fullDay = new TimePeriod
+    {
+        Date = day.Date,
+        TimeQuestionId = day.TimeQuestionId,
+        Appointments = new List<AppointmentTime>()
+    };
+
     if (day.MorningAppointments.Appointments.Any())
         fullDay.Appointments.AddRange(day.MorningAppointments.Appointments);
 
@@ -22,10 +27,7 @@
         fullDay.Appointments.AddRange(day.AfternoonAppointments.Appointments);
 
     if (fullDay.Appointments.Any())
-    {
-        fullDay.TimeQuestionId = Model.First().TimeQuestionId;
         noScriptDays.Add(fullDay);
-    }
 
     <div class="smbc-time smbc-time__conditional smbc-time__conditional--hidden" id="@day.TimeSelectionIdForConditionalReveal" data-module="smbc-time">
         <partial name="TimeHeader" model="timeHeaderModel" />
