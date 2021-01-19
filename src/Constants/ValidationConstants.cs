@@ -10,5 +10,6 @@
         public const string BOOKING_DATE_AND_TIME_EMPTY = "You must select a date and time";
         public const string BOOKING_DATE_EMPTY = "You must select a date";
         public const string BOOKING_TIME_EMPTY = "You must select a time";
+        public const string STREET_INCORRECT_FORMAT = "Enter a street in the correct format";
     }
 }
