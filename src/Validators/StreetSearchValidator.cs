@@ -40,7 +40,7 @@ namespace form_builder.Validators
 
             return new ValidationResult {
                 IsValid = isValid,
-                Message = isValid ? string.Empty : ValidationConstants.POSTCODE_INCORRECT_FORMAT
+                Message = isValid ? string.Empty : ValidationConstants.STREET_INCORRECT_FORMAT
             };
         }
     }

@@ -4,6 +4,6 @@
     {
         public string StreetProvider { get; set; }
 
-        public string StreetIAG { get; set; } = "It must be a Stockport street name.";
+        public string StreetIAG { get; set; } = "It must be a Stockport street name. For example, Stockport Road.";
     }
 }
