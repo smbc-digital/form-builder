@@ -26,7 +26,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("email", "notanemail");
 
             // Act
-            var result = _emailElementValidator.Validate(element, viewModel);
+            var result = _emailElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("email", "isanemail@stockport.gov.uk");
 
             // Act
-            var result = _emailElementValidator.Validate(element, viewModel);
+            var result = _emailElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -68,7 +68,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _requiredElementValidator.Validate(element, viewModel);
+            var result = _requiredElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -91,7 +91,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("email", "");
 
             // Act
-            var result = _emailElementValidator.Validate(element, viewModel);
+            var result = _emailElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);

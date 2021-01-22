@@ -23,7 +23,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic> {{"postcode", "OL16 0AE"}};
 
             // Act
-            var result = _stockportPostcodeValidator.Validate(element, viewModel);
+            var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -42,7 +42,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic> {{"postcode", "SK4 1AA"}};
 
             // Act
-            var result = _stockportPostcodeValidator.Validate(element, viewModel);
+            var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -61,7 +61,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic> {{"postcode", "Elephant"}};
 
             // Act
-            var result = _stockportPostcodeValidator.Validate(element, viewModel);
+            var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
             
             // Assert
             Assert.False(result.IsValid);
@@ -80,7 +80,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic> {{"postcode", "OL16 0AE"}};
 
             // Act
-            var result = _stockportPostcodeValidator.Validate(element, viewModel);
+            var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);

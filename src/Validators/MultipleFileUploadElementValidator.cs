@@ -21,7 +21,7 @@ namespace form_builder.Validators
             _distributedCache = distributedCache;
         }
 
-        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
             if(element.Type != EElementType.MultipleFileUpload)
                 return new ValidationResult { IsValid = true };

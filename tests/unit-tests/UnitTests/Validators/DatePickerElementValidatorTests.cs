@@ -21,7 +21,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             // Act
-            var result = _dateInputElementValidator.Validate(element, null);
+            var result = _dateInputElementValidator.Validate(element, null, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -40,7 +40,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date", "2222aaaa");
 
             // Act
-            var result = _dateInputElementValidator.Validate(element, viewModel);
+            var result = _dateInputElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -60,7 +60,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date", "2019-08-02");
 
             // Act
-            var result = _dateInputElementValidator.Validate(element, viewModel);
+            var result = _dateInputElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -79,7 +79,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date", "2230-01-01");
 
             // Act
-            var result = _dateInputElementValidator.Validate(element, viewModel);
+            var result = _dateInputElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -102,7 +102,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date", "2050-01-01");
 
             // Act
-            var result = _dateInputElementValidator.Validate(element, viewModel);
+            var result = _dateInputElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);

@@ -33,7 +33,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _fileUploadElementValidatorTest.Validate(element, viewModel);
+            var result = _fileUploadElementValidatorTest.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -54,7 +54,7 @@ namespace form_builder_tests.UnitTests.Validators
             };
 
             // Act
-            var result = _fileUploadElementValidatorTest.Validate(element, viewModel);
+            var result = _fileUploadElementValidatorTest.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -74,7 +74,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();            
 
             // Act
-            var result = _fileUploadElementValidatorTest.Validate(element, viewModel);
+            var result = _fileUploadElementValidatorTest.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -102,7 +102,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "fileUpload", Response = Newtonsoft.Json.JsonConvert.SerializeObject(new List<FileUploadModel> { new FileUploadModel { FileSize = 2048576 } }) } } } } }));
 
             // Act
-            var result = _fileUploadElementValidatorTest.Validate(element, viewModel);
+            var result = _fileUploadElementValidatorTest.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -124,7 +124,7 @@ namespace form_builder_tests.UnitTests.Validators
             };
 
             // Act
-            var result = _fileUploadElementValidatorTest.Validate(element, viewModel);
+            var result = _fileUploadElementValidatorTest.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);

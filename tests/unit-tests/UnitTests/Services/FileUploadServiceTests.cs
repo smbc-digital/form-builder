@@ -59,7 +59,7 @@ namespace form_builder_tests.UnitTests.Services
                     null))
                 .ReturnsAsync(new FormBuilderViewModel());
 
-            _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>()))
+            _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
                 .Returns(new ValidationResult { IsValid = true });
 
             var elementValidatorItems = new List<IElementValidator> { _testValidator.Object };
@@ -196,14 +196,14 @@ namespace form_builder_tests.UnitTests.Services
                 .WithBaseUrl("baseUrl")
                 .Build();
 
-            _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>()))
+            _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
                 .Returns(new ValidationResult { IsValid = false });
 
             var elementValidatorItems = new List<IElementValidator> { _testValidator.Object };
 
             _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
 
-            page.Validate(new Dictionary<string, dynamic>(), _validators.Object);
+            page.Validate(new Dictionary<string, dynamic>(), _validators.Object, new FormSchema());
 
             // Act
             var result = await _service.ProcessFile(new Dictionary<string, dynamic>(), page, schema,

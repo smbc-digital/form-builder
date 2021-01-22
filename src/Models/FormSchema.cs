@@ -6,6 +6,7 @@ using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models.Actions;
+using form_builder.Models.Elements;
 
 namespace form_builder.Models
 {
@@ -59,6 +60,21 @@ namespace form_builder.Models
             {
                 throw new ApplicationException($"Requested path '{path}' object could not be found or was not unique.", ex);
             }
+        }
+
+        // TODO: Thbis needs tests
+        public IElement GetElement(string questionId)
+        {
+            return Pages.SelectMany(_ => _.Elements)
+                    .SingleOrDefault(_ => _.Properties.QuestionId == questionId);
+
+        }        
+
+        // TODO: This needs tests
+        public bool HasElement(string questionId)
+        {
+            return Pages.SelectMany(_ => _.Elements)
+                    .Any(_ => _.Properties.QuestionId == questionId);
         }
 
         public async Task ValidateFormSchema(IPageHelper pageHelper, string form, string path)

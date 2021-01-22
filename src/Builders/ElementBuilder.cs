@@ -392,5 +392,20 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithIsDateBeforeAbsolute(string value)
+        {
+            _property.IsDateBeforeAbsolute = value;
+            
+            return this;
+        }
+
+        
+        public ElementBuilder WithIsDateAfterAbsolute(string value)
+        {
+            _property.IsDateAfterAbsolute = value;
+            
+            return this;
+        }
     }
 }

@@ -33,7 +33,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             Assert.True(result.IsValid);
         }
@@ -47,7 +47,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             Assert.True(result.IsValid);
         }
@@ -64,7 +64,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 {$"fileuploadquestion{FileUploadConstants.SUFFIX}", null }
             };
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             Assert.True(result.IsValid);
         }
@@ -83,7 +83,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 {$"fileuploadquestion{FileUploadConstants.SUFFIX}", new List<DocumentModel> { new DocumentModel { FileSize = 1048576 } } }
             };
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             _mockDistributedCacheWrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             Assert.True(result.IsValid);
@@ -108,7 +108,7 @@ namespace form_builder_tests.UnitTests.Validators
                     new DocumentModel { FileSize = 1048576 } } 
                 }
             };
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             _mockDistributedCacheWrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             Assert.True(result.IsValid);
@@ -139,7 +139,7 @@ namespace form_builder_tests.UnitTests.Validators
                 },
                 { "Path", "page-one"}
             };
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             _mockDistributedCacheWrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             Assert.True(result.IsValid);
@@ -164,7 +164,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             _mockDistributedCacheWrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             Assert.False(result.IsValid);
@@ -191,7 +191,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             _mockDistributedCacheWrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             Assert.False(result.IsValid);
@@ -223,7 +223,7 @@ namespace form_builder_tests.UnitTests.Validators
                 },
                 { "Path", "page-one"}
             };
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             _mockDistributedCacheWrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             Assert.False(result.IsValid);

@@ -26,7 +26,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("ni", "");
 
             // Act
-            var result = _regexElementValidator.Validate(element, viewModel);
+            var result = _regexElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("ni", "BV123456E");
 
             // Act
-            var result = _regexElementValidator.Validate(element, viewModel);
+            var result = _regexElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -69,7 +69,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("ni", "notAnNiNumber");
 
             // Act
-            var result = _regexElementValidator.Validate(element, viewModel);
+            var result = _regexElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -89,7 +89,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _requiredElementValidator.Validate(element, viewModel);
+            var result = _requiredElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -112,7 +112,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("ni", "");
 
             // Act
-            var result = _regexElementValidator.Validate(element, viewModel);
+            var result = _regexElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);

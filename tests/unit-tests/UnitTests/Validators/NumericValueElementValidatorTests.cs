@@ -17,7 +17,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithNumeric(false)
                 .Build();
 
-            var result = _validator.Validate(element, null);
+            var result = _validator.Validate(element, null, new form_builder.Models.FormSchema());
 
             Assert.True(result.IsValid);
         }
@@ -33,7 +33,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("tets-id", "123");
 
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             Assert.True(result.IsValid);
             Assert.Equal("", result.Message);
@@ -52,7 +52,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("tets-id", "a123");
 
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             Assert.False(result.IsValid);
             Assert.Equal($"{label} must be a whole number", result.Message);
@@ -74,7 +74,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("tets-id", "a123");
 
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             Assert.False(result.IsValid);
             Assert.Equal(errorMessage, result.Message);
@@ -94,7 +94,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("tets-id", "123");
 
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             Assert.False(result.IsValid);
             Assert.Equal($"{label} must be less than or equal to 20", result.Message);
@@ -114,7 +114,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("tets-id", "12");
 
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             Assert.False(result.IsValid);
             Assert.Equal($"{label} must be greater than or equal to 20", result.Message);
@@ -135,7 +135,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("tets-id", "7");
 
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             Assert.False(result.IsValid);
             Assert.Equal($"{label} must be between 10 and 20 inclusive", result.Message);
@@ -155,7 +155,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-id", "12345678");
 
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             Assert.False(result.IsValid);
             Assert.Equal($"{label} must be 7 digits or less", result.Message);

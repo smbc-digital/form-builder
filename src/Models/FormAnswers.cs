@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
 
 namespace form_builder.Models
 {
@@ -20,8 +22,12 @@ namespace form_builder.Models
         public string StartPageUrl { get; set; }
 
         public Dictionary<string, object> FormData { get; set; } = new Dictionary<string, object>();
+
         public Dictionary<string, object> AdditionalFormData { get; set; } = new Dictionary<string, object>();
 
         public List<PageAnswers> Pages { get; set; }
+
+        [JsonIgnore]
+        public IEnumerable<Answers> AllAnswers => this.Pages != null ? this.Pages.SelectMany(_ => _.Answers) : Enumerable.Empty<Answers>();
     }
 }

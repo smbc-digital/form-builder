@@ -103,10 +103,10 @@ namespace form_builder.Models
 			element.Type == EElementType.TimeInput
 		);
 
-		public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> form_builder)
+		public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm)
 		{
 			ValidatableElements.RemoveUnusedConditionalElements(viewModel).ForEach(element => {
-				element.Validate(viewModel, form_builder);
+				element.Validate(viewModel, validators, baseForm);
 			});
 			IsValidated = true;
 		}

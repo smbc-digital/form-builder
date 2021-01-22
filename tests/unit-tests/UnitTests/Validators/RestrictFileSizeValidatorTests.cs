@@ -23,7 +23,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             // Act
-            var result = _validator.Validate(element, null);
+            var result = _validator.Validate(element, null, new FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -44,7 +44,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -68,7 +68,7 @@ namespace form_builder_tests.UnitTests.Validators
             };
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -94,7 +94,7 @@ namespace form_builder_tests.UnitTests.Validators
             };
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -120,7 +120,7 @@ namespace form_builder_tests.UnitTests.Validators
             };
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -148,7 +148,7 @@ namespace form_builder_tests.UnitTests.Validators
             };
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -175,7 +175,7 @@ namespace form_builder_tests.UnitTests.Validators
             };
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);

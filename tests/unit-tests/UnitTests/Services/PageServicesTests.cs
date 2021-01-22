@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.Services
 
         public PageServicesTests()
         {
-            _validator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>()))
+            _validator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
                 .Returns(new ValidationResult { IsValid = false });
             var elementValidatorItems = new List<IElementValidator> { _validator.Object };
             _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
