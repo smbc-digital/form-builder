@@ -55,16 +55,29 @@ namespace form_builder.Services.MappingService
         {
             var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
 
+            var pageWithAddress = 
+                baseForm.Pages.FirstOrDefault(_ => _.Elements.Count(_ => _.Properties.QuestionId.Equals(bookingElement.Properties.CustomerAddressId)) > 0);
+            var addressElement = pageWithAddress.Elements.FirstOrDefault(_ =>
+                _.Properties.QuestionId.Equals(bookingElement.Properties.QuestionId));
+            var address = _elementMapper.GetAnswerStringValue(addressElement, convertedAnswers);
+            var customer = GetCustomerDetails(convertedAnswers, baseForm);
             return new BookingRequest
             {
                 AppointmentId = bookingElement.Properties.AppointmentType,
-                Customer = GetCustomerDetails(convertedAnswers, baseForm),
+                Customer = new Customer
+                {
+                    Firstname = customer.Firstname,
+                    Lastname = customer.Lastname,
+                    Address = address,
+                    Email = customer.Email,
+                    PhoneNumber = customer.PhoneNumber
+                },
                 StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form),
                 OptionalResources = bookingElement.Properties.OptionalResources
             };
         }
 
-        public async Task<Address> MapAddress(string sessionGuid, string form)
+        public async Task<string> MapAddress(string sessionGuid, string form)
         {
             var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
 

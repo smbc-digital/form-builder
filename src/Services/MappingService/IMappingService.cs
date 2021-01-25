@@ -11,6 +11,6 @@ namespace form_builder.Services.MappingService
     {
         Task<MappingEntity> Map(string sessionGuid, string form);
         Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form);
-        Task<Address> MapAddress(string sessionGuid, string form);
+        Task<string> MapAddress(string sessionGuid, string form);
     }
 }

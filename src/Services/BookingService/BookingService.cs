@@ -273,7 +273,7 @@ namespace form_builder.Services.BookingService
             if (string.IsNullOrEmpty(location))
             {
                 var address = await _mappingService.MapAddress(guid, form);
-                return address.ToStringWithoutPlaceRef().ConvertAddressToTitleCase();
+                return address.ConvertAddressToTitleCase();
             }
             else
             {
