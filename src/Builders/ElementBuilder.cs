@@ -399,5 +399,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithCustomerAddressId(string value)
+        {
+            _property.CustomerAddressId = value;
+
+            return this;
+        }
     }
 }
