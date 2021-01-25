@@ -82,10 +82,13 @@ namespace form_builder.Models.Elements
 
         public static DateTime? GetDate(FormAnswers answers, string key)
         {
-                var response = answers.AllAnswers
-                    .Single(answer => answer.QuestionId == key).Response;
+                var response = answers.AllAnswers;
+                var answer = response.SingleOrDefault(_ => _.QuestionId == key);
 
-                if(!DateTime.TryParse(response, out DateTime dateValue))
+                if(answer == null || string.IsNullOrEmpty(answer.Response))
+                    return null;
+
+                if(!DateTime.TryParse(answer.Response, out DateTime dateValue))
                     throw new FormatException("DatePicker.GetDate: The date format was incorrect");
 
                 return dateValue;

@@ -2,23 +2,19 @@ using System;
 using System.Collections.Generic;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Providers.StorageProvider;
-using Newtonsoft.Json;
+using form_builder.Providers;
 
 namespace form_builder.Validators
 {
     public class IsDateAfterValidator : IElementValidator
     {
-        private readonly ISessionHelper _sessionHelper;
-        private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IFormAnswersProvider _formAnswersProvider;
 
-        public IsDateAfterValidator(ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
+        public IsDateAfterValidator(IFormAnswersProvider formAnswersProvider)
         {
-            _sessionHelper = sessionHelper;
-            _distributedCache = distributedCache;
+            _formAnswersProvider = formAnswersProvider;
         }
 
         public ValidationResult Validate(Element currentElement, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
@@ -40,7 +36,7 @@ namespace form_builder.Validators
             if(!comparisonElementValue.HasValue)
             {
                 // If there is no valid value check previous providedanswers
-                FormAnswers answers = GetFormAnswers();
+                FormAnswers answers = _formAnswersProvider.GetFormAnswers();
                 comparisonElementValue = GetElementValue(comparisonElement, answers);
             }
 
@@ -62,10 +58,10 @@ namespace form_builder.Validators
 
         private bool IsValidatorRelevant(IElement element, IElement comparisonElement)
         {
-            if(comparisonElement == null)
-                return false;
-
             if (element.Type != EElementType.DatePicker && element.Type != EElementType.DateInput)
+                return false;
+            
+            if(comparisonElement == null)
                 return false;
 
             if (comparisonElement.Type != EElementType.DatePicker && comparisonElement.Type != EElementType.DateInput)
@@ -97,16 +93,6 @@ namespace form_builder.Validators
                 return DateInput.GetDate(formAnswers, element.Properties.QuestionId);
 
             return new DateTime();
-        }
-
-        // I think this should go into some sort of validationHeper class... or maybe something even more generic
-        private FormAnswers GetFormAnswers()
-        {
-            string sessionGuid = _sessionHelper.GetSessionGuid();
-            string cachedAnswers = _distributedCache.GetString(sessionGuid);
-            return cachedAnswers == null
-                ? new FormAnswers { Pages = new List<PageAnswers>() }
-                : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);      
         }
     }
 }

@@ -28,6 +28,17 @@ namespace form_builder.Models
         public List<PageAnswers> Pages { get; set; }
 
         [JsonIgnore]
-        public IEnumerable<Answers> AllAnswers => this.Pages != null ? this.Pages.SelectMany(_ => _.Answers) : Enumerable.Empty<Answers>();
+        public IEnumerable<Answers> AllAnswers {
+            get 
+            {
+                if(this.Pages == null)
+                    return Enumerable.Empty<Answers>();
+
+                if(!this.Pages.SelectMany(_ => _.Answers).Any())
+                    return Enumerable.Empty<Answers>();
+
+                return this.Pages.SelectMany(_ => _.Answers);
+            }
+        }
     }
 }

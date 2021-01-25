@@ -400,6 +400,20 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithIsDateBefore(string value)
+        {
+            _property.IsDateBefore = value;
+            
+            return this;
+        }
+
+        
+        public ElementBuilder WithIsDateAfter(string value)
+        {
+            _property.IsDateAfter = value;
+            
+            return this;
+        }
         
         public ElementBuilder WithIsDateAfterAbsolute(string value)
         {
