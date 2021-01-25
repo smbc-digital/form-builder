@@ -19,6 +19,7 @@ using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Mappers;
+using form_builder.Providers;
 using form_builder.Providers.Address;
 using form_builder.Providers.Booking;
 using form_builder.Providers.DocumentCreation;
@@ -206,6 +207,15 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
             return services;
         }
+
+        
+        public static IServiceCollection ConfigureFormAnswersProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IFormAnswersProvider, FormAnswersProvider>();
+
+            return services;
+        }
+
 
         public static IServiceCollection ConfigureStreetProviders(this IServiceCollection services)
         {

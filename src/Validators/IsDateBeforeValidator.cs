@@ -19,7 +19,7 @@ namespace form_builder.Validators
 
         public ValidationResult Validate(Element currentElement, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            IElement comparisonElement  = baseForm.GetElement(currentElement.Properties.IsDateAfter);
+            IElement comparisonElement  = baseForm.GetElement(currentElement.Properties.IsDateBefore);
             
             // Check that all referenced element are valid for this validator type
             if(!IsValidatorRelevant(currentElement, comparisonElement))
@@ -50,9 +50,9 @@ namespace form_builder.Validators
 
             return new ValidationResult {
                 IsValid = false,
-                Message = !string.IsNullOrEmpty(currentElement.Properties.IsDateAfterValidationMessage) 
-                                ? currentElement.Properties.IsDateAfterValidationMessage 
-                                : string.Format(ValidationConstants.IS_DATE_AFTER_VALIDATOR_DEFAULT, currentElement.Properties.IsDateAfter)
+                Message = !string.IsNullOrEmpty(currentElement.Properties.IsDateBeforeValidationMessage) 
+                                ? currentElement.Properties.IsDateBeforeValidationMessage 
+                                : string.Format(ValidationConstants.IS_DATE_AFTER_VALIDATOR_DEFAULT, currentElement.Properties.IsDateBefore)
             };
         }
 
@@ -67,7 +67,7 @@ namespace form_builder.Validators
             if (comparisonElement.Type != EElementType.DatePicker && comparisonElement.Type != EElementType.DateInput)
                 return false;
 
-            if ((string.IsNullOrEmpty(element.Properties.IsDateAfter)))
+            if ((string.IsNullOrEmpty(element.Properties.IsDateBefore)))
                 return false;
 
             return true;

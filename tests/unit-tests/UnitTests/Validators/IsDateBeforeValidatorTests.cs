@@ -18,7 +18,7 @@ namespace form_builder_tests.UnitTests.Validators
         private Element datePickerelement = new ElementBuilder()
                             .WithType(EElementType.DatePicker)
                             .WithQuestionId("test-element")
-                            .WithIsDateAfter("test-comparison-element")
+                            .WithIsDateBefore("test-comparison-element")
                             .Build();
 
         public IsDateBeforeValidatorTests()
