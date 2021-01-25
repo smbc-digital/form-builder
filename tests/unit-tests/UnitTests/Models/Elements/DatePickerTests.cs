@@ -45,10 +45,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         [Fact]
         public void GetDate_ReturnNull_IfKeyNotPresent()
         {
-            var viewModel = new Dictionary<string, dynamic>()
-            {
-            };
-
+            var viewModel = new Dictionary<string, dynamic>();
             var result =  DatePicker.GetDate(viewModel, "test-date");
             Assert.False(result.HasValue);
         }
@@ -104,7 +101,6 @@ namespace form_builder_tests.UnitTests.Models.Elements
                                 QuestionId = "test-date",
                                 Response = "ABC123"
                             }
-                            
                         }
                     }
                 }
@@ -114,7 +110,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         }
 
         [Fact]
-        public void GetDate_WithFormAnswers_ShouldThrowException_IfAnswersIsNotPresent()
+        public void GetDate_WithFormAnswers_ShouldReturnNull_IfAnswersIsNotPresent()
         {
             var formAnswers = new FormAnswers
             {
@@ -124,7 +120,26 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 }
             };
 
-            Assert.Throws<InvalidOperationException>(() => DatePicker.GetDate(formAnswers, "test-date"));
+            Assert.False(DatePicker.GetDate(formAnswers, "test-date").HasValue);
+        }
+
+        [Fact]
+        public void GetDate_WithFormAnswers_ShouldReturnNull_IfAnswersPresent_AndEmpty()
+        {
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers{
+                        Answers = new List<Answers>
+                        {
+                            new Answers{ QuestionId = "test-date" }
+                        }
+                    }
+                }
+            };
+
+            Assert.False(DatePicker.GetDate(formAnswers, "test-date").HasValue);
         }
     }
 }

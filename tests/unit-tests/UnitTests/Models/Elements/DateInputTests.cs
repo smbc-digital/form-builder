@@ -34,6 +34,18 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.True(result.HasValue);
             Assert.True(result.Value == new DateTime(2020, 1, 1));
         }
+        [Fact]
+        public void GetDate_ReturnNull_IfOnlyPartialCorrectDate()
+        {
+            var viewModel = new Dictionary<string, dynamic>()
+            {
+                { $"test-date{DateInput.YEAR_EXTENSION}", "2020" },
+                { $"test-date{DateInput.MONTH_EXTENSION}", "01" },
+            };
+
+            var result =  DateInput.GetDate(viewModel, "test-date");
+            Assert.False(result.HasValue);
+        }
 
         [Fact]
         public void GetDate_ReturnNull_IfKeyNotPresent()
