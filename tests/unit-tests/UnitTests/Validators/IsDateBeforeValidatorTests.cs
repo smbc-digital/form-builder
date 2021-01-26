@@ -27,7 +27,8 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers {
+                    new PageAnswers
+                    {
                         Answers = new List<Answers> { new Answers() }
                     }
                 }
@@ -41,7 +42,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_Returns_Valid_IfElemenType_IsNot_DateInputOrDatePicker()
         {
-            IsDateBeforeValidator isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
+            var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
             // Arrange
             var texttBoxElement = new ElementBuilder()
@@ -50,7 +51,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             // Act
-            var result = isDateBeforeValidator.Validate(texttBoxElement, null, SchemaWithDatePickerElement);
+            ValidationResult result = isDateBeforeValidator.Validate(texttBoxElement, null, SchemaWithDatePickerElement);
 
             // Assert
             Assert.True(result.IsValid);
@@ -59,10 +60,10 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldReturn_Valid_IfComparisonElement_IsNullOrEmpty()
         {
-            IsDateBeforeValidator isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
+            var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
             // Act
-            var result = isDateBeforeValidator.Validate(datePickerelement, null, SchemaWithElement(new Element { Properties = new BaseProperty() } ));
+            ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, null, SchemaWithElement(new Element { Properties = new BaseProperty() } ));
 
             // Assert
             Assert.True(result.IsValid);        
@@ -71,7 +72,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_Returns_Valid_IfComparisonElemenType_IsNot_DateInputOrDatePicker()
         {
-            IsDateBeforeValidator isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
+            var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
             var formSchema = SchemaWithElement(
                                 new Textbox
@@ -81,7 +82,7 @@ namespace form_builder_tests.UnitTests.Validators
 
 
             // Act
-            var result = isDateBeforeValidator.Validate(datePickerelement, null, formSchema);
+            ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, null, formSchema);
 
             // Assert
             Assert.True(result.IsValid);
@@ -90,33 +91,39 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldReturn_Valid_IfElement_DoesNotHaveAValue()
         {   
+            //Arrange
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers {
-                        Answers = new List<Answers> { new Answers
+                    new PageAnswers
+                    {
+                        Answers = new List<Answers>
                         {
-                            QuestionId = "test-comparison-element",
-                            Response = "01/01/2021"
-                        }}
+                            new Answers
+                            {
+                                QuestionId = "test-comparison-element",
+                                Response = "01/01/2021"
+                            }
+                        }
                     }
                 }
             };
 
             _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
 
-            IsDateBeforeValidator isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
+            var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
-            var viewModel = new Dictionary<string, dynamic>{
+            var viewModel = new Dictionary<string, dynamic>
+            {
                 {
                     "test-element",
                     string.Empty
                 }
             };
 
-            // Arrange/Act
-            var result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
+            // Act
+            ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
 
             // Assert
             Assert.True(result.IsValid);        
@@ -125,32 +132,37 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldReturn_Valid_IfComparisonElement_DoesNotHaveAValue()
         {   
+            //Arrange
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers {
-                        Answers = new List<Answers> { new Answers
-                        {
-                            QuestionId = "test-comparison-element"
-                        }}
+                    new PageAnswers
+                    {
+                        Answers = new List<Answers>
+                        { new Answers
+                            {
+                                QuestionId = "test-comparison-element"
+                            }
+                        }
                     }
                 }
             };
 
             _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
 
-            IsDateBeforeValidator isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
+            var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
-            var viewModel = new Dictionary<string, dynamic>{
+            var viewModel = new Dictionary<string, dynamic>
+            {
                 {
                     "test-element",
                     "01/01/2020"
                 }
             };
 
-            // Arrange/Act
-            var result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
+            // Act
+            ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
 
             // Assert
             Assert.True(result.IsValid);        
@@ -163,7 +175,8 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers {
+                    new PageAnswers
+                    {
                         Answers = new List<Answers>()
                     }
                 }
@@ -171,9 +184,10 @@ namespace form_builder_tests.UnitTests.Validators
 
             _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
 
-            IsDateBeforeValidator isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
+            var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
-            var viewModel = new Dictionary<string, dynamic>{
+            var viewModel = new Dictionary<string, dynamic>
+            {
                 {
                     "test-element",
                     "01/01/2019"
@@ -184,8 +198,8 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            // Arrange/Act
-            var result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
+            // Act
+            ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
 
             // Assert
             Assert.True(result.IsValid);        
@@ -193,12 +207,14 @@ namespace form_builder_tests.UnitTests.Validators
 
         [Fact]
         public void Validate_ShouldReturn_NotValid_IfElement_IsNotValid_OnSamePageSubmission()
-        {   
+        {
+            // Arrange
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers {
+                    new PageAnswers
+                    {
                         Answers = new List<Answers>()
                     }
                 }
@@ -206,9 +222,10 @@ namespace form_builder_tests.UnitTests.Validators
 
             _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
 
-            IsDateBeforeValidator isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
+            var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
-            var viewModel = new Dictionary<string, dynamic>{
+            var viewModel = new Dictionary<string, dynamic>
+            {
                 {
                     "test-element",
                     "01/01/2021"
@@ -219,8 +236,8 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            // Arrange/Act
-            var result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
+            // Act
+            ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
 
             // Assert
             Assert.False(result.IsValid);        
@@ -228,34 +245,40 @@ namespace form_builder_tests.UnitTests.Validators
 
         [Fact]
         public void Validate_ShouldReturn_Valid_IfElement_IsValid_OnPreviousPageAnswer()
-        {   
+        {
+            // Arrange
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers {
-                        Answers = new List<Answers> { new Answers
+                    new PageAnswers
+                    {
+                        Answers = new List<Answers>
                         {
-                            QuestionId = "test-comparison-element",
-                            Response = "01/01/2021"
-                        }}
+                            new Answers
+                            {
+                                QuestionId = "test-comparison-element",
+                                Response = "01/01/2021"
+                            }
+                        }
                     }
                 }
             };
 
             _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
 
-            IsDateBeforeValidator isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
+            var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
-            var viewModel = new Dictionary<string, dynamic>{
+            var viewModel = new Dictionary<string, dynamic>
+            {
                 {
                     "test-element",
                     "01/01/2020"
                 }
             };
 
-            // Arrange/Act
-            var result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
+            // Act
+            ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
 
             // Assert
             Assert.True(result.IsValid);        
@@ -263,34 +286,40 @@ namespace form_builder_tests.UnitTests.Validators
 
         [Fact]
         public void Validate_ShouldReturn_NotValid_IfElement_IsNotValid_OnPreviousPageAnswer()
-        {   
+        {
+            // Arrange
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers {
-                        Answers = new List<Answers> { new Answers
+                    new PageAnswers
+                    {
+                        Answers = new List<Answers>
                         {
-                            QuestionId = "test-comparison-element",
-                            Response = "01/01/2020"
-                        }}
+                            new Answers
+                            {
+                                QuestionId = "test-comparison-element",
+                                Response = "01/01/2020"
+                            }
+                        }
                     }
                 }
             };
 
             _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
 
-            IsDateBeforeValidator isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
+            var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
-            var viewModel = new Dictionary<string, dynamic>{
+            var viewModel = new Dictionary<string, dynamic>
+            {
                 {
                     "test-element",
                     "01/01/2021"
                 }
             };
 
-            // Arrange/Act
-            var result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
+            // Act
+            ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
 
             // Assert
             Assert.False(result.IsValid);        
@@ -301,7 +330,8 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Pages = new List<Page>
                 {
-                    new Page {
+                    new Page
+                    {
                         Elements = new List<IElement>
                         {
                             element
