@@ -6,7 +6,7 @@ using form_builder.Enum;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
-using form_builder.Utils.Extesions;
+using form_builder.Utils.Extensions;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
@@ -562,8 +562,8 @@ namespace form_builder_tests.UnitTests.Mappers
                 {
                     new PageAnswers {
                         Answers = new List<Answers> {
-                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = dateTime.ToString() }, 
-                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = dateTime.ToString() } 
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = dateTime.ToString() },
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = dateTime.ToString() }
                         }
                     }
                 }
@@ -575,8 +575,8 @@ namespace form_builder_tests.UnitTests.Mappers
             // Assert
             var dateTimeResult = Assert.IsType<Booking>(result);
         }
-        
-        
+
+
         [Fact]
         public void GetAnswerValue_ShouldReturnNull_WhenElementIsBooking_AndValueNotFound()
         {
@@ -603,7 +603,7 @@ namespace form_builder_tests.UnitTests.Mappers
             // Assert
             Assert.Null(result);
         }
-        
+
 
         [Fact]
         public void GetAnswerValue_ShouldReturnOrganisation_WhenElementIsOrganisation()
@@ -887,7 +887,7 @@ namespace form_builder_tests.UnitTests.Mappers
             Assert.Equal("3", resultData.Hours.ToString());
             Assert.Equal(elementMinutes, resultData.Minutes.ToString());
         }
-        
+
 
         [Fact]
         public void Map_ShouldReturnExpandoObject_WhenFormContains_MultipleValidatableElementsWithTargetMapping_WithValues()
@@ -1200,13 +1200,16 @@ namespace form_builder_tests.UnitTests.Mappers
             var time = new TimeSpan(4, 30, 0);
             var date = DateTime.Now;
             var startTime = DateTime.Today.Add(time);
-            var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> 
-                { 
-                    new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = date.ToString() }, 
-                    new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = startTime.ToString() } 
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers>
+                {
+                    new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = date.ToString() },
+                    new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = startTime.ToString() }
                 }
             }
-            }};
+            }
+            };
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
@@ -1217,7 +1220,7 @@ namespace form_builder_tests.UnitTests.Mappers
             var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
-            Assert.Equal($"{date.ToFullDateFormat()} at 4:30am", result);
+            Assert.Equal($"{date.ToFullDateFormat()} at 4:30am to 12am", result);
         }
 
         [Fact]

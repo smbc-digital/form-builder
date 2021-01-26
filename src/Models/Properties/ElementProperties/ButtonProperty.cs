@@ -3,6 +3,6 @@
     public partial class BaseProperty
     {
         public string ButtonId { get; set; }
-        public bool DisableOnClick { get;set; }
+        public bool DisableOnClick { get; set; }
     }
 }

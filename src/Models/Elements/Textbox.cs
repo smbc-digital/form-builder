@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Enum;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Models.Elements
@@ -41,7 +41,7 @@ namespace form_builder.Models.Elements
                 { "value", Properties.Value},
                 { "spellcheck", Properties.Spellcheck.ToString().ToLower() }
             };
-            
+
             if (Properties.Numeric)
             {
                 properties.Add("type", "number");
@@ -49,7 +49,7 @@ namespace form_builder.Models.Elements
                 properties.Add("min", Properties.Min);
             }
 
-            if(Properties.Telephone == true)
+            if (Properties.Telephone == true)
                 properties["autocomplete"] = "tel";
 
             if (DisplayAriaDescribedby)

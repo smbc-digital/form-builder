@@ -76,11 +76,11 @@ namespace form_builder.Conditions
         private static DateTime GetDateValue(string questionId, Dictionary<string, dynamic> viewModel)
         {
             // for calendar object
-            if(viewModel.ContainsKey(questionId))
+            if (viewModel.ContainsKey(questionId))
             {
                 return DateTime.Parse(viewModel[questionId]);
             }
-            
+
             int years = int.Parse(viewModel[questionId + "-year"]);
             int months = int.Parse(viewModel[questionId + "-month"]);
             int days = int.Parse(viewModel[questionId + "-day"]);

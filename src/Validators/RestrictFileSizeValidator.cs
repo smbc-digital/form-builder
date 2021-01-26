@@ -38,12 +38,12 @@ namespace form_builder.Validators
             if (!invalidFileSizes.Any())
                 return new ValidationResult { IsValid = true };
 
-            var validationMessage = documentModel.Count == 1 
+            var validationMessage = documentModel.Count == 1
                 ? $"The selected file must be smaller than {maxFileSize / SystemConstants.OneMBInBinaryBytes}MB"
                 : invalidFileSizes.Select(_ => $"{_.FileName} must be smaller than {maxFileSize / SystemConstants.OneMBInBinaryBytes}MB").Aggregate((curr, acc) => $"{acc} <br/> {curr}");
 
             return new ValidationResult
-            { 
+            {
                 IsValid = false,
                 Message = validationMessage
             };

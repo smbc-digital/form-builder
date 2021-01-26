@@ -17,7 +17,7 @@ namespace form_builder.Validators
             }
 
             var value = viewModel[element.Properties.QuestionId];
-            if(string.IsNullOrEmpty(value) && element.Properties.Optional)
+            if (string.IsNullOrEmpty(value) && element.Properties.Optional)
             {
                 return new ValidationResult
                 {

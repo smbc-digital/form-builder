@@ -5,7 +5,7 @@ using form_builder.Models.Elements;
 
 namespace form_builder.Validators
 {
-    public class    AutomaticAddressElementValidator : IElementValidator
+    public class AutomaticAddressElementValidator : IElementValidator
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
@@ -20,7 +20,8 @@ namespace form_builder.Validators
             var addressElement = (Address)element;
             if (!viewModel.ContainsKey(addressElement.AddressSelectQuestionId))
             {
-                return new ValidationResult{
+                return new ValidationResult
+                {
                     IsValid = true
                 };
             }
@@ -34,12 +35,13 @@ namespace form_builder.Validators
                 };
             }
 
-            var isValid = AddressConstants.UPRN_REGEX.IsMatch(value); 
+            var isValid = AddressConstants.UPRN_REGEX.IsMatch(value);
 
-            return new ValidationResult{
+            return new ValidationResult
+            {
                 IsValid = isValid,
                 Message = isValid ? string.Empty : $"please select an address"
-            }; 
+            };
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using StockportGovUK.NetStandard.Models.Addresses;
-using System.Globalization;
+﻿using System.Globalization;
+using StockportGovUK.NetStandard.Models.Addresses;
 
 namespace form_builder.Extensions
 {
@@ -7,7 +7,7 @@ namespace form_builder.Extensions
     {
         public static bool IsEmpty(this Address value) => value.IsAutomaticallyFound ?
                 string.IsNullOrEmpty(value.PlaceRef) &&
-                string.IsNullOrEmpty(value.SelectedAddress) : 
+                string.IsNullOrEmpty(value.SelectedAddress) :
                 string.IsNullOrEmpty(value.AddressLine1) &&
                 string.IsNullOrEmpty(value.Postcode);
 

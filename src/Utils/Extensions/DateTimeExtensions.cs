@@ -1,6 +1,6 @@
 using System;
 
-namespace form_builder.Utils.Extesions
+namespace form_builder.Utils.Extensions
 {
     public static class DateTimeExtensions
     {
@@ -10,10 +10,11 @@ namespace form_builder.Utils.Extesions
             return new DateTime(today.Date.Year, today.Date.Month, totalDays, 23, 59, 59);
         }
 
-        public static string ToTimeFormat(this DateTime value) => value.ToString(value.Minute > 0 ? "h:mmtt" :"htt").ToLower();
+        public static string ToTimeFormat(this DateTime value) => value.ToString(value.Minute > 0 ? "h:mmtt" : "htt").ToLower();
         public static string ToFullDateFormat(this DateTime value) => value.ToString("dddd d MMMM yyyy");
-
-        public static int PreviousDaysInMonth(this DateTime value) {
+        public static string ToFullDateWithTimeFormat(this DateTime value) => value.ToString("dddd dd MMMM yyyy hh:mm tt");
+        public static int PreviousDaysInMonth(this DateTime value)
+        {
             switch (value.DayOfWeek)
             {
                 case DayOfWeek.Sunday:

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Constants;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
@@ -15,10 +15,7 @@ using Newtonsoft.Json;
 
 namespace form_builder.Services.StreetService
 {
-    public interface IStreetService
-    {
-        Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path);
-    }
+
 
     public class StreetService : IStreetService
     {
@@ -28,9 +25,9 @@ namespace form_builder.Services.StreetService
         private readonly IPageFactory _pageFactory;
 
         public StreetService(
-            IDistributedCacheWrapper distributedCache, 
-            IEnumerable<IStreetProvider> streetProviders, 
-            IPageHelper pageHelper, 
+            IDistributedCacheWrapper distributedCache,
+            IEnumerable<IStreetProvider> streetProviders,
+            IPageHelper pageHelper,
             IPageFactory pageFactory)
         {
             _distributedCache = distributedCache;
@@ -43,7 +40,7 @@ namespace form_builder.Services.StreetService
         {
             viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
 
-            switch(subPath as string)
+            switch (subPath as string)
             {
                 case LookUpConstants.Automatic:
                     return await ProccessAutomaticStreet(viewModel, currentPage, baseForm, guid, path);
@@ -149,14 +146,14 @@ namespace form_builder.Services.StreetService
                 searchResults = (convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>).ToList();
             }
             else
-            { 
+            {
                 try
                 {
                     searchResults = (await _streetProviders.Get(streetElement.Properties.StreetProvider).SearchAsync(street)).ToList<object>();
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup, Exception: {e.Message}");
+                    throw new ApplicationException($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup on Provider '{streetElement.Properties.StreetProvider}' with searchterm '{street}' Exception: {e.Message}");
                 }
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);

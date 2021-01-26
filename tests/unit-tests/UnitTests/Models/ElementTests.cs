@@ -291,8 +291,13 @@ namespace form_builder_tests.UnitTests.Models
                             .WithHint("hint")
                             .Build();
 
+<<<<<<< HEAD
             var viewModel = new Dictionary<string, dynamic> {{questionId, "test"}};
             element.Validate(viewModel, _validators.Object, new form_builder.Models.FormSchema());
+=======
+            var viewModel = new Dictionary<string, dynamic> { { questionId, "test" } };
+            element.Validate(viewModel, _validators.Object);
+>>>>>>> develop
 
             // Act
             var result = element.GetDescribedByAttributeValue();

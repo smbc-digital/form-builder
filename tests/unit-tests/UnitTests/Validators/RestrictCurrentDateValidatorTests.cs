@@ -72,7 +72,7 @@ namespace form_builder_tests.UnitTests.Validators
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
-                .WithRestrictCurrentDate(true,"Current Date Validation Message")
+                .WithRestrictCurrentDate(true, "Current Date Validation Message")
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();

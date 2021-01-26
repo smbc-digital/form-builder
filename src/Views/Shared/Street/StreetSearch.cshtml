@@ -1,0 +1,18 @@
+﻿@model Street
+@{
+    var elementProperties = Model.GenerateElementProperties();
+    elementProperties.Add("class", $"govuk-input govuk-input--width-20 {(Model.IsValid ? string.Empty : "govuk-input--error")}");
+}
+
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+
+    <partial name="LabelH1" />
+
+    <partial name="InsetText" model="Model.Properties.StreetIAG" />
+
+    <partial name="Hint" />
+
+    <partial name="Error" />
+
+    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elementProperties)
+</div>

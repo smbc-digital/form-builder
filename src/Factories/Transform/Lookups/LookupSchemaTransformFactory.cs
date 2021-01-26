@@ -12,10 +12,7 @@ namespace form_builder.Factories.Transform.Lookups
     {
         private readonly ILookupTransformDataProvider _lookupTransformDataProvider;
 
-        public LookupSchemaTransformFactory(ILookupTransformDataProvider lookupTransformDataProvider)
-        {
-            _lookupTransformDataProvider = lookupTransformDataProvider;
-        }
+        public LookupSchemaTransformFactory(ILookupTransformDataProvider lookupTransformDataProvider) => _lookupTransformDataProvider = lookupTransformDataProvider;
 
 
         public FormSchema Transform(FormSchema formSchema)
@@ -34,7 +31,7 @@ namespace form_builder.Factories.Transform.Lookups
         {
             var lookupOptions = await _lookupTransformDataProvider.Get<List<Option>>(entry.Lookup);
 
-            if(!lookupOptions.Any())
+            if (!lookupOptions.Any())
                 throw new Exception($"LookupSchemaTransformFactory::Build, No lookup options found for question {entry.Properties.QuestionId} with lookup value {entry.Lookup}");
 
             entry.Properties.Options.AddRange(lookupOptions);

@@ -1,5 +1,5 @@
 using System;
-using form_builder.Utils.Extesions;
+using form_builder.Utils.Extensions;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Extensions
@@ -34,19 +34,28 @@ namespace form_builder_tests.UnitTests.Extensions
         [Fact]
         public void ToFullDateFormat_ShouldReturnCorrect_FullDayFormat_ForDate_Without_0()
         {
-            var date = new DateTime(2020,1 , 1);
+            var date = new DateTime(2020, 1, 1);
             var result = date.ToFullDateFormat();
 
             Assert.Equal("Wednesday 1 January 2020", result);
         }
 
-                [Fact]
+        [Fact]
         public void ToFullDateFormat_ShouldReturnCorrect_FullDayFormat()
         {
-            var date = new DateTime(2020,1,20);
+            var date = new DateTime(2020, 1, 20);
             var result = date.ToFullDateFormat();
 
             Assert.Equal("Monday 20 January 2020", result);
+        }
+
+        [Fact]
+        public void ToFullDateWithTimeFormat_ShouldReturnCorrect_FullDateFormat()
+        {
+            var date = new DateTime(2020, 1, 20).Add(new TimeSpan(1, 33, 00));
+            var result = date.ToFullDateWithTimeFormat();
+
+            Assert.Equal("Monday 20 January 2020 01:33 AM", result);
         }
     }
 }

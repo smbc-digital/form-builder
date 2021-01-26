@@ -1,10 +1,10 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using form_builder.Builders;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models;
-using System.Collections.Generic;
 using form_builder_tests.Builders;
 using Xunit;
-using form_builder.Builders;
 
 namespace form_builder_tests.UnitTests.Extensions
 {

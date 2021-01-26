@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Constants;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
+using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.IncomingDataHelper;
@@ -91,7 +92,7 @@ namespace form_builder_tests.UnitTests.Services
                 FormJson = 1
             });
 
-            _service = new PageService(_validators.Object, _mockPageHelper.Object, _sessionHelper.Object, _addressService.Object, _fileUploadService.Object, _streetService.Object, _organisationService.Object, 
+            _service = new PageService(_validators.Object, _mockPageHelper.Object, _sessionHelper.Object, _addressService.Object, _fileUploadService.Object, _streetService.Object, _organisationService.Object,
             _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _bookingService.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object, _mockActionsWorkflow.Object);
         }
 
@@ -401,7 +402,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockPageHelper
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
-                .Returns((Page) null);
+                .Returns((Page)null);
 
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPage("form", requestPath, "", new QueryCollection()));
@@ -710,6 +711,52 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task FinalisePageJourney_ShouldThrow_ApplicationException_WhenNoSessionGuid()
+        {
+            // Arrange
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+
+            var page = new PageBuilder()
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema));
+
+            // Assert
+            Assert.Equal("PageService::FinalisePageJourney: Session has expired", result.Message);
+        }
+
+
+        [Fact]
+        public async Task FinalisePageJourney_ShouldThrow_ApplicationException_When_SessionData_IsNull()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+
+            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns((string)null);
+
+            var page = new PageBuilder()
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema));
+
+            // Assert
+            Assert.Equal("PageService::FinalisePageJourney: Session data is null", result.Message);
+        }
+
+        [Fact]
         public async Task FinalisePageJourney_ShouldDeleteFileUpload_CacheEntries()
         {
             // Arrange
@@ -724,35 +771,35 @@ namespace form_builder_tests.UnitTests.Services
             {
                 Path = "page-one",
                 FormName = "form",
-                Pages = new List<PageAnswers> 
+                Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = $"{questionIDOne}{FileUploadConstants.SUFFIX}",
                                 Response = new List<FileUploadModel>
                                 {
-                                    new FileUploadModel 
+                                    new FileUploadModel
                                     {
                                         Key = fileOneKey
                                     }
                                 }
                             },
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = $"{questionIDTwo}{FileUploadConstants.SUFFIX}",
                                 Response = new List<FileUploadModel>
                                 {
-                                    new FileUploadModel 
+                                    new FileUploadModel
                                     {
                                         Key = fileTwoKey
                                     }
                                 }
                             }
-                        }    
+                        }
                     }
                 }
             };
@@ -805,43 +852,43 @@ namespace form_builder_tests.UnitTests.Services
             {
                 Path = "page-one",
                 FormName = "form",
-                Pages = new List<PageAnswers> 
+                Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = $"{questionIDOne}{FileUploadConstants.SUFFIX}",
                                 Response = new List<FileUploadModel>
                                 {
-                                    new FileUploadModel 
+                                    new FileUploadModel
                                     {
                                         Key = fileOneKey
                                     },
-                                    new FileUploadModel 
+                                    new FileUploadModel
                                     {
                                         Key = fileTwoKey
                                     },
-                                    new FileUploadModel 
+                                    new FileUploadModel
                                     {
                                         Key = fileThreeKey
                                     }
                                 }
                             },
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = $"{questionIDTwo}{FileUploadConstants.SUFFIX}",
                                 Response = new List<FileUploadModel>
                                 {
-                                    new FileUploadModel 
+                                    new FileUploadModel
                                     {
                                         Key = fileFourKey
                                     }
                                 }
                             }
-                        }    
+                        }
                     }
                 }
             };
@@ -879,7 +926,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task FinalisePageJourney_ShouldNotError_WhenFileUPload_DataIsNull()
+        public async Task FinalisePageJourney_ShouldNotError_WhenFileUpload_DataIsNull()
         {
             // Arrange
             var guid = Guid.NewGuid();
@@ -895,23 +942,23 @@ namespace form_builder_tests.UnitTests.Services
             {
                 Path = "page-one",
                 FormName = "form",
-                Pages = new List<PageAnswers> 
+                Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = $"{questionIDOne}{FileUploadConstants.SUFFIX}",
                                 Response = null,
                             },
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = $"{questionIDTwo}{FileUploadConstants.SUFFIX}",
                                 Response = null
                             }
-                        }    
+                        }
                     }
                 }
             };
@@ -1178,7 +1225,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
             _mockIncomingDataHelper.Setup(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>(), It.IsAny<FormAnswers>()))
-                .Returns(new Dictionary<string, dynamic>{ { "test", "testdata"} });
+                .Returns(new Dictionary<string, dynamic> { { "test", "testdata" } });
 
             var element = new ElementBuilder()
                 .WithType(EElementType.H1)
@@ -1213,7 +1260,7 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             Assert.IsType<ProcessPageEntity>(result);
             _mockIncomingDataHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>(), It.IsAny<FormAnswers>()), Times.Once);
-            _mockPageHelper.Verify(_ => _.SaveNonQuestionAnswers(It.IsAny<Dictionary<string, object>>(), It.Is<string>(_ => _ == "form"), It.Is<string>(_ => _ == "page-one"),It.IsAny<string>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveNonQuestionAnswers(It.IsAny<Dictionary<string, object>>(), It.Is<string>(_ => _ == "form"), It.Is<string>(_ => _ == "page-one"), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -1221,7 +1268,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
             _bookingService.Setup(_ => _.Get(It.IsAny<string>(), It.IsAny<Page>(), It.IsAny<string>()))
-                .ReturnsAsync(new BookingProcessEntity{ BookingHasNoAvailableAppointments = true });
+                .ReturnsAsync(new BookingProcessEntity { BookingHasNoAvailableAppointments = true });
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
@@ -1248,16 +1295,16 @@ namespace form_builder_tests.UnitTests.Services
             Assert.IsType<ProcessPageEntity>(result);
             Assert.True(result.ShouldRedirect);
             Assert.Equal(BookingConstants.NO_APPOINTMENT_AVAILABLE, result.TargetPage);
-            _bookingService.Verify(_ => _.Get(It.IsAny<string>(),It.IsAny<Page>(), It.IsAny<string>()), Times.Once);
+            _bookingService.Verify(_ => _.Get(It.IsAny<string>(), It.IsAny<Page>(), It.IsAny<string>()), Times.Once);
         }
-        
+
         [Fact]
         public async Task ProcessRequest_ShouldCall_BookingService_WhenPAge_ContainsBookingElement()
         {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
             _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
-            _bookingService.Setup(_ => _.ProcessBooking(It.IsAny<Dictionary<string, dynamic>>(),  It.IsAny<Page>(),  It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
+            _bookingService.Setup(_ => _.ProcessBooking(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessRequestEntity());
 
             var element = new ElementBuilder()
@@ -1280,7 +1327,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var viewModel = new Dictionary<string, dynamic>
             {
-                { "Guid", Guid.NewGuid().ToString() }   
+                { "Guid", Guid.NewGuid().ToString() }
             };
 
             _mockPageHelper
@@ -1289,7 +1336,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcessRequest("form", "page-one", viewModel, null, true);
 
-            _bookingService.Verify(_ => _.ProcessBooking(It.IsAny<Dictionary<string, dynamic>>(),  It.IsAny<Page>(),  It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _bookingService.Verify(_ => _.ProcessBooking(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
         }
     }

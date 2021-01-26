@@ -37,7 +37,7 @@ namespace form_builder.Helpers.ElementHelpers
         public string CurrentValue(string questionId, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string suffix = "")
         {
             //Todo
-            var defaultValue =  string.Empty;
+            var defaultValue = string.Empty;
 
             return GetCurrentValueFromSavedAnswers<string>(defaultValue, questionId, viewmodel, answers, suffix);
         }
@@ -214,10 +214,11 @@ namespace form_builder.Helpers.ElementHelpers
                     .Where(_ => _ != null)
                     .ToList();
 
-                if(!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())
+                if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())
                     continue;
 
-                formSchemaQuestions.ForEach(question => {
+                formSchemaQuestions.ForEach(question =>
+                {
                     var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
                     summaryBuilder.Add(question.GetLabelText(), answer, question.Type);
                 });

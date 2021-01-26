@@ -3,26 +3,27 @@ using System.Linq;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Models;
-using form_builder.TagParser;
+using form_builder.TagParsers;
+using form_builder.TagParsers.Formatters;
 using form_builder_tests.Builders;
 using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Services
+namespace form_builder_tests.UnitTests.TagParsers
 {
     public class FormAnswerTagParserTests
     {
         private readonly IEnumerable<IFormatter> _formatters;
         private readonly Mock<IFormatter> _mockFormatter = new Mock<IFormatter>();
         private readonly Mock<IFormatter> _mockFormatterTwo = new Mock<IFormatter>();
-        
+
         private FormAnswerTagParser _tagParser;
 
         public FormAnswerTagParserTests()
         {
-            _mockFormatter.Setup(_ => _.FormatterrName).Returns("testformatter");
+            _mockFormatter.Setup(_ => _.FormatterName).Returns("testformatter");
             _mockFormatter.Setup(_ => _.Parse(It.IsAny<string>())).Returns("FAKE-FORMATTED-VALUE");
-            _mockFormatterTwo.Setup(_ => _.FormatterrName).Returns("anothertestformatter");
+            _mockFormatterTwo.Setup(_ => _.FormatterName).Returns("anothertestformatter");
             _mockFormatterTwo.Setup(_ => _.Parse(It.IsAny<string>())).Returns("ANOTHER-FORMATTER");
             _formatters = new List<IFormatter>
             {
@@ -64,7 +65,7 @@ namespace form_builder_tests.UnitTests.Services
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-            
+
             var formAnswers = new FormAnswers();
 
             var result = _tagParser.Parse(page, formAnswers);
@@ -83,7 +84,7 @@ namespace form_builder_tests.UnitTests.Services
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-            
+
             var formAnswers = new FormAnswers();
 
             var result = _tagParser.Parse(page, formAnswers);
@@ -96,10 +97,10 @@ namespace form_builder_tests.UnitTests.Services
         {
             var expectedString = "this value testfirstname should be replaced with name question";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value {{QUESTION:firstname}} should be replaced with name question")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value {{QUESTION:firstname}} should be replaced with name question")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -109,16 +110,16 @@ namespace form_builder_tests.UnitTests.Services
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = "firstname",
                                 Response = "testfirstname"
-                            }    
-                        }     
+                            }
+                        }
                     }
                 }
             };
@@ -132,10 +133,10 @@ namespace form_builder_tests.UnitTests.Services
         {
             var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value {{QUESTION:firstname}} should be replaced with firstname and this {{QUESTION:lastname}} with lastname")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value {{QUESTION:firstname}} should be replaced with firstname and this {{QUESTION:lastname}} with lastname")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -145,9 +146,9 @@ namespace form_builder_tests.UnitTests.Services
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
                             new Answers
                             {
@@ -158,8 +159,8 @@ namespace form_builder_tests.UnitTests.Services
                             {
                                 QuestionId = "lastname",
                                 Response = "testlastname"
-                            }   
-                        }     
+                            }
+                        }
                     }
                 }
             };
@@ -168,16 +169,16 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
         }
 
-        
+
         [Fact]
         public void Parse_ShouldCallFormatter_WhenProvided()
         {
             var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}}")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}}")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -187,16 +188,16 @@ namespace form_builder_tests.UnitTests.Services
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = "firstname",
                                 Response = "value"
-                            }    
-                        }     
+                            }
+                        }
                     }
                 }
             };
@@ -212,10 +213,10 @@ namespace form_builder_tests.UnitTests.Services
         {
             var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE ANOTHER-FORMATTER";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}} {{QUESTION:firstname:anothertestformatter}}")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}} {{QUESTION:firstname:anothertestformatter}}")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -225,16 +226,16 @@ namespace form_builder_tests.UnitTests.Services
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = "firstname",
                                 Response = "value"
-                            }    
-                        }     
+                            }
+                        }
                     }
                 }
             };
@@ -252,10 +253,10 @@ namespace form_builder_tests.UnitTests.Services
         {
             var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE FAKE-FORMATTED-VALUE";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}} {{QUESTION:firstname:testformatter}}")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value should be formatted: {{QUESTION:firstname:testformatter}} {{QUESTION:firstname:testformatter}}")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -265,16 +266,16 @@ namespace form_builder_tests.UnitTests.Services
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
-                            new Answers 
+                            new Answers
                             {
                                 QuestionId = "firstname",
                                 Response = "value"
-                            }    
-                        }     
+                            }
+                        }
                     }
                 }
             };

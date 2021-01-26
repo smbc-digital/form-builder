@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using form_builder.Extensions;
+using form_builder.TagParsers.Formatters;
 
-namespace form_builder.TagParser
+namespace form_builder.TagParsers
 {
     public class TagParser
     {
@@ -44,7 +45,7 @@ namespace form_builder.TagParser
             return value;
         }
 
-        
+
         public string Parse(string value, Regex regex, string data, Func<string[], string> formatContent)
         {
             var match = regex.Match(value);

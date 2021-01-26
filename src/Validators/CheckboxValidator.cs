@@ -18,7 +18,8 @@ namespace form_builder.Validators
             }
 
             var containsValue = viewModel.ContainsKey(element.Properties.QuestionId);
-            if(!containsValue && element.Properties.Optional) {
+            if (!containsValue && element.Properties.Optional)
+            {
                 return new ValidationResult
                 {
                     IsValid = true

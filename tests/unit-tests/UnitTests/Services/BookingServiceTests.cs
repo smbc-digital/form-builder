@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Constants;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Helpers.PageHelpers;
@@ -22,7 +22,6 @@ using form_builder.Services.PageService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.Extensions.Options;
 using Moq;
-using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using Xunit;
@@ -74,19 +73,19 @@ namespace form_builder_tests.UnitTests.Services
             var bookingInfo = new BookingInformation();
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers{ FormData = new Dictionary<string, object> { {$"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", bookingInfo } } }));
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object> { { $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", bookingInfo } } }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("bookingQuestion")
                 .Build();
-            
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
 
             var result = await _service.Get("form", page, "guid");
-            
+
             Assert.IsType<BookingProcessEntity>(result);
             Assert.NotNull(result.BookingInfo);
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))), Times.Once);
@@ -105,7 +104,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new List<AvailabilityDayResponse> { new AvailabilityDayResponse() });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers{ FormData = new Dictionary<string, object>() }));
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
@@ -113,13 +112,13 @@ namespace form_builder_tests.UnitTests.Services
                 .WithQuestionId("bookingQuestion")
                 .WithAppointmentType(guid)
                 .Build();
-            
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
 
             var result = await _service.Get("form", page, "guid");
-            
+
             Assert.IsType<BookingProcessEntity>(result);
             Assert.False(result.BookingHasNoAvailableAppointments);
             var listOfObjects = Assert.IsType<List<object>>(result.BookingInfo);
@@ -140,7 +139,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             var guid = Guid.NewGuid();
             var date = DateTime.Today.AddDays(-2);
-            var bookingResourceId =  Guid.NewGuid();
+            var bookingResourceId = Guid.NewGuid();
             var bookingResourceQuantity = 3;
 
             _bookingProvider.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
@@ -150,22 +149,22 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new List<AvailabilityDayResponse> { new AvailabilityDayResponse() });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers{ FormData = new Dictionary<string, object>() }));
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
                 .WithAppointmentType(guid)
-                .WithBookingResource(new BookingResource{ ResourceId = bookingResourceId, Quantity = bookingResourceQuantity })
+                .WithBookingResource(new BookingResource { ResourceId = bookingResourceId, Quantity = bookingResourceQuantity })
                 .Build();
-            
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
 
             var result = await _service.Get("form", page, "guid");
-            
+
             Assert.IsType<BookingProcessEntity>(result);
             Assert.False(result.BookingHasNoAvailableAppointments);
             var listOfObjects = Assert.IsType<List<object>>(result.BookingInfo);
@@ -190,7 +189,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Throws(new BookingNoAvailabilityException("BookingNoAvailabilityException"));
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers{ FormData = new Dictionary<string, object>() }));
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
@@ -198,13 +197,13 @@ namespace form_builder_tests.UnitTests.Services
                 .WithQuestionId("bookingQuestion")
                 .WithAppointmentType(guid)
                 .Build();
-            
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
 
             var result = await _service.Get("form", page, "guid");
-            
+
             Assert.IsType<BookingProcessEntity>(result);
             Assert.True(result.BookingHasNoAvailableAppointments);
             _bookingProvider.Verify(_ => _.NextAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
@@ -229,7 +228,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals($"testBookingProvider-{guid}"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new BoookingNextAvailabilityEntity {  DayResponse = new AvailabilityDayResponse() }));
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new BoookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse() }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
@@ -399,7 +398,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new List<AvailabilityDayResponse> { new AvailabilityDayResponse() });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>{ {bookingInformationCacheKey, new BookingInformation() }}} ));
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object> { { bookingInformationCacheKey, new BookingInformation() } } }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
@@ -454,7 +453,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_END_TIME}", DateTime.Now.ToString() }
             };
 
-            await _service.ProcessBooking(model, page,formSchema,"guid", "path");
+            await _service.ProcessBooking(model, page, formSchema, "guid", "path");
 
             _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
             _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Once);
@@ -495,7 +494,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_END_TIME}", DateTime.Now.ToString() },
             };
 
-            var result = await _service.ProcessBooking(model, page,formSchema,"guid", "path");
+            var result = await _service.ProcessBooking(model, page, formSchema, "guid", "path");
 
             _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
@@ -536,7 +535,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", DateTime.Now.ToString() }
             };
 
-            var result = await _service.ProcessBooking(model, page,formSchema,"guid", "path");
+            var result = await _service.ProcessBooking(model, page, formSchema, "guid", "path");
 
             _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Never);
             _bookingProvider.Verify(_ => _.GetLocation(It.IsAny<LocationRequest>()), Times.Never);
@@ -581,7 +580,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}", date.ToString() },
             };
 
-            await _service.ProcessBooking(model, page,formSchema,"guid", "path");
+            await _service.ProcessBooking(model, page, formSchema, "guid", "path");
 
             _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Never);
             _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Never);
@@ -621,14 +620,14 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}", date.ToString() },
             };
 
-            await _service.ProcessBooking(model, page,formSchema,"guid", "path");
+            await _service.ProcessBooking(model, page, formSchema, "guid", "path");
 
-           _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
+            _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
             _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
         }
 
-        
+
         [Fact]
         public async Task ProcessBooking_Should_Call_BookingProvider_When_SelectedStartTime_IsDifferent_To_ReservedDateAndTime()
         {
@@ -662,7 +661,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}", date.ToString() }
             };
 
-            await _service.ProcessBooking(model, page,formSchema,"guid", "path");
+            await _service.ProcessBooking(model, page, formSchema, "guid", "path");
 
             _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
             _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Once);
@@ -702,7 +701,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}", date.ToString() },
             };
 
-            await _service.ProcessBooking(model, page,formSchema,"guid", "path");
+            await _service.ProcessBooking(model, page, formSchema, "guid", "path");
 
             _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
             _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Once);

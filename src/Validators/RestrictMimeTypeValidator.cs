@@ -15,11 +15,11 @@ namespace form_builder.Validators
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
             if (element.Type != EElementType.FileUpload && element.Type != EElementType.MultipleFileUpload)
-            {              
+            {
                 return new ValidationResult
                 {
                     IsValid = true
-                };                
+                };
             }
 
             var key = $"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
@@ -41,10 +41,10 @@ namespace form_builder.Validators
                     IsValid = true
                 };
             }
-            
+
             var allowedFileTypes = element.Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
 
-            var fileTypes = documentModel.Select(_ => new MimeTypeFile{ FileType= Convert.FromBase64String(_.Content).GetFileType(), File= _ });
+            var fileTypes = documentModel.Select(_ => new MimeTypeFile { FileType = Convert.FromBase64String(_.Content).GetFileType(), File = _ });
             var invalidFiles = new List<MimeTypeFile>();
             if (fileTypes != null)
             {
@@ -66,7 +66,7 @@ namespace form_builder.Validators
 
             return element.Type == EElementType.FileUpload
                ? SingleFileUpload(allowedFileTypes, documentModel)
-               : MultiFileUpload(allowedFileTypes, invalidFiles, documentModel);            
+               : MultiFileUpload(allowedFileTypes, invalidFiles, documentModel);
         }
 
         private ValidationResult MultiFileUpload(List<string> allowedFileTypes, List<MimeTypeFile> invalidFiles, List<DocumentModel> documentModel)

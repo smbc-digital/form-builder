@@ -97,7 +97,7 @@ namespace form_builder_tests.UnitTests.Validators
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
-                .WithRestrictPastDate(true) 
+                .WithRestrictPastDate(true)
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>

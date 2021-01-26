@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
@@ -61,10 +60,10 @@ namespace form_builder.Services.ValidateService
                 if (!string.IsNullOrEmpty(submitSlug.AuthToken))
                     _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
 
-                response = await _gateway.GetAsync(entity.Url);                        
+                response = await _gateway.GetAsync(entity.Url);
 
                 if (!response.IsSuccessStatusCode)
-                    throw new ApplicationException($"ValidateService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");             
+                    throw new ApplicationException($"ValidateService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
             }
         }
     }

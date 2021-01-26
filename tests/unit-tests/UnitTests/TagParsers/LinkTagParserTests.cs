@@ -3,22 +3,22 @@ using System.Linq;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Models;
-using form_builder.TagParser;
+using form_builder.TagParsers;
+using form_builder.TagParsers.Formatters;
 using form_builder_tests.Builders;
 using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Services
+namespace form_builder_tests.UnitTests.TagParsers
 {
     public class LinkTagParserTests
     {
-        private readonly IEnumerable<IFormatter> _formatters;
-        private readonly Mock<IFormatter> _mockFormatter = new Mock<IFormatter>();
-        private LinkTagParser _tagParser;
+        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new Mock<IEnumerable<IFormatter>>();
+        private readonly LinkTagParser _tagParser;
 
         public LinkTagParserTests()
         {
-            _tagParser = new LinkTagParser(_formatters);
+            _tagParser = new LinkTagParser(_mockFormatters.Object);
         }
 
         [Theory]
@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.Services
             var url = "www.stockport.gov.uk";
             var linkText = "link text";
             var expectValue = string.Format(_tagParser._htmlContent, url, linkText);
-            Assert.Equal(expectValue, _tagParser.FormatContent(new string[2]{url,linkText}));
+            Assert.Equal(expectValue, _tagParser.FormatContent(new string[2] { url, linkText }));
         }
 
 
@@ -63,7 +63,7 @@ namespace form_builder_tests.UnitTests.Services
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-            
+
             var formAnswers = new FormAnswers();
 
             var result = _tagParser.Parse(page, formAnswers);
@@ -82,7 +82,7 @@ namespace form_builder_tests.UnitTests.Services
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-            
+
             var formAnswers = new FormAnswers();
 
             var result = _tagParser.Parse(page, formAnswers);
@@ -93,12 +93,12 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public void Parse_ShouldReturn_UpdatedText_WithReplacedValue()
         {
-            var expectedString = $"this link {_tagParser.FormatContent(new string [2]{"www.stockport.gov", "text"})} should be replaced";
+            var expectedString = $"this link {_tagParser.FormatContent(new string[2] { "www.stockport.gov", "text" })} should be replaced";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this link {{LINK:www.stockport.gov:text}} should be replaced")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this link {{LINK:www.stockport.gov:text}} should be replaced")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)

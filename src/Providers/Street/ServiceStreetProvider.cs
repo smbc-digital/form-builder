@@ -12,11 +12,7 @@ namespace form_builder.Providers.Street
         public string ProviderName => "CRM";
 
         private readonly IStreetServiceGateway _streetServiceGateway;
-
-        public ServiceStreetProvider(IStreetServiceGateway streetServiceGateway)
-        {
-            _streetServiceGateway = streetServiceGateway;
-        }
+        public ServiceStreetProvider(IStreetServiceGateway streetServiceGateway) => _streetServiceGateway = streetServiceGateway;
 
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string street)
         {

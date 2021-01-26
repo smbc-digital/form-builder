@@ -1,0 +1,35 @@
+@model TimePeriod
+
+<div class="smbc-time__body smbc-time__body__conditional smbc-time__body__conditional--hidden">
+    @for (int i = 0; i < Model.Appointments.Count; i++)
+    {
+        var startTime = Model.Appointments[i].StartTime;
+        var endTime = Model.Appointments[i].EndTime;
+        var fullDate = Model.ToFullDateFormat(startTime);
+        var appointmentTime = Model.Value(startTime).ToTimeFormat();
+        var positionalClassName = Model.GetClassNameForDivsPosition(i);
+        var ariaId = Model.GetTimeInputHint(i);
+
+        var inputId = $"{Model.Value(startTime)}-full-time-period";
+        var inputName = Model.NoJSId;
+        var inputValue = $"{Model.Value(startTime)}|{Model.Value(endTime)}";
+
+        <div class="smbc-time__time">
+            <input class="smbc-time__time__input"
+                   type="radio"
+                   id="@inputId"
+                   name="@inputName"
+                   value="@inputValue"
+                   aria-describedby="@ariaId" />
+            <label aria-hidden="true" class="smbc-time__time__label @positionalClassName" for="@inputId">
+                @appointmentTime
+            </label>
+            <span class="govuk-visually-hidden" id="@ariaId">@fullDate</span>
+        </div>
+    }
+
+    @for (int i = 1; i < Model.Appointments.Count % 3; i++)
+    {
+        <div class="smbc-time__time"></div>
+    }
+</div>

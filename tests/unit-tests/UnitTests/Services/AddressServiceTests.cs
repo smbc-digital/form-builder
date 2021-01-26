@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
-using form_builder.ContentFactory;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders, _mockPageContentFactory.Object);
         }
-        
+
         [Fact]
         public async Task ProcessAddress_ShouldCallAddressProvider_WhenCorrectJourney()
         {
@@ -67,7 +67,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Address)
                 .WithQuestionId(questionId)
-                .WithAddressProvider("testAddressProvider")               
+                .WithAddressProvider("testAddressProvider")
                 .Build();
 
             var page = new PageBuilder()
@@ -208,7 +208,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            Assert.Equal($"AddressController: An exception has occured while attempting to perform postcode lookup", result.Message);
+            Assert.Equal($"AddressService::ProcessSearchAddress, An exception has occured while attempting to perform postcode lookup on Provider '{addressProvider}' with searchterm 'SK11aa' Exception:", result.Message);
         }
 
         [Fact]
@@ -217,9 +217,11 @@ namespace form_builder_tests.UnitTests.Services
             _addressProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
                 .Throws<Exception>();
 
+            var testAddressProvider = "testAddressProvider";
+
             var element = new ElementBuilder()
                 .WithType(EElementType.Address)
-                .WithAddressProvider("testAddressProvider")
+                .WithAddressProvider(testAddressProvider)
                 .WithQuestionId("test-address")
                 .Build();
 
@@ -243,7 +245,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
-            Assert.StartsWith($"AddressController: An exception has occured while attempting to perform postcode lookup", result.Message);
+            Assert.StartsWith($"AddressService::ProcessSearchAddress, An exception has occured while attempting to perform postcode lookup on Provider '{testAddressProvider}' with searchterm 'SK11aa' Exception:", result.Message);
         }
     }
 }

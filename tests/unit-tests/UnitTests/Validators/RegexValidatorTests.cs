@@ -8,7 +8,7 @@ namespace form_builder_tests.UnitTests.Validators
 {
     public class RegexValidatorTests
     {
-        private readonly RegexElementValidator  _regexElementValidator = new RegexElementValidator();
+        private readonly RegexElementValidator _regexElementValidator = new RegexElementValidator();
         private readonly RequiredElementValidator _requiredElementValidator = new RequiredElementValidator();
 
         [Fact]
@@ -19,7 +19,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithType(EElementType.Textbox)
                 .WithQuestionId("ni")
                 .WithLabel("NI Number")
-                .WithRegex("^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$")                
+                .WithRegex("^[A-Za-z]{2}[0-9]{6}[A-Za-z]{1}$")
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();

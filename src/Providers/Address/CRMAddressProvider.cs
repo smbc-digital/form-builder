@@ -11,10 +11,7 @@ namespace form_builder.Providers.Address
 
         private readonly IVerintServiceGateway _verintServiceGateway;
 
-        public CRMAddressProvider(IVerintServiceGateway verintServiceGateway)
-        {
-            _verintServiceGateway = verintServiceGateway;
-        }
+        public CRMAddressProvider(IVerintServiceGateway verintServiceGateway) => _verintServiceGateway = verintServiceGateway;
 
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string streetOrPostcode)
         {

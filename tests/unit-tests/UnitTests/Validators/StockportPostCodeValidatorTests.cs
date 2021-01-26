@@ -1,7 +1,7 @@
-﻿using form_builder.Builders;
+﻿using System.Collections.Generic;
+using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Validators;
-using System.Collections.Generic;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
@@ -20,7 +20,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithType(EElementType.Textbox)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"postcode", "OL16 0AE"}};
+            var viewModel = new Dictionary<string, dynamic> { { "postcode", "OL16 0AE" } };
 
             // Act
             var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
@@ -36,10 +36,10 @@ namespace form_builder_tests.UnitTests.Validators
             var element = new ElementBuilder()
                 .WithQuestionId("postcode")
                 .WithType(EElementType.Textbox)
-                .WithStockportPostcode(true)                 
+                .WithStockportPostcode(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"postcode", "SK4 1AA"}};
+            var viewModel = new Dictionary<string, dynamic> { { "postcode", "SK4 1AA" } };
 
             // Act
             var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
@@ -58,7 +58,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithStockportPostcode(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"postcode", "Elephant"}};
+            var viewModel = new Dictionary<string, dynamic> { { "postcode", "Elephant" } };
 
             // Act
             var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
@@ -77,7 +77,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithStockportPostcode(true)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic> {{"postcode", "OL16 0AE"}};
+            var viewModel = new Dictionary<string, dynamic> { { "postcode", "OL16 0AE" } };
 
             // Act
             var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());

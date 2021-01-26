@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Helpers.ActionsHelpers;
@@ -8,7 +7,7 @@ using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Models.Properties.ActionProperties;
 using form_builder.Services.MappingService.Entities;
-using form_builder.TagParser;
+using form_builder.TagParsers.Formatters;
 using form_builder_tests.Builders;
 using Moq;
 using Xunit;
@@ -25,7 +24,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private const string contentWithInvalidVariableQuestionIdInBraces = "Some text with a {{invalidVariableQuestionId}}";
 
         private readonly IActionHelper _actionHelper;
-        private readonly IEnumerable<IFormatter> _formatters;
+        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new Mock<IEnumerable<IFormatter>>();
 
         private readonly MappingEntity _mappingEntity = new MappingEntityBuilder()
             .WithFormAnswers(new FormAnswers
@@ -85,7 +84,7 @@ namespace form_builder_tests.UnitTests.Helpers
             })
             .Build();
 
-        public ActionHelperTests() => _actionHelper = new ActionHelper(_formatters);
+        public ActionHelperTests() => _actionHelper = new ActionHelper(_mockFormatters.Object);
 
         [Fact]
         public void GenerateUrl_ShouldGenerateCorrectGetUrl_PathParameters()

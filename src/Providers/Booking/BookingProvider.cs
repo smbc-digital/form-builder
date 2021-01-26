@@ -1,11 +1,11 @@
-﻿using StockportGovUK.NetStandard.Gateways.BookingService;
-using StockportGovUK.NetStandard.Models.Booking.Request;
-using StockportGovUK.NetStandard.Models.Booking.Response;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using form_builder.Exceptions;
-using System.Net;
+using StockportGovUK.NetStandard.Gateways.BookingService;
+using StockportGovUK.NetStandard.Models.Booking.Request;
+using StockportGovUK.NetStandard.Models.Booking.Response;
 
 namespace form_builder.Providers.Booking
 {
@@ -13,11 +13,7 @@ namespace form_builder.Providers.Booking
     {
         public string ProviderName { get => "SMBC"; }
         private readonly IBookingServiceGateway _gateway;
-
-        public BookingProvider(IBookingServiceGateway gateway)
-        {
-            _gateway = gateway;
-        }
+        public BookingProvider(IBookingServiceGateway gateway) => _gateway = gateway;
 
         public async Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request)
         {
@@ -29,7 +25,7 @@ namespace form_builder.Providers.Booking
             if (result.StatusCode.Equals(HttpStatusCode.NotFound))
                 throw new BookingNoAvailabilityException($"BookingProvider::NextAvailability, BookingServiceGateway returned with 404 status code, no appointments available within the requested timeframe {request.StartDate} to {request.EndDate} for appointentId {request.AppointmentId}");
 
-            if(!result.IsSuccessStatusCode)
+            if (!result.IsSuccessStatusCode)
                 throw new ApplicationException($"BookingProvider::NextAvailability, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
 
             return result.ResponseContent;

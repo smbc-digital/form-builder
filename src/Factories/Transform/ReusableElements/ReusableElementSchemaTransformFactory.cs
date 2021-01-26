@@ -13,10 +13,8 @@ namespace form_builder.Factories.Transform.ReusableElements
     {
         private readonly IReusableElementTransformDataProvider _reusableElementTransformDataProvider;
 
-        public ReusableElementSchemaTransformFactory(IReusableElementTransformDataProvider reusableElementTransformDataProvider)
-        {
+        public ReusableElementSchemaTransformFactory(IReusableElementTransformDataProvider reusableElementTransformDataProvider) =>
             _reusableElementTransformDataProvider = reusableElementTransformDataProvider;
-        }
 
         public async Task<FormSchema> Transform(FormSchema formSchema)
         {
@@ -96,7 +94,8 @@ namespace form_builder.Factories.Transform.ReusableElements
 
             substitutions
                 .ToList()
-                .ForEach(_ => {
+                .ForEach(_ =>
+                {
                     formSchema.Pages[_.PageIndex].Elements[_.OriginalElementIndex] = _.SubstituteElement;
                 });
 

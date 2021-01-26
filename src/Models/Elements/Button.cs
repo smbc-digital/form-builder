@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Models.Elements
@@ -27,9 +27,9 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Text = GetButtonText(page.Elements, viewModel, page);          
+            Properties.Text = GetButtonText(page.Elements, viewModel, page);
 
-            if(!Properties.DisableOnClick)
+            if (!Properties.DisableOnClick)
                 Properties.DisableOnClick = DisableIfSubmitOrLookup(page.Behaviours, page.Elements, viewModel);
 
             return viewRender.RenderAsync("Button", this);
@@ -42,17 +42,17 @@ namespace form_builder.Models.Elements
 
         private bool CheckForLookups(List<IElement> element, Dictionary<string, dynamic> viewModel)
         {
-            var containsLookupElement = element.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.Street  || _.Type == EElementType.Organisation);
+            var containsLookupElement = element.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.Street || _.Type == EElementType.Organisation);
 
             if (containsLookupElement && !viewModel.IsInitial())
                 return false;
-                
+
             return containsLookupElement;
         }
 
         private bool DisableIfSubmitOrLookup(List<Behaviour> behaviour, List<IElement> element, Dictionary<string, dynamic> viewModel)
         {
-             return CheckForBehaviour(behaviour) || CheckForLookups(element, viewModel);
+            return CheckForBehaviour(behaviour) || CheckForLookups(element, viewModel);
         }
 
         private string GetButtonText(List<IElement> element, Dictionary<string, dynamic> viewModel, Page page)
@@ -66,10 +66,11 @@ namespace form_builder.Models.Elements
             if (element.Any(_ => _.Type == EElementType.Organisation) && viewModel.IsInitial())
                 return ButtonConstants.ORG_SEARCH_TEXT;
 
-            if(element.Any(_ => _.Type == EElementType.Booking)){
+            if (element.Any(_ => _.Type == EElementType.Booking))
+            {
                 var bookingElement = element.FirstOrDefault(_ => _.Type == EElementType.Booking);
-                 
-                if(bookingElement.Properties.CheckYourBooking && !viewModel.IsCheckYourBooking()) 
+
+                if (bookingElement.Properties.CheckYourBooking && !viewModel.IsCheckYourBooking())
                     return string.IsNullOrEmpty(Properties.Text) ? ButtonConstants.NEXTSTEP_TEXT : Properties.Text;
             }
 

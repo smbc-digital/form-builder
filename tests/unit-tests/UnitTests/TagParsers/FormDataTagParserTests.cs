@@ -3,12 +3,13 @@ using System.Linq;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Models;
-using form_builder.TagParser;
+using form_builder.TagParsers;
+using form_builder.TagParsers.Formatters;
 using form_builder_tests.Builders;
 using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Services
+namespace form_builder_tests.UnitTests.TagParsers
 {
     public class FormDataTagParserTests
     {
@@ -18,7 +19,7 @@ namespace form_builder_tests.UnitTests.Services
 
         public FormDataTagParserTests()
         {
-            _mockFormatter.Setup(_ => _.FormatterrName).Returns("testformatter");
+            _mockFormatter.Setup(_ => _.FormatterName).Returns("testformatter");
             _mockFormatter.Setup(_ => _.Parse(It.IsAny<string>())).Returns("FAKE-FORMATTED-VALUE");
             _formatters = new List<IFormatter>
             {
@@ -59,7 +60,7 @@ namespace form_builder_tests.UnitTests.Services
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-            
+
             var formAnswers = new FormAnswers();
 
             var result = _tagParser.Parse(page, formAnswers);
@@ -78,7 +79,7 @@ namespace form_builder_tests.UnitTests.Services
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
-            
+
             var formAnswers = new FormAnswers();
 
             var result = _tagParser.Parse(page, formAnswers);
@@ -91,10 +92,10 @@ namespace form_builder_tests.UnitTests.Services
         {
             var expectedString = "this value testfirstname should be replaced with name question";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with name question")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with name question")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -102,7 +103,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var formAnswers = new FormAnswers
             {
-                AdditionalFormData = new Dictionary<string, object> 
+                AdditionalFormData = new Dictionary<string, object>
                 {
                     { "firstname", "testfirstname"}
                 }
@@ -114,13 +115,13 @@ namespace form_builder_tests.UnitTests.Services
 
         [Fact]
         public void Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
-         {
+        {
             var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with firstname and this {{FORMDATA:lastname}} with lastname")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with firstname and this {{FORMDATA:lastname}} with lastname")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -128,7 +129,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var formAnswers = new FormAnswers
             {
-                AdditionalFormData = new Dictionary<string, object> 
+                AdditionalFormData = new Dictionary<string, object>
                 {
                     { "firstname", "testfirstname"},
                     { "lastname", "testlastname"}
@@ -139,16 +140,16 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
         }
 
-        
+
         [Fact]
         public void Parse_ShouldCallFormatter_WhenProvided()
         {
-             var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
+            var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
 
-             var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value should be formatted: {{FORMDATA:firstname:testformatter}}")
-                .Build();
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value should be formatted: {{FORMDATA:firstname:testformatter}}")
+               .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
@@ -156,7 +157,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var formAnswers = new FormAnswers
             {
-                AdditionalFormData = new Dictionary<string, object> 
+                AdditionalFormData = new Dictionary<string, object>
                 {
                     { "firstname", "testfirstname"}
                 }

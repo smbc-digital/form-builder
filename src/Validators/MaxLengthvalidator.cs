@@ -17,7 +17,7 @@ namespace form_builder.Validators
                 };
             }
 
-            if(element.Type == EElementType.FileUpload || element.Type == EElementType.Map)
+            if (element.Type == EElementType.FileUpload || element.Type == EElementType.Map)
             {
                 return new ValidationResult
                 {
@@ -26,7 +26,7 @@ namespace form_builder.Validators
             }
 
             var value = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId] : "";
-            
+
             if (!string.IsNullOrEmpty(value) && value.Length > element.Properties.MaxLength)
             {
                 return new ValidationResult
@@ -34,7 +34,7 @@ namespace form_builder.Validators
                     IsValid = false,
                     Message = $"{element.Properties.Label} has a maximum length of {element.Properties.MaxLength}"
                 };
-            }            
+            }
 
             return new ValidationResult
             {

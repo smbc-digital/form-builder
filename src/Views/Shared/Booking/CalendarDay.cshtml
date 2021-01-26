@@ -1,4 +1,4 @@
-@model form_builder.ViewModels.CalendarDayViewModel
+@model CalendarDayViewModel
 
 @if (Model.Day.IsDisabled)
 {
@@ -13,7 +13,7 @@ else
 {
     <td class="smbc-calendar__cell">
 
-        <input type="radio" class="smbc-calendar__input" value="@Model.Day.Date" name="@Model.QuestionId" id="@Model.InputId" aria-describedby="@Model.GetCalendarHint()" @(Model.Day.Checked ? "checked" : string.Empty) />
+        <input type="radio" data-aria-controls="@Model.InputId-conditional" class="smbc-calendar__input" value="@Model.Day.Date" name="@Model.QuestionId" id="@Model.InputId" aria-describedby="@Model.GetCalendarHint()" @(Model.Day.Checked ? "checked" : string.Empty) />
 
         <label aria-hidden="true" class="smbc-calendar__label" for="@Model.InputId">
             @Model.Day.Date.Day

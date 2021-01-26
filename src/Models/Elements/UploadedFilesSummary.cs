@@ -3,8 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Helpers;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.ViewRender;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -30,12 +30,14 @@ namespace form_builder.Models.Elements
         {
             Properties.ClassName ??= "smbc-!-font-word-break";
 
-            if(Properties.FileUploadQuestionIds.Any()) 
+            if (Properties.FileUploadQuestionIds.Any())
             {
-                Properties.FileUploadQuestionIds.ForEach((questionId) => {
+                Properties.FileUploadQuestionIds.ForEach((questionId) =>
+                {
                     var model = elementHelper.CurrentValue<JArray>(questionId, viewModel, formAnswers, FileUploadConstants.SUFFIX);
 
-                    if(model != null && model.Any()){
+                    if (model != null && model.Any())
+                    {
                         List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(model.ToString());
                         Properties.ListItems.AddRange(response.Select(_ => _.TrustedOriginalFileName));
                     }

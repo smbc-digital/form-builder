@@ -23,7 +23,7 @@ namespace form_builder_tests.UnitTests.Cache
         private const string _applicationVersion = "v2";
         public CacheTests()
         {
-             _mockConfiguration.Setup(_ => _["ApplicationVersion"]).Returns(_applicationVersion);
+            _mockConfiguration.Setup(_ => _["ApplicationVersion"]).Returns(_applicationVersion);
 
 
             _mockDistributedCacheSettings.Setup(_ => _.Value).Returns(new DistributedCacheConfiguration

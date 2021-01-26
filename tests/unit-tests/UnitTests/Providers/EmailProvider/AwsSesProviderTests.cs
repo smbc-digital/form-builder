@@ -40,7 +40,7 @@ namespace form_builder_tests.UnitTests.Providers.EmailProvider
         {
             // Arrange
             var emailMessage = new EmailMessage("subject", "body", "from@email.com", "to@email.com");
-            
+
             // Act
             var result = await _provider.SendEmail(emailMessage);
 

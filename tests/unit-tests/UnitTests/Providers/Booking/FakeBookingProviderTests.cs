@@ -21,7 +21,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         [Fact]
         public async Task NextAvailability_ShouldReturnDayResponse()
         {
-            var request = new AvailabilityRequest{ AppointmentId = Guid.NewGuid() };
+            var request = new AvailabilityRequest { AppointmentId = Guid.NewGuid() };
 
             var result = await _bookigProvider.NextAvailability(request);
 
@@ -31,7 +31,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         [Fact]
         public async Task NextAvailability_Should_Throw_BookingNoAvailabilityException_OnEmptyGuid()
         {
-            var request = new AvailabilityRequest{ AppointmentId = Guid.Parse("00000000-0000-0000-0000-000000000001") };
+            var request = new AvailabilityRequest { AppointmentId = Guid.Parse("00000000-0000-0000-0000-000000000001") };
             var result = await Assert.ThrowsAsync<BookingNoAvailabilityException>(() => _bookigProvider.NextAvailability(request));
 
             Assert.Equal("FakeProvider, no available appointments", result.Message);

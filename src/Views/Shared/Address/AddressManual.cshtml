@@ -1,4 +1,4 @@
-﻿@model form_builder.Models.Elements.AddressManual;
+﻿@model AddressManual
 @{
     var IAGMessage = "No address found at the postcode. Enter your address manually.";
     var inputClass = "govuk-input";
@@ -15,9 +15,10 @@
 
     var postcodeElementProperties = Model.GeneratePostcodeElementProperties();
     postcodeElementProperties.Add("class", Model.IsPostcodeValid ? $"{inputClass} govuk-input--width-10" : $"{invalidInputClasses} govuk-input--width-10");
+
 }
 
-@Html.Hidden(@Model.GetCustomItemId("postcode"), Model.Properties.Value)
+@Html.Hidden(Model.GetCustomItemId("postcode"), Model.Properties.Value)
 
 <fieldset class="govuk-fieldset" @Model.GenerateFieldsetProperties()>
     <partial name="LegendH1" />
@@ -26,7 +27,7 @@
 
     @if (Model.Properties.DisplayNoResultsIAG)
     {
-        <partial name="InsetText" model="@IAGMessage" />
+        <partial name="InsetText" model="IAGMessage" />
     }
 
     @if (!string.IsNullOrEmpty(Model.Properties.AddressManualHint.Trim()))
@@ -37,7 +38,7 @@
     <div class="govuk-form-group @(Model.IsLine1Valid ? string.Empty : " govuk-form-group--error")">
         <label class="govuk-label govuk-label--m" for=@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1)>Address line 1</label>
         <partial name="ErrorBase" model=Model.Line1ValidationModel />
-        @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1), Model.Properties.AddressManualAddressLine1, line1ElementProperties)
+        @Html.TextBox(Model.GetCustomItemId(AddressManualConstants.ADDRESS_LINE_1), Model.Properties.AddressManualAddressLine1, line1ElementProperties)
     </div>
 
     <div class="govuk-form-group">
@@ -57,7 +58,6 @@
     <div class="govuk-form-group @(Model.IsPostcodeValid ? string.Empty : " govuk-form-group--error")">
         <label class="govuk-label govuk-label--m" for=@Model.GetCustomItemId(AddressManualConstants.POSTCODE)>Postcode</label>
         <partial name="ErrorBase" model=Model.PostcodeValidationModel />
-
-        @Html.TextBox(@Model.GetCustomItemId(AddressManualConstants.POSTCODE), Model.Properties.AddressManualAddressPostcode, postcodeElementProperties)
+        @Html.TextBox(Model.GetCustomItemId(AddressManualConstants.POSTCODE), Model.Properties.AddressManualAddressPostcode, postcodeElementProperties)
     </div>
 </fieldset>

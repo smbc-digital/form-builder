@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Actions;
-using form_builder.Models.Elements;
 using form_builder.Providers.EmailProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.EmailService;
@@ -49,14 +47,14 @@ namespace form_builder_tests.UnitTests.Services
             var action = new ActionBuilder()
                 .WithActionType(EActionType.UserEmail)
                 .Build();
-            
+
             _mockActionHelper.Setup(_ => _.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()))
                 .Returns("test@testemail.com");
 
             _mockEmailProvider.Setup(_ => _.SendEmail(It.IsAny<EmailMessage>())).ReturnsAsync(HttpStatusCode.OK);
 
             // Act
-            await _emailService.Process(new List<IAction>{ action });
+            await _emailService.Process(new List<IAction> { action });
 
             // Assert
             _mockSessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
@@ -69,7 +67,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("");
 
             // Act & Assert
-            var result = await Assert.ThrowsAsync<Exception>(() => _emailService.Process(new List<IAction>{ new UserEmail() }));
+            var result = await Assert.ThrowsAsync<Exception>(() => _emailService.Process(new List<IAction> { new UserEmail() }));
             Assert.Contains("EmailService::Process: Session has expired", result.Message);
         }
 
@@ -85,7 +83,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns("test@testemail.com");
 
             // Act
-            await _emailService.Process(new List<IAction>{ action });
+            await _emailService.Process(new List<IAction> { action });
 
             // Assert
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
@@ -95,12 +93,12 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldCall_IfTypeIsUserEmail_EmailProvider()
         {
             // Arrange
-             var action = new ActionBuilder()
-                .WithActionType(EActionType.UserEmail)
-                .Build();
+            var action = new ActionBuilder()
+               .WithActionType(EActionType.UserEmail)
+               .Build();
 
             // Act
-            await _emailService.Process(new List<IAction>{ action });
+            await _emailService.Process(new List<IAction> { action });
 
             // Assert
             _mockEmailProvider.Verify(_ => _.SendEmail(It.IsAny<EmailMessage>()), Times.Once);

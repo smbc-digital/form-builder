@@ -19,7 +19,7 @@ namespace form_builder_tests.Builders
             ComparisonValue = _comparisonValue,
             QuestionId = _questionId
         };
-        
+
         public ConditionBuilder WithConditionType(ECondition type)
         {
             _conditionType = type;

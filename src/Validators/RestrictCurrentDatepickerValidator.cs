@@ -21,7 +21,7 @@ namespace form_builder.Validators
             var value = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId] : null;
 
             var outDate = DateTime.Now;
-            var isValidDate = DateTime.TryParse(value,out outDate); ;
+            var isValidDate = DateTime.TryParse(value, out outDate); ;
 
             if (!isValidDate)
             {

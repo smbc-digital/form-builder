@@ -8,32 +8,20 @@ using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
-using form_builder.Utils.Extesions;
+using form_builder.Utils.Extensions;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
-using Organisation = StockportGovUK.NetStandard.Models.Verint.Organisation;
 using Booking = StockportGovUK.NetStandard.Models.Booking.Booking;
+using Organisation = StockportGovUK.NetStandard.Models.Verint.Organisation;
 
 namespace form_builder.Mappers
 {
-    public interface IElementMapper
-    {
-        T GetAnswerValue<T>(IElement element, FormAnswers formAnswers);
-
-        object GetAnswerValue(IElement element, FormAnswers formAnswers);
-
-        string GetAnswerStringValue(IElement question, FormAnswers formAnswers);
-    }
-
     public class ElementMapper : IElementMapper
     {
         private readonly IDistributedCacheWrapper _distributedCacheWrapper;
 
-        public ElementMapper(IDistributedCacheWrapper distributedCacheWrapper)
-        {
-            _distributedCacheWrapper = distributedCacheWrapper;
-        }
+        public ElementMapper(IDistributedCacheWrapper distributedCacheWrapper) => _distributedCacheWrapper = distributedCacheWrapper;
 
         public T GetAnswerValue<T>(IElement element, FormAnswers formAnswers) => (T)GetAnswerValue(element, formAnswers);
 
@@ -130,23 +118,19 @@ namespace form_builder.Mappers
                     var convertTime = (TimeSpan)value;
                     var date = DateTime.Today.Add(convertTime);
                     return date.ToString("hh:mm tt");
-
                 case EElementType.DatePicker:
                 case EElementType.DateInput:
                     var convertDateTime = (DateTime)value;
                     return convertDateTime.Date.ToString("dd/MM/yyyy");
-
                 case EElementType.Select:
                 case EElementType.Radio:
                     var selectValue = question.Properties.Options.FirstOrDefault(_ => _.Value == value.ToString());
                     return selectValue?.Text ?? string.Empty;
-
                 case EElementType.Checkbox:
                     var answerCheckbox = string.Empty;
                     var list = (List<string>)value;
                     list.ForEach((answersCheckbox) => answerCheckbox += $" {question.Properties.Options.FirstOrDefault(_ => _.Value == answersCheckbox)?.Text ?? string.Empty},");
                     return answerCheckbox.EndsWith(",") ? answerCheckbox.Remove(answerCheckbox.Length - 1).Trim() : answerCheckbox.Trim();
-
                 case EElementType.Organisation:
                     var orgValue = (Organisation)value;
                     return !string.IsNullOrEmpty(orgValue.Name) ? orgValue.Name : string.Empty;
@@ -158,8 +142,7 @@ namespace form_builder.Mappers
                     return string.IsNullOrWhiteSpace(addressValue.AddressLine1) ? string.Empty : $"{addressValue.AddressLine1}{manualLine2Text},{addressValue.Town},{addressValue.Postcode}";
                 case EElementType.Booking:
                     var bookingValue = (Booking)value;
-                    return  bookingValue.Date.Equals(DateTime.MinValue) && bookingValue.StartTime.Equals(DateTime.MinValue) ? string.Empty : $"{bookingValue.Date.ToFullDateFormat()} at {bookingValue.StartTime.ToTimeFormat()}";
-
+                    return bookingValue.Date.Equals(DateTime.MinValue) && bookingValue.StartTime.Equals(DateTime.MinValue) ? string.Empty : $"{bookingValue.Date.ToFullDateFormat()} at {bookingValue.StartTime.ToTimeFormat()} to {bookingValue.EndTime.ToTimeFormat()}";
                 case EElementType.Street:
                     var streetValue = (Address)value;
                     return string.IsNullOrEmpty(streetValue.PlaceRef) && string.IsNullOrEmpty(streetValue.SelectedAddress) ? string.Empty : streetValue.SelectedAddress;
@@ -223,7 +206,7 @@ namespace form_builder.Mappers
                             _.QuestionId.Equals(appointmentLocation))
                 .ToList();
 
-            if(!value.Any())
+            if (!value.Any())
                 return null;
 
             var bookingId = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentId))?.Response;

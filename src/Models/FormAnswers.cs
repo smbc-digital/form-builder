@@ -17,7 +17,7 @@ namespace form_builder.Models
 
         public string Path { get; set; }
 
-        public string CaseReference {get;set;}
+        public string CaseReference { get; set; }
 
         public string StartPageUrl { get; set; }
 

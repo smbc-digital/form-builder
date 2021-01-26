@@ -214,17 +214,17 @@ namespace form_builder.Builders
 
             return this;
         }
-        
+
         public ElementBuilder WithBookingResource(BookingResource value)
         {
-             if (_property.OptionalResources == null)
+            if (_property.OptionalResources == null)
                 _property.OptionalResources = new List<BookingResource>();
 
             _property.OptionalResources.Add(value);
 
             return this;
         }
-        
+
 
         public ElementBuilder WithNumeric(bool value)
         {
@@ -271,7 +271,7 @@ namespace form_builder.Builders
         public ElementBuilder WithUpperLimitValidationMessage(string message)
         {
             _property.UpperLimitValidationMessage = message;
-            
+
             return this;
         }
 
@@ -329,7 +329,7 @@ namespace form_builder.Builders
 
             return this;
         }
-        
+
         public ElementBuilder WithCustomValidationMessage(string value)
         {
             _property.CustomValidationMessage = value;
@@ -386,7 +386,7 @@ namespace form_builder.Builders
             return this;
         }
 
-        public ElementBuilder WithConditionalElement(bool value) 
+        public ElementBuilder WithConditionalElement(bool value)
         {
             _property.isConditionalElement = value;
 
@@ -396,14 +396,12 @@ namespace form_builder.Builders
         public ElementBuilder WithIsDateBeforeAbsolute(string value)
         {
             _property.IsDateBeforeAbsolute = value;
-            
             return this;
         }
 
         public ElementBuilder WithIsDateBefore(string value)
         {
             _property.IsDateBefore = value;
-            
             return this;
         }
 
@@ -411,14 +409,18 @@ namespace form_builder.Builders
         public ElementBuilder WithIsDateAfter(string value)
         {
             _property.IsDateAfter = value;
-            
             return this;
         }
         
         public ElementBuilder WithIsDateAfterAbsolute(string value)
         {
             _property.IsDateAfterAbsolute = value;
-            
+            return this;
+        }
+
+        public ElementBuilder WithNoAvailableTimeForBookingType(string value)
+        {
+            _property.NoAvailableTimeForBookingType = value;
             return this;
         }
     }

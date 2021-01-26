@@ -1,31 +1,38 @@
-@model form_builder.Models.Elements.Booking
+@model Booking
 
-<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
+<div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)" data-module="smbc-calendar">
+
     @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
 
-    @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_DATE), Model.ReservedBookingDate)
-    @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_START_TIME), Model.ReservedBookingStartTime)
-    @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_END_TIME), Model.ReservedBookingEndTime)
-    @Html.Hidden(@Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_ID), Model.ReservedBookingId)
-    @if (@Model.IsAppointmentTypeFullDay)
+    @Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_DATE), Model.ReservedBookingDate)
+    @Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_START_TIME), Model.ReservedBookingStartTime)
+    @Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_END_TIME), Model.ReservedBookingEndTime)
+    @Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_ID), Model.ReservedBookingId)
+    @if (Model.IsAppointmentTypeFullDay)
     {
-        @Html.Hidden(@Model.GetCustomItemId(BookingConstants.APPOINTMENT_START_TIME), Model.AppointmentStartTime)
-        @Html.Hidden(@Model.GetCustomItemId(BookingConstants.APPOINTMENT_END_TIME), Model.AppointmentEndTime)
+        @Html.Hidden(Model.GetCustomItemId(BookingConstants.APPOINTMENT_START_TIME), Model.AppointmentStartTime)
+        @Html.Hidden(Model.GetCustomItemId(BookingConstants.APPOINTMENT_END_TIME), Model.AppointmentEndTime)
     }
 
     <partial name="LegendH1" />
 
-    <partial name="InsetText" model="@Model.Properties.IAG" />
+    <partial name="InsetText" model="Model.Properties.IAG" />
 
-    @if (@Model.DisplayInsetText)
+    @if (Model.DisplayInsetText)
     {
-        <partial name="InsetText" model="@Model.InsetText" />
+        <partial name="InsetText" model="Model.InsetText" />
     }
 
     <partial name="Hint" />
 
     <partial name="Error" />
 
-    <partial name="Calendar" model="@Model" />
+    <partial name="Calendar" model="Model" />
+
+    @if (!Model.IsAppointmentTypeFullDay)
+    {
+        <partial name="Time" model="Model.Times" />
+    }
+
     @Html.EndFieldSet()
 </div>

@@ -13,13 +13,13 @@ namespace form_builder.Models
     public class FormSchema
     {
         public string FormName { get; set; }
-        
+
         public string BaseURL { get; set; }
 
         public string StartPageUrl { get; set; }
-        
+
         public string FirstPageSlug { get; set; }
-        
+
         public string FeedbackForm { get; set; }
 
         public string FeedbackPhase { get; set; }
@@ -29,7 +29,7 @@ namespace form_builder.Models
         public List<Page> Pages { get; set; }
 
         public List<IAction> FormActions { get; set; } = new List<IAction>();
-        
+
         public List<EnvironmentAvailability> EnvironmentAvailabilities { get; set; }
 
         public bool DocumentDownload { get; set; }
@@ -56,7 +56,7 @@ namespace form_builder.Models
 
                 return page;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new ApplicationException($"Requested path '{path}' object could not be found or was not unique.", ex);
             }

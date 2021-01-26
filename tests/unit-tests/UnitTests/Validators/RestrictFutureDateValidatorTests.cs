@@ -72,7 +72,7 @@ namespace form_builder_tests.UnitTests.Validators
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
-                .WithRestrictFutureDate(true,"Future Date Validation Message")
+                .WithRestrictFutureDate(true, "Future Date Validation Message")
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>
@@ -106,7 +106,7 @@ namespace form_builder_tests.UnitTests.Validators
                 { "test-date-month", "10" },
                 { "test-date-year", "2010" }
             };
-           
+
             // Act
             var result = _restrictFutureDateValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 

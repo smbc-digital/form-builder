@@ -44,7 +44,7 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
-       public void Validate_ShouldCheckTimeIsNotValid()
+        public void Validate_ShouldCheckTimeIsNotValid()
         {
             // Arrange
             var element = new ElementBuilder()

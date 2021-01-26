@@ -12,6 +12,7 @@ namespace form_builder.Models.Properties.ElementProperties
         public bool CheckYourBooking { get; set; }
         public string AppointmentTime { get; set; }
         public string NextAvailableIAG { get; set; } = "This is the next available appointment.";
-        public List<BookingResource> OptionalResources { get;set; } =  new List<BookingResource>();
+        public List<BookingResource> OptionalResources { get; set; } = new List<BookingResource>();
+        public string NoAvailableTimeForBookingType { get; set; } = "appointments";
     }
 }
