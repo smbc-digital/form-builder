@@ -594,6 +594,98 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task MapBookingRequest_ShouldReturn_ValidBookingRequest_WithAddress()
+        {
+            // Arrange
+            var bookingGuid = Guid.NewGuid();
+            var startDate = DateTime.Now.AddDays(-2);
+            var startTime = DateTime.Today.Add(new TimeSpan(1, 0, 0));
+            var expectedValue = startDate.Date.Add(startTime.TimeOfDay);
+            var customerFirstnameElement = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("firstname")
+                .WithTargetMapping("customer.firstname")
+                .Build();
+
+            var addressElement = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("address")
+                .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("page-continue")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(addressElement)
+                .WithElement(customerFirstnameElement)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .WithBehaviour(behaviour)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns("Address 1");
+
+            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers
+                {
+                    Pages = new List<PageAnswers>
+                    {
+                        new PageAnswers
+                        {
+                            PageSlug = "page-one",
+                            Answers = new List<Answers>
+                            {
+                                new Answers
+                                {
+                                    QuestionId = "address",
+                                    Response = "Address 1"
+                                },
+                                new Answers
+                                {
+                                    QuestionId = "firstname",
+                                    Response = "firstname"
+                                }
+                            }
+                        }
+                    }
+                }));
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithCustomerAddressId("address")
+                .WithAppointmentType(bookingGuid)
+                .Build();
+
+            var viewModel = new Dictionary<string, object> {
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", startDate.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", startTime.ToString() }
+            };
+
+            // Act
+            var result = await _service.MapBookingRequest("guid", element, viewModel, "form");
+
+            // Assert
+            Assert.IsType<BookingRequest>(result);
+            Assert.Equal(bookingGuid, result.AppointmentId);
+            Assert.Equal(expectedValue, result.StartDateTime);
+            Assert.Equal("Address 1", result.Customer.Address);
+            _mockSchemaFactory.Verify(_ => _.Build(It.IsAny<string>()), Times.Once);
+            _mockElementMapper.Verify(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()), Times.Once);
+            _mockElementMapper.Verify(_ => _.GetAnswerStringValue(addressElement, It.IsAny<FormAnswers>()), Times.Once);
+        }
+
+        [Fact]
         public async Task MapBookingRequest_Should_ThrowApplicationException_WhenAppointmentDate_NotFoundInViewModel()
         {
             // Arrange

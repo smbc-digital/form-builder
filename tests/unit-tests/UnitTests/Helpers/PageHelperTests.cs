@@ -2578,7 +2578,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Act
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
-            Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires customer firstname/lastname/email elements for reservation", result.Message);
+            Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires customer firstname/lastname elements for reservation", result.Message);
         }
 
         [Fact]
@@ -2673,7 +2673,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Act
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
-            Assert.Equal("PageHelper:CheckForBookingElement, Booking element optional resouces are invalid, ResourceId cannot be an empty Guid.", result.Message);
+            Assert.Equal("PageHelper:CheckForBookingElement, Booking element optional resources are invalid, ResourceId cannot be an empty Guid.", result.Message);
         }
 
         [Fact]
@@ -2698,7 +2698,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Act
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
-            Assert.Equal("PageHelper:CheckForBookingElement, Booking element optional resouces are invalid, cannot have a quantity less than 0", result.Message);
+            Assert.Equal("PageHelper:CheckForBookingElement, Booking element optional resources are invalid, cannot have a quantity less than 0", result.Message);
         }
     }
 }
