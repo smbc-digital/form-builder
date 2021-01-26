@@ -20,7 +20,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             // Act
-            var result = _isDateBeforeAbsoluteValidator.Validate(element, null, new form_builder.Models.FormSchema());
+            ValidationResult result = _isDateBeforeAbsoluteValidator.Validate(element, null, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -38,7 +38,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _isDateBeforeAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+            ValidationResult result = _isDateBeforeAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);            
@@ -57,16 +57,15 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-date", "01/01/2019");
             
-
             // Act
-            var result = _isDateBeforeAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+            ValidationResult result = _isDateBeforeAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
         }
 
         [Fact]
-       public void Validate_ShouldReturnValidWhenDateInputIsValid()
+        public void Validate_ShouldReturnValidWhenDateInputIsValid()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -81,12 +80,12 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date-year", "2019");
 
             // Act
-            var result = _isDateBeforeAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+            ValidationResult result = _isDateBeforeAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
         }
-       
+
         [Fact]
         public void Validate_ShouldReturnNotValidWhenDatePickerIsNotValid()
         {
@@ -101,7 +100,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date", "01/01/2021");
 
             // Act
-            var result = _isDateBeforeAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+            ValidationResult result = _isDateBeforeAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -121,7 +120,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date", "01/01/2020");
 
             // Act
-            var result = _isDateBeforeAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+            ValidationResult result = _isDateBeforeAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -143,7 +142,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date-year", "2021");
 
             // Act
-            var result = _isDateBeforeAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+            ValidationResult result = _isDateBeforeAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);

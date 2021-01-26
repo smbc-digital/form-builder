@@ -68,30 +68,27 @@ namespace form_builder.Models.Elements
 
         public static DateTime? GetDate(Dictionary<string, dynamic> viewModel, string key)
         {
-                if(!viewModel.ContainsKey(key))
-                    return null;
+            if (!viewModel.ContainsKey(key) || string.IsNullOrEmpty(viewModel[key]))
+                return null;
 
-                if (string.IsNullOrEmpty(viewModel[key]))
-                    return null;
+            if (!DateTime.TryParse(viewModel[key], out DateTime dateValue))
+                throw new FormatException("DatePicker.GetDate: The date format was incorrect");
 
-                if(!DateTime.TryParse(viewModel[key], out DateTime dateValue))
-                    throw new FormatException("DatePicker.GetDate: The date format was incorrect");
-
-                return dateValue;
+            return dateValue;
         }
 
         public static DateTime? GetDate(FormAnswers answers, string key)
         {
-                var response = answers.AllAnswers;
-                var answer = response.SingleOrDefault(_ => _.QuestionId == key);
+            IEnumerable<Answers> response = answers.AllAnswers;
+            Answers answer = response.SingleOrDefault(_ => _.QuestionId == key);
 
-                if(answer == null || string.IsNullOrEmpty(answer.Response))
-                    return null;
+            if (answer == null || string.IsNullOrEmpty(answer.Response))
+                return null;
 
-                if(!DateTime.TryParse(answer.Response, out DateTime dateValue))
-                    throw new FormatException("DatePicker.GetDate: The date format was incorrect");
+            if (!DateTime.TryParse(answer.Response, out DateTime dateValue))
+                throw new FormatException("DatePicker.GetDate: The date format was incorrect");
 
-                return dateValue;
+            return dateValue;
         }
     }
 }

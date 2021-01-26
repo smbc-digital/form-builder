@@ -62,21 +62,15 @@ namespace form_builder.Models
             }
         }
 
-        // TODO: Thbis needs tests
-        public IElement GetElement(string questionId)
-        {
-            return Pages.SelectMany(_ => _.Elements)
-                    .SingleOrDefault(_ => _.Properties.QuestionId == questionId);
+        public IElement GetElement(string questionId) => 
+            Pages.SelectMany(_ => _.Elements)
+                .SingleOrDefault(_ => _.Properties.QuestionId == questionId);
 
-        }        
-
-        // TODO: This needs tests
-        public bool HasElement(string questionId)
-        {
-            return Pages.SelectMany(_ => _.Elements)
-                    .Any(_ => _.Properties.QuestionId == questionId);
-        }
-
+        public bool HasElement(string questionId) =>
+        
+            Pages.SelectMany(_ => _.Elements)
+                .Any(_ => _.Properties.QuestionId == questionId);
+        
         public async Task ValidateFormSchema(IPageHelper pageHelper, string form, string path)
         {
             if (path != FirstPageSlug)

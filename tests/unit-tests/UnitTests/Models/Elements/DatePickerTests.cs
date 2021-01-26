@@ -46,19 +46,19 @@ namespace form_builder_tests.UnitTests.Models.Elements
         public void GetDate_ReturnNull_IfKeyNotPresent()
         {
             var viewModel = new Dictionary<string, dynamic>();
-            var result =  DatePicker.GetDate(viewModel, "test-date");
+            DateTime? result = DatePicker.GetDate(viewModel, "test-date");
             Assert.False(result.HasValue);
         }
 
         [Fact]
         public void GetDate_ReturnNull_IfKeyPresentButValueIsEmpty()
         {
-            var viewModel = new Dictionary<string, dynamic>()
+            var viewModel = new Dictionary<string, dynamic>
             {
                 { "test-date", "" } 
             };
 
-            var result =  DatePicker.GetDate(viewModel, "test-date");
+            DateTime? result = DatePicker.GetDate(viewModel, "test-date");
             Assert.False(result.HasValue);
         }
 
@@ -69,10 +69,12 @@ namespace form_builder_tests.UnitTests.Models.Elements
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers{
+                    new PageAnswers
+                    {
                         Answers = new List<Answers>
                         {
-                            new Answers{
+                            new Answers
+                            {
                                 QuestionId = "test-date",
                                 Response = "01/01/2020"
                             }
@@ -82,7 +84,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 }
             };
 
-            var result =  DatePicker.GetDate(formAnswers, "test-date");
+            var result = DatePicker.GetDate(formAnswers, "test-date");
             Assert.True(result.HasValue);
             Assert.True(result.Value == new DateTime(2020, 1, 1));
         }
@@ -97,7 +99,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
                     new PageAnswers{
                         Answers = new List<Answers>
                         {
-                            new Answers{
+                            new Answers
+                            {
                                 QuestionId = "test-date",
                                 Response = "ABC123"
                             }
@@ -130,7 +133,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers{
+                    new PageAnswers
+                    {
                         Answers = new List<Answers>
                         {
                             new Answers{ QuestionId = "test-date" }

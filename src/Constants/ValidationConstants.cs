@@ -12,8 +12,5 @@
         public const string BOOKING_TIME_EMPTY = "You must select a time";
         public const string IS_DATE_BEFORE_VALIDATOR_DEFAULT = "The date provided must be before {0}";
         public const string IS_DATE_AFTER_VALIDATOR_DEFAULT = "The date provided must be after {0}";
-
-        
-
     }
 }

@@ -19,26 +19,26 @@ namespace form_builder.Validators
             }
 
             DateTime? dateValue = new DateTime();
-            if(element.Type == EElementType.DatePicker)
+            if (element.Type == EElementType.DatePicker)
                 dateValue = DatePicker.GetDate(viewModel, element.Properties.QuestionId);
 
-            if(element.Type == EElementType.DateInput)
+            if (element.Type == EElementType.DateInput)
                 dateValue = DateInput.GetDate(viewModel, element.Properties.QuestionId);
 
-            if(!dateValue.HasValue)
+            if (!dateValue.HasValue)
                 return new ValidationResult { IsValid = true };
             
-            if(!DateTime.TryParse(element.Properties.IsDateBeforeAbsolute, out DateTime comparisonDateValue))
+            if (!DateTime.TryParse(element.Properties.IsDateBeforeAbsolute, out DateTime comparisonDateValue))
                 throw new FormatException("IsDateBeforeAbsoluteValidator: The comparison date format was incorrect");
 
-            if(dateValue < comparisonDateValue)
+            if (dateValue < comparisonDateValue)
                 return new ValidationResult { IsValid = true };
 
             return new ValidationResult {
                 IsValid = false,
-                Message = !string.IsNullOrEmpty(element.Properties.IsDateBeforeValidationMessage) ? 
-                            element.Properties.IsDateBeforeValidationMessage : 
-                            string.Format(ValidationConstants.IS_DATE_BEFORE_VALIDATOR_DEFAULT, element.Properties.IsDateBeforeAbsolute)
+                Message = !string.IsNullOrEmpty(element.Properties.IsDateBeforeValidationMessage) 
+                    ? element.Properties.IsDateBeforeValidationMessage 
+                    : string.Format(ValidationConstants.IS_DATE_BEFORE_VALIDATOR_DEFAULT, element.Properties.IsDateBeforeAbsolute)
             };
         }
     }

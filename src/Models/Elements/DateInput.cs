@@ -40,39 +40,31 @@ namespace form_builder.Models.Elements
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
-        // TODO: This needs tests
-        private static bool HasValidDateTimeAnswer(Dictionary<string, dynamic> viewModel, string key)
-        {
-                if (viewModel.ContainsKey($"{key}{DateInput.YEAR_EXTENSION}") && 
-                viewModel.ContainsKey($"{key}{DateInput.MONTH_EXTENSION}") && 
-                viewModel.ContainsKey($"{key}{DateInput.DAY_EXTENSION}"))
-                {
-                    return true;
-                }
-                
-                return false;
-        }
-
-        // TODO: This needs tests
+        private static bool HasValidDateTimeAnswer(Dictionary<string, dynamic> viewModel, string key) =>
+            viewModel.ContainsKey($"{key}{DateInput.YEAR_EXTENSION}") && 
+            viewModel.ContainsKey($"{key}{DateInput.MONTH_EXTENSION}") && 
+            viewModel.ContainsKey($"{key}{DateInput.DAY_EXTENSION}") 
+                ? true 
+                : false;
+        
         public static DateTime? GetDate(Dictionary<string, dynamic> viewModel, string key)
         {
             if(!HasValidDateTimeAnswer(viewModel, key))            
                 return null;
 
-            var year = viewModel[$"{key}{DateInput.YEAR_EXTENSION}"];
-            var month = viewModel[$"{key}{DateInput.MONTH_EXTENSION}"];
-            var day = viewModel[$"{key}{DateInput.DAY_EXTENSION}"];
+            string year = viewModel[$"{key}{DateInput.YEAR_EXTENSION}"];
+            string month = viewModel[$"{key}{DateInput.MONTH_EXTENSION}"];
+            string day = viewModel[$"{key}{DateInput.DAY_EXTENSION}"];
             
             return new DateTime(Convert.ToInt32(year), Convert.ToInt32(month), Convert.ToInt32(day));
         }
 
-        // TODO: This needs tests
         public static DateTime? GetDate(FormAnswers answers, string key)
         {
-            var flattenedAnswers = answers.AllAnswers;
-            var year = flattenedAnswers.Single(answer => answer.QuestionId == $"{key}{DateInput.YEAR_EXTENSION}").Response; 
-            var month = flattenedAnswers.Single(answer => answer.QuestionId == $"{key}{DateInput.MONTH_EXTENSION}").Response;
-            var day = flattenedAnswers.Single(answer => answer.QuestionId == $"{key}{DateInput.DAY_EXTENSION}").Response;
+            IEnumerable<Answers> flattenedAnswers = answers.AllAnswers;
+            string year = flattenedAnswers.Single(answer => answer.QuestionId == $"{key}{DateInput.YEAR_EXTENSION}").Response; 
+            string month = flattenedAnswers.Single(answer => answer.QuestionId == $"{key}{DateInput.MONTH_EXTENSION}").Response;
+            string day = flattenedAnswers.Single(answer => answer.QuestionId == $"{key}{DateInput.DAY_EXTENSION}").Response;
             
             return new DateTime(Convert.ToInt32(year), Convert.ToInt32(month), Convert.ToInt32(day));
         }

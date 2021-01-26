@@ -292,9 +292,9 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers
+                    new PageAnswers 
                     {
-                        Answers = new List<Answers>
+                        Answers = new List<Answers> 
                         {
                             new Answers
                             {
@@ -318,7 +318,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            // Act
+            // Arrange/Act
             ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
 
             // Assert
@@ -330,7 +330,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Pages = new List<Page>
                 {
-                    new Page
+                    new Page 
                     {
                         Elements = new List<IElement>
                         {
@@ -342,8 +342,8 @@ namespace form_builder_tests.UnitTests.Validators
 
         private FormSchema SchemaWithDatePickerElement => 
             SchemaWithElement(new DatePicker
-                            {
-                                Properties = new BaseProperty { QuestionId = "test-comparison-element" }
-                            });
+                {
+                    Properties = new BaseProperty { QuestionId = "test-comparison-element" }
+                });
     }
 }

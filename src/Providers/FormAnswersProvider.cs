@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 
 namespace form_builder.Providers
 {
-
     public class FormAnswersProvider : IFormAnswersProvider
     {
         private readonly ISessionHelper _sessionHelper;

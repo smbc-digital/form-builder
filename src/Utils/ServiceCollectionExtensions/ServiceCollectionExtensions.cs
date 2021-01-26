@@ -117,7 +117,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         {
             services.AddTransient<ITagParser, FormAnswerTagParser>();
             services.AddTransient<ITagParser, FormDataTagParser>();
-               services.AddTransient<ITagParser, LinkTagParser>();
+            services.AddTransient<ITagParser, LinkTagParser>();
 
             return services;
         }
@@ -203,7 +203,6 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             return services;
         }
 
-
         public static IServiceCollection ConfigureOrganisationProviders(this IServiceCollection services)
         {
             services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
@@ -211,7 +210,6 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
             return services;
         }
-
         
         public static IServiceCollection ConfigureFormAnswersProviders(this IServiceCollection services)
         {
@@ -219,7 +217,6 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
             return services;
         }
-
 
         public static IServiceCollection ConfigureStreetProviders(this IServiceCollection services)
         {
