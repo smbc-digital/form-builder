@@ -393,10 +393,34 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithIsDateBeforeAbsolute(string value)
+        {
+            _property.IsDateBeforeAbsolute = value;
+            return this;
+        }
+
+        public ElementBuilder WithIsDateBefore(string value)
+        {
+            _property.IsDateBefore = value;
+            return this;
+        }
+
+        
+        public ElementBuilder WithIsDateAfter(string value)
+        {
+            _property.IsDateAfter = value;
+            return this;
+        }
+        
+        public ElementBuilder WithIsDateAfterAbsolute(string value)
+        {
+            _property.IsDateAfterAbsolute = value;
+            return this;
+        }
+
         public ElementBuilder WithNoAvailableTimeForBookingType(string value)
         {
             _property.NoAvailableTimeForBookingType = value;
-
             return this;
         }
 

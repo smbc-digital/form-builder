@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using form_builder.Constants;
+using form_builder.Models;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators
 {
     public class EmailElementValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
             if (element.Properties.Email != true)
             {

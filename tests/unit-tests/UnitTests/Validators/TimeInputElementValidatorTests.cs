@@ -20,7 +20,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             // Assert
-            var result = _dateInputElementValidator.Validate(element, null);
+            var result = _dateInputElementValidator.Validate(element, null, new form_builder.Models.FormSchema());
             Assert.True(result.IsValid);
         }
         [Fact]
@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _dateInputElementValidator.Validate(element, viewModel);
+            var result = _dateInputElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -60,7 +60,7 @@ namespace form_builder_tests.UnitTests.Validators
             };
 
             // Act
-            var result = _dateInputElementValidator.Validate(element, viewModel);
+            var result = _dateInputElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);

@@ -2,13 +2,14 @@
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
+using form_builder.Models;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators
 {
     public class AddressPostcodeValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
             if (element.Type != EElementType.Address || (element.Type == EElementType.Address && !viewModel.IsInitial()))
             {

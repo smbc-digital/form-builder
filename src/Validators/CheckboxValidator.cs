@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using form_builder.Enum;
+using form_builder.Models;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators
 {
     public class CheckboxValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
             if (element.Type != EElementType.Checkbox && element.Type != EElementType.Declaration)
             {

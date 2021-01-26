@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using form_builder.Builders;
 using form_builder.Enum;
+using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Validators;
 using Moq;
@@ -15,7 +16,7 @@ namespace form_builder_tests.UnitTests.Models
 
         public ElementTests()
         {
-            _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>()))
+            _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
                 .Returns(new ValidationResult { IsValid = false });
 
             var elementValidatorItems = new List<IElementValidator> { _testValidator.Object };
@@ -268,9 +269,9 @@ namespace form_builder_tests.UnitTests.Models
                             .WithQuestionId(questionId)
                             .Build();
 
-            var viewModel = new Dictionary<string, dynamic> { { questionId, "test" } };
-            element.Validate(viewModel, _validators.Object);
-
+            var viewModel = new Dictionary<string, dynamic> {{questionId, "test"}};
+            element.Validate(viewModel, _validators.Object, new form_builder.Models.FormSchema());
+            
             // Act
             var result = element.GetDescribedByAttributeValue();
 
@@ -290,8 +291,8 @@ namespace form_builder_tests.UnitTests.Models
                             .WithHint("hint")
                             .Build();
 
-            var viewModel = new Dictionary<string, dynamic> { { questionId, "test" } };
-            element.Validate(viewModel, _validators.Object);
+            var viewModel = new Dictionary<string, dynamic> {{questionId, "test"}};
+            element.Validate(viewModel, _validators.Object, new form_builder.Models.FormSchema());
 
             // Act
             var result = element.GetDescribedByAttributeValue();

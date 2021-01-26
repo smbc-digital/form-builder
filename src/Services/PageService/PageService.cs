@@ -206,7 +206,7 @@ namespace form_builder.Services.PageService
             IEnumerable<CustomFormFile> files,
             bool modelStateIsValid)
         {
-            var baseForm = await _schemaFactory.Build(form);
+            FormSchema baseForm = await _schemaFactory.Build(form);
 
             if (!baseForm.IsAvailable(_environment.EnvironmentName))
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
@@ -224,7 +224,7 @@ namespace form_builder.Services.PageService
             if (currentPage.HasIncomingPostValues)
                 viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
-            currentPage.Validate(viewModel, _validators);
+            currentPage.Validate(viewModel, _validators, baseForm);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
                 return await _addressService.ProcessAddress(viewModel, currentPage, baseForm, sessionGuid, path);
@@ -275,7 +275,6 @@ namespace form_builder.Services.PageService
         public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
         {
             var answers = new Dictionary<string, dynamic>();
-
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var cachedAnswers = _distributedCache.GetString(sessionGuid);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);

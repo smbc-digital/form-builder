@@ -20,7 +20,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             // Act
-            var result = _restrictFutureDateValidator.Validate(element, null);
+            var result = _restrictFutureDateValidator.Validate(element, null, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -39,7 +39,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _restrictFutureDateValidator.Validate(element, viewModel);
+            var result = _restrictFutureDateValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -59,7 +59,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic> { { "test-date", string.Empty } };
 
             // Act
-            var result = _restrictFutureDateValidator.Validate(element, viewModel);
+            var result = _restrictFutureDateValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -81,7 +81,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date", tomorrow.ToString("yyyy-MM-dd"));
 
             // Act
-            var result = _restrictFutureDateValidator.Validate(element, viewModel);
+            var result = _restrictFutureDateValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -103,7 +103,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date", yesterday.ToString("yyyy-MM-dd"));
 
             // Act
-            var result = _restrictFutureDateValidator.Validate(element, viewModel);
+            var result = _restrictFutureDateValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);

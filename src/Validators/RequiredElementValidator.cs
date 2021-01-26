@@ -9,7 +9,7 @@ namespace form_builder.Validators
 {
     public class RequiredElementValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
             if (element.Type == EElementType.DateInput || element.Type == EElementType.Map ||
                 element.Type == EElementType.TimeInput || element.Type == EElementType.DatePicker ||

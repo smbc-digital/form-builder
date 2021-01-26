@@ -20,7 +20,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             // Act
-            var result = _restrictCurrentDateValidator.Validate(element, null);
+            var result = _restrictCurrentDateValidator.Validate(element, null,new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -38,7 +38,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _restrictCurrentDateValidator.Validate(element, viewModel);
+            var result = _restrictCurrentDateValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -58,7 +58,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _restrictCurrentDateValidator.Validate(element, viewModel);
+            var result = _restrictCurrentDateValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -82,7 +82,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date-day", today.Day.ToString());
 
             // Act
-            var result = _restrictCurrentDateValidator.Validate(element, viewModel);
+            var result = _restrictCurrentDateValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -105,7 +105,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date-year", "2012");
 
             // Act
-            var result = _restrictCurrentDateValidator.Validate(element, viewModel);
+            var result = _restrictCurrentDateValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
