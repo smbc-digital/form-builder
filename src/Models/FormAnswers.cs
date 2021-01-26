@@ -31,10 +31,10 @@ namespace form_builder.Models
         public IEnumerable<Answers> AllAnswers {
             get 
             {
-                if(this.Pages == null)
+                if (this.Pages == null)
                     return Enumerable.Empty<Answers>();
 
-                if(!this.Pages.SelectMany(_ => _.Answers).Any())
+                if (!this.Pages.SelectMany(_ => _.Answers).Any())
                     return Enumerable.Empty<Answers>();
 
                 return this.Pages.SelectMany(_ => _.Answers);
