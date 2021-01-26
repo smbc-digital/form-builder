@@ -67,7 +67,6 @@ namespace form_builder.Models
                 .SingleOrDefault(_ => _.Properties.QuestionId == questionId);
 
         public bool HasElement(string questionId) =>
-        
             Pages.SelectMany(_ => _.Elements)
                 .Any(_ => _.Properties.QuestionId == questionId);
         
