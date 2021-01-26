@@ -344,6 +344,6 @@ namespace form_builder_tests.UnitTests.Validators
             SchemaWithElement(new DatePicker
                             {
                                 Properties = new BaseProperty { QuestionId = "test-comparison-element" }
-                            }) ;
+                            });
     }
 }
