@@ -41,7 +41,7 @@ namespace form_builder.Models.Elements
                     htmlContent.AppendHtmlLine($"<dd class=\"govuk-summary-list__value\">{answer.Value}</dd>");
 
                     if (Properties != null && Properties.AllowEditing)
-                        htmlContent.AppendHtmlLine($"<dd class=\"govuk-summary-list__actions\"><a class=\"govuk-link\" href=\"{pageSummary.PageSlug}\">Change</a><span class=\"govuk-visually-hidden\">{answer.Key}</span</dd>");
+                        htmlContent.AppendHtmlLine($"<dd class=\"govuk-summary-list__actions\"><a class=\"govuk-link\" href=\"{pageSummary.PageSlug}\">Change <span class=\"govuk-visually-hidden\">{answer.Key}</span></a></dd>");
 
                     htmlContent.AppendHtmlLine("</div>");
                 }
