@@ -20,6 +20,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Helpers.ViewRender;
 using form_builder.Mappers;
+using form_builder.Providers;
 using form_builder.Providers.Address;
 using form_builder.Providers.Booking;
 using form_builder.Providers.DocumentCreation;
@@ -104,6 +105,10 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddTransient<IElementValidator, RestrictFileSizeValidator>();
             services.AddTransient<IElementValidator, RestrictCombinedFileSizeValidator>();
             services.AddTransient<IElementValidator, BookingValidator>();
+            services.AddTransient<IElementValidator, IsDateBeforeAbsoluteValidator>();
+            services.AddTransient<IElementValidator, IsDateBeforeValidator>();
+            services.AddTransient<IElementValidator, IsDateAfterAbsoluteValidator>();
+            services.AddTransient<IElementValidator, IsDateAfterValidator>();
 
             return services;
         }
@@ -198,11 +203,17 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             return services;
         }
 
-
         public static IServiceCollection ConfigureOrganisationProviders(this IServiceCollection services)
         {
             services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
             services.AddSingleton<IOrganisationProvider, ServiceOrganisationProvider>();
+
+            return services;
+        }
+        
+        public static IServiceCollection ConfigureFormAnswersProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IFormAnswersProvider, FormAnswersProvider>();
 
             return services;
         }

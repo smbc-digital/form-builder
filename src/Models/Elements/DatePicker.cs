@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
@@ -63,6 +64,31 @@ namespace form_builder.Models.Elements
             }
 
             return properties;
+        }
+
+        public static DateTime? GetDate(Dictionary<string, dynamic> viewModel, string key)
+        {
+            if (!viewModel.ContainsKey(key) || string.IsNullOrEmpty(viewModel[key]))
+                return null;
+
+            if (!DateTime.TryParse(viewModel[key], out DateTime dateValue))
+                throw new FormatException("DatePicker.GetDate: The date format was incorrect");
+
+            return dateValue;
+        }
+
+        public static DateTime? GetDate(FormAnswers answers, string key)
+        {
+            IEnumerable<Answers> response = answers.AllAnswers;
+            Answers answer = response.SingleOrDefault(_ => _.QuestionId == key);
+
+            if (answer == null || string.IsNullOrEmpty(answer.Response))
+                return null;
+
+            if (!DateTime.TryParse(answer.Response, out DateTime dateValue))
+                throw new FormatException("DatePicker.GetDate: The date format was incorrect");
+
+            return dateValue;
         }
     }
 }
