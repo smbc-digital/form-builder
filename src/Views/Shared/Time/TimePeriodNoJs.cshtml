@@ -10,17 +10,12 @@
         var positionalClassName = Model.GetClassNameForDivsPosition(i);
         var ariaId = Model.GetTimeInputHint(i);
 
-        var inputId = $"{Model.Value(startTime)}-full-time-period";
+        var inputId = $"{Model.Value(startTime)}{BookingConstants.APPOINTMENT_FULL_TIME_OF_DAY_SUFFIX}";
         var inputName = Model.NoJSId;
         var inputValue = $"{Model.Value(startTime)}|{Model.Value(endTime)}";
 
         <div class="smbc-time__time">
-            <input class="smbc-time__time__input"
-                   type="radio"
-                   id="@inputId"
-                   name="@inputName"
-                   value="@inputValue"
-                   aria-describedby="@ariaId" />
+            <input class="smbc-time__time__input" type="radio" id="@inputId" name="@inputName" value="@inputValue" aria-describedby="@ariaId" />
             <label aria-hidden="true" class="smbc-time__time__label @positionalClassName" for="@inputId">
                 @appointmentTime
             </label>
