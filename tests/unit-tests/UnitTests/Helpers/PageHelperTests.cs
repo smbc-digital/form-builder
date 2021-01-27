@@ -1000,6 +1000,84 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
+        public void CheckQuestionIdExistsForBookingCustomerAddressId_ShouldThrowException_WhenQuestionIdDoesNotExist()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithQuestionId("address")
+                .WithType(EElementType.Textarea)
+                .Build();
+
+            var bookingElement = new ElementBuilder()
+                .WithQuestionId("booking")
+                .WithType(EElementType.Booking)
+                .WithCustomerAddressId("address")
+                .Build();
+
+            var additionalBookingElement = new ElementBuilder()
+                .WithQuestionId("additionalBooking")
+                .WithType(EElementType.Booking)
+                .WithCustomerAddressId("additionalAddress")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+            page = new PageBuilder()
+                .WithElement(bookingElement)
+                .Build();
+
+            pages.Add(page);
+            page = new PageBuilder()
+                .WithElement(additionalBookingElement)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckQuestionIdExistsForBookingCustomerAddressId(pages, "formName"));
+
+            // Assert
+            Assert.StartsWith("The provided json 'formName' does not contain an element with questionId of ", result.Message);
+        }
+
+        [Fact]
+        public void CheckQuestionIdExistsForBookingCustomerAddressId_ShouldNotThrowException_WhenQuestionIdExists()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var addressElement = new ElementBuilder()
+                .WithQuestionId("address")
+                .WithType(EElementType.Textarea)
+                .Build();
+
+            var bookingElement = new ElementBuilder()
+                .WithQuestionId("booking")
+                .WithType(EElementType.Booking)
+                .WithCustomerAddressId("address")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(addressElement)
+                .Build();
+
+            pages.Add(page);
+            page = new PageBuilder()
+                .WithElement(bookingElement)
+                .Build();
+
+            pages.Add(page);
+
+            // Act & Assert
+            _pageHelper.CheckForInvalidQuestionOrTargetMappingValue(pages, "formName");
+        }
+
+        [Fact]
         public async Task CheckForPaymentConfiguration_ShouldThrowException_WhenNoConfigFound_ForForm()
         {
             // Arrange
