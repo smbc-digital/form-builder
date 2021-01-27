@@ -59,6 +59,7 @@ namespace form_builder_tests.UnitTests.Validators {
 
             // Assert
             Assert.False(result.IsValid);
+            Assert.Equal("Enter street name in the correct format", result.Message);
         }
     }
 }
