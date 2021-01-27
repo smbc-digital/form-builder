@@ -228,7 +228,9 @@ namespace form_builder.Services.BookingService
             var currentlySelectedBookingStartTime = bookingElement.StartTimeQuestionId;
             var currentlySelectedBookingEndTime = bookingElement.EndTimeQuestionId;
 
-            
+            var bookingRequest = await _mappingService.MapBookingRequest(guid, bookingElement, viewModel, form);
+            var location = await GetReservedBookingLocation(bookingElement, bookingRequest);
+            viewModel.Add(bookingElement.AppointmentLocation, location);
 
             if (viewModel.ContainsKey(reservedBookingId) && !string.IsNullOrEmpty((string)viewModel[reservedBookingId]))
             {
@@ -248,12 +250,9 @@ namespace form_builder.Services.BookingService
             viewModel.Remove(reservedBookingStartTime);
             viewModel.Remove(reservedBookingEndTime);
 
-            var bookingRequest = await _mappingService.MapBookingRequest(guid, bookingElement, viewModel, form);
             var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
                 .Reserve(bookingRequest);
 
-            var location = await GetReservedBookingLocation(bookingElement, bookingRequest);
-            viewModel.Add(bookingElement.AppointmentLocation, location);
             viewModel.Add(reservedBookingDate, viewModel[currentlySelectedBookingDate]);
             viewModel.Add(reservedBookingStartTime, viewModel[currentlySelectedBookingStartTime]);
             viewModel.Add(reservedBookingEndTime, viewModel[currentlySelectedBookingEndTime]);

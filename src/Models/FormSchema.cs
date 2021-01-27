@@ -91,6 +91,7 @@ namespace form_builder.Models
             pageHelper.CheckForAnyConditionType(Pages);
             pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(Pages);
             pageHelper.CheckForBookingElement(Pages);
+            pageHelper.CheckQuestionIdExistsForBookingCustomerAddressId(Pages, form);
         }
 
         public bool IsAvailable(string environment)
