@@ -4,6 +4,6 @@
     {
         public string StreetProvider { get; set; }
 
-        public string StreetIAG { get; set; } = "It must be a Stockport street name.";
+        public string StreetIAG { get; set; } = "You must enter a Stockport street name and it must only include letters a to z and space. For example, Stockport Road.";
     }
 }
