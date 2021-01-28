@@ -53,9 +53,9 @@ namespace form_builder.Models.Elements
                 return false;
             }
 
-            if(string.IsNullOrEmpty(yearKey) ||
-                string.IsNullOrEmpty(monthKey) ||
-                string.IsNullOrEmpty(dayKey))
+            if(string.IsNullOrEmpty(viewModel[yearKey]) ||
+                string.IsNullOrEmpty(viewModel[monthKey]) ||
+                string.IsNullOrEmpty(viewModel[dayKey]))
             {
                 return false;
             }
@@ -65,12 +65,17 @@ namespace form_builder.Models.Elements
         
         public static DateTime? GetDate(Dictionary<string, dynamic> viewModel, string key)
         {
+
+            var yearKey = $"{key}{DateInput.YEAR_EXTENSION}";
+            var monthKey = $"{key}{DateInput.MONTH_EXTENSION}";
+            var dayKey = $"{key}{DateInput.DAY_EXTENSION}";
+
             if(!HasValidDateTimeAnswer(viewModel, key))            
                 return null;
 
-            string year = viewModel[$"{key}{DateInput.YEAR_EXTENSION}"];
-            string month = viewModel[$"{key}{DateInput.MONTH_EXTENSION}"];
-            string day = viewModel[$"{key}{DateInput.DAY_EXTENSION}"];
+            string year = viewModel[yearKey];
+            string month = viewModel[monthKey];
+            string day = viewModel[dayKey];
             
             return new DateTime(Convert.ToInt32(year), Convert.ToInt32(month), Convert.ToInt32(day));
         }
