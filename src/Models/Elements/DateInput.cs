@@ -40,12 +40,28 @@ namespace form_builder.Models.Elements
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
-        private static bool HasValidDateTimeAnswer(Dictionary<string, dynamic> viewModel, string key) =>
-            viewModel.ContainsKey($"{key}{DateInput.YEAR_EXTENSION}") && 
-            viewModel.ContainsKey($"{key}{DateInput.MONTH_EXTENSION}") && 
-            viewModel.ContainsKey($"{key}{DateInput.DAY_EXTENSION}") 
-                ? true 
-                : false;
+        private static bool HasValidDateTimeAnswer(Dictionary<string, dynamic> viewModel, string key) 
+        {
+            var yearKey = $"{key}{DateInput.YEAR_EXTENSION}";
+            var monthKey = $"{key}{DateInput.MONTH_EXTENSION}";
+            var dayKey = $"{key}{DateInput.DAY_EXTENSION}";
+
+            if(!viewModel.ContainsKey(yearKey) ||
+                !viewModel.ContainsKey(monthKey) ||
+                !viewModel.ContainsKey(dayKey))
+            {
+                return false;
+            }
+
+            if(string.IsNullOrEmpty(yearKey) ||
+                string.IsNullOrEmpty(monthKey) ||
+                string.IsNullOrEmpty(dayKey))
+            {
+                return false;
+            }
+
+            return true;
+        }
         
         public static DateTime? GetDate(Dictionary<string, dynamic> viewModel, string key)
         {
