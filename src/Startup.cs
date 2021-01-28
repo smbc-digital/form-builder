@@ -123,6 +123,19 @@ namespace form_builder
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}")
             );
+
+            app.UseResponseCaching();
+            app.Use(async (context, next) =>
+            {
+                context.Response.GetTypedHeaders().CacheControl = 
+                    new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
+                    {
+                        NoCache = true,
+                        NoStore = true
+                    };                
+
+                await next();
+            });
         }
     }
 }
