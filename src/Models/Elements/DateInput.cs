@@ -46,14 +46,14 @@ namespace form_builder.Models.Elements
             var monthKey = $"{key}{DateInput.MONTH_EXTENSION}";
             var dayKey = $"{key}{DateInput.DAY_EXTENSION}";
 
-            if(!viewModel.ContainsKey(yearKey) ||
+            if (!viewModel.ContainsKey(yearKey) ||
                 !viewModel.ContainsKey(monthKey) ||
                 !viewModel.ContainsKey(dayKey))
             {
                 return false;
             }
 
-            if(string.IsNullOrEmpty(viewModel[yearKey]) ||
+            if (string.IsNullOrEmpty(viewModel[yearKey]) ||
                 string.IsNullOrEmpty(viewModel[monthKey]) ||
                 string.IsNullOrEmpty(viewModel[dayKey]))
             {
@@ -70,7 +70,7 @@ namespace form_builder.Models.Elements
             var monthKey = $"{key}{DateInput.MONTH_EXTENSION}";
             var dayKey = $"{key}{DateInput.DAY_EXTENSION}";
 
-            if(!HasValidDateTimeAnswer(viewModel, key))            
+            if (!HasValidDateTimeAnswer(viewModel, key))            
                 return null;
 
             string year = viewModel[yearKey];
