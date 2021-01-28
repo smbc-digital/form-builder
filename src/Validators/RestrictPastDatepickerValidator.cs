@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using form_builder.Enum;
+using form_builder.Models;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators
 {
     public class RestrictPastDatepickerValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel)
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
             if (!element.Properties.RestrictPastDate
                 || element.Type != EElementType.DatePicker

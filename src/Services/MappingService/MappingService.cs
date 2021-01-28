@@ -17,7 +17,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
-using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
 
 namespace form_builder.Services.MappingService
 {
@@ -54,22 +53,14 @@ namespace form_builder.Services.MappingService
         public async Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form)
         {
             var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
-
+            
             return new BookingRequest
             {
                 AppointmentId = bookingElement.Properties.AppointmentType,
-                Customer = GetCustomerDetails(convertedAnswers, baseForm),
+                Customer = GetCustomerBookingDetails(convertedAnswers, baseForm, bookingElement),
                 StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form),
                 OptionalResources = bookingElement.Properties.OptionalResources
             };
-        }
-
-        public async Task<Address> MapAddress(string sessionGuid, string form)
-        {
-            var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
-
-            var customer = GetCustomerDetails(convertedAnswers, baseForm);
-            return customer.Address;
         }
 
         private async Task<(FormAnswers convertedAnswers, FormSchema baseForm)> GetFormAnswers(string form, string sessionGuid)
@@ -99,18 +90,32 @@ namespace form_builder.Services.MappingService
             return new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day, time.Hour, time.Minute, time.Second);
         }
 
-        private Customer GetCustomerDetails(FormAnswers formAnswers, FormSchema formSchema)
+        private Customer GetCustomerBookingDetails(FormAnswers formAnswers, FormSchema formSchema, IElement bookingElement)
         {
             var data = new ExpandoObject() as IDictionary<string, dynamic>;
             formSchema.Pages.SelectMany(_ => _.ValidatableElements)
-                .Where(x => !string.IsNullOrEmpty(x.Properties.TargetMapping) && x.Properties.TargetMapping.ToLower().StartsWith("customer."))
+                .Where(x => !string.IsNullOrEmpty(x.Properties.TargetMapping) 
+                            && x.Properties.TargetMapping.ToLower().StartsWith("customer.") 
+                            && !x.Properties.TargetMapping.ToLower().Equals("customer.address"))
                 .ToList()
                 .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
 
             if (!data.ContainsKey("customer"))
                 throw new ApplicationException($"MappingService::GetCustomerDetails, Booking request form data for form {formSchema.BaseURL} does not contain required customer object");
 
-            return JsonConvert.DeserializeObject<Customer>(JsonConvert.SerializeObject(data["customer"]));
+            var customer = JsonConvert.DeserializeObject<Customer>(JsonConvert.SerializeObject(data["customer"]));
+            if (string.IsNullOrEmpty(bookingElement.Properties.CustomerAddressId))
+            {
+                return customer;
+            }
+
+            var addressElement = formSchema.Pages.SelectMany(_ => _.Elements)
+                .FirstOrDefault(_ =>
+                    _.Properties.QuestionId != null &&
+                    _.Properties.QuestionId.Contains(bookingElement.Properties.CustomerAddressId));
+            customer.Address = _elementMapper.GetAnswerStringValue(addressElement, formAnswers);
+
+            return customer;
         }
 
         private object CreatePostData(FormAnswers formAnswers, FormSchema formSchema)

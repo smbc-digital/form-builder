@@ -21,7 +21,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _automaticAddressElementValidator.Validate(element, viewModel);
+            var result = _automaticAddressElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -40,7 +40,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("testaddress-address", "234567434567");
 
             // Act
-            var result = _automaticAddressElementValidator.Validate(element, viewModel);
+            var result = _automaticAddressElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -59,7 +59,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("testaddress-address", "566");
 
             // Act
-            var result = _automaticAddressElementValidator.Validate(element, viewModel);
+            var result = _automaticAddressElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);

@@ -44,19 +44,14 @@ namespace form_builder_tests.UnitTests.Services
         public BookingServiceTests()
         {
             _mockdistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(_cacheConfig);
-
+            _mockMappingService
+                .Setup(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, object>>(), It.IsAny<string>()))
+                .ReturnsAsync(new BookingRequest { Customer = new Customer() });
             _bookingProvider.Setup(_ => _.ProviderName).Returns("testBookingProvider");
             _bookingProviders = new List<IBookingProvider>
             {
                 _bookingProvider.Object
             };
-
-            _mockMappingService
-                .Setup(expression: _ => _.MapAddress(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new Address
-                {
-                    SelectedAddress = "Address"
-                });
 
             _service = new BookingService(
               _mockDistributedCache.Object,
@@ -583,13 +578,14 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessBooking(model, page, formSchema, "guid", "path");
 
             _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Never);
-            _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Never);
+            _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
         }
 
         [Fact]
         public async Task ProcessBooking_Should_Call_BookingProvider_When_SelectedDate_IsDifferent_To_ReservedDateAndTime()
         {
+            
             var appointmentTypeGuid = new Guid();
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
@@ -619,6 +615,8 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}", date.ToString() },
             };
+
+            
 
             await _service.ProcessBooking(model, page, formSchema, "guid", "path");
 

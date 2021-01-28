@@ -247,6 +247,32 @@ namespace form_builder.Helpers.PageHelpers
             });
         }
 
+        public void CheckQuestionIdExistsForBookingCustomerAddressId(List<Page> pages, string formName)
+        {
+            var bookingElements = pages.SelectMany(_ => _.Elements)
+                .Where(_ => _.Type.Equals(EElementType.Booking)).ToList();
+
+            if (bookingElements.Count > 0)
+            {
+                foreach (var bookingElement in bookingElements)
+                {
+                    if (!string.IsNullOrEmpty(bookingElement.Properties.CustomerAddressId))
+                    {
+                        var matchingElement = pages.SelectMany(_ => _.Elements)
+                            .FirstOrDefault(_ =>
+                                _.Properties.QuestionId != null &&
+                                _.Properties.QuestionId.Contains(bookingElement.Properties.CustomerAddressId));
+
+                        if (matchingElement == null)
+                            throw new ApplicationException($"The provided json '{formName}' does not contain an element with questionId of " +
+                                                           $"'{bookingElement.Properties.CustomerAddressId}' for booking element " +
+                                                           $"'{bookingElement.Properties.QuestionId}'");
+                    }
+                }
+                
+            }
+        }
+
         public void CheckForCurrentEnvironmentSubmitSlugs(List<Page> pages, string formName)
         {
             var behaviours = pages.Where(page => page.Behaviours != null).SelectMany(page => page.Behaviours).ToList();
@@ -667,10 +693,10 @@ namespace form_builder.Helpers.PageHelpers
                         booking.Properties.OptionalResources.ForEach(resource =>
                         {
                             if (resource.Quantity <= 0)
-                                throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element optional resouces are invalid, cannot have a quantity less than 0");
+                                throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element optional resources are invalid, cannot have a quantity less than 0");
 
                             if (resource.ResourceId.Equals(Guid.Empty))
-                                throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element optional resouces are invalid, ResourceId cannot be an empty Guid.");
+                                throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element optional resources are invalid, ResourceId cannot be an empty Guid.");
                         });
                     }
                 });
@@ -681,12 +707,11 @@ namespace form_builder.Helpers.PageHelpers
                 var additionalRequiredElements = pages.SelectMany(_ => _.ValidatableElements)
                     .Where(_ => _.Properties != null && _.Properties.TargetMapping != null)
                     .Where(_ => _.Properties.TargetMapping.ToLower().Equals("customer.firstname")
-                        || _.Properties.TargetMapping.ToLower().Equals("customer.lastname")
-                        || _.Properties.TargetMapping.ToLower().Equals("customer.email"))
+                        || _.Properties.TargetMapping.ToLower().Equals("customer.lastname"))
                     .ToList();
 
-                if (additionalRequiredElements.Count() != 3)
-                    throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires customer firstname/lastname/email elements for reservation");
+                if (additionalRequiredElements.Count != 2)
+                    throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires customer firstname/lastname elements for reservation");
             }
         }
     }

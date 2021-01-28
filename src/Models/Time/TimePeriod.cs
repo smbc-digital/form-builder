@@ -20,7 +20,7 @@ namespace form_builder.Models.Time
         public DateTime Value(TimeSpan time) => Date.Add(time);
         public string GetTimeInputHint(int position) => $"{TimeQuestionId}-{position}-{TimeOfDay}-{Date.Day}-hint";
         public string ToFullDateFormat(TimeSpan time) => Value(time).ToFullDateWithTimeFormat();
-        public string NoJSId => $"{TimeQuestionId}-{Date.Day}-{BookingConstants.APPOINTMENT_FULL_TIME_OF_DAY_SUFFIX}";
+        public string NoJSId => $"{TimeQuestionId}-{BookingConstants.APPOINTMENT_FULL_TIME_OF_DAY_SUFFIX}";
         public string BookingType { get; set; }
         public string GetClassNameForDivsPosition(int value)
         {
