@@ -63,12 +63,17 @@ namespace form_builder
                 .AddWorkflows()
                 .AddFactories()
                 .AddCache()
-                .AddAntiforgery(_ => _.Cookie.Name = ".formbuilder.antiforgery.v2")
+                .AddAntiforgery(_ => 
+                    {
+                        _.Cookie.Name = ".formbuilder.antiforgery.v2";
+                        _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    })
                 .AddSession(_ =>
                 {
                     _.IdleTimeout = TimeSpan.FromMinutes(30);
                     _.Cookie.Path = "/";
                     _.Cookie.Name = ".formbuilder.v2";
+                    _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 });
 
             services
