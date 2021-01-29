@@ -228,7 +228,8 @@ namespace form_builder.Services.BookingService
             var currentlySelectedBookingStartTime = bookingElement.StartTimeQuestionId;
             var currentlySelectedBookingEndTime = bookingElement.EndTimeQuestionId;
 
-            var location = await GetReservedBookingLocation(bookingElement, form, guid);
+            var bookingRequest = await _mappingService.MapBookingRequest(guid, bookingElement, viewModel, form);
+            var location = await GetReservedBookingLocation(bookingElement, bookingRequest);
             viewModel.Add(bookingElement.AppointmentLocation, location);
 
             if (viewModel.ContainsKey(reservedBookingId) && !string.IsNullOrEmpty((string)viewModel[reservedBookingId]))
@@ -249,7 +250,6 @@ namespace form_builder.Services.BookingService
             viewModel.Remove(reservedBookingStartTime);
             viewModel.Remove(reservedBookingEndTime);
 
-            var bookingRequest = await _mappingService.MapBookingRequest(guid, bookingElement, viewModel, form);
             var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
                 .Reserve(bookingRequest);
 
@@ -261,7 +261,7 @@ namespace form_builder.Services.BookingService
             return result;
         }
 
-        private async Task<string> GetReservedBookingLocation(Booking bookingElement, string form, string guid)
+        private async Task<string> GetReservedBookingLocation(Booking bookingElement, BookingRequest bookingRequest)
         {
             var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
             var location = await bookingProvider.GetLocation(new LocationRequest
@@ -272,13 +272,10 @@ namespace form_builder.Services.BookingService
 
             if (string.IsNullOrEmpty(location))
             {
-                var address = await _mappingService.MapAddress(guid, form);
-                return address.ToStringWithoutPlaceRef().ConvertAddressToTitleCase();
+                return string.IsNullOrEmpty(bookingRequest.Customer.Address) ? string.Empty : bookingRequest.Customer.Address.ConvertAddressToTitleCase();
             }
-            else
-            {
-                return location.ConvertAddressToTitleCase();
-            }
+
+            return location.ConvertAddressToTitleCase();
         }
 
         public async Task ProcessMonthRequest(Dictionary<string, object> viewModel, FormSchema baseForm, Page currentPage, string guid)

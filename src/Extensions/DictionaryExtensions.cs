@@ -76,47 +76,87 @@ namespace form_builder.Extensions
             if (!normalisedFormData.Any(_ => _.Key.EndsWith(BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX)))
                 return normalisedFormData;
 
+            var selectedTimeNoJsKey = $"-{BookingConstants.APPOINTMENT_FULL_TIME_OF_DAY_SUFFIX}";
+
             var appointmentDate = normalisedFormData.FirstOrDefault(_ => _.Key.EndsWith($"-{BookingConstants.APPOINTMENT_DATE}"));
-
-            if (appointmentDate.Value == null)
-                return normalisedFormData;
-
-            DateTime.TryParse((string)appointmentDate.Value, out DateTime parsedDate);
-
-            var selectedTimePeriodKey = $"{parsedDate.Day}{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}";
-            var selectedTimePeriod = normalisedFormData[selectedTimePeriodKey];
-            var selectedTimeKey = $"-{parsedDate.Day}-{selectedTimePeriod}";
-            var selectedTimeNoJsKey = $"-{parsedDate.Day}-{BookingConstants.APPOINTMENT_FULL_TIME_OF_DAY_SUFFIX}";
-
-            var timeValue = normalisedFormData.FirstOrDefault(_ => _.Key.EndsWith(selectedTimeNoJsKey));
-            if (timeValue.Value == null)
-                timeValue = normalisedFormData.FirstOrDefault(_ => _.Key.EndsWith(selectedTimeKey));
-
-            var bookingElementId = appointmentDate.Key.Remove(appointmentDate.Key.Length - BookingConstants.APPOINTMENT_DATE.Length, BookingConstants.APPOINTMENT_DATE.Length);
-
-            if (timeValue.Value == null)
+            if (DateTime.TryParse((string)appointmentDate.Value, out var parsedDate))
             {
+                var selectedTimePeriodKey = $"{parsedDate.Day}{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}";
+                var selectedTimePeriod = normalisedFormData[selectedTimePeriodKey];
+                var selectedTimeKey = $"-{parsedDate.Day}-{selectedTimePeriod}";
+
+                var bookingElementId = appointmentDate.Key.Remove(appointmentDate.Key.Length - BookingConstants.APPOINTMENT_DATE.Length, BookingConstants.APPOINTMENT_DATE.Length);
+
+                if (normalisedFormData.Any(_ => _.Key.EndsWith(selectedTimeKey)))
+                {
+                    var selectedTime = normalisedFormData
+                        .First(_ => _.Key.EndsWith(selectedTimeKey))
+                        .Value
+                        .ToString().Split('|');
+
+                    normalisedFormData = normalisedFormData
+                        .Where(_ => !_.Key.EndsWith($"{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}"))
+                        .Where(_ => !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_MORNING}") &&
+                        !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_AFTERNOON}"))
+                        .ToDictionary(x => x.Key, x => (dynamic)x.Value);
+
+                    if (DateTime.TryParse(selectedTime[0], out DateTime parsedStartTime) &&
+                        DateTime.TryParse(selectedTime[1], out DateTime parsedEndTime))
+                    {
+                        normalisedFormData.Add($"{bookingElementId}{BookingConstants.APPOINTMENT_START_TIME}", parsedStartTime.ToString());
+                        normalisedFormData.Add($"{bookingElementId}{BookingConstants.APPOINTMENT_END_TIME}", parsedEndTime.ToString());
+                    }
+                    return normalisedFormData;
+                }
+
+                if (normalisedFormData.Any(_ => _.Key.EndsWith(selectedTimeNoJsKey)))
+                {
+                    var times = normalisedFormData
+                        .First(_ => _.Key.EndsWith(selectedTimeNoJsKey))
+                        .Value
+                        .ToString().Split('|');
+
+                    if (times.Length < 2)
+                        return normalisedFormData;
+
+                    if (!DateTime.TryParse(times[0], out var appointmentStart) ||
+                        !DateTime.TryParse(times[1], out var appointmentEnd))
+                        return normalisedFormData;
+
+                    if (appointmentStart.Day > parsedDate.Day || appointmentStart.Day < parsedDate.Day)
+                    {
+                        normalisedFormData.Remove(appointmentDate.Key);
+                        normalisedFormData.Add(appointmentDate.Key, new DateTime(appointmentStart.Year, appointmentStart.Month, appointmentStart.Day).ToString());
+                    }
+                    normalisedFormData.Add($"{bookingElementId}{BookingConstants.APPOINTMENT_START_TIME}", appointmentStart.ToString());
+                    normalisedFormData.Add($"{bookingElementId}{BookingConstants.APPOINTMENT_END_TIME}", appointmentEnd.ToString());
+                    return normalisedFormData;
+                }
+
                 normalisedFormData.Where(_ => !_.Key.EndsWith($"{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}"))
                     .Where(_ => !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_MORNING}") && !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_AFTERNOON}"))
                     .ToDictionary(x => x.Key, x => (dynamic)x.Value);
                 normalisedFormData.Add($"{bookingElementId}{BookingConstants.APPOINTMENT_START_TIME}", string.Empty);
-
                 return normalisedFormData;
             }
 
-            var selectedTime = timeValue.Value.ToString().Split('|');
-
-            normalisedFormData = normalisedFormData.Where(_ => !_.Key.EndsWith($"{BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX}"))
-                .Where(_ => !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_MORNING}") && !_.Key.EndsWith($"-{BookingConstants.APPOINTMENT_TIME_OF_DAY_AFTERNOON}"))
-                .ToDictionary(x => x.Key, x => (dynamic)x.Value);
-
-            var parseStartTimeResult = DateTime.TryParse(selectedTime[0], out DateTime parsedStartTime);
-            var parseEndTimeResult = DateTime.TryParse(selectedTime[1], out DateTime parsedEndTime);
-
-            if (parseStartTimeResult && parseEndTimeResult)
+            if (normalisedFormData.Any(_ => _.Key.EndsWith(selectedTimeNoJsKey)))
             {
-                normalisedFormData.Add($"{bookingElementId}{BookingConstants.APPOINTMENT_START_TIME}", parsedStartTime.ToString());
-                normalisedFormData.Add($"{bookingElementId}{BookingConstants.APPOINTMENT_END_TIME}", parsedEndTime.ToString());
+                var timeValue = normalisedFormData.First(_ => _.Key.EndsWith(selectedTimeNoJsKey));
+                var bookingElementId = timeValue.Key.Split("-")[0];
+
+                var times = timeValue.Value.ToString().Split('|');
+                if (times.Length < 2)
+                    return normalisedFormData;
+
+                if (!DateTime.TryParse(times[0], out var appointmentStart) ||
+                    !DateTime.TryParse(times[1], out var appointmentEnd))
+                    return normalisedFormData;
+
+                normalisedFormData.Add($"{bookingElementId}-{BookingConstants.APPOINTMENT_DATE}", new DateTime(appointmentStart.Year, appointmentStart.Month, appointmentStart.Day).ToString());
+                normalisedFormData.Add($"{bookingElementId}-{BookingConstants.APPOINTMENT_START_TIME}", appointmentStart.ToString());
+                normalisedFormData.Add($"{bookingElementId}-{BookingConstants.APPOINTMENT_END_TIME}", appointmentEnd.ToString());
+                return normalisedFormData;
             }
 
             return normalisedFormData;

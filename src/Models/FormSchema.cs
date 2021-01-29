@@ -6,6 +6,7 @@ using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models.Actions;
+using form_builder.Models.Elements;
 
 namespace form_builder.Models
 {
@@ -61,6 +62,14 @@ namespace form_builder.Models
             }
         }
 
+        public IElement GetElement(string questionId) => 
+            Pages.SelectMany(_ => _.Elements)
+                .SingleOrDefault(_ => _.Properties.QuestionId == questionId);
+
+        public bool HasElement(string questionId) =>
+            Pages.SelectMany(_ => _.Elements)
+                .Any(_ => _.Properties.QuestionId == questionId);
+        
         public async Task ValidateFormSchema(IPageHelper pageHelper, string form, string path)
         {
             if (path != FirstPageSlug)
@@ -82,6 +91,7 @@ namespace form_builder.Models
             pageHelper.CheckForAnyConditionType(Pages);
             pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(Pages);
             pageHelper.CheckForBookingElement(Pages);
+            pageHelper.CheckQuestionIdExistsForBookingCustomerAddressId(Pages, form);
         }
 
         public bool IsAvailable(string environment)

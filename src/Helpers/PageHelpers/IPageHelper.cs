@@ -51,5 +51,7 @@ namespace form_builder.Helpers.PageHelpers
         List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload);
 
         void CheckConditionalElementsAreValid(List<Page> pages, string formName);
+
+        void CheckQuestionIdExistsForBookingCustomerAddressId(List<Page> pages, string formName);
     }
 }

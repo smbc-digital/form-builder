@@ -28,7 +28,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic> { { $"fileUpload{FileUploadConstants.SUFFIX}", null } };
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -70,7 +70,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -94,7 +94,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -121,7 +121,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -143,7 +143,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", documentModel);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -164,7 +164,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", documentModel);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -185,7 +185,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", documentModel);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -208,7 +208,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -232,7 +232,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -259,7 +259,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -287,7 +287,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -312,7 +312,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -337,7 +337,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -366,7 +366,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
@@ -392,7 +392,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
 
             // Act
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.False(result.IsValid);

@@ -54,6 +54,7 @@ namespace form_builder
                 .ConfigurePaymentProviders()
                 .ConfigureBookingProviders()
                 .ConfigureDocumentCreationProviders()
+                .ConfigureFormAnswersProviders()
                 .ConfigureFormatters()
                 .ConfigureEmailProviders(HostingEnvironment)
                 .AddHelpers()
@@ -62,12 +63,17 @@ namespace form_builder
                 .AddWorkflows()
                 .AddFactories()
                 .AddCache()
-                .AddAntiforgery(_ => _.Cookie.Name = ".formbuilder.antiforgery.v2")
+                .AddAntiforgery(_ => 
+                    {
+                        _.Cookie.Name = ".formbuilder.antiforgery.v2";
+                        _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    })
                 .AddSession(_ =>
                 {
                     _.IdleTimeout = TimeSpan.FromMinutes(30);
                     _.Cookie.Path = "/";
                     _.Cookie.Name = ".formbuilder.v2";
+                    _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 });
 
             services
@@ -117,6 +123,19 @@ namespace form_builder
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}")
             );
+
+            app.UseResponseCaching();
+            app.Use(async (context, next) =>
+            {
+                context.Response.GetTypedHeaders().CacheControl = 
+                    new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
+                    {
+                        NoCache = true,
+                        NoStore = true
+                    };                
+
+                await next();
+            });
         }
     }
 }

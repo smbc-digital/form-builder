@@ -22,7 +22,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>() { { "test-id", "123456789012345678901234567890" } };
 
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
             Assert.False(result.IsValid);
             Assert.Equal("Label has a maximum length of 20", result.Message);
         }
@@ -39,7 +39,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>() { { "test-id", "1234567" } };
 
-            var result = _validator.Validate(element, viewModel);
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
             Assert.True(result.IsValid);
         }
     }
