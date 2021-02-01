@@ -1,6 +1,6 @@
 ﻿@model Element
 @{
-    var cssClass = "govuk-heading-m";
+    var cssClass = "govuk-heading-s";
     switch (Model.Properties.Size)
     {
         case ESize.ExtraLarge:
@@ -9,8 +9,8 @@
         case ESize.Large:
             cssClass = "govuk-heading-l";
             break;
-        case ESize.Small:
-            cssClass = "govuk-heading-s";
+        case ESize.Medium:
+            cssClass = "govuk-heading-m";
             break;
     }
 }

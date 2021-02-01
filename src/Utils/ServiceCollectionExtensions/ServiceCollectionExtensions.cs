@@ -105,6 +105,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddTransient<IElementValidator, RestrictFileSizeValidator>();
             services.AddTransient<IElementValidator, RestrictCombinedFileSizeValidator>();
             services.AddTransient<IElementValidator, BookingValidator>();
+            services.AddTransient<IElementValidator, StreetSearchValidator>();
             services.AddTransient<IElementValidator, IsDateBeforeAbsoluteValidator>();
             services.AddTransient<IElementValidator, IsDateBeforeValidator>();
             services.AddTransient<IElementValidator, IsDateAfterAbsoluteValidator>();

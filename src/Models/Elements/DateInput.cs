@@ -40,21 +40,42 @@ namespace form_builder.Models.Elements
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
-        private static bool HasValidDateTimeAnswer(Dictionary<string, dynamic> viewModel, string key) =>
-            viewModel.ContainsKey($"{key}{DateInput.YEAR_EXTENSION}") && 
-            viewModel.ContainsKey($"{key}{DateInput.MONTH_EXTENSION}") && 
-            viewModel.ContainsKey($"{key}{DateInput.DAY_EXTENSION}") 
-                ? true 
-                : false;
+        private static bool HasValidDateTimeAnswer(Dictionary<string, dynamic> viewModel, string key) 
+        {
+            var yearKey = $"{key}{DateInput.YEAR_EXTENSION}";
+            var monthKey = $"{key}{DateInput.MONTH_EXTENSION}";
+            var dayKey = $"{key}{DateInput.DAY_EXTENSION}";
+
+            if (!viewModel.ContainsKey(yearKey) ||
+                !viewModel.ContainsKey(monthKey) ||
+                !viewModel.ContainsKey(dayKey))
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(viewModel[yearKey]) ||
+                string.IsNullOrEmpty(viewModel[monthKey]) ||
+                string.IsNullOrEmpty(viewModel[dayKey]))
+            {
+                return false;
+            }
+
+            return true;
+        }
         
         public static DateTime? GetDate(Dictionary<string, dynamic> viewModel, string key)
         {
-            if(!HasValidDateTimeAnswer(viewModel, key))            
+
+            var yearKey = $"{key}{DateInput.YEAR_EXTENSION}";
+            var monthKey = $"{key}{DateInput.MONTH_EXTENSION}";
+            var dayKey = $"{key}{DateInput.DAY_EXTENSION}";
+
+            if (!HasValidDateTimeAnswer(viewModel, key))            
                 return null;
 
-            string year = viewModel[$"{key}{DateInput.YEAR_EXTENSION}"];
-            string month = viewModel[$"{key}{DateInput.MONTH_EXTENSION}"];
-            string day = viewModel[$"{key}{DateInput.DAY_EXTENSION}"];
+            string year = viewModel[yearKey];
+            string month = viewModel[monthKey];
+            string day = viewModel[dayKey];
             
             return new DateTime(Convert.ToInt32(year), Convert.ToInt32(month), Convert.ToInt32(day));
         }

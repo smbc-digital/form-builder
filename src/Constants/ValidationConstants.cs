@@ -10,6 +10,7 @@
         public const string BOOKING_DATE_AND_TIME_EMPTY = "You must select a date and time";
         public const string BOOKING_DATE_EMPTY = "You must select a date";
         public const string BOOKING_TIME_EMPTY = "You must select a time";
+        public const string STREET_INCORRECT_FORMAT = "Enter street name in the correct format";
         public const string IS_DATE_BEFORE_VALIDATOR_DEFAULT = "The date provided must be before {0}";
         public const string IS_DATE_AFTER_VALIDATOR_DEFAULT = "The date provided must be after {0}";
     }
