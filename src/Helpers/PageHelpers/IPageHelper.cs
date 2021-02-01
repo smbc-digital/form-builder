@@ -53,5 +53,9 @@ namespace form_builder.Helpers.PageHelpers
         void CheckConditionalElementsAreValid(List<Page> pages, string formName);
 
         void CheckQuestionIdExistsForBookingCustomerAddressId(List<Page> pages, string formName);
+
+        void CheckDateValidations(List<Page> pages);
+        
+        void CheckAbsoluteDateValidations(List<Page> pages);
     }
 }
