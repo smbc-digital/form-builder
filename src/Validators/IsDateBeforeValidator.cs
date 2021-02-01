@@ -39,6 +39,9 @@ namespace form_builder.Validators
             if (currentElementValue < comparisonElementValue) 
                 return new ValidationResult { IsValid = true };
 
+            if(currentElement.Properties.IsDateEqualityAllowed && currentElementValue == comparisonElementValue)
+                return new ValidationResult { IsValid = true };
+
             return new ValidationResult {
                 IsValid = false,
                 Message = !string.IsNullOrEmpty(currentElement.Properties.IsDateBeforeValidationMessage) 
@@ -46,7 +49,7 @@ namespace form_builder.Validators
                     : string.Format(ValidationConstants.IS_DATE_AFTER_VALIDATOR_DEFAULT, currentElement.Properties.IsDateBefore)
             };
         }
-        
+
         private bool IsValidatorRelevant(IElement element, IElement comparisonElement)
         {
             if (element.Type != EElementType.DatePicker && element.Type != EElementType.DateInput)
