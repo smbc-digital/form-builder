@@ -728,9 +728,9 @@ namespace form_builder.Helpers.PageHelpers
 
             elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateBeforeAbsolute))
                 .ToList()
-            .ForEach(element => { 
-                if(!DateTime.TryParse(element.Properties.IsDateBeforeAbsolute, out DateTime outputDate))
-                    throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateBeforeAbsolute validation, {element.Properties.QuestionId} does not provide a valid comparison date");
+                .ForEach(element => { 
+                    if(!DateTime.TryParse(element.Properties.IsDateBeforeAbsolute, out DateTime outputDate))
+                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateBeforeAbsolute validation, {element.Properties.QuestionId} does not provide a valid comparison date");
             });            
         }
 
