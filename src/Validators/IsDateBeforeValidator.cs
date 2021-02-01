@@ -46,6 +46,7 @@ namespace form_builder.Validators
                     : string.Format(ValidationConstants.IS_DATE_AFTER_VALIDATOR_DEFAULT, currentElement.Properties.IsDateBefore)
             };
         }
+        
         private bool IsValidatorRelevant(IElement element, IElement comparisonElement)
         {
             if (element.Type != EElementType.DatePicker && element.Type != EElementType.DateInput)
