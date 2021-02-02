@@ -39,7 +39,7 @@ namespace form_builder.Validators
             if (currentElementValue < comparisonElementValue) 
                 return new ValidationResult { IsValid = true };
 
-            if(currentElement.Properties.IsDateEqualityAllowed && currentElementValue == comparisonElementValue)
+            if (currentElement.Properties.IsDateEqualityAllowed && currentElementValue == comparisonElementValue)
                 return new ValidationResult { IsValid = true };
 
             return new ValidationResult {
