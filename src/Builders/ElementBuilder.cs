@@ -430,5 +430,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithIsDateEqualityAllowed(bool allowed)
+        {
+            _property.IsDateEqualityAllowed = allowed;
+
+            return this;
+        }
     }
 }
