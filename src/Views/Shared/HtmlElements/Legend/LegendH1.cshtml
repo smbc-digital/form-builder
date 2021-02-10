@@ -11,7 +11,7 @@
 }
 else
 {
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    <legend class="govuk-fieldset__legend @(Model.Properties.StrongLabel ? "govuk-fieldset__legend--m" : string.Empty)">
         @Model.Label
         @if (Model.Properties.Optional && !Model.Properties.HideOptionalText)
         {

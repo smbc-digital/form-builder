@@ -10,29 +10,8 @@
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
     @Html.BeginFieldSet(Model)
 
-
-    @if (Model.Properties.LegendAsH1)
-    {
-        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-            <h1 class="govuk-fieldset__heading">
-                @Model.Properties.Label
-                @if (Model.Properties.Optional)
-                {
-                    <span class="smbc-body">(optional)</span>
-                }
-
-            </h1>
-        </legend>
-    }
-    else
-    {
-        <legend class="govuk-fieldset__legend">
-            @Model.Properties.Label
-            @if (Model.Properties.Optional)
-            {
-                <span class="smbc-body">(optional)</span>
-            }
-        </legend>
+    @if (!Model.Properties.HideLabel) {
+        <partial name="LegendH1" />
     }
 
     <partial name="Hint" />

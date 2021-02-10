@@ -12,6 +12,8 @@
         
         public string IsDateAfterAbsolute { get; set; }  = string.Empty;
 
-        public string IsDateAfterValidationMessage { get; set; } = string.Empty;      
+        public string IsDateAfterValidationMessage { get; set; } = string.Empty;  
+
+        public bool IsDateEqualityAllowed { get; set; } = false;  
     }
 }
