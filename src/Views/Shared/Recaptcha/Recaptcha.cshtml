@@ -5,4 +5,6 @@
     var recaptchaClasses = Model ? "g-recaptcha smbc-recaptcha" : "g-recaptcha smbc-recaptcha govuk-input--error";
 }
 
-<div data-module="smbc-recaptcha" class="@recaptchaClasses" data-sitekey="@Config.Value.SiteKey"></div>
+@section Recaptcha {
+    <div data-module="smbc-recaptcha" class="@recaptchaClasses" data-sitekey="@Config.Value.SiteKey"></div>
+}
