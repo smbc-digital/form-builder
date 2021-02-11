@@ -135,7 +135,16 @@ namespace form_builder.Models
                     return behaviour;
             }
 
-            throw new ApplicationException($"Page::GetNextPage, There was a problem whilst processing behaviors for page '{PageSlug}'");
+            var conditionValuesForDebug = Behaviours.OrderByDescending(_ => _.Conditions.Count)
+                .Where(_ => _.Conditions != null)
+                .SelectMany(_ => _.Conditions)
+                .Where(_ => !string.IsNullOrEmpty(_.QuestionId))
+                .Select(_ => _.QuestionId)
+                .Distinct()
+                .Select(_ => $"QuestionId: {_} with answer {(viewModel.ContainsKey(_) ? viewModel[_] : "'null'")}")
+                .Aggregate((curr, acc) => $"{acc} {curr}");
+
+            throw new ApplicationException($"Page::GetNextPage, There was a problem whilst processing behaviors for page '{PageSlug}', Behaviour Answers and conditions: {conditionValuesForDebug}");
         }
 
         public bool CheckPageMeetsConditions(Dictionary<string, dynamic> answers)
