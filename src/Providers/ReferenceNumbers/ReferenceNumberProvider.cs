@@ -5,7 +5,6 @@ namespace form_builder.Providers.ReferenceNumbers
     /// </summary>
     public class ReferenceNumberProvider : IReferenceNumberProvider
     {
-        public string GetReference(string prefix, int length=8) => $"{prefix}{RandomIdGenerator.GetId(length)}";
-        
+        public string GetReference(string prefix, int length=8) => $"{prefix}{RandomReferenceGenerator.GetReference(length)}";
     }
 }
