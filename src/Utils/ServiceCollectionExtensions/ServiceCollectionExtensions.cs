@@ -31,6 +31,7 @@ using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
+using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.Transforms.Lookups;
 using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Services.AddressService;
@@ -383,6 +384,14 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
             return services;
         }
+
+        public static IServiceCollection AddReferenceNumberProvider(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddTransient<IReferenceNumberProvider, ReferenceNumberProvider>();
+
+            return services;
+        }
+
 
         public static IServiceCollection AddRazorViewEngineViewLocations(this IServiceCollection services)
         {
