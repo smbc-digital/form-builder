@@ -392,7 +392,6 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             return services;
         }
 
-
         public static IServiceCollection AddRazorViewEngineViewLocations(this IServiceCollection services)
         {
             services.Configure<RazorViewEngineOptions>(o =>
