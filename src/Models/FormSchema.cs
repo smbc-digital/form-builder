@@ -23,6 +23,10 @@ namespace form_builder.Models
         public string FeedbackForm { get; set; }
 
         public string FeedbackPhase { get; set; }
+        
+        public bool GenerateReferenceNumber { get; set; }
+
+        public string ReferencePrefix { get; set; }
 
         public List<Breadcrumb> BreadCrumbs { get; set; }
 
