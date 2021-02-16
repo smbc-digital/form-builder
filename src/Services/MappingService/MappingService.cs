@@ -13,6 +13,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
@@ -26,16 +27,19 @@ namespace form_builder.Services.MappingService
         private readonly IElementMapper _elementMapper;
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
+        private ILogger<MappingService> _logger;
 
         public MappingService(IDistributedCacheWrapper distributedCache,
             IElementMapper elementMapper,
             ISchemaFactory schemaFactory,
-            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
+            ILogger<MappingService> logger)
         {
             _distributedCache = distributedCache;
             _elementMapper = elementMapper;
             _schemaFactory = schemaFactory;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
+            _logger = logger;
         }
 
         public async Task<MappingEntity> Map(string sessionGuid, string form)
@@ -69,6 +73,9 @@ namespace form_builder.Services.MappingService
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
             convertedAnswers.FormName = form;
+
+            if(convertedAnswers.Pages == null || !convertedAnswers.Pages.Any())
+                _logger.LogWarning($"MappingService::GetFormAnswers, Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}");
 
             return (convertedAnswers, baseForm);
         }
