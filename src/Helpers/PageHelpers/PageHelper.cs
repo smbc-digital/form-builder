@@ -32,7 +32,7 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IViewRender _viewRender;
         private readonly IElementHelper _elementHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly DisallowedAnswerKeysConfiguration _disallowedKeys;
+        private readonly FormConfiguration _disallowedKeys;
         private readonly IWebHostEnvironment _environment;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly ICache _cache;
@@ -41,7 +41,7 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
-            IOptions<DisallowedAnswerKeysConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
+            IOptions<FormConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             IEnumerable<IPaymentProvider> paymentProviders, ISessionHelper sessionHelper, IHttpContextAccessor httpContextAccessor)
         {
