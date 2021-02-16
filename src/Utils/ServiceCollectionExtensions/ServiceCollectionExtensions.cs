@@ -385,7 +385,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             return services;
         }
 
-        public static IServiceCollection AddReferenceNumberProvider(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddReferenceNumberProvider(this IServiceCollection services)
         {
             services.AddTransient<IReferenceNumberProvider, ReferenceNumberProvider>();
 
