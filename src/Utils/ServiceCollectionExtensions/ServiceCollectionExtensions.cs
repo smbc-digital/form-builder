@@ -334,7 +334,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
         public static IServiceCollection AddIOptionsConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<DisallowedAnswerKeysConfiguration>(configuration.GetSection("FormConfig"));
+            services.Configure<FormConfiguration>(configuration.GetSection("FormConfig"));
             services.Configure<CivicaPaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
             services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection("DistributedCacheExpiration"));
             services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>("UseDistributedCache"));
