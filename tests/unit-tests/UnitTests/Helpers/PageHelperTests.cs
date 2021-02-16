@@ -36,8 +36,8 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
         private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IOptions<DisallowedAnswerKeysConfiguration>> _mockDisallowedKeysOptions =
-            new Mock<IOptions<DisallowedAnswerKeysConfiguration>>();
+        private readonly Mock<IOptions<FormConfiguration>> _mockDisallowedKeysOptions =
+            new Mock<IOptions<FormConfiguration>>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly Mock<ICache> _mockCache = new Mock<ICache>();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings
@@ -50,7 +50,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
         public PageHelperTests()
         {
-            _mockDisallowedKeysOptions.Setup(_ => _.Value).Returns(new DisallowedAnswerKeysConfiguration
+            _mockDisallowedKeysOptions.Setup(_ => _.Value).Returns(new FormConfiguration
             {
                 DisallowedAnswerKeys = new[]
                 {
