@@ -1,15 +1,28 @@
 using System.Text.RegularExpressions;
+using form_builder.Configuration;
 using form_builder.Providers.ReferenceNumbers;
+using Microsoft.Extensions.Options;
+using Moq;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Providers.ReferenceNumberProviders
 {
     public class ReferenceNumberProviderTests
     {
-        ReferenceNumberProvider _referenceNumberProvider;
-        const string prefix = "TEST";
+        private ReferenceNumberProvider _referenceNumberProvider;
+        private const string _prefix = "TEST";
+        private Mock<IOptions<FormConfiguration>> _mockFormConfiguration = new Mock<IOptions<FormConfiguration>>();
 
-        public ReferenceNumberProviderTests() => _referenceNumberProvider = new ReferenceNumberProvider();
+        public ReferenceNumberProviderTests() 
+        {
+            _mockFormConfiguration
+                .Setup(options => options.Value)
+                .Returns(new FormConfiguration{
+                    ValidReferenceCharacters = "abc123456789"
+                });
+
+            _referenceNumberProvider = new ReferenceNumberProvider(_mockFormConfiguration.Object);
+        }
 
         [Fact]
         public void ReferenceNumberProvider_Returns_Reference_ThatStartsWith_Prefix()
@@ -21,30 +34,17 @@ namespace form_builder_tests.UnitTests.Providers.ReferenceNumberProviders
             string result = _referenceNumberProvider.GetReference(localPrefix);
 
             // Assert
-            Assert.True(result.StartsWith(localPrefix));
+            Assert.StartsWith(localPrefix, result);
         }
 
         [Fact]
         public void ReferenceNumberProvider_Returns_Correct_Length_Reference()
         {
             // Act
-            string result = _referenceNumberProvider.GetReference(prefix, length: 8);
+            string result = _referenceNumberProvider.GetReference(_prefix, length: 8);
 
             // Assert
-            Assert.Equal(result.Length, 12);
-        }
-
-        [Fact]
-        public void ReferenceNumberProvider_Returns_CorrectCase()
-        {
-            // Arrange
-            Regex regex = new Regex("^[A-Z0-9]*$");
-
-            // Act
-            string result = _referenceNumberProvider.GetReference(prefix, caseSensitive: false);
-
-            // Assert
-            Assert.True(regex.IsMatch(result));
+            Assert.Equal(12, result.Length);
         }
     }
 }
