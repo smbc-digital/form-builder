@@ -2326,8 +2326,8 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             // Arrange
             var element = new ElementBuilder()
-          .WithType(EElementType.Textbox)
-          .Build();
+                .WithType(EElementType.Textbox)
+                .Build();
 
             var condition = new ConditionBuilder()
                 .WithConditionType(ECondition.Any)
@@ -2389,13 +2389,13 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var fileUpload = new List<FileUploadModel>();
             fileUpload.Add(
-              new FileUploadModel
-              {
-                  Key = currentAnswerKey,
-                  TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
-                  UntrustedOriginalFileName = "replace-me.txt",
-                  FileSize = 0
-              }
+                new FileUploadModel
+                {
+                    Key = currentAnswerKey,
+                    TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
+                    UntrustedOriginalFileName = "replace-me.txt",
+                    FileSize = 0
+                }
             );
 
             var page = new PageAnswers
@@ -2428,13 +2428,13 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var fileUpload = new List<FileUploadModel>();
             fileUpload.Add(
-              new FileUploadModel
-              {
-                  Key = $"file-OLD-ANSWER",
-                  TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
-                  UntrustedOriginalFileName = "replace-me.txt",
-                  FileSize = 0
-              }
+                new FileUploadModel
+                {
+                    Key = $"file-OLD-ANSWER",
+                    TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
+                    UntrustedOriginalFileName = "replace-me.txt",
+                    FileSize = 0
+                }
             );
 
             var page = new PageAnswers
@@ -2755,28 +2755,49 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_Contains_ZeroQuantity_ForOptionalResources()
+        public void CheckGeneratedIdConfiguration_Throw_ApplicationException_WhenGeneratedReferenceNumberMapping_IsNullOrEmpty()
         {
             // Arrange
-            var pages = new List<Page>();
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithQuestionId("booking")
-                .WithAppointmentType(Guid.NewGuid())
-                .WithBookingProvider("TestProvider")
-                .WithBookingResource(new BookingResource { ResourceId = Guid.NewGuid(), Quantity = 0 })
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            pages.Add(page);
-
+            var schema = new FormSchema
+            {
+                GenerateReferenceNumber = true,
+                ReferencePrefix = "TEST"
+            };
+            
             // Act
-            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
-            Assert.Equal("PageHelper:CheckForBookingElement, Booking element optional resources are invalid, cannot have a quantity less than 0", result.Message);
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckGeneratedIdConfiguration(schema));
+            Assert.Equal("PageHelper:: CheckGeneratedIdConfiguration, GeneratedReferenceNumberMapping and ReferencePrefix must both have a value", result.Message);
+        }
+
+        [Fact]
+        public void CheckGeneratedIdConfiguration_Throw_ApplicationException_WhenReferencePrefix_IsNullOrEmpty()
+        {
+            // Arrange
+            var schema = new FormSchema
+            {
+                GenerateReferenceNumber = true,
+                GeneratedReferenceNumberMapping = "CaseReference"
+            };
+            
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckGeneratedIdConfiguration(schema));
+            Assert.Equal("PageHelper:: CheckGeneratedIdConfiguration, GeneratedReferenceNumberMapping and ReferencePrefix must both have a value", result.Message);
+        }
+
+        [Fact]
+        public void CheckGeneratedIdConfiguration_DoesNotThrow_ApplicationException_GeneratedIdConfig_IsCorrect()
+        {
+            // Arrange
+            var schema = new FormSchema
+            {
+                GenerateReferenceNumber = true,
+                GeneratedReferenceNumberMapping = "CaseReference",
+                ReferencePrefix = "TEST"
+            };
+            
+            // Act
+            var exception = Record.Exception(() => _pageHelper.CheckGeneratedIdConfiguration(schema));
+            Assert.Null(exception);
         }
     }
 }
