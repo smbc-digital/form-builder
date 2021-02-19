@@ -31,6 +31,7 @@ using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
+using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.Transforms.Lookups;
 using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Services.AddressService;
@@ -333,7 +334,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
         public static IServiceCollection AddIOptionsConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<DisallowedAnswerKeysConfiguration>(configuration.GetSection("FormConfig"));
+            services.Configure<FormConfiguration>(configuration.GetSection("FormConfig"));
             services.Configure<CivicaPaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
             services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection("DistributedCacheExpiration"));
             services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>("UseDistributedCache"));
@@ -380,6 +381,13 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
             services.AddDataProtection().SetApplicationName("formbuilder");
             services.AddSingleton<IDistributedCacheWrapper, DistributedCacheWrapper>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddReferenceNumberProvider(this IServiceCollection services)
+        {
+            services.AddTransient<IReferenceNumberProvider, ReferenceNumberProvider>();
 
             return services;
         }
