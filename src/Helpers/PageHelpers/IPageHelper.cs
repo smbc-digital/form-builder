@@ -13,7 +13,7 @@ namespace form_builder.Helpers.PageHelpers
 
         void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false);
 
-        void SaveCaseReference(string guid, string caseReference, bool isGenerated=false, string generatedRefereceMappingId="");
+        void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedRefereceMappingId = "");
 
         void CheckForInvalidQuestionOrTargetMappingValue(List<Page> pages, string formName);
 

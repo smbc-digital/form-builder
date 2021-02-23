@@ -36,21 +36,25 @@ namespace form_builder_tests.UnitTests.Services
 
         public SubmitServiceTests()
         {
-            _mockEnvironment.Setup(_ => _.EnvironmentName)
+            _mockEnvironment
+                .Setup(_ => _.EnvironmentName)
                 .Returns("local");
 
-            _mockIOptions.Setup(_ => _.Value)
+            _mockIOptions
+                .Setup(_ => _.Value)
                 .Returns(new SubmissionServiceConfiguration
                 {
                     FakePaymentSubmission = false
                 });
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+            _mockSchemaFactory
+                .Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(new FormSchema {
                     GenerateReferenceNumber = false
                 });
         
-            _mockReferenceNumberProvider.Setup(_ => _.GetReference(It.IsAny<string>(), It.IsAny<int>()))
+            _mockReferenceNumberProvider
+                .Setup(_ => _.GetReference(It.IsAny<string>(), It.IsAny<int>()))
                 .Returns("TEST123456");
 
             _service = new SubmitService(_mockGateway.Object, _mockPageHelper.Object, _mockEnvironment.Object, _mockIOptions.Object, _mockDistributedCache.Object, _mockSchemaFactory.Object, _mockReferenceNumberProvider.Object);
@@ -97,7 +101,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessSubmission_Applicaton_ShouldCatchException_WhenGatewayCallThrowsException()
         {
             // Arrange
-            var submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.Environment.com" };
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.Environment.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -139,7 +143,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Textarea)
                 .Build();
 
-            var submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
 
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -156,7 +160,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK
@@ -184,7 +189,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithGeneratedReference("CaseReference", "TEST")
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+            _mockSchemaFactory
+                .Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -215,7 +221,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Textarea)
                 .Build();
 
-            var submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+            var submitSlug = new SubmitSlug{ AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
                 .WithSubmitSlug(submitSlug)
@@ -231,10 +237,12 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+            _mockSchemaFactory
+                .Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK
@@ -248,7 +256,8 @@ namespace form_builder_tests.UnitTests.Services
                     { "CaseReference", "TEST123456" }
                 }});
 
-            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(json);
+            _mockDistributedCache
+                .Setup(_ => _.GetString(It.IsAny<string>())).Returns(json);
 
             // Act
             var result = await _service.ProcessSubmission(new MappingEntity { Data = new ExpandoObject(), BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "123454");
@@ -256,7 +265,6 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             Assert.Equal("TEST123456", result);
         }
-
 
         [Fact]
         public async Task ProcessSubmission__Application_ShoudlThrowApplicationException_WhenGatewayResponse_IsNotOk()
@@ -268,7 +276,7 @@ namespace form_builder_tests.UnitTests.Services
                     .WithPropertyText("test-text")
                     .Build();
 
-            var submitSlug = new SubmitSlug() { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -285,7 +293,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.InternalServerError
@@ -326,7 +335,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -367,7 +377,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.InternalServerError
@@ -405,7 +416,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -446,7 +458,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,

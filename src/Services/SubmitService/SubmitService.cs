@@ -52,7 +52,7 @@ namespace form_builder.Services.SubmitService
         public async Task PreProcessSubmission(string form, string sessionGuid)
         {
             var baseForm = await _schemaFactory.Build(form);
-            if(baseForm.GenerateReferenceNumber)
+            if (baseForm.GenerateReferenceNumber)
                 _pageHelper.SaveCaseReference(sessionGuid, _referenceNumberProvider.GetReference(baseForm.ReferencePrefix), true, baseForm.GeneratedReferenceNumberMapping);
         }
 
@@ -61,20 +61,20 @@ namespace form_builder.Services.SubmitService
             var baseForm = await _schemaFactory.Build(form);
             var reference = string.Empty;
 
-            if(baseForm.GenerateReferenceNumber)
+            if (baseForm.GenerateReferenceNumber)
             {
                 var answers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
                 reference = answers.CaseReference;
             }
 
-            return _submissionServiceConfiguration.FakeSubmission ? 
-                ProcessFakeSubmission(sessionGuid, reference) :
-                await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, baseForm, reference);
+            return _submissionServiceConfiguration.FakeSubmission 
+                ? ProcessFakeSubmission(sessionGuid, reference) 
+                : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, baseForm, reference);
         }
 
         private string ProcessFakeSubmission(string sessionGuid, string reference)
         {
-                if(!string.IsNullOrEmpty(reference))
+                if (!string.IsNullOrEmpty(reference))
                     return reference;
                     
                 _pageHelper.SaveCaseReference(sessionGuid, "123456");

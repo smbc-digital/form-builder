@@ -123,6 +123,5 @@ namespace form_builder_tests.Builders
 
             return this;
         }
-
     }
 }

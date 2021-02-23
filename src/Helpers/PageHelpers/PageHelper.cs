@@ -145,7 +145,7 @@ namespace form_builder.Helpers.PageHelpers
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-            if(isGenerated)
+            if (isGenerated)
                 convertedAnswers.AdditionalFormData.Add(generatedRefereceMappingId, caseReference);
 
             convertedAnswers.CaseReference = caseReference;
@@ -468,8 +468,8 @@ namespace form_builder.Helpers.PageHelpers
                 .Where(_ => _.Type == EActionType.RetrieveExternalData)).ToList();
 
             var validateActions = formSchema.FormActions.Where(_ => _.Type.Equals(EActionType.Validate))
-               .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
-               .Where(_ => _.Type == EActionType.Validate)).ToList();
+                .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
+                .Where(_ => _.Type == EActionType.Validate)).ToList();
 
             CheckEmailAction(userEmail);
             CheckEmailAction(backOfficeEmail);
@@ -479,9 +479,9 @@ namespace form_builder.Helpers.PageHelpers
 
         public void CheckGeneratedIdConfiguration(FormSchema formSchema)
         {
-            if(formSchema.GenerateReferenceNumber)
+            if (formSchema.GenerateReferenceNumber)
             {
-                if(string.IsNullOrEmpty(formSchema.GeneratedReferenceNumberMapping) || string.IsNullOrEmpty(formSchema.ReferencePrefix))
+                if (string.IsNullOrEmpty(formSchema.GeneratedReferenceNumberMapping) || string.IsNullOrEmpty(formSchema.ReferencePrefix))
                     throw new ApplicationException("PageHelper:: CheckGeneratedIdConfiguration, GeneratedReferenceNumberMapping and ReferencePrefix must both have a value");
             }
         }
