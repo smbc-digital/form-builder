@@ -2799,5 +2799,97 @@ namespace form_builder_tests.UnitTests.Helpers
             var exception = Record.Exception(() => _pageHelper.CheckGeneratedIdConfiguration(schema));
             Assert.Null(exception);
         }
+
+        [Fact]
+        public void CheckAbsoluteDateValidations_Throw_ApplicationException_IsDateBeforeAbsolute_Contains_InvalidDate()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.DatePicker)
+                .WithQuestionId("test-date")
+                .WithIsDateBeforeAbsolute("test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckAbsoluteDateValidations(pages));
+            Assert.Equal("PageHelper:CheckDateValidations, IsDateBeforeAbsolute validation, test-date does not provide a valid comparison date", result.Message);
+        }
+
+        [Fact]
+        public void CheckAbsoluteDateValidations_Throw_ApplicationException_IsDateAfterAbsolute_Contains_InvalidDate()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.DatePicker)
+                .WithQuestionId("test-date")
+                .WithIsDateAfterAbsolute("test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckAbsoluteDateValidations(pages));
+            Assert.Equal("PageHelper:CheckDateValidations, IsDateAfterAbsolute validation, test-date does not provide a valid comparison date", result.Message);
+        }
+
+            [Fact]
+        public void CheckDateValidations_Throw_ApplicationException_IsDateBefore_Contains_InvalidQuestionId()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.DatePicker)
+                .WithQuestionId("test-date")
+                .WithIsDateBefore("test-comparison")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckDateValidations(pages));
+            Assert.Equal("PageHelper:CheckDateValidations, IsDateBefore validation, test-date the form does not contain a comparison element with question id test-comparison", result.Message);
+        }
+
+        [Fact]
+        public void CheckDateValidations_Throw_ApplicationException_IsDateAfter_Contains_InvalidQuestionId()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.DatePicker)
+                .WithQuestionId("test-date")
+                .WithIsDateAfter("test-comparison")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckDateValidations(pages));
+            Assert.Equal("PageHelper:CheckDateValidations, IsDateAfter validation, test-date the form does not contain a comparison element with question id test-comparison", result.Message);
+        }
     }
 }

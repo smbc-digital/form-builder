@@ -55,5 +55,9 @@ namespace form_builder.Helpers.PageHelpers
         void CheckQuestionIdExistsForBookingCustomerAddressId(List<Page> pages, string formName);
 
         void CheckGeneratedIdConfiguration(FormSchema formSchema);
+
+        void CheckDateValidations(List<Page> pages);
+        
+        void CheckAbsoluteDateValidations(List<Page> pages);
     }
 }

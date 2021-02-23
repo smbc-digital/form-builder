@@ -99,6 +99,8 @@ namespace form_builder.Models
             pageHelper.CheckForBookingElement(Pages);
             pageHelper.CheckQuestionIdExistsForBookingCustomerAddressId(Pages, form);
             pageHelper.CheckGeneratedIdConfiguration(this);
+            pageHelper.CheckDateValidations(Pages);
+            pageHelper.CheckAbsoluteDateValidations(Pages);
         }
 
         public bool IsAvailable(string environment)

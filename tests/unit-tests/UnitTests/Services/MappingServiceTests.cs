@@ -14,6 +14,7 @@ using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -30,6 +31,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDistributedCacheWrapper> _mockDistrubutedCache = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
+        private readonly Mock<ILogger<MappingService>> _mockLogger = new Mock<ILogger<MappingService>>();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
 
         public MappingServiceTests()
@@ -66,7 +68,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _service = new MappingService(_mockDistrubutedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockDistributedCacheExpirationConfiguration.Object);
+            _service = new MappingService(_mockDistrubutedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockLogger.Object);
         }
 
         [Fact]

@@ -726,5 +726,43 @@ namespace form_builder.Helpers.PageHelpers
                     throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires customer firstname/lastname elements for reservation");
             }
         }
+
+        public void CheckAbsoluteDateValidations(List<Page> pages)
+        {
+            var elements = pages.SelectMany(element => element.ValidatableElements);
+            
+            elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateAfterAbsolute))
+                .ToList()
+                .ForEach(element => { 
+                    if(!DateTime.TryParse(element.Properties.IsDateAfterAbsolute, out DateTime outputDate))
+                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateAfterAbsolute validation, {element.Properties.QuestionId} does not provide a valid comparison date"); 
+                });
+
+            elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateBeforeAbsolute))
+                .ToList()
+                .ForEach(element => { 
+                    if(!DateTime.TryParse(element.Properties.IsDateBeforeAbsolute, out DateTime outputDate))
+                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateBeforeAbsolute validation, {element.Properties.QuestionId} does not provide a valid comparison date");
+            });            
+        }
+
+        public void CheckDateValidations(List<Page> pages)
+        {
+            var elements = pages.SelectMany(element => element.ValidatableElements);
+
+            elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateAfter))
+                .ToList()
+                .ForEach(element => { 
+                    if(!elements.Any(comparisonElement => comparisonElement.Properties.QuestionId == element.Properties.IsDateAfter)) 
+                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateAfter validation, {element.Properties.QuestionId} the form does not contain a comparison element with question id {element.Properties.IsDateAfter}"); 
+                });
+
+            elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateBefore))
+                .ToList()
+                .ForEach(element => { 
+                    if(!elements.Any(comparisonElement => comparisonElement.Properties.QuestionId == element.Properties.IsDateBefore)) 
+                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateBefore validation, {element.Properties.QuestionId} the form does not contain a comparison element with question id {element.Properties.IsDateBefore}"); 
+                });
+        }
     }
 }

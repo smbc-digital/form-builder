@@ -274,7 +274,40 @@ namespace form_builder_tests.UnitTests.Models
             var result = Assert.Throws<ApplicationException>(() => page.GetNextPage(viewModel));
 
             // Assert
-            Assert.Equal($"Page::GetNextPage, There was a problem whilst processing behaviors for page '{pageSlug}'", result.Message);
+            Assert.Equal($"Page::GetNextPage, There was a problem whilst processing behaviors for page '{pageSlug}', Behaviour Answers and conditions: QuestionId: test with answer 'null'", result.Message);
+        }
+
+        [Fact]
+        public void GetNextPage_ShouldThrowException_WhenNoConditions_Match_WithCorrect_Confition_Log()
+        {
+            // Arrange
+            var pageSlug = "est-page";
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(new Condition { EqualTo = "apple", QuestionId = "otherquestion" })
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .WithCondition(new Condition { EqualTo = "peach", QuestionId = "otherquestiontwo" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .WithPageSlug(pageSlug)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {"otherquestion", "pear"}
+            };
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => page.GetNextPage(viewModel));
+
+            // Assert
+            Assert.Equal($"Page::GetNextPage, There was a problem whilst processing behaviors for page '{pageSlug}', Behaviour Answers and conditions: QuestionId: otherquestiontwo with answer 'null' QuestionId: otherquestion with answer pear", result.Message);
         }
 
         [Fact]

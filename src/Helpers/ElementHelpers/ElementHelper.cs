@@ -96,7 +96,7 @@ namespace form_builder.Helpers.ElementHelpers
         public bool CheckIfLabelAndTextEmpty(Element element)
         {
             if (string.IsNullOrEmpty(element.Properties.Label) && string.IsNullOrEmpty(element.Properties.Text))
-                throw new Exception("An inline alert requires either a label or text or both to be present. Both can not be empty");
+                throw new Exception("An inline alert requires either a label or text or both to be present. Both cannot be empty");
 
             return true;
         }
