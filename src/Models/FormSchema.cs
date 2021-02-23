@@ -23,6 +23,12 @@ namespace form_builder.Models
         public string FeedbackForm { get; set; }
 
         public string FeedbackPhase { get; set; }
+        
+        public bool GenerateReferenceNumber { get; set; }
+        
+        public string GeneratedReferenceNumberMapping { get; set; }
+
+        public string ReferencePrefix { get; set; }
 
         public List<Breadcrumb> BreadCrumbs { get; set; }
 
@@ -92,6 +98,7 @@ namespace form_builder.Models
             pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(Pages);
             pageHelper.CheckForBookingElement(Pages);
             pageHelper.CheckQuestionIdExistsForBookingCustomerAddressId(Pages, form);
+            pageHelper.CheckGeneratedIdConfiguration(this);
             pageHelper.CheckDateValidations(Pages);
             pageHelper.CheckAbsoluteDateValidations(Pages);
         }

@@ -15,6 +15,9 @@ namespace form_builder_tests.Builders
         private string _startPageUrl = "page-url";
         private string _firstPageSlug = "page-one";
         private bool _documentDownload;
+        private bool _generateReferenceNumber = false;
+        public string _generatedReferenceNumberMapping { get; set; }
+        public string _referencePrefix { get; set; }
         private List<EDocumentType> _documentType = new List<EDocumentType>();
         private List<IAction> _formActions = new List<IAction>();
         private List<EnvironmentAvailability> _environmentAvailability = new List<EnvironmentAvailability>();
@@ -31,7 +34,10 @@ namespace form_builder_tests.Builders
             EnvironmentAvailabilities = _environmentAvailability,
             DocumentDownload = _documentDownload,
             DocumentType = _documentType,
-            FormActions = _formActions
+            FormActions = _formActions,
+            GenerateReferenceNumber = _generateReferenceNumber,
+            ReferencePrefix = _referencePrefix,
+            GeneratedReferenceNumberMapping = _generatedReferenceNumberMapping
         };
 
         public FormSchemaBuilder WithBaseUrl(string baseUrl)
@@ -105,6 +111,15 @@ namespace form_builder_tests.Builders
         public FormSchemaBuilder WithFormActions(IAction formAction)
         {
             _formActions.Add(formAction);
+
+            return this;
+        }
+
+        public FormSchemaBuilder WithGeneratedReference(string mapping, string prefix)
+        {
+            _generateReferenceNumber = true;
+            _generatedReferenceNumberMapping = mapping;
+            _referencePrefix = prefix;
 
             return this;
         }

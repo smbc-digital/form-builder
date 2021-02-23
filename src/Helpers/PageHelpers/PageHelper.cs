@@ -137,13 +137,16 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
-        public void SaveCaseReference(string guid, string caseReference)
+        public void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedRefereceMappingId = "GeneratedReference")
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+            if (isGenerated)
+                convertedAnswers.AdditionalFormData.Add(generatedRefereceMappingId, caseReference);
 
             convertedAnswers.CaseReference = caseReference;
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
@@ -465,13 +468,22 @@ namespace form_builder.Helpers.PageHelpers
                 .Where(_ => _.Type == EActionType.RetrieveExternalData)).ToList();
 
             var validateActions = formSchema.FormActions.Where(_ => _.Type.Equals(EActionType.Validate))
-               .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
-               .Where(_ => _.Type == EActionType.Validate)).ToList();
+                .Concat(formSchema.Pages.SelectMany(_ => _.PageActions)
+                .Where(_ => _.Type == EActionType.Validate)).ToList();
 
             CheckEmailAction(userEmail);
             CheckEmailAction(backOfficeEmail);
             CheckRetrieveExternalDataAction(retrieveExternalDataActions);
             CheckValidateAction(validateActions);
+        }
+
+        public void CheckGeneratedIdConfiguration(FormSchema formSchema)
+        {
+            if (formSchema.GenerateReferenceNumber)
+            {
+                if (string.IsNullOrEmpty(formSchema.GeneratedReferenceNumberMapping) || string.IsNullOrEmpty(formSchema.ReferencePrefix))
+                    throw new ApplicationException("PageHelper:: CheckGeneratedIdConfiguration, GeneratedReferenceNumberMapping and ReferencePrefix must both have a value");
+            }
         }
 
         private void CheckEmailAction(List<IAction> actions)
