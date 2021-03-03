@@ -19,7 +19,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '5.x'
+        dotnet-version: '5.0.200'
 
     - name: Setup culture
       run: Set-Culture -CultureInfo en-GB
