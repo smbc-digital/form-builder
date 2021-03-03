@@ -391,7 +391,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             var result = await Assert.ThrowsAsync<Exception>(() => _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page));
-            Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with null content", result.Message);
+            Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty payment amount within content", result.Message);
         }
 
         [Fact]

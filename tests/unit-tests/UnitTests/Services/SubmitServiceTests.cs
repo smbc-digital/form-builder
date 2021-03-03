@@ -323,7 +323,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
             // Assert
-            Assert.StartsWith("SubmitService::PaymentSubmission, An exception has occured when response content from ", result.Message);
+            Assert.StartsWith("SubmitService::PaymentSubmission, Gateway www.location.com responded with empty reference", result.Message);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 
