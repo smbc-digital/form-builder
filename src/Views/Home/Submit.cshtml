@@ -6,6 +6,14 @@
 }
 
 <h1 class="govuk-heading-l">Your answers</h1>
+
+<div class="smbc-panel smbc-panel--confirmation">
+    @if (!string.IsNullOrWhiteSpace(Model.Reference))
+    {
+        <div class="smbc-panel__body smbc-!-font-word-break">Your reference number is: <strong>@Html.Raw(Model.Reference)</strong></div>
+    }
+</div>
+
 @foreach (var currentPage in Model.FormAnswers.Pages)
 {
     <dl class="govuk-summary-list govuk-!-margin-bottom-9">
@@ -15,21 +23,22 @@
         {
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">@question.QuestionId</dt>
-                <dd class="govuk-summary-list__value">
-                    @question.Response
+                <dd class="govuk-summary-list__value">@question.Response</dd>
             </div>
         }
     </dl>
 }
 
-<dl class="govuk-summary-list govuk-!-margin-bottom-9">
-    <h2 class="govuk-heading-m">Additional Non Question Answers</h2>
-    @foreach (var additonalData in Model.FormAnswers.AdditionalFormData)
-    {
+@if (Model.FormAnswers.AdditionalFormData.Any())
+{
+    <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+        <h2 class="govuk-heading-m">Additional Non Question Answers</h2>
+        @foreach (var additonalData in Model.FormAnswers.AdditionalFormData)
+        {
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">@additonalData.Key</dt>
-                <dd class="govuk-summary-list__value">
-                    @additonalData.Value
+                <dd class="govuk-summary-list__value">@additonalData.Value</dd>
             </div>
-    }
-</dl>
+        }
+    </dl>
+}

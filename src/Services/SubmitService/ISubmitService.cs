@@ -5,6 +5,7 @@ namespace form_builder.Services.SubmitService
 {
     public interface ISubmitService
     {
+        Task PreProcessSubmission(string form, string sessionGuid);
         Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
         Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
 

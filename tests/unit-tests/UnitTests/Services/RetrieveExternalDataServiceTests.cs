@@ -220,7 +220,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act & Assert
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.Process(actions, null, "test"));
-            Assert.Equal("RetrieveExternalDataService::Process, response content from www.test.com/testResponse is null.", result.Message);
+            Assert.Equal("RetrieveExternalDataService::Process, Gateway www.test.com/testResponse responded with empty reference", result.Message);
         }
 
         [Fact]
