@@ -72,6 +72,7 @@ using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
+using form_builder.Providers.DynamicLookupData;
 
 namespace form_builder.Utils.ServiceCollectionExtensions
 {
@@ -193,6 +194,13 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
             services.AddSingleton<IAddressProvider, ServiceAddressProvider>();
+
+            return services;
+        }
+
+        public static IServiceCollection ConfigureDynamicLookDataProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IDynamicLookDataProvider, FakeLookupDataProvider>();
 
             return services;
         }

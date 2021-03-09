@@ -42,6 +42,7 @@
         Textbox,
         TimeInput,
         UploadedFilesSummary,
-        Warning
+        Warning,
+        Source
     }
 }
