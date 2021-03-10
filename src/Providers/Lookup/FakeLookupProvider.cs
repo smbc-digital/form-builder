@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using form_builder.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using form_builder.Models;
 
 namespace form_builder.Providers.Lookup
 {
@@ -11,7 +11,7 @@ namespace form_builder.Providers.Lookup
         {
             return query switch
             {
-                "https://my.service.url/endpoint?query=waste" => await Waste(),
+                "waste" => await Waste(),
                 _ => await Generic(),
             };
         }

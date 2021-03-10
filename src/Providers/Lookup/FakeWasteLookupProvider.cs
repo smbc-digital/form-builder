@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -30,7 +31,8 @@ namespace form_builder.Providers.Lookup
             submitDetails.URL += query;
             var response = await _gateway.GetAsync(submitDetails.URL);
 
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+                throw new ApplicationException($"WasteLookupProvider::GetAsync, Gateway returned with non success status code of {response.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
 
             // Handle success
             var content = await response.Content.ReadAsStringAsync();
