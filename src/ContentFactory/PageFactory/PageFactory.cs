@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
@@ -49,21 +50,21 @@ namespace form_builder.ContentFactory.PageFactory
             _tagParsers.ToList().ForEach(_ => _.Parse(page, formAnswers));
 
             // HERE : TODO : If this page has "source" in element || "HasDynamicLookUpSource"
-            if (page.Elements.Any(x => x.DynamicLookup))
+            if (page.Elements.Any(x => !string.IsNullOrEmpty(x.Lookup) && x.Lookup.Equals(LookUpConstants.Dynamic)))
             {
                 // Check I have query string
-                Answers query = formAnswers.AllAnswers.SingleOrDefault(x => x.QuestionId.Equals("sourceQueryString"));
+                Answers query = formAnswers.AllAnswers.SingleOrDefault(x => x.QuestionId.Equals(Constants.LookUpConstants.DynamicLookupQuery));
 
                 if (!string.IsNullOrEmpty((string)query.Response))
                 {
-                    var elements = page.Elements.Where(x => x.DynamicLookup);
+                    var elements = page.Elements.Where(x => !string.IsNullOrEmpty(x.Lookup) && x.Lookup.Equals(LookUpConstants.Dynamic));
                     foreach (var element in elements)
                     {
-                        if (!string.IsNullOrEmpty(element.Properties.SourceObject.Provider))
+                        if (!string.IsNullOrEmpty(element.Properties.Lookup.Provider))
                         {
-                            var lookupProvider = _lookupProviders.Get(element.Properties.SourceObject.Provider);
+                            var lookupProvider = _lookupProviders.Get(element.Properties.Lookup.Provider);
 
-                            var lookupOptions = await lookupProvider.GetAsync(element.Properties.SourceObject, (string)query.Response);
+                            var lookupOptions = await lookupProvider.GetAsync(element.Properties.Lookup, (string)query.Response);
 
                             if (!lookupOptions.Any())
                                 throw new Exception("test");

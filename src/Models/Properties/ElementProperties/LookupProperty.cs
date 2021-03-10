@@ -1,16 +1,15 @@
 ﻿
-using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace form_builder.Models.Properties.ElementProperties
 {
     public partial class BaseProperty
     {
-        public Source SourceObject { get; set; }
+        public Lookup Lookup { get; set; }
     }
-    public class Source
+    public class Lookup
     {
         public string Provider { get; set; }
-        public List<SubmitSlug> SubmitSlugs { get; set; }
+        public List<SubmitSlug> Environments { get; set; }
     }
 }

@@ -21,9 +21,9 @@ namespace form_builder.Providers.Lookup
             _environment = enviroment;
         }
 
-        public async Task<IList<Option>> GetAsync(Source source, string query)
+        public async Task<IList<Option>> GetAsync(form_builder.Models.Properties.ElementProperties.Lookup lookup, string query)
         {
-            var submitDetails = source.SubmitSlugs.SingleOrDefault(x => x.Environment.Equals(_environment.EnvironmentName));
+            var submitDetails = lookup.Environments.SingleOrDefault(x => x.Environment.Equals(_environment.EnvironmentName));
 
             _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(submitDetails.AuthToken) ? string.Empty : submitDetails.AuthToken);
 
