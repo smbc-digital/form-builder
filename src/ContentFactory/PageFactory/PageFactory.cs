@@ -49,20 +49,21 @@ namespace form_builder.ContentFactory.PageFactory
             _tagParsers.ToList().ForEach(_ => _.Parse(page, formAnswers));
 
             // HERE : TODO : If this page has "source" in element || "HasDynamicLookUpSource"
-            if (page.Elements.Any(x => !string.IsNullOrEmpty(x.Source)))
+            if (page.Elements.Any(x => x.DynamicLookup))
             {
                 // Check I have query string
                 Answers query = formAnswers.AllAnswers.SingleOrDefault(x => x.QuestionId.Equals("sourceQueryString"));
+
                 if (!string.IsNullOrEmpty((string)query.Response))
                 {
-                    var elements = page.Elements.Where(x => !string.IsNullOrEmpty(x.Source));
+                    var elements = page.Elements.Where(x => x.DynamicLookup);
                     foreach (var element in elements)
                     {
-                        if (!string.IsNullOrEmpty(element.Properties.SourceProvider))
+                        if (!string.IsNullOrEmpty(element.Properties.SourceObject.Provider))
                         {
-                            var lookupProvider = _lookupProviders.Get(element.Properties.SourceProvider);
+                            var lookupProvider = _lookupProviders.Get(element.Properties.SourceObject.Provider);
 
-                            var lookupOptions = await lookupProvider.GetAsync(element.Source += query.Response);
+                            var lookupOptions = await lookupProvider.GetAsync(element.Properties.SourceObject, (string)query.Response);
 
                             if (!lookupOptions.Any())
                                 throw new Exception("test");

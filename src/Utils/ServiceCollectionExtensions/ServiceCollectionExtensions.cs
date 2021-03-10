@@ -201,6 +201,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         public static IServiceCollection ConfigureDynamicLookDataProviders(this IServiceCollection services)
         {
             services.AddSingleton<ILookupProvider, FakeLookupProvider>();
+            services.AddSingleton<ILookupProvider, FakeWasteLookupProvider>();
 
             return services;
         }
