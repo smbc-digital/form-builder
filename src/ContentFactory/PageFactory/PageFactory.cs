@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Models.Elements;
+using form_builder.Providers.Lookup;
 using form_builder.Providers.StorageProvider;
 using form_builder.TagParsers;
 using form_builder.ViewModels;
@@ -18,12 +21,18 @@ namespace form_builder.ContentFactory.PageFactory
         private readonly IPageHelper _pageHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IEnumerable<ITagParser> _tagParsers;
+        private readonly IEnumerable<ILookupProvider> _lookupProviders;
 
-        public PageFactory(IPageHelper pageHelper, IEnumerable<ITagParser> tagParsers, IDistributedCacheWrapper distributedCache)
+        public PageFactory(
+            IPageHelper pageHelper,
+            IEnumerable<ITagParser> tagParsers,
+            IDistributedCacheWrapper distributedCache,
+            IEnumerable<ILookupProvider> lookupProviders)
         {
             _pageHelper = pageHelper;
             _tagParsers = tagParsers;
             _distributedCache = distributedCache;
+            _lookupProviders = lookupProviders;
         }
 
         public async Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers = null, List<object> results = null)
@@ -38,6 +47,31 @@ namespace form_builder.ContentFactory.PageFactory
             }
 
             _tagParsers.ToList().ForEach(_ => _.Parse(page, formAnswers));
+
+            // HERE : TODO : If this page has "source" in element || "HasDynamicLookUpSource"
+            if (page.Elements.Any(x => !string.IsNullOrEmpty(x.Source)))
+            {
+                // Check I have query string
+                Answers query = formAnswers.AllAnswers.SingleOrDefault(x => x.QuestionId.Equals("sourceQueryString"));
+                if (!string.IsNullOrEmpty((string)query.Response))
+                {
+                    var elements = page.Elements.Where(x => !string.IsNullOrEmpty(x.Source));
+                    foreach (var element in elements)
+                    {
+                        if (!string.IsNullOrEmpty(element.Properties.SourceProvider))
+                        {
+                            var lookupProvider = _lookupProviders.Get(element.Properties.SourceProvider);
+
+                            var lookupOptions = await lookupProvider.GetAsync(element.Source += query.Response);
+
+                            if (!lookupOptions.Any())
+                                throw new Exception("test");
+
+                            element.Properties.Options.AddRange(lookupOptions);
+                        }
+                    }
+                }
+            }
 
             var result = await _pageHelper.GenerateHtml(page, viewModel, baseForm, sessionGuid, formAnswers, results);
             result.Path = page.PageSlug;
