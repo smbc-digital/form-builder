@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Models;
-using form_builder.Models.Properties.ElementProperties;
 
 namespace form_builder.Providers.Lookup
 {
     public class FakeLookupProvider : ILookupProvider
     {
         public string ProviderName { get => "Fake"; }
-        public async Task<IList<Option>> GetAsync(Source source, string query)
+        public async Task<IList<Option>> GetAsync(form_builder.Models.Properties.ElementProperties.Lookup lookup, string query)
         {
             return query switch
             {

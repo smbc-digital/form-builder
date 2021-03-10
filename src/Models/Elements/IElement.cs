@@ -22,8 +22,6 @@ namespace form_builder.Models.Elements
 
         string Lookup { get; set; }
 
-        bool DynamicLookup { get; set; }
-
         bool IsValid { get; }
 
         void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm);
