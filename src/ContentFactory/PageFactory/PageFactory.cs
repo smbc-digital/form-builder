@@ -1,17 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
-using form_builder.Models.Elements;
 using form_builder.Providers.Lookup;
 using form_builder.Providers.StorageProvider;
 using form_builder.TagParsers;
 using form_builder.ViewModels;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace form_builder.ContentFactory.PageFactory
 {
@@ -49,36 +48,10 @@ namespace form_builder.ContentFactory.PageFactory
 
             _tagParsers.ToList().ForEach(_ => _.Parse(page, formAnswers));
 
-            // HERE : TODO : If this page has "source" in element || "HasDynamicLookUpSource"
+            // HERE : TODO : If this page has "lookup" in element || "HasDynamicLookUpSource"
             if (page.Elements.Any(x => !string.IsNullOrEmpty(x.Lookup) && x.Lookup.Equals(LookUpConstants.Dynamic)))
             {
-                // Check I have query string
-                Answers query = formAnswers.AllAnswers.SingleOrDefault(x => x.QuestionId.Equals(Constants.LookUpConstants.DynamicLookupQuery));
-
-                if (!string.IsNullOrEmpty((string)query.Response))
-                {
-                    var elements = page.Elements.Where(x => !string.IsNullOrEmpty(x.Lookup) && x.Lookup.Equals(LookUpConstants.Dynamic));
-                    foreach (var element in elements)
-                    {
-                        if (!string.IsNullOrEmpty(element.Properties.Lookup.Provider))
-                        {
-                            var lookupProvider = _lookupProviders.Get(element.Properties.Lookup.Provider);
-
-                            var lookupOptions = await lookupProvider.GetAsync(element.Properties.Lookup, (string)query.Response);
-
-                            if (!lookupOptions.Any())
-                                throw new Exception("test");
-
-                            foreach (var option in lookupOptions)
-                            {
-                                if (!string.IsNullOrEmpty(option.Value) && !string.IsNullOrEmpty(option.Text))
-                                {
-                                    element.Properties.Options.Add(option);
-                                }
-                            }
-                        }
-                    }
-                }
+                await AddDynamicOptions(page, formAnswers);
             }
 
             var result = await _pageHelper.GenerateHtml(page, viewModel, baseForm, sessionGuid, formAnswers, results);
@@ -92,6 +65,37 @@ namespace form_builder.ContentFactory.PageFactory
             result.DisplayBreadCrumbs = page.DisplayBreadCrumbs;
             result.StartPageUrl = baseForm.StartPageUrl;
             return result;
+        }
+
+        private async Task AddDynamicOptions(Page page, FormAnswers formAnswers)
+        {
+            // Check I have query string
+            Answers query = formAnswers.AllAnswers.SingleOrDefault(x => x.QuestionId.Equals(Constants.LookUpConstants.DynamicLookupQuery));
+
+            if (!string.IsNullOrEmpty((string)query.Response))
+            {
+                var elements = page.Elements.Where(x => !string.IsNullOrEmpty(x.Lookup) && x.Lookup.Equals(LookUpConstants.Dynamic));
+                foreach (var element in elements)
+                {
+                    if (!string.IsNullOrEmpty(element.Properties.Lookup.Provider))
+                    {
+                        var lookupProvider = _lookupProviders.Get(element.Properties.Lookup.Provider);
+
+                        var lookupOptions = await lookupProvider.GetAsync(element.Properties.Lookup, (string)query.Response);
+
+                        if (!lookupOptions.Any())
+                            throw new Exception("Dynamic lookup: GetAsync cannot get IList<Options>.");
+
+                        foreach (var option in lookupOptions)
+                        {
+                            if (!string.IsNullOrEmpty(option.Value) && !string.IsNullOrEmpty(option.Text))
+                            {
+                                element.Properties.Options.Add(option);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
