@@ -22,7 +22,7 @@ namespace form_builder.Models.Elements
 
         string Lookup { get; set; }
 
-        string Source { get; set; }
+        bool DynamicLookup { get; set; }
 
         bool IsValid { get; }
 

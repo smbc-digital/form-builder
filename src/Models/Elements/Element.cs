@@ -46,7 +46,7 @@ namespace form_builder.Models.Elements
 
         public string Lookup { get; set; }
 
-        public string Source { get; set; }
+        public bool DynamicLookup { get; set; }
 
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm)
         {

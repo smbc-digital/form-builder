@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Models;
+using form_builder.Models.Properties.ElementProperties;
 
 namespace form_builder.Providers.Lookup
 {
     public class FakeLookupProvider : ILookupProvider
     {
         public string ProviderName { get => "Fake"; }
-        public async Task<IList<Option>> GetAsync(string key)
+        public async Task<IList<Option>> GetAsync(Source source, string query)
         {
-            return key switch
+            return query switch
             {
                 "https://my.service.url/endpoint?query=waste" => await Waste(),
                 _ => await Generic(),
