@@ -68,7 +68,13 @@ namespace form_builder.ContentFactory.PageFactory
                             if (!lookupOptions.Any())
                                 throw new Exception("test");
 
-                            element.Properties.Options.AddRange(lookupOptions);
+                            foreach (var option in lookupOptions)
+                            {
+                                if (!string.IsNullOrEmpty(option.Value) && !string.IsNullOrEmpty(option.Text))
+                                {
+                                    element.Properties.Options.Add(option);
+                                }
+                            }
                         }
                     }
                 }
