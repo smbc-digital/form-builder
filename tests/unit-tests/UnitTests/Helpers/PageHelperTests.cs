@@ -9,6 +9,7 @@ using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -49,6 +50,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IHttpContextAccessor> _httpContextAccessor = new Mock<IHttpContextAccessor>();
         private readonly Mock<IEnumerable<ILookupProvider>> _mockLookupProviders = new Mock<IEnumerable<ILookupProvider>>();
+        private readonly Mock<IActionHelper> _mockActionHelper = new Mock<IActionHelper>();
 
         public PageHelperTests()
         {
@@ -94,7 +96,8 @@ namespace form_builder_tests.UnitTests.Helpers
                 _mockElementHelper.Object, _mockDistributedCache.Object,
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockCache.Object, _mockDistributedCacheExpirationSettings.Object,
-                _mockPaymentProvider.Object, _mockSessionHelper.Object, _httpContextAccessor.Object, _mockLookupProviders.Object);
+                _mockPaymentProvider.Object, _mockSessionHelper.Object, _httpContextAccessor.Object, _mockLookupProviders.Object,
+                _mockActionHelper.Object);
         }
 
         [Fact]

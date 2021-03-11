@@ -11,12 +11,12 @@ namespace form_builder_tests.UnitTests.Providers.Lookup
 {
     public class LookupProviderTests
     {
-        private readonly FakeWasteLookupProvider _lookupProvider;
+        private readonly JsonLookupProvider _lookupProvider;
         private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
 
         public LookupProviderTests()
         {
-            _lookupProvider = new FakeWasteLookupProvider(_mockGateway.Object);
+            _lookupProvider = new JsonLookupProvider(_mockGateway.Object);
         }
 
         [Theory]
