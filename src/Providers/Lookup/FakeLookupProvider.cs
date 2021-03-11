@@ -7,9 +7,9 @@ namespace form_builder.Providers.Lookup
     public class FakeLookupProvider : ILookupProvider
     {
         public string ProviderName { get => "Fake"; }
-        public async Task<IList<Option>> GetAsync(form_builder.Models.Properties.ElementProperties.Lookup lookup, string query)
+        public async Task<IList<Option>> GetAsync(string url, string authToken)
         {
-            return query switch
+            return url switch
             {
                 "waste" => await Waste(),
                 _ => await Generic(),
