@@ -4,8 +4,6 @@ namespace form_builder.Models.Properties.ElementProperties
 {
     public partial class BaseProperty
     {
-        public string LookupQuestionIdQueryKey { get; set; }
-
         public List<Lookup> Lookup { get; set; }
     }
     public class Lookup
