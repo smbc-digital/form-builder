@@ -9,6 +9,7 @@ using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
+using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Helpers.ViewRender;
@@ -41,12 +42,14 @@ namespace form_builder.Helpers.PageHelpers
         private readonly ISessionHelper _sessionHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IEnumerable<ILookupProvider> _lookupProviders;
+        private readonly IActionHelper _actionHelper;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
             IOptions<FormConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             IEnumerable<IPaymentProvider> paymentProviders, ISessionHelper sessionHelper, IHttpContextAccessor httpContextAccessor,
-            IEnumerable<ILookupProvider> lookupProviders)
+            IEnumerable<ILookupProvider> lookupProviders,
+            IActionHelper actionHelper)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -59,6 +62,7 @@ namespace form_builder.Helpers.PageHelpers
             _sessionHelper = sessionHelper;
             _httpContextAccessor = httpContextAccessor;
             _lookupProviders = lookupProviders;
+            _actionHelper = actionHelper;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(
@@ -111,17 +115,16 @@ namespace form_builder.Helpers.PageHelpers
             var submitDetails = element.Properties.Lookup
                 .SingleOrDefault(x => x.EnvironmentName.Equals(_environment.EnvironmentName));
 
-            Answers query = formAnswers.AllAnswers
-                .SingleOrDefault(x => x.QuestionId.Equals(element.Properties.LookupQuestionIdQueryKey));
+            var request = _actionHelper.GenerateUrl(submitDetails.URL, formAnswers);
 
-            if (string.IsNullOrEmpty((string)query?.Response) || string.IsNullOrEmpty(submitDetails.Provider))
+            if (string.IsNullOrEmpty(submitDetails.Provider))
                 throw new Exception("Dynamic lookup: No Query Details Found.");
 
             var lookupProvider = _lookupProviders.Get(submitDetails.Provider);
             if(lookupProvider == null)
                 throw new Exception("Dynamic lookup: No Lookup Provider Found.");
 
-            var lookupOptions = await lookupProvider.GetAsync(submitDetails.URL += (string)query.Response, submitDetails.AuthToken);
+            var lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
             if (!lookupOptions.Any())
                 throw new Exception("Dynamic lookup: GetAsync cannot get IList<Options>.");
 
