@@ -17,6 +17,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ActionProperties;
 using form_builder.Models.Properties.ElementProperties;
+using form_builder.Providers.Lookup;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder_tests.Builders;
@@ -47,6 +48,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IHttpContextAccessor> _httpContextAccessor = new Mock<IHttpContextAccessor>();
+        private readonly Mock<IEnumerable<ILookupProvider>> _mockLookupProviders = new Mock<IEnumerable<ILookupProvider>>();
 
         public PageHelperTests()
         {
@@ -92,7 +94,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 _mockElementHelper.Object, _mockDistributedCache.Object,
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockCache.Object, _mockDistributedCacheExpirationSettings.Object,
-                _mockPaymentProvider.Object, _mockSessionHelper.Object, _httpContextAccessor.Object);
+                _mockPaymentProvider.Object, _mockSessionHelper.Object, _httpContextAccessor.Object, _mockLookupProviders.Object);
         }
 
         [Fact]
