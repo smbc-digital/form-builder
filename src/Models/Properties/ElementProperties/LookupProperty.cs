@@ -1,15 +1,22 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace form_builder.Models.Properties.ElementProperties
 {
     public partial class BaseProperty
     {
-        public Lookup Lookup { get; set; }
+        public string LookupQuestionIdQueryKey { get; set; }
+
+        public List<Lookup> Lookup { get; set; }
     }
     public class Lookup
     {
+        public string EnvironmentName { get; set; }
+
         public string Provider { get; set; }
-        public List<SubmitSlug> Environments { get; set; }
+
+
+        public string URL { get; set; }
+
+        public string AuthToken { get; set; }
     }
 }

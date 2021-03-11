@@ -21,18 +21,15 @@ namespace form_builder.ContentFactory.PageFactory
         private readonly IPageHelper _pageHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IEnumerable<ITagParser> _tagParsers;
-        private readonly IEnumerable<ILookupProvider> _lookupProviders;
 
         public PageFactory(
             IPageHelper pageHelper,
             IEnumerable<ITagParser> tagParsers,
-            IDistributedCacheWrapper distributedCache,
-            IEnumerable<ILookupProvider> lookupProviders)
+            IDistributedCacheWrapper distributedCache)
         {
             _pageHelper = pageHelper;
             _tagParsers = tagParsers;
             _distributedCache = distributedCache;
-            _lookupProviders = lookupProviders;
         }
 
         public async Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers = null, List<object> results = null)
@@ -48,12 +45,6 @@ namespace form_builder.ContentFactory.PageFactory
 
             _tagParsers.ToList().ForEach(_ => _.Parse(page, formAnswers));
 
-            // HERE : TODO : If this page has "lookup" in element || "HasDynamicLookUpSource"
-            if (page.Elements.Any(x => !string.IsNullOrEmpty(x.Lookup) && x.Lookup.Equals(LookUpConstants.Dynamic)))
-            {
-                await AddDynamicOptions(page, formAnswers);
-            }
-
             var result = await _pageHelper.GenerateHtml(page, viewModel, baseForm, sessionGuid, formAnswers, results);
             result.Path = page.PageSlug;
             result.FormName = baseForm.FormName;
@@ -65,37 +56,6 @@ namespace form_builder.ContentFactory.PageFactory
             result.DisplayBreadCrumbs = page.DisplayBreadCrumbs;
             result.StartPageUrl = baseForm.StartPageUrl;
             return result;
-        }
-
-        private async Task AddDynamicOptions(Page page, FormAnswers formAnswers)
-        {
-            // Check I have query string
-            Answers query = formAnswers.AllAnswers.SingleOrDefault(x => x.QuestionId.Equals(Constants.LookUpConstants.DynamicLookupQuery));
-
-            if (!string.IsNullOrEmpty((string)query.Response))
-            {
-                var elements = page.Elements.Where(x => !string.IsNullOrEmpty(x.Lookup) && x.Lookup.Equals(LookUpConstants.Dynamic));
-                foreach (var element in elements)
-                {
-                    if (!string.IsNullOrEmpty(element.Properties.Lookup.Provider))
-                    {
-                        var lookupProvider = _lookupProviders.Get(element.Properties.Lookup.Provider);
-
-                        var lookupOptions = await lookupProvider.GetAsync(element.Properties.Lookup, (string)query.Response);
-
-                        if (!lookupOptions.Any())
-                            throw new Exception("Dynamic lookup: GetAsync cannot get IList<Options>.");
-
-                        foreach (var option in lookupOptions)
-                        {
-                            if (!string.IsNullOrEmpty(option.Value) && !string.IsNullOrEmpty(option.Text))
-                            {
-                                element.Properties.Options.Add(option);
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }

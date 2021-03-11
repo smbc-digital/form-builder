@@ -7,6 +7,5 @@
         public const string SearchResultsKeyPostFix = "-search-results";
         public const string SubPathViewModelKey = "subPath";
         public const string Dynamic = "dynamic";
-        public const string DynamicLookupQuery = "dynamicLookupQuery";
     }
 }

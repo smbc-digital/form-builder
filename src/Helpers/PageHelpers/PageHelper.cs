@@ -16,6 +16,7 @@ using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
+using form_builder.Providers.Lookup;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
@@ -39,11 +40,13 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly ISessionHelper _sessionHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IEnumerable<ILookupProvider> _lookupProviders;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
             IOptions<FormConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            IEnumerable<IPaymentProvider> paymentProviders, ISessionHelper sessionHelper, IHttpContextAccessor httpContextAccessor)
+            IEnumerable<IPaymentProvider> paymentProviders, ISessionHelper sessionHelper, IHttpContextAccessor httpContextAccessor,
+            IEnumerable<ILookupProvider> lookupProviders)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -55,6 +58,7 @@ namespace form_builder.Helpers.PageHelpers
             _paymentProviders = paymentProviders;
             _sessionHelper = sessionHelper;
             _httpContextAccessor = httpContextAccessor;
+            _lookupProviders = lookupProviders;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(
@@ -72,6 +76,12 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var element in page.Elements)
             {
+                if (!string.IsNullOrEmpty(element.Lookup) &&
+                    element.Lookup.Equals(LookUpConstants.Dynamic))
+                {
+                    await AddDynamicOptions(element, formAnswers);
+                }
+
                 string html = await element.RenderAsync(
                     _viewRender,
                     _elementHelper,
@@ -94,6 +104,28 @@ namespace form_builder.Helpers.PageHelpers
 
             }
             return formModel;
+        }
+
+        private async Task AddDynamicOptions(IElement element, FormAnswers formAnswers)
+        {
+            var submitDetails = element.Properties.Lookup
+                .SingleOrDefault(x => x.EnvironmentName.Equals(_environment.EnvironmentName));
+
+            Answers query = formAnswers.AllAnswers
+                .SingleOrDefault(x => x.QuestionId.Equals(element.Properties.LookupQuestionIdQueryKey));
+
+            if (string.IsNullOrEmpty((string)query?.Response) || string.IsNullOrEmpty(submitDetails.Provider))
+                throw new Exception("Dynamic lookup: No Query Details Found.");
+
+            var lookupProvider = _lookupProviders.Get(submitDetails.Provider);
+            if(lookupProvider == null)
+                throw new Exception("Dynamic lookup: No Lookup Provider Found.");
+
+            var lookupOptions = await lookupProvider.GetAsync(submitDetails.URL += (string)query.Response, submitDetails.AuthToken);
+            if (!lookupOptions.Any())
+                throw new Exception("Dynamic lookup: GetAsync cannot get IList<Options>.");
+
+            element.Properties.Options.AddRange(lookupOptions);
         }
 
         public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
@@ -272,7 +304,7 @@ namespace form_builder.Helpers.PageHelpers
                                                            $"'{bookingElement.Properties.QuestionId}'");
                     }
                 }
-                
+
             }
         }
 
@@ -362,12 +394,12 @@ namespace form_builder.Helpers.PageHelpers
                         throw new ApplicationException($"The provided json '{formName}' does not contain a conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}'");
 
                     if (
-                        option.HasConditionalElement && 
-                        !string.IsNullOrEmpty(option.ConditionalElementId) && 
+                        option.HasConditionalElement &&
+                        !string.IsNullOrEmpty(option.ConditionalElementId) &&
                         !pages.Any(page => page.ValidatableElements.Contains(radio) && page.Elements.Any(_ => _.Properties.QuestionId == option.ConditionalElementId && _.Properties.isConditionalElement)))
                         throw new ApplicationException($"The provided json '{formName}' contains the conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}' on a different page to the radio element");
 
-                    
+
                     conditionalElements.Remove(conditionalElements.FirstOrDefault(_ => _.Properties.QuestionId == option.ConditionalElementId));
                 }
             }
@@ -418,7 +450,6 @@ namespace form_builder.Helpers.PageHelpers
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
-
 
         public void CheckForDocumentDownload(FormSchema formSchema)
         {
@@ -735,20 +766,22 @@ namespace form_builder.Helpers.PageHelpers
         public void CheckAbsoluteDateValidations(List<Page> pages)
         {
             var elements = pages.SelectMany(element => element.ValidatableElements);
-            
+
             elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateAfterAbsolute))
                 .ToList()
-                .ForEach(element => { 
-                    if(!DateTime.TryParse(element.Properties.IsDateAfterAbsolute, out DateTime outputDate))
-                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateAfterAbsolute validation, {element.Properties.QuestionId} does not provide a valid comparison date"); 
+                .ForEach(element =>
+                {
+                    if (!DateTime.TryParse(element.Properties.IsDateAfterAbsolute, out DateTime outputDate))
+                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateAfterAbsolute validation, {element.Properties.QuestionId} does not provide a valid comparison date");
                 });
 
             elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateBeforeAbsolute))
                 .ToList()
-                .ForEach(element => { 
-                    if(!DateTime.TryParse(element.Properties.IsDateBeforeAbsolute, out DateTime outputDate))
+                .ForEach(element =>
+                {
+                    if (!DateTime.TryParse(element.Properties.IsDateBeforeAbsolute, out DateTime outputDate))
                         throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateBeforeAbsolute validation, {element.Properties.QuestionId} does not provide a valid comparison date");
-            });            
+                });
         }
 
         public void CheckDateValidations(List<Page> pages)
@@ -757,16 +790,18 @@ namespace form_builder.Helpers.PageHelpers
 
             elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateAfter))
                 .ToList()
-                .ForEach(element => { 
-                    if(!elements.Any(comparisonElement => comparisonElement.Properties.QuestionId == element.Properties.IsDateAfter)) 
-                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateAfter validation, {element.Properties.QuestionId} the form does not contain a comparison element with question id {element.Properties.IsDateAfter}"); 
+                .ForEach(element =>
+                {
+                    if (!elements.Any(comparisonElement => comparisonElement.Properties.QuestionId == element.Properties.IsDateAfter))
+                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateAfter validation, {element.Properties.QuestionId} the form does not contain a comparison element with question id {element.Properties.IsDateAfter}");
                 });
 
             elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateBefore))
                 .ToList()
-                .ForEach(element => { 
-                    if(!elements.Any(comparisonElement => comparisonElement.Properties.QuestionId == element.Properties.IsDateBefore)) 
-                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateBefore validation, {element.Properties.QuestionId} the form does not contain a comparison element with question id {element.Properties.IsDateBefore}"); 
+                .ForEach(element =>
+                {
+                    if (!elements.Any(comparisonElement => comparisonElement.Properties.QuestionId == element.Properties.IsDateBefore))
+                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateBefore validation, {element.Properties.QuestionId} the form does not contain a comparison element with question id {element.Properties.IsDateBefore}");
                 });
         }
     }
