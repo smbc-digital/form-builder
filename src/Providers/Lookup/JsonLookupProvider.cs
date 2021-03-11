@@ -8,11 +8,11 @@ using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Providers.Lookup
 {
-    public class FakeWasteLookupProvider : ILookupProvider
+    public class JsonLookupProvider : ILookupProvider
     {
-        public string ProviderName { get => "FakeWaste"; }
+        public string ProviderName { get => "Json"; }
         private readonly IGateway _gateway;
-        public FakeWasteLookupProvider(IGateway gateway) => _gateway = gateway;
+        public JsonLookupProvider(IGateway gateway) => _gateway = gateway;
 
         public async Task<IList<Option>> GetAsync(string url, string authToken)
         {
