@@ -2805,7 +2805,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Act
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
-            Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires an AppointmentTypes property with a valid AppointmentID for the environment", result.Message);
+            Assert.Equal("PageHelper:CheckForBookingElement, No appointment type found for current environment or empty AppointmentID", result.Message);
         }
 
         [Fact]
@@ -2834,7 +2834,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Act
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
-            Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires an AppointmentTypes property with a valid AppointmentID for the environment", result.Message);
+            Assert.Equal("PageHelper:CheckForBookingElement, No appointment type found for current environment or empty AppointmentID", result.Message);
         }
 
         [Fact]
