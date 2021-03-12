@@ -703,7 +703,7 @@ namespace form_builder.Helpers.PageHelpers
                     var appointmentTypeForEnv = booking.Properties.AppointmentTypes.FirstOrDefault(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToLower()) && !_.AppointmentId.Equals(Guid.Empty));
 
                     if (appointmentTypeForEnv == null)
-                        throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires an AppointmentTypes property with a valid AppointmentID for the environment");
+                        throw new ApplicationException("PageHelper:CheckForBookingElement, No appointment type found for current environment or empty AppointmentID");
 
                     if (appointmentTypeForEnv.OptionalResources.Any())
                     {
