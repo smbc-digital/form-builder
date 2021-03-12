@@ -125,16 +125,21 @@ namespace form_builder.Helpers.PageHelpers
                 {
                     if (element.Properties.Lookup != null)
                     {
+                        if (!element.Properties.Lookup
+                            .Any(lookup => lookup.EnvironmentName
+                            .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase)))
+                            throw new ApplicationException($"The provided json '{formName}' has no Environment details for this:({_environment.EnvironmentName}) Environment");
+
                         foreach (var env in element.Properties.Lookup)
                         {
                             if (string.IsNullOrEmpty(env.EnvironmentName))
                                 throw new ApplicationException($"The provided json '{formName}' has no Environment Name");
 
-                            if (!env.EnvironmentName.Equals(_environment.EnvironmentName))
-                                throw new ApplicationException($"The provided json '{formName}' has no Environment details for this:({_environment.EnvironmentName}) Environment");
-
                             if (string.IsNullOrEmpty(env.Provider))
                                 throw new ApplicationException($"The provided json '{formName}' has no Provider Name");
+
+                            if (_lookupProviders.Get(env.Provider) == null)
+                                throw new Exception($"The provided json '{formName}': No Lookup Provider Found.");
 
                             if (string.IsNullOrEmpty(env.URL))
                                 throw new ApplicationException($"The provided json '{formName}' has no API URL to submit to");
@@ -143,7 +148,7 @@ namespace form_builder.Helpers.PageHelpers
                                 throw new ApplicationException($"The provided json '{formName}' has no auth token for the API");
 
                             if (!_environment.IsEnvironment("local") && 
-                                !env.EnvironmentName.ToLower().Equals("local") && 
+                                !env.EnvironmentName.Equals("local", StringComparison.OrdinalIgnoreCase) && 
                                 !env.URL.StartsWith("https://"))
                                 throw new Exception("SubmitUrl must start with https");
                         }
@@ -159,7 +164,11 @@ namespace form_builder.Helpers.PageHelpers
         private async Task AddDynamicOptions(IElement element, FormAnswers formAnswers)
         {
             Lookup submitDetails = element.Properties.Lookup
-                .SingleOrDefault(x => x.EnvironmentName.Equals(_environment.EnvironmentName));
+                .SingleOrDefault(x => x.EnvironmentName
+                .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
+
+            if(submitDetails == null)
+                throw new Exception("Dynamic lookup: No Environment Specific Details Found.");
 
             RequestEntity request = _actionHelper.GenerateUrl(submitDetails.URL, formAnswers);
 
