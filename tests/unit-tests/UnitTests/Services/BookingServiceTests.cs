@@ -20,6 +20,7 @@ using form_builder.Services.BookingService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.PageService.Entities;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using StockportGovUK.NetStandard.Models.Booking.Request;
@@ -39,8 +40,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IPageFactory> _mockPageFactory = new Mock<IPageFactory>();
         private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockdistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly DistributedCacheExpirationConfiguration _cacheConfig = new DistributedCacheExpirationConfiguration { Booking = 5, BookingNoAppointmentsAvailable = 10 };
-
         public BookingServiceTests()
         {
             _mockdistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(_cacheConfig);
@@ -53,12 +54,15 @@ namespace form_builder_tests.UnitTests.Services
                 _bookingProvider.Object
             };
 
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
+
             _service = new BookingService(
               _mockDistributedCache.Object,
               _mockPageHelper.Object,
               _bookingProviders,
               _mockPageFactory.Object,
               _mockMappingService.Object,
+              _mockHostingEnv.Object,
               _mockdistributedCacheExpirationConfiguration.Object);
         }
 
@@ -105,7 +109,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(guid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -146,12 +150,16 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
+            var appointmentType = new AppointmentTypeBuilder()
+                .WithAppointmentId(guid)
+                .WithOptionalResource(new BookingResource { ResourceId = bookingResourceId, Quantity = bookingResourceQuantity })
+                .Build();
+
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(guid)
-                .WithBookingResource(new BookingResource { ResourceId = bookingResourceId, Quantity = bookingResourceQuantity })
+                .WithAppointmentType(appointmentType)
                 .Build();
 
             var page = new PageBuilder()
@@ -190,7 +198,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(guid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -229,7 +237,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(guid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -268,7 +276,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(guid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -296,7 +304,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(guid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -326,7 +334,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(guid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -360,7 +368,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(guid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -399,7 +407,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(guid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -429,7 +437,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(appointmentTypeGuid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -469,7 +477,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(appointmentTypeGuid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .WithCheckYourBooking(false)
                 .Build();
 
@@ -511,7 +519,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(appointmentTypeGuid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .WithCheckYourBooking(true)
                 .Build();
 
@@ -550,7 +558,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(appointmentTypeGuid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -591,7 +599,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(appointmentTypeGuid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -634,7 +642,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(appointmentTypeGuid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -674,7 +682,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(appointmentTypeGuid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
