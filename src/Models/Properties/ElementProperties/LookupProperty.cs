@@ -12,7 +12,6 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public string Provider { get; set; }
 
-
         public string URL { get; set; }
 
         public string AuthToken { get; set; }
