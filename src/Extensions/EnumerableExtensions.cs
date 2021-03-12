@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using form_builder.Providers.Address;
 using form_builder.Providers.Booking;
@@ -12,7 +13,7 @@ namespace form_builder.Extensions
     public static class EnumerableExtensions
     {
         public static ILookupProvider Get(this IEnumerable<ILookupProvider> value, string providerName) =>
-            value.Single(_ => _.ProviderName == providerName);
+            value.Single(_ => _.ProviderName.Equals(providerName, StringComparison.OrdinalIgnoreCase));
 
         public static IAddressProvider Get(this IEnumerable<IAddressProvider> value, string providerName) =>
             value.Single(_ => _.ProviderName == providerName);

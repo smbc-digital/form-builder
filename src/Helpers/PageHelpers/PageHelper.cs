@@ -27,6 +27,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace form_builder.Helpers.PageHelpers
 {
@@ -88,16 +89,10 @@ namespace form_builder.Helpers.PageHelpers
                 }
 
                 string html = await element.RenderAsync(
-                    _viewRender,
-                    _elementHelper,
-                    guid,
-                    viewModel,
-                    page,
-                    baseForm,
-                    _environment,
-                    formAnswers,
-                    results
-                    );
+                    _viewRender, _elementHelper, guid,
+                    viewModel, page, baseForm, _environment,
+                    formAnswers, results);
+
                 if (element.Properties.isConditionalElement)
                 {
                     formModel.RawHTML = formModel.RawHTML.Replace(SystemConstants.ConditionalElementReplacementString + element.Properties.QuestionId, html);
@@ -106,8 +101,8 @@ namespace form_builder.Helpers.PageHelpers
                 {
                     formModel.RawHTML += html;
                 }
-
             }
+
             return formModel;
         }
 
@@ -147,8 +142,8 @@ namespace form_builder.Helpers.PageHelpers
                             if (string.IsNullOrEmpty(env.AuthToken))
                                 throw new ApplicationException($"The provided json '{formName}' has no auth token for the API");
 
-                            if (!_environment.IsEnvironment("local") && 
-                                !env.EnvironmentName.Equals("local", StringComparison.OrdinalIgnoreCase) && 
+                            if (!_environment.IsEnvironment("local") &&
+                                !env.EnvironmentName.Equals("local", StringComparison.OrdinalIgnoreCase) &&
                                 !env.URL.StartsWith("https://"))
                                 throw new Exception("SubmitUrl must start with https");
                         }
@@ -167,7 +162,7 @@ namespace form_builder.Helpers.PageHelpers
                 .SingleOrDefault(x => x.EnvironmentName
                 .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
 
-            if(submitDetails == null)
+            if (submitDetails == null)
                 throw new Exception("Dynamic lookup: No Environment Specific Details Found.");
 
             RequestEntity request = _actionHelper.GenerateUrl(submitDetails.URL, formAnswers);
@@ -179,7 +174,26 @@ namespace form_builder.Helpers.PageHelpers
             if (lookupProvider == null)
                 throw new Exception("Dynamic lookup: No Lookup Provider Found.");
 
-            var lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
+            List<Option> lookupOptions = new();
+            var session = _sessionHelper.GetSessionGuid();
+            var cachedAnswers = _distributedCache.GetString(session);
+            if (!string.IsNullOrEmpty(cachedAnswers))
+            {
+                var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+                var lookUpCacheResults = convertedAnswers.FormData.SingleOrDefault(x => x.Key.Equals(request.Url, StringComparison.OrdinalIgnoreCase));
+                if (!string.IsNullOrEmpty(lookUpCacheResults.Key) && lookUpCacheResults.Value != null)
+                {
+                    lookupOptions = JsonConvert.DeserializeObject<List<Option>>(JsonConvert.SerializeObject(lookUpCacheResults.Value));
+                }
+            }
+
+            if (!lookupOptions.Any())
+            {
+                lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
+
+                SaveFormData(request.Url, lookupOptions, session, "dynamic");
+            }
+
             if (!lookupOptions.Any())
                 throw new Exception("Dynamic lookup: GetAsync cannot get IList<Options>.");
 
