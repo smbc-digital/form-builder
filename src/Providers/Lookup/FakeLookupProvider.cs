@@ -1,4 +1,5 @@
 ﻿using form_builder.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,13 +8,12 @@ namespace form_builder.Providers.Lookup
     public class FakeLookupProvider : ILookupProvider
     {
         public string ProviderName { get => "Fake"; }
-        public async Task<IList<Option>> GetAsync(string url, string authToken)
+        public async Task<List<Option>> GetAsync(string url, string authToken)
         {
-            return url switch
-            {
-                "waste" => await Waste(),
-                _ => await Generic(),
-            };
+            if (url.Contains("waste", StringComparison.OrdinalIgnoreCase))
+                return await Waste();
+
+            return await Generic();
         }
 
         private static async Task<List<Option>> Waste()
