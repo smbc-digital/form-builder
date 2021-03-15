@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using form_builder.Models;
 
 namespace form_builder.Extensions
 {
@@ -12,5 +13,7 @@ namespace form_builder.Extensions
                   ? string.Join(", ", value.Take(value.Count - 1)).ToUpper() + $" or {value.Last().ToUpper()}"
                   : value.First().ToUpper();
         }
+
+        public static AppointmentType GetAppointmentTypeForEnvironment(this List<AppointmentType> value, string environment) => value.First(_ => _.Environment.ToLower().Equals(environment.ToLower()));
     }
 }

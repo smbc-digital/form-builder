@@ -37,7 +37,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                .WithType(EElementType.Booking)
                .WithBookingProvider("testBookingProvider")
                .WithQuestionId("bookingQuestion")
-               .WithAppointmentType(Guid.NewGuid())
+               .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
                .WithCheckYourBooking(true)
                .Build();
 
@@ -101,7 +101,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
                 .WithCheckYourBooking(true)
                 .Build();
 
@@ -169,7 +169,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                .WithType(EElementType.Booking)
                .WithBookingProvider("testBookingProvider")
                .WithQuestionId("bookingQuestion")
-               .WithAppointmentType(Guid.NewGuid())
+               .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
                .WithCheckYourBooking(true)
                .Build();
 
@@ -248,7 +248,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
                 .WithCheckYourBooking(true)
                 .Build();
 
@@ -327,7 +327,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
                 .WithCheckYourBooking(true)
                 .Build();
 
@@ -391,7 +391,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
                 .WithCheckYourBooking(true)
                 .Build();
 
@@ -457,7 +457,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
                 .WithCheckYourBooking(true)
                 .WithNoAvailableTimeForBookingType("test")
                 .Build();
@@ -535,7 +535,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
                 .WithCheckYourBooking(true)
                 .WithNoAvailableTimeForBookingType("test2")
                 .Build();
