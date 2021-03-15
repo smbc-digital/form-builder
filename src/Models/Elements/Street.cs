@@ -43,6 +43,8 @@ namespace form_builder.Models.Elements
             }
         }
 
+        public override string GetLabelText(string pageTitle) => $"{pageTitle}{(Properties.Optional ? " (optional)" : string.Empty)}";
+
         public Street()
         {
             Type = EElementType.Street;
