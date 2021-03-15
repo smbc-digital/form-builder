@@ -45,8 +45,6 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public override string GetLabelText() => $"Address{(Properties.Optional ? " (optional)" : string.Empty)}";
-
         public Address()
         {
             Type = EElementType.Address;
