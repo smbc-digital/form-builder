@@ -220,7 +220,16 @@ namespace form_builder.Helpers.ElementHelpers
                 formSchemaQuestions.ForEach(question =>
                 {
                     var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
-                    summaryBuilder.Add(question.GetLabelText(), answer, question.Type);
+                    if (question.Type.Equals(EElementType.Address)
+                        || question.Type.Equals(EElementType.Street)
+                        || question.Type.Equals(EElementType.Organisation))
+                    {
+                        summaryBuilder.Add($"{page.Title}{(question.Properties.Optional ? " (optional)" : string.Empty)}", answer, question.Type);
+                    }
+                    else
+                    {
+                        summaryBuilder.Add(question.GetLabelText(), answer, question.Type);
+                    }
                 });
 
                 pageSummary.Answers = summaryBuilder.Build();
