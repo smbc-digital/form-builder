@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using form_builder.Models;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 
-namespace form_builder.Builders
+namespace form_builder_tests.Builders
 {
     public class AppointmentTypeBuilder
     {
