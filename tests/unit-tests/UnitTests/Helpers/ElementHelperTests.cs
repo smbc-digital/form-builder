@@ -659,6 +659,45 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Single(result);
         }
 
+        [Theory]
+        [InlineData(EElementType.Address, "Address Title")]
+        [InlineData(EElementType.Street, "Street title")]
+        [InlineData(EElementType.Organisation, "Organisation title")]
+        public void GenerateQuestionAndAnswersList_ShouldReturnFormSummary_WithPageTitleAsLabel(EElementType type, string title)
+        {
+            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" } } } } }));
+
+            _mockElementMapper
+                .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns("address");
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
+            var element = new ElementBuilder()
+                .WithQuestionId("question")
+                .WithType(type)
+                .WithAddressProvider("testProvider")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithBehaviour(behaviour)
+                .WithPageTitle(title)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            var result = _elementHelper.GenerateQuestionAndAnswersList("12345", formSchema);
+
+            Assert.NotNull(result[0].Answers[title]);
+        }
+
         [Fact]
         public void GenerateValidDocumentUploadUrl_ShouldReturnUrlWithCaseRefEncoded()
         {
