@@ -26,19 +26,7 @@ namespace form_builder.Helpers.DocumentCreation
                 formSchemaQuestions.ForEach(question =>
                 {
                     var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
-
-                    if (question.Type.Equals(EElementType.Address)
-                        || question.Type.Equals(EElementType.Street)
-                        || question.Type.Equals(EElementType.Organisation))
-                    {
-                        summaryBuilder.Add(
-                            $"{page.Title}{(question.Properties.Optional ? " (optional)" : string.Empty)}", answer,
-                            question.Type);
-                    }
-                    else
-                    {
-                        summaryBuilder.Add(question.GetLabelText(), answer, question.Type);
-                    }
+                    summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
 
                     summaryBuilder.AddBlankLine();
                 });
