@@ -1,13 +1,16 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Providers.Lookup;
 using form_builder.Providers.StorageProvider;
 using form_builder.TagParsers;
 using form_builder.ViewModels;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace form_builder.ContentFactory.PageFactory
 {
@@ -19,7 +22,10 @@ namespace form_builder.ContentFactory.PageFactory
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IEnumerable<ITagParser> _tagParsers;
 
-        public PageFactory(IPageHelper pageHelper, IEnumerable<ITagParser> tagParsers, IDistributedCacheWrapper distributedCache)
+        public PageFactory(
+            IPageHelper pageHelper,
+            IEnumerable<ITagParser> tagParsers,
+            IDistributedCacheWrapper distributedCache)
         {
             _pageHelper = pageHelper;
             _tagParsers = tagParsers;

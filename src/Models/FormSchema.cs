@@ -81,6 +81,7 @@ namespace form_builder.Models
             if (path != FirstPageSlug)
                 return;
 
+            pageHelper.ValidateDynamicLookUpObject(Pages, form);
             pageHelper.HasDuplicateQuestionIDs(Pages, form);
             pageHelper.CheckForEmptyBehaviourSlugs(Pages, form);
             pageHelper.CheckForInvalidQuestionOrTargetMappingValue(Pages, form);

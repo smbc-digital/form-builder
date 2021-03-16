@@ -50,6 +50,7 @@ namespace form_builder
                 .AddGateways(Configuration)
                 .AddIOptionsConfiguration(Configuration)
                 .ConfigureAddressProviders()
+                .ConfigureDynamicLookDataProviders()
                 .ConfigureOrganisationProviders()
                 .ConfigureStreetProviders()
                 .ConfigurePaymentProviders()

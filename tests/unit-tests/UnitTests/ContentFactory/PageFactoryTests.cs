@@ -18,7 +18,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
         private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
         private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new Mock<IEnumerable<ITagParser>>();
-        private readonly Mock<ITagParser> _tagParser = new Mock<ITagParser>();
+        private readonly Mock<ITagParser> _tagParser = new Mock<ITagParser>();        
 
         public PageFactoryTests()
         {

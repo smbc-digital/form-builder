@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using form_builder.Providers.Address;
 using form_builder.Providers.Booking;
+using form_builder.Providers.Lookup;
 using form_builder.Providers.Organisation;
 using form_builder.Providers.Street;
 using form_builder.TagParsers.Formatters;
@@ -10,6 +12,9 @@ namespace form_builder.Extensions
 {
     public static class EnumerableExtensions
     {
+        public static ILookupProvider Get(this IEnumerable<ILookupProvider> value, string providerName) =>
+            value.Single(_ => _.ProviderName.Equals(providerName, StringComparison.OrdinalIgnoreCase));
+
         public static IAddressProvider Get(this IEnumerable<IAddressProvider> value, string providerName) =>
             value.Single(_ => _.ProviderName == providerName);
 
