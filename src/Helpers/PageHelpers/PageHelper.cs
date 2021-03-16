@@ -27,24 +27,23 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace form_builder.Helpers.PageHelpers
 {
     public class PageHelper : IPageHelper
     {
-        private readonly IViewRender _viewRender;
-        private readonly IElementHelper _elementHelper;
-        private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly FormConfiguration _disallowedKeys;
-        private readonly IWebHostEnvironment _environment;
-        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly ICache _cache;
-        private readonly IEnumerable<IPaymentProvider> _paymentProviders;
-        private readonly ISessionHelper _sessionHelper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IEnumerable<ILookupProvider> _lookupProviders;
+        private readonly IViewRender _viewRender;
         private readonly IActionHelper _actionHelper;
+        private readonly IElementHelper _elementHelper;
+        private readonly ISessionHelper _sessionHelper;
+        private readonly IWebHostEnvironment _environment;
+        private readonly FormConfiguration _disallowedKeys;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IEnumerable<ILookupProvider> _lookupProviders;
+        private readonly IEnumerable<IPaymentProvider> _paymentProviders;
+        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
             IOptions<FormConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
@@ -133,8 +132,14 @@ namespace form_builder.Helpers.PageHelpers
                             if (string.IsNullOrEmpty(env.Provider))
                                 throw new ApplicationException($"The provided json '{formName}' has no Provider Name");
 
-                            if (_lookupProviders.Get(env.Provider) == null)
-                                throw new Exception($"The provided json '{formName}': No Lookup Provider Found.");
+                            try
+                            {
+                                _lookupProviders.Get(env.Provider);
+                            }
+                            catch (Exception e)
+                            {
+                                throw new ApplicationException($"The provided json '{formName}': No Lookup Provider Found {e.Message}.");
+                            }
 
                             if (string.IsNullOrEmpty(env.URL))
                                 throw new ApplicationException($"The provided json '{formName}' has no API URL to submit to");
@@ -145,7 +150,7 @@ namespace form_builder.Helpers.PageHelpers
                             if (!_environment.IsEnvironment("local") &&
                                 !env.EnvironmentName.Equals("local", StringComparison.OrdinalIgnoreCase) &&
                                 !env.URL.StartsWith("https://"))
-                                throw new Exception("SubmitUrl must start with https");
+                                throw new ApplicationException("SubmitUrl must start with https");
                         }
                     }
                     else
@@ -156,7 +161,7 @@ namespace form_builder.Helpers.PageHelpers
             }
         }
 
-        private async Task AddDynamicOptions(IElement element, FormAnswers formAnswers)
+        public async Task AddDynamicOptions(IElement element, FormAnswers formAnswers)
         {
             Lookup submitDetails = element.Properties.Lookup
                 .SingleOrDefault(x => x.EnvironmentName
@@ -191,7 +196,8 @@ namespace form_builder.Helpers.PageHelpers
             {
                 lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
 
-                SaveFormData(request.Url, lookupOptions, session, "dynamic");
+                if (lookupOptions.Any())
+                    SaveFormData(request.Url, lookupOptions, session, "dynamic");
             }
 
             if (!lookupOptions.Any())

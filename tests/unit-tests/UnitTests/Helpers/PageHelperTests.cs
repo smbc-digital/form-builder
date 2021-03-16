@@ -21,6 +21,7 @@ using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.Lookup;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
+using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -35,22 +36,20 @@ namespace form_builder_tests.UnitTests.Helpers
     public class PageHelperTests
     {
         private readonly PageHelper _pageHelper;
-        private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
-        private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IOptions<FormConfiguration>> _mockDisallowedKeysOptions =
-            new Mock<IOptions<FormConfiguration>>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        private readonly Mock<ICache> _mockCache = new Mock<ICache>();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings
-            = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
-        private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider =
-            new Mock<IEnumerable<IPaymentProvider>>();
-        private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
-        private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<IHttpContextAccessor> _httpContextAccessor = new Mock<IHttpContextAccessor>();
-        private readonly Mock<IEnumerable<ILookupProvider>> _mockLookupProviders = new Mock<IEnumerable<ILookupProvider>>();
-        private readonly Mock<IActionHelper> _mockActionHelper = new Mock<IActionHelper>();
+        private readonly Mock<IViewRender> _mockIViewRender = new();
+        private readonly Mock<IElementHelper> _mockElementHelper = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<IOptions<FormConfiguration>> _mockDisallowedKeysOptions = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+        private readonly Mock<ICache> _mockCache = new();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings = new();
+        private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider = new();
+        private readonly Mock<IPaymentProvider> _paymentProvider = new();
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new();
+        private readonly Mock<IHttpContextAccessor> _httpContextAccessor = new();
+        private readonly List<ILookupProvider> _mockLookupProviders = new List<ILookupProvider>();
+        private readonly FakeLookupProvider _lookupProvider = new();
+        private readonly Mock<IActionHelper> _mockActionHelper = new();
 
         public PageHelperTests()
         {
@@ -89,15 +88,84 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
 
+            _mockLookupProviders.Add(_lookupProvider);
+
             _paymentProvider.Setup(_ => _.ProviderName).Returns("testProvider");
             var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
             _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
+
             _pageHelper = new PageHelper(_mockIViewRender.Object,
                 _mockElementHelper.Object, _mockDistributedCache.Object,
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockCache.Object, _mockDistributedCacheExpirationSettings.Object,
-                _mockPaymentProvider.Object, _mockSessionHelper.Object, _httpContextAccessor.Object, _mockLookupProviders.Object,
+                _mockPaymentProvider.Object, _mockSessionHelper.Object, _httpContextAccessor.Object, _mockLookupProviders,
                 _mockActionHelper.Object);
+        }
+
+        [Theory]
+        [InlineData("local", "int", "Fake", "TestToken", "https://myapi.com")] // 1) No Match:  environment for current Environment Name
+        [InlineData("local", "", "Fake", "TestToken", "https://myapi.com")] // 2) No Environment Name
+        [InlineData("local", "local", "", "TestToken", "https://myapi.com")] // 3) No Provider Name
+        [InlineData("local", "local", "Test_Provider", "TestToken", "https://myapi.com")] // 4) No Provider found.. ( Just have Fake to select )
+        [InlineData("local", "local", "Fake", "TestToken", "")] // 5) No URL to hit
+        [InlineData("local", "local", "Fake", "", "https://myapi.com")] // 6) No Auth Token
+        [InlineData("int", "int", "Fake", "TestToken", "http://myapi.com")] // 7) No https if not on local
+        public void ValidateDynamicLookUpObject_ShouldThrowError_IfNotValidLookupProperties(string environmentName, string lookupEnv, string provider, string authToken, string url)
+        {
+            // Arrange
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns(environmentName);
+
+            var element = new ElementBuilder().WithType(EElementType.Radio).WithLookup("dynamic").Build();
+            element.Properties.Lookup = new List<Lookup>
+            {
+                new Lookup
+                {
+                    EnvironmentName = lookupEnv,
+                    Provider = provider,
+                    AuthToken = authToken,
+                    URL = url
+                }
+            };
+
+            var page = new PageBuilder().WithElement(element).Build();
+            List<Page> pages = new() { page };
+
+            // Act & Assert
+            Assert.Throws<ApplicationException>(() => _pageHelper.ValidateDynamicLookUpObject(pages, "test-form"));
+        }
+
+        [Fact]
+        public async Task GenerateHtml_ShouldAddOptions_WhenFormContainsDynamicLookup()
+        {
+            //Arrange
+            var element = new ElementBuilder().WithType(EElementType.Radio).WithLookup("dynamic").Build();
+            element.Properties.Lookup = new List<Lookup>
+            {
+                new Lookup
+                {
+                    EnvironmentName = "local",
+                    Provider = "Fake",
+                    AuthToken = "fake",
+                    URL = "https://myapi.com"
+                }
+            };
+
+            var page = new PageBuilder().WithElement(element).Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
+
+            var schema = new FormSchemaBuilder().WithName("form-name").Build();
+            var formAnswers = new FormAnswers();
+
+            _mockActionHelper.Setup(_ => _.GenerateUrl("https://myapi.com", formAnswers)).Returns(new RequestEntity() { IsPost = false, Url = "waste" });
+
+            //Act
+            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers, new List<object>());
+
+            //Assert
+            element = (Element)page.Elements.Single(x => !string.IsNullOrEmpty(x.Lookup) && x.Lookup.Equals("dynamic"));
+            Assert.True(element.Properties.Options.Any());
         }
 
         [Fact]
@@ -2880,7 +2948,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 GenerateReferenceNumber = true,
                 ReferencePrefix = "TEST"
             };
-            
+
             // Act
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckGeneratedIdConfiguration(schema));
             Assert.Equal("PageHelper:: CheckGeneratedIdConfiguration, GeneratedReferenceNumberMapping and ReferencePrefix must both have a value", result.Message);
@@ -2895,7 +2963,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 GenerateReferenceNumber = true,
                 GeneratedReferenceNumberMapping = "CaseReference"
             };
-            
+
             // Act
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckGeneratedIdConfiguration(schema));
             Assert.Equal("PageHelper:: CheckGeneratedIdConfiguration, GeneratedReferenceNumberMapping and ReferencePrefix must both have a value", result.Message);
@@ -2911,7 +2979,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 GeneratedReferenceNumberMapping = "CaseReference",
                 ReferencePrefix = "TEST"
             };
-            
+
             // Act
             var exception = Record.Exception(() => _pageHelper.CheckGeneratedIdConfiguration(schema));
             Assert.Null(exception);
@@ -2963,7 +3031,7 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal("PageHelper:CheckDateValidations, IsDateAfterAbsolute validation, test-date does not provide a valid comparison date", result.Message);
         }
 
-            [Fact]
+        [Fact]
         public void CheckDateValidations_Throw_ApplicationException_IsDateBefore_Contains_InvalidQuestionId()
         {
             // Arrange
