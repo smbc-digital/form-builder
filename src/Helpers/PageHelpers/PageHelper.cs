@@ -197,7 +197,7 @@ namespace form_builder.Helpers.PageHelpers
                 lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
 
                 if (lookupOptions.Any())
-                    SaveFormData(request.Url, lookupOptions, session, "dynamic");
+                    SaveFormData(request.Url, lookupOptions, session, formAnswers.FormName);
             }
 
             if (!lookupOptions.Any())
