@@ -9,6 +9,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
+using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.ContentFactory.SuccessPageFactory
 {
@@ -18,12 +19,16 @@ namespace form_builder.ContentFactory.SuccessPageFactory
         private readonly IPageFactory _pageFactory;
         private readonly ISessionHelper _sessionHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
-        public SuccessPageFactory(IPageHelper pageHelper, IPageFactory pageFactory, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
+        private readonly IWebHostEnvironment _environment;
+        public SuccessPageFactory(IPageHelper pageHelper, IPageFactory pageFactory,
+            ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache,
+            IWebHostEnvironment environment)
         {
             _pageHelper = pageHelper;
             _pageFactory = pageFactory;
             _sessionHelper = sessionHelper;
             _distributedCache = distributedCache;
+            _environment = environment;
         }
 
         public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType)
@@ -55,12 +60,13 @@ namespace form_builder.ContentFactory.SuccessPageFactory
 
             if (baseForm.DocumentDownload)
             {
-                baseForm.DocumentType.ForEach((docType) =>
+                var sourceBase = _environment.EnvironmentName.Equals("local") ? "/document/Summary" : "/v2/document/Summary";
+                baseForm.DocumentType.ForEach(docType =>
                 {
                     var element = new ElementBuilder()
                         .WithType(EElementType.DocumentDownload)
                         .WithLabel($"Download {docType} document")
-                        .WithSource($"/v2/document/Summary/{docType}/{sessionGuid}")
+                        .WithSource($"{sourceBase}/{docType}/{sessionGuid}")
                         .WithDocumentType(docType)
                         .Build();
 
