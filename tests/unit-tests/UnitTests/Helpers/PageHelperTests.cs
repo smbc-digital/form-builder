@@ -116,9 +116,9 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns(environmentName);
 
             var element = new ElementBuilder().WithType(EElementType.Radio).WithLookup("dynamic").Build();
-            element.Properties.Lookup = new List<Lookup>
+            element.Properties.LookupSources = new List<LookupSource>
             {
-                new Lookup
+                new LookupSource
                 {
                     EnvironmentName = lookupEnv,
                     Provider = provider,
@@ -139,9 +139,9 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             //Arrange
             var element = new ElementBuilder().WithType(EElementType.Radio).WithLookup("dynamic").Build();
-            element.Properties.Lookup = new List<Lookup>
+            element.Properties.LookupSources = new List<LookupSource>
             {
-                new Lookup
+                new LookupSource
                 {
                     EnvironmentName = "local",
                     Provider = "Fake",
