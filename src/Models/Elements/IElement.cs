@@ -5,6 +5,7 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.ViewRender;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Validators;
+using form_builder.ViewModels;
 using JsonSubTypes;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
@@ -25,6 +26,8 @@ namespace form_builder.Models.Elements
         bool IsValid { get; }
 
         void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm);
+
+        ErrorViewModel GetErrorViewModel();
 
         Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,

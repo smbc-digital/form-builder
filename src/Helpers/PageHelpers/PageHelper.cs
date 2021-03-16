@@ -70,6 +70,21 @@ namespace form_builder.Helpers.PageHelpers
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
                 formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
 
+            var errorSummaryList = new List<ErrorViewModel>();
+            foreach (var element in page.ValidatableElements)
+            {
+                if (!element.IsValid)
+                {
+                    errorSummaryList.Add(element.GetErrorViewModel());
+                }
+            }
+
+            if (errorSummaryList.Any())
+            {
+                // Create ErrorSummary View and call RenderAsync to get the html
+                formModel.RawHTML += await _viewRender.RenderAsync("ErrorSummary", errorSummaryList, null);
+            }
+
             foreach (var element in page.Elements)
             {
                 string html = await element.RenderAsync(

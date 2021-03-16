@@ -5,6 +5,7 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.ViewRender;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Validators;
+using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Models.Elements
@@ -59,9 +60,11 @@ namespace form_builder.Models.Elements
             }
         }
 
+        public ErrorViewModel GetErrorViewModel() => new() {Id = ErrorId, IsValid = IsValid, Message = ValidationMessage};
+
         public virtual string GenerateFieldsetProperties() => string.Empty;
 
-        public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "") => new Dictionary<string, dynamic>();
+        public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "") => new();
 
         public string GetListItemId(int index) => $"{QuestionId}-{index}";
 
