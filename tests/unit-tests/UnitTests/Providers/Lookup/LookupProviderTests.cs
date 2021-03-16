@@ -30,5 +30,20 @@ namespace form_builder_tests.UnitTests.Providers.Lookup
             //Assert
             await Assert.ThrowsAsync<ApplicationException>(() => _lookupProvider.GetAsync(It.IsAny<string>(), It.IsAny<string>()));
         }
+
+        [Theory]
+        [InlineData(HttpStatusCode.OK)]
+        [InlineData(HttpStatusCode.Created)]
+        [InlineData(HttpStatusCode.Accepted)]
+        public async Task GetAsync_DoesNotThrowError_OnSuccessCall(HttpStatusCode httpStatusCode)
+        {
+            //Arrange
+            _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = httpStatusCode });
+
+            //Act & Assert
+            var exception = await Record.ExceptionAsync(() =>  _lookupProvider.GetAsync(It.IsAny<string>(), It.IsAny<string>()));
+            Assert.Null(exception);
+        }
     }
 }
