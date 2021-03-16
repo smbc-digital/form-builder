@@ -16,13 +16,17 @@ namespace form_builder.Helpers.DocumentCreation
         {
             var summaryBuilder = new SummaryAnswerBuilder();
 
-            var formSchemaQuestions = formSchema.Pages
-                .Where(_ => _.Elements != null)
-                .SelectMany(_ => _.ValidatableElements)
-                .ToList();
+            //var formSchemaQuestions = formSchema.Pages
+            //    .Where(_ => _.Elements != null)
+            //    .SelectMany(_ => _.ValidatableElements)
+            //    .ToList();
 
             formSchema.Pages.ForEach(page =>
             {
+                var formSchemaQuestions = page.ValidatableElements
+                    .Where(_ => _ != null)
+                    .ToList();
+
                 formSchemaQuestions.ForEach(question =>
                 {
                     var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
