@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using form_builder.Builders.Document;
+using form_builder.Enum;
 using form_builder.Mappers;
 using form_builder.Models;
 
@@ -15,18 +16,19 @@ namespace form_builder.Helpers.DocumentCreation
         {
             var summaryBuilder = new SummaryAnswerBuilder();
 
-            var formSchemaQuestions = formSchema.Pages.ToList()
-                .Where(_ => _.Elements != null)
-                .SelectMany(_ => _.ValidatableElements)
-                .ToList();
-
-            formSchemaQuestions.ForEach(question =>
+            formSchema.Pages.ForEach(page =>
             {
-                var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
+                var formSchemaQuestions = page.ValidatableElements
+                    .Where(_ => _ != null)
+                    .ToList();
 
-                summaryBuilder.Add(question.GetLabelText(), answer, question.Type);
+                formSchemaQuestions.ForEach(question =>
+                {
+                    var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
+                    summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
 
-                summaryBuilder.AddBlankLine();
+                    summaryBuilder.AddBlankLine();
+                });
             });
 
             return summaryBuilder.Build();
