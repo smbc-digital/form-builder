@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.Transforms.Lookups;
@@ -19,7 +20,7 @@ namespace form_builder.Factories.Transform.Lookups
         {
             formSchema.Pages
                 .SelectMany(_ => _.ValidatableElements)
-                .Where(_ => !string.IsNullOrEmpty(_.Lookup))
+                .Where(_ => !string.IsNullOrEmpty(_.Lookup) && !_.Lookup.Equals(LookUpConstants.Dynamic))
                 .Select(async element => { return await TransformElement(element); })
                 .Select(t => t.Result)
                 .ToList();
