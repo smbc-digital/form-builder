@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.ViewRender;
+using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Models.Elements
@@ -13,6 +14,9 @@ namespace form_builder.Models.Elements
         {
             Type = EElementType.Radio;
         }
+
+        public override ErrorViewModel GetErrorViewModel() => new ErrorViewModel { Id = $"{QuestionId}-0", IsValid = IsValid, Message = ValidationMessage };
+
         public async override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,

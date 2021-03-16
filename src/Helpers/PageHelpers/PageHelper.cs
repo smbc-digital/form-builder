@@ -82,7 +82,7 @@ namespace form_builder.Helpers.PageHelpers
             if (errorSummaryList.Any())
             {
                 // Create ErrorSummary View and call RenderAsync to get the html
-                formModel.RawHTML += await _viewRender.RenderAsync("ErrorSummary", errorSummaryList, null);
+                formModel.RawErrorSummaryHTML = await _viewRender.RenderAsync("ErrorSummary", errorSummaryList, null);
             }
 
             foreach (var element in page.Elements)

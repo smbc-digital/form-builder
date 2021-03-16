@@ -1,7 +1,7 @@
 ﻿@model Element
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-    @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
+    @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" }, Model.QuestionId)
 
     <partial name="LegendH1" />
 

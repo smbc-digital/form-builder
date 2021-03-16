@@ -60,7 +60,7 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public ErrorViewModel GetErrorViewModel() => new() {Id = ErrorId, IsValid = IsValid, Message = ValidationMessage};
+        public virtual ErrorViewModel GetErrorViewModel() => new ErrorViewModel {Id = QuestionId, IsValid = IsValid, Message = ValidationMessage};
 
         public virtual string GenerateFieldsetProperties() => string.Empty;
 

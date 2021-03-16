@@ -1,4 +1,5 @@
-﻿using form_builder.Models.Elements;
+﻿using System.Drawing;
+using form_builder.Models.Elements;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -18,12 +19,15 @@ namespace form_builder.Helpers
             return fieldsetBuilder.RenderStartTag();
         }
 
-        public static IHtmlContent BeginFieldSet<TModel>(this IHtmlHelper<TModel> html, Element element, string[] classNames)
+        public static IHtmlContent BeginFieldSet<TModel>(this IHtmlHelper<TModel> html, Element element, string[] classNames, string id = "")
         {
             var fieldsetBuilder = new TagBuilder("fieldset");
 
             if (element.DisplayAriaDescribedby)
                 fieldsetBuilder.Attributes.Add("aria-describedby", element.GetDescribedByAttributeValue());
+
+            if (!string.IsNullOrEmpty(id))
+                fieldsetBuilder.Attributes.Add("id", id);
 
             foreach (var className in classNames)
                 fieldsetBuilder.AddCssClass(className);

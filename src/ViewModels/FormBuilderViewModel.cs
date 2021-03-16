@@ -7,6 +7,8 @@ namespace form_builder.ViewModels
     {
         public string RawHTML { get; set; }
 
+        public string RawErrorSummaryHTML { get; set; }
+
         public string Path { get; set; }
 
         public string FeedbackForm { get; set; }
