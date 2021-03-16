@@ -1404,13 +1404,15 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.CheckForAcceptedFileUploadFileTypes(pages, "end-point");
         }
 
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIsFoundInJson()
+        [Theory]
+        [InlineData(EElementType.Radio)]
+        [InlineData(EElementType.Checkbox)]
+        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIsFoundInJson(EElementType type)
         {
             // Arrange
             var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
             var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
+                .WithType(type)
                 .WithQuestionId("radio")
                 .WithLabel("First name")
                 .WithOptions(new List<Option> { option1 })
@@ -1434,13 +1436,15 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.CheckConditionalElementsAreValid(pages, "form");
         }
 
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIdIsBlankInJson()
+        [Theory]
+        [InlineData(EElementType.Radio)]
+        [InlineData(EElementType.Checkbox)]
+        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIdIsBlankInJson(EElementType type)
         {
             // Arrange
             var option1 = new Option { ConditionalElementId = "", Value = "Value1" };
             var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
+                .WithType(type)
                 .WithQuestionId("radio")
                 .WithLabel("First name")
                 .WithOptions(new List<Option> { option1 })
@@ -1456,13 +1460,15 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.CheckConditionalElementsAreValid(pages, "form");
         }
 
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementNotFoundInJson()
+        [Theory]
+        [InlineData(EElementType.Radio)]
+        [InlineData(EElementType.Checkbox)]
+        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementNotFoundInJson(EElementType type)
         {
             // Arrange
             var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
             var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
+                .WithType(type)
                 .WithQuestionId("radio")
                 .WithLabel("First name")
                 .WithOptions(new List<Option> { option1 })
@@ -1478,13 +1484,15 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Throws<ApplicationException>(() => _pageHelper.CheckConditionalElementsAreValid(pages, "form"));
         }
 
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenTooManyConditionalElementsFoundInJson()
+        [Theory]
+        [InlineData(EElementType.Radio)]
+        [InlineData(EElementType.Checkbox)]
+        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenTooManyConditionalElementsFoundInJson(EElementType type)
         {
             // Arrange
             var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
             var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
+                .WithType(type)
                 .WithQuestionId("radio")
                 .WithLabel("First name")
                 .WithOptions(new List<Option> { option1 })
@@ -1516,13 +1524,15 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Throws<ApplicationException>(() => _pageHelper.CheckConditionalElementsAreValid(pages, "form"));
         }
 
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementIsPlacedOnAnotherPageInJson()
+        [Theory]
+        [InlineData(EElementType.Radio)]
+        [InlineData(EElementType.Checkbox)]
+        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementIsPlacedOnAnotherPageInJson(EElementType type)
         {
             // Arrange
             var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
             var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
+                .WithType(type)
                 .WithQuestionId("radio")
                 .WithLabel("First name")
                 .WithOptions(new List<Option> { option1 })
