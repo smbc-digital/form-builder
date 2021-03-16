@@ -4,9 +4,9 @@ namespace form_builder.Models.Properties.ElementProperties
 {
     public partial class BaseProperty
     {
-        public List<Lookup> Lookup { get; set; }
+        public List<LookupSource> LookupSources { get; set; }
     }
-    public class Lookup
+    public class LookupSource
     {
         public string EnvironmentName { get; set; }
 

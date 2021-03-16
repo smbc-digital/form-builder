@@ -117,14 +117,14 @@ namespace form_builder.Helpers.PageHelpers
             {
                 foreach (var element in elements)
                 {
-                    if (element.Properties.Lookup != null)
+                    if (element.Properties.LookupSources != null)
                     {
-                        if (!element.Properties.Lookup
+                        if (!element.Properties.LookupSources
                             .Any(lookup => lookup.EnvironmentName
                             .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase)))
                             throw new ApplicationException($"The provided json '{formName}' has no Environment details for this:({_environment.EnvironmentName}) Environment");
 
-                        foreach (var env in element.Properties.Lookup)
+                        foreach (var env in element.Properties.LookupSources)
                         {
                             if (string.IsNullOrEmpty(env.EnvironmentName))
                                 throw new ApplicationException($"The provided json '{formName}' has no Environment Name");
@@ -163,7 +163,7 @@ namespace form_builder.Helpers.PageHelpers
 
         public async Task AddDynamicOptions(IElement element, FormAnswers formAnswers)
         {
-            Lookup submitDetails = element.Properties.Lookup
+            LookupSource submitDetails = element.Properties.LookupSources
                 .SingleOrDefault(x => x.EnvironmentName
                 .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
 
