@@ -806,12 +806,17 @@ namespace form_builder.Helpers.PageHelpers
                     if (string.IsNullOrEmpty(booking.Properties.BookingProvider))
                         throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a valid booking provider property.");
 
-                    if (booking.Properties.AppointmentType == Guid.Empty)
-                        throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.");
+                    if (!booking.Properties.AppointmentTypes.Any())
+                        throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a AppointmentTypes property.");
 
-                    if (booking.Properties.OptionalResources.Any())
+                    var appointmentTypeForEnv = booking.Properties.AppointmentTypes.FirstOrDefault(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToLower()) && !_.AppointmentId.Equals(Guid.Empty));
+
+                    if (appointmentTypeForEnv == null)
+                        throw new ApplicationException("PageHelper:CheckForBookingElement, No appointment type found for current environment or empty AppointmentID");
+
+                    if (appointmentTypeForEnv.OptionalResources.Any())
                     {
-                        booking.Properties.OptionalResources.ForEach(resource =>
+                        appointmentTypeForEnv.OptionalResources.ForEach(resource =>
                         {
                             if (resource.Quantity <= 0)
                                 throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element optional resources are invalid, cannot have a quantity less than 0");

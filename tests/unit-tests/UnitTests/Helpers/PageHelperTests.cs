@@ -2703,6 +2703,57 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(pages);
         }
 
+        
+        [Fact]
+        public void CheckForBookingElement_Should_Not_Throw_OnValid_BookingElement()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var appointmentType = new AppointmentTypeBuilder()
+                .WithEnvironment("local")
+                .Build();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithBookingProvider("TestProvider")
+                .WithAppointmentType(appointmentType)
+                .Build();
+
+            var firstname = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("firstname")
+                .WithTargetMapping("customer.firstname")
+                .Build();
+
+            var lastname = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("lastname")
+                .WithTargetMapping("customer.lastname")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var customerpage = new PageBuilder()
+                .WithElement(firstname)
+                .WithElement(lastname)
+                .Build();
+
+            var appointment = new PageBuilder()
+                .WithPageSlug(BookingConstants.NO_APPOINTMENT_AVAILABLE)
+                .Build();
+
+            pages.Add(page);
+            pages.Add(appointment);
+            pages.Add(customerpage);
+
+            // Act
+            _pageHelper.CheckForBookingElement(pages);
+        }
+
         [Fact]
         public void CheckForBookingElement_Throw_ApplicationException_WhenForm_DoenotContain_RequiredCustomerFields()
         {
@@ -2713,7 +2764,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
                 .WithBookingProvider("Fake")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
             var page = new PageBuilder()
@@ -2742,7 +2793,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
                 .WithBookingProvider("Fake")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
             var page = new PageBuilder()
@@ -2776,7 +2827,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Act
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
-            Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.", result.Message);
+            Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires a AppointmentTypes property.", result.Message);
         }
 
         [Fact]
@@ -2788,7 +2839,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
             var page = new PageBuilder()
@@ -2803,17 +2854,78 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_Contains_EmptyGuid_ForOptionalResources()
+        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_DoesNotContain_AppointmentTypes_ForCurrent_Env()
         {
             // Arrange
             var pages = new List<Page>();
+
+            var appointmentType = new AppointmentTypeBuilder()
+                .WithEnvironment("unknown")
+                .Build();
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
                 .WithBookingProvider("TestProvider")
-                .WithAppointmentType(Guid.NewGuid())
-                .WithBookingResource(new BookingResource { ResourceId = Guid.Empty, Quantity = 1 })
+                .WithAppointmentType(appointmentType)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
+            Assert.Equal("PageHelper:CheckForBookingElement, No appointment type found for current environment or empty AppointmentID", result.Message);
+        }
+
+        [Fact]
+        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_Contains_AppointmentTypes_ForCurrent_Env_But_Empty_AppointmentGuid()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var appointmentType = new AppointmentTypeBuilder()
+                .WithEnvironment("local")
+                .WithAppointmentId(Guid.Empty)
+                .Build();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithBookingProvider("TestProvider")
+                .WithAppointmentType(appointmentType)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
+            Assert.Equal("PageHelper:CheckForBookingElement, No appointment type found for current environment or empty AppointmentID", result.Message);
+        }
+
+        [Fact]
+        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_Contains_EmptyGuid_ForOptionalResources()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var appointmentType = new AppointmentTypeBuilder()
+                .WithEnvironment("local")
+                .WithOptionalResource(new BookingResource { ResourceId = Guid.Empty, Quantity = 1 })
+                .Build();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithBookingProvider("TestProvider")
+                .WithAppointmentType(appointmentType)
                 .Build();
 
             var page = new PageBuilder()
