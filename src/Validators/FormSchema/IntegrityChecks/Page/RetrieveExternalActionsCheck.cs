@@ -46,6 +46,6 @@ namespace form_builder.Validators.IntegrityChecks.Page
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(Models.Page page) => await Task.Run(() => Validate(schema));
+        public async Task<IntegrityCheckResult> ValidateAsync(Models.Page page) => await Task.Run(() => Validate(page));
     }
 }

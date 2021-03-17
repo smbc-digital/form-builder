@@ -7,7 +7,7 @@ using form_builder.Models;
 
 namespace form_builder.Validators.IntegrityChecks.Properties
 {
-    public class DateValidationsCheck: IFormSchemaIntegrityCheck
+    public class DateValidationsCheck: IPropertySchemaIntegrityCheck
     {
         public IntegrityCheckResult Validate(FormSchema schema)
         {

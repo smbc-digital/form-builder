@@ -5,8 +5,11 @@ using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Validators.IntegrityChecks;
+using form_builder.Validators.IntegrityChecks.Behaviours;
+using form_builder.Validators.IntegrityChecks.Elements;
 using form_builder.Validators.IntegrityChecks.FormSchema;
 using form_builder.Validators.IntegrityChecks.Page;
+using form_builder.Validators.IntegrityChecks.Properties;
 
 namespace form_builder.Validators
 {
@@ -20,10 +23,16 @@ namespace form_builder.Validators
 
         public FormSchemaIntegrityValidator(
             IEnumerable<IFormSchemaIntegrityCheck> formSchemaIntegrityChecks,
-            IEnumerable<IPageSchemaIntegrityCheck> pageSchemaIntegrityChecks)
+            IEnumerable<IPageSchemaIntegrityCheck> pageSchemaIntegrityChecks,
+            IEnumerable<IBehaviourSchemaIntegrityCheck> behaviorSchemaIntegrityChecks,
+            IEnumerable<IElementSchemaIntegrityCheck> elementSchemaIntegrityChecks,
+            IEnumerable<IPropertySchemaIntegrityCheck> propertySchemaIntegrityChecks)
         {
             _formSchemaIntegrityChecks = formSchemaIntegrityChecks;
             _pageSchemaIntegrityChecks = pageSchemaIntegrityChecks;
+            _behaviorSchemaIntegrityChecks = behaviorSchemaIntegrityChecks;
+            _elementSchemaIntegrityChecks = elementSchemaIntegrityChecks;
+            _propertySchemaIntegrityChecks = propertySchemaIntegrityChecks;
         }
 
         public async Task Validate(FormSchema schema)
@@ -53,7 +62,10 @@ namespace form_builder.Validators
                         if (behaviour.BehaviourType.Equals(EBehaviourType.SubmitForm) ||
                             behaviour.BehaviourType.Equals(EBehaviourType.SubmitAndPay))
                         {
-
+                            foreach (var integrityCheck in _behaviorSchemaIntegrityChecks)
+                            {
+                                integrityCheckResults.Add(await integrityCheck.ValidateAsync(behaviour));
+                            }
                         }
                         else
                         {

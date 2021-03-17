@@ -7,9 +7,9 @@ using form_builder.Models;
 
 namespace form_builder.Validators.IntegrityChecks.Elements
 {
-    public class AddressNoManualTextIsSetCheck: IFormSchemaIntegrityCheck
+    public class AddressNoManualTextIsSetCheck: IElementSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(FormSchema schema)
+        public IntegrityCheckResult Validate(IElement element)
         {
             var integrityCheckResult = new IntegrityCheckResult();
             var addressElements = schema.Pages.Where(_ => _.Elements != null)
@@ -29,6 +29,6 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
+        public async Task<IntegrityCheckResult> ValidateAsync(IElement element) => await Task.Run(() => Validate(element));
     }
 }

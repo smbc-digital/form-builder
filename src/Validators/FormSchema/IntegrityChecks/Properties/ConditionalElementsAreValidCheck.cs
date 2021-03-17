@@ -7,7 +7,7 @@ using form_builder.Models;
 
 namespace form_builder.Validators.IntegrityChecks.Properties
 {
-    public class ConditionalElementsAreValidCheck: IFormSchemaIntegrityCheck
+    public class ConditionalElementsAreValidCheck: IPropertySchemaIntegrityCheck
     {
         public IntegrityCheckResult Validate(FormSchema schema)
         {

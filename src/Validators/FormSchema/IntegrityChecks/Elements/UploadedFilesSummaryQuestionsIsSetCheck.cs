@@ -3,12 +3,13 @@ using System.Text;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Models;
+using form_builder.Models.Elements;
 
 namespace form_builder.Validators.IntegrityChecks.Elements
 {
-    public class UploadedFilesSummaryQuestionsIsSetCheck: IFormSchemaIntegrityCheck
+    public class UploadedFilesSummaryQuestionsIsSetCheck: IElementSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(FormSchema schema)
+        public IntegrityCheckResult Validate(IElement element)
         {
             var integrityCheckResult = new IntegrityCheckResult();
             var fileSummaryElements = schema.Pages.SelectMany(_ => _.Elements)
@@ -30,6 +31,6 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
+        public async Task<IntegrityCheckResult> ValidateAsync(IElement element) => await Task.Run(() => Validate(element));
     }
 }

@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace form_builder.Validators.IntegrityChecks.Behaviours
 {
-    public class PaymentConfigurationCheck: IFormSchemaIntegrityCheck
+    public class PaymentConfigurationCheck: IBehaviourSchemaIntegrityCheck
     {
         private IWebHostEnvironment _environment;
         private readonly ICache _cache;
@@ -27,12 +27,12 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
-        public IntegrityCheckResult Validate(FormSchema schema)
+        public IntegrityCheckResult Validate(Behaviour behaviour)
         {
             return ValidateAsync(schema).Result;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema)
+        public async Task<IntegrityCheckResult> ValidateAsync(Behaviour behaviour)
         {
             var integrityCheckResult = new IntegrityCheckResult();
             var containsPayment = schema.Pages.Where(x => x.Behaviours != null)

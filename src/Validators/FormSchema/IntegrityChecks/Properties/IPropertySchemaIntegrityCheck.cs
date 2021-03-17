@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using form_builder.Models;
 
-namespace form_builder.Validators.IntegrityChecks.Elements
+namespace form_builder.Validators.IntegrityChecks.Properties
 {
-    public interface IFormSchemaIntegrityCheck
+    public interface IPropertySchemaIntegrityCheck
     {
         IntegrityCheckResult Validate(FormSchema schema);
         Task<IntegrityCheckResult> ValidateAsync(FormSchema schema);

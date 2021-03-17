@@ -75,6 +75,9 @@ using StockportGovUK.NetStandard.Gateways.VerintService;
 using form_builder.Validators.IntegrityChecks;
 using form_builder.Validators.IntegrityChecks.FormSchema;
 using form_builder.Validators.IntegrityChecks.Page;
+using form_builder.Validators.IntegrityChecks.Behaviours;
+using form_builder.Validators.IntegrityChecks.Elements;
+using IElementSchemaIntegrityCheck = form_builder.Validators.IntegrityChecks.Elements.IElementSchemaIntegrityCheck;
 
 namespace form_builder.Utils.ServiceCollectionExtensions
 {
@@ -274,30 +277,29 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddSingleton<IPageSchemaIntegrityCheck, RetrieveExternalActionsCheck>();
 
             // Behaviour Integrity Checks
-            services.AddSingleton<IFormSchemaIntegrityCheck, AbsoluteDateValidationsCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, AcceptedFileUploadFileTypesCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, AddressNoManualTextIsSetCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, AnyConditionTypeCheck>();
+            services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
+            services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
+            services.AddSingleton<IBehaviourSchemaIntegrityCheck, PaymentConfigurationCheck>();
+            services.AddSingleton<IBehaviourSchemaIntegrityCheck, SubmitSlugsHaveAllPropertiesCheck>();
 
-            services.AddSingleton<IFormSchemaIntegrityCheck, BookingElementCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementsAreValidCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, DateValidationsCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
 
             // Element Integrity Checks
-            services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, IncomingFormDataValuesCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, InvalidQuestionOrTargetMappingValueCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, PaymentConfigurationCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, QuestionIdExistsForBookingCustomerAddressIdCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, RenderConditionsValidCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, AcceptedFileUploadFileTypesCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, AddressNoManualTextIsSetCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, BookingElementCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, InvalidQuestionOrTargetMappingValueCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, QuestionIdExistsForBookingCustomerAddressIdCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();
 
             // Element.Property Integrity Checks
-            services.AddSingleton<IFormSchemaIntegrityCheck, SubmitSlugsHaveAllPropertiesCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ValidateActionCheck>();
-
+            services.AddSingleton<IFormSchemaIntegrityCheck, AbsoluteDateValidationsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, AnyConditionTypeCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementsAreValidCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, DateValidationsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, IncomingFormDataValuesCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, RenderConditionsValidCheck>();
 
             // Integrity Validation Service
             services.AddSingleton<IFormSchemaIntegrityValidator,FormSchemaIntegrityValidator>();

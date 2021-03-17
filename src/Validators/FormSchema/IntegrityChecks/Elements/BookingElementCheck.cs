@@ -7,9 +7,9 @@ using form_builder.Models;
 
 namespace form_builder.Validators.IntegrityChecks.Elements
 {
-    public class BookingElementCheck: IFormSchemaIntegrityCheck
+    public class BookingElementCheck: IElementSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(FormSchema schema)
+        public IntegrityCheckResult Validate(IElement element)
         {
             var integrityCheckResult = new IntegrityCheckResult();
             var bookingElements = schema.Pages.SelectMany(page => page.ValidatableElements)
@@ -59,6 +59,6 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
+        public async Task<IntegrityCheckResult> ValidateAsync(IElement element) => await Task.Run(() => Validate(element));
     }
 }

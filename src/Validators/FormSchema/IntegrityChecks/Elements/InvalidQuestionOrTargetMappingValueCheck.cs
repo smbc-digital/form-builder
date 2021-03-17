@@ -5,12 +5,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Models;
+using form_builder.Models.Elements;
 
 namespace form_builder.Validators.IntegrityChecks.Elements
 {
-    public class InvalidQuestionOrTargetMappingValueCheck: IFormSchemaIntegrityCheck
+    public class InvalidQuestionOrTargetMappingValueCheck: IElementSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(FormSchema schema)
+        public IntegrityCheckResult Validate(IElement element)
         {
             var integrityCheckResult = new IntegrityCheckResult();
             var questionIds = schema.Pages.Where(_ => _.Elements != null)
@@ -32,6 +33,6 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
+        public async Task<IntegrityCheckResult> ValidateAsync(IElement element) => await Task.Run(() => Validate(element));
     }
 }

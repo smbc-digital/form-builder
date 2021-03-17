@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 namespace form_builder.Validators.IntegrityChecks.FormSchema
 {
-    public interface IFormSchemaIntegrityCheck
+    public interface IElementSchemaIntegrityCheck
     {
         IntegrityCheckResult Validate(Models.FormSchema schema);
         Task<IntegrityCheckResult> ValidateAsync(Models.FormSchema schema);

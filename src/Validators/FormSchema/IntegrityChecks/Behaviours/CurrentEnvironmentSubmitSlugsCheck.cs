@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Validators.IntegrityChecks.Behaviours
 {
-    public class CurrentEnvironmentSubmitSlugsCheck: IFormSchemaIntegrityCheck
+    public class CurrentEnvironmentSubmitSlugsCheck: IBehaviourSchemaIntegrityCheck
     {
         IWebHostEnvironment _environment;
         public CurrentEnvironmentSubmitSlugsCheck(IWebHostEnvironment environment)
@@ -17,28 +17,20 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
             _environment= environment;
         }
 
-        public IntegrityCheckResult Validate(FormSchema schema)
+        public IntegrityCheckResult Validate(Behaviour behaviour)
         {
             var integrityCheckResult = new IntegrityCheckResult();
-            var behaviours = schema.Pages.Where(page => page.Behaviours != null).SelectMany(page => page.Behaviours).ToList();
-            
-            foreach (var item in behaviours)
-            {
-                if (item.BehaviourType != EBehaviourType.SubmitForm && item.BehaviourType != EBehaviourType.SubmitAndPay) continue;
 
-                if (item.SubmitSlugs.Count <= 0) continue;
+            var foundEnvironmentSubmitSlug = false;
+            foreach (var subItem in behaviour.SubmitSlugs.Where(subItem => subItem.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower())))
+                foundEnvironmentSubmitSlug = true;
 
-                var foundEnvironmentSubmitSlug = false;
-                foreach (var subItem in item.SubmitSlugs.Where(subItem => subItem.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower())))
-                    foundEnvironmentSubmitSlug = true;
-
-                if (!foundEnvironmentSubmitSlug)
-                    integrityCheckResult.AddFailureMessage($"No SubmitSlug found in form '{schema.FormName}' for environment '{_environment.EnvironmentName}'.");
-            }
+            if (!foundEnvironmentSubmitSlug)
+                integrityCheckResult.AddFailureMessage($"No SubmitSlug found in form '{schema.FormName}' for environment '{_environment.EnvironmentName}'.");
 
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
+        public async Task<IntegrityCheckResult> ValidateAsync(Behaviour behaviour) => await Task.Run(() => Validate(behaviour));
     }
 }
