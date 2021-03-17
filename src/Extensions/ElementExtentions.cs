@@ -11,16 +11,16 @@ namespace form_builder.Extensions
         public static List<IElement> RemoveUnusedConditionalElements(this IEnumerable<IElement> elements, Dictionary<string, dynamic> viewModel)
         {
             var listOfElemets = elements.ToList();
-            var radioElements = elements.ToList().Where(_ => _.Type == EElementType.Radio);
+            var listOfElementsWhichMayContainConditionalElements = elements.ToList().Where(_ => _.Type.Equals(EElementType.Radio) || _.Type.Equals(EElementType.Checkbox));
 
-            if (!radioElements.Any())
+            if (!listOfElementsWhichMayContainConditionalElements.Any())
                 return listOfElemets;
 
-            foreach (Element element in radioElements)
+            foreach (Element element in listOfElementsWhichMayContainConditionalElements)
             {
                 foreach (Option option in element.Properties.Options)
                 {
-                    KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key == element.Properties.QuestionId && value.Value == option.Value);
+                    KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key == element.Properties.QuestionId && (element.Type.Equals(EElementType.Checkbox) ? value.Value.Contains(option.Value) : value.Value == option.Value));
                     if (option.ConditionalElementId != null && optionValue.Key == null)
                     {
                         viewModel.Remove(option.ConditionalElementId);

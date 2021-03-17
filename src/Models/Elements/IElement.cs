@@ -40,6 +40,6 @@ namespace form_builder.Models.Elements
 
         string GenerateFieldsetProperties();
 
-        string GetLabelText();
+        string GetLabelText(string pageTitle);
     }
 }

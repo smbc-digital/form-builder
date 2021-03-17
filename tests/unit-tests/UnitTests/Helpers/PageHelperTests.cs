@@ -9,6 +9,7 @@ using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -17,8 +18,10 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ActionProperties;
 using form_builder.Models.Properties.ElementProperties;
+using form_builder.Providers.Lookup;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
+using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -33,20 +36,20 @@ namespace form_builder_tests.UnitTests.Helpers
     public class PageHelperTests
     {
         private readonly PageHelper _pageHelper;
-        private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
-        private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IOptions<FormConfiguration>> _mockDisallowedKeysOptions =
-            new Mock<IOptions<FormConfiguration>>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        private readonly Mock<ICache> _mockCache = new Mock<ICache>();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings
-            = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
-        private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider =
-            new Mock<IEnumerable<IPaymentProvider>>();
-        private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
-        private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<IHttpContextAccessor> _httpContextAccessor = new Mock<IHttpContextAccessor>();
+        private readonly Mock<IViewRender> _mockIViewRender = new();
+        private readonly Mock<IElementHelper> _mockElementHelper = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<IOptions<FormConfiguration>> _mockDisallowedKeysOptions = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+        private readonly Mock<ICache> _mockCache = new();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings = new();
+        private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider = new();
+        private readonly Mock<IPaymentProvider> _paymentProvider = new();
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new();
+        private readonly Mock<IHttpContextAccessor> _httpContextAccessor = new();
+        private readonly List<ILookupProvider> _mockLookupProviders = new List<ILookupProvider>();
+        private readonly FakeLookupProvider _lookupProvider = new();
+        private readonly Mock<IActionHelper> _mockActionHelper = new();
 
         public PageHelperTests()
         {
@@ -85,14 +88,84 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
 
+            _mockLookupProviders.Add(_lookupProvider);
+
             _paymentProvider.Setup(_ => _.ProviderName).Returns("testProvider");
             var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
             _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
+
             _pageHelper = new PageHelper(_mockIViewRender.Object,
                 _mockElementHelper.Object, _mockDistributedCache.Object,
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockCache.Object, _mockDistributedCacheExpirationSettings.Object,
-                _mockPaymentProvider.Object, _mockSessionHelper.Object, _httpContextAccessor.Object);
+                _mockPaymentProvider.Object, _mockSessionHelper.Object, _httpContextAccessor.Object, _mockLookupProviders,
+                _mockActionHelper.Object);
+        }
+
+        [Theory]
+        [InlineData("local", "int", "Fake", "TestToken", "https://myapi.com")] // 1) No Match:  environment for current Environment Name
+        [InlineData("local", "", "Fake", "TestToken", "https://myapi.com")] // 2) No Environment Name
+        [InlineData("local", "local", "", "TestToken", "https://myapi.com")] // 3) No Provider Name
+        [InlineData("local", "local", "Test_Provider", "TestToken", "https://myapi.com")] // 4) No Provider found.. ( Just have Fake to select )
+        [InlineData("local", "local", "Fake", "TestToken", "")] // 5) No URL to hit
+        [InlineData("local", "local", "Fake", "", "https://myapi.com")] // 6) No Auth Token
+        [InlineData("int", "int", "Fake", "TestToken", "http://myapi.com")] // 7) No https if not on local
+        public void ValidateDynamicLookUpObject_ShouldThrowError_IfNotValidLookupProperties(string environmentName, string lookupEnv, string provider, string authToken, string url)
+        {
+            // Arrange
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns(environmentName);
+
+            var element = new ElementBuilder().WithType(EElementType.Radio).WithLookup("dynamic").Build();
+            element.Properties.LookupSources = new List<LookupSource>
+            {
+                new LookupSource
+                {
+                    EnvironmentName = lookupEnv,
+                    Provider = provider,
+                    AuthToken = authToken,
+                    URL = url
+                }
+            };
+
+            var page = new PageBuilder().WithElement(element).Build();
+            List<Page> pages = new() { page };
+
+            // Act & Assert
+            Assert.Throws<ApplicationException>(() => _pageHelper.ValidateDynamicLookUpObject(pages, "test-form"));
+        }
+
+        [Fact]
+        public async Task GenerateHtml_ShouldAddOptions_WhenFormContainsDynamicLookup()
+        {
+            //Arrange
+            var element = new ElementBuilder().WithType(EElementType.Radio).WithLookup("dynamic").Build();
+            element.Properties.LookupSources = new List<LookupSource>
+            {
+                new LookupSource
+                {
+                    EnvironmentName = "local",
+                    Provider = "Fake",
+                    AuthToken = "fake",
+                    URL = "https://myapi.com"
+                }
+            };
+
+            var page = new PageBuilder().WithElement(element).Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
+
+            var schema = new FormSchemaBuilder().WithName("form-name").Build();
+            var formAnswers = new FormAnswers();
+
+            _mockActionHelper.Setup(_ => _.GenerateUrl("https://myapi.com", formAnswers)).Returns(new RequestEntity() { IsPost = false, Url = "waste" });
+
+            //Act
+            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers, new List<object>());
+
+            //Assert
+            element = (Element)page.Elements.Single(x => !string.IsNullOrEmpty(x.Lookup) && x.Lookup.Equals("dynamic"));
+            Assert.True(element.Properties.Options.Any());
         }
 
         [Fact]
@@ -1404,13 +1477,15 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.CheckForAcceptedFileUploadFileTypes(pages, "end-point");
         }
 
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIsFoundInJson()
+        [Theory]
+        [InlineData(EElementType.Radio)]
+        [InlineData(EElementType.Checkbox)]
+        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIsFoundInJson(EElementType type)
         {
             // Arrange
             var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
             var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
+                .WithType(type)
                 .WithQuestionId("radio")
                 .WithLabel("First name")
                 .WithOptions(new List<Option> { option1 })
@@ -1434,13 +1509,15 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.CheckConditionalElementsAreValid(pages, "form");
         }
 
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIdIsBlankInJson()
+        [Theory]
+        [InlineData(EElementType.Radio)]
+        [InlineData(EElementType.Checkbox)]
+        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIdIsBlankInJson(EElementType type)
         {
             // Arrange
             var option1 = new Option { ConditionalElementId = "", Value = "Value1" };
             var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
+                .WithType(type)
                 .WithQuestionId("radio")
                 .WithLabel("First name")
                 .WithOptions(new List<Option> { option1 })
@@ -1456,13 +1533,15 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.CheckConditionalElementsAreValid(pages, "form");
         }
 
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementNotFoundInJson()
+        [Theory]
+        [InlineData(EElementType.Radio)]
+        [InlineData(EElementType.Checkbox)]
+        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementNotFoundInJson(EElementType type)
         {
             // Arrange
             var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
             var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
+                .WithType(type)
                 .WithQuestionId("radio")
                 .WithLabel("First name")
                 .WithOptions(new List<Option> { option1 })
@@ -1478,13 +1557,15 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Throws<ApplicationException>(() => _pageHelper.CheckConditionalElementsAreValid(pages, "form"));
         }
 
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenTooManyConditionalElementsFoundInJson()
+        [Theory]
+        [InlineData(EElementType.Radio)]
+        [InlineData(EElementType.Checkbox)]
+        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenTooManyConditionalElementsFoundInJson(EElementType type)
         {
             // Arrange
             var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
             var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
+                .WithType(type)
                 .WithQuestionId("radio")
                 .WithLabel("First name")
                 .WithOptions(new List<Option> { option1 })
@@ -1516,13 +1597,15 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Throws<ApplicationException>(() => _pageHelper.CheckConditionalElementsAreValid(pages, "form"));
         }
 
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementIsPlacedOnAnotherPageInJson()
+        [Theory]
+        [InlineData(EElementType.Radio)]
+        [InlineData(EElementType.Checkbox)]
+        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementIsPlacedOnAnotherPageInJson(EElementType type)
         {
             // Arrange
             var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
             var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
+                .WithType(type)
                 .WithQuestionId("radio")
                 .WithLabel("First name")
                 .WithOptions(new List<Option> { option1 })
@@ -2630,6 +2713,57 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(pages);
         }
 
+        
+        [Fact]
+        public void CheckForBookingElement_Should_Not_Throw_OnValid_BookingElement()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var appointmentType = new AppointmentTypeBuilder()
+                .WithEnvironment("local")
+                .Build();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithBookingProvider("TestProvider")
+                .WithAppointmentType(appointmentType)
+                .Build();
+
+            var firstname = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("firstname")
+                .WithTargetMapping("customer.firstname")
+                .Build();
+
+            var lastname = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("lastname")
+                .WithTargetMapping("customer.lastname")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var customerpage = new PageBuilder()
+                .WithElement(firstname)
+                .WithElement(lastname)
+                .Build();
+
+            var appointment = new PageBuilder()
+                .WithPageSlug(BookingConstants.NO_APPOINTMENT_AVAILABLE)
+                .Build();
+
+            pages.Add(page);
+            pages.Add(appointment);
+            pages.Add(customerpage);
+
+            // Act
+            _pageHelper.CheckForBookingElement(pages);
+        }
+
         [Fact]
         public void CheckForBookingElement_Throw_ApplicationException_WhenForm_DoenotContain_RequiredCustomerFields()
         {
@@ -2640,7 +2774,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
                 .WithBookingProvider("Fake")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
             var page = new PageBuilder()
@@ -2669,7 +2803,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
                 .WithBookingProvider("Fake")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
             var page = new PageBuilder()
@@ -2703,7 +2837,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Act
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
-            Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.", result.Message);
+            Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires a AppointmentTypes property.", result.Message);
         }
 
         [Fact]
@@ -2715,7 +2849,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
             var page = new PageBuilder()
@@ -2730,17 +2864,78 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_Contains_EmptyGuid_ForOptionalResources()
+        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_DoesNotContain_AppointmentTypes_ForCurrent_Env()
         {
             // Arrange
             var pages = new List<Page>();
+
+            var appointmentType = new AppointmentTypeBuilder()
+                .WithEnvironment("unknown")
+                .Build();
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
                 .WithBookingProvider("TestProvider")
-                .WithAppointmentType(Guid.NewGuid())
-                .WithBookingResource(new BookingResource { ResourceId = Guid.Empty, Quantity = 1 })
+                .WithAppointmentType(appointmentType)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
+            Assert.Equal("PageHelper:CheckForBookingElement, No appointment type found for current environment or empty AppointmentID", result.Message);
+        }
+
+        [Fact]
+        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_Contains_AppointmentTypes_ForCurrent_Env_But_Empty_AppointmentGuid()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var appointmentType = new AppointmentTypeBuilder()
+                .WithEnvironment("local")
+                .WithAppointmentId(Guid.Empty)
+                .Build();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithBookingProvider("TestProvider")
+                .WithAppointmentType(appointmentType)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            pages.Add(page);
+
+            // Act
+            var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckForBookingElement(pages));
+            Assert.Equal("PageHelper:CheckForBookingElement, No appointment type found for current environment or empty AppointmentID", result.Message);
+        }
+
+        [Fact]
+        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_Contains_EmptyGuid_ForOptionalResources()
+        {
+            // Arrange
+            var pages = new List<Page>();
+
+            var appointmentType = new AppointmentTypeBuilder()
+                .WithEnvironment("local")
+                .WithOptionalResource(new BookingResource { ResourceId = Guid.Empty, Quantity = 1 })
+                .Build();
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithBookingProvider("TestProvider")
+                .WithAppointmentType(appointmentType)
                 .Build();
 
             var page = new PageBuilder()
@@ -2763,7 +2958,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 GenerateReferenceNumber = true,
                 ReferencePrefix = "TEST"
             };
-            
+
             // Act
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckGeneratedIdConfiguration(schema));
             Assert.Equal("PageHelper:: CheckGeneratedIdConfiguration, GeneratedReferenceNumberMapping and ReferencePrefix must both have a value", result.Message);
@@ -2778,7 +2973,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 GenerateReferenceNumber = true,
                 GeneratedReferenceNumberMapping = "CaseReference"
             };
-            
+
             // Act
             var result = Assert.Throws<ApplicationException>(() => _pageHelper.CheckGeneratedIdConfiguration(schema));
             Assert.Equal("PageHelper:: CheckGeneratedIdConfiguration, GeneratedReferenceNumberMapping and ReferencePrefix must both have a value", result.Message);
@@ -2794,7 +2989,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 GeneratedReferenceNumberMapping = "CaseReference",
                 ReferencePrefix = "TEST"
             };
-            
+
             // Act
             var exception = Record.Exception(() => _pageHelper.CheckGeneratedIdConfiguration(schema));
             Assert.Null(exception);
@@ -2846,7 +3041,7 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal("PageHelper:CheckDateValidations, IsDateAfterAbsolute validation, test-date does not provide a valid comparison date", result.Message);
         }
 
-            [Fact]
+        [Fact]
         public void CheckDateValidations_Throw_ApplicationException_IsDateBefore_Contains_InvalidQuestionId()
         {
             // Arrange

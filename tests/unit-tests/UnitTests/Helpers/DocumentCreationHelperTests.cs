@@ -101,6 +101,42 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal($"{labelText}: {value}", result[0]);
         }
 
+        [Theory]
+        [InlineData(EElementType.Address)]
+        [InlineData(EElementType.Street)]
+        [InlineData(EElementType.Organisation)]
+        public void GenerateQuestionAndAnswersList_ShouldReturn_TitleAsLabel_For_ElementType(EElementType type)
+        {
+            // Arrange
+            var value = "value";
+            _mockElementMapper
+                .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns(value);
+
+            var formAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+            var titleText = "I am a title";
+
+            var element = new ElementBuilder()
+                .WithType(type)
+                .WithQuestionId("testQuestion")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageTitle(titleText)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            // Act
+            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+
+            Assert.Equal(2, result.Count);
+            Assert.Equal($"{titleText}: {value}", result[0]);
+        }
+
         [Fact]
         public void GenerateQuestionAndAnswersList_ShouldReturn_ListOfMultipleItems()
         {

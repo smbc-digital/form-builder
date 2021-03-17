@@ -18,6 +18,7 @@ using form_builder.Services.BookingService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Utils.Extensions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
@@ -32,6 +33,7 @@ namespace form_builder.Services.BookingService
         private readonly IEnumerable<IBookingProvider> _bookingProviders;
         private readonly IPageFactory _pageFactory;
         private readonly IMappingService _mappingService;
+        private readonly IWebHostEnvironment _environment;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
         public BookingService(
@@ -40,6 +42,7 @@ namespace form_builder.Services.BookingService
             IEnumerable<IBookingProvider> bookingProviders,
             IPageFactory pageFactory,
             IMappingService mappingService,
+            IWebHostEnvironment environment,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
             _distributedCache = distributedCache;
@@ -47,6 +50,7 @@ namespace form_builder.Services.BookingService
             _bookingProviders = bookingProviders;
             _pageFactory = pageFactory;
             _mappingService = mappingService;
+            _environment = environment;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
@@ -80,12 +84,14 @@ namespace form_builder.Services.BookingService
             if (nextAvailability.BookingHasNoAvailableAppointments)
                 return new BookingProcessEntity { BookingHasNoAvailableAppointments = true };
 
+            var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+
             appointmentTimes = await bookingProvider.GetAvailability(new AvailabilityRequest
             {
                 StartDate = nextAvailability.DayResponse.Date,
                 EndDate = nextAvailability.DayResponse.Date.LastDayOfTheMonth(),
-                AppointmentId = bookingElement.Properties.AppointmentType,
-                OptionalResources = bookingElement.Properties.OptionalResources
+                AppointmentId = appointmentType.AppointmentId,
+                OptionalResources = appointmentType.OptionalResources
             });
 
             var bookingInformation = new BookingInformation
@@ -121,9 +127,62 @@ namespace form_builder.Services.BookingService
             }
         }
 
+        public async Task ProcessMonthRequest(Dictionary<string, object> viewModel, FormSchema baseForm, Page currentPage, string guid)
+        {
+            if (!viewModel.ContainsKey(BookingConstants.BOOKING_MONTH_REQUEST))
+                throw new ApplicationException("BookingService::ProcessMonthRequest, request for appointment did not contain requested month");
+
+            var requestedMonth = DateTime.Parse(viewModel[BookingConstants.BOOKING_MONTH_REQUEST].ToString());
+
+            var currentDate = DateTime.Now;
+            var bookingElement = currentPage.Elements
+                .Where(_ => _.Type == EElementType.Booking)
+                .FirstOrDefault();
+
+            if (requestedMonth.Month == currentDate.Month && requestedMonth.Year == currentDate.Year)
+                requestedMonth = currentDate;
+
+            if (requestedMonth > new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(bookingElement.Properties.SearchPeriod))
+                throw new ApplicationException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is after allowed search period");
+
+            if (requestedMonth < currentDate)
+                throw new ApplicationException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is before today");
+
+            var bookingSearchResultsKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+
+            var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+
+            var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
+                .GetAvailability(new AvailabilityRequest
+                {
+                    StartDate = requestedMonth.Date,
+                    EndDate = requestedMonth.Date.LastDayOfTheMonth(),
+                    AppointmentId = appointmentType.AppointmentId,
+                    OptionalResources = appointmentType.OptionalResources
+                });
+
+            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var cachedAnswers = _distributedCache.GetString(guid);
+            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+            var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
+
+            var bookingInformation = new BookingInformation
+            {
+                Appointments = appointmentTimes,
+                CurrentSearchedMonth = requestedMonth,
+                FirstAvailableMonth = cachedBookingInformation.FirstAvailableMonth,
+                IsFullDayAppointment = cachedBookingInformation.IsFullDayAppointment,
+                AppointmentEndTime = cachedBookingInformation.AppointmentEndTime,
+                AppointmentStartTime = cachedBookingInformation.AppointmentStartTime
+            };
+
+            _pageHelper.SaveFormData(bookingSearchResultsKey, bookingInformation, guid, baseForm.BaseURL);
+        }
+
         private async Task<BoookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider)
         {
-            var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{bookingElement.Properties.AppointmentType}{bookingElement.Properties.OptionalResources.CreateKeyFromResources()}";
+            var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+            var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{appointmentType.AppointmentId}{appointmentType.OptionalResources.CreateKeyFromResources()}";
             var bookingNextAvailabilityCachedResponse = _distributedCache.GetString(bookingNextAvailabilityCachedKey);
 
             var nextAvailability = new AvailabilityDayResponse();
@@ -141,8 +200,8 @@ namespace form_builder.Services.BookingService
                     {
                         StartDate = DateTime.Now,
                         EndDate = DateTime.Now.AddMonths(bookingElement.Properties.SearchPeriod),
-                        AppointmentId = bookingElement.Properties.AppointmentType,
-                        OptionalResources = bookingElement.Properties.OptionalResources
+                        AppointmentId = appointmentType.AppointmentId,
+                        OptionalResources = appointmentType.OptionalResources
                     });
                 }
                 catch (BookingNoAvailabilityException)
@@ -264,10 +323,11 @@ namespace form_builder.Services.BookingService
         private async Task<string> GetReservedBookingLocation(Booking bookingElement, BookingRequest bookingRequest)
         {
             var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
+            var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
             var location = await bookingProvider.GetLocation(new LocationRequest
             {
-                AppointmentId = bookingElement.Properties.AppointmentType,
-                OptionalResources = bookingElement.Properties.OptionalResources
+                AppointmentId = appointmentType.AppointmentId,
+                OptionalResources = appointmentType.OptionalResources
             });
 
             if (string.IsNullOrEmpty(location))
@@ -278,54 +338,5 @@ namespace form_builder.Services.BookingService
             return location.ConvertAddressToTitleCase();
         }
 
-        public async Task ProcessMonthRequest(Dictionary<string, object> viewModel, FormSchema baseForm, Page currentPage, string guid)
-        {
-            if (!viewModel.ContainsKey(BookingConstants.BOOKING_MONTH_REQUEST))
-                throw new ApplicationException("BookingService::ProcessMonthRequest, request for appointment did not contain requested month");
-
-            var requestedMonth = DateTime.Parse(viewModel[BookingConstants.BOOKING_MONTH_REQUEST].ToString());
-
-            var currentDate = DateTime.Now;
-            var bookingElement = currentPage.Elements
-                .Where(_ => _.Type == EElementType.Booking)
-                .FirstOrDefault();
-
-            if (requestedMonth.Month == currentDate.Month && requestedMonth.Year == currentDate.Year)
-                requestedMonth = currentDate;
-
-            if (requestedMonth > new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(bookingElement.Properties.SearchPeriod))
-                throw new ApplicationException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is after allowed search period");
-
-            if (requestedMonth < currentDate)
-                throw new ApplicationException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is before today");
-
-            var bookingSearchResultsKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
-
-            var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
-                .GetAvailability(new AvailabilityRequest
-                {
-                    StartDate = requestedMonth.Date,
-                    EndDate = requestedMonth.Date.LastDayOfTheMonth(),
-                    AppointmentId = bookingElement.Properties.AppointmentType,
-                    OptionalResources = bookingElement.Properties.OptionalResources
-                });
-
-            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
-            var cachedAnswers = _distributedCache.GetString(guid);
-            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-            var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
-
-            var bookingInformation = new BookingInformation
-            {
-                Appointments = appointmentTimes,
-                CurrentSearchedMonth = requestedMonth,
-                FirstAvailableMonth = cachedBookingInformation.FirstAvailableMonth,
-                IsFullDayAppointment = cachedBookingInformation.IsFullDayAppointment,
-                AppointmentEndTime = cachedBookingInformation.AppointmentEndTime,
-                AppointmentStartTime = cachedBookingInformation.AppointmentStartTime
-            };
-
-            _pageHelper.SaveFormData(bookingSearchResultsKey, bookingInformation, guid, baseForm.BaseURL);
-        }
     }
 }

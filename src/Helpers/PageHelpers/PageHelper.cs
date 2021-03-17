@@ -9,6 +9,7 @@ using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
+using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Helpers.ViewRender;
@@ -16,8 +17,10 @@ using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
+using form_builder.Providers.Lookup;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
+using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -29,21 +32,25 @@ namespace form_builder.Helpers.PageHelpers
 {
     public class PageHelper : IPageHelper
     {
-        private readonly IViewRender _viewRender;
-        private readonly IElementHelper _elementHelper;
-        private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly FormConfiguration _disallowedKeys;
-        private readonly IWebHostEnvironment _environment;
-        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly ICache _cache;
-        private readonly IEnumerable<IPaymentProvider> _paymentProviders;
+        private readonly IViewRender _viewRender;
+        private readonly IActionHelper _actionHelper;
+        private readonly IElementHelper _elementHelper;
         private readonly ISessionHelper _sessionHelper;
+        private readonly IWebHostEnvironment _environment;
+        private readonly FormConfiguration _disallowedKeys;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IEnumerable<ILookupProvider> _lookupProviders;
+        private readonly IEnumerable<IPaymentProvider> _paymentProviders;
+        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
             IOptions<FormConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            IEnumerable<IPaymentProvider> paymentProviders, ISessionHelper sessionHelper, IHttpContextAccessor httpContextAccessor)
+            IEnumerable<IPaymentProvider> paymentProviders, ISessionHelper sessionHelper, IHttpContextAccessor httpContextAccessor,
+            IEnumerable<ILookupProvider> lookupProviders,
+            IActionHelper actionHelper)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -55,6 +62,8 @@ namespace form_builder.Helpers.PageHelpers
             _paymentProviders = paymentProviders;
             _sessionHelper = sessionHelper;
             _httpContextAccessor = httpContextAccessor;
+            _lookupProviders = lookupProviders;
+            _actionHelper = actionHelper;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(
@@ -72,28 +81,129 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var element in page.Elements)
             {
+                if (!string.IsNullOrEmpty(element.Lookup) &&
+                    element.Lookup.Equals(LookUpConstants.Dynamic))
+                {
+                    await AddDynamicOptions(element, formAnswers);
+                }
+
                 string html = await element.RenderAsync(
-                    _viewRender,
-                    _elementHelper,
-                    guid,
-                    viewModel,
-                    page,
-                    baseForm,
-                    _environment,
-                    formAnswers,
-                    results
-                    );
+                    _viewRender, _elementHelper, guid,
+                    viewModel, page, baseForm, _environment,
+                    formAnswers, results);
+
                 if (element.Properties.isConditionalElement)
                 {
-                    formModel.RawHTML = formModel.RawHTML.Replace(SystemConstants.ConditionalElementReplacementString + element.Properties.QuestionId, html);
+                    formModel.RawHTML = formModel.RawHTML.Replace($"{SystemConstants.CONDITIONAL_ELEMENT_REPLACEMENT}{element.Properties.QuestionId}", html);
                 }
                 else
                 {
                     formModel.RawHTML += html;
                 }
-
             }
+
             return formModel;
+        }
+
+        public void ValidateDynamicLookUpObject(List<Page> pages, string formName)
+        {
+            var elements = pages
+                .SelectMany(page => page.Elements)
+                .Where(element => !string.IsNullOrEmpty(element.Lookup) &&
+                       element.Lookup.Equals(LookUpConstants.Dynamic))
+                .ToList();
+
+            if (elements.Any())
+            {
+                foreach (var element in elements)
+                {
+                    if (element.Properties.LookupSources != null)
+                    {
+                        if (!element.Properties.LookupSources
+                            .Any(lookup => lookup.EnvironmentName
+                            .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase)))
+                            throw new ApplicationException($"The provided json '{formName}' has no Environment details for this:({_environment.EnvironmentName}) Environment");
+
+                        foreach (var env in element.Properties.LookupSources)
+                        {
+                            if (string.IsNullOrEmpty(env.EnvironmentName))
+                                throw new ApplicationException($"The provided json '{formName}' has no Environment Name");
+
+                            if (string.IsNullOrEmpty(env.Provider))
+                                throw new ApplicationException($"The provided json '{formName}' has no Provider Name");
+
+                            try
+                            {
+                                _lookupProviders.Get(env.Provider);
+                            }
+                            catch (Exception e)
+                            {
+                                throw new ApplicationException($"The provided json '{formName}': No Lookup Provider Found {e.Message}.");
+                            }
+
+                            if (string.IsNullOrEmpty(env.URL))
+                                throw new ApplicationException($"The provided json '{formName}' has no API URL to submit to");
+
+                            if (string.IsNullOrEmpty(env.AuthToken))
+                                throw new ApplicationException($"The provided json '{formName}' has no auth token for the API");
+
+                            if (!_environment.IsEnvironment("local") &&
+                                !env.EnvironmentName.Equals("local", StringComparison.OrdinalIgnoreCase) &&
+                                !env.URL.StartsWith("https://"))
+                                throw new ApplicationException("SubmitUrl must start with https");
+                        }
+                    }
+                    else
+                    {
+                        throw new ApplicationException($"The provided json '{formName}' has no Lookup Object in Properties");
+                    }
+                }
+            }
+        }
+
+        public async Task AddDynamicOptions(IElement element, FormAnswers formAnswers)
+        {
+            LookupSource submitDetails = element.Properties.LookupSources
+                .SingleOrDefault(x => x.EnvironmentName
+                .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
+
+            if (submitDetails == null)
+                throw new Exception("Dynamic lookup: No Environment Specific Details Found.");
+
+            RequestEntity request = _actionHelper.GenerateUrl(submitDetails.URL, formAnswers);
+
+            if (string.IsNullOrEmpty(submitDetails.Provider))
+                throw new Exception("Dynamic lookup: No Query Details Found.");
+
+            var lookupProvider = _lookupProviders.Get(submitDetails.Provider);
+            if (lookupProvider == null)
+                throw new Exception("Dynamic lookup: No Lookup Provider Found.");
+
+            List<Option> lookupOptions = new();
+            var session = _sessionHelper.GetSessionGuid();
+            var cachedAnswers = _distributedCache.GetString(session);
+            if (!string.IsNullOrEmpty(cachedAnswers))
+            {
+                var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+                var lookUpCacheResults = convertedAnswers.FormData.SingleOrDefault(x => x.Key.Equals(request.Url, StringComparison.OrdinalIgnoreCase));
+                if (!string.IsNullOrEmpty(lookUpCacheResults.Key) && lookUpCacheResults.Value != null)
+                {
+                    lookupOptions = JsonConvert.DeserializeObject<List<Option>>(JsonConvert.SerializeObject(lookUpCacheResults.Value));
+                }
+            }
+
+            if (!lookupOptions.Any())
+            {
+                lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
+
+                if (lookupOptions.Any())
+                    SaveFormData(request.Url, lookupOptions, session, formAnswers.FormName);
+            }
+
+            if (!lookupOptions.Any())
+                throw new Exception("Dynamic lookup: GetAsync cannot get IList<Options>.");
+
+            element.Properties.Options.AddRange(lookupOptions);
         }
 
         public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
@@ -272,7 +382,7 @@ namespace form_builder.Helpers.PageHelpers
                                                            $"'{bookingElement.Properties.QuestionId}'");
                     }
                 }
-                
+
             }
         }
 
@@ -340,9 +450,9 @@ namespace form_builder.Helpers.PageHelpers
 
         public void CheckConditionalElementsAreValid(List<Page> pages, string formName)
         {
-            var radioWithConditionals = pages.Where(_ => _.Elements != null)
+            var ElementsWithConditionalElements = pages.Where(_ => _.Elements != null)
                 .SelectMany(_ => _.ValidatableElements)
-                .Where(_ => _.Type == EElementType.Radio)
+                .Where(_ => _.Type.Equals(EElementType.Radio) || _.Type.Equals(EElementType.Checkbox))
                 .Where(_ => _.Properties.Options.Any(_ => _.HasConditionalElement))
                 .ToList();
 
@@ -351,29 +461,27 @@ namespace form_builder.Helpers.PageHelpers
                 .Where(_ => _.Properties.isConditionalElement)
                 .ToList();
 
-            foreach (var radio in radioWithConditionals)
+            foreach (var elementWithConditional in ElementsWithConditionalElements)
             {
-                foreach (var option in radio.Properties.Options)
+                foreach (var option in elementWithConditional.Properties.Options)
                 {
                     if (
                         option.HasConditionalElement &&
                         !string.IsNullOrEmpty(option.ConditionalElementId) &&
                         !conditionalElements.Any(_ => _.Properties.QuestionId == option.ConditionalElementId))
-                        throw new ApplicationException($"The provided json '{formName}' does not contain a conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}'");
+                            throw new ApplicationException($"The provided json '{formName}' does not contain a conditional element for the '{option.Value}' value of {elementWithConditional.Type} '{elementWithConditional.Properties.QuestionId}'");
 
-                    if (
-                        option.HasConditionalElement && 
+                    if (option.HasConditionalElement && 
                         !string.IsNullOrEmpty(option.ConditionalElementId) && 
-                        !pages.Any(page => page.ValidatableElements.Contains(radio) && page.Elements.Any(_ => _.Properties.QuestionId == option.ConditionalElementId && _.Properties.isConditionalElement)))
-                        throw new ApplicationException($"The provided json '{formName}' contains the conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}' on a different page to the radio element");
+                        !pages.Any(page => page.ValidatableElements.Contains(elementWithConditional) && page.Elements.Any(_ => _.Properties.QuestionId == option.ConditionalElementId && _.Properties.isConditionalElement)))
+                            throw new ApplicationException($"The provided json '{formName}' contains the conditional element for the '{option.Value}' value of {elementWithConditional.Type} '{elementWithConditional.Properties.QuestionId}' on a different page to the radio element");
 
-                    
                     conditionalElements.Remove(conditionalElements.FirstOrDefault(_ => _.Properties.QuestionId == option.ConditionalElementId));
                 }
             }
 
             if (conditionalElements.Count > 0)
-                throw new ApplicationException($"The provided json '{formName}' has conditional elements '{String.Join(", ", conditionalElements.Select(_ => _.Properties.QuestionId))}' not assigned to radio options");
+                throw new ApplicationException($"The provided json '{formName}' has conditional elements '{String.Join(", ", conditionalElements.Select(_ => _.Properties.QuestionId))}' not assigned to element options");
 
         }
 
@@ -418,7 +526,6 @@ namespace form_builder.Helpers.PageHelpers
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
-
 
         public void CheckForDocumentDownload(FormSchema formSchema)
         {
@@ -697,12 +804,17 @@ namespace form_builder.Helpers.PageHelpers
                     if (string.IsNullOrEmpty(booking.Properties.BookingProvider))
                         throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a valid booking provider property.");
 
-                    if (booking.Properties.AppointmentType == Guid.Empty)
-                        throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.");
+                    if (!booking.Properties.AppointmentTypes.Any())
+                        throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element requires a AppointmentTypes property.");
 
-                    if (booking.Properties.OptionalResources.Any())
+                    var appointmentTypeForEnv = booking.Properties.AppointmentTypes.FirstOrDefault(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToLower()) && !_.AppointmentId.Equals(Guid.Empty));
+
+                    if (appointmentTypeForEnv == null)
+                        throw new ApplicationException("PageHelper:CheckForBookingElement, No appointment type found for current environment or empty AppointmentID");
+
+                    if (appointmentTypeForEnv.OptionalResources.Any())
                     {
-                        booking.Properties.OptionalResources.ForEach(resource =>
+                        appointmentTypeForEnv.OptionalResources.ForEach(resource =>
                         {
                             if (resource.Quantity <= 0)
                                 throw new ApplicationException("PageHelper:CheckForBookingElement, Booking element optional resources are invalid, cannot have a quantity less than 0");
@@ -730,20 +842,22 @@ namespace form_builder.Helpers.PageHelpers
         public void CheckAbsoluteDateValidations(List<Page> pages)
         {
             var elements = pages.SelectMany(element => element.ValidatableElements);
-            
+
             elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateAfterAbsolute))
                 .ToList()
-                .ForEach(element => { 
-                    if(!DateTime.TryParse(element.Properties.IsDateAfterAbsolute, out DateTime outputDate))
-                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateAfterAbsolute validation, {element.Properties.QuestionId} does not provide a valid comparison date"); 
+                .ForEach(element =>
+                {
+                    if (!DateTime.TryParse(element.Properties.IsDateAfterAbsolute, out DateTime outputDate))
+                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateAfterAbsolute validation, {element.Properties.QuestionId} does not provide a valid comparison date");
                 });
 
             elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateBeforeAbsolute))
                 .ToList()
-                .ForEach(element => { 
-                    if(!DateTime.TryParse(element.Properties.IsDateBeforeAbsolute, out DateTime outputDate))
+                .ForEach(element =>
+                {
+                    if (!DateTime.TryParse(element.Properties.IsDateBeforeAbsolute, out DateTime outputDate))
                         throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateBeforeAbsolute validation, {element.Properties.QuestionId} does not provide a valid comparison date");
-            });            
+                });
         }
 
         public void CheckDateValidations(List<Page> pages)
@@ -752,16 +866,18 @@ namespace form_builder.Helpers.PageHelpers
 
             elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateAfter))
                 .ToList()
-                .ForEach(element => { 
-                    if(!elements.Any(comparisonElement => comparisonElement.Properties.QuestionId == element.Properties.IsDateAfter)) 
-                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateAfter validation, {element.Properties.QuestionId} the form does not contain a comparison element with question id {element.Properties.IsDateAfter}"); 
+                .ForEach(element =>
+                {
+                    if (!elements.Any(comparisonElement => comparisonElement.Properties.QuestionId == element.Properties.IsDateAfter))
+                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateAfter validation, {element.Properties.QuestionId} the form does not contain a comparison element with question id {element.Properties.IsDateAfter}");
                 });
 
             elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateBefore))
                 .ToList()
-                .ForEach(element => { 
-                    if(!elements.Any(comparisonElement => comparisonElement.Properties.QuestionId == element.Properties.IsDateBefore)) 
-                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateBefore validation, {element.Properties.QuestionId} the form does not contain a comparison element with question id {element.Properties.IsDateBefore}"); 
+                .ForEach(element =>
+                {
+                    if (!elements.Any(comparisonElement => comparisonElement.Properties.QuestionId == element.Properties.IsDateBefore))
+                        throw new ApplicationException($"PageHelper:CheckDateValidations, IsDateBefore validation, {element.Properties.QuestionId} the form does not contain a comparison element with question id {element.Properties.IsDateBefore}");
                 });
         }
     }

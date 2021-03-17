@@ -7,6 +7,8 @@ namespace form_builder.Helpers.PageHelpers
 {
     public interface IPageHelper
     {
+        void ValidateDynamicLookUpObject(List<Page> pages, string formName);
+
         void HasDuplicateQuestionIDs(List<Page> pages, string formName);
 
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, FormAnswers formAnswers, List<object> results = null);
