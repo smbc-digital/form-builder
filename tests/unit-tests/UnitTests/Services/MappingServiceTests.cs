@@ -14,6 +14,7 @@ using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -32,6 +33,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
         private readonly Mock<ILogger<MappingService>> _mockLogger = new Mock<ILogger<MappingService>>();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
 
         public MappingServiceTests()
@@ -68,7 +70,9 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _service = new MappingService(_mockDistrubutedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockLogger.Object);
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
+
+            _service = new MappingService(_mockDistrubutedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -576,7 +580,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(bookingGuid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "test" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -666,7 +670,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
                 .WithCustomerAddressId("address")
-                .WithAppointmentType(bookingGuid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "test" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -714,7 +718,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(bookingGuid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "test" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -755,7 +759,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(bookingGuid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "test" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -792,7 +796,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(bookingGuid)
+                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "test" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {

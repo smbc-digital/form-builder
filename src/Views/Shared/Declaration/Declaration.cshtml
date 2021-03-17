@@ -1,14 +1,10 @@
-﻿@model Element
+﻿@model Declaration
 @{
-    var hintId = $"{Model.Properties.QuestionId}-hint";
-    var errorId = $"{Model.Properties.QuestionId}-error";
-    var itemName = $"{Model.Properties.QuestionId}";
-    var itemId = $"{Model.Properties.QuestionId}";
-    var hint = Model.Properties.Hint;
+    var questionId = Model.Properties.QuestionId;
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
-    @Html.BeginFieldSet(Model)
+    @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
 
     @if (!Model.Properties.HideLabel) {
         <partial name="LegendH1" />
@@ -20,28 +16,20 @@
 
     <div class="govuk-checkboxes">
         <div class="govuk-checkboxes__item">
-            @if (Model.Properties.Checked)
-            {
-                <input class="govuk-checkboxes__input" type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
-            }
-            else if (!string.IsNullOrEmpty(Model.Properties.Value))
+            <input 
+                class="govuk-checkboxes__input" 
+                type="checkbox" 
+                value="true" 
+                name="@questionId" 
+                id="@questionId" 
+                @(Model.Properties.Checked || !string.IsNullOrEmpty(Model.Properties.Value) ? "checked" : string.Empty) />
 
-            {
-                <input class="govuk-checkboxes__input" type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" checked />
-            }
-            else
-            {
-                <input class="govuk-checkboxes__input" type="checkbox" value="true" name="@itemName" id="@itemId" aria-describedby="@hintId" />
-            }
-
-            @if (Model.Properties.Optional)
-            {
-                <label class="govuk-label govuk-checkboxes__label" for="@itemId">@Model.Properties.Text</label>
-            }
-            else
-            {
-                <label class="govuk-label govuk-checkboxes__label" for="@itemId">@Model.Properties.Text</label>
-            }
+            <label class="govuk-label govuk-checkboxes__label" for="@questionId">@Model.Properties.Text
+                @if (Model.Properties.Optional && !Model.Properties.HideOptionalText)
+                {
+                    <span class="smbc-body">(optional)</span>
+                }
+            </label>
         </div>
     </div>
 

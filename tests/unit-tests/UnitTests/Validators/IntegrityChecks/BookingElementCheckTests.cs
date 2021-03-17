@@ -7,6 +7,8 @@ using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Validators.IntegrityChecks;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
+using Moq;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using Xunit;
 
@@ -14,15 +16,22 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 {
     public class BookingCheckTests
     {
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+        
+        public BookingCheckTests()
+        {
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
+        }
+
         [Fact]
-        public void CheckForBookingElement_IsNotValid_WhenForm_DoesNotContain_RequiredCustomerFields()
+        public void BookingElementCheck_IsNotValid_WhenForm_DoesNotContain_RequiredCustomerFields()
         {
             // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
                 .WithBookingProvider("Fake")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType { AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
             var page = new PageBuilder()
@@ -38,7 +47,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithPage(appointmentPage)
                 .Build();
 
-            var check = new BookingElementCheck();
+            var check = new BookingElementCheck(_mockHostingEnv.Object);
 
             // Act
             var result = check.Validate(schema);
@@ -56,7 +65,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
                 .WithBookingProvider("Fake")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
             var page = new PageBuilder()
@@ -68,7 +77,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithPage(page)
                 .Build();
 
-            var check = new BookingElementCheck();
+            var check = new BookingElementCheck(_mockHostingEnv.Object);
 
             // Act
             var result = check.Validate(schema);
@@ -97,7 +106,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithPage(page)
                 .Build();
 
-            var check = new BookingElementCheck();
+            var check = new BookingElementCheck(_mockHostingEnv.Object);
 
             // Act
             var result = check.Validate(schema);
@@ -107,7 +116,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
         }
 
         [Fact]
-        public void CheckForBookingElement_Throw_ApplicationException_WhenBookingElement_DoesNotContains_BookingProvider()
+        public void BookingElementCheck_IsNotValid_WhenBookingElement_DoesNotContains_BookingProvider()
         {
             // Arrange
             var pages = new List<Page>();
@@ -115,7 +124,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(Guid.NewGuid())
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
             var page = new PageBuilder()
@@ -127,7 +136,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithPage(page)
                 .Build();
 
-            var check = new BookingElementCheck();
+            var check = new BookingElementCheck(_mockHostingEnv.Object);
 
             // Act
             var result = check.Validate(schema);
@@ -141,12 +150,16 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             // Arrange
             var pages = new List<Page>();
 
+            var appointmentType = new AppointmentTypeBuilder()
+                .WithEnvironment("local")
+                .WithOptionalResource(new BookingResource { ResourceId = Guid.Empty, Quantity = 1 })
+                .Build();
+
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
                 .WithBookingProvider("TestProvider")
-                .WithAppointmentType(Guid.NewGuid())
-                .WithBookingResource(new BookingResource { ResourceId = Guid.Empty, Quantity = 1 })
+                .WithAppointmentType(appointmentType)
                 .Build();
 
             var page = new PageBuilder()
@@ -158,7 +171,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithPage(page)
                 .Build();
 
-            var check = new BookingElementCheck();
+            var check = new BookingElementCheck(_mockHostingEnv.Object);
 
             // Act
             var result = check.Validate(schema);

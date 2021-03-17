@@ -13,6 +13,7 @@ using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
 using Moq;
 using Xunit;
 
@@ -25,6 +26,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
         private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new Mock<IWebHostEnvironment>();
 
         public SuccessPageContentFactoryTests()
         {
@@ -32,7 +34,10 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 _mockPageHelper.Object,
                 _mockPageContentFactory.Object,
                 _mockSessionHelper.Object,
-                _mockDistributedCache.Object);
+                _mockDistributedCache.Object,
+                _mockWebHostEnvironment.Object);
+
+            _mockWebHostEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
         }
 
         private static readonly Page Page = new PageBuilder()
