@@ -7,7 +7,7 @@ using form_builder.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace form_builder.Validators.IntegrityChecks
+namespace form_builder.Validators.IntegrityChecks.Behaviours
 {
     public class SubmitSlugsHaveAllPropertiesCheck: IFormSchemaIntegrityCheck
     {

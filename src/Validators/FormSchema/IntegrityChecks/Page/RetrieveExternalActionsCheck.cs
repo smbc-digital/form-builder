@@ -6,9 +6,9 @@ using form_builder.Extensions;
 using form_builder.Models;
 using Microsoft.AspNetCore.Hosting;
 
-namespace form_builder.Validators.IntegrityChecks
+namespace form_builder.Validators.IntegrityChecks.Page
 {
-    public class RetrieveExternalActionsCheck: IFormSchemaIntegrityCheck
+    public class RetrieveExternalActionsCheck: IPageSchemaIntegrityCheck
     {
         private readonly IWebHostEnvironment _environment;
 
@@ -17,7 +17,7 @@ namespace form_builder.Validators.IntegrityChecks
             _environment = enviroment;
         }
 
-        public IntegrityCheckResult Validate(FormSchema schema)
+        public IntegrityCheckResult Validate(Models.Page page)
         {
             var integrityCheckResult = new IntegrityCheckResult();
             var actions = schema.FormActions.Where(formAction => formAction.Type.Equals(EActionType.RetrieveExternalData))
@@ -46,6 +46,6 @@ namespace form_builder.Validators.IntegrityChecks
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
+        public async Task<IntegrityCheckResult> ValidateAsync(Models.Page page) => await Task.Run(() => Validate(schema));
     }
 }

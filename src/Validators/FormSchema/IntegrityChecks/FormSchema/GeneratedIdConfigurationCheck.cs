@@ -1,14 +1,10 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Enum;
-using form_builder.Models;
 
-namespace form_builder.Validators.IntegrityChecks
+namespace form_builder.Validators.IntegrityChecks.FormSchema
 {
     public class GeneratedIdConfigurationCheck: IFormSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(FormSchema schema)
+        public IntegrityCheckResult Validate(Models.FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
@@ -21,6 +17,6 @@ namespace form_builder.Validators.IntegrityChecks
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
+        public async Task<IntegrityCheckResult> ValidateAsync(Models.FormSchema schema) => await Task.Run(() => Validate(schema));
     }
 }

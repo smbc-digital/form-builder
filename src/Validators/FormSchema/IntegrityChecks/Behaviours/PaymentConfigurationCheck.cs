@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace form_builder.Validators.IntegrityChecks
+namespace form_builder.Validators.IntegrityChecks.Behaviours
 {
     public class PaymentConfigurationCheck: IFormSchemaIntegrityCheck
     {

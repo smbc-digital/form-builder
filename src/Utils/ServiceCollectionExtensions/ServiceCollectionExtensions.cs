@@ -73,6 +73,8 @@ using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
 using form_builder.Validators.IntegrityChecks;
+using form_builder.Validators.IntegrityChecks.FormSchema;
+using form_builder.Validators.IntegrityChecks.Page;
 
 namespace form_builder.Utils.ServiceCollectionExtensions
 {
@@ -263,29 +265,41 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
         public static IServiceCollection AddSchemaIntegrityValidation(this IServiceCollection services)
         {
+            // Form Integrity Checks
+            services.AddSingleton<IFormSchemaIntegrityCheck, DocumentDownloadCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, GeneratedIdConfigurationCheck>();
+
+            // Page Integrity Checks
+            services.AddSingleton<IPageSchemaIntegrityCheck, EmailActionsCheck>();
+            services.AddSingleton<IPageSchemaIntegrityCheck, RetrieveExternalActionsCheck>();
+
+            // Behaviour Integrity Checks
             services.AddSingleton<IFormSchemaIntegrityCheck, AbsoluteDateValidationsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, AcceptedFileUploadFileTypesCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, AddressNoManualTextIsSetCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, AnyConditionTypeCheck>();
+
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingElementCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementsAreValidCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, DateValidationsCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, DocumentDownloadCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, EmailActionsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, GeneratedIdConfigurationCheck>();
+
+            // Element Integrity Checks
             services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, IncomingFormDataValuesCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, InvalidQuestionOrTargetMappingValueCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, PaymentConfigurationCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, QuestionIdExistsForBookingCustomerAddressIdCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, RenderConditionsValidCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, RetrieveExternalActionsCheck>();
+
+            // Element.Property Integrity Checks
             services.AddSingleton<IFormSchemaIntegrityCheck, SubmitSlugsHaveAllPropertiesCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ValidateActionCheck>();
 
+
+            // Integrity Validation Service
             services.AddSingleton<IFormSchemaIntegrityValidator,FormSchemaIntegrityValidator>();
 
             return services;

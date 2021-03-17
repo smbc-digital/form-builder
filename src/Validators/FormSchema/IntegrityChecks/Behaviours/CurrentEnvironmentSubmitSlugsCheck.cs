@@ -7,7 +7,7 @@ using form_builder.Extensions;
 using form_builder.Models;
 using Microsoft.AspNetCore.Hosting;
 
-namespace form_builder.Validators.IntegrityChecks
+namespace form_builder.Validators.IntegrityChecks.Behaviours
 {
     public class CurrentEnvironmentSubmitSlugsCheck: IFormSchemaIntegrityCheck
     {
