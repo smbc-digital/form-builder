@@ -86,11 +86,20 @@ namespace form_builder.Services.SubmitService
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
+            System.Net.Http.HttpResponseMessage response;
+
+            if (submitSlug.AuthToken.ToLower().StartsWith("flowtoken"))
+            {
+                response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
+            }
+            else
+            { 
             _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(submitSlug.AuthToken)
                 ? string.Empty
                 : submitSlug.AuthToken);
 
-            var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
+               response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
+            }
             if (!response.IsSuccessStatusCode)
                 throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occurred while attempting to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             
