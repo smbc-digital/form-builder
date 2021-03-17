@@ -7,6 +7,7 @@ using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Models;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
+using form_builder.Validators;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -23,13 +24,17 @@ namespace form_builder.Factories.Schema
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IConfiguration _configuration;
 
+        private readonly IFormSchemaIntegrityValidator _formSchemaIntegrityValidator;
+
+
         public SchemaFactory(IDistributedCacheWrapper distributedCache,
             ISchemaProvider schemaProvider,
             ILookupSchemaTransformFactory lookupSchemaFactory,
             IReusableElementSchemaTransformFactory reusableElementSchemaFactory,
             IOptions<DistributedCacheConfiguration> distributedCacheConfiguration,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IFormSchemaIntegrityValidator formSchemaIntegrityValidator)
         {
             _distributedCache = distributedCache;
             _schemaProvider = schemaProvider;
@@ -38,6 +43,8 @@ namespace form_builder.Factories.Schema
             _distributedCacheConfiguration = distributedCacheConfiguration.Value;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _configuration = configuration;
+            _formSchemaIntegrityValidator = formSchemaIntegrityValidator;
+
         }
 
         public async Task<FormSchema> Build(string formKey)
@@ -54,9 +61,10 @@ namespace form_builder.Factories.Schema
             }
 
             var formSchema = await _schemaProvider.Get<FormSchema>(formKey);
-
             formSchema = await _reusableElementSchemaFactory.Transform(formSchema);
             formSchema = _lookupSchemaFactory.Transform(formSchema);
+
+            await _formSchemaIntegrityValidator.Validate(formSchema);
 
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)
                 await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}", JsonConvert.SerializeObject(formSchema), _distributedCacheExpirationConfiguration.FormJson);

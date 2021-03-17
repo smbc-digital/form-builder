@@ -61,23 +61,32 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISuccessPageFactory> _mockSuccessPageFactory = new Mock<ISuccessPageFactory>();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new Mock<IActionsWorkflow>();
 
+        private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new Mock<IFormSchemaIntegrityValidator>();
+
         public PageServicesTests()
         {
             _validator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
                 .Returns(new ValidationResult { IsValid = false });
+
             var elementValidatorItems = new List<IElementValidator> { _validator.Object };
-            _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
+            _validators
+                .Setup(m => m.GetEnumerator())
+                .Returns(() => elementValidatorItems.GetEnumerator());
 
             _mockPageHelper
                 .Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
-                        .ReturnsAsync(new FormBuilderViewModel());
+                .ReturnsAsync(new FormBuilderViewModel());
 
             _mockPageHelper
                 .Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), null))
-                        .ReturnsAsync(new FormBuilderViewModel());
+                .ReturnsAsync(new FormBuilderViewModel());
 
-            _mockEnvironment.Setup(_ => _.EnvironmentName)
+            _mockEnvironment
+                .Setup(_ => _.EnvironmentName)
                 .Returns("local");
+
+            _mockFormSchemaIntegrityValidator
+                .Setup(_ => _.Validate(It.IsAny<FormSchema>()));
 
             var cacheData = new FormAnswers
             {

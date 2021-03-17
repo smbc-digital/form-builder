@@ -5,7 +5,7 @@ namespace form_builder.Validators.IntegrityChecks
 {
     public interface IFormSchemaIntegrityCheck
     {
-        IntegrityCheckResult Validate(FormSchema schema, string form);
-        Task<IntegrityCheckResult> ValidateAsync(FormSchema schema, string form);
+        IntegrityCheckResult Validate(FormSchema schema);
+        Task<IntegrityCheckResult> ValidateAsync(FormSchema schema);
     }
 }

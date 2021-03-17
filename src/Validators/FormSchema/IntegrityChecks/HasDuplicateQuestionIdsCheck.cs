@@ -8,8 +8,9 @@ namespace form_builder.Validators.IntegrityChecks
 {
     public class HasDuplicateQuestionIdsCheck: IFormSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(FormSchema schema, string form)
+        public IntegrityCheckResult Validate(FormSchema schema)
         {
+            var integrityCheckResult = new IntegrityCheckResult();
             var questionIds = new List<string>();
             foreach (var page in schema.Pages)
             {
@@ -40,18 +41,12 @@ namespace form_builder.Validators.IntegrityChecks
             }
 
             var hashSet = new HashSet<string>();
-
-            // TODO: possible improvement - highlight the duplicates and include in error messaging
             if (questionIds.Any(id => !hashSet.Add(id)))
-                return new IntegrityCheckResult
-                {
-                    IsValid = false,
-                    Message = $"The provided json '{form}' has duplicate QuestionIDs"
-                };
+                integrityCheckResult.AddFailureMessage($"The provided json '{schema.FormName}' has duplicate QuestionIDs");
             
-            return new IntegrityCheckResult { IsValid= true };
+            return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema, string form) => await Task.Run(() => Validate(schema, form));
+        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,24 +9,26 @@ namespace form_builder.Validators
 {
     public class FormSchemaIntegrityValidator : IFormSchemaIntegrityValidator
     {
-        List<IFormSchemaIntegrityCheck> _formSchemaIntegrityChecks;
-        public FormSchemaIntegrityValidator(List<IFormSchemaIntegrityCheck> formSchemaIntegrityChecks)
+        IEnumerable<IFormSchemaIntegrityCheck> _formSchemaIntegrityChecks;
+        public FormSchemaIntegrityValidator(IEnumerable<IFormSchemaIntegrityCheck> formSchemaIntegrityChecks)
         {
             _formSchemaIntegrityChecks = formSchemaIntegrityChecks;
         }
-        public async Task<bool> Validate(FormSchema schema, string form, string path)
+        
+        public async Task Validate(FormSchema schema)
         {
-            if (path !=schema.FirstPageSlug)
-                return true;
-
             var integrityCheckResults = new List<IntegrityCheckResult>();
-
             foreach(var integrityCheck in _formSchemaIntegrityChecks)
             {
-                integrityCheckResults.Add(await integrityCheck.ValidateAsync(schema, form));
+                integrityCheckResults.Add(await integrityCheck.ValidateAsync(schema));
             }
             
-            return integrityCheckResults.Any(integrityCheckResult => !integrityCheckResult.IsValid);
+            var invalidCheckResults = integrityCheckResults.Where(result => !result.IsValid);
+            if(invalidCheckResults.Any())
+            {
+                var failingCheckResultMessages = invalidCheckResults.SelectMany(result => result.Messages);
+                throw new ApplicationException($"The requested for schema '{schema.FormName}' was invalid, The following integrity check results are failing: \n { String.Join('\n', failingCheckResultMessages) }");
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Models;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
+using form_builder.Validators;
 using form_builder_tests.Builders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -28,6 +29,8 @@ namespace form_builder_tests.UnitTests.Factories.Schema
         private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new Mock<IOptions<DistributedCacheConfiguration>>();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
         private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
+        private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new Mock<IFormSchemaIntegrityValidator>();
+
 
         public SchemaFactoryTests()
         {
@@ -54,7 +57,14 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
-            _schemaFactory = new SchemaFactory(_mockDistributedCache.Object, _mockSchemaProvider.Object, _mockLookupSchemaFactory.Object, _mockReusableElementSchemaFactory.Object, _mockDistributedCacheConfiguration.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockConfiguration.Object);
+            _mockSchemaProvider
+                .Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
+                .ReturnsAsync(formSchema);
+
+            _mockFormSchemaIntegrityValidator
+                .Setup(_ => _.Validate(It.IsAny<FormSchema>()));
+
+            _schemaFactory = new SchemaFactory(_mockDistributedCache.Object, _mockSchemaProvider.Object, _mockLookupSchemaFactory.Object, _mockReusableElementSchemaFactory.Object, _mockDistributedCacheConfiguration.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockConfiguration.Object, _mockFormSchemaIntegrityValidator.Object);
         }
 
         [Fact]
@@ -95,6 +105,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             _mockLookupSchemaFactory.Verify(_ => _.Transform(It.IsAny<FormSchema>()), Times.Never);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
+            _mockFormSchemaIntegrityValidator.Verify(_ => _.Validate(It.IsAny<FormSchema>()), Times.Never);
         }
 
         [Fact]
@@ -223,6 +234,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             // Assert
             Assert.IsType<FormSchema>(result);
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+            _mockFormSchemaIntegrityValidator.Verify(_ => _.Validate(It.IsAny<FormSchema>()), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }

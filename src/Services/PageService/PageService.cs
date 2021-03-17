@@ -72,8 +72,7 @@ namespace form_builder.Services.PageService
             IMappingService mappingService,
             IPayService payService,
             IIncomingDataHelper incomingDataHelper,
-            IActionsWorkflow actionsWorkflow,
-            IFormSchemaIntegrityValidator formSchemaIntegrityValidator)
+            IActionsWorkflow actionsWorkflow)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -93,7 +92,6 @@ namespace form_builder.Services.PageService
             _mappingService = mappingService;
             _incomingDataHelper = incomingDataHelper;
             _actionsWorkflow = actionsWorkflow;
-            _formSchemaIntegrityValidator = formSchemaIntegrityValidator;
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParamters)
@@ -145,7 +143,6 @@ namespace form_builder.Services.PageService
                 throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
             // await baseForm.ValidateFormSchema(_pageHelper, form, path);
-            await _formSchemaIntegrityValidator.Validate(baseForm, form, path);
 
             List<object> searchResults = null;
             if (subPath.Equals(LookUpConstants.Automatic) || subPath.Equals(LookUpConstants.Manual))
@@ -163,7 +160,6 @@ namespace form_builder.Services.PageService
             {
                 var data = await _mappingService.Map(sessionGuid, form);
                 var paymentAmount = await _payService.GetFormPaymentInformation(data, form, page);
-
                 page.Elements.First(_ => _.Type == EElementType.PaymentSummary).Properties.Value = paymentAmount.Settings.Amount;
             }
 
