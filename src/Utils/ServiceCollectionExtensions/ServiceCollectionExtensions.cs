@@ -78,6 +78,7 @@ using form_builder.Validators.IntegrityChecks.Page;
 using form_builder.Validators.IntegrityChecks.Behaviours;
 using form_builder.Validators.IntegrityChecks.Elements;
 using form_builder.Providers.Lookup;
+using form_builder.Validators.FormSchema.IntegrityChecks.FormSchema;
 
 namespace form_builder.Utils.ServiceCollectionExtensions
 {
@@ -277,17 +278,16 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         public static IServiceCollection AddSchemaIntegrityValidation(this IServiceCollection services)
         {
             // Form Integrity Checks
+            services.AddSingleton<IFormSchemaIntegrityCheck, BookingFormCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, DocumentDownloadCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, GeneratedIdConfigurationCheck>();
-
-            // Page Integrity Checks
-            services.AddSingleton<IPageSchemaIntegrityCheck, EmailActionsCheck>();
-            services.AddSingleton<IPageSchemaIntegrityCheck, RetrieveExternalActionsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, EmailActionsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, RetrieveExternalActionsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, PaymentConfigurationCheck>();
 
             // Behaviour Integrity Checks
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
-            services.AddSingleton<IBehaviourSchemaIntegrityCheck, PaymentConfigurationCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, SubmitSlugsHaveAllPropertiesCheck>();
 
 
