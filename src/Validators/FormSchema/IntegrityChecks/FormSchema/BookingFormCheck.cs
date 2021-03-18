@@ -15,23 +15,21 @@ namespace form_builder.Validators.FormSchema.IntegrityChecks.FormSchema
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
-            if (schema.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Booking))))
+            if (!schema.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Booking))))
                 return integrityCheckResult;
 
             if (!schema.Pages.Any(page => page.PageSlug.Equals(BookingConstants.NO_APPOINTMENT_AVAILABLE, StringComparison.OrdinalIgnoreCase)))
                 integrityCheckResult.AddFailureMessage($"Booking Element Check, Form contains booking element, but is missing required page with slug {BookingConstants.NO_APPOINTMENT_AVAILABLE}.");
 
-            var additionalRequiredElements = schema.Pages
-                .SelectMany(page => page.ValidatableElements)
-                .Where(element => element.Properties is not null
-                        && element.Properties.TargetMapping is not null)
-                .Where(element => element.Properties.TargetMapping.ToLower().Equals("customer.firstname")
-                        || element.Properties.TargetMapping.ToLower().Equals("customer.lastname"))
-                .ToList();
-
-            if (additionalRequiredElements.Count != 2)
+            var bookingElements = schema.Pages.SelectMany(page => page.Elements.Where(element => element.Type.Equals(EElementType.Booking)));
+            var requiredFields = new[] { "customer.firstname", "customer.lastname" };
+            foreach (var requiredField in requiredFields)
             {
-                integrityCheckResult.AddFailureMessage($"Booking Element Check, Booking element requires customer firstname/lastname elements for reservation.");
+                if (!bookingElements.Any(
+                    element => element.Properties is not null && 
+                    element.Properties.TargetMapping is not null && 
+                    element.Properties.TargetMapping.Equals(requiredField, StringComparison.OrdinalIgnoreCase)))
+                integrityCheckResult.AddFailureMessage($"Booking Element Check, Booking element requires {requiredField} elements for reservation.");
             }
 
             return integrityCheckResult;
