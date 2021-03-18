@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models;
+using form_builder.Models.Elements;
 using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Validators.IntegrityChecks.Elements
@@ -17,7 +18,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             _environment = enviroment;
         }
 
-        public IntegrityCheckResult Validate(FormSchema schema)
+        public IntegrityCheckResult Validate(IElement element)
         {
             var integrityCheckResult = new IntegrityCheckResult();
             var bookingElements = schema.Pages.SelectMany(page => page.ValidatableElements)

@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Validators.IntegrityChecks;
 using form_builder.Validators.IntegrityChecks.Behaviours;
 using form_builder.Validators.IntegrityChecks.Elements;
 using form_builder.Validators.IntegrityChecks.FormSchema;
-using form_builder.Validators.IntegrityChecks.Page;
 using form_builder.Validators.IntegrityChecks.Properties;
 
 namespace form_builder.Validators
@@ -44,7 +42,7 @@ namespace form_builder.Validators
 
             foreach (var page in schema.Pages)
             {
-                if (page.Behaviours != null)
+                if (page.Behaviours is not null)
                 {
                     foreach (var integrityCheck in _behaviorSchemaIntegrityChecks)
                     {

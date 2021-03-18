@@ -10,9 +10,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace form_builder.Validators.IntegrityChecks.Behaviours
+namespace form_builder.Validators.IntegrityChecks.FormSchema
 {
-    public class PaymentConfigurationCheck: IBehaviourSchemaIntegrityCheck
+    public class PaymentConfigurationCheck: IFormSchemaIntegrityCheck
     {
         private IWebHostEnvironment _environment;
         private readonly ICache _cache;
@@ -30,18 +30,18 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
-        public IntegrityCheckResult Validate(List<Behaviour> behaviours, string formName)
+        public IntegrityCheckResult Validate(Models.FormSchema schema)
         {
-            return ValidateAsync(behaviours, formName).Result;
+            return ValidateAsync(schema).Result;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(List<Behaviour> behaviours, string formName)
+        public async Task<IntegrityCheckResult> ValidateAsync(Models.FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
             var containsPayment = schema.Pages.Where(x => x.Behaviours != null)
                 .SelectMany(x => x.Behaviours)
-                .Any(x => );
+                .Any(x => x.BehaviourType == EBehaviourType.SubmitAndPay);
 
             if (!containsPayment)
                 return IntegrityCheckResult.ValidResult;
@@ -51,7 +51,7 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
 
             if (formPaymentInformation == null)
             {
-                integrityCheckResult.AddFailureMessage($"No payment information configured for '{formName}' form");
+                integrityCheckResult.AddFailureMessage($"No payment information configured for '{schema.FormName}' form");
             }
             else
             {
