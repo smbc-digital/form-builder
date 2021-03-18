@@ -1,14 +1,13 @@
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Extensions;
-using form_builder.Models;
+using form_builder.Validators.IntegrityChecks.FormSchema;
 using Microsoft.AspNetCore.Hosting;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace form_builder.Validators.IntegrityChecks
 {
-    public class ValidateActionCheck: IFormSchemaIntegrityCheck
+    public class ValidateActionCheck : IFormSchemaIntegrityCheck
     {
         private readonly IWebHostEnvironment _environment;
 
@@ -17,7 +16,7 @@ namespace form_builder.Validators.IntegrityChecks
             _environment = enviroment;
         }
 
-        public IntegrityCheckResult Validate(FormSchema schema)
+        public IntegrityCheckResult Validate(Models.FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
             var actions = schema.FormActions.Where(formAction => formAction.Type.Equals(EActionType.Validate))
@@ -43,6 +42,6 @@ namespace form_builder.Validators.IntegrityChecks
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
+        public async Task<IntegrityCheckResult> ValidateAsync(Models.FormSchema schema) => await Task.Run(() => Validate(schema));
     }
 }

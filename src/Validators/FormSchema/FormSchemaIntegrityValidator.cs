@@ -7,7 +7,6 @@ using form_builder.Validators.IntegrityChecks;
 using form_builder.Validators.IntegrityChecks.Behaviours;
 using form_builder.Validators.IntegrityChecks.Elements;
 using form_builder.Validators.IntegrityChecks.FormSchema;
-using form_builder.Validators.IntegrityChecks.Properties;
 
 namespace form_builder.Validators
 {
@@ -16,18 +15,15 @@ namespace form_builder.Validators
         IEnumerable<IFormSchemaIntegrityCheck> _formSchemaIntegrityChecks;
         IEnumerable<IBehaviourSchemaIntegrityCheck> _behaviorSchemaIntegrityChecks;
         IEnumerable<IElementSchemaIntegrityCheck> _elementSchemaIntegrityChecks;
-        IEnumerable<IPropertySchemaIntegrityCheck> _propertySchemaIntegrityChecks;
 
         public FormSchemaIntegrityValidator(
             IEnumerable<IFormSchemaIntegrityCheck> formSchemaIntegrityChecks,
             IEnumerable<IBehaviourSchemaIntegrityCheck> behaviorSchemaIntegrityChecks,
-            IEnumerable<IElementSchemaIntegrityCheck> elementSchemaIntegrityChecks,
-            IEnumerable<IPropertySchemaIntegrityCheck> propertySchemaIntegrityChecks)
+            IEnumerable<IElementSchemaIntegrityCheck> elementSchemaIntegrityChecks)
         {
             _formSchemaIntegrityChecks = formSchemaIntegrityChecks;
             _behaviorSchemaIntegrityChecks = behaviorSchemaIntegrityChecks;
             _elementSchemaIntegrityChecks = elementSchemaIntegrityChecks;
-            _propertySchemaIntegrityChecks = propertySchemaIntegrityChecks;
         }
 
         public async Task Validate(FormSchema schema)

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
-using form_builder.Models;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators.IntegrityChecks.Elements
@@ -13,7 +12,6 @@ namespace form_builder.Validators.IntegrityChecks.Elements
         {
             var integrityCheckResult = new IntegrityCheckResult();
             var questionIds = new List<string>();
-
 
             if (element.Type != EElementType.H1
                 && element.Type != EElementType.H2
@@ -37,10 +35,9 @@ namespace form_builder.Validators.IntegrityChecks.Elements
                 questionIds.Add(element.Properties.QuestionId);
             }
             
-
             var hashSet = new HashSet<string>();
             if (questionIds.Any(id => !hashSet.Add(id)))
-                integrityCheckResult.AddFailureMessage($"The provided json '{schema.FormName}' has duplicate QuestionIDs");
+                integrityCheckResult.AddFailureMessage($"The provided json has duplicate QuestionIDs");
             
             return integrityCheckResult;
         }

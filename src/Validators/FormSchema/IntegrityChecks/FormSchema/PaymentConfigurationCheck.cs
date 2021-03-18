@@ -1,10 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Enum;
-using form_builder.Models;
 using form_builder.Providers.PaymentProvider;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
@@ -51,7 +51,7 @@ namespace form_builder.Validators.IntegrityChecks.FormSchema
 
             if (formPaymentInformation == null)
             {
-                integrityCheckResult.AddFailureMessage($"No payment information configured for '{schema.FormName}' form");
+                integrityCheckResult.AddFailureMessage($"No payment information configured.");
             }
             else
             {
@@ -66,9 +66,12 @@ namespace form_builder.Validators.IntegrityChecks.FormSchema
                 if (formPaymentInformation.Settings.ComplexCalculationRequired)
                 {
                     var paymentSummaryElement = schema.Pages.SelectMany(_ => _.Elements)
-                        .First(_ => _.Type == EElementType.PaymentSummary);
+                        .First(_ => _.Type.Equals(EElementType.PaymentSummary));
 
-                    if (!_environment.IsEnvironment("local") && !paymentSummaryElement.Properties.CalculationSlugs.Where(_ => !_.Environment.ToLower().Equals("local")).Any(_ => _.URL.StartsWith("https://")))
+                    if (!_environment.IsEnvironment("local") && 
+                        !paymentSummaryElement.Properties.CalculationSlugs
+                            .Where(_ => !_.Environment.Equals("local", StringComparison.OrdinalIgnoreCase))
+                            .Any(_ => _.URL.StartsWith("https://")))
                         integrityCheckResult.AddFailureMessage($"PaymentSummary::CalculateCostUrl must start with https");
                 }
             }

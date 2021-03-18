@@ -15,11 +15,11 @@ namespace form_builder.Validators.IntegrityChecks.FormSchema
             if (schema.DocumentType.Any())
             {
                 if (schema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
-                    integrityCheckResult.AddFailureMessage($"Document Download Check, Unknown document download type configured for form '{ schema.FormName }'");
+                    integrityCheckResult.AddFailureMessage($"Document Download Check, Unknown document download type configured.");
             }
             else
             {
-                integrityCheckResult.AddFailureMessage($"Document Download Check, No document download type configured for form '{ schema.FormName }'");
+                integrityCheckResult.AddFailureMessage($"Document Download Check, No document download type configured.");
             }
 
             return integrityCheckResult;

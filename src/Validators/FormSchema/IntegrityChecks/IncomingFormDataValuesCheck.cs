@@ -1,15 +1,13 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using form_builder.Enum;
-using form_builder.Models;
+using form_builder.Validators.IntegrityChecks.FormSchema;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace form_builder.Validators.IntegrityChecks
 {
-    public class IncomingFormDataValuesCheck: IFormSchemaIntegrityCheck
+    public class IncomingFormDataValuesCheck : IFormSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(FormSchema schema)
+        public IntegrityCheckResult Validate(Models.FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
@@ -31,6 +29,6 @@ namespace form_builder.Validators.IntegrityChecks
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
+        public async Task<IntegrityCheckResult> ValidateAsync(Models.FormSchema schema) => await Task.Run(() => Validate(schema));
     }
 }

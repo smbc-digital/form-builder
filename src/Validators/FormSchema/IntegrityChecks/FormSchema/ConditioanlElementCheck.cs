@@ -1,17 +1,15 @@
+using form_builder.Enum;
 using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using form_builder.Enum;
-using form_builder.Models;
 
-namespace form_builder.Validators.IntegrityChecks.Properties
+namespace form_builder.Validators.IntegrityChecks.FormSchema
 {
-    public class ConditionalElementsAreValidCheck: IPropertySchemaIntegrityCheck
+    public class ConditioanlElementCheck : IFormSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(FormSchema schema)
+        public IntegrityCheckResult Validate(Models.FormSchema schema)
         {
-            var integrityCheckResult = new IntegrityCheckResult();
+            IntegrityCheckResult integrityCheckResult = new();
 
             var radioWithConditionals = schema.Pages.Where(page => page.Elements != null)
                 .SelectMany(page => page.ValidatableElements)
@@ -28,18 +26,18 @@ namespace form_builder.Validators.IntegrityChecks.Properties
             {
                 foreach (var option in radio.Properties.Options)
                 {
-                    if (option.HasConditionalElement 
-                            && !string.IsNullOrEmpty(option.ConditionalElementId) 
+                    if (option.HasConditionalElement
+                            && !string.IsNullOrEmpty(option.ConditionalElementId)
                             && !conditionalElements.Any(_ => _.Properties.QuestionId == option.ConditionalElementId))
                         integrityCheckResult.AddFailureMessage($"The provided json '{schema.FormName}' does not contain a conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}'");
 
-                    if (option.HasConditionalElement 
-                            && !string.IsNullOrEmpty(option.ConditionalElementId)  
-                            && !schema.Pages.Any(page => page.ValidatableElements.Contains(radio) 
-                                        && page.Elements.Any(element => element.Properties.QuestionId == option.ConditionalElementId 
+                    if (option.HasConditionalElement
+                            && !string.IsNullOrEmpty(option.ConditionalElementId)
+                            && !schema.Pages.Any(page => page.ValidatableElements.Contains(radio)
+                                        && page.Elements.Any(element => element.Properties.QuestionId == option.ConditionalElementId
                                             && element.Properties.isConditionalElement)))
                         integrityCheckResult.AddFailureMessage($"The provided json '{schema.FormName}' contains the conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}' on a different page to the radio element");
-                    
+
                     conditionalElements.Remove(conditionalElements.FirstOrDefault(_ => _.Properties.QuestionId == option.ConditionalElementId));
                 }
             }
@@ -50,6 +48,6 @@ namespace form_builder.Validators.IntegrityChecks.Properties
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
+        public async Task<IntegrityCheckResult> ValidateAsync(Models.FormSchema schema) => await Task.Run(() => Validate(schema));
     }
 }

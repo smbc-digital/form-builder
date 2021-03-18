@@ -1,17 +1,17 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using form_builder.Models;
 using form_builder.Constants;
+using form_builder.Extensions;
+using form_builder.Providers.Lookup;
+using form_builder.Validators.IntegrityChecks.FormSchema;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Collections.Generic;
-using form_builder.Providers.Lookup;
-using form_builder.Extensions;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace form_builder.Validators.IntegrityChecks
 {
-    public class DynamicLookupCheck: IFormSchemaIntegrityCheck
+    public class DynamicLookupCheck : IFormSchemaIntegrityCheck
     {
         IWebHostEnvironment _environment;
         IEnumerable<ILookupProvider> _lookupProviders;
@@ -21,13 +21,13 @@ namespace form_builder.Validators.IntegrityChecks
             _lookupProviders = lookupProviders;
         }
 
-        public IntegrityCheckResult Validate(FormSchema schema)
+        public IntegrityCheckResult Validate(Models.FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
             var elements = schema.Pages
                 .SelectMany(page => page.Elements)
-                .Where(element => !string.IsNullOrEmpty(element.Lookup) && 
+                .Where(element => !string.IsNullOrEmpty(element.Lookup) &&
                        element.Lookup.Equals(LookUpConstants.Dynamic))
                 .ToList();
 
@@ -40,7 +40,7 @@ namespace form_builder.Validators.IntegrityChecks
                         if (!element.Properties.LookupSources
                             .Any(lookup => lookup.EnvironmentName
                             .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase)))
-                                integrityCheckResult.AddFailureMessage($"The provided json '{schema.FormName}' has no Environment details for this:({_environment.EnvironmentName}) Environment");
+                            integrityCheckResult.AddFailureMessage($"The provided json '{schema.FormName}' has no Environment details for this:({_environment.EnvironmentName}) Environment");
 
                         foreach (var env in element.Properties.LookupSources)
                         {
@@ -65,9 +65,9 @@ namespace form_builder.Validators.IntegrityChecks
                             if (string.IsNullOrEmpty(env.AuthToken))
                                 integrityCheckResult.AddFailureMessage($"The provided json '{schema.FormName}' has no auth token for the API");
 
-                           if (!_environment.IsEnvironment("local") &&
-                                !env.EnvironmentName.Equals("local", StringComparison.OrdinalIgnoreCase) &&
-                                !env.URL.StartsWith("https://"))
+                            if (!_environment.IsEnvironment("local") &&
+                                 !env.EnvironmentName.Equals("local", StringComparison.OrdinalIgnoreCase) &&
+                                 !env.URL.StartsWith("https://"))
                                 integrityCheckResult.AddFailureMessage($"SubmitUrl must start with https, in form {schema.FormName}");
                         }
                     }
@@ -81,6 +81,6 @@ namespace form_builder.Validators.IntegrityChecks
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
+        public async Task<IntegrityCheckResult> ValidateAsync(Models.FormSchema schema) => await Task.Run(() => Validate(schema));
     }
 }

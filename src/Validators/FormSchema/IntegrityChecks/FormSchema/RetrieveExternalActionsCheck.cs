@@ -15,7 +15,8 @@ namespace form_builder.Validators.IntegrityChecks.FormSchema
         public IntegrityCheckResult Validate(Models.FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
-            var actions = schema.FormActions.Where(formAction => formAction.Type.Equals(EActionType.RetrieveExternalData))
+            var actions = schema.FormActions
+                .Where(formAction => formAction.Type.Equals(EActionType.RetrieveExternalData))
                 .Concat(schema.Pages.SelectMany(page => page.PageActions)
                 .Where(pageAction => pageAction.Type == EActionType.RetrieveExternalData)).ToList();
 
