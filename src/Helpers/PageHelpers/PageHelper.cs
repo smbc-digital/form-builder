@@ -103,62 +103,6 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        public void ValidateDynamicLookUpObject(List<Page> pages, string formName)
-        {
-            var elements = pages
-                .SelectMany(page => page.Elements)
-                .Where(element => !string.IsNullOrEmpty(element.Lookup) &&
-                       element.Lookup.Equals(LookUpConstants.Dynamic))
-                .ToList();
-
-            if (elements.Any())
-            {
-                foreach (var element in elements)
-                {
-                    if (element.Properties.LookupSources != null)
-                    {
-                        if (!element.Properties.LookupSources
-                            .Any(lookup => lookup.EnvironmentName
-                            .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase)))
-                            throw new ApplicationException($"The provided json '{formName}' has no Environment details for this:({_environment.EnvironmentName}) Environment");
-
-                        foreach (var env in element.Properties.LookupSources)
-                        {
-                            if (string.IsNullOrEmpty(env.EnvironmentName))
-                                throw new ApplicationException($"The provided json '{formName}' has no Environment Name");
-
-                            if (string.IsNullOrEmpty(env.Provider))
-                                throw new ApplicationException($"The provided json '{formName}' has no Provider Name");
-
-                            try
-                            {
-                                _lookupProviders.Get(env.Provider);
-                            }
-                            catch (Exception e)
-                            {
-                                throw new ApplicationException($"The provided json '{formName}': No Lookup Provider Found {e.Message}.");
-                            }
-
-                            if (string.IsNullOrEmpty(env.URL))
-                                throw new ApplicationException($"The provided json '{formName}' has no API URL to submit to");
-
-                            if (string.IsNullOrEmpty(env.AuthToken))
-                                throw new ApplicationException($"The provided json '{formName}' has no auth token for the API");
-
-                            if (!_environment.IsEnvironment("local") &&
-                                !env.EnvironmentName.Equals("local", StringComparison.OrdinalIgnoreCase) &&
-                                !env.URL.StartsWith("https://"))
-                                throw new ApplicationException("SubmitUrl must start with https");
-                        }
-                    }
-                    else
-                    {
-                        throw new ApplicationException($"The provided json '{formName}' has no Lookup Object in Properties");
-                    }
-                }
-            }
-        }
-
         public async Task AddDynamicOptions(IElement element, FormAnswers formAnswers)
         {
             LookupSource submitDetails = element.Properties.LookupSources
