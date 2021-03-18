@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
@@ -12,12 +11,12 @@ namespace form_builder.Validators.IntegrityChecks
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
-            if (!schema.DocumentDownload) return IntegrityCheckResult.ValidResult;
+            if (!schema.DocumentDownload)
+                return IntegrityCheckResult.ValidResult;
 
-            if (schema.DocumentType.Any())
+            if (schema.DocumentType.Any() && schema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
             {
-                if (schema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
-                    integrityCheckResult.AddFailureMessage($"Document Download Check, Unknown document download type configured for form '{ schema.FormName }'");
+                integrityCheckResult.AddFailureMessage($"Document Download Check, Unknown document download type configured for form '{ schema.FormName }'");
             }
             else
             {

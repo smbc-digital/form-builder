@@ -295,7 +295,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddSingleton<IFormSchemaIntegrityCheck, SubmitSlugsHaveAllPropertiesCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ValidateActionCheck>();
-
+            
             services.AddSingleton<IFormSchemaIntegrityValidator,FormSchemaIntegrityValidator>();
 
             return services;

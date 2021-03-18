@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models;
+using form_builder.Models.Elements;
 using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Validators.IntegrityChecks
@@ -12,15 +14,14 @@ namespace form_builder.Validators.IntegrityChecks
     {
         private readonly IWebHostEnvironment _environment;
 
-        public BookingElementCheck(IWebHostEnvironment enviroment)
-        {
+        public BookingElementCheck(IWebHostEnvironment enviroment) =>
             _environment = enviroment;
-        }
 
         public IntegrityCheckResult Validate(FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
-            var bookingElements = schema.Pages.SelectMany(page => page.ValidatableElements)
+            
+            List<IElement> bookingElements = schema.Pages.SelectMany(page => page.ValidatableElements)
                 .Where(element => element.Type.Equals(EElementType.Booking))
                 .ToList();
 
@@ -31,7 +32,7 @@ namespace form_builder.Validators.IntegrityChecks
                     if (string.IsNullOrEmpty(booking.Properties.BookingProvider))
                         integrityCheckResult.AddFailureMessage($"Booking Element Check, Booking element '{booking.Properties.QuestionId}' requires a valid booking provider property on form {schema.FormName}.");
 
-                    var appointmentTypeForEnv = booking.Properties.AppointmentTypes.FirstOrDefault(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToLower()));
+                    AppointmentType appointmentTypeForEnv = booking.Properties.AppointmentTypes.FirstOrDefault(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToLower()));
 
                     if (appointmentTypeForEnv == null)
                     {
@@ -62,9 +63,7 @@ namespace form_builder.Validators.IntegrityChecks
                     .ToList();
 
                 if (additionalRequiredElements.Count != 2)
-                {
                     integrityCheckResult.AddFailureMessage($"Booking Element Check, Booking element requires customer firstname/lastname elements for reservation on form {schema.FormName}.");
-                }
             }
 
             return integrityCheckResult;

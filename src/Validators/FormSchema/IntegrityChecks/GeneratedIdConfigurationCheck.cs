@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Enum;
 using form_builder.Models;
 
 namespace form_builder.Validators.IntegrityChecks
@@ -12,11 +9,8 @@ namespace form_builder.Validators.IntegrityChecks
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
-            if (schema.GenerateReferenceNumber)
-            {
-                if (string.IsNullOrEmpty(schema.GeneratedReferenceNumberMapping) || string.IsNullOrEmpty(schema.ReferencePrefix))
+            if (schema.GenerateReferenceNumber && (string.IsNullOrEmpty(schema.GeneratedReferenceNumberMapping) || string.IsNullOrEmpty(schema.ReferencePrefix)))
                     integrityCheckResult.AddFailureMessage($"Generated Id Configuration Check, 'GeneratedReferenceNumberMapping' and 'ReferencePrefix' must both have a value in form {schema.FormName}");
-            }
 
             return integrityCheckResult;
         }

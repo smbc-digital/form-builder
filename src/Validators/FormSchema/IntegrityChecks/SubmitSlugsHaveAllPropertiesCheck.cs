@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Models;
@@ -13,20 +12,25 @@ namespace form_builder.Validators.IntegrityChecks
     {
         IWebHostEnvironment _environment;
 
-        public SubmitSlugsHaveAllPropertiesCheck(IWebHostEnvironment environment)
-        {
+        public SubmitSlugsHaveAllPropertiesCheck(IWebHostEnvironment environment) =>
             _environment= environment;
-        }
+
         public IntegrityCheckResult Validate(FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
-            IEnumerable<Behaviour> behaviours = schema.Pages.Where(page => page.Behaviours != null).SelectMany(page => page.Behaviours).ToList();
+
+            List<Behaviour> behaviours = schema.Pages
+                .Where(page => page.Behaviours != null)
+                .SelectMany(page => page.Behaviours)
+                .ToList();
             
             foreach (var item in behaviours)
             {
-                if (item.BehaviourType != EBehaviourType.SubmitForm && item.BehaviourType != EBehaviourType.SubmitAndPay) continue;
+                if (item.BehaviourType != EBehaviourType.SubmitForm && item.BehaviourType != EBehaviourType.SubmitAndPay)
+                    continue;
 
-                if (item.SubmitSlugs.Count <= 0) continue;
+                if (item.SubmitSlugs.Count <= 0)
+                    continue;
 
                 foreach (var submitSlug in item.SubmitSlugs)
                 {

@@ -4,29 +4,35 @@ using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Extensions;
 using Microsoft.AspNetCore.Hosting;
+using System.Collections.Generic;
 
 namespace form_builder.Validators.IntegrityChecks
 {
-    public class CurrentEnvironmentSubmitSlugsCheck: IFormSchemaIntegrityCheck
+    public class CurrentEnvironmentSubmitSlugsCheck : IFormSchemaIntegrityCheck
     {
         IWebHostEnvironment _environment;
-        public CurrentEnvironmentSubmitSlugsCheck(IWebHostEnvironment environment)
-        {
+        public CurrentEnvironmentSubmitSlugsCheck(IWebHostEnvironment environment) =>
             _environment= environment;
-        }
 
         public IntegrityCheckResult Validate(FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
-            var behaviours = schema.Pages.Where(page => page.Behaviours != null).SelectMany(page => page.Behaviours).ToList();
+
+            IEnumerable<Behaviour> behaviours = schema.Pages
+                .Where(page => page.Behaviours != null)
+                .SelectMany(page => page.Behaviours)
+                .ToList();
             
             foreach (var item in behaviours)
             {
-                if (item.BehaviourType != EBehaviourType.SubmitForm && item.BehaviourType != EBehaviourType.SubmitAndPay) continue;
+                if (item.BehaviourType != EBehaviourType.SubmitForm && item.BehaviourType != EBehaviourType.SubmitAndPay)
+                    continue;
 
-                if (item.SubmitSlugs.Count <= 0) continue;
+                if (item.SubmitSlugs.Count <= 0)
+                    continue;
 
-                var foundEnvironmentSubmitSlug = false;
+                bool foundEnvironmentSubmitSlug = false;
+
                 foreach (var subItem in item.SubmitSlugs.Where(subItem => subItem.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower())))
                     foundEnvironmentSubmitSlug = true;
 

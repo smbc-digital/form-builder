@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using form_builder.Enum;
 using form_builder.Models;
 
 namespace form_builder.Validators.IntegrityChecks
@@ -13,7 +11,8 @@ namespace form_builder.Validators.IntegrityChecks
         public IntegrityCheckResult Validate(FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
-            var questionIds = schema.Pages.Where(_ => _.Elements != null)
+            
+            List<string> questionIds = schema.Pages.Where(_ => _.Elements != null)
                 .SelectMany(_ => _.ValidatableElements)
                 .Select(_ => string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping)
                 .ToList();
@@ -21,6 +20,7 @@ namespace form_builder.Validators.IntegrityChecks
             questionIds.ForEach(questionId =>
             {
                 var regex = new Regex(@"^[a-zA-Z.]+$", RegexOptions.IgnoreCase);
+
                 if ((!regex.IsMatch(questionId.ToString()))
                     || questionId.ToString().EndsWith(".") 
                     || questionId.ToString().StartsWith("."))

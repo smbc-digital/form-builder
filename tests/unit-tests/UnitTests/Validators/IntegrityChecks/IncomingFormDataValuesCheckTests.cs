@@ -46,7 +46,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             // Act & Assert
             var result = check.Validate(schema);
             Assert.False(result.IsValid);
-            Assert.True(result.Messages.Any(_ => _.Equals($"FAILURE - Incoming Form DataValues Check, QuestionId or Name cannot be empty on page 'test-page' in form 'test-form'")));
+            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - Incoming Form DataValues Check, QuestionId or Name cannot be empty on page 'test-page' in form 'test-form'"));
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             // Act & Assert
             var result = check.Validate(schema);
             Assert.False(result.IsValid);
-            Assert.True(result.Messages.Any(_ => _.Equals($"FAILURE - Incoming Form DataValues Check, EHttpActionType cannot be unknown, set to Get or Post for incoming value 'test-value' on page 'test-page' in form 'test-form'")));
+            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - Incoming Form DataValues Check, EHttpActionType cannot be unknown, set to Get or Post for incoming value 'test-value' on page 'test-page' in form 'test-form'"));
         }
     }
 }

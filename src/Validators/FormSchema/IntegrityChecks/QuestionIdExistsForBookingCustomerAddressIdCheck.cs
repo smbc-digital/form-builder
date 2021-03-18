@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Models;
+using form_builder.Models.Elements;
 
 namespace form_builder.Validators.IntegrityChecks
 {
@@ -11,9 +12,11 @@ namespace form_builder.Validators.IntegrityChecks
         public IntegrityCheckResult Validate(FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
-            var bookingElements = schema.Pages.SelectMany(_ => _.Elements)
-                                    .Where(_ => _.Type.Equals(EElementType.Booking))
-                                    .ToList();
+
+            List<IElement> bookingElements = schema.Pages
+                .SelectMany(_ => _.Elements)
+                .Where(_ => _.Type.Equals(EElementType.Booking))
+                .ToList();
 
             if (bookingElements.Count > 0)
             {

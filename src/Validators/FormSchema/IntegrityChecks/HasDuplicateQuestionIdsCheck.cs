@@ -12,6 +12,7 @@ namespace form_builder.Validators.IntegrityChecks
         {
             var integrityCheckResult = new IntegrityCheckResult();
             var questionIds = new List<string>();
+
             foreach (var page in schema.Pages)
             {
                 foreach (var element in page.Elements)
@@ -32,8 +33,7 @@ namespace form_builder.Validators.IntegrityChecks
                         && element.Type != EElementType.HR
                         && element.Type != EElementType.UploadedFilesSummary
                         && element.Type != EElementType.Warning
-                        && element.Type != EElementType.Link
-                        )
+                        && element.Type != EElementType.Link)
                     {
                         questionIds.Add(element.Properties.QuestionId);
                     }
@@ -41,6 +41,7 @@ namespace form_builder.Validators.IntegrityChecks
             }
 
             var hashSet = new HashSet<string>();
+            
             if (questionIds.Any(id => !hashSet.Add(id)))
                 integrityCheckResult.AddFailureMessage($"The provided json '{schema.FormName}' has duplicate QuestionIDs");
             

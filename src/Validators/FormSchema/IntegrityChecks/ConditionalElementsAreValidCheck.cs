@@ -1,27 +1,26 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Models;
+using form_builder.Models.Elements;
 
 namespace form_builder.Validators.IntegrityChecks
 {
-    
-    
-    public class ConditionalElementsAreValidCheck: IFormSchemaIntegrityCheck
+    public class ConditionalElementsAreValidCheck : IFormSchemaIntegrityCheck
     {
         public IntegrityCheckResult Validate(FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
-            var radioWithConditionals = schema.Pages.Where(page => page.Elements != null)
+            List<IElement> radioWithConditionals = schema.Pages.Where(page => page.Elements != null)
                 .SelectMany(page => page.ValidatableElements)
                 .Where(element => element.Type == EElementType.Radio)
                 .Where(element => element.Properties.Options.Any(_ => _.HasConditionalElement))
                 .ToList();
 
-            var conditionalElements = schema.Pages.Where(page => page.Elements != null)
+            List<IElement> conditionalElements = schema.Pages.Where(page => page.Elements != null)
                 .SelectMany(page => page.Elements)
                 .Where(element => element.Properties.isConditionalElement)
                 .ToList();

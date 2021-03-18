@@ -28,8 +28,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
         [InlineData("www.url.com", "questionId", "test",
             "FAILURE - Retrieve External Data Action, there is no PageActionSlug for environment 'local'")]
         public void
-        CheckRetrieveExternalDataAction_ShouldThrowException_WhenActionDoesNotContain_URL_or_TargetQuestionId(
-                string url, string questionId, string env, string message)
+        CheckRetrieveExternalDataAction_ShouldThrowException_WhenActionDoesNotContain_URL_or_TargetQuestionId(string url, string questionId, string env, string message)
         {
             // Arrange
             var action = new ActionBuilder()
@@ -51,7 +50,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             // Act & Assert
             var result = check.Validate(schema);
             Assert.False(result.IsValid);
-            Assert.True(result.Messages.Any(_ => _.Equals(message)));
+            Assert.Contains(result.Messages, m => m.Equals(message));
         }
     }
 }

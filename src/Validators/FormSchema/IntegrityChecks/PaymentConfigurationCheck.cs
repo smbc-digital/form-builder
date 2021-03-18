@@ -27,23 +27,22 @@ namespace form_builder.Validators.IntegrityChecks
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
-        public IntegrityCheckResult Validate(FormSchema schema)
-        {
-            return ValidateAsync(schema).Result;
-        }
+        public IntegrityCheckResult Validate(FormSchema schema) =>
+            ValidateAsync(schema).Result;
 
         public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
-            var containsPayment = schema.Pages.Where(x => x.Behaviours != null)
+
+            bool containsPayment = schema.Pages.Where(x => x.Behaviours != null)
                 .SelectMany(x => x.Behaviours)
                 .Any(x => x.BehaviourType == EBehaviourType.SubmitAndPay);
 
             if (!containsPayment)
                 return IntegrityCheckResult.ValidResult;
 
-            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_environment.EnvironmentName}", _distributedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
-            var formPaymentInformation = paymentInformation.FirstOrDefault(payment => payment.FormName == schema.BaseURL);
+            List<PaymentInformation> paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_environment.EnvironmentName}", _distributedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
+            PaymentInformation formPaymentInformation = paymentInformation.FirstOrDefault(payment => payment.FormName == schema.BaseURL);
 
             if (formPaymentInformation == null)
             {

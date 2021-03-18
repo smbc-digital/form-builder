@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models;
+using form_builder.Models.Actions;
+using form_builder.Models.Properties.ActionProperties;
 using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Validators.IntegrityChecks
@@ -12,24 +14,26 @@ namespace form_builder.Validators.IntegrityChecks
     {
         private readonly IWebHostEnvironment _environment;
 
-        public ValidateActionCheck(IWebHostEnvironment enviroment)
-        {
+        public ValidateActionCheck(IWebHostEnvironment enviroment) =>
             _environment = enviroment;
-        }
 
         public IntegrityCheckResult Validate(FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
-            var actions = schema.FormActions.Where(formAction => formAction.Type.Equals(EActionType.Validate))
+
+            List<IAction> actions = schema.FormActions
+                .Where(formAction => formAction.Type.Equals(EActionType.Validate))
                 .Concat(schema.Pages.SelectMany(page => page.PageActions)
-                .Where(action => action.Type == EActionType.Validate)).ToList();
+                .Where(action => action.Type == EActionType.Validate))
+                .ToList();
 
             if (!actions.Any())
                 return IntegrityCheckResult.ValidResult;
 
             actions.ForEach(action =>
             {
-                var slug = action.Properties.PageActionSlugs.FirstOrDefault(slug => slug.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+                PageActionSlug slug = action.Properties.PageActionSlugs.FirstOrDefault(slug => slug.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+
                 if (slug == null)
                     integrityCheckResult.AddFailureMessage($"Validate Action Check, Validate there is no PageActionSlug for {_environment.EnvironmentName}");
 

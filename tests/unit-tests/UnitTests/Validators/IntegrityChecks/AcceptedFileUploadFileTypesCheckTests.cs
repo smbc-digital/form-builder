@@ -79,7 +79,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Act & Assert
             Assert.False(result.IsValid);
-            Assert.True(result.Messages.Any(_ => _.Equals($"FAILURE - Accepted FileUpload File Types Check, Allowed file type in FileUpload element in form 'test-name', 'fileUpload2' must have a valid extension which begins with a '.', e.g. .png")));
+            Assert.Contains(result.Messages, messages => messages.Equals($"FAILURE - Accepted FileUpload File Types Check, Allowed file type in FileUpload element in form 'test-name', 'fileUpload2' must have a valid extension which begins with a '.', e.g. .png"));
         }
 
         [Fact]

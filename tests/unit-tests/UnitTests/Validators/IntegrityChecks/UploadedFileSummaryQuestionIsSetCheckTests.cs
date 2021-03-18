@@ -38,7 +38,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.True(result.Messages.Any(_ => _.Equals($"FAILURE - Uploaded Files Summary Question Is Set, Uploaded files summary must have atleast one file questionId specified to display the list of uploaded files.")));
+            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - Uploaded Files Summary Question Is Set, Uploaded files summary must have atleast one file questionId specified to display the list of uploaded files."));
         }
 
         [Fact]
@@ -68,7 +68,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.True(result.Messages.Any(_ => _.Equals($"FAILURE - Uploaded Files Summary Question Is Set, Uploaded files summary text must not be empty.")));
+            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - Uploaded Files Summary Question Is Set, Uploaded files summary text must not be empty."));
         }
 
         [Fact]

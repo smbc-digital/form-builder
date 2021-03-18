@@ -41,7 +41,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.True(result.Messages.Any(_ => _.Equals($"FAILURE - Render Conditions Valid Check, More than one {page.PageSlug} page has no render conditions")));
+            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - Render Conditions Valid Check, More than one {page.PageSlug} page has no render conditions"));
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.True(result.Messages.Any(_ => _.Equals($"FAILURE - Render Conditions Valid Check, More than one {page.PageSlug} page has no render conditions")));
+            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - Render Conditions Valid Check, More than one {page.PageSlug} page has no render conditions"));
         }
 
         [Fact]
@@ -126,7 +126,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.True(result.Messages.Any(_ => _.Equals($"FAILURE - Render Conditions Valid Check, More than one {page.PageSlug} page has no render conditions")));
+            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - Render Conditions Valid Check, More than one {page.PageSlug} page has no render conditions"));
         }
 
         [Fact]

@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models;
+using form_builder.Models.Actions;
+using form_builder.Models.Properties.ActionProperties;
 using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Validators.IntegrityChecks
@@ -12,15 +14,15 @@ namespace form_builder.Validators.IntegrityChecks
     {
         private readonly IWebHostEnvironment _environment;
 
-        public RetrieveExternalActionsCheck(IWebHostEnvironment enviroment)
-        {
+        public RetrieveExternalActionsCheck(IWebHostEnvironment enviroment) =>
             _environment = enviroment;
-        }
 
         public IntegrityCheckResult Validate(FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
-            var actions = schema.FormActions.Where(formAction => formAction.Type.Equals(EActionType.RetrieveExternalData))
+            
+            List<IAction> actions = schema.FormActions
+                .Where(formAction => formAction.Type.Equals(EActionType.RetrieveExternalData))
                 .Concat(schema.Pages.SelectMany(page => page.PageActions)
                 .Where(pageAction => pageAction.Type == EActionType.RetrieveExternalData)).ToList();
 
@@ -29,12 +31,14 @@ namespace form_builder.Validators.IntegrityChecks
 
             actions.ForEach(action =>
             {
-                var slug = action.Properties.PageActionSlugs.FirstOrDefault(slugs => slugs.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+                PageActionSlug slug = action.Properties.PageActionSlugs.FirstOrDefault(slugs => slugs.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+
                 if (slug == null)
                 {
                     integrityCheckResult.AddFailureMessage($"Retrieve External Data Action, there is no PageActionSlug for environment '{_environment.EnvironmentName}'");
                 }
-                else{
+                else
+                {
                     if (string.IsNullOrEmpty(slug.URL))
                         integrityCheckResult.AddFailureMessage("Retrieve External Data Action, action type does not contain a url");
                 }

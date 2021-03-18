@@ -35,7 +35,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             var result = check.Validate(schema);
 
             Assert.False(result.IsValid);
-            Assert.True(result.Messages.Any(_ => _.Equals(message)));
+            Assert.Contains(result.Messages, m => m.Equals(message));
         }
     }
 }

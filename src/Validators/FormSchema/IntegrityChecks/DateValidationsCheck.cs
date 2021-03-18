@@ -1,18 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using form_builder.Enum;
 using form_builder.Models;
+using form_builder.Models.Elements;
 
 namespace form_builder.Validators.IntegrityChecks
 {
-    public class DateValidationsCheck: IFormSchemaIntegrityCheck
+    public class DateValidationsCheck : IFormSchemaIntegrityCheck
     {
         public IntegrityCheckResult Validate(FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
-            var elements = schema.Pages.SelectMany(element => element.ValidatableElements);
+            IEnumerable<IElement> elements = schema.Pages.SelectMany(element => element.ValidatableElements);
 
             elements.Where(element => !string.IsNullOrEmpty(element.Properties.IsDateAfter))
                 .ToList()

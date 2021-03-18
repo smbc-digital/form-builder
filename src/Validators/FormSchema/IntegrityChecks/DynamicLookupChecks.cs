@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
 using form_builder.Providers.Lookup;
 using form_builder.Extensions;
+using form_builder.Models.Elements;
 
 namespace form_builder.Validators.IntegrityChecks
 {
@@ -25,7 +26,7 @@ namespace form_builder.Validators.IntegrityChecks
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
-            var elements = schema.Pages
+            List<IElement> elements = schema.Pages
                 .SelectMany(page => page.Elements)
                 .Where(element => !string.IsNullOrEmpty(element.Lookup) && 
                        element.Lookup.Equals(LookUpConstants.Dynamic))
@@ -65,7 +66,7 @@ namespace form_builder.Validators.IntegrityChecks
                             if (string.IsNullOrEmpty(env.AuthToken))
                                 integrityCheckResult.AddFailureMessage($"The provided json '{schema.FormName}' has no auth token for the API");
 
-                           if (!_environment.IsEnvironment("local") &&
+                            if (!_environment.IsEnvironment("local") &&
                                 !env.EnvironmentName.Equals("local", StringComparison.OrdinalIgnoreCase) &&
                                 !env.URL.StartsWith("https://"))
                                 integrityCheckResult.AddFailureMessage($"SubmitUrl must start with https, in form {schema.FormName}");
