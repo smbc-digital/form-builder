@@ -1,23 +1,18 @@
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Extensions;
-using form_builder.Models;
 using Microsoft.AspNetCore.Hosting;
 
-namespace form_builder.Validators.IntegrityChecks.Page
+namespace form_builder.Validators.IntegrityChecks.FormSchema
 {
-    public class RetrieveExternalActionsCheck: IPageSchemaIntegrityCheck
+    public class RetrieveExternalActionsCheck : IFormSchemaIntegrityCheck
     {
         private readonly IWebHostEnvironment _environment;
 
-        public RetrieveExternalActionsCheck(IWebHostEnvironment enviroment)
-        {
-            _environment = enviroment;
-        }
+        public RetrieveExternalActionsCheck(IWebHostEnvironment enviroment) => _environment = enviroment;
 
-        public IntegrityCheckResult Validate(Models.Page page)
+        public IntegrityCheckResult Validate(Models.FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
             var actions = schema.FormActions.Where(formAction => formAction.Type.Equals(EActionType.RetrieveExternalData))
@@ -46,6 +41,6 @@ namespace form_builder.Validators.IntegrityChecks.Page
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(Models.Page page) => await Task.Run(() => Validate(page));
+        public async Task<IntegrityCheckResult> ValidateAsync(Models.FormSchema schema) => await Task.Run(() => Validate(schema));
     }
 }

@@ -19,7 +19,10 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
         private IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
-        public PaymentConfigurationCheck(IWebHostEnvironment environment, ICache cache, IEnumerable<IPaymentProvider> paymentProviders, IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
+        public PaymentConfigurationCheck(
+            IWebHostEnvironment environment,
+            ICache cache, IEnumerable<IPaymentProvider> paymentProviders,
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
             _environment= environment;
             _cache = cache;
@@ -27,17 +30,18 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
-        public IntegrityCheckResult Validate(Behaviour behaviour)
+        public IntegrityCheckResult Validate(List<Behaviour> behaviours, string formName)
         {
-            return ValidateAsync(schema).Result;
+            return ValidateAsync(behaviours, formName).Result;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(Behaviour behaviour)
+        public async Task<IntegrityCheckResult> ValidateAsync(List<Behaviour> behaviours, string formName)
         {
             var integrityCheckResult = new IntegrityCheckResult();
+
             var containsPayment = schema.Pages.Where(x => x.Behaviours != null)
                 .SelectMany(x => x.Behaviours)
-                .Any(x => x.BehaviourType == EBehaviourType.SubmitAndPay);
+                .Any(x => );
 
             if (!containsPayment)
                 return IntegrityCheckResult.ValidResult;
@@ -47,7 +51,7 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
 
             if (formPaymentInformation == null)
             {
-                integrityCheckResult.AddFailureMessage($"No payment information configured for '{schema.FormName}' form");
+                integrityCheckResult.AddFailureMessage($"No payment information configured for '{formName}' form");
             }
             else
             {

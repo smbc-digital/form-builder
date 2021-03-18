@@ -16,20 +16,17 @@ namespace form_builder.Validators
     public class FormSchemaIntegrityValidator : IFormSchemaIntegrityValidator
     {
         IEnumerable<IFormSchemaIntegrityCheck> _formSchemaIntegrityChecks;
-        IEnumerable<IPageSchemaIntegrityCheck> _pageSchemaIntegrityChecks;
         IEnumerable<IBehaviourSchemaIntegrityCheck> _behaviorSchemaIntegrityChecks;
         IEnumerable<IElementSchemaIntegrityCheck> _elementSchemaIntegrityChecks;
         IEnumerable<IPropertySchemaIntegrityCheck> _propertySchemaIntegrityChecks;
 
         public FormSchemaIntegrityValidator(
             IEnumerable<IFormSchemaIntegrityCheck> formSchemaIntegrityChecks,
-            IEnumerable<IPageSchemaIntegrityCheck> pageSchemaIntegrityChecks,
             IEnumerable<IBehaviourSchemaIntegrityCheck> behaviorSchemaIntegrityChecks,
             IEnumerable<IElementSchemaIntegrityCheck> elementSchemaIntegrityChecks,
             IEnumerable<IPropertySchemaIntegrityCheck> propertySchemaIntegrityChecks)
         {
             _formSchemaIntegrityChecks = formSchemaIntegrityChecks;
-            _pageSchemaIntegrityChecks = pageSchemaIntegrityChecks;
             _behaviorSchemaIntegrityChecks = behaviorSchemaIntegrityChecks;
             _elementSchemaIntegrityChecks = elementSchemaIntegrityChecks;
             _propertySchemaIntegrityChecks = propertySchemaIntegrityChecks;
@@ -47,30 +44,11 @@ namespace form_builder.Validators
 
             foreach (var page in schema.Pages)
             {
-                // Page : 
-                foreach (var integrityCheck in _pageSchemaIntegrityChecks)
-                {
-                    integrityCheckResults.Add(await integrityCheck.ValidateAsync(page));
-                }
-
-
                 if (page.Behaviours != null)
                 {
-                    // Page Behaviours : 
-                    foreach (var behaviour in page.Behaviours)
+                    foreach (var integrityCheck in _behaviorSchemaIntegrityChecks)
                     {
-                        if (behaviour.BehaviourType.Equals(EBehaviourType.SubmitForm) ||
-                            behaviour.BehaviourType.Equals(EBehaviourType.SubmitAndPay))
-                        {
-                            foreach (var integrityCheck in _behaviorSchemaIntegrityChecks)
-                            {
-                                integrityCheckResults.Add(await integrityCheck.ValidateAsync(behaviour));
-                            }
-                        }
-                        else
-                        {
-
-                        }
+                        integrityCheckResults.Add(await integrityCheck.ValidateAsync(page.Behaviours, schema.FormName));
                     }
 
                     // Page Elements : 
@@ -84,9 +62,6 @@ namespace form_builder.Validators
                         {
                             integrityCheckResults.Add(await integrityCheck.ValidateAsync(element, form));
                         }
-
-                        // Page Element Properties
-
                     }
                 }
             }

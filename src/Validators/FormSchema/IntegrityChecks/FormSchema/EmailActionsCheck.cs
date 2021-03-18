@@ -2,11 +2,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
 
-namespace form_builder.Validators.IntegrityChecks.Page
+namespace form_builder.Validators.IntegrityChecks.FormSchema
 {
-    public class EmailActionsCheck: IPageSchemaIntegrityCheck
+    public class EmailActionsCheck : IFormSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(Models.Page page)
+        public IntegrityCheckResult Validate(Models.FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
@@ -41,6 +41,6 @@ namespace form_builder.Validators.IntegrityChecks.Page
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(Models.Page page) => await Task.Run(() => Validate(schema));
+        public async Task<IntegrityCheckResult> ValidateAsync(Models.FormSchema schema) => await Task.Run(() => Validate(schema));
     }
 }
