@@ -306,6 +306,12 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddSingleton<IFormSchemaIntegrityCheck, AnyConditionTypeCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementsAreValidCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, DateValidationsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, DocumentDownloadCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, DynamicLookupCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, EmailActionsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, GeneratedIdConfigurationCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, IncomingFormDataValuesCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, RenderConditionsValidCheck>();
 

@@ -46,7 +46,7 @@ namespace form_builder.Validators
                 {
                     foreach (var integrityCheck in _behaviorSchemaIntegrityChecks)
                     {
-                        integrityCheckResults.Add(await integrityCheck.ValidateAsync(page.Behaviours, schema.FormName));
+                        integrityCheckResults.Add(await integrityCheck.ValidateAsync(page.Behaviours));
                     }
 
                     // Page Elements : 
@@ -58,7 +58,7 @@ namespace form_builder.Validators
                         // Page Element
                         foreach (var integrityCheck in _elementSchemaIntegrityChecks)
                         {
-                            integrityCheckResults.Add(await integrityCheck.ValidateAsync(element, form));
+                            integrityCheckResults.Add(await integrityCheck.ValidateAsync(element));
                         }
                     }
                 }

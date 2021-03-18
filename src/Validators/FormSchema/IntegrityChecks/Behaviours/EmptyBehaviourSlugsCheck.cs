@@ -6,7 +6,7 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
 {
     public class EmptyBehaviourSlugsCheck: IBehaviourSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(List<Behaviour> behaviours, string formName)
+        public IntegrityCheckResult Validate(List<Behaviour> behaviours)
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
@@ -18,6 +18,6 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
             return integrityCheckResult;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(List<Behaviour> behaviours, string formName) => await Task.Run(() => Validate(behaviour, formName));
+        public async Task<IntegrityCheckResult> ValidateAsync(List<Behaviour> behaviours) => await Task.Run(() => Validate(behaviour));
     }
 }
