@@ -208,23 +208,15 @@ namespace form_builder.Builders
             return this;
         }
 
-        public ElementBuilder WithAppointmentType(Guid value)
+        public ElementBuilder WithAppointmentType(AppointmentType value)
         {
-            _property.AppointmentType = value;
+            if (_property.AppointmentTypes == null)
+                _property.AppointmentTypes = new List<AppointmentType>();
+
+            _property.AppointmentTypes.Add(value);
 
             return this;
         }
-
-        public ElementBuilder WithBookingResource(BookingResource value)
-        {
-            if (_property.OptionalResources == null)
-                _property.OptionalResources = new List<BookingResource>();
-
-            _property.OptionalResources.Add(value);
-
-            return this;
-        }
-
 
         public ElementBuilder WithNumeric(bool value)
         {

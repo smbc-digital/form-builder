@@ -13,6 +13,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -27,17 +28,20 @@ namespace form_builder.Services.MappingService
         private readonly IElementMapper _elementMapper;
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
+        private readonly IWebHostEnvironment _environment;
         private ILogger<MappingService> _logger;
 
         public MappingService(IDistributedCacheWrapper distributedCache,
             IElementMapper elementMapper,
             ISchemaFactory schemaFactory,
+            IWebHostEnvironment environment,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ILogger<MappingService> logger)
         {
             _distributedCache = distributedCache;
             _elementMapper = elementMapper;
             _schemaFactory = schemaFactory;
+            _environment = environment;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _logger = logger;
         }
@@ -58,12 +62,14 @@ namespace form_builder.Services.MappingService
         {
             var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
             
+            var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+
             return new BookingRequest
             {
-                AppointmentId = bookingElement.Properties.AppointmentType,
+                AppointmentId = appointmentType.AppointmentId,
                 Customer = GetCustomerBookingDetails(convertedAnswers, baseForm, bookingElement),
                 StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form),
-                OptionalResources = bookingElement.Properties.OptionalResources
+                OptionalResources = appointmentType.OptionalResources
             };
         }
 

@@ -4,12 +4,20 @@ using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models;
+using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Validators.IntegrityChecks.Elements
 {
     public class BookingElementCheck: IElementSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(IElement element)
+        private readonly IWebHostEnvironment _environment;
+        
+        public BookingElementCheck(IWebHostEnvironment enviroment)
+        {
+            _environment = enviroment;
+        }
+
+        public IntegrityCheckResult Validate(FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
             var bookingElements = schema.Pages.SelectMany(page => page.ValidatableElements)
@@ -23,12 +31,14 @@ namespace form_builder.Validators.IntegrityChecks.Elements
                     if (string.IsNullOrEmpty(booking.Properties.BookingProvider))
                         integrityCheckResult.AddFailureMessage($"Booking Element Check, Booking element '{booking.Properties.QuestionId}' requires a valid booking provider property on form {schema.FormName}.");
 
-                    if (booking.Properties.AppointmentType == Guid.Empty)
-                        integrityCheckResult.AddFailureMessage($"Booking Element Check, Booking element '{booking.Properties.QuestionId}' requires a AppointmentType property on form {schema.FormName}.");
+                    var appointmentTypeForEnv = booking.Properties.AppointmentTypes.FirstOrDefault(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToLower()));
 
-                    if (booking.Properties.OptionalResources.Any())
+                    if (appointmentTypeForEnv == null)
+                        throw new ApplicationException("Booking Element Check, No appointment type found for current environment or empty AppointmentID");
+
+                    if (appointmentTypeForEnv.OptionalResources.Any())
                     {
-                        booking.Properties.OptionalResources.ForEach(resource =>
+                        appointmentTypeForEnv.OptionalResources.ForEach(resource =>
                         {
                             if (resource.Quantity <= 0)
                                 integrityCheckResult.AddFailureMessage($"Booking Element Check, Booking element '{booking.Properties.QuestionId}', optional resources are invalid, cannot have a quantity less than 0 on form {schema.FormName}.");
