@@ -77,7 +77,6 @@ using form_builder.Validators.IntegrityChecks.FormSchema;
 using form_builder.Validators.IntegrityChecks.Page;
 using form_builder.Validators.IntegrityChecks.Behaviours;
 using form_builder.Validators.IntegrityChecks.Elements;
-using IElementSchemaIntegrityCheck = form_builder.Validators.IntegrityChecks.Elements.IElementSchemaIntegrityCheck;
 using form_builder.Providers.Lookup;
 
 namespace form_builder.Utils.ServiceCollectionExtensions
