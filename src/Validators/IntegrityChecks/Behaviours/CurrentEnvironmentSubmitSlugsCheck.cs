@@ -20,7 +20,9 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
 
             foreach (var behaviour in behaviours)
             {
-                if (!behaviour.SubmitSlugs.Any(submitSlug => submitSlug.Environment
+                if (behaviour.SubmitSlugs is not null && 
+                    !behaviour.SubmitSlugs
+                    .Any(submitSlug => submitSlug.Environment
                     .Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase)))
                 {
                     result.AddFailureMessage($"No SubmitSlug found for environment '{_environment.EnvironmentName}'.");
