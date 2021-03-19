@@ -52,7 +52,6 @@ namespace form_builder.Services.PageService
         private readonly IPageFactory _pageContentFactory;
         private readonly IIncomingDataHelper _incomingDataHelper;
         private readonly IActionsWorkflow _actionsWorkflow;
-        private readonly IFormSchemaIntegrityValidator _formSchemaIntegrityValidator;
 
         public PageService(
             IEnumerable<IElementValidator> validators,
@@ -141,8 +140,6 @@ namespace form_builder.Services.PageService
             var page = baseForm.GetPage(_pageHelper, path);
             if (page == null)
                 throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
-
-            // await baseForm.ValidateFormSchema(_pageHelper, form, path);
 
             List<object> searchResults = null;
             if (subPath.Equals(LookUpConstants.Automatic) || subPath.Equals(LookUpConstants.Manual))

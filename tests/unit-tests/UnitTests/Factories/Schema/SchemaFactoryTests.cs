@@ -31,10 +31,11 @@ namespace form_builder_tests.UnitTests.Factories.Schema
         private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
         private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new Mock<IFormSchemaIntegrityValidator>();
 
-
         public SchemaFactoryTests()
         {
-            _mockConfiguration.Setup(_ => _["ApplicationVersion"]).Returns("v2");
+            _mockConfiguration
+                .Setup(_ => _["ApplicationVersion"])
+                .Returns("v2");
 
             _mockDistributedCacheExpirationConfiguration
                 .Setup(_ => _.Value)

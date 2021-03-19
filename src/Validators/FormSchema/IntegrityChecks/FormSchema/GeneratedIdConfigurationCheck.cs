@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using form_builder.Models;
 
 namespace form_builder.Validators.IntegrityChecks.FormSchema
 {
@@ -8,11 +9,8 @@ namespace form_builder.Validators.IntegrityChecks.FormSchema
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
-            if (schema.GenerateReferenceNumber)
-            {
-                if (string.IsNullOrEmpty(schema.GeneratedReferenceNumberMapping) || string.IsNullOrEmpty(schema.ReferencePrefix))
-                    integrityCheckResult.AddFailureMessage($"Generated Id Configuration Check, 'GeneratedReferenceNumberMapping' and 'ReferencePrefix' must both have a value.");
-            }
+            if (schema.GenerateReferenceNumber && (string.IsNullOrEmpty(schema.GeneratedReferenceNumberMapping) || string.IsNullOrEmpty(schema.ReferencePrefix)))
+                    integrityCheckResult.AddFailureMessage($"Generated Id Configuration Check, 'GeneratedReferenceNumberMapping' and 'ReferencePrefix' must both have a value in form {schema.FormName}");
 
             return integrityCheckResult;
         }

@@ -9,7 +9,10 @@ namespace form_builder.Validators.IntegrityChecks
         public IntegrityCheckResult Validate(Models.FormSchema schema)
         {
             var integrityCheckResult = new IntegrityCheckResult();
-            var groups = schema.Pages.GroupBy(page => page.PageSlug, (key, g) => new { Slug = key, Pages = g.ToList() });
+            
+            var groups = schema.Pages
+                .GroupBy(page => page.PageSlug, (key, g) => new { Slug = key, Pages = g.ToList() });
+
             foreach (var group in groups)
             {
                 if (group.Pages.Count(page => !page.HasRenderConditions) > 1)

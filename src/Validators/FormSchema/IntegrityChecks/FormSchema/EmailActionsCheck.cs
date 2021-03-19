@@ -1,6 +1,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
+using form_builder.Models;
+using form_builder.Models.Actions;
 
 namespace form_builder.Validators.IntegrityChecks.FormSchema
 {
@@ -10,15 +12,21 @@ namespace form_builder.Validators.IntegrityChecks.FormSchema
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
-            var userEmail = schema.FormActions.Where(_ => _.Type.Equals(EActionType.UserEmail))
+            List<IAction> userEmail = schema.FormActions
+                .Where(_ => _.Type.Equals(EActionType.UserEmail))
                 .Concat(schema.Pages.SelectMany(_ => _.PageActions)
-                .Where(_ => _.Type == EActionType.UserEmail)).ToList();
+                .Where(_ => _.Type == EActionType.UserEmail))
+                .ToList();
 
-            var backOfficeEmail = schema.FormActions.Where(_ => _.Type.Equals(EActionType.BackOfficeEmail))
+            List<IAction> backOfficeEmail = schema.FormActions
+                .Where(_ => _.Type.Equals(EActionType.BackOfficeEmail))
                 .Concat(schema.Pages.SelectMany(_ => _.PageActions)
-                .Where(_ => _.Type == EActionType.BackOfficeEmail)).ToList();
+                .Where(_ => _.Type == EActionType.BackOfficeEmail))
+                .ToList();
 
-            var actions = userEmail.Concat(backOfficeEmail).ToList();
+            List<IAction> actions = userEmail
+                .Concat(backOfficeEmail)
+                .ToList();
 
             if (actions.Any())
             {

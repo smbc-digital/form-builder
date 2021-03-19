@@ -25,7 +25,7 @@ namespace form_builder.Validators.IntegrityChecks
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
-            var elements = schema.Pages
+            List<IElement> elements = schema.Pages
                 .SelectMany(page => page.Elements)
                 .Where(element => !string.IsNullOrEmpty(element.Lookup) &&
                        element.Lookup.Equals(LookUpConstants.Dynamic))

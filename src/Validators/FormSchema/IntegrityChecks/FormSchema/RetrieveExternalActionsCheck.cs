@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
@@ -25,12 +26,14 @@ namespace form_builder.Validators.IntegrityChecks.FormSchema
 
             actions.ForEach(action =>
             {
-                var slug = action.Properties.PageActionSlugs.FirstOrDefault(slugs => slugs.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+                PageActionSlug slug = action.Properties.PageActionSlugs.FirstOrDefault(slugs => slugs.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+
                 if (slug == null)
                 {
                     integrityCheckResult.AddFailureMessage($"Retrieve External Data Action, there is no PageActionSlug for environment '{_environment.EnvironmentName}'");
                 }
-                else{
+                else
+                {
                     if (string.IsNullOrEmpty(slug.URL))
                         integrityCheckResult.AddFailureMessage("Retrieve External Data Action, action type does not contain a url");
                 }

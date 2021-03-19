@@ -31,7 +31,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             var result = check.Validate(schema);
 
             Assert.False(result.IsValid);
-            Assert.True(result.Messages.Any(_ => _.Equals("FAILURE - Empty Behaviour Slugs Check, Incorrectly configured behaviour slug was discovered in 'test-name' form")));
+            Assert.Contains(result.Messages, message => message.Equals("FAILURE - Empty Behaviour Slugs Check, Incorrectly configured behaviour slug was discovered in 'test-name' form"));
         }
 
         [Fact]

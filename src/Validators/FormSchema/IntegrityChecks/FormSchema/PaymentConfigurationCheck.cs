@@ -46,8 +46,8 @@ namespace form_builder.Validators.IntegrityChecks.FormSchema
             if (!containsPayment)
                 return IntegrityCheckResult.ValidResult;
 
-            var paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_environment.EnvironmentName}", _distributedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
-            var formPaymentInformation = paymentInformation.FirstOrDefault(payment => payment.FormName == schema.BaseURL);
+            List<PaymentInformation> paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_environment.EnvironmentName}", _distributedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
+            PaymentInformation formPaymentInformation = paymentInformation.FirstOrDefault(payment => payment.FormName == schema.BaseURL);
 
             if (formPaymentInformation == null)
             {

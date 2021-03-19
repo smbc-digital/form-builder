@@ -60,7 +60,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             
             // Assert
             Assert.False(result.IsValid);
-            Assert.True(result.Messages.Any(_ => _.StartsWith($"FAILURE - The provided json 'test-name' contains invalid QuestionIDs or TargetMapping")));
+            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - The provided json 'test-name' contains invalid QuestionIDs or TargetMapping"));
         }
 
         [Theory]

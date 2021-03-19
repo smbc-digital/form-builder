@@ -10,7 +10,7 @@ namespace form_builder.Validators.IntegrityChecks.FormSchema
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
-            var bookingElements = schema.Pages
+            List<IElement> bookingElements = schema.Pages
                 .SelectMany(_ => _.Elements)
                 .Where(_ => _.Type.Equals(EElementType.Booking))
                 .ToList();

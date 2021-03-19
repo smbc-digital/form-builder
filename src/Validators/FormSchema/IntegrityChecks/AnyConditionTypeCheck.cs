@@ -13,14 +13,14 @@ namespace form_builder.Validators.IntegrityChecks
         {
             var integrityCheckResult = new IntegrityCheckResult();
             var anyConditionType = new List<Condition>();
-            var anyConditionTypeRenderConditions = schema.Pages.Where(page => page.Behaviours != null)
+            List<Condition> anyConditionTypeRenderConditions = schema.Pages.Where(page => page.Behaviours != null)
                 .SelectMany(page => page.Behaviours)
                 .Where(behaviour => behaviour.Conditions != null)
                 .SelectMany(behaviour => behaviour.Conditions)
                 .Where(condition => condition.ConditionType == ECondition.Any)
                 .ToList();
 
-            var anyConditionTypeBehaviours = schema.Pages.Where(page => page.RenderConditions != null)
+            List<Condition> anyConditionTypeBehaviours = schema.Pages.Where(page => page.RenderConditions != null)
                 .SelectMany(page => page.RenderConditions)
                 .Where(condition => condition.ConditionType == ECondition.Any)
                 .ToList();

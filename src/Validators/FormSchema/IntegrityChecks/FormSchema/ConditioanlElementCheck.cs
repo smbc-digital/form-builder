@@ -1,5 +1,6 @@
 using form_builder.Enum;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,13 +12,13 @@ namespace form_builder.Validators.IntegrityChecks.FormSchema
         {
             IntegrityCheckResult integrityCheckResult = new();
 
-            var radioWithConditionals = schema.Pages.Where(page => page.Elements != null)
+            List<IElement> radioWithConditionals = schema.Pages.Where(page => page.Elements != null)
                 .SelectMany(page => page.ValidatableElements)
                 .Where(element => element.Type == EElementType.Radio)
                 .Where(element => element.Properties.Options.Any(_ => _.HasConditionalElement))
                 .ToList();
 
-            var conditionalElements = schema.Pages.Where(page => page.Elements != null)
+            List<IElement> conditionalElements = schema.Pages.Where(page => page.Elements != null)
                 .SelectMany(page => page.Elements)
                 .Where(element => element.Properties.isConditionalElement)
                 .ToList();
