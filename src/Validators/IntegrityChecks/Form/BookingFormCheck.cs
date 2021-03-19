@@ -15,12 +15,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
         {
             IntegrityCheckResult result = new();
 
-            List<IElement> bookingElements = schema.Pages
-                 .SelectMany(page => page.Elements)
-                 .Where(element => element.Type.Equals(EElementType.Booking))
-                 .ToList();
-
-            if (bookingElements.Count == 0)
+            if (!schema.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Booking))))
                 return result;
 
             if (!schema.Pages.Any(page => page.PageSlug.Equals(BookingConstants.NO_APPOINTMENT_AVAILABLE, StringComparison.OrdinalIgnoreCase)))
@@ -29,11 +24,11 @@ namespace form_builder.Validators.IntegrityChecks.Form
             var requiredFields = new[] { "customer.firstname", "customer.lastname" };
             foreach (var requiredField in requiredFields)
             {
-                if (!bookingElements.Any(
-                    element => element.Properties is not null &&
+                if (!schema.Pages.Any(page => page.Elements.Any(element => 
+                    element.Properties is not null &&
                     element.Properties.TargetMapping is not null &&
-                    element.Properties.TargetMapping.Equals(requiredField, StringComparison.OrdinalIgnoreCase)))
-                    result.AddFailureMessage($"Booking Element Check, Booking element requires {requiredField} elements for reservation.");
+                    element.Properties.TargetMapping.Equals(requiredField, StringComparison.OrdinalIgnoreCase))))
+                        result.AddFailureMessage($"Booking Element Check, Booking element requires {requiredField} elements for reservation.");
             }
 
             return result;

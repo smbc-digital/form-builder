@@ -13,7 +13,7 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
             foreach (var behaviour in behaviours)
             {
                 if (string.IsNullOrEmpty(behaviour.PageSlug) && (behaviour.SubmitSlugs is null || behaviour.SubmitSlugs.Count == 0))
-                    result.AddFailureMessage($"Empty Behaviour Slugs Check, Incorrectly configured behaviour slug was discovered");
+                    result.AddFailureMessage($"{nameof(EmptyBehaviourSlugsCheck)}, Incorrectly configured behaviour slug was discovered");
             }
             return result;
         }
