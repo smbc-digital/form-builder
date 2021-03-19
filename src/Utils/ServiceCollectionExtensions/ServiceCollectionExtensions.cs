@@ -277,7 +277,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddSingleton<IFormSchemaIntegrityCheck, AnyConditionTypeCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingFormCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingQuestionIdExistsForCustomerAddressCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, ConditioanlElementCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, DocumentDownloadCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, DynamicLookupCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, EmailActionsCheck>();
@@ -298,7 +298,8 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddSingleton<IElementSchemaIntegrityCheck, BookingElementCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, DateValidationsCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
-            services.AddSingleton<IElementSchemaIntegrityCheck, InvalidQuestionOrTargetMappingValueCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, InvalidQuestionCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, InvalidTargetMappingValueCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();
 
             services.AddSingleton<IFormSchemaIntegrityValidator, FormSchemaIntegrityValidator>();

@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Models.Elements;
@@ -16,8 +15,8 @@ namespace form_builder.Validators.IntegrityChecks.Elements
           
             if (string.IsNullOrEmpty(element.Properties.Text))
                 result.AddFailureMessage("Uploaded Files Summary Question Is Set, Uploaded files summary text must not be empty.");
-                        
-            if (!element.Properties.FileUploadQuestionIds.Any())
+
+            if (element.Properties.FileUploadQuestionIds.Count == 0)
                 result.AddFailureMessage("Uploaded Files Summary Question Is Set, Uploaded files summary must have atleast one file questionId specified to display the list of uploaded files.");
 
             return result;

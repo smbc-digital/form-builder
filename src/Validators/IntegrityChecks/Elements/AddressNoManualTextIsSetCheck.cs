@@ -13,7 +13,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             if (element.Type.Equals(EElementType.Address) && 
                 element.Properties.DisableManualAddress && 
                 string.IsNullOrWhiteSpace(element.Properties.NoManualAddressDetailText))
-                result.AddFailureMessage($"Address No Manual Text Is Set Check, 'DisableManualAddress' set to 'true', 'NoManualAddressDetailText' must have value");
+                    result.AddFailureMessage($"Address No Manual Text Is Set Check, 'DisableManualAddress' set to 'true', 'NoManualAddressDetailText' must have value");
 
             return result;
         }

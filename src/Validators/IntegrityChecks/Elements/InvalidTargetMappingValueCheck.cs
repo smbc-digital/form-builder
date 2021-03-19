@@ -4,25 +4,19 @@ using form_builder.Models.Elements;
 
 namespace form_builder.Validators.IntegrityChecks.Elements
 {
-    public class InvalidQuestionOrTargetMappingValueCheck : IElementSchemaIntegrityCheck
+    public class InvalidTargetMappingValueCheck : IElementSchemaIntegrityCheck
     {
         public IntegrityCheckResult Validate(IElement element)
         {
             IntegrityCheckResult result = new();
 
-            if (element.Properties is null)
+            if (element.Properties is null || string.IsNullOrEmpty(element.Properties.TargetMapping))
                 return result;
 
             Regex regex = new(@"^[a-zA-Z.]+$", RegexOptions.IgnoreCase);
-            if (!string.IsNullOrEmpty(element.Properties.QuestionId) &&
-                !regex.IsMatch(element.Properties.QuestionId))
-                    result.AddFailureMessage($"The provided json contains invalid QuestionIDs, '{element.Properties.QuestionId}' contains invalid characters");
 
-            if (string.IsNullOrEmpty(element.Properties.TargetMapping))
-                return result;
-
-            if (!regex.IsMatch(element.Properties.TargetMapping) || 
-                element.Properties.TargetMapping.EndsWith(".") || 
+            if (!regex.IsMatch(element.Properties.TargetMapping) ||
+                element.Properties.TargetMapping.EndsWith(".") ||
                 element.Properties.TargetMapping.StartsWith("."))
                     result.AddFailureMessage($"The provided json contains invalid TargetMapping, '{element.Properties.QuestionId}' contains invalid characters");
 

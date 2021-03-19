@@ -24,7 +24,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
                 result.AddFailureMessage($"Booking Element Check, Booking element '{element.Properties.QuestionId}' requires a valid booking provider property.");
 
             var appointmentTypeForEnv = element.Properties.AppointmentTypes
-                .FirstOrDefault(_ => _.Environment.Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(appointmentType => appointmentType.Environment.Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
 
             if (appointmentTypeForEnv is null)
             {

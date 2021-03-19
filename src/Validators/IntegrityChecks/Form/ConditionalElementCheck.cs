@@ -8,7 +8,7 @@ using form_builder.Models.Elements;
 
 namespace form_builder.Validators.IntegrityChecks.Form
 {
-    public class ConditioanlElementCheck : IFormSchemaIntegrityCheck
+    public class ConditionalElementCheck : IFormSchemaIntegrityCheck
     {
         public IntegrityCheckResult Validate(FormSchema schema)
         {
@@ -34,14 +34,13 @@ namespace form_builder.Validators.IntegrityChecks.Form
                     if (option.HasConditionalElement &&
                         !string.IsNullOrEmpty(option.ConditionalElementId) &&
                         !conditionalElements.Any(element => element.Properties.QuestionId.Equals(option.ConditionalElementId)))
-                        result.AddFailureMessage($"The provided json '{schema.FormName}' does not contain a conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}'");
+                            result.AddFailureMessage($"The provided json '{schema.FormName}' does not contain a conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}'");
 
-                    if (option.HasConditionalElement &&
-                        !string.IsNullOrEmpty(option.ConditionalElementId) &&
+                    if (option.HasConditionalElement && !string.IsNullOrEmpty(option.ConditionalElementId) &&
                         !schema.Pages.Any(page => page.ValidatableElements.Contains(radio) &&
-                        page.Elements.Any(element => element.Properties.QuestionId.Equals(option.ConditionalElementId) &&
+                        page.Elements.Any(element => element.Properties.QuestionId is not null && element.Properties.QuestionId.Equals(option.ConditionalElementId) &&
                         element.Properties.isConditionalElement)))
-                        result.AddFailureMessage($"The provided json '{schema.FormName}' contains the conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}' on a different page to the radio element");
+                            result.AddFailureMessage($"The provided json '{schema.FormName}' contains the conditional element for the '{option.Value}' value of radio '{radio.Properties.QuestionId}' on a different page to the radio element");
 
                     conditionalElements.Remove(conditionalElements
                         .FirstOrDefault(element => element.Properties.QuestionId.Equals(option.ConditionalElementId)));
@@ -49,7 +48,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
             }
 
             if (conditionalElements.Count > 0)
-                result.AddFailureMessage($"The provided json '{schema.FormName}' has conditional elements '{ String.Join(", ", conditionalElements.Select(_ => _.Properties.QuestionId)) }' not assigned to radio options");
+                result.AddFailureMessage($"The provided json has conditional elements '{ String.Join(", ", conditionalElements.Select(_ => _.Properties.QuestionId)) }' not assigned to radio options");
 
             return result;
         }

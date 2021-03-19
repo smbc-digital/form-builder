@@ -15,11 +15,11 @@ namespace form_builder.Validators.IntegrityChecks.Elements
 
             if (!string.IsNullOrEmpty(element.Properties.IsDateAfterAbsolute) &&
                 !DateTime.TryParse(element.Properties.IsDateAfterAbsolute, out DateTime _))
-                result.AddFailureMessage($"Absolute Date Validations Check, IsDateAfterAbsolute validation, '{element.Properties.QuestionId}' does not provide a valid comparison date.");
+                    result.AddFailureMessage($"Absolute Date Validations Check, IsDateAfterAbsolute validation, '{element.Properties.QuestionId}' does not provide a valid comparison date.");
 
             if (!string.IsNullOrEmpty(element.Properties.IsDateBeforeAbsolute) &&
                 !DateTime.TryParse(element.Properties.IsDateBeforeAbsolute, out DateTime _))
-                result.AddFailureMessage($"Absolute Date Validations Check, IsDateBeforeAbsolute validation, '{element.Properties.QuestionId}' does not provide a valid comparison date");
+                    result.AddFailureMessage($"Absolute Date Validations Check, IsDateBeforeAbsolute validation, '{element.Properties.QuestionId}' does not provide a valid comparison date");
 
             return result;
         }
