@@ -50,7 +50,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Contains(result.Messages, _ => _.Equals($"FAILURE - No SubmitSlug found in form 'test-name' for environment 'local'."));
+            Assert.Contains("FAILURE - No SubmitSlug found in form 'test-name' for environment 'local'.", result.Messages);
         }
     }
 }

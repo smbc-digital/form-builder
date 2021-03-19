@@ -28,7 +28,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - Document Download Check, No document download type configured for form 'test-name'"));
+            Assert.Contains("FAILURE - Document Download Check, No document download type configured for form 'test-name'", result.Messages);
         }
 
         [Fact]
@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - Document Download Check, Unknown document download type configured for form 'test-name'"));
+            Assert.Contains("FAILURE - Document Download Check, Unknown document download type configured for form 'test-name'", result.Messages);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - Document Download Check, Unknown document download type configured for form 'test-name'"));
+            Assert.Contains("FAILURE - Document Download Check, Unknown document download type configured for form 'test-name'", result.Messages);
         }
 
         [Fact]

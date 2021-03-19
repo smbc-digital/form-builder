@@ -50,7 +50,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - No auth token found for SubmitSlug in environmment 'local' in form 'test-name'"));
+            Assert.Contains($"FAILURE - No auth token found for SubmitSlug in environmment 'local' in form 'test-name'", result.Messages);
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - No URL found for SubmitSlug in environmment 'local' in form 'test-name'"));
+            Assert.Contains("FAILURE - No URL found for SubmitSlug in environmment 'local' in form 'test-name'", result.Messages);
         }
 
         [Fact]
@@ -119,7 +119,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - No URL found for SubmitSlug in environmment 'local' in form 'test-name'"));
+            Assert.Contains("FAILURE - No URL found for SubmitSlug in environmment 'local' in form 'test-name'", result.Messages);
         }
 
         [Fact]

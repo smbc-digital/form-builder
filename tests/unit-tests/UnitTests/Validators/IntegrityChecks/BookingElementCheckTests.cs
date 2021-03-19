@@ -82,7 +82,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             // Act
             var result = check.Validate(schema);
             Assert.False(result.IsValid);
-            Assert.Contains(result.Messages, _ => _.StartsWith($"FAILURE - "));
+            Assert.All(result.Messages, message => Assert.StartsWith($"FAILURE - ", message));
         }
 
         [Fact]
@@ -141,7 +141,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             // Act
             var result = check.Validate(schema);
             Assert.False(result.IsValid);
-            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - Booking Element Check, Booking element 'booking' requires a valid booking provider property on form test-name."));
+            Assert.Contains("FAILURE - Booking Element Check, Booking element 'booking' requires a valid booking provider property on form test-name.", result.Messages);
         }
 
         [Fact]
@@ -176,7 +176,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             // Act
             var result = check.Validate(schema);
             Assert.False(result.IsValid);
-            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - Booking Element Check, Booking element 'booking', optional resources are invalid, ResourceId cannot be an empty Guid on form test-name."));        
+            Assert.Contains("FAILURE - Booking Element Check, Booking element 'booking', optional resources are invalid, ResourceId cannot be an empty Guid on form test-name.", result.Messages);
         }  
     }
 }     
