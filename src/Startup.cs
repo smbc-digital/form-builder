@@ -60,6 +60,7 @@ namespace form_builder
                 .ConfigureFormatters()
                 .ConfigureEmailProviders(HostingEnvironment)
                 .AddHelpers()
+                .AddSchemaIntegrityValidation()
                 .AddAttributes()
                 .AddServices()
                 .AddWorkflows()

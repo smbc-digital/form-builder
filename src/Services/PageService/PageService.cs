@@ -52,6 +52,7 @@ namespace form_builder.Services.PageService
         private readonly IPageFactory _pageContentFactory;
         private readonly IIncomingDataHelper _incomingDataHelper;
         private readonly IActionsWorkflow _actionsWorkflow;
+
         public PageService(
             IEnumerable<IElementValidator> validators,
             IPageHelper pageHelper,
@@ -140,8 +141,6 @@ namespace form_builder.Services.PageService
             if (page == null)
                 throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
-            await baseForm.ValidateFormSchema(_pageHelper, form, path);
-
             List<object> searchResults = null;
             if (subPath.Equals(LookUpConstants.Automatic) || subPath.Equals(LookUpConstants.Manual))
             {
@@ -158,7 +157,6 @@ namespace form_builder.Services.PageService
             {
                 var data = await _mappingService.Map(sessionGuid, form);
                 var paymentAmount = await _payService.GetFormPaymentInformation(data, form, page);
-
                 page.Elements.First(_ => _.Type == EElementType.PaymentSummary).Properties.Value = paymentAmount.Settings.Amount;
             }
 

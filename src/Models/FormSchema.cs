@@ -75,34 +75,6 @@ namespace form_builder.Models
         public bool HasElement(string questionId) =>
             Pages.SelectMany(_ => _.Elements)
                 .Any(_ => _.Properties.QuestionId == questionId);
-        
-        public async Task ValidateFormSchema(IPageHelper pageHelper, string form, string path)
-        {
-            if (path != FirstPageSlug)
-                return;
-
-            pageHelper.ValidateDynamicLookUpObject(Pages, form);
-            pageHelper.HasDuplicateQuestionIDs(Pages, form);
-            pageHelper.CheckForEmptyBehaviourSlugs(Pages, form);
-            pageHelper.CheckForInvalidQuestionOrTargetMappingValue(Pages, form);
-            pageHelper.CheckForCurrentEnvironmentSubmitSlugs(Pages, form);
-            pageHelper.CheckSubmitSlugsHaveAllProperties(Pages, form);
-            await pageHelper.CheckForPaymentConfiguration(Pages, form);
-            pageHelper.CheckForAcceptedFileUploadFileTypes(Pages, form);
-            pageHelper.CheckConditionalElementsAreValid(Pages, form);
-            pageHelper.CheckForDocumentDownload(this);
-            pageHelper.CheckForIncomingFormDataValues(Pages);
-            pageHelper.CheckForPageActions(this);
-            pageHelper.CheckRenderConditionsValid(Pages);
-            pageHelper.CheckAddressNoManualTextIsSet(Pages);
-            pageHelper.CheckForAnyConditionType(Pages);
-            pageHelper.CheckUploadedFilesSummaryQuestionsIsSet(Pages);
-            pageHelper.CheckForBookingElement(Pages);
-            pageHelper.CheckQuestionIdExistsForBookingCustomerAddressId(Pages, form);
-            pageHelper.CheckGeneratedIdConfiguration(this);
-            pageHelper.CheckDateValidations(Pages);
-            pageHelper.CheckAbsoluteDateValidations(Pages);
-        }
 
         public bool IsAvailable(string environment)
         {

@@ -72,6 +72,7 @@ using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
+using form_builder.Validators.IntegrityChecks;
 using form_builder.Providers.Lookup;
 
 namespace form_builder.Utils.ServiceCollectionExtensions
@@ -265,6 +266,37 @@ namespace form_builder.Utils.ServiceCollectionExtensions
                 services.AddSingleton<IEmailProvider, FakeEmailProvider>();
             else
                 services.AddSingleton<IEmailProvider, AwsSesProvider>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddSchemaIntegrityValidation(this IServiceCollection services)
+        {
+            services.AddSingleton<IFormSchemaIntegrityCheck, AbsoluteDateValidationsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, AcceptedFileUploadFileTypesCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, AddressNoManualTextIsSetCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, AnyConditionTypeCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, BookingElementCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementsAreValidCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, DateValidationsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, DocumentDownloadCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, DynamicLookupCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, EmailActionsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, GeneratedIdConfigurationCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, IncomingFormDataValuesCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, InvalidQuestionOrTargetMappingValueCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, PaymentConfigurationCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, QuestionIdExistsForBookingCustomerAddressIdCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, RenderConditionsValidCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, RetrieveExternalActionsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, SubmitSlugsHaveAllPropertiesCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, ValidateActionCheck>();
+            
+            services.AddSingleton<IFormSchemaIntegrityValidator,FormSchemaIntegrityValidator>();
 
             return services;
         }
