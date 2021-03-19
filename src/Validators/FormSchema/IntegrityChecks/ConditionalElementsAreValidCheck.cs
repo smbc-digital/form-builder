@@ -14,10 +14,10 @@ namespace form_builder.Validators.IntegrityChecks
         {
             var integrityCheckResult = new IntegrityCheckResult();
 
-            List<IElement> radioWithConditionals = schema.Pages.Where(page => page.Elements != null)
-                .SelectMany(page => page.ValidatableElements)
-                .Where(element => element.Type == EElementType.Radio)
-                .Where(element => element.Properties.Options.Any(_ => _.HasConditionalElement))
+            List<IElement> elementsWithConditionalElements = schema.Pages.Where(_ => _.Elements != null)
+                .SelectMany(_ => _.ValidatableElements)
+                .Where(_ => _.Type.Equals(EElementType.Radio) || _.Type.Equals(EElementType.Checkbox))
+                .Where(_ => _.Properties.Options.Any(_ => _.HasConditionalElement))
                 .ToList();
 
             List<IElement> conditionalElements = schema.Pages.Where(page => page.Elements != null)
@@ -25,7 +25,7 @@ namespace form_builder.Validators.IntegrityChecks
                 .Where(element => element.Properties.isConditionalElement)
                 .ToList();
 
-            foreach (var radio in radioWithConditionals)
+            foreach (var radio in elementsWithConditionalElements)
             {
                 foreach (var option in radio.Properties.Options)
                 {
