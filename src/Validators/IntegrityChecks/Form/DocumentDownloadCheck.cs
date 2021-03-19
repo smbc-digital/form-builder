@@ -1,28 +1,29 @@
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
+using form_builder.Models;
 
 namespace form_builder.Validators.IntegrityChecks.Form
 {
-    public class DocumentDownloadCheck: IFormSchemaIntegrityCheck
+    public class DocumentDownloadCheck : IFormSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(Models.FormSchema schema)
+        public IntegrityCheckResult Validate(FormSchema schema)
         {
-            var integrityCheckResult = new IntegrityCheckResult();
+            IntegrityCheckResult result = new();
 
             if (!schema.DocumentDownload)
-                return IntegrityCheckResult.ValidResult;
+                return result;
 
-            if (schema.DocumentType.Any() && schema.DocumentType.Any(_ => _ == EDocumentType.Unknown))
+            if (schema.DocumentType.Any() && schema.DocumentType.Any(documentType => documentType.Equals(EDocumentType.Unknown)))
             {
-                integrityCheckResult.AddFailureMessage($"Document Download Check, Unknown document download type configured for form '{ schema.FormName }'");
+                result.AddFailureMessage($"Document Download Check, Unknown document download type configured.");
             }
             else
             {
-                integrityCheckResult.AddFailureMessage($"Document Download Check, No document download type configured.");
+                result.AddFailureMessage($"Document Download Check, No document download type configured.");
             }
 
-            return integrityCheckResult;
+            return result;
         }
 
         public async Task<IntegrityCheckResult> ValidateAsync(Models.FormSchema schema) => await Task.Run(() => Validate(schema));

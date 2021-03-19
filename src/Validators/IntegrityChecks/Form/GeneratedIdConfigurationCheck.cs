@@ -3,16 +3,17 @@ using form_builder.Models;
 
 namespace form_builder.Validators.IntegrityChecks.Form
 {
-    public class GeneratedIdConfigurationCheck: IFormSchemaIntegrityCheck
+    public class GeneratedIdConfigurationCheck : IFormSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(Models.FormSchema schema)
+        public IntegrityCheckResult Validate(FormSchema schema)
         {
-            var integrityCheckResult = new IntegrityCheckResult();
+            IntegrityCheckResult result = new();
 
-            if (schema.GenerateReferenceNumber && (string.IsNullOrEmpty(schema.GeneratedReferenceNumberMapping) || string.IsNullOrEmpty(schema.ReferencePrefix)))
-                    integrityCheckResult.AddFailureMessage($"Generated Id Configuration Check, 'GeneratedReferenceNumberMapping' and 'ReferencePrefix' must both have a value in form {schema.FormName}");
+            if (schema.GenerateReferenceNumber &&
+                (string.IsNullOrEmpty(schema.GeneratedReferenceNumberMapping) || string.IsNullOrEmpty(schema.ReferencePrefix)))
+                result.AddFailureMessage($"Generated Id Configuration Check, 'GeneratedReferenceNumberMapping' and 'ReferencePrefix' must both have a value.");
 
-            return integrityCheckResult;
+            return result;
         }
 
         public async Task<IntegrityCheckResult> ValidateAsync(Models.FormSchema schema) => await Task.Run(() => Validate(schema));

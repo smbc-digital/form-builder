@@ -1,9 +1,13 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Enum;
-using form_builder.Extensions;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Hosting;
+using form_builder.Enum;
+using form_builder.Models;
+using form_builder.Extensions;
+using form_builder.Models.Properties.ActionProperties;
+using form_builder.Models.Actions;
 
 namespace form_builder.Validators.IntegrityChecks.Form
 {
@@ -11,38 +15,42 @@ namespace form_builder.Validators.IntegrityChecks.Form
     {
         private readonly IWebHostEnvironment _environment;
 
-        public RetrieveExternalActionsCheck(IWebHostEnvironment enviroment) => _environment = enviroment;
+        public RetrieveExternalActionsCheck(IWebHostEnvironment enviroment) =>
+            _environment = enviroment;
 
         public IntegrityCheckResult Validate(FormSchema schema)
         {
-            var integrityCheckResult = new IntegrityCheckResult();
-            var actions = schema.FormActions
+            IntegrityCheckResult result = new();
+
+            List<IAction> actions = schema.FormActions
                 .Where(formAction => formAction.Type.Equals(EActionType.RetrieveExternalData))
                 .Concat(schema.Pages.SelectMany(page => page.PageActions)
-                .Where(pageAction => pageAction.Type == EActionType.RetrieveExternalData)).ToList();
+                .Where(pageAction => pageAction.Type.Equals(EActionType.RetrieveExternalData))).ToList();
 
-            if (!actions.Any())
-                return IntegrityCheckResult.ValidResult;
+            if (actions.Count == 0)
+                return result;
 
             actions.ForEach(action =>
             {
-                PageActionSlug slug = action.Properties.PageActionSlugs.FirstOrDefault(slugs => slugs.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+                PageActionSlug slug = action.Properties.PageActionSlugs
+                    .FirstOrDefault(slugs => slugs.Environment
+                    .Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
 
-                if (slug == null)
+                if (slug is null)
                 {
-                    integrityCheckResult.AddFailureMessage($"Retrieve External Data Action, there is no PageActionSlug for environment '{_environment.EnvironmentName}'");
+                    result.AddFailureMessage($"Retrieve External Data Action, there is no PageActionSlug for environment '{_environment.EnvironmentName}'");
                 }
                 else
                 {
                     if (string.IsNullOrEmpty(slug.URL))
-                        integrityCheckResult.AddFailureMessage("Retrieve External Data Action, action type does not contain a url");
+                        result.AddFailureMessage("Retrieve External Data Action, action type does not contain a url");
                 }
 
                 if (string.IsNullOrEmpty(action.Properties.TargetQuestionId))
-                    integrityCheckResult.AddFailureMessage("Retrieve External Data Action, action type does not contain a TargetQuestionId");
+                    result.AddFailureMessage("Retrieve External Data Action, action type does not contain a TargetQuestionId");
             });
 
-            return integrityCheckResult;
+            return result;
         }
 
         public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));

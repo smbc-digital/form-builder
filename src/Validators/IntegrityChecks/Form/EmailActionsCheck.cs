@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
@@ -8,20 +9,20 @@ namespace form_builder.Validators.IntegrityChecks.Form
 {
     public class EmailActionsCheck : IFormSchemaIntegrityCheck
     {
-        public IntegrityCheckResult Validate(Models.FormSchema schema)
+        public IntegrityCheckResult Validate(FormSchema schema)
         {
-            var integrityCheckResult = new IntegrityCheckResult();
+            IntegrityCheckResult result = new();
 
             List<IAction> userEmail = schema.FormActions
-                .Where(_ => _.Type.Equals(EActionType.UserEmail))
-                .Concat(schema.Pages.SelectMany(_ => _.PageActions)
-                .Where(_ => _.Type == EActionType.UserEmail))
+                .Where(formAction => formAction.Type.Equals(EActionType.UserEmail))
+                .Concat(schema.Pages.SelectMany(page => page.PageActions)
+                .Where(pageAction => pageAction.Type.Equals(EActionType.UserEmail)))
                 .ToList();
 
             List<IAction> backOfficeEmail = schema.FormActions
-                .Where(_ => _.Type.Equals(EActionType.BackOfficeEmail))
-                .Concat(schema.Pages.SelectMany(_ => _.PageActions)
-                .Where(_ => _.Type == EActionType.BackOfficeEmail))
+                .Where(formAction => formAction.Type.Equals(EActionType.BackOfficeEmail))
+                .Concat(schema.Pages.SelectMany(page => page.PageActions)
+                .Where(pageAction => pageAction.Type.Equals(EActionType.BackOfficeEmail)))
                 .ToList();
 
             List<IAction> actions = userEmail
@@ -33,20 +34,20 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 actions.ForEach(action =>
                 {
                     if (string.IsNullOrEmpty(action.Properties.Content))
-                        integrityCheckResult.AddFailureMessage($"Email Actions Check, Content doesn't have a value");
+                        result.AddFailureMessage($"Email Actions Check, Content doesn't have a value");
 
                     if (string.IsNullOrEmpty(action.Properties.To))
-                        integrityCheckResult.AddFailureMessage("Email Actions Check, To doesn't have a value");
+                        result.AddFailureMessage("Email Actions Check, To doesn't have a value");
 
                     if (string.IsNullOrEmpty(action.Properties.From))
-                        integrityCheckResult.AddFailureMessage("Email Actions Check, From doesn't have a value");
+                        result.AddFailureMessage("Email Actions Check, From doesn't have a value");
 
                     if (string.IsNullOrEmpty(action.Properties.Subject))
-                        integrityCheckResult.AddFailureMessage("Email Actions Check, Subject doesn't have a value");
+                        result.AddFailureMessage("Email Actions Check, Subject doesn't have a value");
                 });
             }
 
-            return integrityCheckResult;
+            return result;
         }
 
         public async Task<IntegrityCheckResult> ValidateAsync(Models.FormSchema schema) => await Task.Run(() => Validate(schema));

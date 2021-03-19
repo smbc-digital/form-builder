@@ -1,18 +1,19 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Cache;
-using form_builder.Configuration;
-using form_builder.Enum;
-using form_builder.Providers.PaymentProvider;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using form_builder.Cache;
+using form_builder.Enum;
+using form_builder.Models;
+using form_builder.Configuration;
+using form_builder.Providers.PaymentProvider;
 
 namespace form_builder.Validators.IntegrityChecks.Form
 {
-    public class PaymentConfigurationCheck: IFormSchemaIntegrityCheck
+    public class PaymentConfigurationCheck : IFormSchemaIntegrityCheck
     {
         private IWebHostEnvironment _environment;
         private readonly ICache _cache;
@@ -24,59 +25,63 @@ namespace form_builder.Validators.IntegrityChecks.Form
             ICache cache, IEnumerable<IPaymentProvider> paymentProviders,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
-            _environment= environment;
+            _environment = environment;
             _cache = cache;
             _paymentProviders = paymentProviders;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
-        public IntegrityCheckResult Validate(Models.FormSchema schema)
+        public IntegrityCheckResult Validate(FormSchema schema)
         {
             return ValidateAsync(schema).Result;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(Models.FormSchema schema)
+        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema)
         {
-            var integrityCheckResult = new IntegrityCheckResult();
+            IntegrityCheckResult result = new();
 
-            var containsPayment = schema.Pages.Where(x => x.Behaviours != null)
-                .SelectMany(x => x.Behaviours)
-                .Any(x => x.BehaviourType == EBehaviourType.SubmitAndPay);
+            bool containsPayment = schema.Pages
+                .Where(page => page.Behaviours is not null)
+                .SelectMany(page => page.Behaviours)
+                .Any(page => page.BehaviourType.Equals(EBehaviourType.SubmitAndPay));
 
             if (!containsPayment)
-                return IntegrityCheckResult.ValidResult;
+                return result;
 
             List<PaymentInformation> paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_environment.EnvironmentName}", _distributedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
-            PaymentInformation formPaymentInformation = paymentInformation.FirstOrDefault(payment => payment.FormName == schema.BaseURL);
+            PaymentInformation formPaymentInformation = paymentInformation.FirstOrDefault(payment => payment.FormName.Equals(schema.BaseURL));
 
-            if (formPaymentInformation == null)
+            if (formPaymentInformation is null)
             {
-                integrityCheckResult.AddFailureMessage($"No payment information configured.");
+                result.AddFailureMessage($"No payment information configured.");
             }
             else
             {
-                var paymentProvider = _paymentProviders.FirstOrDefault(_ => _.ProviderName == formPaymentInformation.PaymentProvider);
+                IPaymentProvider paymentProvider = _paymentProviders
+                    .FirstOrDefault(provider => provider.ProviderName
+                    .Equals(formPaymentInformation.PaymentProvider));
 
-                if (paymentProvider == null)
+                if (paymentProvider is null)
                 {
-                    integrityCheckResult.AddFailureMessage($"No payment provider configured for provider '{formPaymentInformation.PaymentProvider}'");
-                    return integrityCheckResult;
+                    result.AddFailureMessage($"No payment provider configured for provider '{formPaymentInformation.PaymentProvider}'");
+                    return result;
                 }
 
                 if (formPaymentInformation.Settings.ComplexCalculationRequired)
                 {
-                    var paymentSummaryElement = schema.Pages.SelectMany(_ => _.Elements)
-                        .First(_ => _.Type.Equals(EElementType.PaymentSummary));
+                    var paymentSummaryElement = schema.Pages
+                        .SelectMany(page => page.Elements)
+                        .First(element => element.Type.Equals(EElementType.PaymentSummary));
 
-                    if (!_environment.IsEnvironment("local") && 
+                    if (!_environment.IsEnvironment("local") &&
                         !paymentSummaryElement.Properties.CalculationSlugs
-                            .Where(_ => !_.Environment.Equals("local", StringComparison.OrdinalIgnoreCase))
-                            .Any(_ => _.URL.StartsWith("https://")))
-                        integrityCheckResult.AddFailureMessage($"PaymentSummary::CalculateCostUrl must start with https");
+                            .Where(submitSlug => !submitSlug.Environment.Equals("local", StringComparison.OrdinalIgnoreCase))
+                            .Any(submitSlug => submitSlug.URL.StartsWith("https://")))
+                        result.AddFailureMessage($"PaymentSummary::CalculateCostUrl must start with https");
                 }
             }
 
-            return integrityCheckResult;
+            return result;
         }
     }
 }

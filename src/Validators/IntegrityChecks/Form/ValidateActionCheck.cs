@@ -1,9 +1,13 @@
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Models;
-using Microsoft.AspNetCore.Hosting;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Hosting;
+using form_builder.Enum;
+using form_builder.Models;
+using form_builder.Extensions;
+using form_builder.Models.Actions;
+using form_builder.Models.Properties.ActionProperties;
 
 namespace form_builder.Validators.IntegrityChecks.Form
 {
@@ -16,7 +20,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
         public IntegrityCheckResult Validate(FormSchema schema)
         {
-            var integrityCheckResult = new IntegrityCheckResult();
+            IntegrityCheckResult result = new();
 
             List<IAction> actions = schema.FormActions
                 .Where(formAction => formAction.Type.Equals(EActionType.Validate))
@@ -24,24 +28,26 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 .Where(action => action.Type == EActionType.Validate))
                 .ToList();
 
-            if (!actions.Any())
-                return IntegrityCheckResult.ValidResult;
+            if (actions.Count == 0)
+                return result;
 
             actions.ForEach(action =>
             {
-                PageActionSlug slug = action.Properties.PageActionSlugs.FirstOrDefault(slug => slug.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+                PageActionSlug slug = action.Properties.PageActionSlugs
+                    .FirstOrDefault(slug => slug.Environment
+                    .Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
 
-                if (slug == null)
-                    integrityCheckResult.AddFailureMessage($"Validate Action Check, Validate there is no PageActionSlug for {_environment.EnvironmentName}");
+                if (slug is null)
+                    result.AddFailureMessage($"Validate Action Check, Validate there is no PageActionSlug for {_environment.EnvironmentName}");
 
                 if (string.IsNullOrEmpty(slug.URL))
-                    integrityCheckResult.AddFailureMessage("Validate Action Check, Validate action type does not contain a url");
+                    result.AddFailureMessage("Validate Action Check, Validate action type does not contain a url");
 
-                if (action.Properties.HttpActionType == EHttpActionType.Unknown)
-                    integrityCheckResult.AddFailureMessage("Validate Action Check, Validate action type does not contain 'Unknown'");
+                if (action.Properties.HttpActionType.Equals(EHttpActionType.Unknown))
+                    result.AddFailureMessage("Validate Action Check, Validate action type does not contain 'Unknown'");
             });
 
-            return integrityCheckResult;
+            return result;
         }
 
         public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
