@@ -1,3 +1,4 @@
+using form_builder.Constants;
 using System.Collections.Generic;
 
 namespace form_builder.Validators.IntegrityChecks
@@ -22,14 +23,14 @@ namespace form_builder.Validators.IntegrityChecks
         public void AddFailureMessage (string message)
         {
             IsValid = false;
-            Messages.Add($"FAILURE - {message}");
+            Messages.Add($"{IntegrityCheckConstants.FAILURE}{message}");
         }
 
         public void AddWarningMessage(string message)
         {
-            Messages.Add($"WARNIING - {message}");
+            Messages.Add($"{IntegrityCheckConstants.WARNING}{message}");
         }
 
-        public static IntegrityCheckResult ValidResult => new IntegrityCheckResult { IsValid = true };
+        public static IntegrityCheckResult ValidResult => new() { IsValid = true };
     }
 }
