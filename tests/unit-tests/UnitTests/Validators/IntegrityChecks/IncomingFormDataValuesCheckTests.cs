@@ -1,6 +1,6 @@
-using System.Linq;
+using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Validators.IntegrityChecks;
+using form_builder.Validators.IntegrityChecks.Form;
 using form_builder_tests.Builders;
 using Xunit;
 
@@ -41,12 +41,12 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithName("test-form")
                 .Build();
 
-            var check = new IncomingFormDataValuesCheck();
+            IncomingFormDataValuesCheck check = new();
 
             // Act & Assert
             var result = check.Validate(schema);
             Assert.False(result.IsValid);
-            Assert.Contains("FAILURE - Incoming Form DataValues Check, QuestionId or Name cannot be empty on page 'test-page' in form 'test-form'", result.Messages);
+            Assert.All<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
 
         [Fact]
@@ -75,12 +75,12 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithName("test-form")
                 .Build();
 
-            var check = new IncomingFormDataValuesCheck();
+            IncomingFormDataValuesCheck check = new();
 
             // Act & Assert
             var result = check.Validate(schema);
             Assert.False(result.IsValid);
-            Assert.Contains("FAILURE - Incoming Form DataValues Check, EHttpActionType cannot be unknown, set to Get or Post for incoming value 'test-value' on page 'test-page' in form 'test-form'", result.Messages);
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
     }
 }

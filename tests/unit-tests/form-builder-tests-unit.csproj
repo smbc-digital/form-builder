@@ -8,20 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="UnitTests\Validators\IntegrityChecks\CurrentEnvironmentSubmitSlugsCheckTests.cs" />
-    <Compile Remove="UnitTests\Validators\IntegrityChecks\DocumentDownloadCheckTests.cs" />
-    <Compile Remove="UnitTests\Validators\IntegrityChecks\DynamicLookupCheckTests.cs" />
-    <Compile Remove="UnitTests\Validators\IntegrityChecks\EmailActionCheckTests.cs" />
-    <Compile Remove="UnitTests\Validators\IntegrityChecks\EmptyBehaviourSlugsCheckTests.cs" />
-    <Compile Remove="UnitTests\Validators\IntegrityChecks\GeneratedIdConfigurationTests.cs" />
-    <Compile Remove="UnitTests\Validators\IntegrityChecks\IncomingFormDataValuesCheckTests.cs" />
+
     <Compile Remove="UnitTests\Validators\IntegrityChecks\InvalidQuestionOrTargetMappingValueCheckTests.cs" />
     <Compile Remove="UnitTests\Validators\IntegrityChecks\PaymemtConfigurationCheckTests.cs" />
     <Compile Remove="UnitTests\Validators\IntegrityChecks\QuestionIdExistsForBookingCustomerAddressIdCheckTests.cs" />
     <Compile Remove="UnitTests\Validators\IntegrityChecks\RenderConditionsValidCheckTests.cs" />
     <Compile Remove="UnitTests\Validators\IntegrityChecks\RetrieveExternalActionsCheckTests.cs" />
     <Compile Remove="UnitTests\Validators\IntegrityChecks\SubmitSlugsHaveAllPropertiesCheckTests.cs" />
-    <Compile Remove="UnitTests\Validators\IntegrityChecks\UploadedFileSummaryQuestionIsSetCheckTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
