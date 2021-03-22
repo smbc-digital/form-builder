@@ -86,7 +86,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             // Assert
             var result = await check.ValidateAsync(schema);
             Assert.False(result.IsValid);
-            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - No payment information configured for 'test-name' form"));
+            Assert.Contains("FAILURE - No payment information configured for 'test-name' form", result.Messages);
         }
 
         [Fact]
@@ -204,7 +204,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             var result = await check.ValidateAsync(schema);
-            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - PaymentSummary::CalculateCostUrl must start with https"));
+            Assert.Contains("FAILURE - PaymentSummary::CalculateCostUrl must start with https", result.Messages);
             Assert.False(result.IsValid);
         }
 
@@ -235,7 +235,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             // Assert
             var result = await check.ValidateAsync(schema);
             Assert.False(result.IsValid);       
-            Assert.Contains(result.Messages, message => message.Equals($"FAILURE - No payment provider configured for provider 'invalidProvider'"));
+            Assert.Contains("FAILURE - No payment provider configured for provider 'invalidProvider'", result.Messages);
         }
     }
 }

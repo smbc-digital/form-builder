@@ -50,7 +50,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             // Act & Assert
             var result = check.Validate(schema);
             Assert.False(result.IsValid);
-            Assert.Contains(result.Messages, m => m.Equals(message));
+            Assert.Contains(message, result.Messages);
         }
     }
 }
