@@ -1,7 +1,7 @@
 ﻿
 namespace form_builder.Constants
 {
-    public class IntegrityCheckConstants
+    public class IntegrityChecksConstants
     {
         public static readonly string FAILURE = "FAILURE - ";
 

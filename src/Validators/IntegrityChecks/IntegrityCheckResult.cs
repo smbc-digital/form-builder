@@ -23,12 +23,12 @@ namespace form_builder.Validators.IntegrityChecks
         public void AddFailureMessage (string message)
         {
             IsValid = false;
-            Messages.Add($"{IntegrityCheckConstants.FAILURE}{message}");
+            Messages.Add($"{IntegrityChecksConstants.FAILURE}{message}");
         }
 
         public void AddWarningMessage(string message)
         {
-            Messages.Add($"{IntegrityCheckConstants.WARNING}{message}");
+            Messages.Add($"{IntegrityChecksConstants.WARNING}{message}");
         }
 
         public static IntegrityCheckResult ValidResult => new() { IsValid = true };

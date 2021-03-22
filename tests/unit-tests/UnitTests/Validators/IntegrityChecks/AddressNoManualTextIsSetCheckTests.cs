@@ -1,7 +1,7 @@
 using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Validators.IntegrityChecks;
-using form_builder_tests.Builders;
+using form_builder.Validators.IntegrityChecks.Elements;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
@@ -18,20 +18,13 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithNoManualAddressDetailText("Test")
                 .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
+            // Act
+            AddressNoManualTextIsSetCheck check = new();
 
             // Act
-            var check = new AddressNoManualTextIsSetCheck();
-
-            // Act
-            var result = check.Validate(schema);
+            var result = check.Validate(element);
             Assert.True(result.IsValid);
+            Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
         }
 
         [Fact]
@@ -39,25 +32,17 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
         {
             // Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.Address
-                )
+                .WithType(EElementType.Address)
                 .WithDisableManualAddress(true)
                 .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
             // Act
-            var check = new AddressNoManualTextIsSetCheck();
+            AddressNoManualTextIsSetCheck check = new();
 
             // Assert
-            var result = check.Validate(schema);
+            var result = check.Validate(element);
             Assert.False(result.IsValid);
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
     }
 }
