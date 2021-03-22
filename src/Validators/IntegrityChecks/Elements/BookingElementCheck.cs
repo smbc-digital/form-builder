@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using form_builder.Enum;
 using form_builder.Models.Elements;
+using form_builder.Models;
 
 namespace form_builder.Validators.IntegrityChecks.Elements
 {
@@ -23,23 +24,25 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             if (string.IsNullOrEmpty(element.Properties.BookingProvider))
                 result.AddFailureMessage($"Booking Element Check, Booking element '{element.Properties.QuestionId}' requires a valid booking provider property.");
 
-            var appointmentTypeForEnv = element.Properties.AppointmentTypes
+            AppointmentType appointmentTypeForEnv = element.Properties.AppointmentTypes
                 .FirstOrDefault(appointmentType => appointmentType.Environment.Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
 
             if (appointmentTypeForEnv is null)
             {
                 result.AddFailureMessage($"Booking Element Check, No appointment type found for current environment or empty AppointmentID.");
+                return result;
             }
-            else if (appointmentTypeForEnv.OptionalResources.Any())
-            {
-                appointmentTypeForEnv.OptionalResources.ForEach(resource =>
-                {
-                    if (resource.Quantity <= 0)
-                        result.AddFailureMessage($"Booking Element Check, Booking element '{element.Properties.QuestionId}', optional resources are invalid, cannot have a quantity less than 0.");
 
-                    if (resource.ResourceId.Equals(Guid.Empty))
-                        result.AddFailureMessage($"Booking Element Check, Booking element '{element.Properties.QuestionId}', optional resources are invalid, ResourceId cannot be an empty Guid.");
-                });
+            if (appointmentTypeForEnv.OptionalResources.Count == 0)
+                return result;
+
+            foreach (var resource in appointmentTypeForEnv.OptionalResources)
+            {
+                if (resource.Quantity <= 0)
+                    result.AddFailureMessage($"Booking Element Check, Booking element '{element.Properties.QuestionId}', optional resources are invalid, cannot have a quantity less than 0.");
+
+                if (resource.ResourceId.Equals(Guid.Empty))
+                    result.AddFailureMessage($"Booking Element Check, Booking element '{element.Properties.QuestionId}', optional resources are invalid, ResourceId cannot be an empty Guid.");
             }
 
             return result;

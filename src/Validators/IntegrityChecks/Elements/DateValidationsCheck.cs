@@ -17,7 +17,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
                     result.AddFailureMessage($"Date Validations Check, IsDateAfter validation, for question '{element.Properties.QuestionId}' - the form does not contain a comparison element with QuestionId '{element.Properties.IsDateAfter}'");
 
             if (!string.IsNullOrEmpty(element.Properties.IsDateBefore) &&
-                element.Properties.QuestionId.Equals(element.Properties.IsDateAfter))
+                element.Properties.QuestionId.Equals(element.Properties.IsDateBefore))
                     result.AddFailureMessage($"Date Validations Check, IsDateBefore validation, for question '{element.Properties.QuestionId}' - the form does not contain a comparison element with question id '{element.Properties.IsDateBefore}'");
 
             return result;

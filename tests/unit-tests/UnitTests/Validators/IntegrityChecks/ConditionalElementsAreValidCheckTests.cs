@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Validators.IntegrityChecks;
+using form_builder.Validators.IntegrityChecks.Form;
 using form_builder_tests.Builders;
 using Xunit;
 
@@ -11,23 +13,24 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 {
     public class ConditionalElementsAreValidCheckTests
     {
-        
-        [Fact]
-        public void ConditionalElementsAreValidCheck_IsValid_WhenConditionalElementIsFoundInJson()
+        [Theory]
+        [InlineData(EElementType.Radio, "conditionalOne", "conditionalOne")]
+        [InlineData(EElementType.Checkbox, "conditionalOne", "conditionalOne")]
+        public void ConditionalElementsAreValidCheck_IsValid(
+            EElementType elementType,
+            string conditionalElementId,
+            string conditionalElementCorrespondingId)
         {
             // Arrange
-            var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
+            var option1 = new Option { ConditionalElementId = conditionalElementId, Value = "Value1" };
             var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
-                .WithQuestionId("radio")
-                .WithLabel("First name")
+                .WithType(elementType)
                 .WithOptions(new List<Option> { option1 })
                 .Build();
 
             var element2 = new ElementBuilder()
                 .WithType(EElementType.Textbox)
-                .WithQuestionId("conditionalQuestion1")
-                .WithLabel("First name")
+                .WithQuestionId(conditionalElementCorrespondingId)
                 .WithConditionalElement(true)
                 .Build();
 
@@ -35,111 +38,45 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithElement(element1)
                 .WithElement(element2)
                 .Build();
-            
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .WithName("test-name")
-                .Build();
-
-            var check = new ConditionalElementsAreValidCheck();
-
-            // Act & Assert
-            var result = check.Validate(schema);
-
-            // Assert            
-            Assert.True(result.IsValid);
-        }
-
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldNotThrowApplicationException_WhenConditionalElementIdIsBlankInJson()
-        {
-            // Arrange
-            var option1 = new Option { ConditionalElementId = "", Value = "Value1" };
-            var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
-                .WithQuestionId("radio")
-                .WithLabel("First name")
-                .WithOptions(new List<Option> { option1 })
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element1)
-                .Build();
 
             var schema = new FormSchemaBuilder()
                 .WithPage(page)
                 .WithName("test-name")
                 .Build();
 
-            var check = new ConditionalElementsAreValidCheck();
-
             // Act & Assert
-            var result = check.Validate(schema);
-
-            // Assert            
-            Assert.True(result.IsValid);
-        }
-
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementNotFoundInJson()
-        {
-            // Arrange
-            var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
-            var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
-                .WithQuestionId("radio")
-                .WithLabel("First name")
-                .WithOptions(new List<Option> { option1 })
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element1)
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .WithName("test-name")
-                .Build();
-
-            var check = new ConditionalElementsAreValidCheck();
-
-            // Act & Assert
+            ConditionalElementCheck check = new();
             var result = check.Validate(schema);
 
             // Assert
-            Assert.False(result.IsValid);
+            Assert.True(result.IsValid);
+            Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
         }
 
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenTooManyConditionalElementsFoundInJson()
+        [Theory]
+        [InlineData(EElementType.Radio, "conditionalOne", "conditionalTwo")]
+        [InlineData(EElementType.Checkbox, "conditionalOne", "conditionalTwo")]
+        public void ConditionalElementsAreValidCheck_IsNotValid_NoCorrespondingConditionalId(
+            EElementType elementType,
+            string conditionalElementId,
+            string conditionalElementCorrespondingId)
         {
             // Arrange
-            var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
+            var option1 = new Option { ConditionalElementId = conditionalElementId, Value = "Value1" };
             var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
-                .WithQuestionId("radio")
-                .WithLabel("First name")
+                .WithType(elementType)
                 .WithOptions(new List<Option> { option1 })
                 .Build();
 
             var element2 = new ElementBuilder()
                 .WithType(EElementType.Textbox)
-                .WithQuestionId("conditionalQuestion1")
-                .WithLabel("First name")
-                .WithConditionalElement(true)
-                .Build();
-
-            var element3 = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithQuestionId("conditionalQuestion2")
-                .WithLabel("First name")
+                .WithQuestionId(conditionalElementCorrespondingId)
                 .WithConditionalElement(true)
                 .Build();
 
             var page = new PageBuilder()
                 .WithElement(element1)
                 .WithElement(element2)
-                .WithElement(element3)
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -147,36 +84,70 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithName("test-name")
                 .Build();
 
-            var check = new ConditionalElementsAreValidCheck();
-
-            // Act & Assert
+            // Act
+            ConditionalElementCheck check = new();
             var result = check.Validate(schema);
 
             // Assert
             Assert.False(result.IsValid);
+            Assert.All<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
 
-        [Fact]
-        public void CheckConditionalElementsAreValid_ShouldThrowApplicationException_WhenConditionalElementIsPlacedOnAnotherPageInJson()
+        [Theory]
+        [InlineData(EElementType.Radio, "conditionalOne")]
+        [InlineData(EElementType.Checkbox, "conditionalOne")]
+        public void ConditionalElementsAreValidCheck_IsNotValid_NoConditionalElement(
+            EElementType elementType,
+            string conditionalElementId)
         {
             // Arrange
-            var option1 = new Option { ConditionalElementId = "conditionalQuestion1", Value = "Value1" };
+            var option1 = new Option { ConditionalElementId = conditionalElementId, Value = "Value1" };
             var element1 = new ElementBuilder()
-                .WithType(EElementType.Radio)
-                .WithQuestionId("radio")
-                .WithLabel("First name")
+                .WithType(elementType)
                 .WithOptions(new List<Option> { option1 })
                 .Build();
 
-            var element2 = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithQuestionId("conditionalQuestion1")
-                .WithLabel("First name")
-                .WithConditionalElement(true)
+            var page = new PageBuilder()
+                .WithElement(element1)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithName("test-name")
+                .Build();
+
+            // Act
+            ConditionalElementCheck check = new();
+            var result = check.Validate(schema);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.All<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
+        }
+
+        [Theory]
+        [InlineData(EElementType.Radio, "conditionalOne", "conditionalTwo")]
+        [InlineData(EElementType.Checkbox, "conditionalOne", "conditionalTwo")]
+        public void ConditionalElementsAreValidCheck_IsNotValid_ConditionalElementOnAnotherPage(
+            EElementType elementType,
+            string conditionalElementId,
+            string conditionalElementCorrespondingId)
+        {
+            // Arrange
+            var option1 = new Option { ConditionalElementId = conditionalElementId, Value = "Value1" };
+            var element1 = new ElementBuilder()
+                .WithType(elementType)
+                .WithOptions(new List<Option> { option1 })
                 .Build();
 
             var page1 = new PageBuilder()
                 .WithElement(element1)
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId(conditionalElementCorrespondingId)
+                .WithConditionalElement(true)
                 .Build();
 
             var page2 = new PageBuilder()
@@ -189,13 +160,13 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithName("test-name")
                 .Build();
 
-            var check = new ConditionalElementsAreValidCheck();
-
-            // Act & Assert
+            // Act
+            ConditionalElementCheck check = new();
             var result = check.Validate(schema);
 
             // Assert
             Assert.False(result.IsValid);
+            Assert.All<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
     }
 }

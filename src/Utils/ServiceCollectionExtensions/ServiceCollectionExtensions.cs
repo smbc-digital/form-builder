@@ -287,6 +287,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddSingleton<IFormSchemaIntegrityCheck, RenderConditionsValidCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, RetrieveExternalActionsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ValidateActionCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
 
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
@@ -297,7 +298,6 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.AddSingleton<IElementSchemaIntegrityCheck, AddressNoManualTextIsSetCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, BookingElementCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, DateValidationsCheck>();
-            services.AddSingleton<IElementSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidQuestionCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidTargetMappingValueCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();

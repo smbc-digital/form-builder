@@ -1,182 +1,110 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Models;
-using form_builder.Validators.IntegrityChecks;
+using form_builder.Validators.IntegrityChecks.Form;
 using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Hosting;
-using Moq;
-using StockportGovUK.NetStandard.Models.Booking.Request;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 {
-    public class BookingCheckTests
+    public class BookingFormCheckTests
     {
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
-        
-        public BookingCheckTests()
-        {
-            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
-        }
-
-        [Fact]
-        public void BookingElementCheck_IsNotValid_WhenForm_DoesNotContain_RequiredCustomerFields()
+        [Theory]
+        [InlineData("customer.firstname", "customer.lastname", "test-page")]
+        [InlineData("customer.firstname", "customerlastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+        [InlineData("customerfirstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+        public void BookingFormCheck_IsNotValid(string firstName, string lastName,string pageSlug)
         {
             // Arrange
-            var element = new ElementBuilder()
+            var customerFirstName = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithTargetMapping(firstName)
+                .Build();
+
+            var customerLastName = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithTargetMapping(lastName)
+                .Build();
+
+            var page1 = new PageBuilder()
+                .WithElement(customerFirstName)
+                .WithElement(customerLastName)
+                .Build();
+
+            var bookingElement = new ElementBuilder()
                 .WithType(EElementType.Booking)
-                .WithQuestionId("booking")
-                .WithBookingProvider("Fake")
-                .WithAppointmentType(new AppointmentType { AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
+            var page2 = new PageBuilder()
+                .WithElement(bookingElement)
                 .Build();
 
-            var appointmentPage = new PageBuilder()
-                .WithPageSlug(BookingConstants.NO_APPOINTMENT_AVAILABLE)
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .WithPage(appointmentPage)
-                .Build();
-
-            var check = new BookingElementCheck(_mockHostingEnv.Object);
-
-            // Act
-            var result = check.Validate(schema);
-            Assert.False(result.IsValid);
-            Assert.Equal(1, result.Messages.Count);
-        }
-
-        [Fact]
-        public void BookingElementCheck_IsNotValid_WhenForm_DoesNotContain_Required_NoAppointmentsPage()
-        {
-            // Arrange
-            var pages = new List<Page>();
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithQuestionId("booking")
-                .WithBookingProvider("Fake")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-            
-            var schema = new FormSchemaBuilder()
-                .WithName("test-name")
-                .WithPage(page)
-                .Build();
-
-            var check = new BookingElementCheck(_mockHostingEnv.Object);
-
-            // Act
-            var result = check.Validate(schema);
-            Assert.False(result.IsValid);
-            Assert.All(result.Messages, message => Assert.StartsWith($"FAILURE - ", message));
-        }
-
-        [Fact]
-        public void BookingElementCheck_IsNotValid_WhenBookingElement_DoesNotContains_AppointmentType()
-        {
-            // Arrange
-            var pages = new List<Page>();
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithQuestionId("booking")
-                .WithBookingProvider("Fake")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
+            var page3 = new PageBuilder()
+                .WithPageSlug(pageSlug)
                 .Build();
 
             var schema = new FormSchemaBuilder()
                 .WithName("test-name")
-                .WithPage(page)
+                .WithPage(page1)
+                .WithPage(page2)
+                .WithPage(page3)
                 .Build();
-
-            var check = new BookingElementCheck(_mockHostingEnv.Object);
 
             // Act
+            BookingFormCheck check = new();
             var result = check.Validate(schema);
+
+            // Assert
             Assert.False(result.IsValid);
-            //Assert.True(result.Messages.Any(_ => _.Equals($"FAILURE - Booking Element Check, Booking element 'booking' requires a AppointmentType property on form test-name.")));
-            //Assert.Equal("PageHelper:CheckForBookingElement, Booking element requires a AppointmentType property.", result.Message);
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
 
-        [Fact]
-        public void BookingElementCheck_IsNotValid_WhenBookingElement_DoesNotContains_BookingProvider()
+        [Theory]
+        [InlineData("customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+        public void BookingFormCheck_IsValid(string firstName, string lastName,string pageSlug)
         {
             // Arrange
-            var pages = new List<Page>();
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithQuestionId("booking")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
+            var customerFirstName = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithTargetMapping(firstName)
                 .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
+            var customerLastName = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithTargetMapping(lastName)
+                .Build();
+
+            var page1 = new PageBuilder()
+                .WithElement(customerFirstName)
+                .WithElement(customerLastName)
+                .Build();
+
+            var bookingElement = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithElement(bookingElement)
+                .Build();
+
+            var page3 = new PageBuilder()
+                .WithPageSlug(pageSlug)
                 .Build();
 
             var schema = new FormSchemaBuilder()
                 .WithName("test-name")
-                .WithPage(page)
+                .WithPage(page1)
+                .WithPage(page2)
+                .WithPage(page3)
                 .Build();
 
-            var check = new BookingElementCheck(_mockHostingEnv.Object);
-
             // Act
+            BookingFormCheck check = new();
             var result = check.Validate(schema);
-            Assert.False(result.IsValid);
-            Assert.Contains("FAILURE - Booking Element Check, Booking element 'booking' requires a valid booking provider property on form test-name.", result.Messages);
+
+            // Assert
+            Assert.True(result.IsValid);
+            Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
         }
-
-        [Fact]
-        public void BookingElementCheck_IsNotValid_WhenBookingElement_Contains_EmptyGuid_ForOptionalResources()
-        {
-            // Arrange
-            var pages = new List<Page>();
-
-            var appointmentType = new AppointmentTypeBuilder()
-                .WithEnvironment("local")
-                .WithOptionalResource(new BookingResource { ResourceId = Guid.Empty, Quantity = 1 })
-                .Build();
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithQuestionId("booking")
-                .WithBookingProvider("TestProvider")
-                .WithAppointmentType(appointmentType)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithName("test-name")
-                .WithPage(page)
-                .Build();
-
-            var check = new BookingElementCheck(_mockHostingEnv.Object);
-
-            // Act
-            var result = check.Validate(schema);
-            Assert.False(result.IsValid);
-            Assert.Contains("FAILURE - Booking Element Check, Booking element 'booking', optional resources are invalid, ResourceId cannot be an empty Guid on form test-name.", result.Messages);
-        }  
     }
 }     
