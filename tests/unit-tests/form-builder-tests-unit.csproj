@@ -8,13 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-
-    <Compile Remove="UnitTests\Validators\IntegrityChecks\InvalidQuestionOrTargetMappingValueCheckTests.cs" />
-    <Compile Remove="UnitTests\Validators\IntegrityChecks\PaymemtConfigurationCheckTests.cs" />
+    <Compile Remove="UnitTests\Validators\IntegrityChecks\InvalidTargetMappingValueCheckTests.cs" />
     <Compile Remove="UnitTests\Validators\IntegrityChecks\QuestionIdExistsForBookingCustomerAddressIdCheckTests.cs" />
-    <Compile Remove="UnitTests\Validators\IntegrityChecks\RenderConditionsValidCheckTests.cs" />
-    <Compile Remove="UnitTests\Validators\IntegrityChecks\RetrieveExternalActionsCheckTests.cs" />
-    <Compile Remove="UnitTests\Validators\IntegrityChecks\SubmitSlugsHaveAllPropertiesCheckTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

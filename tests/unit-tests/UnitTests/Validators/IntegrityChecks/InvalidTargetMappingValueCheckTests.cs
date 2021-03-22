@@ -7,7 +7,7 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 {
-    public class InvalidQuestionOrTargetMappingValueCheckTests
+    public class InvalidTargetMappingValueCheckTests
     {
         [Theory]
         [InlineData("invalid-questionId", "")]
