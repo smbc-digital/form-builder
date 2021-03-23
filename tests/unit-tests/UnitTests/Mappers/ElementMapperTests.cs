@@ -549,8 +549,11 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var questionId = "testbookingId";
-            var dateTime = DateTime.Now;
+            var date = DateTime.Today;
             var startTime = DateTime.Today.Add(new TimeSpan(22, 0, 0));
+            var id = Guid.NewGuid();
+            var hashedId = "hashedId";
+            var location = "location";
             var element = new ElementBuilder()
                   .WithQuestionId(questionId)
                   .WithType(EElementType.Booking)
@@ -562,8 +565,11 @@ namespace form_builder_tests.UnitTests.Mappers
                 {
                     new PageAnswers {
                         Answers = new List<Answers> {
-                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = dateTime.ToString() },
-                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = dateTime.ToString() }
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = date.ToString() },
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = startTime.ToString() },
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_ID}", Response = id.ToString() },
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.APPOINTMENT_LOCATION}", Response = location },
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_HASHED_ID}", Response = hashedId }
                         }
                     }
                 }
@@ -573,7 +579,12 @@ namespace form_builder_tests.UnitTests.Mappers
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
-            var dateTimeResult = Assert.IsType<Booking>(result);
+            var bookingResult = Assert.IsType<Booking>(result);
+            Assert.Equal(id, bookingResult.Id);
+            Assert.Equal(location, bookingResult.Location);
+            Assert.Equal(hashedId, bookingResult.HashedId);
+            Assert.Equal(date, bookingResult.Date);
+            Assert.Equal(startTime, bookingResult.StartTime);
         }
 
 

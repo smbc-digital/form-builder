@@ -94,7 +94,7 @@ namespace form_builder.Services.SubmitService
             }
             else
             { 
-            _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(submitSlug.AuthToken)
+                _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(submitSlug.AuthToken)
                 ? string.Empty
                 : submitSlug.AuthToken);
 
