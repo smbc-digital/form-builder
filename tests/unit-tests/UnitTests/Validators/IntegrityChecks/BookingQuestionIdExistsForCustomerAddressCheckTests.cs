@@ -1,15 +1,17 @@
 using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Validators.IntegrityChecks.Form;
 using form_builder_tests.Builders;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 {
-    public class QuestionIdExistsForBookingCustomerAddressIdCheckTests
+    public class BookingQuestionIdExistsForCustomerAddressCheckTests
     {
         
         [Fact]
-        public void QuestionIdExistsForBookingCustomerAddressIdCheck_IsNotValid_WhenQuestionIdDoesNotExist()
+        public void BookingQuestionIdExistsForCustomerAddressCheck_NotValid()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -29,7 +31,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithCustomerAddressId("additionalAddress")
                 .Build();
 
-            var page = new PageBuilder()
+            var page1 = new PageBuilder()
                 .WithElement(element)
                 .Build();
             
@@ -42,23 +44,24 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .Build();
 
             var schema = new FormSchemaBuilder()
-                .WithPage(page)
+                .WithPage(page1)
                 .WithPage(page2)
                 .WithPage(page3)
                 .WithName("test-name")
                 .Build();
 
-            var check = new QuestionIdExistsForBookingCustomerAddressIdCheck();
 
             // Act
+            BookingQuestionIdExistsForCustomerAddressCheck check = new();
             var result = check.Validate(schema);
             
             // Assert
             Assert.False(result.IsValid);
+            Assert.Collection(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
 
         [Fact]
-        public void CheckQuestionIdExistsForBookingCustomerAddressId_ShouldNotThrowException_WhenQuestionIdExists()
+        public void BookingQuestionIdExistsForCustomerAddressCheck_Valid()
         {
             // Arrange
             var addressElement = new ElementBuilder()
@@ -72,7 +75,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithCustomerAddressId("address")
                 .Build();
 
-            var page = new PageBuilder()
+            var page1 = new PageBuilder()
                 .WithElement(addressElement)
                 .Build();
 
@@ -81,18 +84,19 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .Build();
 
             var schema = new FormSchemaBuilder()
-                .WithPage(page)
+                .WithPage(page1)
                 .WithPage(page2)
                 .WithName("test-name")
                 .Build();
 
-            var check = new QuestionIdExistsForBookingCustomerAddressIdCheck();
 
             // Act
+            BookingQuestionIdExistsForCustomerAddressCheck check = new();
             var result = check.Validate(schema);
             
             // Assert
             Assert.True(result.IsValid);
+            Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
         }
     }
 }
