@@ -20,9 +20,6 @@ namespace form_builder.Utils.Hash
             return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
         }
 
-        public bool Check(string reference, string hash)
-        {
-            return hash.Equals(Hash(reference));
-        }
+        public bool Check(string reference, string hash) => hash.Equals(Hash(reference));
     }
 }
