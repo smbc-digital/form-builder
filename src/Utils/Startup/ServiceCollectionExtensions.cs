@@ -77,7 +77,9 @@ using form_builder.Workflows.DocumentWorkflow;
 using form_builder.Workflows.PaymentWorkflow;
 using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
-namespace form_builder.Utils.ServiceCollectionExtensions
+using form_builder.Utils.Hash;
+
+namespace form_builder.Utils.Startup
 {
     [ExcludeFromCodeCoverage]
     public static class ServiceCollectionExtensions
@@ -389,6 +391,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection("ReCaptchaConfiguration"));
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
             services.Configure<TagManagerConfiguration>(TagManagerId => configuration.GetValue<string>("GoogleTagManagerId"));
+            services.Configure<HashConfiguration>(configuration.GetSection("HashConfiguration"));
 
             return services;
         }
@@ -486,6 +489,13 @@ namespace form_builder.Utils.ServiceCollectionExtensions
                 o.ViewLocationFormats.Add("/Views/Shared/TimeInput/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/Warning/{0}" + RazorViewEngine.ViewExtension);
             });
+
+            return services;
+        }
+
+        public static IServiceCollection AddUtilities(this IServiceCollection services)
+        {
+            services.AddSingleton<IHashUtil, HashUtil>();
 
             return services;
         }
