@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 using form_builder.Builders;
 using form_builder.Cache;
 using form_builder.Configuration;
@@ -9,8 +11,6 @@ using form_builder.Models;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Validators.IntegrityChecks.Form;
 using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 

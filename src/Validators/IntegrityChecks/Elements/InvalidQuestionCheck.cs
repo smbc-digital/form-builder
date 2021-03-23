@@ -1,5 +1,5 @@
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators.IntegrityChecks.Elements
