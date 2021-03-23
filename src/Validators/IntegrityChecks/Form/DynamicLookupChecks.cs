@@ -32,50 +32,49 @@ namespace form_builder.Validators.IntegrityChecks.Form
                        element.Lookup.Equals(LookUpConstants.Dynamic))
                 .ToList();
 
-            if (elements.Any())
+            if (elements.Count == 0)
+                return result;
+
+            foreach (var element in elements)
             {
-                foreach (var element in elements)
+                if (element.Properties.LookupSources is not null)
                 {
-                    if (element.Properties.LookupSources is not null)
+                    result.AddFailureMessage($"Any Condition Type Check, any condition type requires a comparison value in form.");
+                    return result;
+                }
+
+                if (!element.Properties.LookupSources
+                    .Any(lookup => lookup.EnvironmentName
+                    .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase)))
+                        result.AddFailureMessage($"The provided json has no Environment details for this:({_environment.EnvironmentName}) Environment");
+
+                foreach (var env in element.Properties.LookupSources)
+                {
+                    if (string.IsNullOrEmpty(env.EnvironmentName))
+                        result.AddFailureMessage($"The provided json has no Environment Name");
+
+                    if (string.IsNullOrEmpty(env.Provider))
+                        result.AddFailureMessage($"The provided json has no Provider Name");
+
+                    try
                     {
-                        if (!element.Properties.LookupSources
-                            .Any(lookup => lookup.EnvironmentName
-                            .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase)))
-                            result.AddFailureMessage($"The provided json '{schema.FormName}' has no Environment details for this:({_environment.EnvironmentName}) Environment");
-
-                        foreach (var env in element.Properties.LookupSources)
-                        {
-                            if (string.IsNullOrEmpty(env.EnvironmentName))
-                                result.AddFailureMessage($"The provided json '{schema.FormName}' has no Environment Name");
-
-                            if (string.IsNullOrEmpty(env.Provider))
-                                result.AddFailureMessage($"The provided json '{schema.FormName}' has no Provider Name");
-
-                            try
-                            {
-                                _lookupProviders.Get(env.Provider);
-                            }
-                            catch (Exception e)
-                            {
-                                result.AddFailureMessage($"No specified Providers in form {schema.FormName}. Error Message {e.Message}");
-                            }
-
-                            if (string.IsNullOrEmpty(env.URL))
-                                result.AddFailureMessage($"The provided json '{schema.FormName}' has no API URL to submit to");
-
-                            if (string.IsNullOrEmpty(env.AuthToken))
-                                result.AddFailureMessage($"The provided json '{schema.FormName}' has no auth token for the API");
-
-                            if (!_environment.IsEnvironment("local") &&
-                                 !env.EnvironmentName.Equals("local", StringComparison.OrdinalIgnoreCase) &&
-                                 !env.URL.StartsWith("https://"))
-                                result.AddFailureMessage($"SubmitUrl must start with https, in form {schema.FormName}");
-                        }
+                        _lookupProviders.Get(env.Provider);
                     }
-                    else
+                    catch (Exception e)
                     {
-                        result.AddFailureMessage($"Any Condition Type Check, any condition type requires a comparison value in form {schema.FormName}");
+                        result.AddFailureMessage($"No specified Providers in form. Error Message {e.Message}");
                     }
+
+                    if (string.IsNullOrEmpty(env.URL))
+                        result.AddFailureMessage($"The provided json has no API URL to submit to");
+
+                    if (string.IsNullOrEmpty(env.AuthToken))
+                        result.AddFailureMessage($"The provided json has no auth token for the API");
+
+                    if (!_environment.IsEnvironment("local") &&
+                         !env.EnvironmentName.Equals("local", StringComparison.OrdinalIgnoreCase) &&
+                         !env.URL.StartsWith("https://"))
+                        result.AddFailureMessage($"SubmitUrl must start with https, in form.");
                 }
             }
 

@@ -31,10 +31,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
-        public IntegrityCheckResult Validate(FormSchema schema)
-        {
-            return ValidateAsync(schema).Result;
-        }
+        public IntegrityCheckResult Validate(FormSchema schema) => ValidateAsync(schema).Result;
 
         public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema)
         {
@@ -54,31 +51,30 @@ namespace form_builder.Validators.IntegrityChecks.Form
             if (formPaymentInformation is null)
             {
                 result.AddFailureMessage($"No payment information configured.");
+                return result;
             }
-            else
+
+            IPaymentProvider paymentProvider = _paymentProviders
+                .FirstOrDefault(provider => provider.ProviderName
+                .Equals(formPaymentInformation.PaymentProvider));
+
+            if (paymentProvider is null)
             {
-                IPaymentProvider paymentProvider = _paymentProviders
-                    .FirstOrDefault(provider => provider.ProviderName
-                    .Equals(formPaymentInformation.PaymentProvider));
+                result.AddFailureMessage($"No payment provider configured for provider '{formPaymentInformation.PaymentProvider}'");
+                return result;
+            }
 
-                if (paymentProvider is null)
-                {
-                    result.AddFailureMessage($"No payment provider configured for provider '{formPaymentInformation.PaymentProvider}'");
-                    return result;
-                }
+            if (formPaymentInformation.Settings.ComplexCalculationRequired)
+            {
+                var paymentSummaryElement = schema.Pages
+                    .SelectMany(page => page.Elements)
+                    .First(element => element.Type.Equals(EElementType.PaymentSummary));
 
-                if (formPaymentInformation.Settings.ComplexCalculationRequired)
-                {
-                    var paymentSummaryElement = schema.Pages
-                        .SelectMany(page => page.Elements)
-                        .First(element => element.Type.Equals(EElementType.PaymentSummary));
-
-                    if (!_environment.IsEnvironment("local") &&
-                        !paymentSummaryElement.Properties.CalculationSlugs
-                            .Where(submitSlug => !submitSlug.Environment.Equals("local", StringComparison.OrdinalIgnoreCase))
-                            .Any(submitSlug => submitSlug.URL.StartsWith("https://")))
-                        result.AddFailureMessage($"PaymentSummary::CalculateCostUrl must start with https");
-                }
+                if (!_environment.IsEnvironment("local") &&
+                    !paymentSummaryElement.Properties.CalculationSlugs
+                        .Where(submitSlug => !submitSlug.Environment.Equals("local", StringComparison.OrdinalIgnoreCase))
+                        .Any(submitSlug => submitSlug.URL.StartsWith("https://")))
+                    result.AddFailureMessage($"PaymentSummary::CalculateCostUrl must start with https");
             }
 
             return result;

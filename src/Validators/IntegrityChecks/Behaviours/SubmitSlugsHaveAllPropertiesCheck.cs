@@ -18,7 +18,7 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
         {
             IntegrityCheckResult result = new();
 
-            foreach (var behaviour in behaviours.Where(behaviour => behaviour.SubmitSlugs is not null && behaviour.SubmitSlugs.Any()))
+            foreach (var behaviour in behaviours.Where(behaviour => behaviour.SubmitSlugs is not null && behaviour.SubmitSlugs.Count > 0))
             {
                 foreach (var submitSlug in behaviour.SubmitSlugs)
                 {
