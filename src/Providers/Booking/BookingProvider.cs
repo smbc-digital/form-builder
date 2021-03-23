@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using form_builder.Exceptions;
+using form_builder.Models.Booking;
 using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
@@ -77,6 +78,11 @@ namespace form_builder.Providers.Booking
                 throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
 
             return result.ResponseContent;
+        }
+
+        public Task<AppointmentInformation> GetAppointment(Guid bookingId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

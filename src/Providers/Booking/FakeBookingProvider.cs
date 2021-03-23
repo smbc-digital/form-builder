@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Exceptions;
+using form_builder.Models.Booking;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 
@@ -91,23 +92,23 @@ namespace form_builder.Providers.Booking
             var response = new List<AvailabilityDayResponse>();
             switch (request.StartDate.Month)
             {
-                case 11:
+                case 3:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 13), 1, true)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 15), 1, true)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 22), 1, true)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 23), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 13), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 15), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 22), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 23), 1, true)
                         .Build();
                     break;
-                case 12:
+                case 4:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 15), 1, true)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 12), 1, true)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 13), 1, true)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 20), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 15), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 12), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 13), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 20), 1, true)
                         .Build();
                     break;
-                case 1:
+                case 5:
                     response = new AvailabilityDayResponseBuilder()
                         .WithDay(new DateTime(2021, request.StartDate.Month, 1), 1, true)
                         .WithDay(new DateTime(2021, request.StartDate.Month, 4), 1, true)
@@ -115,7 +116,7 @@ namespace form_builder.Providers.Booking
                         .WithDay(new DateTime(2021, request.StartDate.Month, 22), 1, true)
                         .Build();
                     break;
-                case 2:
+                case 6:
                     response = new AvailabilityDayResponseBuilder()
                         .WithDay(new DateTime(2021, request.StartDate.Month, 4), 1, true)
                         .WithDay(new DateTime(2021, request.StartDate.Month, 5), 1, true)
@@ -166,6 +167,17 @@ namespace form_builder.Providers.Booking
         public Task<string> GetLocation(LocationRequest request)
         {
             return Task.FromResult("Test, Test St, Stockport SK1 3UR");
+        }
+
+        public Task<AppointmentInformation> GetAppointment(Guid bookingId)
+        {
+            return Task.FromResult(new AppointmentInformation
+            {
+                BookingDate = new DateTime(2021, 3, 13),
+                Cancellable = true,
+                StartDate = new DateTime(2021, 3, 13),
+                EndDate = new DateTime(2021, 3, 14)
+            });
         }
     }
 }
