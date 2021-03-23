@@ -1,6 +1,6 @@
-using System.Linq;
+using form_builder.Constants;
 using form_builder.Models;
-using form_builder.Validators.IntegrityChecks;
+using form_builder.Validators.IntegrityChecks.Form;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
@@ -17,12 +17,12 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 GenerateReferenceNumber = true,
                 ReferencePrefix = "TEST"
             };
-            
-            var check = new GeneratedIdConfigurationCheck();
+
+            GeneratedIdConfigurationCheck check = new();
 
             // Act
             var result = check.Validate(schema);
-            Assert.Equal($"FAILURE - Generated Id Configuration Check, 'GeneratedReferenceNumberMapping' and 'ReferencePrefix' must both have a value in form test-form", result.Messages.First());
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
 
         [Fact]
@@ -35,12 +35,12 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 GenerateReferenceNumber = true,
                 GeneratedReferenceNumberMapping = "CaseReference"
             };
-            
-            var check = new GeneratedIdConfigurationCheck();
+
+            GeneratedIdConfigurationCheck check = new();
 
             // Act
             var result = check.Validate(schema);
-            Assert.Equal($"FAILURE - Generated Id Configuration Check, 'GeneratedReferenceNumberMapping' and 'ReferencePrefix' must both have a value in form test-form", result.Messages.First());
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
 
         [Fact]
@@ -54,12 +54,13 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 GeneratedReferenceNumberMapping = "CaseReference",
                 ReferencePrefix = "TEST"
             };
-            
-            var check = new GeneratedIdConfigurationCheck();
+
+            GeneratedIdConfigurationCheck check = new();
 
             // Act
             var result = check.Validate(schema);
             Assert.True(result.IsValid);
+            Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
         }
     }
 }

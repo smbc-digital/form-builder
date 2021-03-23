@@ -1,11 +1,12 @@
-using System.Linq;
-using form_builder.Enum;
-using form_builder.Models;
-using form_builder.Validators.IntegrityChecks;
-using form_builder_tests.Builders;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
 using Xunit;
+using form_builder.Constants;
+using form_builder.Enum;
+using form_builder.Models;
+using form_builder.Validators.IntegrityChecks.Behaviours;
+using form_builder_tests.Builders;
 
 namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 {
@@ -29,28 +30,22 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 URL = "test-url"
             };
 
-            var behaviour = new BehaviourBuilder()
+            var behaviours = new List<Behaviour>
+            {
+                new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
                 .WithSubmitSlug(submitSlug)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithBehaviour(behaviour)
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .WithName("test-name")
-                .Build();
+                .Build()
+            };
 
             var check = new CurrentEnvironmentSubmitSlugsCheck(_mockHostingEnv.Object);
 
             // Act & Assert
-            var result = check.Validate(schema);
+            var result = check.Validate(behaviours);
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Contains("FAILURE - No SubmitSlug found in form 'test-name' for environment 'local'.", result.Messages);
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
     }
 }

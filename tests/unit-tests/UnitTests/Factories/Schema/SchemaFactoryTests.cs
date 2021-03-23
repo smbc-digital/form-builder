@@ -9,7 +9,7 @@ using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Models;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
-using form_builder.Validators;
+using form_builder.Validators.IntegrityChecks;
 using form_builder_tests.Builders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;

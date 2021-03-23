@@ -1,8 +1,6 @@
-using System.Linq;
-using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Models.Properties.ActionProperties;
-using form_builder.Validators.IntegrityChecks;
+using form_builder.Validators.IntegrityChecks.Form;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Moq;

@@ -1,9 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
 using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Models;
-using form_builder.Validators.IntegrityChecks;
+using form_builder.Validators.IntegrityChecks.Form;
 using form_builder_tests.Builders;
 using Xunit;
 
@@ -38,11 +36,12 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithPage(page)
                 .Build();
 
-            var check = new AnyConditionTypeCheck();
+            AnyConditionTypeCheck check = new();
 
             // Act & Assert
             var result = check.Validate(schema);
             Assert.False(result.IsValid);
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
 
         [Fact]
@@ -73,11 +72,12 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithPage(page)
                 .Build();
 
-            var check = new AnyConditionTypeCheck();
+            AnyConditionTypeCheck check = new();
 
             // Act & Assert
             var result = check.Validate(schema);
             Assert.True(result.IsValid);
+            Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
         }
     }
 }

@@ -1,13 +1,13 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Cache;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Providers.PaymentProvider;
-using form_builder.Validators.IntegrityChecks;
+using form_builder.Validators.IntegrityChecks.Form;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
@@ -86,7 +86,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             // Assert
             var result = await check.ValidateAsync(schema);
             Assert.False(result.IsValid);
-            Assert.Contains("FAILURE - No payment information configured for 'test-name' form", result.Messages);
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
 
         [Fact]
@@ -204,7 +204,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             var result = await check.ValidateAsync(schema);
-            Assert.Contains("FAILURE - PaymentSummary::CalculateCostUrl must start with https", result.Messages);
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
             Assert.False(result.IsValid);
         }
 
@@ -234,8 +234,8 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             // Assert
             var result = await check.ValidateAsync(schema);
-            Assert.False(result.IsValid);       
-            Assert.Contains("FAILURE - No payment provider configured for provider 'invalidProvider'", result.Messages);
+            Assert.False(result.IsValid);
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
     }
 }
