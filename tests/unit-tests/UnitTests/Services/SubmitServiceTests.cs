@@ -182,6 +182,54 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task ProcessSubmission_ShouldCallGateway_WithFlowAuthToken() {
+            // Arrange
+            var questionId = "testQuestion";
+            var callbackValue = new ExpandoObject() as IDictionary<string, object>;
+
+            var element = new ElementBuilder()
+                .WithQuestionId(questionId)
+                .WithType(EElementType.Textarea)
+                .Build();
+
+            var submitSlug = new SubmitSlug { AuthToken = "flowtoken:TestToken", Environment = "local", URL = "www.location.com" };
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlug)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.OK
+                })
+                .Callback<string, object, string, string>((x, y, a, b) => callbackValue = (ExpandoObject)y);
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            // Act
+            await _service.ProcessSubmission(new MappingEntity { Data = new ExpandoObject(), BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "123454");
+
+            // Assert
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+
+            Assert.NotNull(callbackValue);
+        }
+
+        [Fact]
         public async Task PreProcessSubmission_ShouldCallGateway_CreateReferenceAndSave()
         {
             // Arrange
