@@ -221,7 +221,7 @@ namespace form_builder.Mappers
             var bookingEndTime = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentEndTime))?.Response;
             var bookingLocation = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentLocation))?.Response;
             bookingObject.Id = bookingId != null ? Guid.Parse(bookingId) : Guid.Empty;
-            bookingObject.HashedId = _hashUtil.Hash(bookingObject.Id.ToString());
+            bookingObject.HashedId = bookingId != null ? _hashUtil.Hash(bookingObject.Id.ToString()) : string.Empty;
             bookingObject.Date = bookingDate != null ? DateTime.Parse(bookingDate) : DateTime.MinValue;
             bookingObject.StartTime = bookingStartTime != null ? DateTime.Parse(bookingStartTime) : DateTime.MinValue;
             bookingObject.EndTime = bookingEndTime != null ? DateTime.Parse(bookingEndTime) : DateTime.MinValue;
