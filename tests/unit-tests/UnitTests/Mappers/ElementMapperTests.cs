@@ -7,6 +7,7 @@ using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.Utils.Extensions;
+using form_builder.Utils.Hash;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
@@ -20,10 +21,15 @@ namespace form_builder_tests.UnitTests.Mappers
     {
         private readonly ElementMapper _elementMapper;
         private readonly Mock<IDistributedCacheWrapper> _wrapper = new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<IHashUtil> _mockHashUtil = new Mock<IHashUtil>();
 
         public ElementMapperTests()
         {
-            _elementMapper = new ElementMapper(_wrapper.Object);
+            _mockHashUtil
+                .Setup(_ => _.Hash(It.IsAny<string>()))
+                .Returns("hashedId");
+
+            _elementMapper = new ElementMapper(_wrapper.Object, _mockHashUtil.Object);
         }
 
         [Fact]
@@ -568,8 +574,7 @@ namespace form_builder_tests.UnitTests.Mappers
                             new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = date.ToString() },
                             new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = startTime.ToString() },
                             new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_ID}", Response = id.ToString() },
-                            new Answers { QuestionId = $"{questionId}-{BookingConstants.APPOINTMENT_LOCATION}", Response = location },
-                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_HASHED_ID}", Response = hashedId }
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.APPOINTMENT_LOCATION}", Response = location }
                         }
                     }
                 }
