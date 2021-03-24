@@ -90,7 +90,7 @@ namespace form_builder.Services.SubmitService
 
             if (submitSlug.AuthToken.ToLower().StartsWith("flowtoken"))
             {
-                var token = submitSlug.AuthToken.Split(':')[1];
+                var token = submitSlug.AuthToken.Split(':')[1]; 
                 response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data, "flowtoken", token);
             }
             else
