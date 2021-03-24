@@ -36,7 +36,6 @@ namespace form_builder.Services.BookingService
         private readonly IMappingService _mappingService;
         private readonly IWebHostEnvironment _environment;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
-        private readonly IHashUtil _hashUtil;
 
         public BookingService(
             IDistributedCacheWrapper distributedCache,
@@ -45,8 +44,7 @@ namespace form_builder.Services.BookingService
             IPageFactory pageFactory,
             IMappingService mappingService,
             IWebHostEnvironment environment,
-            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            IHashUtil hashUtil)
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
@@ -54,7 +52,6 @@ namespace form_builder.Services.BookingService
             _pageFactory = pageFactory;
             _mappingService = mappingService;
             _environment = environment;
-            _hashUtil = hashUtil;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
@@ -283,7 +280,7 @@ namespace form_builder.Services.BookingService
         private async Task<Guid> ReserveAppointment(Booking bookingElement, Dictionary<string, dynamic> viewModel, string form, string guid)
         {
             var reservedBookingId = bookingElement.ReservedIdQuestionId;
-            var reservedBookingHashedId = bookingElement.ReservedHashedIdQuestionId;
+            
             var reservedBookingDate = bookingElement.ReservedDateQuestionId;
             var reservedBookingStartTime = bookingElement.ReservedStartTimeQuestionId;
             var reservedBookingEndTime = bookingElement.ReservedEndTimeQuestionId;
@@ -321,7 +318,6 @@ namespace form_builder.Services.BookingService
             viewModel.Add(reservedBookingStartTime, viewModel[currentlySelectedBookingStartTime]);
             viewModel.Add(reservedBookingEndTime, viewModel[currentlySelectedBookingEndTime]);
             viewModel.Add(reservedBookingId, result);
-            viewModel.Add(reservedBookingHashedId, _hashUtil.Hash(result.ToString()));
 
             return result;
         }
