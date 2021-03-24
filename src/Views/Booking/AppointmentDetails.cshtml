@@ -1,0 +1,41 @@
+﻿@using form_builder.Models.Properties.ElementProperties;
+
+@model CancelBookingViewModel
+@{
+    ViewData["Title"] = Model.FormName;
+    ViewData["PageTitle"] = Model.PageTitle;
+    ViewData["FeedbackForm"] = Model.FeedbackForm;
+    ViewData["FeedbackPhase"] = Model.FeedbackPhase;
+    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadCrumbs;
+    ViewData["Breadcrumbs"] = Model.BreadCrumbs;
+
+    var buttonModel = new Button
+    {
+        Properties = new BaseProperty
+        {
+            Text = "Submit"
+        }
+    };
+}
+
+<h1 class="govuk-heading-l">Cancel your booking</h1>
+<table class="govuk-table">
+    <tr class="govuk-table__row">
+        <th scope="row" class="smbc-table__header">Date:</th>
+        <td class="govuk-table__cell">@Model.FormattedCancelBookingDate</td>
+    </tr>
+    <tr class="govuk-table__row">
+        <th scope="row" class="smbc-table__header">Time:</th>
+        <td class="govuk-table__cell">@Model.FormattedTime</td>
+    </tr>
+    <tr class="govuk-table__row">
+        <th scope="row" class="smbc-table__header">Full day:</th>
+        <td class="govuk-table__cell">@Model.appointmentInformation.IsFullday</td>
+    </tr>
+</table>
+
+<partial name="Button" model="buttonModel" />
+
+<p class="smbc-body">
+    <a class="govuk-link" href="https://www.stockport.gov.uk">Go back to the homepage</a>
+</p>

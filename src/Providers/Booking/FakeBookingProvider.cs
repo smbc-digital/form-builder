@@ -171,12 +171,26 @@ namespace form_builder.Providers.Booking
 
         public Task<AppointmentInformation> GetAppointment(Guid bookingId)
         {
+            var guid = new Guid("49e55a45-662a-40f4-9f08-bb1de675d144");
+            if (!guid.Equals(bookingId))
+            {
+                return Task.FromResult(new AppointmentInformation
+                {
+                    BookingDate = new DateTime(2021, 4, 13),
+                    Cancellable = false,
+                    StartTime = new TimeSpan(1,1,1),
+                    EndTime = new TimeSpan(2,1, 1),
+                    IsFullday = false
+                });
+            }
+
             return Task.FromResult(new AppointmentInformation
             {
                 BookingDate = new DateTime(2021, 3, 13),
                 Cancellable = true,
-                StartDate = new DateTime(2021, 3, 13),
-                EndDate = new DateTime(2021, 3, 14)
+                StartTime = new TimeSpan(2, 1, 1),
+                EndTime = new TimeSpan(23, 1, 1),
+                IsFullday = false
             });
         }
     }
