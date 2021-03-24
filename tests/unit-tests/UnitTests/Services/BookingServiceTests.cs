@@ -19,6 +19,7 @@ using form_builder.Services.BookingService;
 using form_builder.Services.BookingService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.PageService.Entities;
+using form_builder.Utils.Hash;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
@@ -41,6 +42,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockdistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IHashUtil> _mockHashUtil = new Mock<IHashUtil>();
         private readonly DistributedCacheExpirationConfiguration _cacheConfig = new DistributedCacheExpirationConfiguration { Booking = 5, BookingNoAppointmentsAvailable = 10 };
         public BookingServiceTests()
         {
@@ -55,6 +57,7 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
+            _mockHashUtil.Setup(_ => _.Hash(It.IsAny<string>())).Returns("hashedId");
 
             _service = new BookingService(
               _mockDistributedCache.Object,
@@ -63,7 +66,8 @@ namespace form_builder_tests.UnitTests.Services
               _mockPageFactory.Object,
               _mockMappingService.Object,
               _mockHostingEnv.Object,
-              _mockdistributedCacheExpirationConfiguration.Object);
+              _mockdistributedCacheExpirationConfiguration.Object,
+              _mockHashUtil.Object);
         }
 
         [Fact]
@@ -459,6 +463,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessBooking(model, page, formSchema, "guid", "path");
 
             _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
+            _mockHashUtil.Verify(_ => _.Hash(It.IsAny<string>()), Times.Once);
             _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
         }
