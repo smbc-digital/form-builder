@@ -4,7 +4,7 @@ namespace form_builder.Models.Booking
 {
     public class AppointmentInformation
     {
-        public string AppointmentName { get; set; }
+        public Guid AppointmentId { get; set; }
         public bool Cancellable { get; set; }
         public DateTime BookingDate { get; set; }
         public TimeSpan StartTime { get; set; }

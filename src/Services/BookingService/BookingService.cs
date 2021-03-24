@@ -8,7 +8,9 @@ using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Extensions;
+using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Booking;
 using form_builder.Models.Elements;
@@ -18,6 +20,7 @@ using form_builder.Services.BookingService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Utils.Extensions;
+using form_builder.Utils.Hash;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -34,6 +37,9 @@ namespace form_builder.Services.BookingService
         private readonly IPageFactory _pageFactory;
         private readonly IMappingService _mappingService;
         private readonly IWebHostEnvironment _environment;
+        private readonly ISchemaFactory _schemaFactory;
+        private readonly ISessionHelper _sessionHelper;
+        private readonly IHashUtil _hashUtil;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
         public BookingService(
@@ -43,6 +49,9 @@ namespace form_builder.Services.BookingService
             IPageFactory pageFactory,
             IMappingService mappingService,
             IWebHostEnvironment environment,
+            ISchemaFactory schemaFactory,
+            ISessionHelper sessionHelper,
+            IHashUtil hashUtil,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
             _distributedCache = distributedCache;
@@ -51,6 +60,9 @@ namespace form_builder.Services.BookingService
             _pageFactory = pageFactory;
             _mappingService = mappingService;
             _environment = environment;
+            _schemaFactory = schemaFactory;
+            _sessionHelper = sessionHelper;
+            _hashUtil = hashUtil;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
@@ -127,8 +139,19 @@ namespace form_builder.Services.BookingService
             }
         }
 
-        public async Task ProcessMonthRequest(Dictionary<string, object> viewModel, FormSchema baseForm, Page currentPage, string guid)
+        public async Task ProcessMonthRequest(Dictionary<string, object> viewModel, string form, string path)
         {
+            var baseForm = await _schemaFactory.Build(form);
+
+            if (baseForm == null)
+                throw new ApplicationException($"Requested form '{form}' could not be found.");
+
+            var currentPage = baseForm.GetPage(_pageHelper, path);
+            if (currentPage == null)
+                throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
+
+            var guid = _sessionHelper.GetSessionGuid();
+
             if (!viewModel.ContainsKey(BookingConstants.BOOKING_MONTH_REQUEST))
                 throw new ApplicationException("BookingService::ProcessMonthRequest, request for appointment did not contain requested month");
 
@@ -177,6 +200,32 @@ namespace form_builder.Services.BookingService
             };
 
             _pageHelper.SaveFormData(bookingSearchResultsKey, bookingInformation, guid, baseForm.BaseURL);
+        }
+
+        public async Task<CancelledAppointmentInformation> ValidateCancellationRequest(string formName, Guid bookingGuid, string hash)
+        {
+            var hashedBookingId = _hashUtil.Hash(bookingGuid.ToString());
+
+            var hashNotValid = !_hashUtil.Check(bookingGuid.ToString(), hash);
+            if (hashNotValid)
+                throw new ApplicationException($"Booking controllers: BookingId has been tampered.");
+
+            var schema = await _schemaFactory.Build(formName);
+
+            var provider = schema.Pages.SelectMany(p => p.Elements)
+                .Where(e => e.Type.Equals(EElementType.Booking))
+                .FirstOrDefault().Properties.BookingProvider;
+
+            var bookingProvider = _bookingProviders.Get(provider);
+            var appointment = await bookingProvider.GetAppointment(bookingGuid);
+
+            if(!appointment.Cancellable)
+                throw new BookingCannotBeCancelledException($"BookingSerivice::ValidateCancellationRequest, booking: {bookingGuid} cannot be cancelled");
+
+            return new CancelledAppointmentInformation 
+            {
+
+            };
         }
 
         private async Task<BoookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider)

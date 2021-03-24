@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Enum;
+using form_builder.Exceptions;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
@@ -49,18 +50,8 @@ namespace form_builder.Controllers
         {
             var viewModel = formData.ToNormaliseDictionary(string.Empty);
             var queryParamters = Request.Query;
-            var baseForm = await _schemaFactory.Build(form);
 
-            if (baseForm == null)
-                throw new ApplicationException($"Requested form '{form}' could not be found.");
-
-            var page = baseForm.GetPage(_pageHelper, path);
-            if (page == null)
-                throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
-
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-
-            await _bookingService.ProcessMonthRequest(viewModel, baseForm, page, sessionGuid);
+            await _bookingService.ProcessMonthRequest(viewModel, form, path);
 
             var routeValuesDictionary = new RouteValueDictionaryBuilder()
                 .WithValue("path", path)
@@ -75,19 +66,54 @@ namespace form_builder.Controllers
         [Route("booking/{formName}/cancel/{bookingGuid}")]
         public async Task<IActionResult> CancelBooking([FromQuery] string hash, Guid bookingGuid, string formName)
         {
-            //validate the model
             if (string.IsNullOrEmpty(hash) || Guid.Empty == bookingGuid)
                 throw new ApplicationException($"Booking controllers: Invalid cancel model recieved.");
 
-            //Hash and Salt BookingID
+            try
+            {
+                var appointment = await _bookingService.ValidateCancellationRequest(formName, bookingGuid, hash);
+
+                return View("AppointmentDetails", new CancelBookingViewModel
+                {
+                    FormName = formName,
+                    BaseURL = schema.BaseURL,
+                    Id = bookingGuid,
+                    BookingDate = appointment.BookingDate,
+                    StartTime = appointment.StartTime,
+                    EndTime = appointment.EndTime,
+                    Cancellable = appointment.Cancellable,
+                    Hash = hash,
+                    IsFullday = appointment.IsFullday,
+                    DisplayBreadCrumbs = false,
+                    HideBackButton = true,
+                    PageTitle = "Cancel Booking"
+                });
+            }
+            catch (BookingCannotBeCancelledException)
+            {
+                return RedirectToAction("CannotCancel", new
+                {
+                    formName
+                });
+            }
+        }
+
+        [HttpPost]
+        [Route("booking/{formName}/cancel/{bookingGuid}")]
+        public async Task<IActionResult> CancelBookingPost([FromQuery] string hash, Guid bookingGuid, string formName)
+        {
+            //Validate model - hash is not empty, bookign guid is not empty
+            if (string.IsNullOrEmpty(hash) || Guid.Empty == bookingGuid)
+                throw new ApplicationException($"Booking controllers: Invalid cancel model recieved.");
 
             var hashedBookingId = _hashUtil.Hash(bookingGuid.ToString());
 
-            //Compare hash value annd go to error if don't match
+            //Compare guid and hash
             var hashNotValid = !_hashUtil.Check(bookingGuid.ToString(), hash);
             if (hashNotValid)
                 throw new ApplicationException($"Booking controllers: BookingId has been tampered.");
 
+            //Get the formSchema
             var schema = await _schemaFactory.Build(formName);
 
             var provider = schema.Pages.SelectMany(p => p.Elements)
@@ -95,31 +121,22 @@ namespace form_builder.Controllers
                 .FirstOrDefault().Properties.BookingProvider;
 
             //Call Booking Provider to get appointment info
-            var bookingProvider = _bookingProviders.Get(provider);
-            //Get a response back
-            var appointment = await bookingProvider.GetAppointment(bookingGuid);
+            //Call .Cancel on booking Provider
+            await _bookingProviders.Get(provider).Cancel(bookingGuid);
 
-            //Handle the response can it cancel the booking
-            //Can cancel then render page
-
-            if (!appointment.Cancellable)
-                return RedirectToAction("CannotCancel", new
-                {
-                    formName
-                });
-
-            return View("AppointmentDetails", new CancelBookingViewModel
+            //If Successful - show success page
+            return RedirectToAction("CancelSuccess", new
             {
-                FormName = formName,
-                appointmentInformation = appointment,
-                DisplayBreadCrumbs = false,
-                HideBackButton = true,
-                PageTitle = "Cancel Booking"
-            });;
+                formName
+            });
         }
 
         [HttpGet]
         [Route("booking/{formName}/cannot-cancel-booking")]
         public IActionResult CannotCancel(string formName) => View();
+
+        [HttpGet]
+        [Route("booking/{formName}/cancel-success")]
+        public IActionResult CancelSuccess(string formName) => View("../Home/Success", new SuccessViewModel { LeadingParagraph = "Thanks for cancelling your appointment", BannerTitle = "Your've successfully cancelled your appointment" });
     }
 }

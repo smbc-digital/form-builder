@@ -69,7 +69,7 @@ namespace form_builder.Providers.Booking
             var result = await _gateway.GetLocation(request);
 
             if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
-                throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGaBookingProvider::GetLocation, BookingServiceGateway returned 404 status code, booking with idteway received a bad request, Request:{Newtonsoft.Json.JsonConvert.SerializeObject(request)}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+                throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned 400 status code, gateway received a bad request, Request:{Newtonsoft.Json.JsonConvert.SerializeObject(request)}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
 
             if (result.StatusCode.Equals(HttpStatusCode.NotFound))
                 throw new ApplicationException($" {request.AppointmentId} cannot be found");
@@ -83,6 +83,20 @@ namespace form_builder.Providers.Booking
         public Task<AppointmentInformation> GetAppointment(Guid bookingId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task Cancel(Guid bookingId)
+        {
+            var response = await _gateway.Cancel(bookingId.ToString());
+
+            if (response.StatusCode.Equals(HttpStatusCode.BadRequest))
+                throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway returned 400 status code, Gateway recieved bad request, Request:{bookingId.ToString()}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
+
+            if (response.StatusCode.Equals(HttpStatusCode.NotFound))
+                throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway return 404 not found for bookingId {bookingId}");
+
+            if (!response.IsSuccessStatusCode)
+                throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway returned with non success status code of {response.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
         }
     }
 }

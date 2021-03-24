@@ -193,5 +193,7 @@ namespace form_builder.Providers.Booking
                 IsFullday = false
             });
         }
+
+        public async Task Cancel(Guid bookingId) => _ = await Task.FromResult("");
     }
 }
