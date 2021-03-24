@@ -22,6 +22,7 @@ using form_builder.Services.PageService.Entities;
 using form_builder.Utils.Extensions;
 using form_builder.Utils.Hash;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
@@ -41,6 +42,7 @@ namespace form_builder.Services.BookingService
         private readonly ISessionHelper _sessionHelper;
         private readonly IHashUtil _hashUtil;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public BookingService(
             IDistributedCacheWrapper distributedCache,
@@ -52,7 +54,8 @@ namespace form_builder.Services.BookingService
             ISchemaFactory schemaFactory,
             ISessionHelper sessionHelper,
             IHashUtil hashUtil,
-            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
+            IHttpContextAccessor httpContextAccessor)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
@@ -64,6 +67,7 @@ namespace form_builder.Services.BookingService
             _sessionHelper = sessionHelper;
             _hashUtil = hashUtil;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<BookingProcessEntity> Get(string baseUrl, Page currentPage, string guid)
@@ -219,13 +223,43 @@ namespace form_builder.Services.BookingService
             var bookingProvider = _bookingProviders.Get(provider);
             var appointment = await bookingProvider.GetAppointment(bookingGuid);
 
-            if(!appointment.Cancellable)
+            if (!appointment.Cancellable)
                 throw new BookingCannotBeCancelledException($"BookingSerivice::ValidateCancellationRequest, booking: {bookingGuid} cannot be cancelled");
+
+           var envStartPageUrl =  _environment.EnvironmentName.Equals("local") ?
+                $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{formName}/{schema.StartPageUrl}" :
+                $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formName}/{schema.StartPageUrl}";
 
             return new CancelledAppointmentInformation 
             {
-
+                FormName = schema.FormName,
+                StartPageUrl = envStartPageUrl,
+                BaseURL = schema.BaseURL,
+                BookingDate = appointment.BookingDate,
+                Id = appointment.AppointmentId,
+                Cancellable = appointment.Cancellable,
+                StartTime = appointment.StartTime,
+                EndTime = appointment.EndTime,
+                IsFullday = appointment.IsFullday,
+                Hash = hash,
             };
+        }
+
+        public async Task Cancel(string formName, Guid bookingGuid, string hash)
+        {
+            var hashedBookingId = _hashUtil.Hash(bookingGuid.ToString());
+
+            var hashNotValid = !_hashUtil.Check(bookingGuid.ToString(), hash);
+            if (hashNotValid)
+                throw new ApplicationException($"Booking controllers: BookingId has been tampered.");
+
+            var schema = await _schemaFactory.Build(formName);
+
+            var provider = schema.Pages.SelectMany(p => p.Elements)
+                .Where(e => e.Type.Equals(EElementType.Booking))
+                .FirstOrDefault().Properties.BookingProvider;
+
+            await _bookingProviders.Get(provider).Cancel(bookingGuid);
         }
 
         private async Task<BoookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider)

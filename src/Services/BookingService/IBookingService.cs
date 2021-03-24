@@ -30,5 +30,10 @@ namespace form_builder.Services.BookingService
             string formName,
             Guid bookingGuid, 
             string hash);
+
+        Task Cancel(
+            string formName,
+            Guid bookingGuid,
+            string hash);
     }
 }

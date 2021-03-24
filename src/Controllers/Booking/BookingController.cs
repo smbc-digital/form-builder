@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Builders;
-using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
@@ -75,8 +73,10 @@ namespace form_builder.Controllers
 
                 return View("AppointmentDetails", new CancelBookingViewModel
                 {
-                    FormName = formName,
-                    BaseURL = schema.BaseURL,
+                    FormName = appointment.FormName,
+                    BaseURL = appointment.BaseURL,
+                    //StartPageUrl = $"http://localhost:44328/{appointment.BaseURL}/{appointment.StartPageUrl}",
+                    StartPageUrl = appointment.StartPageUrl,
                     Id = bookingGuid,
                     BookingDate = appointment.BookingDate,
                     StartTime = appointment.StartTime,
@@ -102,29 +102,11 @@ namespace form_builder.Controllers
         [Route("booking/{formName}/cancel/{bookingGuid}")]
         public async Task<IActionResult> CancelBookingPost([FromQuery] string hash, Guid bookingGuid, string formName)
         {
-            //Validate model - hash is not empty, bookign guid is not empty
             if (string.IsNullOrEmpty(hash) || Guid.Empty == bookingGuid)
                 throw new ApplicationException($"Booking controllers: Invalid cancel model recieved.");
 
-            var hashedBookingId = _hashUtil.Hash(bookingGuid.ToString());
+            await _bookingService.Cancel(formName, bookingGuid, hash);
 
-            //Compare guid and hash
-            var hashNotValid = !_hashUtil.Check(bookingGuid.ToString(), hash);
-            if (hashNotValid)
-                throw new ApplicationException($"Booking controllers: BookingId has been tampered.");
-
-            //Get the formSchema
-            var schema = await _schemaFactory.Build(formName);
-
-            var provider = schema.Pages.SelectMany(p => p.Elements)
-                .Where(e => e.Type.Equals(EElementType.Booking))
-                .FirstOrDefault().Properties.BookingProvider;
-
-            //Call Booking Provider to get appointment info
-            //Call .Cancel on booking Provider
-            await _bookingProviders.Get(provider).Cancel(bookingGuid);
-
-            //If Successful - show success page
             return RedirectToAction("CancelSuccess", new
             {
                 formName
