@@ -33,7 +33,9 @@ namespace form_builder.Validators.IntegrityChecks.Form
                         && element.Type != EElementType.HR
                         && element.Type != EElementType.UploadedFilesSummary
                         && element.Type != EElementType.Warning
-                        && element.Type != EElementType.Link)
+                        && element.Type != EElementType.Link
+                        && element.Type != EElementType.Summary
+                        && element.Type != EElementType.DocumentUpload)
                     {
                         questionIds.Add(element.Properties.QuestionId);
                     }
