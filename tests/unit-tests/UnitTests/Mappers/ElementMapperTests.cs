@@ -592,6 +592,39 @@ namespace form_builder_tests.UnitTests.Mappers
             Assert.Equal(startTime, bookingResult.StartTime);
         }
 
+        [Fact]
+        public void GetAnswerValue_ShouldCallHashUtil_WhenElementIsBooking()
+        {
+            // Arrange
+            var questionId = "testbookingId";
+            var date = DateTime.Today;
+            var startTime = DateTime.Today.Add(new TimeSpan(22, 0, 0));
+            var id = Guid.NewGuid();
+            var element = new ElementBuilder()
+                .WithQuestionId(questionId)
+                .WithType(EElementType.Booking)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = date.ToString() },
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = startTime.ToString() },
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_ID}", Response = id.ToString() }
+                        }
+                    }
+                }
+            };
+
+            // Act
+            _elementMapper.GetAnswerValue(element, formAnswers);
+
+            // Assert
+            _mockHashUtil.Verify(_ => _.Hash(It.IsAny<string>()), Times.Once);
+        }
 
         [Fact]
         public void GetAnswerValue_ShouldReturnNull_WhenElementIsBooking_AndValueNotFound()
