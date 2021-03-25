@@ -90,7 +90,7 @@ namespace form_builder.Controllers
                 });
             }
             catch (BookingCannotBeCancelledException)
-            {
+            {                
                 return RedirectToAction("CannotCancel", new
                 {
                     formName
@@ -115,7 +115,19 @@ namespace form_builder.Controllers
 
         [HttpGet]
         [Route("{formName}/cannot-cancel-booking")]
-        public IActionResult CannotCancel(string formName) => View();
+        public async Task<IActionResult> CannotCancel(string formName) 
+        {
+            var formSchema = await _schemaFactory.Build(formName);
+
+            return View("CannotCancel", new FormBuilderViewModel 
+            {
+                FormName = formSchema.FormName,
+                StartPageUrl = formSchema.StartPageUrl,
+                PageTitle = "Cannot Cancel Booking",
+                DisplayBreadCrumbs = false,
+                HideBackButton = true
+            });
+        } 
 
         [HttpGet]
         [Route("{formName}/cancel-success")]

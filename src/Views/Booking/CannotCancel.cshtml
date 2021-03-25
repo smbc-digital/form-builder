@@ -1,10 +1,12 @@
+@model FormBuilderViewModel
 @{
-    ViewData["Title"] = "Appointment cannot be cancelled";
-    ViewData["IsError"] = true;
-    Layout = "_ErrorLayout";
+    ViewData["Title"] = Model.FormName;
+    ViewData["PageTitle"] = Model.PageTitle;
+    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadCrumbs;
+    ViewData["Breadcrumbs"] = Model.BreadCrumbs;
 }
 
-<h1 class="govuk-heading-l">Appointment cannot be cancelled</h1>
+<h1 class="govuk-heading-l">Booking cannot be cancelled</h1>
 
 
 <p class="smbc-body">
