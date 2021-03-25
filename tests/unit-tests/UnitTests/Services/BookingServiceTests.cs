@@ -323,11 +323,16 @@ namespace form_builder_tests.UnitTests.Services
 
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithPageSlug("path")
                 .Build();
 
             var formSchema = new FormSchemaBuilder()
-                .WithBaseUrl("base-form")
+                .WithBaseUrl("form")
+                .WithPage(page)
                 .Build();
+
+            _schemaFactory.Setup(_ => _.Build("form"))
+                .ReturnsAsync(formSchema);
 
             // Assert
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(new Dictionary<string, object>(), "form", "path"));
@@ -353,18 +358,23 @@ namespace form_builder_tests.UnitTests.Services
 
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithPageSlug("path")
                 .Build();
 
             var formSchema = new FormSchemaBuilder()
                 .WithBaseUrl("base-form")
+                .WithPage(page)
                 .Build();
+
+            _schemaFactory.Setup(_ => _.Build("base-form"))
+                .ReturnsAsync(formSchema);
 
             var model = new Dictionary<string, object>{
                 { BookingConstants.BOOKING_MONTH_REQUEST, DateTime.Now.AddYears(1).AddMonths(1).ToString() }
             };
 
             // Assert
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(model, "form", "path"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(model, "base-form", "path"));
 
             _bookingProvider.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Never);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -387,18 +397,23 @@ namespace form_builder_tests.UnitTests.Services
 
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithPageSlug("page-one")
                 .Build();
 
             var formSchema = new FormSchemaBuilder()
                 .WithBaseUrl("base-form")
+                .WithPage(page)
                 .Build();
+
+            _schemaFactory.Setup(_ => _.Build("base-form"))
+                .ReturnsAsync(formSchema);
 
             var model = new Dictionary<string, object>{
                 { BookingConstants.BOOKING_MONTH_REQUEST, DateTime.Now.AddMonths(-1).ToString() }
             };
 
             // Assert
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(model, "form", "path"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(model, "base-form", "page-one"));
 
             _bookingProvider.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Never);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -409,13 +424,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessMonthRequest_ShouldCall_BookingProvider_AndSaveUpdatedBooking_Information()
         {
-            var bookingInformationCacheKey = $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
             var guid = Guid.NewGuid();
-            _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new List<AvailabilityDayResponse> { new AvailabilityDayResponse() });
-
-            _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object> { { bookingInformationCacheKey, new BookingInformation() } } }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
@@ -426,11 +435,26 @@ namespace form_builder_tests.UnitTests.Services
 
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithPageSlug("path")
                 .Build();
 
             var formSchema = new FormSchemaBuilder()
-                .WithBaseUrl("base-form")
+                .WithBaseUrl("form")
+                .WithPage(page)
                 .Build();
+
+            var bookingInformationCacheKey = $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new AvailabilityDayResponse() });
+
+            _sessionHelper.Setup(_ => _.GetSessionGuid())
+                .Returns("guid");
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object> { { bookingInformationCacheKey, new BookingInformation() } } }));
+
+            _schemaFactory.Setup(_ => _.Build("form"))
+                .ReturnsAsync(formSchema);
 
             var model = new Dictionary<string, object>{
                 { BookingConstants.BOOKING_MONTH_REQUEST, DateTime.Now.ToString() }
@@ -439,7 +463,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessMonthRequest(model, "form", "path");
 
             _bookingProvider.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Once);
-            _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.Is<string>(_ => _.Equals("guid")), It.Is<string>(_ => _.Equals("base-form"))), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.Is<string>(_ => _.Equals("guid")), It.Is<string>(_ => _.Equals("form"))), Times.Once);
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
         }
         
@@ -465,8 +489,30 @@ namespace form_builder_tests.UnitTests.Services
         public async void ProcessMonthRequest_Should_Should_Throw_ApplicationException_When_InvalidPath()
         {
             // Arrange
-            const string form = "valid";
+            const string form = "base-form";
             const string path = "invalid";
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("valid")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl(form)
+                .Build();
+
+            _schemaFactory.Setup(_ => _.Build("base-form"))
+                .ReturnsAsync(formSchema);
+
+
             var viewModel = new Dictionary<string, object>();
 
             // Act
