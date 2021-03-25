@@ -330,7 +330,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             // Assert
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(new Dictionary<string, object>(), formSchema, page, "guid"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(new Dictionary<string, object>(), "form", "path"));
 
             _bookingProvider.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Never);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -364,7 +364,7 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             // Assert
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(model, formSchema, page, "guid"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(model, "form", "path"));
 
             _bookingProvider.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Never);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -398,7 +398,7 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             // Assert
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(model, formSchema, page, "guid"));
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(model, "form", "path"));
 
             _bookingProvider.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Never);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
@@ -436,11 +436,43 @@ namespace form_builder_tests.UnitTests.Services
                 { BookingConstants.BOOKING_MONTH_REQUEST, DateTime.Now.ToString() }
             };
 
-            await _service.ProcessMonthRequest(model, formSchema, page, "guid");
+            await _service.ProcessMonthRequest(model, "form", "path");
 
             _bookingProvider.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.Is<string>(_ => _.Equals("guid")), It.Is<string>(_ => _.Equals("base-form"))), Times.Once);
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+        }
+        
+        [Fact]
+        public async void ProcessMonthRequest_Should_Throw_ApplicationException_When_InvalidForm()
+        {
+            //
+            _schemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync((FormSchema)null);
+
+            // Arrange
+            const string form = "invalid";
+            const string path = "irrelevant";
+            var viewModel = new Dictionary<string, object>();
+
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(viewModel, form, path));
+            Assert.Equal($"Requested form '{form}' could not be found.", result.Message);
+            _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Never);
+        }
+
+
+        [Fact]
+        public async void ProcessMonthRequest_Should_Should_Throw_ApplicationException_When_InvalidPath()
+        {
+            // Arrange
+            const string form = "valid";
+            const string path = "invalid";
+            var viewModel = new Dictionary<string, object>();
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(viewModel, form, path));
+            Assert.Equal($"Requested path '{path}' object could not be found for form '{form}'", result.Message);
+            _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Never);
         }
 
         [Fact]
@@ -476,7 +508,6 @@ namespace form_builder_tests.UnitTests.Services
             _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
         }
-
 
         [Fact]
         public async Task ProcessBooking_Should_Return_CurrentPageEntity_When_CheckYourBooking_Property_IsFalse_AndReserve_Appointment()
