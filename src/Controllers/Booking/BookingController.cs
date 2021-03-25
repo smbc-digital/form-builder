@@ -65,7 +65,6 @@ namespace form_builder.Controllers
                 {
                     FormName = appointment.FormName,
                     BaseURL = appointment.BaseURL,
-                    //StartPageUrl = $"http://localhost:44328/{appointment.BaseURL}/{appointment.StartPageUrl}",
                     StartPageUrl = appointment.StartPageUrl,
                     Id = bookingGuid,
                     BookingDate = appointment.BookingDate,
