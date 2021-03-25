@@ -208,8 +208,6 @@ namespace form_builder.Services.BookingService
 
         public async Task<CancelledAppointmentInformation> ValidateCancellationRequest(string formName, Guid bookingGuid, string hash)
         {
-            var hashedBookingId = _hashUtil.Hash(bookingGuid.ToString());
-
             if (!_hashUtil.Check(bookingGuid.ToString(), hash))
                 throw new ApplicationException($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity");
 
@@ -247,8 +245,6 @@ namespace form_builder.Services.BookingService
 
         public async Task Cancel(string formName, Guid bookingGuid, string hash)
         {
-            var hashedBookingId = _hashUtil.Hash(bookingGuid.ToString());
-
             if (!_hashUtil.Check(bookingGuid.ToString(), hash))
                 throw new ApplicationException($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity");
 

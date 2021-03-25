@@ -48,8 +48,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISchemaFactory> _schemaFactory = new Mock<ISchemaFactory>();
         private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IHashUtil> _hashUtil = new Mock<IHashUtil>();
-        private readonly Mock<IHttpContextAccessor> _httpContextAccessor = new Mock<IHttpContextAccessor>();
-        
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
         public BookingServiceTests()
         {
@@ -76,7 +75,7 @@ namespace form_builder_tests.UnitTests.Services
               _sessionHelper.Object,
               _hashUtil.Object,
               _mockdistributedCacheExpirationConfiguration.Object,
-              _httpContextAccessor.Object);
+              _mockHttpContextAccessor.Object);
         }
 
         [Fact]
@@ -122,7 +121,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -211,7 +210,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -250,7 +249,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -289,7 +288,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -317,7 +316,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -352,7 +351,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -391,7 +390,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -429,7 +428,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = guid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = guid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -465,7 +464,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.Is<string>(_ => _.Equals("guid")), It.Is<string>(_ => _.Equals("form"))), Times.Once);
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
         }
-        
+
         [Fact]
         public async void ProcessMonthRequest_Should_Throw_ApplicationException_When_InvalidForm()
         {
@@ -495,7 +494,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = Guid.NewGuid(), Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -528,7 +527,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -567,7 +566,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .WithCheckYourBooking(false)
                 .Build();
 
@@ -609,7 +608,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .WithCheckYourBooking(true)
                 .Build();
 
@@ -648,7 +647,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -683,13 +682,13 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessBooking_Should_Call_BookingProvider_When_SelectedDate_IsDifferent_To_ReservedDateAndTime()
         {
-            
+
             var appointmentTypeGuid = new Guid();
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -714,7 +713,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}", date.ToString() },
             };
 
-            
+
 
             await _service.ProcessBooking(model, page, formSchema, "guid", "path");
 
@@ -732,7 +731,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -772,7 +771,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithBookingProvider("testBookingProvider")
                 .WithQuestionId("bookingQuestion")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = appointmentTypeGuid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = appointmentTypeGuid, Environment = "test" })
                 .Build();
 
             var page = new PageBuilder()
@@ -802,6 +801,168 @@ namespace form_builder_tests.UnitTests.Services
             _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
             _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
+        }
+
+        [Theory]
+        [InlineData("test-form", "49e55a45-662a-40f4-9f08-bb1de675d144", "922d9f461f24e52a6fe826529608982d8f42d7ef424b493520c74a10c46d8121")]
+        public async Task ValidateCancellationRequest_ThrowApplicationException_WhenBookingGuidAndHashCheckFailed(
+            string formName,
+            Guid bookingId,
+            string hash)
+        {
+            //Arrange
+            //Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() =>
+                _service.ValidateCancellationRequest(formName, bookingId, hash));
+
+            //Assert
+            Assert.Equal($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity", result.Message);
+        }
+
+        [Theory]
+        [InlineData("test-form", "49e55a45-662a-40f4-9f08-bb1de675d145", "testHash")]
+        public async Task ValidateCancellationRequest_ThrowBookingCannotBeCancelledException_WhenBookingNotCancallable(
+            string formName,
+            Guid bookingId,
+            string hash)
+        {
+            //Arrange
+            _hashUtil.Setup(_ => _.Check(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(true);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl(formName)
+                .WithPage(page)
+                .Build();
+
+            _schemaFactory.Setup(_ => _.Build(formName))
+                .ReturnsAsync(formSchema);
+
+            _bookingProvider.Setup(_ => _.GetBooking(bookingId))
+                .ReturnsAsync(new AppointmentInformation
+                {
+                    BookingDate = new DateTime(2021, 4, 13),
+                    Cancellable = false,
+                    StartTime = new TimeSpan(1, 1, 1),
+                    EndTime = new TimeSpan(2, 1, 1),
+                    IsFullday = false
+                });
+
+            //Act
+            var result = await Assert.ThrowsAsync<BookingCannotBeCancelledException>(() =>
+                _service.ValidateCancellationRequest(formName, bookingId, hash));
+
+            //Assert
+            Assert.Equal($"BookingSerivice::ValidateCancellationRequest, booking: {bookingId} specified it can not longer be cancelled", result.Message);
+        }
+
+        [Theory]
+        [InlineData("test-form", "49e55a45-662a-40f4-9f08-bb1de675d144", "testHash")]
+        public async Task ValidateCancellationRequest_ValidRequest_ReturnCancelledAppointmentInformationObject(
+           string formName,
+           Guid bookingId,
+           string hash)
+        {
+            //Arrange
+            _hashUtil.Setup(_ => _.Check(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(true);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl(formName)
+                .WithPage(page)
+                .Build();
+
+            _schemaFactory.Setup(_ => _.Build(formName))
+                .ReturnsAsync(formSchema);
+
+            _bookingProvider.Setup(_ => _.GetBooking(bookingId))
+                .ReturnsAsync(new AppointmentInformation
+                {
+                    BookingDate = new DateTime(2021, 4, 13),
+                    Cancellable = true,
+                    StartTime = new TimeSpan(1, 1, 1),
+                    EndTime = new TimeSpan(2, 1, 1),
+                    IsFullday = false
+                });
+
+            _mockHostingEnv.Setup(_ => _.EnvironmentName)
+                .Returns("local");
+
+            _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
+               .Returns(new HostString("www.test.com"));
+
+            //Act
+            var result = await _service.ValidateCancellationRequest(formName, bookingId, hash);
+
+            //Assert
+            Assert.IsType<CancelledAppointmentInformation>(result);
+        }
+
+        [Theory]
+        [InlineData("test-form", "49e55a45-662a-40f4-9f08-bb1de675d144", "922d9f461f24e52a6fe826529608982d8f42d7ef424b493520c74a10c46d8121")]
+        public async Task Cancel_ThrowApplicationException_CheckBookingIdAndHash(string formName,
+            Guid bookingId,
+            string hash)
+        {
+            //Arrange
+            //Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() =>
+                _service.ValidateCancellationRequest(formName, bookingId, hash));
+
+            //Assert
+            Assert.Equal($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity", result.Message);
+        }
+
+        [Theory]
+        [InlineData("test-form", "49e55a45-662a-40f4-9f08-bb1de675d144", "testHash")]
+        public async Task Cancel_BookingProvider_ShouldCallCancel(
+           string formName,
+           Guid bookingId,
+           string hash)
+        {
+            //Arrange
+            _hashUtil.Setup(_ => _.Check(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(true);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl(formName)
+                .WithPage(page)
+                .Build();
+
+            _schemaFactory.Setup(_ => _.Build(formName))
+                .ReturnsAsync(formSchema);
+
+            //Act
+            await _service.Cancel(formName, bookingId, hash);
+            //Assert
+            _bookingProvider.Verify(_ => _.Cancel(It.IsAny<Guid>()), Times.Once);
         }
     }
 }
