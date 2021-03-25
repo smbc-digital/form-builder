@@ -15,6 +15,8 @@ namespace form_builder.Providers.Booking
         private static string BOOKING_UI_TEST => "00000000-0000-0000-0000-000000000002";
         private static string BOOKING_WITH_NO_AVAILABILITY => "00000000-0000-0000-0000-000000000001";
         private static string BOOKING_NON_FULL_DAY_APPOINTMENT => "00000000-0000-0000-0000-000000000003";
+        private static string BOOKING_CANNOT_BE_CANCELLED => "00000000-0000-0000-0000-000000000004";
+        private static string BOOKING_WITH_ERROR_ON_CANCEL => "00000000-0000-0000-0000-000000000005";
 
         public Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request)
         {
@@ -171,8 +173,7 @@ namespace form_builder.Providers.Booking
 
         public Task<AppointmentInformation> GetBooking(Guid bookingId)
         {
-            var guid = new Guid("49e55a45-662a-40f4-9f08-bb1de675d144");
-            if (!guid.Equals(bookingId))
+            if (!bookingId.Equals(Guid.Parse(BOOKING_CANNOT_BE_CANCELLED)))
             {
                 return Task.FromResult(new AppointmentInformation
                 {
@@ -194,6 +195,12 @@ namespace form_builder.Providers.Booking
             });
         }
 
-        public async Task Cancel(Guid bookingId) => _ = await Task.FromResult("");
+        public async Task Cancel(Guid bookingId)
+        {
+            if(bookingId.Equals(Guid.Parse(BOOKING_WITH_ERROR_ON_CANCEL)))
+                throw new Exception("FakeBookingProvider::Cancel, Booking faked with fake exception");
+
+            _ = await Task.FromResult("");
+        }
     }
 }

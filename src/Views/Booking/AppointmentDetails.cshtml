@@ -1,6 +1,4 @@
-﻿@using form_builder.Models.Properties.ElementProperties;
-
-@model CancelBookingViewModel
+﻿@model CancelBookingViewModel
 @{
     ViewData["Title"] = Model.FormName;
     ViewData["PageTitle"] = Model.PageTitle;
@@ -8,14 +6,6 @@
     ViewData["FeedbackPhase"] = Model.FeedbackPhase;
     ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadCrumbs;
     ViewData["Breadcrumbs"] = Model.BreadCrumbs;
-
-    var buttonModel = new Button
-    {
-        Properties = new BaseProperty
-        {
-            Text = "Submit"
-        }
-    };
 }
 
 <h1 class="govuk-heading-l">Cancel your booking</h1>
