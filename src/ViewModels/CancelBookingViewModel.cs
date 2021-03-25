@@ -1,5 +1,5 @@
-﻿using System;
-using form_builder.Utils.Extensions;
+﻿using form_builder.Utils.Extensions;
+using System;
 
 namespace form_builder.ViewModels
 {
@@ -7,8 +7,8 @@ namespace form_builder.ViewModels
     {
         public string FormattedTime => IsFullday ? $"between {StartTime.ToTimeFormat()} and {EndTime.ToTimeFormat()}" : $"{StartTime.ToTimeFormat()} to {EndTime.ToTimeFormat()}";
         public string FormattedCancelBookingDate => BookingDate.ToFullDateFormat();
-        public string Hash {get;set;}
-        public string BaseURL {get;set;}
+        public string Hash { get; set; }
+        public string BaseURL { get; set; }
         public Guid Id { get; set; }
         public bool Cancellable { get; set; }
         public DateTime BookingDate { get; set; }

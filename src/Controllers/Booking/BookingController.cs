@@ -2,16 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
-using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Exceptions;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
 using form_builder.Providers.Booking;
 using form_builder.Services.BookingService;
 using form_builder.Services.PageService;
-using form_builder.Utils.Hash;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +16,7 @@ namespace form_builder.Controllers
     public class BookingController : Controller
     {
         private readonly IBookingService _bookingService;
+        private readonly ISchemaFactory _schemaFactory;
         private readonly IPageService _pageService;
 
         public BookingController(IBookingService bookingService,
@@ -28,6 +25,7 @@ namespace form_builder.Controllers
             IEnumerable<IBookingProvider> bookingProviders)
         {
             _bookingService = bookingService;
+            _schemaFactory = schemaFactory;
             _pageService = pageService;
         }
 
@@ -82,7 +80,7 @@ namespace form_builder.Controllers
                 });
             }
             catch (BookingCannotBeCancelledException)
-            {
+            {                
                 return RedirectToAction("CannotCancel", new
                 {
                     formName
@@ -107,7 +105,19 @@ namespace form_builder.Controllers
 
         [HttpGet]
         [Route("{formName}/cannot-cancel-booking")]
-        public IActionResult CannotCancel(string formName) => View();
+        public async Task<IActionResult> CannotCancel(string formName) 
+        {
+            var formSchema = await _schemaFactory.Build(formName);
+
+            return View("CannotCancel", new FormBuilderViewModel 
+            {
+                FormName = formSchema.FormName,
+                StartPageUrl = formSchema.StartPageUrl,
+                PageTitle = "Cannot Cancel Booking",
+                DisplayBreadCrumbs = false,
+                HideBackButton = true
+            });
+        } 
 
         [HttpGet]
         [Route("{formName}/booking-cancel-success")]
