@@ -21,8 +21,7 @@ namespace form_builder.Controllers
 
         public BookingController(IBookingService bookingService,
             ISchemaFactory schemaFactory,
-            IPageService pageService,
-            IEnumerable<IBookingProvider> bookingProviders)
+            IPageService pageService)
         {
             _bookingService = bookingService;
             _schemaFactory = schemaFactory;

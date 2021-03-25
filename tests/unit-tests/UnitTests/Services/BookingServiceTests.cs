@@ -9,7 +9,9 @@ using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Exceptions;
+using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Booking;
 using form_builder.Models.Elements;
@@ -19,8 +21,10 @@ using form_builder.Services.BookingService;
 using form_builder.Services.BookingService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.PageService.Entities;
+using form_builder.Utils.Hash;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Moq;
 using StockportGovUK.NetStandard.Models.Booking.Request;
@@ -42,6 +46,12 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockdistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly DistributedCacheExpirationConfiguration _cacheConfig = new DistributedCacheExpirationConfiguration { Booking = 5, BookingNoAppointmentsAvailable = 10 };
+        private readonly Mock<ISchemaFactory> _schemaFactory = new Mock<ISchemaFactory>();
+        private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
+        private readonly Mock<IHashUtil> _hashUtil = new Mock<IHashUtil>();
+        private readonly Mock<IHttpContextAccessor> _httpContextAccessor = new Mock<IHttpContextAccessor>();
+        
+
         public BookingServiceTests()
         {
             _mockdistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(_cacheConfig);
@@ -63,7 +73,11 @@ namespace form_builder_tests.UnitTests.Services
               _mockPageFactory.Object,
               _mockMappingService.Object,
               _mockHostingEnv.Object,
-              _mockdistributedCacheExpirationConfiguration.Object);
+              _schemaFactory.Object,
+              _sessionHelper.Object,
+              _hashUtil.Object,
+              _mockdistributedCacheExpirationConfiguration.Object,
+              _httpContextAccessor.Object);
         }
 
         [Fact]

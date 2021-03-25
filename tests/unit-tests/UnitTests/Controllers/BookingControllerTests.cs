@@ -8,6 +8,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Services.BookingService;
+using form_builder.Services.PageService;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,7 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly BookingController _bookingController;
 
         private readonly Mock<IBookingService> _bookingService = new Mock<IBookingService>();
+        private readonly Mock<IPageService> _pageService = new Mock<IPageService>();
         private readonly Mock<ISchemaFactory> _schemaFactory = new Mock<ISchemaFactory>();
         private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
         private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
@@ -45,7 +47,7 @@ namespace form_builder_tests.UnitTests.Controllers
             _schemaFactory.Setup(_ => _.Build("valid"))
                 .ReturnsAsync(schema);
 
-            _bookingController = new BookingController(_bookingService.Object, _schemaFactory.Object, _pageHelper.Object, _sessionHelper.Object);
+            _bookingController = new BookingController(_bookingService.Object, _schemaFactory.Object, _pageService.Object);
             _bookingController.ControllerContext = new ControllerContext();
             _bookingController.ControllerContext.HttpContext = new DefaultHttpContext();
             _bookingController.ControllerContext.HttpContext.Request.Query = new QueryCollection();
