@@ -9,6 +9,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Utils.Extensions;
+using form_builder.Utils.Hash;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
@@ -20,8 +21,13 @@ namespace form_builder.Mappers
     public class ElementMapper : IElementMapper
     {
         private readonly IDistributedCacheWrapper _distributedCacheWrapper;
+        private readonly IHashUtil _hashUtil;
 
-        public ElementMapper(IDistributedCacheWrapper distributedCacheWrapper) => _distributedCacheWrapper = distributedCacheWrapper;
+        public ElementMapper(IDistributedCacheWrapper distributedCacheWrapper, IHashUtil hashUtil)
+        {
+            _distributedCacheWrapper = distributedCacheWrapper;
+            _hashUtil = hashUtil;
+        } 
 
         public T GetAnswerValue<T>(IElement element, FormAnswers formAnswers) => (T)GetAnswerValue(element, formAnswers);
 
@@ -215,6 +221,7 @@ namespace form_builder.Mappers
             var bookingEndTime = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentEndTime))?.Response;
             var bookingLocation = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentLocation))?.Response;
             bookingObject.Id = bookingId != null ? Guid.Parse(bookingId) : Guid.Empty;
+            bookingObject.HashedId = bookingId != null ? _hashUtil.Hash(bookingObject.Id.ToString()) : string.Empty;
             bookingObject.Date = bookingDate != null ? DateTime.Parse(bookingDate) : DateTime.MinValue;
             bookingObject.StartTime = bookingStartTime != null ? DateTime.Parse(bookingStartTime) : DateTime.MinValue;
             bookingObject.EndTime = bookingEndTime != null ? DateTime.Parse(bookingEndTime) : DateTime.MinValue;

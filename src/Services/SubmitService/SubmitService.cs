@@ -94,12 +94,13 @@ namespace form_builder.Services.SubmitService
             }
             else
             { 
-            _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(submitSlug.AuthToken)
-                ? string.Empty
-                : submitSlug.AuthToken);
+                _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(submitSlug.AuthToken)
+                    ? string.Empty
+                    : submitSlug.AuthToken);
 
                response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
             }
+
             if (!response.IsSuccessStatusCode)
                 throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occurred while attempting to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             

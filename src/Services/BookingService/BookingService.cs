@@ -363,6 +363,7 @@ namespace form_builder.Services.BookingService
         private async Task<Guid> ReserveAppointment(Booking bookingElement, Dictionary<string, dynamic> viewModel, string form, string guid)
         {
             var reservedBookingId = bookingElement.ReservedIdQuestionId;
+            
             var reservedBookingDate = bookingElement.ReservedDateQuestionId;
             var reservedBookingStartTime = bookingElement.ReservedStartTimeQuestionId;
             var reservedBookingEndTime = bookingElement.ReservedEndTimeQuestionId;

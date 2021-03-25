@@ -30,7 +30,6 @@ using Moq;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using Xunit;
-using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
 
 namespace form_builder_tests.UnitTests.Services
 {
