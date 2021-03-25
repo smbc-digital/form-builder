@@ -65,7 +65,7 @@ namespace form_builder.Controllers
         public async Task<IActionResult> CancelBooking([FromQuery] string hash, Guid bookingGuid, string formName)
         {
             if (string.IsNullOrEmpty(hash) || Guid.Empty == bookingGuid)
-                throw new ApplicationException($"Booking controllers: Invalid cancel model recieved.");
+                throw new ApplicationException($"BookingController::CancelBooking, Invalid paramters recieved. Id: '{bookingGuid}', hash '{hash}' for form '{formName}'");
 
             try
             {
@@ -103,7 +103,7 @@ namespace form_builder.Controllers
         public async Task<IActionResult> CancelBookingPost([FromQuery] string hash, Guid bookingGuid, string formName)
         {
             if (string.IsNullOrEmpty(hash) || Guid.Empty == bookingGuid)
-                throw new ApplicationException($"Booking controllers: Invalid cancel model recieved.");
+                throw new ApplicationException($"BookingController::CancelBookingPost, Invalid paramters recieved. Id: '{bookingGuid}', hash '{hash}' for form '{formName}'");
 
             await _bookingService.Cancel(formName, bookingGuid, hash);
 
@@ -114,11 +114,11 @@ namespace form_builder.Controllers
         }
 
         [HttpGet]
-        [Route("booking/{formName}/cannot-cancel-booking")]
+        [Route("{formName}/cannot-cancel-booking")]
         public IActionResult CannotCancel(string formName) => View();
 
         [HttpGet]
-        [Route("booking/{formName}/cancel-success")]
+        [Route("{formName}/booking-cancel-success")]
         public IActionResult CancelSuccess(string formName) => View("../Home/Success", new SuccessViewModel { LeadingParagraph = "Thanks for cancelling your appointment", BannerTitle = "Your've successfully cancelled your appointment" });
     }
 }

@@ -210,37 +210,37 @@ namespace form_builder.Services.BookingService
         {
             var hashedBookingId = _hashUtil.Hash(bookingGuid.ToString());
 
-            var hashNotValid = !_hashUtil.Check(bookingGuid.ToString(), hash);
-            if (hashNotValid)
-                throw new ApplicationException($"Booking controllers: BookingId has been tampered.");
+            if (!_hashUtil.Check(bookingGuid.ToString(), hash))
+                throw new ApplicationException($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity");
 
-            var schema = await _schemaFactory.Build(formName);
+            var formSchema = await _schemaFactory.Build(formName);
 
-            var provider = schema.Pages.SelectMany(p => p.Elements)
-                .Where(e => e.Type.Equals(EElementType.Booking))
-                .FirstOrDefault().Properties.BookingProvider;
+            var provider = formSchema.Pages
+                .Where(_ => _.Elements != null)
+                .SelectMany(_ => _.Elements)
+                .Where(_ => _.Type.Equals(EElementType.Booking))
+                .First().Properties.BookingProvider;
 
-            var bookingProvider = _bookingProviders.Get(provider);
-            var appointment = await bookingProvider.GetAppointment(bookingGuid);
+            var bookingInformation = await _bookingProviders.Get(provider).GetBooking(bookingGuid);
 
-            if (!appointment.Cancellable)
-                throw new BookingCannotBeCancelledException($"BookingSerivice::ValidateCancellationRequest, booking: {bookingGuid} cannot be cancelled");
+            if (!bookingInformation.Cancellable)
+                throw new BookingCannotBeCancelledException($"BookingSerivice::ValidateCancellationRequest, booking: {bookingGuid} specified it can not longer be cancelled");
 
            var envStartPageUrl =  _environment.EnvironmentName.Equals("local") ?
-                $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{formName}/{schema.StartPageUrl}" :
-                $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formName}/{schema.StartPageUrl}";
+                $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{formName}/{formSchema.StartPageUrl}" :
+                $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formName}/{formSchema.StartPageUrl}";
 
             return new CancelledAppointmentInformation 
             {
-                FormName = schema.FormName,
+                FormName = formSchema.FormName,
                 StartPageUrl = envStartPageUrl,
-                BaseURL = schema.BaseURL,
-                BookingDate = appointment.BookingDate,
-                Id = appointment.AppointmentId,
-                Cancellable = appointment.Cancellable,
-                StartTime = appointment.StartTime,
-                EndTime = appointment.EndTime,
-                IsFullday = appointment.IsFullday,
+                BaseURL = formSchema.BaseURL,
+                BookingDate = bookingInformation.BookingDate,
+                Id = bookingInformation.AppointmentId,
+                Cancellable = bookingInformation.Cancellable,
+                StartTime = bookingInformation.StartTime,
+                EndTime = bookingInformation.EndTime,
+                IsFullday = bookingInformation.IsFullday,
                 Hash = hash,
             };
         }
@@ -249,15 +249,16 @@ namespace form_builder.Services.BookingService
         {
             var hashedBookingId = _hashUtil.Hash(bookingGuid.ToString());
 
-            var hashNotValid = !_hashUtil.Check(bookingGuid.ToString(), hash);
-            if (hashNotValid)
-                throw new ApplicationException($"Booking controllers: BookingId has been tampered.");
+            if (!_hashUtil.Check(bookingGuid.ToString(), hash))
+                throw new ApplicationException($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity");
 
-            var schema = await _schemaFactory.Build(formName);
+            var formSchema = await _schemaFactory.Build(formName);
 
-            var provider = schema.Pages.SelectMany(p => p.Elements)
-                .Where(e => e.Type.Equals(EElementType.Booking))
-                .FirstOrDefault().Properties.BookingProvider;
+            var provider = formSchema.Pages
+                .Where(_ => _.Elements != null)
+                .SelectMany(_ => _.Elements)
+                .Where(_ => _.Type.Equals(EElementType.Booking))
+                .First().Properties.BookingProvider;
 
             await _bookingProviders.Get(provider).Cancel(bookingGuid);
         }

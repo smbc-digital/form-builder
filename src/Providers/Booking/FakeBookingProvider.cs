@@ -169,7 +169,7 @@ namespace form_builder.Providers.Booking
             return Task.FromResult("Test, Test St, Stockport SK1 3UR");
         }
 
-        public Task<AppointmentInformation> GetAppointment(Guid bookingId)
+        public Task<AppointmentInformation> GetBooking(Guid bookingId)
         {
             var guid = new Guid("49e55a45-662a-40f4-9f08-bb1de675d144");
             if (!guid.Equals(bookingId))

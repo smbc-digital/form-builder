@@ -80,7 +80,7 @@ namespace form_builder.Providers.Booking
             return result.ResponseContent;
         }
 
-        public Task<AppointmentInformation> GetAppointment(Guid bookingId)
+        public Task<AppointmentInformation> GetBooking(Guid bookingId)
         {
             throw new NotImplementedException();
         }
