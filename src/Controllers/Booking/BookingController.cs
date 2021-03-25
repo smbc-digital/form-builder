@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
+using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Exceptions;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
@@ -9,6 +10,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Providers.Booking;
 using form_builder.Services.BookingService;
+using form_builder.Services.PageService;
 using form_builder.Utils.Hash;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -18,25 +20,15 @@ namespace form_builder.Controllers
     public class BookingController : Controller
     {
         private readonly IBookingService _bookingService;
-        private readonly ISchemaFactory _schemaFactory;
-        private readonly IPageHelper _pageHelper;
-        private readonly ISessionHelper _sessionHelper;
-        private readonly IHashUtil _hashUtil;
-        private readonly IEnumerable<IBookingProvider> _bookingProviders;
+        private readonly IPageService _pageService;
 
         public BookingController(IBookingService bookingService,
             ISchemaFactory schemaFactory,
-            IPageHelper pageHelper,
-            ISessionHelper sessionHelper,
-            IHashUtil hashUtil,
+            IPageService pageService,
             IEnumerable<IBookingProvider> bookingProviders)
         {
             _bookingService = bookingService;
-            _schemaFactory = schemaFactory;
-            _pageHelper = pageHelper;
-            _sessionHelper = sessionHelper;
-            _hashUtil = hashUtil;
-            _bookingProviders = bookingProviders;
+            _pageService = pageService;
         }
 
         [HttpPost]
@@ -119,6 +111,26 @@ namespace form_builder.Controllers
 
         [HttpGet]
         [Route("{formName}/booking-cancel-success")]
-        public IActionResult CancelSuccess(string formName) => View("../Home/Success", new SuccessViewModel { LeadingParagraph = "Thanks for cancelling your appointment", BannerTitle = "Your've successfully cancelled your appointment" });
+        public async Task<IActionResult> CancelSuccess(string formName) 
+        {
+            var result = await _pageService.GetCancelBookingSuccessPage(formName);
+            var success = new SuccessViewModel
+            {
+                Reference = result.CaseReference,
+                PageContent = result.HtmlContent,
+                FormAnswers = result.FormAnswers,
+                FormName = result.FormName,
+                StartPageUrl = result.StartPageUrl,
+                FeedbackPhase = result.FeedbackPhase,
+                FeedbackForm = result.FeedbackFormUrl,
+                PageTitle = result.PageTitle,
+                BannerTitle = result.BannerTitle,
+                LeadingParagraph = result.LeadingParagraph,
+                DisplayBreadcrumbs = result.DisplayBreadcrumbs,
+                Breadcrumbs = result.Breadcrumbs
+            };
+
+            return View("../Home/Success", success);
+        }
     }
 }

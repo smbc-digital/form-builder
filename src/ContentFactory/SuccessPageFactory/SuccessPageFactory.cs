@@ -94,6 +94,30 @@ namespace form_builder.ContentFactory.SuccessPageFactory
             };
         }
 
+        public async Task<SuccessPageEntity> BuildBooking(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers)
+        {
+            _sessionHelper.RemoveSessionGuid();
+
+            var page = GenerateGenericBookingPage();
+
+            var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid, formAnswers);
+
+            return new SuccessPageEntity
+            {
+                HtmlContent = result.RawHTML,
+                CaseReference = formAnswers.CaseReference,
+                FeedbackFormUrl = result.FeedbackForm,
+                FeedbackPhase = result.FeedbackPhase,
+                FormName = result.FormName,
+                StartPageUrl = result.StartPageUrl,
+                PageTitle = result.PageTitle,
+                BannerTitle = page.BannerTitle,
+                LeadingParagraph = page.LeadingParagraph,
+                DisplayBreadcrumbs = page.DisplayBreadCrumbs,
+                Breadcrumbs = baseForm.BreadCrumbs
+            };
+        }
+
         private Page GenerateGenericPaymentPage()
         {
             var h2Element = new ElementBuilder()
@@ -138,6 +162,42 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                     aElement
                 },
                 PageSlug = "success"
+            };
+        }
+
+        private Page GenerateGenericBookingPage()
+        {
+            var h2Element = new ElementBuilder()
+                .WithType(EElementType.H2)
+                .WithPropertyText("What happens next")
+                .Build();
+
+            var pElement = new ElementBuilder()
+                .WithType(EElementType.P)
+                .WithPropertyText("You booking has been cancelled, you will recieve an email if to confirm this if you supplied one when booking.")
+                .Build();
+
+            var linkElement = new ElementBuilder()
+                .WithType(EElementType.Link)
+                .WithOpenInTab(true)
+                .WithUrl("https://www.stockport.gov.uk")
+                .WithPropertyText("Go to home page")
+                .WithClassName("govuk-button")
+                .Build();
+
+            return new Page
+            {
+                Elements = new List<IElement>
+                {
+                    h2Element,
+                    pElement,
+                    linkElement
+                },
+                PageSlug = "booking-cancel-success",
+                BannerTitle = "Your've successfully cancelled your booking",
+                LeadingParagraph = "We've received your cancellation",
+                Title = "We've received your cancellation request",
+                HideTitle = true
             };
         }
     }
