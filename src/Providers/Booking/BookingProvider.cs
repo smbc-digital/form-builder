@@ -72,7 +72,7 @@ namespace form_builder.Providers.Booking
                 throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned 400 status code, gateway received a bad request, Request:{Newtonsoft.Json.JsonConvert.SerializeObject(request)}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
 
             if (result.StatusCode.Equals(HttpStatusCode.NotFound))
-                throw new ApplicationException($" {request.AppointmentId} cannot be found");
+                throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned not found for appointmetnId: {request.AppointmentId}");
 
             if (!result.IsSuccessStatusCode)
                 throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
@@ -80,17 +80,14 @@ namespace form_builder.Providers.Booking
             return result.ResponseContent;
         }
 
-        public Task<AppointmentInformation> GetBooking(Guid bookingId)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<AppointmentInformation> GetBooking(Guid bookingId) => throw new NotImplementedException();
 
         public async Task Cancel(Guid bookingId)
         {
             var response = await _gateway.Cancel(bookingId.ToString());
 
             if (response.StatusCode.Equals(HttpStatusCode.BadRequest))
-                throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway returned 400 status code, Gateway recieved bad request, Request:{bookingId.ToString()}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
+                throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway returned 400 status code, Gateway recieved bad request, Request:{bookingId}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
 
             if (response.StatusCode.Equals(HttpStatusCode.NotFound))
                 throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway return 404 not found for bookingId {bookingId}");
