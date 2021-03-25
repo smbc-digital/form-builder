@@ -233,7 +233,7 @@ namespace form_builder.Services.BookingService
             return new CancelledAppointmentInformation 
             {
                 FormName = formSchema.FormName,
-                StartPageUrl = envStartPageUrl,
+                StartPageUrl = formSchema.StartPageUrl.StartsWith("https://") || formSchema.StartPageUrl.StartsWith("http://") ? formSchema.StartPageUrl : envStartPageUrl,
                 BaseURL = formSchema.BaseURL,
                 BookingDate = bookingInformation.BookingDate,
                 Id = bookingInformation.AppointmentId,

@@ -118,7 +118,8 @@ namespace form_builder.Controllers
         public IActionResult CannotCancel(string formName) => View();
 
         [HttpGet]
-        [Route("{formName}/booking-cancel-success")]
-        public IActionResult CancelSuccess(string formName) => View("../Home/Success", new SuccessViewModel { LeadingParagraph = "Thanks for cancelling your appointment", BannerTitle = "Your've successfully cancelled your appointment" });
+        [Route("{formName}/cancel-success")]
+        public IActionResult CancelSuccess(string formName) => View("../Home/Success", new SuccessViewModel {PageTitle= "Cancel Success", FormName= formName, LeadingParagraph = "Thanks for cancelling your appointment", BannerTitle = "Your've successfully cancelled your appointment" });
+
     }
 }
