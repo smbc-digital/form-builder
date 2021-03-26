@@ -110,7 +110,7 @@ namespace form_builder.Controllers
             {
                 FormName = formSchema.FormName,
                 StartPageUrl = formSchema.StartPageUrl,
-                PageTitle = "Cannot Cancel Booking",
+                PageTitle = "Booking cannot be cancelled",
                 DisplayBreadCrumbs = false,
                 HideBackButton = true
             });
