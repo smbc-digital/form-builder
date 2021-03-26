@@ -147,11 +147,11 @@ namespace form_builder.Services.BookingService
         {
             var baseForm = await _schemaFactory.Build(form);
 
-            if (baseForm == null)
+            if (baseForm is null)
                 throw new ApplicationException($"Requested form '{form}' could not be found.");
 
             var currentPage = baseForm.GetPage(_pageHelper, path);
-            if (currentPage == null)
+            if (currentPage is null)
                 throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
             var guid = _sessionHelper.GetSessionGuid();
@@ -213,13 +213,13 @@ namespace form_builder.Services.BookingService
 
             var formSchema = await _schemaFactory.Build(formName);
 
-            if(formSchema == null)
+            if(formSchema is null)
                 throw new ApplicationException($"BookingService::ValidateCancellationRequest, Provided formname '{formName}' is not valid and cannot be resolved");
 
             var provider = formSchema.Pages
-                .Where(_ => _.Elements != null)
-                .SelectMany(_ => _.Elements)
-                .Where(_ => _.Type.Equals(EElementType.Booking))
+                .Where(page => page.Elements != null)
+                .SelectMany(page => page.Elements)
+                .Where(element => element.Type.Equals(EElementType.Booking))
                 .First().Properties.BookingProvider;
 
             var bookingInformation = await _bookingProviders.Get(provider).GetBooking(bookingGuid);
@@ -253,13 +253,13 @@ namespace form_builder.Services.BookingService
 
             var formSchema = await _schemaFactory.Build(formName);
 
-            if(formSchema == null)
+            if(formSchema is null)
                 throw new ApplicationException($"BookingService::Cancel, Provided formname '{formName}' is not valid and cannot be resolved");
 
             var provider = formSchema.Pages
-                .Where(_ => _.Elements != null)
-                .SelectMany(_ => _.Elements)
-                .Where(_ => _.Type.Equals(EElementType.Booking))
+                .Where(page => page.Elements != null)
+                .SelectMany(page => page.Elements)
+                .Where(element => element.Type.Equals(EElementType.Booking))
                 .First().Properties.BookingProvider;
 
             await _bookingProviders.Get(provider).Cancel(bookingGuid);
@@ -309,7 +309,7 @@ namespace form_builder.Services.BookingService
             {
                 var cachedAnswers = _distributedCache.GetString(guid);
 
-                var convertedAnswers = cachedAnswers == null
+                var convertedAnswers = cachedAnswers is null
                     ? new FormAnswers { Pages = new List<PageAnswers>() }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
