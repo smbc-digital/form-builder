@@ -184,7 +184,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                 },
                 PageSlug = "booking-cancel-success",
                 BannerTitle = "You've successfully cancelled your booking",
-                LeadingParagraph = "We've received your cancellation request",
+                LeadingParagraph = "We've received your cancellation request.",
                 Title = "Success",
                 HideTitle = true,
                 DisplayBreadCrumbs = baseForm.BreadCrumbs != null && baseForm.BreadCrumbs.Any()
