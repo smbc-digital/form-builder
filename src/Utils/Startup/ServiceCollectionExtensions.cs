@@ -282,8 +282,6 @@ namespace form_builder.Utils.Startup
             return services;
         }
 
-
-
         public static IServiceCollection AddSchemaIntegrityValidation(this IServiceCollection services)
         {
             services.AddSingleton<IFormSchemaIntegrityCheck, AnyConditionTypeCheck>();

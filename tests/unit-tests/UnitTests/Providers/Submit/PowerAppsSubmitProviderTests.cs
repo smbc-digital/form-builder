@@ -59,7 +59,7 @@ namespace form_builder_tests.UnitTests.Providers.Submit {
 
         [Fact]
         public async Task PostAsync_ShouldReturnResponseContent() {
-            SubmitSlug submitSlug = new SubmitSlug { URL = "www.test.com" };
+            SubmitSlug submitSlug = new SubmitSlug { URL = "www.test.com", Type = "flowtoken", AuthToken = "TestToken" };
 
             var result = await _powerAppsSubmitProvider.PostAsync(_mappingEntity, submitSlug);
 
