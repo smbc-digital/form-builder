@@ -16,8 +16,7 @@ namespace form_builder.Providers.Submit {
             _gateway = gateway;
         }
 
-        public async Task<HttpResponseMessage> PostAsync(MappingEntity mappingEntity, SubmitSlug submitSlug) {
-            return await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data, submitSlug.Type, submitSlug.AuthToken);
-        }
+        public async Task<HttpResponseMessage> PostAsync(MappingEntity mappingEntity, SubmitSlug submitSlug) => 
+            await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data, submitSlug.Type, submitSlug.AuthToken);
     }
 }

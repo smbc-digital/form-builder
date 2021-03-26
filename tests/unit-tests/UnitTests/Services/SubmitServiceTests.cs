@@ -61,8 +61,8 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns("TEST123456");
 
             _mockSubmitProvider
-                .Setup(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()))
-                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK});
+                .Setup(_ => _.ProviderName).Returns("AuthHeader");
+
             _submitProviders = new List<ISubmitProvider>
             {
                 _mockSubmitProvider.Object
@@ -175,6 +175,10 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
 
+            _mockSubmitProvider
+            .Setup(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()))
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+
             // Act
             await _service.ProcessSubmission(new MappingEntity { Data = new ExpandoObject(), BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "123454");
 
@@ -261,6 +265,10 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockDistributedCache
                 .Setup(_ => _.GetString(It.IsAny<string>())).Returns(json);
+
+            _mockSubmitProvider
+            .Setup(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()))
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
 
             // Act
             var result = await _service.ProcessSubmission(new MappingEntity { Data = new ExpandoObject(), BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "123454");
