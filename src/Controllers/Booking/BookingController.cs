@@ -89,7 +89,7 @@ namespace form_builder.Controllers
         [Route("booking/{formName}/cancel/{bookingGuid}")]
         public async Task<IActionResult> CancelBookingPost([FromQuery] string hash, Guid bookingGuid, string formName)
         {
-            if (string.IsNullOrEmpty(hash) || Guid.Empty == bookingGuid)
+            if (string.IsNullOrEmpty(hash) || Guid.Empty.Equals(bookingGuid))
                 throw new ApplicationException($"BookingController::CancelBookingPost, Invalid parameters recieved. Id: '{bookingGuid}', hash '{hash}' for form '{formName}'");
 
             await _bookingService.Cancel(formName, bookingGuid, hash);
