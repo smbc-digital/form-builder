@@ -807,9 +807,12 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ValidateCancellationRequest_ThrowApplicationException_WhenBookingGuidAndHashCheckFailed()
         {
             //Arrange
+            _hashUtil.Setup(_ => _.Check(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(false);
+
             //Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() =>
-                _service.ValidateCancellationRequest("test-form", new Guid("49e55a45-662a-40f4-9f08-bb1de675d144"), "922d9f461f24e52a6fe826529608982d8f42d7ef424b493520c74a10c46d8121"));
+                _service.ValidateCancellationRequest("test-form", new Guid(), "testHash"));
 
             //Assert
             Assert.Equal($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity", result.Message);
@@ -820,7 +823,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             //Arrange
             var formName = "test-form";
-            var bookingId = new Guid("49e55a45-662a-40f4-9f08-bb1de675d145");
+            var bookingId = new Guid();
 
             _hashUtil.Setup(_ => _.Check(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(true);
@@ -865,7 +868,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             //Arrange
             var formName = "test-form";
-            var bookingId = new Guid("49e55a45-662a-40f4-9f08-bb1de675d144");
+            var bookingId = new Guid();
 
             _hashUtil.Setup(_ => _.Check(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(true);
@@ -914,9 +917,12 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Cancel_ThrowApplicationException_CheckBookingIdAndHash()
         {
             //Arrange
+            _hashUtil.Setup(_ => _.Check(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(false);
+
             //Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() =>
-                _service.ValidateCancellationRequest("test-form", new Guid("49e55a45-662a-40f4-9f08-bb1de675d144"), "922d9f461f24e52a6fe826529608982d8f42d7ef424b493520c74a10c46d8121"));
+                _service.ValidateCancellationRequest("test-form", new Guid(), "testHash"));
 
             //Assert
             Assert.Equal($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity", result.Message);
