@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace form_builder.Providers.Submit {
     public class AuthenticationHeaderSubmitProvider : ISubmitProvider {
-        public string ProviderName => null;
+        public string ProviderName => "AuthHeader";
         private IGateway _gateway;
 
         public AuthenticationHeaderSubmitProvider(IGateway gateway) {

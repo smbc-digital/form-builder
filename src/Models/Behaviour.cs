@@ -23,7 +23,7 @@ namespace form_builder.Models
 
         public string URL { get; set; }
 
-        public string Type { get; set; }
+        public string Type { get; set; } = "AuthHeader";
 
         public string AuthToken { get; set; }
 
