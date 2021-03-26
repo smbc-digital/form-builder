@@ -54,6 +54,7 @@ namespace form_builder
                 .ConfigureDynamicLookDataProviders()
                 .ConfigureOrganisationProviders()
                 .ConfigureStreetProviders()
+                .ConfigureSubmitProviders()
                 .ConfigurePaymentProviders()
                 .ConfigureBookingProviders()
                 .ConfigureDocumentCreationProviders()

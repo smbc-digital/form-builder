@@ -78,6 +78,7 @@ using form_builder.Workflows.PaymentWorkflow;
 using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
 using form_builder.Utils.Hash;
+using form_builder.Providers.Submit;
 
 namespace form_builder.Utils.Startup
 {
@@ -242,6 +243,13 @@ namespace form_builder.Utils.Startup
             return services;
         }
 
+        public static IServiceCollection ConfigureSubmitProviders(this IServiceCollection services) {
+            services.AddSingleton<ISubmitProvider, AuthenticationHeaderSubmitProvider>();
+            services.AddSingleton<ISubmitProvider, PowerAppsSubmitProvider>();
+
+            return services;
+        }
+
         public static IServiceCollection ConfigureFormatters(this IServiceCollection services)
         {
             services.AddSingleton<IFormatter, FullDateFormatter>();
@@ -273,6 +281,8 @@ namespace form_builder.Utils.Startup
 
             return services;
         }
+
+
 
         public static IServiceCollection AddSchemaIntegrityValidation(this IServiceCollection services)
         {
