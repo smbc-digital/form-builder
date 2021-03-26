@@ -251,7 +251,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             Assert.IsType<SuccessPageEntity>(result);
             _mockSessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
             _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
-            Assert.Equal(pageCallback.Elements.Count, 3);
+            Assert.Single(pageCallback.Elements);
             Assert.Equal(pageCallback.PageSlug, "booking-cancel-success");
             Assert.Equal(pageCallback.BannerTitle, "Your've successfully cancelled your booking");
             Assert.Equal(pageCallback.LeadingParagraph, "We've received your cancellation");

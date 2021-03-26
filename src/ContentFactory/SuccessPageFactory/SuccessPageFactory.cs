@@ -168,16 +168,6 @@ namespace form_builder.ContentFactory.SuccessPageFactory
 
         private Page GenerateGenericBookingPage(FormSchema baseForm)
         {
-            var h2Element = new ElementBuilder()
-                .WithType(EElementType.H2)
-                .WithPropertyText("What happens next")
-                .Build();
-
-            var pElement = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("You booking has been cancelled, you will recieve an email if to confirm this if you supplied one when booking.")
-                .Build();
-
             var linkElement = new ElementBuilder()
                 .WithType(EElementType.Link)
                 .WithOpenInTab(true)
@@ -190,8 +180,6 @@ namespace form_builder.ContentFactory.SuccessPageFactory
             {
                 Elements = new List<IElement>
                 {
-                    h2Element,
-                    pElement,
                     linkElement
                 },
                 PageSlug = "booking-cancel-success",
