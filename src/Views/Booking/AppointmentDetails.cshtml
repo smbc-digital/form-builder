@@ -8,7 +8,7 @@
     ViewData["Breadcrumbs"] = Model.BreadCrumbs;
 }
 
-<h1 class="govuk-heading-l">Cancel your booking</h1>
+<h1 class="govuk-heading-l">Cancel your appointment</h1>
 
 @using (Html.BeginForm("CancelBookingPost", "Booking", new { formName = Model.BaseURL, bookingGuid = Model.Id, hash = Model.Hash  }, FormMethod.Post, false, new { autocomplete = "on", novalidate = "novalidate", enctype = "multipart/form-data" }) )
 {

@@ -73,7 +73,7 @@ namespace form_builder.Controllers
                     IsFullday = appointment.IsFullday,
                     DisplayBreadCrumbs = false,
                     HideBackButton = true,
-                    PageTitle = "Cancel Booking"
+                    PageTitle = "Cancel Appointment"
                 });
             }
             catch (BookingCannotBeCancelledException)
@@ -110,7 +110,7 @@ namespace form_builder.Controllers
             {
                 FormName = formSchema.FormName,
                 StartPageUrl = formSchema.StartPageUrl,
-                PageTitle = "Booking cannot be cancelled",
+                PageTitle = "Appointment cannot be cancelled",
                 DisplayBreadCrumbs = false,
                 HideBackButton = true
             });
