@@ -805,10 +805,7 @@ namespace form_builder_tests.UnitTests.Services
 
         [Theory]
         [InlineData("test-form", "49e55a45-662a-40f4-9f08-bb1de675d144", "922d9f461f24e52a6fe826529608982d8f42d7ef424b493520c74a10c46d8121")]
-        public async Task ValidateCancellationRequest_ThrowApplicationException_WhenBookingGuidAndHashCheckFailed(
-            string formName,
-            Guid bookingId,
-            string hash)
+        public async Task ValidateCancellationRequest_ThrowApplicationException_WhenBookingGuidAndHashCheckFailed(string formName,Guid bookingId,string hash)
         {
             //Arrange
             //Act
@@ -820,11 +817,8 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Theory]
-        [InlineData("test-form", "49e55a45-662a-40f4-9f08-bb1de675d145", "testHash")]
-        public async Task ValidateCancellationRequest_ThrowBookingCannotBeCancelledException_WhenBookingNotCancallable(
-            string formName,
-            Guid bookingId,
-            string hash)
+        [InlineData("test-form", "49e55a45-662a-40f4-9f08-bb1de675d145")]
+        public async Task ValidateCancellationRequest_ThrowBookingCannotBeCancelledException_WhenBookingNotCancallable(string formName,Guid bookingId)
         {
             //Arrange
             _hashUtil.Setup(_ => _.Check(It.IsAny<string>(), It.IsAny<string>()))
@@ -859,18 +853,15 @@ namespace form_builder_tests.UnitTests.Services
 
             //Act
             var result = await Assert.ThrowsAsync<BookingCannotBeCancelledException>(() =>
-                _service.ValidateCancellationRequest(formName, bookingId, hash));
+                _service.ValidateCancellationRequest(formName, bookingId, It.IsAny<string>()));
 
             //Assert
             Assert.Equal($"BookingSerivice::ValidateCancellationRequest, booking: {bookingId} specified it can not longer be cancelled", result.Message);
         }
 
         [Theory]
-        [InlineData("test-form", "49e55a45-662a-40f4-9f08-bb1de675d144", "testHash")]
-        public async Task ValidateCancellationRequest_ValidRequest_ReturnCancelledAppointmentInformationObject(
-           string formName,
-           Guid bookingId,
-           string hash)
+        [InlineData("test-form", "49e55a45-662a-40f4-9f08-bb1de675d144")]
+        public async Task ValidateCancellationRequest_ValidRequest_ReturnCancelledAppointmentInformationObject(string formName,Guid bookingId)
         {
             //Arrange
             _hashUtil.Setup(_ => _.Check(It.IsAny<string>(), It.IsAny<string>()))
@@ -910,7 +901,7 @@ namespace form_builder_tests.UnitTests.Services
                .Returns(new HostString("www.test.com"));
 
             //Act
-            var result = await _service.ValidateCancellationRequest(formName, bookingId, hash);
+            var result = await _service.ValidateCancellationRequest(formName, bookingId, It.IsAny<string>());
 
             //Assert
             Assert.IsType<CancelledAppointmentInformation>(result);
@@ -918,9 +909,7 @@ namespace form_builder_tests.UnitTests.Services
 
         [Theory]
         [InlineData("test-form", "49e55a45-662a-40f4-9f08-bb1de675d144", "922d9f461f24e52a6fe826529608982d8f42d7ef424b493520c74a10c46d8121")]
-        public async Task Cancel_ThrowApplicationException_CheckBookingIdAndHash(string formName,
-            Guid bookingId,
-            string hash)
+        public async Task Cancel_ThrowApplicationException_CheckBookingIdAndHash(string formName,Guid bookingId,string hash)
         {
             //Arrange
             //Act
@@ -931,14 +920,12 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity", result.Message);
         }
 
-        [Theory]
-        [InlineData("test-form", "49e55a45-662a-40f4-9f08-bb1de675d144", "testHash")]
-        public async Task Cancel_BookingProvider_ShouldCallCancel(
-           string formName,
-           Guid bookingId,
-           string hash)
+        [Fact]
+        public async Task Cancel_BookingProvider_ShouldCallCancel()
         {
             //Arrange
+            var formName = "test-form";
+
             _hashUtil.Setup(_ => _.Check(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(true);
 
@@ -960,7 +947,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(formSchema);
 
             //Act
-            await _service.Cancel(formName, bookingId, hash);
+            await _service.Cancel(formName, It.IsAny<Guid>(), It.IsAny<string>());
             //Assert
             _bookingProvider.Verify(_ => _.Cancel(It.IsAny<Guid>()), Times.Once);
         }
