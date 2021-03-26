@@ -213,6 +213,9 @@ namespace form_builder.Services.BookingService
 
             var formSchema = await _schemaFactory.Build(formName);
 
+            if(formSchema == null)
+                throw new ApplicationException($"BookingService::ValidateCancellationRequest, Provided formname '{formName}' is not valid and cannot be resolved");
+
             var provider = formSchema.Pages
                 .Where(_ => _.Elements != null)
                 .SelectMany(_ => _.Elements)
@@ -246,9 +249,12 @@ namespace form_builder.Services.BookingService
         public async Task Cancel(string formName, Guid bookingGuid, string hash)
         {
             if (!_hashUtil.Check(bookingGuid.ToString(), hash))
-                throw new ApplicationException($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity");
+                throw new ApplicationException($"BookingService::Cancel, Booking guid does not match hash, unable to verify request integrity");
 
             var formSchema = await _schemaFactory.Build(formName);
+
+            if(formSchema == null)
+                throw new ApplicationException($"BookingService::Cancel, Provided formname '{formName}' is not valid and cannot be resolved");
 
             var provider = formSchema.Pages
                 .Where(_ => _.Elements != null)

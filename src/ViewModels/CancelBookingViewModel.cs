@@ -6,7 +6,7 @@ namespace form_builder.ViewModels
     public class CancelBookingViewModel : FormBuilderViewModel
     {
         public string FormattedTime => IsFullday ? $"between {StartTime.ToTimeFormat()} and {EndTime.ToTimeFormat()}" : $"{StartTime.ToTimeFormat()} to {EndTime.ToTimeFormat()}";
-        public string FormattedCancelBookingDate => BookingDate.ToFullDateFormat();
+        public string FormattedDate => BookingDate.ToFullDateFormat();
         public string Hash { get; set; }
         public string BaseURL { get; set; }
         public Guid Id { get; set; }

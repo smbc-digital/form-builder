@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.ContentFactory.PageFactory;
@@ -98,7 +99,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
         {
             _sessionHelper.RemoveSessionGuid();
 
-            var page = GenerateGenericBookingPage();
+            var page = GenerateGenericBookingPage(baseForm);
 
             var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid, formAnswers);
 
@@ -165,7 +166,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
             };
         }
 
-        private Page GenerateGenericBookingPage()
+        private Page GenerateGenericBookingPage(FormSchema baseForm)
         {
             var h2Element = new ElementBuilder()
                 .WithType(EElementType.H2)
@@ -197,7 +198,8 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                 BannerTitle = "Your've successfully cancelled your booking",
                 LeadingParagraph = "We've received your cancellation",
                 Title = "We've received your cancellation request",
-                HideTitle = true
+                HideTitle = true,
+                DisplayBreadCrumbs = baseForm.BreadCrumbs != null && baseForm.BreadCrumbs.Any()
             };
         }
     }
