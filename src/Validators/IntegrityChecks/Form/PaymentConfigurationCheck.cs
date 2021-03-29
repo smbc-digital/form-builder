@@ -2,33 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using form_builder.Cache;
+using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Models;
-using form_builder.Configuration;
 using form_builder.Providers.PaymentProvider;
+using form_builder.Providers.Transforms.PaymentConfiguration;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace form_builder.Validators.IntegrityChecks.Form
 {
     public class PaymentConfigurationCheck : IFormSchemaIntegrityCheck
     {
         private IWebHostEnvironment _environment;
-        private readonly ICache _cache;
+        private readonly IPaymentConfigurationTransformDataProvider _paymentConfigProvider;
         private IEnumerable<IPaymentProvider> _paymentProviders;
-        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
         public PaymentConfigurationCheck(
-            IWebHostEnvironment environment,
-            ICache cache, IEnumerable<IPaymentProvider> paymentProviders,
-            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
+            IWebHostEnvironment environment, 
+            IEnumerable<IPaymentProvider> paymentProviders,
+            IPaymentConfigurationTransformDataProvider paymentConfigProvider)
         {
             _environment = environment;
-            _cache = cache;
             _paymentProviders = paymentProviders;
-            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
+            _paymentConfigProvider = paymentConfigProvider;
         }
 
         public IntegrityCheckResult Validate(FormSchema schema) => ValidateAsync(schema).Result;
@@ -45,7 +42,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
             if (!containsPayment)
                 return result;
 
-            List<PaymentInformation> paymentInformation = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_environment.EnvironmentName}", _distributedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
+            List<PaymentInformation> paymentInformation = await _paymentConfigProvider.Get<List<PaymentInformation>>();
             PaymentInformation formPaymentInformation = paymentInformation.FirstOrDefault(payment => payment.FormName.Equals(schema.BaseURL));
 
             if (formPaymentInformation is null)

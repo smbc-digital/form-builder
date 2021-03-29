@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
@@ -12,13 +11,13 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.PaymentProvider;
+using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.PayService;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
 using Xunit;
@@ -34,10 +33,9 @@ namespace form_builder_tests.UnitTests.Services
             new Mock<IEnumerable<IPaymentProvider>>();
 
         private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
-        private readonly Mock<ICache> _mockCache = new Mock<ICache>();
 
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings
-            = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+        private readonly Mock<IPaymentConfigurationTransformDataProvider> _mockPaymentConfigProvider =
+            new Mock<IPaymentConfigurationTransformDataProvider>();
 
         private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
         private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
@@ -48,9 +46,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             _paymentProvider.Setup(_ => _.ProviderName).Returns("testPaymentProvider");
 
-            _mockCache.Setup(_ =>
-                    _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(),
-                        It.IsAny<int>(), It.IsAny<ESchemaType>()))
+            _mockPaymentConfigProvider.Setup(_ => _.Get<List<PaymentInformation>>())
                 .ReturnsAsync(new List<PaymentInformation>
                 {
                     new PaymentInformation
@@ -81,13 +77,6 @@ namespace form_builder_tests.UnitTests.Services
                             ComplexCalculationRequired = true
                         }
                     }
-                });
-
-            _mockDistributedCacheExpirationSettings.Setup(_ => _.Value).Returns(
-                new DistributedCacheExpirationConfiguration
-                {
-                    UserData = 30,
-                    PaymentConfiguration = 5
                 });
 
             var submitSlug = new SubmitSlug
@@ -132,10 +121,8 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(mappingEntity);
             _mockHostingEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
 
-            _service = new PayService(_mockPaymentProvider.Object, _mockLogger.Object, _mockGateway.Object,
-                _mockCache.Object,
-                _mockDistributedCacheExpirationSettings.Object, _mockSessionHelper.Object, _mockMappingService.Object,
-                _mockHostingEnvironment.Object, _mockPageHelper.Object);
+            _service = new PayService(_mockPaymentProvider.Object, _mockLogger.Object, _mockGateway.Object, _mockSessionHelper.Object, _mockMappingService.Object,
+                _mockHostingEnvironment.Object, _mockPageHelper.Object, _mockPaymentConfigProvider.Object);
         }
 
         private static MappingEntity GetMappingEntityData()

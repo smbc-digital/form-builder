@@ -79,6 +79,7 @@ using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
 using form_builder.Utils.Hash;
 using form_builder.Providers.Submit;
+using form_builder.Providers.Transforms.PaymentConfiguration;
 
 namespace form_builder.Utils.Startup
 {
@@ -378,12 +379,13 @@ namespace form_builder.Utils.Startup
             {
                 services.AddSingleton<ILookupTransformDataProvider, LocalLookupTransformDataProvider>();
                 services.AddSingleton<IReusableElementTransformDataProvider, LocalReusableElementTransformDataProvider>();
+                services.AddSingleton<IPaymentConfigurationTransformDataProvider, LocalPaymentConfigurationTransformDataProvider>();
             }
             else
             {
                 services.AddSingleton<ILookupTransformDataProvider, S3LookupTransformDataProvider>();
                 services.AddSingleton<IReusableElementTransformDataProvider, S3ReusableElementTransformDataProvider>();
-
+                services.AddSingleton<IPaymentConfigurationTransformDataProvider, S3PaymentConfigurationTransformDataProvider>();
             }
 
             return services;
