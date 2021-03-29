@@ -217,10 +217,9 @@ namespace form_builder.Services.BookingService
                 throw new ApplicationException($"BookingService::ValidateCancellationRequest, Provided formname '{formName}' is not valid and cannot be resolved");
 
             var provider = formSchema.Pages
-                .Where(page => page.Elements != null)
+                .Where(page => page.Elements is not null)
                 .SelectMany(page => page.Elements)
-                .Where(element => element.Type.Equals(EElementType.Booking))
-                .First().Properties.BookingProvider;
+                .First(element => element.Type.Equals(EElementType.Booking)).Properties.BookingProvider;
 
             var bookingInformation = await _bookingProviders.Get(provider).GetBooking(bookingGuid);
 
@@ -257,10 +256,9 @@ namespace form_builder.Services.BookingService
                 throw new ApplicationException($"BookingService::Cancel, Provided formname '{formName}' is not valid and cannot be resolved");
 
             var provider = formSchema.Pages
-                .Where(page => page.Elements != null)
+                .Where(page => page.Elements is not null)
                 .SelectMany(page => page.Elements)
-                .Where(element => element.Type.Equals(EElementType.Booking))
-                .First().Properties.BookingProvider;
+                .First(element => element.Type.Equals(EElementType.Booking)).Properties.BookingProvider;
 
             await _bookingProviders.Get(provider).Cancel(bookingGuid);
         }

@@ -18,10 +18,10 @@ namespace form_builder_tests.Builders
         private bool _generateReferenceNumber = false;
         public string _generatedReferenceNumberMapping { get; set; }
         public string _referencePrefix { get; set; }
-        private List<EDocumentType> _documentType = new List<EDocumentType>();
-        private List<IAction> _formActions = new List<IAction>();
-        private List<EnvironmentAvailability> _environmentAvailability = new List<EnvironmentAvailability>();
-        private List<Breadcrumb> _breadcrumbs = new List<Breadcrumb>();
+        private List<EDocumentType> _documentType = new();
+        private List<IAction> _formActions = new();
+        private List<EnvironmentAvailability> _environmentAvailability = new();
+        private List<Breadcrumb> _breadcrumbs = new();
 
         public FormSchema Build() => new FormSchema
         {

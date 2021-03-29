@@ -20,7 +20,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 result.AddFailureMessage($"Booking Element Check, Form contains booking element, but is missing required page with slug {BookingConstants.NO_APPOINTMENT_AVAILABLE}.");
 
             var bookingProviders = schema.Pages
-                .Where(page => page.Elements != null)
+                .Where(page => page.Elements is not null)
                 .SelectMany(page => page.Elements
                 .Where(element => element.Type.Equals(EElementType.Booking))
                 .Select(element => element.Properties.BookingProvider)

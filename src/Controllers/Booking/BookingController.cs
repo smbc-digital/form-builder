@@ -52,7 +52,7 @@ namespace form_builder.Controllers
         [Route("booking/{formName}/cancel/{bookingGuid}")]
         public async Task<IActionResult> CancelBooking([FromQuery] string hash, Guid bookingGuid, string formName)
         {
-            if (string.IsNullOrEmpty(hash) || Guid.Empty == bookingGuid)
+            if (string.IsNullOrEmpty(hash) || bookingGuid.Equals(Guid.Empty))
                 throw new ApplicationException($"BookingController::CancelBooking, Invalid parameters recieved. Id: '{bookingGuid}', hash '{hash}' for form '{formName}'");
 
             try
