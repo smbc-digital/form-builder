@@ -21,7 +21,6 @@ using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
 using form_builder.Attributes;
-using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.ContentFactory.SuccessPageFactory;
@@ -402,13 +401,6 @@ namespace form_builder.Utils.Startup
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
             services.Configure<TagManagerConfiguration>(TagManagerId => configuration.GetValue<string>("GoogleTagManagerId"));
             services.Configure<HashConfiguration>(configuration.GetSection("HashConfiguration"));
-
-            return services;
-        }
-
-        public static IServiceCollection AddCache(this IServiceCollection services)
-        {
-            services.AddTransient<ICache, Cache.Cache>();
 
             return services;
         }

@@ -266,6 +266,34 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task GetFormPaymentInformation_ShouldCallIPaymentConfigurationTransformProvider()
+        {
+            // Arrange
+            var page = new PageBuilder().WithElement(new Element
+            {
+                Type = EElementType.PaymentSummary,
+                Properties = new BaseProperty
+                {
+                    CalculationSlugs = new List<SubmitSlug>
+                    {
+                        new SubmitSlug
+                        {
+                            Environment = "local",
+                            URL = "url",
+                            AuthToken = "auth"
+                        }
+                    }
+                }
+            }).Build();
+
+            // Act
+            await _service.GetFormPaymentInformation(GetMappingEntityData(), "testForm", page);
+
+            // Assert
+            _mockPaymentConfigProvider.Verify(_ => _.Get<List<PaymentInformation>>(), Times.Once);
+        }
+
+        [Fact]
         public async Task GetFormPaymentInformation_ShouldCallGatewayIfComplexCalculationRequired()
         {
             var page = new PageBuilder().WithElement(new Element

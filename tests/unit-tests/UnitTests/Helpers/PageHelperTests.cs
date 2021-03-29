@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Builders;
-using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -18,12 +17,10 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.Lookup;
-using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -39,12 +36,8 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
         private readonly Mock<IOptions<FormConfiguration>> _mockDisallowedKeysOptions = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
-        private readonly Mock<ICache> _mockCache = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings = new();
-        private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider = new();
-        private readonly Mock<IPaymentProvider> _paymentProvider = new();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new();
-        private readonly Mock<IHttpContextAccessor> _httpContextAccessor = new();
         private readonly List<ILookupProvider> _mockLookupProviders = new List<ILookupProvider>();
         private readonly FakeLookupProvider _lookupProvider = new();
         private readonly Mock<IActionHelper> _mockActionHelper = new();
@@ -59,23 +52,6 @@ namespace form_builder_tests.UnitTests.Helpers
                 }
             });
 
-            _mockCache.Setup(_ =>
-                    _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(),
-                        It.IsAny<int>(), It.IsAny<ESchemaType>()))
-                .ReturnsAsync(new List<PaymentInformation>
-                {
-                    new PaymentInformation
-                    {
-                        FormName = "test-form",
-                        PaymentProvider = "testProvider"
-                    },
-                    new PaymentInformation
-                    {
-                        FormName = "test-form-with-incorrect-provider",
-                        PaymentProvider = "invalidProvider"
-                    }
-                });
-
             _mockDistributedCacheExpirationSettings.Setup(_ => _.Value).Returns(
                 new DistributedCacheExpirationConfiguration
                 {
@@ -88,15 +64,11 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _mockLookupProviders.Add(_lookupProvider);
 
-            _paymentProvider.Setup(_ => _.ProviderName).Returns("testProvider");
-            var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object };
-            _mockPaymentProvider.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
-
             _pageHelper = new PageHelper(_mockIViewRender.Object,
                 _mockElementHelper.Object, _mockDistributedCache.Object,
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
-                _mockCache.Object, _mockDistributedCacheExpirationSettings.Object,
-                _mockPaymentProvider.Object, _mockSessionHelper.Object, _httpContextAccessor.Object, _mockLookupProviders,
+                _mockDistributedCacheExpirationSettings.Object,
+                _mockSessionHelper.Object, _mockLookupProviders,
                 _mockActionHelper.Object);
         }
 
