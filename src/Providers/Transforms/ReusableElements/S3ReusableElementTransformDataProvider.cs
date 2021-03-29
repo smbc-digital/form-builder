@@ -40,13 +40,11 @@ namespace form_builder.Providers.Transforms.ReusableElements
             }
             catch (AmazonS3Exception e)
             {
-                var ex = new Exception($"S3ReusableElementTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_environment.EnvironmentName.ToS3EnvPrefix()}/Elements/{schemaName} ", e);
-                throw ex;
+                throw new Exception($"S3ReusableElementTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_environment.EnvironmentName.ToS3EnvPrefix()}/Elements/{schemaName} ", e);
             }
             catch (Exception e)
             {
-                var ex = new Exception($"S3ReusableElementTransformDataProvider: An error has occured while attempting to deserialise object, Exception: {e.Message}", e);
-                throw ex;
+                throw new Exception($"S3ReusableElementTransformDataProvider: An error has occured while attempting to deserialise object, Exception: {e.Message}", e);
             }
         }
     }

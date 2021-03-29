@@ -38,13 +38,11 @@ namespace form_builder.Providers.Transforms.PaymentConfiguration
             }
             catch (AmazonS3Exception e)
             {
-                var ex = new Exception($"S3PaymentConfigurationTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_environment.EnvironmentName.ToS3EnvPrefix()}/payment-config/paymentconfiguration.{_environment.EnvironmentName.ToS3EnvPrefix()}.json ", e);
-                throw ex;
+                throw new Exception($"S3PaymentConfigurationTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_environment.EnvironmentName.ToS3EnvPrefix()}/payment-config/paymentconfiguration.{_environment.EnvironmentName.ToS3EnvPrefix()}.json ", e);
             }
             catch (Exception e)
             {
-                var ex = new Exception($"S3PaymentConfigurationTransformDataProvider: An error has occured while attempting to deserialise object, Exception: {e.Message}", e);
-                throw ex;
+                throw new Exception($"S3PaymentConfigurationTransformDataProvider: An error has occured while attempting to deserialise object, Exception: {e.Message}", e);
             }
         }
     }
