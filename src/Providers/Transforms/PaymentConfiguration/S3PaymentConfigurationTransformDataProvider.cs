@@ -27,7 +27,7 @@ namespace form_builder.Providers.Transforms.PaymentConfiguration
         {
             try
             {
-                var s3Result = await _s3Gateway.GetObject(_configuration["S3BucketKey"], $"{_environment.EnvironmentName.ToS3EnvPrefix()}/payment-config/paymentconfiguration.{_environment.EnvironmentName.ToS3EnvPrefix()}.json");
+                var s3Result = await _s3Gateway.GetObject(_configuration["S3BucketKey"], $"{_environment.EnvironmentName.ToS3EnvPrefix()}/payment-config/paymentconfiguration.{_environment.EnvironmentName}.json");
 
                 using (Stream responseStream = s3Result.ResponseStream)
                 using (StreamReader reader = new StreamReader(responseStream))
