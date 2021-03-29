@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Exceptions;
@@ -11,11 +10,11 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.PaymentProvider;
+using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 
@@ -26,8 +25,7 @@ namespace form_builder.Services.PayService
         private readonly IGateway _gateway;
         private readonly ILogger<PayService> _logger;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
-        private readonly ICache _cache;
-        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
+        private readonly IPaymentConfigurationTransformDataProvider _paymentConfigProvider;
         private readonly ISessionHelper _sessionHelper;
         private readonly IMappingService _mappingService;
         private readonly IWebHostEnvironment _hostingEnvironment;
@@ -37,22 +35,20 @@ namespace form_builder.Services.PayService
             IEnumerable<IPaymentProvider> paymentProviders,
             ILogger<PayService> logger,
             IGateway gateway,
-            ICache cache,
-            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ISessionHelper sessionHelper,
             IMappingService mappingService,
             IWebHostEnvironment hostingEnvironment,
-            IPageHelper pageHelper)
+            IPageHelper pageHelper, 
+            IPaymentConfigurationTransformDataProvider paymentConfigProvider)
         {
             _gateway = gateway;
             _logger = logger;
             _paymentProviders = paymentProviders;
-            _cache = cache;
-            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _sessionHelper = sessionHelper;
             _mappingService = mappingService;
             _hostingEnvironment = hostingEnvironment;
             _pageHelper = pageHelper;
+            _paymentConfigProvider = paymentConfigProvider;
         }
 
         public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string sessionGuid)
@@ -108,7 +104,7 @@ namespace form_builder.Services.PayService
 
         public async Task<PaymentInformation> GetFormPaymentInformation(MappingEntity formData, string form, Page page)
         {
-            var paymentConfig = await _cache.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>($"paymentconfiguration.{_hostingEnvironment.EnvironmentName}", _distributedCacheExpirationConfiguration.PaymentConfiguration, ESchemaType.PaymentConfiguration);
+            var paymentConfig = await _paymentConfigProvider.Get<List<PaymentInformation>>();
             var formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName == form);
 
             if (formPaymentConfig == null)

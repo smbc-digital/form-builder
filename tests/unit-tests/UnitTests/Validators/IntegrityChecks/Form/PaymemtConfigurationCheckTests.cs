@@ -1,16 +1,15 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Options;
 using form_builder.Builders;
-using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Providers.PaymentProvider;
+using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Validators.IntegrityChecks.Form;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
 using Moq;
 using Xunit;
 
@@ -20,54 +19,31 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
     {
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
 
-        private readonly Mock<ICache> _mockCache = new Mock<ICache>();
-
         private readonly Mock<IPaymentProvider> _mockPaymentProvider = new Mock<IPaymentProvider>();
 
         private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProviders = new Mock<IEnumerable<IPaymentProvider>>();
 
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings
-            = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+        private readonly Mock<IPaymentConfigurationTransformDataProvider> _mockPaymentConfigProvider =
+            new Mock<IPaymentConfigurationTransformDataProvider>();
 
         public PaymemtConfigurationCheckTests()
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName)
                 .Returns("local");
 
-            _mockCache.Setup(_ =>
-                    _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(),
-                        It.IsAny<int>(), It.IsAny<ESchemaType>()))
-                .ReturnsAsync(new List<PaymentInformation>
-                {
-                    new PaymentInformation
-                    {
-                        FormName = "test-name",
-                        PaymentProvider = "testProvider"
-                    },
-                    new PaymentInformation
-                    {
-                        FormName = "test-form-with-incorrect-provider",
-                        PaymentProvider = "invalidProvider"
-                    }
-                });
-
             _mockPaymentProvider.Setup(_ => _.ProviderName).Returns("testProvider");
             var paymentProviderItems = new List<IPaymentProvider> { _mockPaymentProvider.Object };
             _mockPaymentProviders.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
-
-            _mockDistributedCacheExpirationSettings.Setup(_ => _.Value).Returns(
-                new DistributedCacheExpirationConfiguration
-                {
-                    UserData = 30,
-                    PaymentConfiguration = 5,
-                    FileUpload = 60
-                });
         }
 
         [Fact]
         public async Task PaymentConfigurationCheck_IsNotValid_WhenNoConfigFound_ForForm()
         {
             // Arrange
+            _mockPaymentConfigProvider
+                .Setup(_ => _.Get<List<PaymentInformation>>())
+                .ReturnsAsync(new List<PaymentInformation>());
+
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitAndPay)
                 .Build();
@@ -81,7 +57,9 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .WithName("test-name")
                 .Build();
 
-            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockCache.Object, _mockPaymentProviders.Object, _mockDistributedCacheExpirationSettings.Object);
+            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object,
+                _mockPaymentProviders.Object,
+                _mockPaymentConfigProvider.Object);
 
             // Assert
             var result = await check.ValidateAsync(schema);
@@ -93,16 +71,11 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
         public async Task PaymentConfigurationCheck_IsValid_WhenConfigFound_ForForm_WithProvider()
         {
             // Arrange
-            _mockCache
-                .Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
+            _mockPaymentConfigProvider
+                .Setup(_ => _.Get<List<PaymentInformation>>())
                 .ReturnsAsync(new List<PaymentInformation>
                 {
-                    new PaymentInformation
-                    {
-                        FormName = "test-name",
-                        PaymentProvider = "testProvider",
-                        Settings = new Settings()
-                    }
+                    new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings() }
                 });
 
             var behaviour = new BehaviourBuilder()
@@ -120,7 +93,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Build();
 
             // Act
-            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockCache.Object, _mockPaymentProviders.Object, _mockDistributedCacheExpirationSettings.Object);
+            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockPaymentProviders.Object, _mockPaymentConfigProvider.Object);
 
             // Assert
             var result = await check.ValidateAsync(schema);
@@ -131,8 +104,12 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
         public async Task PaymentConfigurationCheck_Should_VerifyCalculationSlugs_StartWithHttps()
         {
             // Arrange
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
-                .ReturnsAsync(new List<PaymentInformation> { new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings { ComplexCalculationRequired = true } } });
+            _mockPaymentConfigProvider
+                .Setup(_ => _.Get<List<PaymentInformation>>())
+                .ReturnsAsync(new List<PaymentInformation>
+                {
+                    new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings { ComplexCalculationRequired = true } }
+                });
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName)
                 .Returns("non-local");
@@ -160,7 +137,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Build();
 
             // Act
-            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockCache.Object, _mockPaymentProviders.Object, _mockDistributedCacheExpirationSettings.Object);
+            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockPaymentProviders.Object, _mockPaymentConfigProvider.Object);
 
             // Assert
             var result = await check.ValidateAsync(schema);
@@ -171,8 +148,12 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
         public async Task CheckForPaymentConfiguration_Should_ThrowException_WhenCalculateCostUrl_DoesNot_StartWithHttps()
         {
             // Arrange
-            _mockCache.Setup(_ => _.GetFromCacheOrDirectlyFromSchemaAsync<List<PaymentInformation>>(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<ESchemaType>()))
-                .ReturnsAsync(new List<PaymentInformation> { new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings { ComplexCalculationRequired = true } } });
+            _mockPaymentConfigProvider
+                .Setup(_ => _.Get<List<PaymentInformation>>())
+                .ReturnsAsync(new List<PaymentInformation>
+                {
+                    new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings { ComplexCalculationRequired = true } }
+                });
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName)
                 .Returns("non-local");
@@ -200,7 +181,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Build();
 
             // Act
-            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockCache.Object, _mockPaymentProviders.Object, _mockDistributedCacheExpirationSettings.Object);
+            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockPaymentProviders.Object, _mockPaymentConfigProvider.Object);
 
             // Assert
             var result = await check.ValidateAsync(schema);
@@ -213,6 +194,13 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
         PaymentConfigurationCheck_IsNotValid_WhenPaymentProvider_DoesNotExists_WhenConfig_IsFound()
         {
             // Arrange
+            _mockPaymentConfigProvider
+                .Setup(_ => _.Get<List<PaymentInformation>>())
+                .ReturnsAsync(new List<PaymentInformation>
+                {
+                    new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings { ComplexCalculationRequired = true } }
+                });
+
             var pages = new List<Page>();
 
             var behaviour = new BehaviourBuilder()
@@ -230,7 +218,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Build();     
 
             // Act
-            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockCache.Object, _mockPaymentProviders.Object, _mockDistributedCacheExpirationSettings.Object);
+            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockPaymentProviders.Object, _mockPaymentConfigProvider.Object);
 
             // Assert
             var result = await check.ValidateAsync(schema);

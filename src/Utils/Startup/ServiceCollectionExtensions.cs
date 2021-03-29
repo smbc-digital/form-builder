@@ -21,7 +21,6 @@ using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
 using form_builder.Attributes;
-using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.ContentFactory.SuccessPageFactory;
@@ -79,6 +78,7 @@ using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
 using form_builder.Utils.Hash;
 using form_builder.Providers.Submit;
+using form_builder.Providers.Transforms.PaymentConfiguration;
 
 namespace form_builder.Utils.Startup
 {
@@ -378,12 +378,13 @@ namespace form_builder.Utils.Startup
             {
                 services.AddSingleton<ILookupTransformDataProvider, LocalLookupTransformDataProvider>();
                 services.AddSingleton<IReusableElementTransformDataProvider, LocalReusableElementTransformDataProvider>();
+                services.AddSingleton<IPaymentConfigurationTransformDataProvider, LocalPaymentConfigurationTransformDataProvider>();
             }
             else
             {
                 services.AddSingleton<ILookupTransformDataProvider, S3LookupTransformDataProvider>();
                 services.AddSingleton<IReusableElementTransformDataProvider, S3ReusableElementTransformDataProvider>();
-
+                services.AddSingleton<IPaymentConfigurationTransformDataProvider, S3PaymentConfigurationTransformDataProvider>();
             }
 
             return services;
@@ -400,13 +401,6 @@ namespace form_builder.Utils.Startup
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
             services.Configure<TagManagerConfiguration>(TagManagerId => configuration.GetValue<string>("GoogleTagManagerId"));
             services.Configure<HashConfiguration>(configuration.GetSection("HashConfiguration"));
-
-            return services;
-        }
-
-        public static IServiceCollection AddCache(this IServiceCollection services)
-        {
-            services.AddTransient<ICache, Cache.Cache>();
 
             return services;
         }

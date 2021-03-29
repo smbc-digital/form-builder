@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.Constants;
-using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
@@ -16,13 +14,10 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.Lookup;
-using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -30,24 +25,20 @@ namespace form_builder.Helpers.PageHelpers
 {
     public class PageHelper : IPageHelper
     {
-        private readonly ICache _cache;
         private readonly IViewRender _viewRender;
         private readonly IActionHelper _actionHelper;
         private readonly IElementHelper _elementHelper;
         private readonly ISessionHelper _sessionHelper;
         private readonly IWebHostEnvironment _environment;
         private readonly FormConfiguration _disallowedKeys;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IEnumerable<ILookupProvider> _lookupProviders;
-        private readonly IEnumerable<IPaymentProvider> _paymentProviders;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
-            IOptions<FormConfiguration> disallowedKeys, IWebHostEnvironment enviroment, ICache cache,
+            IOptions<FormConfiguration> disallowedKeys, IWebHostEnvironment enviroment,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            IEnumerable<IPaymentProvider> paymentProviders, ISessionHelper sessionHelper, IHttpContextAccessor httpContextAccessor,
-            IEnumerable<ILookupProvider> lookupProviders,
+            ISessionHelper sessionHelper, IEnumerable<ILookupProvider> lookupProviders,
             IActionHelper actionHelper)
         {
             _viewRender = viewRender;
@@ -55,11 +46,8 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache = distributedCache;
             _disallowedKeys = disallowedKeys.Value;
             _environment = enviroment;
-            _cache = cache;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
-            _paymentProviders = paymentProviders;
             _sessionHelper = sessionHelper;
-            _httpContextAccessor = httpContextAccessor;
             _lookupProviders = lookupProviders;
             _actionHelper = actionHelper;
         }
