@@ -19,6 +19,16 @@ namespace form_builder.Validators.IntegrityChecks.Form
             if (!schema.Pages.Any(page => page.PageSlug.Equals(BookingConstants.NO_APPOINTMENT_AVAILABLE, StringComparison.OrdinalIgnoreCase)))
                 result.AddFailureMessage($"Booking Element Check, Form contains booking element, but is missing required page with slug {BookingConstants.NO_APPOINTMENT_AVAILABLE}.");
 
+            var bookingProviders = schema.Pages
+                .Where(page => page.Elements is not null)
+                .SelectMany(page => page.Elements
+                .Where(element => element.Type.Equals(EElementType.Booking))
+                .Select(element => element.Properties.BookingProvider)
+                .Distinct());
+
+            if (bookingProviders.Count() > 1)
+                result.AddFailureMessage($"Booking Element Check, Form contains different booking provider. Only one provider allows on for form");
+
             var requiredFields = new[] { "customer.firstname", "customer.lastname" };
             foreach (var requiredField in requiredFields)
             {

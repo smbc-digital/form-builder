@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
+namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 {
     public class PaymemtConfigurationCheckTests
     {

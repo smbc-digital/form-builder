@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Models;
 using form_builder.Services.BookingService.Entities;
@@ -22,8 +23,17 @@ namespace form_builder.Services.BookingService
 
         Task ProcessMonthRequest(
             Dictionary<string, object> viewModel,
-            FormSchema baseForm,
-            Page currentPage,
-            string guid);
+            string form,
+            string path);
+
+        Task<CancelledAppointmentInformation> ValidateCancellationRequest(
+            string formName,
+            Guid bookingGuid, 
+            string hash);
+
+        Task Cancel(
+            string formName,
+            Guid bookingGuid,
+            string hash);
     }
 }

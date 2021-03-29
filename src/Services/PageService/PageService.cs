@@ -323,5 +323,12 @@ namespace form_builder.Services.PageService
 
             return await _successPageContentFactory.Build(form, baseForm, sessionGuid, formAnswers, behaviourType);
         }
+
+        public async Task<SuccessPageEntity> GetCancelBookingSuccessPage(string form)
+        {
+            var baseForm = await _schemaFactory.Build(form);
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+            return await _successPageContentFactory.BuildBooking(form, baseForm, sessionGuid, new FormAnswers());
+        }
     }
 }

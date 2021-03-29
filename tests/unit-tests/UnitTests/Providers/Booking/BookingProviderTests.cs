@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Exceptions;
 using form_builder.Providers.Booking;
@@ -31,6 +32,9 @@ namespace form_builder_tests.UnitTests.Providers.Booking
 
             _mockBookingServiceGateway.Setup(_ => _.GetLocation(It.IsAny<LocationRequest>()))
                 .ReturnsAsync(new HttpResponse<string> { StatusCode = System.Net.HttpStatusCode.OK, IsSuccessStatusCode = true, ResponseContent = String.Empty });
+
+            _mockBookingServiceGateway.Setup(_ => _.Cancel(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.OK });
 
             _bookigProvider = new BookingProvider(_mockBookingServiceGateway.Object);
         }
@@ -209,7 +213,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         }
 
         [Fact]
-        public async Task GetLocation_Should_Throw_NotFoundExceptionn_WhenAppointmentNotAvailable()
+        public async Task GetLocation_Should_Throw_NotFoundException_WhenAppointmentNotAvailable()
         {
             _mockBookingServiceGateway.Setup(_ => _.GetLocation(It.IsAny<LocationRequest>()))
                 .ReturnsAsync(new HttpResponse<string> { StatusCode = System.Net.HttpStatusCode.NotFound, IsSuccessStatusCode = false });
@@ -219,7 +223,53 @@ namespace form_builder_tests.UnitTests.Providers.Booking
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookigProvider.GetLocation(request));
 
             _mockBookingServiceGateway.Verify(_ => _.GetLocation(It.IsAny<LocationRequest>()), Times.Once);
-            Assert.Contains("cannot be found", result.Message);
+            Assert.Equal($"BookingProvider::GetLocation, BookingServiceGateway returned not found for appointmetnId: {request.AppointmentId}", result.Message);
+        }
+
+        [Fact]
+        public async Task Cancel_Should_Throw_Exception_When_Response_Is_BadRequest()
+        {
+            var guid = Guid.NewGuid();
+            _mockBookingServiceGateway.Setup(_ => _.Cancel(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.BadRequest });
+
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookigProvider.Cancel(guid));
+
+            _mockBookingServiceGateway.Verify(_ => _.Cancel(It.IsAny<string>()), Times.Once);
+            Assert.StartsWith($"BookingProvider::Cancel, BookingServiceGateway returned 400 status code, Gateway recieved bad request, Request:{guid}, Response:", result.Message);
+        }
+
+        [Fact]
+        public async Task Cancel_Should_Throw_Exception_When_Response_Is_InternalServerError()
+        {
+            var guid = Guid.NewGuid();
+            _mockBookingServiceGateway.Setup(_ => _.Cancel(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.InternalServerError });
+
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookigProvider.Cancel(guid));
+
+            _mockBookingServiceGateway.Verify(_ => _.Cancel(It.IsAny<string>()), Times.Once);
+            Assert.StartsWith($"BookingProvider::Cancel, BookingServiceGateway returned with non success status code of InternalServerError", result.Message);
+        }
+
+        public async Task Cancel_Should_Throw_Exception_When_Booking_NotFound()
+        {
+            var guid = Guid.NewGuid();
+            _mockBookingServiceGateway.Setup(_ => _.Cancel(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.NotFound });
+
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookigProvider.Cancel(guid));
+
+            _mockBookingServiceGateway.Verify(_ => _.Cancel(It.IsAny<string>()), Times.Once);
+            Assert.Equal($"BookingProvider::Cancel, BookingServiceGateway return 404 not found for bookingId {guid}", result.Message);
+        }
+
+        [Fact]
+        public async Task Cancel_Should_Resolve_WhenResponse_Is_Ok()
+        {
+            await _bookigProvider.Cancel(Guid.NewGuid());
+
+            _mockBookingServiceGateway.Verify(_ => _.Cancel(It.IsAny<string>()), Times.Once);
         }
     }
 }

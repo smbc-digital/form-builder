@@ -8,7 +8,9 @@ using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Extensions;
+using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Booking;
 using form_builder.Models.Elements;
@@ -20,6 +22,7 @@ using form_builder.Services.PageService.Entities;
 using form_builder.Utils.Extensions;
 using form_builder.Utils.Hash;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
@@ -35,7 +38,11 @@ namespace form_builder.Services.BookingService
         private readonly IPageFactory _pageFactory;
         private readonly IMappingService _mappingService;
         private readonly IWebHostEnvironment _environment;
+        private readonly ISchemaFactory _schemaFactory;
+        private readonly ISessionHelper _sessionHelper;
+        private readonly IHashUtil _hashUtil;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public BookingService(
             IDistributedCacheWrapper distributedCache,
@@ -44,7 +51,11 @@ namespace form_builder.Services.BookingService
             IPageFactory pageFactory,
             IMappingService mappingService,
             IWebHostEnvironment environment,
-            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
+            ISchemaFactory schemaFactory,
+            ISessionHelper sessionHelper,
+            IHashUtil hashUtil,
+            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
+            IHttpContextAccessor httpContextAccessor)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
@@ -52,7 +63,11 @@ namespace form_builder.Services.BookingService
             _pageFactory = pageFactory;
             _mappingService = mappingService;
             _environment = environment;
+            _schemaFactory = schemaFactory;
+            _sessionHelper = sessionHelper;
+            _hashUtil = hashUtil;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<BookingProcessEntity> Get(string baseUrl, Page currentPage, string guid)
@@ -128,8 +143,19 @@ namespace form_builder.Services.BookingService
             }
         }
 
-        public async Task ProcessMonthRequest(Dictionary<string, object> viewModel, FormSchema baseForm, Page currentPage, string guid)
+        public async Task ProcessMonthRequest(Dictionary<string, object> viewModel, string form, string path)
         {
+            var baseForm = await _schemaFactory.Build(form);
+
+            if (baseForm is null)
+                throw new ApplicationException($"Requested form '{form}' could not be found.");
+
+            var currentPage = baseForm.GetPage(_pageHelper, path);
+            if (currentPage is null)
+                throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
+
+            var guid = _sessionHelper.GetSessionGuid();
+
             if (!viewModel.ContainsKey(BookingConstants.BOOKING_MONTH_REQUEST))
                 throw new ApplicationException("BookingService::ProcessMonthRequest, request for appointment did not contain requested month");
 
@@ -180,6 +206,63 @@ namespace form_builder.Services.BookingService
             _pageHelper.SaveFormData(bookingSearchResultsKey, bookingInformation, guid, baseForm.BaseURL);
         }
 
+        public async Task<CancelledAppointmentInformation> ValidateCancellationRequest(string formName, Guid bookingGuid, string hash)
+        {
+            if (!_hashUtil.Check(bookingGuid.ToString(), hash))
+                throw new ApplicationException($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity");
+
+            var formSchema = await _schemaFactory.Build(formName);
+
+            if(formSchema is null)
+                throw new ApplicationException($"BookingService::ValidateCancellationRequest, Provided formname '{formName}' is not valid and cannot be resolved");
+
+            var provider = formSchema.Pages
+                .Where(page => page.Elements is not null)
+                .SelectMany(page => page.Elements)
+                .First(element => element.Type.Equals(EElementType.Booking)).Properties.BookingProvider;
+
+            var bookingInformation = await _bookingProviders.Get(provider).GetBooking(bookingGuid);
+
+            if (!bookingInformation.Cancellable)
+                throw new BookingCannotBeCancelledException($"BookingSerivice::ValidateCancellationRequest, booking: {bookingGuid} specified it can not longer be cancelled");
+
+           var envStartPageUrl =  _environment.EnvironmentName.Equals("local") ?
+                $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{formName}/{formSchema.StartPageUrl}" :
+                $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formName}/{formSchema.StartPageUrl}";
+
+            return new CancelledAppointmentInformation 
+            {
+                FormName = formSchema.FormName,
+                StartPageUrl = formSchema.StartPageUrl.StartsWith("https://") || formSchema.StartPageUrl.StartsWith("http://") ? formSchema.StartPageUrl : envStartPageUrl,
+                BaseURL = formSchema.BaseURL,
+                BookingDate = bookingInformation.BookingDate,
+                Id = bookingInformation.AppointmentId,
+                Cancellable = bookingInformation.Cancellable,
+                StartTime = bookingInformation.StartTime,
+                EndTime = bookingInformation.EndTime,
+                IsFullday = bookingInformation.IsFullday,
+                Hash = hash,
+            };
+        }
+
+        public async Task Cancel(string formName, Guid bookingGuid, string hash)
+        {
+            if (!_hashUtil.Check(bookingGuid.ToString(), hash))
+                throw new ApplicationException($"BookingService::Cancel, Booking guid does not match hash, unable to verify request integrity");
+
+            var formSchema = await _schemaFactory.Build(formName);
+
+            if(formSchema is null)
+                throw new ApplicationException($"BookingService::Cancel, Provided formname '{formName}' is not valid and cannot be resolved");
+
+            var provider = formSchema.Pages
+                .Where(page => page.Elements is not null)
+                .SelectMany(page => page.Elements)
+                .First(element => element.Type.Equals(EElementType.Booking)).Properties.BookingProvider;
+
+            await _bookingProviders.Get(provider).Cancel(bookingGuid);
+        }
+
         private async Task<BoookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider)
         {
             var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
@@ -224,7 +307,7 @@ namespace form_builder.Services.BookingService
             {
                 var cachedAnswers = _distributedCache.GetString(guid);
 
-                var convertedAnswers = cachedAnswers == null
+                var convertedAnswers = cachedAnswers is null
                     ? new FormAnswers { Pages = new List<PageAnswers>() }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
