@@ -174,7 +174,7 @@ namespace form_builder.Providers.Booking
 
         public Task<AppointmentInformation> GetBooking(Guid bookingId)
         {
-            if (!bookingId.Equals(Guid.Parse(BOOKING_CANNOT_BE_CANCELLED)))
+            if (bookingId.Equals(Guid.Parse(BOOKING_CANNOT_BE_CANCELLED)))
             {
                 return Task.FromResult(new AppointmentInformation
                 {
