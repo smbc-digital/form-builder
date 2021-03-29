@@ -15,28 +15,9 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             foreach (var page in schema.Pages)
             {
-                foreach (var element in page.Elements)
+                foreach (var element in page.ValidatableElements)
                 {
-                    if (element.Type != EElementType.H1
-                        && element.Type != EElementType.H2
-                        && element.Type != EElementType.H3
-                        && element.Type != EElementType.H4
-                        && element.Type != EElementType.H5
-                        && element.Type != EElementType.H6
-                        && element.Type != EElementType.Img
-                        && element.Type != EElementType.InlineAlert
-                        && element.Type != EElementType.P
-                        && element.Type != EElementType.Span
-                        && element.Type != EElementType.UL
-                        && element.Type != EElementType.OL
-                        && element.Type != EElementType.Button
-                        && element.Type != EElementType.HR
-                        && element.Type != EElementType.UploadedFilesSummary
-                        && element.Type != EElementType.Warning
-                        && element.Type != EElementType.Link)
-                    {
-                        questionIds.Add(element.Properties.QuestionId);
-                    }
+                    questionIds.Add(element.Properties.QuestionId);
                 }
             }
 
