@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Exceptions;
+using form_builder.Models.Booking;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 
@@ -14,6 +15,8 @@ namespace form_builder.Providers.Booking
         private static string BOOKING_UI_TEST => "00000000-0000-0000-0000-000000000002";
         private static string BOOKING_WITH_NO_AVAILABILITY => "00000000-0000-0000-0000-000000000001";
         private static string BOOKING_NON_FULL_DAY_APPOINTMENT => "00000000-0000-0000-0000-000000000003";
+        private static string BOOKING_CANNOT_BE_CANCELLED => "00000000-0000-0000-0000-000000000004";
+        private static string BOOKING_WITH_ERROR_ON_CANCEL => "00000000-0000-0000-0000-000000000005";
 
         public Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request)
         {
@@ -91,23 +94,23 @@ namespace form_builder.Providers.Booking
             var response = new List<AvailabilityDayResponse>();
             switch (request.StartDate.Month)
             {
-                case 11:
+                case 3:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 13), 1, true)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 15), 1, true)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 22), 1, true)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 23), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 13), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 15), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 22), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 23), 1, true)
                         .Build();
                     break;
-                case 12:
+                case 4:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 15), 1, true)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 12), 1, true)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 13), 1, true)
-                        .WithDay(new DateTime(2020, request.StartDate.Month, 20), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 15), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 12), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 13), 1, true)
+                        .WithDay(new DateTime(2021, request.StartDate.Month, 20), 1, true)
                         .Build();
                     break;
-                case 1:
+                case 5:
                     response = new AvailabilityDayResponseBuilder()
                         .WithDay(new DateTime(2021, request.StartDate.Month, 1), 1, true)
                         .WithDay(new DateTime(2021, request.StartDate.Month, 4), 1, true)
@@ -115,7 +118,7 @@ namespace form_builder.Providers.Booking
                         .WithDay(new DateTime(2021, request.StartDate.Month, 22), 1, true)
                         .Build();
                     break;
-                case 2:
+                case 6:
                     response = new AvailabilityDayResponseBuilder()
                         .WithDay(new DateTime(2021, request.StartDate.Month, 4), 1, true)
                         .WithDay(new DateTime(2021, request.StartDate.Month, 5), 1, true)
@@ -123,21 +126,6 @@ namespace form_builder.Providers.Booking
                         .WithDay(new DateTime(2021, request.StartDate.Month, 7), 1, true)
                         .Build();
                     break;
-                case 3:
-                    response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 4), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 5), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 6), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 7), 1, true)
-                        .Build();
-                    break;
-                case 4:
-                    response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 4), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 5), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 6), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 7), 1, true)
-                        .Build();
                     break;
                 default:
                     break;
@@ -182,6 +170,38 @@ namespace form_builder.Providers.Booking
         public Task<string> GetLocation(LocationRequest request)
         {
             return Task.FromResult("Test, Test St, Stockport SK1 3UR");
+        }
+
+        public Task<AppointmentInformation> GetBooking(Guid bookingId)
+        {
+            if (!bookingId.Equals(Guid.Parse(BOOKING_CANNOT_BE_CANCELLED)))
+            {
+                return Task.FromResult(new AppointmentInformation
+                {
+                    BookingDate = new DateTime(2021, 4, 13),
+                    Cancellable = false,
+                    StartTime = new TimeSpan(1,1,1),
+                    EndTime = new TimeSpan(2,1, 1),
+                    IsFullday = false
+                });
+            }
+
+            return Task.FromResult(new AppointmentInformation
+            {
+                BookingDate = new DateTime(2021, 3, 13),
+                Cancellable = true,
+                StartTime = new TimeSpan(2, 1, 1),
+                EndTime = new TimeSpan(23, 1, 1),
+                IsFullday = false
+            });
+        }
+
+        public async Task Cancel(Guid bookingId)
+        {
+            if(bookingId.Equals(Guid.Parse(BOOKING_WITH_ERROR_ON_CANCEL)))
+                throw new Exception("FakeBookingProvider::Cancel, Booking faked with fake exception");
+
+            _ = await Task.FromResult("");
         }
     }
 }

@@ -8,5 +8,6 @@ namespace form_builder.ContentFactory.SuccessPageFactory
     public interface ISuccessPageFactory
     {
         Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType);
+        Task<SuccessPageEntity> BuildBooking(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers);
     }
 }

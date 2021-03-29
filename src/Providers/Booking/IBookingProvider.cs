@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using form_builder.Models.Booking;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 
@@ -14,5 +15,7 @@ namespace form_builder.Providers.Booking
         Task<List<AvailabilityDayResponse>> GetAvailability(AvailabilityRequest request);
         Task<Guid> Reserve(BookingRequest request);
         Task<string> GetLocation(LocationRequest request);
+        Task<AppointmentInformation> GetBooking(Guid bookingId);
+        Task Cancel(Guid bookingId);
     }
 }
