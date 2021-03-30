@@ -23,10 +23,9 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 .Where(page => page.Elements is not null)
                 .SelectMany(page => page.Elements
                 .Where(element => element.Type.Equals(EElementType.Booking))
-                .Select(element => element.Properties.BookingProvider)
-                .Distinct());
+                .Select(element => element.Properties.BookingProvider));
 
-            if (bookingProviders.Count() > 1)
+            if (bookingProviders.Distinct().Count() > 1)
                 result.AddFailureMessage($"Booking Element Check, Form contains different booking provider. Only one provider allows on for form");
 
             var requiredFields = new[] { "customer.firstname", "customer.lastname" };
