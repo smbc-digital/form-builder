@@ -20,11 +20,11 @@ namespace form_builder_tests.UnitTests.Services
     public class EmailServiceTests
     {
         private readonly EmailService _emailService;
-        private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IEmailProvider> _mockEmailProvider = new Mock<IEmailProvider>();
-        private readonly Mock<IEnumerable<IEmailProvider>> _mockEmailProviders = new Mock<IEnumerable<IEmailProvider>>();
-        private readonly Mock<IActionHelper> _mockActionHelper = new Mock<IActionHelper>();
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<IEmailProvider> _mockEmailProvider = new();
+        private readonly Mock<IEnumerable<IEmailProvider>> _mockEmailProviders = new();
+        private readonly Mock<IActionHelper> _mockActionHelper = new();
 
         public EmailServiceTests()
         {

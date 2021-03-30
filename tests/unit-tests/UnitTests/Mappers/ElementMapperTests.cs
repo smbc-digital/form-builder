@@ -20,8 +20,8 @@ namespace form_builder_tests.UnitTests.Mappers
     public class ElementMapperTests
     {
         private readonly ElementMapper _elementMapper;
-        private readonly Mock<IDistributedCacheWrapper> _wrapper = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IHashUtil> _mockHashUtil = new Mock<IHashUtil>();
+        private readonly Mock<IDistributedCacheWrapper> _wrapper = new ();
+        private readonly Mock<IHashUtil> _mockHashUtil = new ();
 
         public ElementMapperTests()
         {

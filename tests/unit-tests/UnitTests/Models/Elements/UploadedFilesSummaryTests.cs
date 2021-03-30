@@ -8,7 +8,6 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Moq;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -17,10 +16,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 {
     public class UploadedFilesSummaryTests
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
-        private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        private readonly Mock<IViewRender> _mockIViewRender = new();
+        private readonly Mock<IElementHelper> _mockElementHelper = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
 
         [Fact]
         public async Task RenderAsync_ShouldCall_PageHelper_ToGetCurrentValue()

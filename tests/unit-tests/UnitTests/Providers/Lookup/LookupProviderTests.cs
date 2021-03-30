@@ -12,7 +12,7 @@ namespace form_builder_tests.UnitTests.Providers.Lookup
     public class LookupProviderTests
     {
         private readonly JsonLookupProvider _lookupProvider;
-        private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
+        private readonly Mock<IGateway> _mockGateway = new ();
 
         public LookupProviderTests() => _lookupProvider = new JsonLookupProvider(_mockGateway.Object);
 

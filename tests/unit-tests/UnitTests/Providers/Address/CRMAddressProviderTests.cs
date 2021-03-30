@@ -13,7 +13,7 @@ namespace form_builder_tests.UnitTests.Providers.Address
     {
         private readonly CRMAddressProvider _addressProvider;
 
-        private readonly Mock<IVerintServiceGateway> _mockVerintGateway = new Mock<IVerintServiceGateway>();
+        private readonly Mock<IVerintServiceGateway> _mockVerintGateway = new ();
 
         public CRMAddressProviderTests()
         {

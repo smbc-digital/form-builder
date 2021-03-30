@@ -27,20 +27,20 @@ namespace form_builder_tests.UnitTests.Services
     public class PayServiceTests
     {
         private readonly PayService _service;
-        private readonly Mock<ILogger<PayService>> _mockLogger = new Mock<ILogger<PayService>>();
-        private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
+        private readonly Mock<ILogger<PayService>> _mockLogger = new();
+        private readonly Mock<IGateway> _mockGateway = new();
         private readonly Mock<IEnumerable<IPaymentProvider>> _mockPaymentProvider =
-            new Mock<IEnumerable<IPaymentProvider>>();
+            new();
 
-        private readonly Mock<IPaymentProvider> _paymentProvider = new Mock<IPaymentProvider>();
+        private readonly Mock<IPaymentProvider> _paymentProvider = new();
 
         private readonly Mock<IPaymentConfigurationTransformDataProvider> _mockPaymentConfigProvider =
-            new Mock<IPaymentConfigurationTransformDataProvider>();
+            new();
 
-        private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnvironment = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new();
+        private readonly Mock<IMappingService> _mockMappingService = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnvironment = new();
+        private readonly Mock<IPageHelper> _mockPageHelper = new();
 
         public PayServiceTests()
         {
@@ -49,7 +49,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockPaymentConfigProvider.Setup(_ => _.Get<List<PaymentInformation>>())
                 .ReturnsAsync(new List<PaymentInformation>
                 {
-                    new PaymentInformation
+                    new()
                     {
                         FormName = "testForm",
                         PaymentProvider = "testPaymentProvider",
@@ -59,16 +59,16 @@ namespace form_builder_tests.UnitTests.Services
                             Amount = "12.65"
                         }
                     },
-                    new PaymentInformation
+                    new()
                     {
-                        FormName = "testFormwithnovalidpayment",
-                        PaymentProvider = "invalidPaymentPorvider",
+                        FormName = "testFormWithNoValidPayment",
+                        PaymentProvider = "invalidPaymentProvider",
                         Settings = new Settings
                         {
                             ComplexCalculationRequired = false
                         }
                     },
-                    new PaymentInformation
+                    new()
                     {
                         FormName = "complexCalculationForm",
                         PaymentProvider = "testPaymentProvider",
@@ -197,10 +197,10 @@ namespace form_builder_tests.UnitTests.Services
             _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
 
             var result = await Assert.ThrowsAsync<Exception>(() =>
-                _service.ProcessPayment(GetMappingEntityData(), "testFormwithnovalidpayment", "page-one", "12345",
+                _service.ProcessPayment(GetMappingEntityData(), "testFormWithNoValidPayment", "page-one", "12345",
                     "guid"));
 
-            Assert.Equal("PayService::GetFormPaymentProvider, No payment provider configured for invalidPaymentPorvider", result.Message);
+            Assert.Equal("PayService::GetFormPaymentProvider, No payment provider configured for invalidPaymentProvider", result.Message);
         }
 
         [Fact]
@@ -255,7 +255,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPaymentResponse_ShouldReturnPaymentReference_OnSuccessfull_PaymentProviderCall()
+        public async Task ProcessPaymentResponse_ShouldReturnPaymentReference_OnSuccessful_PaymentProviderCall()
         {
             _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(Page);
 
@@ -276,7 +276,7 @@ namespace form_builder_tests.UnitTests.Services
                 {
                     CalculationSlugs = new List<SubmitSlug>
                     {
-                        new SubmitSlug
+                        new()
                         {
                             Environment = "local",
                             URL = "url",
@@ -303,7 +303,7 @@ namespace form_builder_tests.UnitTests.Services
                 {
                     CalculationSlugs = new List<SubmitSlug>
                     {
-                        new SubmitSlug
+                        new()
                         {
                             Environment = "local",
                             URL = "url",
@@ -335,7 +335,7 @@ namespace form_builder_tests.UnitTests.Services
                 {
                     CalculationSlugs = new List<SubmitSlug>
                     {
-                        new SubmitSlug
+                        new()
                         {
                             Environment = "local"
                         }
@@ -367,7 +367,7 @@ namespace form_builder_tests.UnitTests.Services
                 {
                     CalculationSlugs = new List<SubmitSlug>
                     {
-                        new SubmitSlug
+                        new()
                         {
                             Environment = "local"
                         }
@@ -389,7 +389,7 @@ namespace form_builder_tests.UnitTests.Services
                 {
                     CalculationSlugs = new List<SubmitSlug>
                     {
-                        new SubmitSlug
+                        new()
                         {
                             Environment = "local",
                             URL = "url",
@@ -419,7 +419,7 @@ namespace form_builder_tests.UnitTests.Services
                 {
                     CalculationSlugs = new List<SubmitSlug>
                     {
-                        new SubmitSlug
+                        new()
                         {
                             Environment = "local",
                             URL = "url",

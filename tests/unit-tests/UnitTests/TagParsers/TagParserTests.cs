@@ -10,9 +10,9 @@ namespace form_builder_tests.UnitTests.TagParsers
 {
     public class TagParserTests
     {
-        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new Mock<IEnumerable<IFormatter>>();
-        private Regex _regex => new Regex("(?<={{)TEST:.*?(?=}})");
-        private TagParser _tagParser;
+        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
+        private Regex _regex => new("(?<={{)TEST:.*?(?=}})");
+        private readonly TagParser _tagParser;
 
         public TagParserTests() => _tagParser = new TagParser(_mockFormatters.Object);
 

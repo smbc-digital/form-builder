@@ -6,7 +6,7 @@ namespace form_builder_tests.UnitTests.TagParsers.Formatters
 {
     public class TimeOnlyFormatterTests
     {
-        private TimeOnlyFormatter _formatter = new TimeOnlyFormatter();
+        private readonly TimeOnlyFormatter _formatter = new();
 
         [Fact]
         public void Parse_ShouldReturn_CorrectTimeFormat()

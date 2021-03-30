@@ -22,14 +22,14 @@ namespace form_builder_tests.UnitTests.Factories.Schema
     public class SchemaFactoryTests
     {
         private readonly SchemaFactory _schemaFactory;
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<ISchemaProvider> _mockSchemaProvider = new Mock<ISchemaProvider>();
-        private readonly Mock<ILookupSchemaTransformFactory> _mockLookupSchemaFactory = new Mock<ILookupSchemaTransformFactory>();
-        private readonly Mock<IReusableElementSchemaTransformFactory> _mockReusableElementSchemaFactory = new Mock<IReusableElementSchemaTransformFactory>();
-        private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new Mock<IOptions<DistributedCacheConfiguration>>();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
-        private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
-        private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new Mock<IFormSchemaIntegrityValidator>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new ();
+        private readonly Mock<ISchemaProvider> _mockSchemaProvider = new ();
+        private readonly Mock<ILookupSchemaTransformFactory> _mockLookupSchemaFactory = new ();
+        private readonly Mock<IReusableElementSchemaTransformFactory> _mockReusableElementSchemaFactory = new ();
+        private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new ();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new ();
+        private readonly Mock<IConfiguration> _mockConfiguration = new ();
+        private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new ();
 
         public SchemaFactoryTests()
         {

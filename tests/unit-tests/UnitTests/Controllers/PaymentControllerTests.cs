@@ -14,10 +14,10 @@ namespace form_builder_tests.UnitTests.Controllers
     public class PaymentControllerTests
     {
         private readonly PaymentController _controller;
-        private readonly Mock<IPayService> _payService = new Mock<IPayService>();
-        private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<IMappingService> _mappingService = new Mock<IMappingService>();
-        private readonly Mock<ISuccessWorkflow> _successWorkflow = new Mock<ISuccessWorkflow>();
+        private readonly Mock<IPayService> _payService = new ();
+        private readonly Mock<ISessionHelper> _sessionHelper = new ();
+        private readonly Mock<IMappingService> _mappingService = new ();
+        private readonly Mock<ISuccessWorkflow> _successWorkflow = new ();
 
         public PaymentControllerTests()
         {

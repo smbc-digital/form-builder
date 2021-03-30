@@ -22,11 +22,11 @@ namespace form_builder_tests.UnitTests.Services
     {
         private readonly OrganisationService _service;
         private readonly OrganisationSearch _searchModel;
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IOrganisationProvider> _organisationProvider = new Mock<IOrganisationProvider>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<IPageHelper> _pageHelper = new();
+        private readonly Mock<IOrganisationProvider> _organisationProvider = new();
         private readonly IEnumerable<IOrganisationProvider> _organisationProviders;
-        private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
+        private readonly Mock<IPageFactory> _mockPageContentFactory = new();
 
         public OrganisationServiceTests()
         {
@@ -55,11 +55,11 @@ namespace form_builder_tests.UnitTests.Services
                 Path = "page-one",
                 Pages = new List<PageAnswers>()
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = questionId,
                                 Response = "searchTerm"
@@ -115,11 +115,11 @@ namespace form_builder_tests.UnitTests.Services
                 Path = "page-one",
                 Pages = new List<PageAnswers>()
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = questionId,
                                 Response = ""
@@ -170,11 +170,11 @@ namespace form_builder_tests.UnitTests.Services
                 Path = "page-one",
                 Pages = new List<PageAnswers>()
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = "test-address",
                                 Response = _searchModel.SearchTerm
@@ -185,7 +185,7 @@ namespace form_builder_tests.UnitTests.Services
                 },
                 FormData = new Dictionary<string, object>
                 {
-                    {"page-one-search-results", new List<object>{ }}
+                    { "page-one-search-results", new List<object>() }
                 }
             };
 
@@ -230,11 +230,11 @@ namespace form_builder_tests.UnitTests.Services
                 Path = "page-one",
                 Pages = new List<PageAnswers>()
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = "test-address",
                                 Response = "old search term"
@@ -308,7 +308,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessOrganisation(viewModel, page, schema, "", "page-one"));
             _organisationProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
-            Assert.StartsWith($"OrganisationService.ProccessInitialOrganisation:: An exception has occured while attempting to perform organisation lookup, Exception: ", result.Message);
+            Assert.StartsWith("OrganisationService.ProcessInitialOrganisation:: An exception has occurred while attempting to perform organisation lookup, Exception: ", result.Message);
         }
     }
 }

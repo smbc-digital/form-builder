@@ -14,11 +14,11 @@ namespace form_builder_tests.UnitTests.Providers.TransformDataProvider
     public class S3ReusableElementTransformDataProviderTests
     {
         private readonly S3ReusableElementTransformDataProvider _s3TransformProvider;
-        private readonly Mock<IS3Gateway> _mockS3Gateway = new Mock<IS3Gateway>();
-        private readonly Mock<ILogger<S3ReusableElementTransformDataProvider>> _mockLogger = new Mock<ILogger<S3ReusableElementTransformDataProvider>>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IS3Gateway> _mockS3Gateway = new();
+        private readonly Mock<ILogger<S3ReusableElementTransformDataProvider>> _mockLogger = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
 
-        private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
+        private readonly Mock<IConfiguration> _mockConfiguration = new();
 
         public S3ReusableElementTransformDataProviderTests()
         {

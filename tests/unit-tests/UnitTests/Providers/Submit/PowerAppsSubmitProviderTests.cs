@@ -1,23 +1,21 @@
-﻿using form_builder.Models;
+﻿using System.Collections.Generic;
+using System.Dynamic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using form_builder.Models;
 using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
 using form_builder_tests.Builders;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Providers.Submit {
+namespace form_builder_tests.UnitTests.Providers.Submit
+{
     public class PowerAppsSubmitProviderTests {
 
         private readonly PowerAppsSubmitProvider _powerAppsSubmitProvider;
-        private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
+        private readonly Mock<IGateway> _mockGateway = new();
         private readonly MappingEntity _mappingEntity =
             new MappingEntityBuilder()
                 .WithFormAnswers(new FormAnswers {

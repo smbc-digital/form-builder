@@ -53,7 +53,7 @@ namespace form_builder.Controllers
         public async Task<IActionResult> CancelBooking([FromQuery] string hash, Guid bookingGuid, string formName)
         {
             if (string.IsNullOrEmpty(hash) || bookingGuid.Equals(Guid.Empty))
-                throw new ApplicationException($"BookingController::CancelBooking, Invalid parameters recieved. Id: '{bookingGuid}', hash '{hash}' for form '{formName}'");
+                throw new ApplicationException($"BookingController::CancelBooking, Invalid parameters received. Id: '{bookingGuid}', hash '{hash}' for form '{formName}'");
 
             try
             {
@@ -90,7 +90,7 @@ namespace form_builder.Controllers
         public async Task<IActionResult> CancelBookingPost([FromQuery] string hash, Guid bookingGuid, string formName)
         {
             if (string.IsNullOrEmpty(hash) || Guid.Empty.Equals(bookingGuid))
-                throw new ApplicationException($"BookingController::CancelBookingPost, Invalid parameters recieved. Id: '{bookingGuid}', hash '{hash}' for form '{formName}'");
+                throw new ApplicationException($"BookingController::CancelBookingPost, Invalid parameters received. Id: '{bookingGuid}', hash '{hash}' for form '{formName}'");
 
             await _bookingService.Cancel(formName, bookingGuid, hash);
 

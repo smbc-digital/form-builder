@@ -24,7 +24,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private const string contentWithInvalidVariableQuestionIdInBraces = "Some text with a {{invalidVariableQuestionId}}";
 
         private readonly IActionHelper _actionHelper;
-        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new Mock<IEnumerable<IFormatter>>();
+        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new ();
 
         private readonly MappingEntity _mappingEntity = new MappingEntityBuilder()
             .WithFormAnswers(new FormAnswers

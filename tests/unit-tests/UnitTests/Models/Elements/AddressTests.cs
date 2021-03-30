@@ -7,7 +7,6 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
@@ -15,10 +14,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 {
     public class AddressTests
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
-        private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        private readonly Mock<IViewRender> _mockIViewRender = new ();
+        private readonly Mock<IElementHelper> _mockElementHelper = new ();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
 
         public AddressTests()
         {
@@ -45,7 +43,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var formAnswers = new FormAnswers();
             //Act
-            var result = await element.RenderAsync(
+            await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 "",
@@ -56,7 +54,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 formAnswers);
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<form_builder.Models.Elements.Address>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSearch"), It.IsAny<Address>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
@@ -99,7 +97,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 new List<object>());
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<form_builder.Models.Elements.Address>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressSelect"), It.IsAny<Address>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]
@@ -111,8 +109,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
             _mockElementHelper.Setup(_ => _.CurrentValue(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Address>(), null))
-                .Callback<string, form_builder.Models.Elements.Address, Dictionary<string, object>>((x, y, z) => callback = y);
+            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Address>(), null))
+                .Callback<string, Address, Dictionary<string, object>>((x, y, z) => callback = y);
 
             var pageSlug = "page-one";
             var baseUrl = "test";
@@ -141,7 +139,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var formAnswers = new FormAnswers();
 
             //Act
-            var result = await element.RenderAsync(_mockIViewRender.Object,
+            await element.RenderAsync(_mockIViewRender.Object,
                 _mockElementHelper.Object,
                 string.Empty,
                 viewModel,

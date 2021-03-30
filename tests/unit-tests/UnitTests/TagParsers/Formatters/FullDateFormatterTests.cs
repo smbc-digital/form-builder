@@ -6,7 +6,7 @@ namespace form_builder_tests.UnitTests.TagParsers.Formatters
 {
     public class FullDateFormatterTests
     {
-        private FullDateFormatter _formatter = new FullDateFormatter();
+        private readonly FullDateFormatter _formatter = new();
 
         [Fact]
         public void Parse_ShouldReturn_CorrectDateTimeFormat()

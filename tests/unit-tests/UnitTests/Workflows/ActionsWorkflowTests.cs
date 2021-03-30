@@ -16,10 +16,10 @@ namespace form_builder_tests.UnitTests.Workflows
     public class ActionsWorkflowTests
     {
         private readonly ActionsWorkflow _actionsWorkflow;
-        private readonly Mock<IRetrieveExternalDataService> _mockRetrieveExternalDataService = new Mock<IRetrieveExternalDataService>();
-        private readonly Mock<IEmailService> _mockEmailService = new Mock<IEmailService>();
-        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
-        private readonly Mock<IValidateService> _mockValidateService = new Mock<IValidateService>();
+        private readonly Mock<IRetrieveExternalDataService> _mockRetrieveExternalDataService = new();
+        private readonly Mock<IEmailService> _mockEmailService = new();
+        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
+        private readonly Mock<IValidateService> _mockValidateService = new();
 
         public ActionsWorkflowTests()
         {

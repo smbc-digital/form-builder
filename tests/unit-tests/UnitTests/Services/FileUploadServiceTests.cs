@@ -7,7 +7,6 @@ using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
@@ -25,12 +24,11 @@ namespace form_builder_tests.UnitTests.Services
     public class FileUploadServiceTests
     {
         private readonly FileUploadService _service;
-        private readonly Mock<IEnumerable<IElementValidator>> _validators = new Mock<IEnumerable<IElementValidator>>();
-        private readonly Mock<IElementValidator> _testValidator = new Mock<IElementValidator>();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IPageFactory> _mockPageFactory = new Mock<IPageFactory>();
-        private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
-        private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
+        private readonly Mock<IEnumerable<IElementValidator>> _validators = new();
+        private readonly Mock<IElementValidator> _testValidator = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<IPageFactory> _mockPageFactory = new();
+        private readonly Mock<IPageHelper> _mockPageHelper = new();
 
         private static readonly Element _element = new ElementBuilder()
             .WithType(EElementType.MultipleFileUpload)
@@ -75,13 +73,13 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var files = new List<DocumentModel>
             {
-                new DocumentModel
+                new()
                 {
                     Content = "content",
                     FileSize = 12,
                     FileName = "SMBC.png"
                 },
-                new DocumentModel
+                new()
                 {
                     Content = "more content",
                     FileSize = 21,
@@ -98,8 +96,8 @@ namespace form_builder_tests.UnitTests.Services
 
             var fileUpload = new List<CustomFormFile>
             {
-                new CustomFormFile("content", "fileUpload-fileupload", 12, "SMBC.png"),
-                new CustomFormFile("more content", "fileUpload-fileupload", 21, "TEST.jpg")
+                new("content", "fileUpload-fileupload", 12, "SMBC.png"),
+                new("more content", "fileUpload-fileupload", 21, "TEST.jpg")
             };
 
             // Act
@@ -271,8 +269,8 @@ namespace form_builder_tests.UnitTests.Services
 
             var fileUpload = new List<CustomFormFile>
             {
-                new CustomFormFile("content", "fileUpload-fileupload", 12, "SMBC.png"),
-                new CustomFormFile("more content", "fileUpload-fileupload", 21, "TEST.jpg")
+                new("content", "fileUpload-fileupload", 12, "SMBC.png"),
+                new("more content", "fileUpload-fileupload", 21, "TEST.jpg")
             };
 
             // Act
@@ -300,8 +298,8 @@ namespace form_builder_tests.UnitTests.Services
 
             var fileUpload = new List<CustomFormFile>
             {
-                new CustomFormFile("content", "fileUpload-fileupload", 12, "SMBC.png"),
-                new CustomFormFile("more content", "fileUpload-fileupload", 21, "TEST.jpg")
+                new("content", "fileUpload-fileupload", 12, "SMBC.png"),
+                new("more content", "fileUpload-fileupload", 21, "TEST.jpg")
             };
 
             // Act
@@ -323,8 +321,8 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var fileUpload = new List<CustomFormFile>
             {
-                new CustomFormFile("content", "fileUpload-fileupload", 12, "SMBC.png"),
-                new CustomFormFile("more content", "fileUpload-fileupload", 21, "TEST.jpg")
+                new("content", "fileUpload-fileupload", 12, "SMBC.png"),
+                new("more content", "fileUpload-fileupload", 21, "TEST.jpg")
             };
 
             // Act
@@ -361,8 +359,8 @@ namespace form_builder_tests.UnitTests.Services
 
             var fileUpload = new List<CustomFormFile>
             {
-                new CustomFormFile("content", "fileUpload-fileupload", 12, "SMBC.png"),
-                new CustomFormFile("more content", "fileUpload-fileupload", 21, "TEST.jpg")
+                new("content", "fileUpload-fileupload", 12, "SMBC.png"),
+                new("more content", "fileUpload-fileupload", 21, "TEST.jpg")
             };
 
             // Act
@@ -414,33 +412,29 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessFile_ProcessSelectedFiles_ShouldSave_WhenMUltipleFileUpload_IsOptional_WithNoFiles_OnSubmit()
+        public async Task ProcessFile_ProcessSelectedFiles_ShouldSave_WhenMultipleFileUpload_IsOptional_WithNoFiles_OnSubmit()
         {
 
-            var _element = new ElementBuilder()
+
+
+
+            // Arrange
+            var element = new ElementBuilder()
                 .WithType(EElementType.MultipleFileUpload)
                 .WithQuestionId("fileUpload")
                 .WithOptional(true)
                 .Build();
 
-            var _page = new PageBuilder()
-                .WithElement(_element)
+            var page = new PageBuilder()
+                .WithElement(element)
                 .WithValidatedModel(true)
                 .WithPageSlug("page-one")
                 .Build();
 
-            var _schema = new FormSchemaBuilder()
-                .WithPage(_page)
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
                 .WithBaseUrl("baseUrl")
                 .Build();
-
-
-            // Arrange
-            var expectedRouteValues = new
-            {
-                form = "baseUrl",
-                path = "path"
-            };
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -450,7 +444,7 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             // Act
-            var result = await _service.ProcessFile(viewModel, _page, _schema, new Guid().ToString(),
+            var result = await _service.ProcessFile(viewModel, page, schema, new Guid().ToString(),
                 "path", null, true);
 
             // Assert

@@ -14,7 +14,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
 {
     public class LookupSchemaTransformFactoryTests
     {
-        private readonly Mock<ILookupTransformDataProvider> _transformDataProvider = new Mock<ILookupTransformDataProvider>();
+        private readonly Mock<ILookupTransformDataProvider> _transformDataProvider = new ();
 
         private LookupSchemaTransformFactory LookupSchemaTransformFactory { get; }
 
@@ -37,7 +37,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Build();
 
             // Act
-            var result = LookupSchemaTransformFactory.Transform(new FormSchema()
+            var result = LookupSchemaTransformFactory.Transform(new FormSchema
             {
                 Pages = new List<Page>{
                     new Page

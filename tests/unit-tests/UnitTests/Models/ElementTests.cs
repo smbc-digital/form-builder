@@ -11,8 +11,8 @@ namespace form_builder_tests.UnitTests.Models
 {
     public class ElementTests
     {
-        private readonly Mock<IEnumerable<IElementValidator>> _validators = new Mock<IEnumerable<IElementValidator>>();
-        private readonly Mock<IElementValidator> _testValidator = new Mock<IElementValidator>();
+        private readonly Mock<IEnumerable<IElementValidator>> _validators = new();
+        private readonly Mock<IElementValidator> _testValidator = new();
 
         public ElementTests()
         {
@@ -270,7 +270,7 @@ namespace form_builder_tests.UnitTests.Models
                             .Build();
 
             var viewModel = new Dictionary<string, dynamic> {{questionId, "test"}};
-            element.Validate(viewModel, _validators.Object, new form_builder.Models.FormSchema());
+            element.Validate(viewModel, _validators.Object, new FormSchema());
             
             // Act
             var result = element.GetDescribedByAttributeValue();
@@ -292,7 +292,7 @@ namespace form_builder_tests.UnitTests.Models
                             .Build();
 
             var viewModel = new Dictionary<string, dynamic> {{questionId, "test"}};
-            element.Validate(viewModel, _validators.Object, new form_builder.Models.FormSchema());
+            element.Validate(viewModel, _validators.Object, new FormSchema());
 
             // Act
             var result = element.GetDescribedByAttributeValue();

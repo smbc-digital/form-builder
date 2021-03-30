@@ -11,7 +11,7 @@ namespace form_builder_tests.UnitTests.Models
 {
     public class FormSchemaTests
     {
-        private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
+        private readonly Mock<IPageHelper> _mockPageHelper = new();
 
         [Fact]
         public void IsAvailable_ShouldReturn_True_WhenNoEnvironmentAvailabilitiesAreSpecified()
