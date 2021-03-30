@@ -1,0 +1,33 @@
+﻿@model CancelBookingViewModel
+@{
+    ViewData["Title"] = Model.FormName;
+    ViewData["PageTitle"] = Model.PageTitle;
+    ViewData["FeedbackForm"] = Model.FeedbackForm;
+    ViewData["FeedbackPhase"] = Model.FeedbackPhase;
+    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadCrumbs;
+    ViewData["Breadcrumbs"] = Model.BreadCrumbs;
+}
+
+<h1 class="govuk-heading-l">Cancel your appointment</h1>
+
+@using (Html.BeginForm("CancelBookingPost", "Booking", new { formName = Model.BaseURL, bookingGuid = Model.Id, hash = Model.Hash  }, FormMethod.Post, false, new { autocomplete = "on", novalidate = "novalidate", enctype = "multipart/form-data" }) )
+{
+    @Html.AntiForgeryToken()
+    <table class="govuk-table">
+        <tr class="govuk-table__row">
+            <th scope="row" class="smbc-table__header">Date:</th>
+            <td class="govuk-table__cell">@Model.FormattedDate</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="smbc-table__header">Time:</th>
+            <td class="govuk-table__cell">@Model.FormattedTime</td>
+        </tr>
+    </table>
+
+    <button class="govuk-button"
+                name="submit"
+                id="submit"
+                data-module="govuk-button">
+            Submit
+    </button>
+}

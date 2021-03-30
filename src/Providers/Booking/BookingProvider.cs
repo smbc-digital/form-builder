@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using form_builder.Exceptions;
+using form_builder.Models.Booking;
 using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
+using Newtonsoft.Json;
 
 namespace form_builder.Providers.Booking
 {
@@ -20,13 +22,13 @@ namespace form_builder.Providers.Booking
             var result = await _gateway.NextAvailability(request);
 
             if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
-                throw new ApplicationException($"BookingProvider::NextAvailability, BookingServiceGateway received a bad request, Request:{Newtonsoft.Json.JsonConvert.SerializeObject(request)}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+                throw new ApplicationException($"BookingProvider::NextAvailability, BookingServiceGateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
 
             if (result.StatusCode.Equals(HttpStatusCode.NotFound))
                 throw new BookingNoAvailabilityException($"BookingProvider::NextAvailability, BookingServiceGateway returned with 404 status code, no appointments available within the requested timeframe {request.StartDate} to {request.EndDate} for appointentId {request.AppointmentId}");
 
             if (!result.IsSuccessStatusCode)
-                throw new ApplicationException($"BookingProvider::NextAvailability, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+                throw new ApplicationException($"BookingProvider::NextAvailability, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {JsonConvert.SerializeObject(result)}");
 
             return result.ResponseContent;
         }
@@ -36,13 +38,13 @@ namespace form_builder.Providers.Booking
             var result = await _gateway.GetAvailability(request);
 
             if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
-                throw new ApplicationException($"BookingProvider::GetAvailability, BookingServiceGateway received a bad request, Request:{Newtonsoft.Json.JsonConvert.SerializeObject(request)}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+                throw new ApplicationException($"BookingProvider::GetAvailability, BookingServiceGateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
 
             if (result.StatusCode.Equals(HttpStatusCode.NotFound))
                 throw new ApplicationException($"BookingProvider::GetAvailability, BookingServiceGateway returned 404 status code, booking with id {request.AppointmentId} cannot be found");
 
             if (!result.IsSuccessStatusCode)
-                throw new ApplicationException($"BookingProvider::GetAvailability, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+                throw new ApplicationException($"BookingProvider::GetAvailability, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {JsonConvert.SerializeObject(result)}");
 
             return result.ResponseContent;
         }
@@ -52,13 +54,13 @@ namespace form_builder.Providers.Booking
             var result = await _gateway.Reserve(request);
 
             if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
-                throw new ApplicationException($"BookingProvider::Reserve, BookingServiceGateway received a bad request, Request:{Newtonsoft.Json.JsonConvert.SerializeObject(request)}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+                throw new ApplicationException($"BookingProvider::Reserve, BookingServiceGateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
 
             if (result.StatusCode.Equals(HttpStatusCode.NotFound))
                 throw new ApplicationException($"BookingProvider::Reserve, BookingServiceGateway returned 404 status code, booking with id {request.AppointmentId} cannot be found");
 
             if (!result.IsSuccessStatusCode)
-                throw new ApplicationException($"BookingProvider::Reserve, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+                throw new ApplicationException($"BookingProvider::Reserve, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {JsonConvert.SerializeObject(result)}");
 
             return result.ResponseContent;
         }
@@ -68,15 +70,31 @@ namespace form_builder.Providers.Booking
             var result = await _gateway.GetLocation(request);
 
             if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
-                throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGaBookingProvider::GetLocation, BookingServiceGateway returned 404 status code, booking with idteway received a bad request, Request:{Newtonsoft.Json.JsonConvert.SerializeObject(request)}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+                throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned 400 status code, gateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
 
             if (result.StatusCode.Equals(HttpStatusCode.NotFound))
-                throw new ApplicationException($" {request.AppointmentId} cannot be found");
+                throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned not found for appointmentId: {request.AppointmentId}");
 
             if (!result.IsSuccessStatusCode)
-                throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+                throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {JsonConvert.SerializeObject(result)}");
 
             return result.ResponseContent;
+        }
+
+        public Task<AppointmentInformation> GetBooking(Guid bookingId) => throw new NotImplementedException();
+
+        public async Task Cancel(Guid bookingId)
+        {
+            var response = await _gateway.Cancel(bookingId.ToString());
+
+            if (response.StatusCode.Equals(HttpStatusCode.BadRequest))
+                throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway returned 400 status code, Gateway received bad request, Request:{bookingId}, Response: {JsonConvert.SerializeObject(response)}");
+
+            if (response.StatusCode.Equals(HttpStatusCode.NotFound))
+                throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway return 404 not found for bookingId {bookingId}");
+
+            if (!response.IsSuccessStatusCode)
+                throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway returned with non success status code of {response.StatusCode}, Response: {JsonConvert.SerializeObject(response)}");
         }
     }
 }

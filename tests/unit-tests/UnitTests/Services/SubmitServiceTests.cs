@@ -12,6 +12,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
+using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.SubmitService;
 using form_builder_tests.Builders;
@@ -26,13 +27,15 @@ namespace form_builder_tests.UnitTests.Services
     public class SubmitServiceTests
     {
         private readonly SubmitService _service;
-        private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
-        private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IWebHostEnvironment> _mockEnvironment = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IOptions<SubmissionServiceConfiguration>> _mockIOptions = new Mock<IOptions<SubmissionServiceConfiguration>>();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
-        private readonly Mock<IReferenceNumberProvider> _mockReferenceNumberProvider = new Mock<IReferenceNumberProvider>();
+        private readonly Mock<IGateway> _mockGateway = new();
+        private readonly Mock<IPageHelper> _mockPageHelper = new();
+        private readonly Mock<IWebHostEnvironment> _mockEnvironment = new();
+        private readonly Mock<IOptions<SubmissionServiceConfiguration>> _mockIOptions = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
+        private readonly Mock<IReferenceNumberProvider> _mockReferenceNumberProvider = new();
+        private readonly Mock<ISubmitProvider> _mockSubmitProvider = new();
+        private readonly IEnumerable<ISubmitProvider> _submitProviders;
 
         public SubmitServiceTests()
         {
@@ -57,7 +60,15 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetReference(It.IsAny<string>(), It.IsAny<int>()))
                 .Returns("TEST123456");
 
-            _service = new SubmitService(_mockGateway.Object, _mockPageHelper.Object, _mockEnvironment.Object, _mockIOptions.Object, _mockDistributedCache.Object, _mockSchemaFactory.Object, _mockReferenceNumberProvider.Object);
+            _mockSubmitProvider
+                .Setup(_ => _.ProviderName).Returns("AuthHeader");
+
+            _submitProviders = new List<ISubmitProvider>
+            {
+                _mockSubmitProvider.Object
+            };
+
+            _service = new SubmitService(_mockGateway.Object, _mockPageHelper.Object, _mockEnvironment.Object, _mockIOptions.Object, _mockDistributedCache.Object, _mockSchemaFactory.Object, _mockReferenceNumberProvider.Object, _submitProviders);
         }
 
         [Fact]
@@ -132,7 +143,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessSubmission_ShouldCallGateway_WithFormData()
+        public async Task ProcessSubmission_ShouldCallProvider_WithFormData()
         {
             // Arrange
             var questionId = "testQuestion";
@@ -160,23 +171,19 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockGateway
-                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK
-                })
-                .Callback<string, object>((x, y) => callbackValue = (ExpandoObject)y);
-
             _mockPageHelper
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
+
+            _mockSubmitProvider
+            .Setup(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()))
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
 
             // Act
             await _service.ProcessSubmission(new MappingEntity { Data = new ExpandoObject(), BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "123454");
 
             // Assert
-            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
+            _mockSubmitProvider.Verify(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()), Times.Once);
 
             Assert.NotNull(callbackValue);
         }
@@ -259,6 +266,10 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache
                 .Setup(_ => _.GetString(It.IsAny<string>())).Returns(json);
 
+            _mockSubmitProvider
+            .Setup(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()))
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+
             // Act
             var result = await _service.ProcessSubmission(new MappingEntity { Data = new ExpandoObject(), BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "123454");
 
@@ -267,7 +278,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessSubmission__Application_ShoudlThrowApplicationException_WhenGatewayResponse_IsNotOk()
+        public async Task ProcessSubmission__Application_ShoudlThrowApplicationException_WhenProviderResponse_IsNotOk()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -293,10 +304,9 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockGateway
-                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
+            _mockSubmitProvider
+                .Setup(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()))
+                .ReturnsAsync(new HttpResponseMessage {
                     StatusCode = HttpStatusCode.InternalServerError
                 });
 
@@ -309,7 +319,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             Assert.StartsWith("SubmitService::ProcessSubmission, An exception has occurred while attempting to call ", result.Message);
-            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
+            _mockSubmitProvider.Verify(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()), Times.Once);
         }
 
         [Fact]
@@ -392,7 +402,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
             // Assert
-            Assert.StartsWith("SubmitService::PaymentSubmission, An exception has occured while attempting to call ", result.Message);
+            Assert.StartsWith("SubmitService::PaymentSubmission, An exception has occurred while attempting to call ", result.Message);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 
@@ -474,7 +484,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
             // Assert
-            Assert.StartsWith($"SubmitService::PaymentSubmission, Gateway", result.Message);
+            Assert.StartsWith("SubmitService::PaymentSubmission, Gateway", result.Message);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 

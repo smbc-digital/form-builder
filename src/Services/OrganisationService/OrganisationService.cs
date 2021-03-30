@@ -155,7 +155,7 @@ namespace form_builder.Services.OrganisationService
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException($"OrganisationService.ProccessInitialOrganisation:: An exception has occured while attempting to perform organisation lookup, Exception: {e.Message}");
+                    throw new ApplicationException($"OrganisationService.ProcessInitialOrganisation:: An exception has occurred while attempting to perform organisation lookup, Exception: {e.Message}");
                 }
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);

@@ -26,6 +26,7 @@ using form_builder.Services.PageService.Entities;
 using form_builder.Services.PayService;
 using form_builder.Services.StreetService;
 using form_builder.Validators;
+using form_builder.Validators.IntegrityChecks;
 using form_builder.ViewModels;
 using form_builder.Workflows.ActionsWorkflow;
 using form_builder_tests.Builders;
@@ -41,43 +42,52 @@ namespace form_builder_tests.UnitTests.Services
     public class PageServicesTests
     {
         private readonly PageService _service;
-        private readonly Mock<IEnumerable<IElementValidator>> _validators = new Mock<IEnumerable<IElementValidator>>();
-        private readonly Mock<IElementValidator> _validator = new Mock<IElementValidator>();
-        private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
-        private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<IStreetService> _streetService = new Mock<IStreetService>();
-        private readonly Mock<IAddressService> _addressService = new Mock<IAddressService>();
-        private readonly Mock<IBookingService> _bookingService = new Mock<IBookingService>();
-        private readonly Mock<IFileUploadService> _fileUploadService = new Mock<IFileUploadService>();
-        private readonly Mock<IOrganisationService> _organisationService = new Mock<IOrganisationService>();
-        private readonly Mock<IDistributedCacheWrapper> _distributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
-        private readonly Mock<IWebHostEnvironment> _mockEnvironment = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IPayService> _payService = new Mock<IPayService>();
-        private readonly Mock<IMappingService> _mappingService = new Mock<IMappingService>();
-        private readonly Mock<IPageFactory> _mockPageFactory = new Mock<IPageFactory>();
-        private readonly Mock<IIncomingDataHelper> _mockIncomingDataHelper = new Mock<IIncomingDataHelper>();
-        private readonly Mock<ISuccessPageFactory> _mockSuccessPageFactory = new Mock<ISuccessPageFactory>();
-        private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new Mock<IActionsWorkflow>();
+        private readonly Mock<IEnumerable<IElementValidator>> _validators = new();
+        private readonly Mock<IElementValidator> _validator = new();
+        private readonly Mock<IPageHelper> _mockPageHelper = new();
+        private readonly Mock<ISessionHelper> _sessionHelper = new();
+        private readonly Mock<IStreetService> _streetService = new();
+        private readonly Mock<IAddressService> _addressService = new();
+        private readonly Mock<IBookingService> _bookingService = new();
+        private readonly Mock<IFileUploadService> _fileUploadService = new();
+        private readonly Mock<IOrganisationService> _organisationService = new();
+        private readonly Mock<IDistributedCacheWrapper> _distributedCache = new();
+        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new();
+        private readonly Mock<IWebHostEnvironment> _mockEnvironment = new();
+        private readonly Mock<IPayService> _payService = new();
+        private readonly Mock<IMappingService> _mappingService = new();
+        private readonly Mock<IPageFactory> _mockPageFactory = new();
+        private readonly Mock<IIncomingDataHelper> _mockIncomingDataHelper = new();
+        private readonly Mock<ISuccessPageFactory> _mockSuccessPageFactory = new();
+        private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new();
+
+        private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new();
 
         public PageServicesTests()
         {
             _validator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
                 .Returns(new ValidationResult { IsValid = false });
+
             var elementValidatorItems = new List<IElementValidator> { _validator.Object };
-            _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
+            _validators
+                .Setup(m => m.GetEnumerator())
+                .Returns(() => elementValidatorItems.GetEnumerator());
 
             _mockPageHelper
                 .Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
-                        .ReturnsAsync(new FormBuilderViewModel());
+                .ReturnsAsync(new FormBuilderViewModel());
 
             _mockPageHelper
                 .Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), null))
-                        .ReturnsAsync(new FormBuilderViewModel());
+                .ReturnsAsync(new FormBuilderViewModel());
 
-            _mockEnvironment.Setup(_ => _.EnvironmentName)
+            _mockEnvironment
+                .Setup(_ => _.EnvironmentName)
                 .Returns("local");
+
+            _mockFormSchemaIntegrityValidator
+                .Setup(_ => _.Validate(It.IsAny<FormSchema>()));
 
             var cacheData = new FormAnswers
             {
@@ -773,27 +783,27 @@ namespace form_builder_tests.UnitTests.Services
                 FormName = "form",
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = $"{questionIDOne}{FileUploadConstants.SUFFIX}",
                                 Response = new List<FileUploadModel>
                                 {
-                                    new FileUploadModel
+                                    new()
                                     {
                                         Key = fileOneKey
                                     }
                                 }
                             },
-                            new Answers
+                            new()
                             {
                                 QuestionId = $"{questionIDTwo}{FileUploadConstants.SUFFIX}",
                                 Response = new List<FileUploadModel>
                                 {
-                                    new FileUploadModel
+                                    new()
                                     {
                                         Key = fileTwoKey
                                     }
@@ -854,35 +864,35 @@ namespace form_builder_tests.UnitTests.Services
                 FormName = "form",
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = $"{questionIDOne}{FileUploadConstants.SUFFIX}",
                                 Response = new List<FileUploadModel>
                                 {
-                                    new FileUploadModel
+                                    new()
                                     {
                                         Key = fileOneKey
                                     },
-                                    new FileUploadModel
+                                    new()
                                     {
                                         Key = fileTwoKey
                                     },
-                                    new FileUploadModel
+                                    new()
                                     {
                                         Key = fileThreeKey
                                     }
                                 }
                             },
-                            new Answers
+                            new()
                             {
                                 QuestionId = $"{questionIDTwo}{FileUploadConstants.SUFFIX}",
                                 Response = new List<FileUploadModel>
                                 {
-                                    new FileUploadModel
+                                    new()
                                     {
                                         Key = fileFourKey
                                     }
@@ -944,16 +954,16 @@ namespace form_builder_tests.UnitTests.Services
                 FormName = "form",
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = $"{questionIDOne}{FileUploadConstants.SUFFIX}",
                                 Response = null,
                             },
-                            new Answers
+                            new()
                             {
                                 QuestionId = $"{questionIDTwo}{FileUploadConstants.SUFFIX}",
                                 Response = null
@@ -1338,6 +1348,16 @@ namespace form_builder_tests.UnitTests.Services
 
             _bookingService.Verify(_ => _.ProcessBooking(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
+        }
+
+        public async Task GetCancelBookingSuccessPage_Should_Return_SuccessPageEntity()
+        {
+            var result = await _service.GetCancelBookingSuccessPage("form");
+
+            Assert.IsType<SuccessPageEntity>(result);
+            _mockSchemaFactory.Verify(_ => _.Build(It.Is<string>(_ => _.Equals("form"))), Times.Once);
+            _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
+            _mockSuccessPageFactory.Verify(_ => _.BuildBooking(It.Is<string>(_ => _.Equals("form")), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>()), Times.Once);
         }
     }
 }

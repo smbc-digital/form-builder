@@ -17,7 +17,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
 {
     public class ReusableElementSchemaTransformFactoryTests
     {
-        private readonly Mock<IReusableElementTransformDataProvider> _transformDataProvider = new Mock<IReusableElementTransformDataProvider>();
+        private readonly Mock<IReusableElementTransformDataProvider> _transformDataProvider = new ();
         public ReusableElementSchemaTransformFactory ReusableElementSchemaTransformFactory;
 
         public ReusableElementSchemaTransformFactoryTests()
@@ -49,7 +49,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             element.ElementRef = "test";
 
             // Act
-            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema
             {
                 Pages = new List<Page>{
                     new Page
@@ -85,7 +85,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             element.ElementRef = "test";
 
             // Act
-            var result = await Assert.ThrowsAsync<Exception>(() => ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            var result = await Assert.ThrowsAsync<Exception>(() => ReusableElementSchemaTransformFactory.Transform(new FormSchema
             {
                 Pages = new List<Page>{
                     new Page
@@ -117,7 +117,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Build();
 
             // Act
-            var result = await Assert.ThrowsAsync<Exception>(() => ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            var result = await Assert.ThrowsAsync<Exception>(() => ReusableElementSchemaTransformFactory.Transform(new FormSchema
             {
                 Pages = new List<Page>{
                     new Page
@@ -150,7 +150,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             element.ElementRef = "test";
 
             // Act
-            var result = await Assert.ThrowsAsync<Exception>(() => ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            var result = await Assert.ThrowsAsync<Exception>(() => ReusableElementSchemaTransformFactory.Transform(new FormSchema
             {
                 Pages = new List<Page>{
                     new Page
@@ -193,7 +193,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             element.ElementRef = "test";
 
             // Act
-            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema
             {
                 Pages = new List<Page>{
                     new Page()
@@ -238,7 +238,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             element.ElementRef = "test";
 
             // Act
-            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema
             {
                 Pages = new List<Page>{
                     new Page()
@@ -282,7 +282,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             element.ElementRef = "test";
 
             // Act
-            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema
             {
                 Pages = new List<Page>{
                     new Page()
@@ -326,7 +326,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             element.ElementRef = "test";
 
             // Act
-            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema()
+            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema
             {
                 Pages = new List<Page>{
                     new Page()
@@ -345,7 +345,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
-        public async Task Transform_ShouldTranform_Correct_Elements_WhenMultiplePagesExists_WithSameSlug()
+        public async Task Transform_ShouldTransform_Correct_Elements_WhenMultiplePagesExists_WithSameSlug()
         {
             // Arrange
             _transformDataProvider
@@ -417,7 +417,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
-        public async Task Transform_ShouldTranform_ElementsRef_WhenUsedMultipleTimes_AcrossPages()
+        public async Task Transform_ShouldTransform_ElementsRef_WhenUsedMultipleTimes_AcrossPages()
         {
             // Arrange
             _transformDataProvider
@@ -474,7 +474,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
-        public async Task Transform_ShouldTranform_Correct_Elements_WhenMultiplePagesExists_WithSameSlug_AndSameElementReference()
+        public async Task Transform_ShouldTransform_Correct_Elements_WhenMultiplePagesExists_WithSameSlug_AndSameElementReference()
         {
             // Arrange
             _transformDataProvider

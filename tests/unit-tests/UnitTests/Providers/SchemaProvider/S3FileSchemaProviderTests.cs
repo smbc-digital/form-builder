@@ -17,13 +17,13 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
     public class S3FileSchemaProviderTests
     {
         private readonly S3FileSchemaProvider _s3Schema;
-        private readonly Mock<IS3Gateway> _mockS3Gateway = new Mock<IS3Gateway>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IConfiguration> _mockConfiguration = new Mock<IConfiguration>();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new Mock<IOptions<DistributedCacheConfiguration>>();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
-        private readonly Mock<ILogger<ISchemaProvider>> _mockLogger = new Mock<ILogger<ISchemaProvider>>();
+        private readonly Mock<IS3Gateway> _mockS3Gateway = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+        private readonly Mock<IConfiguration> _mockConfiguration = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new();
+        private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new();
+        private readonly Mock<ILogger<ISchemaProvider>> _mockLogger = new();
 
         public S3FileSchemaProviderTests()
         {

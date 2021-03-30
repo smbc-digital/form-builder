@@ -14,10 +14,10 @@ namespace form_builder_tests.UnitTests.Workflows
     public class PaymentWorkflowTests
     {
         private readonly PaymentWorkflow _workflow;
-        private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<ISubmitService> _submitService = new Mock<ISubmitService>();
-        private readonly Mock<IPayService> _payService = new Mock<IPayService>();
-        private readonly Mock<IMappingService> _mappingService = new Mock<IMappingService>();
+        private readonly Mock<ISessionHelper> _sessionHelper = new();
+        private readonly Mock<ISubmitService> _submitService = new();
+        private readonly Mock<IPayService> _payService = new();
+        private readonly Mock<IMappingService> _mappingService = new();
 
         public PaymentWorkflowTests()
         {

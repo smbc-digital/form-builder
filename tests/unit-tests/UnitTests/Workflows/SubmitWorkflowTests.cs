@@ -14,9 +14,9 @@ namespace form_builder_tests.UnitTests.Workflows
     public class SubmitWorkflowTests
     {
         private readonly SubmitWorkflow _workflow;
-        private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<ISubmitService> _submitService = new Mock<ISubmitService>();
-        private readonly Mock<IMappingService> _mappingService = new Mock<IMappingService>();
+        private readonly Mock<ISessionHelper> _sessionHelper = new();
+        private readonly Mock<ISubmitService> _submitService = new();
+        private readonly Mock<IMappingService> _mappingService = new();
 
         public SubmitWorkflowTests()
         {

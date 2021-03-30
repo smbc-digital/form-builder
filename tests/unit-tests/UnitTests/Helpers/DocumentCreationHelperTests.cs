@@ -14,7 +14,7 @@ namespace form_builder_tests.UnitTests.Helpers
     public class DocumentCreationHelperTests
     {
         private readonly DocumentCreationHelper _documentCreation;
-        private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
+        private readonly Mock<IElementMapper> _mockElementMapper = new ();
 
         public DocumentCreationHelperTests()
         {

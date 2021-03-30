@@ -26,14 +26,14 @@ namespace form_builder_tests.UnitTests.Services
     public class ValidateServiceTests
     {
         private readonly ValidateService _service;
-        private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
-        private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
-        private readonly Mock<IActionHelper> _mockActionHelper = new Mock<IActionHelper>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IGateway> _mockGateway = new();
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new();
+        private readonly Mock<IMappingService> _mockMappingService = new();
+        private readonly Mock<IActionHelper> _mockActionHelper = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
 
-        private readonly List<IAction> _pageActions = new List<IAction>
+        private readonly List<IAction> _pageActions = new()
         {
             new ActionBuilder()
                 .WithActionType(EActionType.Validate)
@@ -53,11 +53,11 @@ namespace form_builder_tests.UnitTests.Services
                     Path = "page-one",
                     Pages = new List<PageAnswers>
                     {
-                        new PageAnswers
+                        new()
                         {
                             Answers = new List<Answers>
                             {
-                                new Answers
+                                new()
                                 {
                                     Response = "testResponse",
                                     QuestionId = "testQuestionId"
@@ -70,7 +70,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithData(new ExpandoObject())
                 .Build();
 
-        private readonly HttpResponseMessage _successResponse = new HttpResponseMessage
+        private readonly HttpResponseMessage _successResponse = new()
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent("\"test\"")

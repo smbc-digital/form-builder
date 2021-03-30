@@ -1,10 +1,26 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.SimpleEmail;
+using StackExchange.Redis;
+using StockportGovUK.NetStandard.Gateways;
+using StockportGovUK.NetStandard.Gateways.AddressService;
+using StockportGovUK.NetStandard.Gateways.BookingService;
+using StockportGovUK.NetStandard.Gateways.CivicaPay;
+using StockportGovUK.NetStandard.Gateways.Extensions;
+using StockportGovUK.NetStandard.Gateways.OrganisationService;
+using StockportGovUK.NetStandard.Gateways.StreetService;
+using StockportGovUK.NetStandard.Gateways.VerintService;
 using form_builder.Attributes;
-using form_builder.Cache;
 using form_builder.Configuration;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.ContentFactory.SuccessPageFactory;
@@ -26,12 +42,13 @@ using form_builder.Providers.Booking;
 using form_builder.Providers.DocumentCreation;
 using form_builder.Providers.DocumentCreation.Generic;
 using form_builder.Providers.EmailProvider;
+using form_builder.Providers.Lookup;
 using form_builder.Providers.Organisation;
 using form_builder.Providers.PaymentProvider;
+using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
-using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.Transforms.Lookups;
 using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Services.AddressService;
@@ -50,30 +67,20 @@ using form_builder.Services.ValidateService;
 using form_builder.TagParsers;
 using form_builder.TagParsers.Formatters;
 using form_builder.Validators;
+using form_builder.Validators.IntegrityChecks;
+using form_builder.Validators.IntegrityChecks.Behaviours;
+using form_builder.Validators.IntegrityChecks.Elements;
+using form_builder.Validators.IntegrityChecks.Form;
 using form_builder.Workflows.ActionsWorkflow;
 using form_builder.Workflows.DocumentWorkflow;
 using form_builder.Workflows.PaymentWorkflow;
 using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using StackExchange.Redis;
-using StockportGovUK.NetStandard.Gateways;
-using StockportGovUK.NetStandard.Gateways.AddressService;
-using StockportGovUK.NetStandard.Gateways.BookingService;
-using StockportGovUK.NetStandard.Gateways.CivicaPay;
-using StockportGovUK.NetStandard.Gateways.Extensions;
-using StockportGovUK.NetStandard.Gateways.OrganisationService;
-using StockportGovUK.NetStandard.Gateways.StreetService;
-using StockportGovUK.NetStandard.Gateways.VerintService;
+using form_builder.Utils.Hash;
+using form_builder.Providers.Submit;
+using form_builder.Providers.Transforms.PaymentConfiguration;
 
-namespace form_builder.Utils.ServiceCollectionExtensions
+namespace form_builder.Utils.Startup
 {
     [ExcludeFromCodeCoverage]
     public static class ServiceCollectionExtensions
@@ -197,6 +204,14 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             return services;
         }
 
+        public static IServiceCollection ConfigureDynamicLookDataProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<ILookupProvider, FakeLookupProvider>();
+            services.AddSingleton<ILookupProvider, JsonLookupProvider>();
+
+            return services;
+        }
+
         public static IServiceCollection ConfigureBookingProviders(this IServiceCollection services)
         {
             services.AddSingleton<IBookingProvider, FakeBookingProvider>();
@@ -212,7 +227,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
 
             return services;
         }
-        
+
         public static IServiceCollection ConfigureFormAnswersProviders(this IServiceCollection services)
         {
             services.AddSingleton<IFormAnswersProvider, FormAnswersProvider>();
@@ -224,6 +239,13 @@ namespace form_builder.Utils.ServiceCollectionExtensions
         {
             services.AddSingleton<IStreetProvider, FakeStreetProvider>();
             services.AddSingleton<IStreetProvider, ServiceStreetProvider>();
+
+            return services;
+        }
+
+        public static IServiceCollection ConfigureSubmitProviders(this IServiceCollection services) {
+            services.AddSingleton<ISubmitProvider, AuthenticationHeaderSubmitProvider>();
+            services.AddSingleton<ISubmitProvider, PowerAppsSubmitProvider>();
 
             return services;
         }
@@ -256,6 +278,41 @@ namespace form_builder.Utils.ServiceCollectionExtensions
                 services.AddSingleton<IEmailProvider, FakeEmailProvider>();
             else
                 services.AddSingleton<IEmailProvider, AwsSesProvider>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddSchemaIntegrityValidation(this IServiceCollection services)
+        {
+            services.AddSingleton<IFormSchemaIntegrityCheck, AnyConditionTypeCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, BookingFormCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, BookingQuestionIdExistsForCustomerAddressCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, DocumentDownloadCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, DynamicLookupCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, EmailActionsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, GeneratedIdConfigurationCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, IncomingFormDataValuesCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, PaymentConfigurationCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, RenderConditionsValidCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, RetrieveExternalActionsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, ValidateActionCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
+
+            services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
+            services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
+            services.AddSingleton<IBehaviourSchemaIntegrityCheck, SubmitSlugsHaveAllPropertiesCheck>();
+
+            services.AddSingleton<IElementSchemaIntegrityCheck, AbsoluteDateValidationsCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, AcceptedFileUploadFileTypesCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, AddressNoManualTextIsSetCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, BookingElementCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, DateValidationsCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, InvalidQuestionCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, InvalidTargetMappingValueCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();
+
+            services.AddSingleton<IFormSchemaIntegrityValidator, FormSchemaIntegrityValidator>();
 
             return services;
         }
@@ -321,12 +378,13 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             {
                 services.AddSingleton<ILookupTransformDataProvider, LocalLookupTransformDataProvider>();
                 services.AddSingleton<IReusableElementTransformDataProvider, LocalReusableElementTransformDataProvider>();
+                services.AddSingleton<IPaymentConfigurationTransformDataProvider, LocalPaymentConfigurationTransformDataProvider>();
             }
             else
             {
                 services.AddSingleton<ILookupTransformDataProvider, S3LookupTransformDataProvider>();
                 services.AddSingleton<IReusableElementTransformDataProvider, S3ReusableElementTransformDataProvider>();
-
+                services.AddSingleton<IPaymentConfigurationTransformDataProvider, S3PaymentConfigurationTransformDataProvider>();
             }
 
             return services;
@@ -342,13 +400,7 @@ namespace form_builder.Utils.ServiceCollectionExtensions
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection("ReCaptchaConfiguration"));
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
             services.Configure<TagManagerConfiguration>(TagManagerId => configuration.GetValue<string>("GoogleTagManagerId"));
-
-            return services;
-        }
-
-        public static IServiceCollection AddCache(this IServiceCollection services)
-        {
-            services.AddTransient<ICache, Cache.Cache>();
+            services.Configure<HashConfiguration>(configuration.GetSection("HashConfiguration"));
 
             return services;
         }
@@ -439,6 +491,13 @@ namespace form_builder.Utils.ServiceCollectionExtensions
                 o.ViewLocationFormats.Add("/Views/Shared/TimeInput/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/Warning/{0}" + RazorViewEngine.ViewExtension);
             });
+
+            return services;
+        }
+
+        public static IServiceCollection AddUtilities(this IServiceCollection services)
+        {
+            services.AddSingleton<IHashUtil, HashUtil>();
 
             return services;
         }

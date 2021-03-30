@@ -11,11 +11,11 @@ namespace form_builder_tests.UnitTests.Providers.Booking
 {
     public class FakeBookingProviderTests
     {
-        private readonly FakeBookingProvider _bookigProvider;
+        private readonly FakeBookingProvider _bookingProvider;
 
         public FakeBookingProviderTests()
         {
-            _bookigProvider = new FakeBookingProvider();
+            _bookingProvider = new FakeBookingProvider();
         }
 
         [Fact]
@@ -23,7 +23,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         {
             var request = new AvailabilityRequest { AppointmentId = Guid.NewGuid() };
 
-            var result = await _bookigProvider.NextAvailability(request);
+            var result = await _bookingProvider.NextAvailability(request);
 
             Assert.IsType<AvailabilityDayResponse>(result);
         }
@@ -32,7 +32,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         public async Task NextAvailability_Should_Throw_BookingNoAvailabilityException_OnEmptyGuid()
         {
             var request = new AvailabilityRequest { AppointmentId = Guid.Parse("00000000-0000-0000-0000-000000000001") };
-            var result = await Assert.ThrowsAsync<BookingNoAvailabilityException>(() => _bookigProvider.NextAvailability(request));
+            var result = await Assert.ThrowsAsync<BookingNoAvailabilityException>(() => _bookingProvider.NextAvailability(request));
 
             Assert.Equal("FakeProvider, no available appointments", result.Message);
         }
@@ -43,7 +43,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         {
             var request = new AvailabilityRequest();
 
-            var result = await _bookigProvider.GetAvailability(request);
+            var result = await _bookingProvider.GetAvailability(request);
 
             Assert.IsType<List<AvailabilityDayResponse>>(result);
         }
@@ -53,7 +53,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         {
             var request = new BookingRequest();
 
-            var result = await _bookigProvider.Reserve(request);
+            var result = await _bookingProvider.Reserve(request);
 
             Assert.IsType<Guid>(result);
         }
@@ -63,7 +63,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         {
             var request = new LocationRequest { AppointmentId = Guid.NewGuid() };
 
-            var result = await _bookigProvider.GetLocation(request);
+            var result = await _bookingProvider.GetLocation(request);
 
             Assert.IsType<string>(result);
         }

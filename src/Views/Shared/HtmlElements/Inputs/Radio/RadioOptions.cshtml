@@ -62,7 +62,7 @@
         @if (!string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElementId))
         {
             <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
-                @SystemConstants.ConditionalElementReplacementString@Model.Properties.Options[i].ConditionalElementId
+                @SystemConstants.CONDITIONAL_ELEMENT_REPLACEMENT@Model.Properties.Options[i].ConditionalElementId
             </div>
         }
     }

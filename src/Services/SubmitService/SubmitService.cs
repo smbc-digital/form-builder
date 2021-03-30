@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Extensions;
@@ -7,6 +9,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
+using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
@@ -31,6 +34,8 @@ namespace form_builder.Services.SubmitService
 
         private readonly IReferenceNumberProvider _referenceNumberProvider;
 
+        private readonly IEnumerable<ISubmitProvider> _submitProviders;
+
         public SubmitService(
             IGateway gateway,
             IPageHelper pageHelper,
@@ -38,7 +43,8 @@ namespace form_builder.Services.SubmitService
             IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration,
             IDistributedCacheWrapper distributedCache,  
             ISchemaFactory schemaFactory,
-            IReferenceNumberProvider referenceNumberProvider)
+            IReferenceNumberProvider referenceNumberProvider,
+            IEnumerable<ISubmitProvider> submitProviders)
         {
             _gateway = gateway;
             _pageHelper = pageHelper;
@@ -47,6 +53,7 @@ namespace form_builder.Services.SubmitService
             _distributedCache = distributedCache;
             _schemaFactory = schemaFactory;
             _referenceNumberProvider = referenceNumberProvider;
+            _submitProviders = submitProviders;
         }
 
         public async Task PreProcessSubmission(string form, string sessionGuid)
@@ -86,15 +93,11 @@ namespace form_builder.Services.SubmitService
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
-            _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(submitSlug.AuthToken)
-                ? string.Empty
-                : submitSlug.AuthToken);
+            HttpResponseMessage response = await _submitProviders.Get(submitSlug.Type).PostAsync(mappingEntity, submitSlug);
 
-            var response = await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
             if (!response.IsSuccessStatusCode)
                 throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occurred while attempting to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             
-
             if (!baseForm.GenerateReferenceNumber && response.Content != null)
             {
                 var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
@@ -134,7 +137,7 @@ namespace form_builder.Services.SubmitService
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occurred while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             }
 
             if (response.Content != null)

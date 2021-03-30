@@ -7,6 +7,7 @@ using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.Utils.Extensions;
+using form_builder.Utils.Hash;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
@@ -19,11 +20,16 @@ namespace form_builder_tests.UnitTests.Mappers
     public class ElementMapperTests
     {
         private readonly ElementMapper _elementMapper;
-        private readonly Mock<IDistributedCacheWrapper> _wrapper = new Mock<IDistributedCacheWrapper>();
+        private readonly Mock<IDistributedCacheWrapper> _wrapper = new ();
+        private readonly Mock<IHashUtil> _mockHashUtil = new ();
 
         public ElementMapperTests()
         {
-            _elementMapper = new ElementMapper(_wrapper.Object);
+            _mockHashUtil
+                .Setup(_ => _.Hash(It.IsAny<string>()))
+                .Returns("hashedId");
+
+            _elementMapper = new ElementMapper(_wrapper.Object, _mockHashUtil.Object);
         }
 
         [Fact]
@@ -549,8 +555,11 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var questionId = "testbookingId";
-            var dateTime = DateTime.Now;
+            var date = DateTime.Today;
             var startTime = DateTime.Today.Add(new TimeSpan(22, 0, 0));
+            var id = Guid.NewGuid();
+            var hashedId = "hashedId";
+            var location = "location";
             var element = new ElementBuilder()
                   .WithQuestionId(questionId)
                   .WithType(EElementType.Booking)
@@ -562,8 +571,10 @@ namespace form_builder_tests.UnitTests.Mappers
                 {
                     new PageAnswers {
                         Answers = new List<Answers> {
-                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = dateTime.ToString() },
-                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = dateTime.ToString() }
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = date.ToString() },
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = startTime.ToString() },
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_ID}", Response = id.ToString() },
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.APPOINTMENT_LOCATION}", Response = location }
                         }
                     }
                 }
@@ -573,9 +584,47 @@ namespace form_builder_tests.UnitTests.Mappers
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
-            var dateTimeResult = Assert.IsType<Booking>(result);
+            var bookingResult = Assert.IsType<Booking>(result);
+            Assert.Equal(id, bookingResult.Id);
+            Assert.Equal(location, bookingResult.Location);
+            Assert.Equal(hashedId, bookingResult.HashedId);
+            Assert.Equal(date, bookingResult.Date);
+            Assert.Equal(startTime, bookingResult.StartTime);
         }
 
+        [Fact]
+        public void GetAnswerValue_ShouldCallHashUtil_WhenElementIsBooking()
+        {
+            // Arrange
+            var questionId = "testbookingId";
+            var date = DateTime.Today;
+            var startTime = DateTime.Today.Add(new TimeSpan(22, 0, 0));
+            var id = Guid.NewGuid();
+            var element = new ElementBuilder()
+                .WithQuestionId(questionId)
+                .WithType(EElementType.Booking)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_DATE}", Response = date.ToString() },
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", Response = startTime.ToString() },
+                            new Answers { QuestionId = $"{questionId}-{BookingConstants.RESERVED_BOOKING_ID}", Response = id.ToString() }
+                        }
+                    }
+                }
+            };
+
+            // Act
+            _elementMapper.GetAnswerValue(element, formAnswers);
+
+            // Assert
+            _mockHashUtil.Verify(_ => _.Hash(It.IsAny<string>()), Times.Once);
+        }
 
         [Fact]
         public void GetAnswerValue_ShouldReturnNull_WhenElementIsBooking_AndValueNotFound()

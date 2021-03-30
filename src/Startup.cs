@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using form_builder.Middleware;
 using form_builder.ModelBinders.Providers;
-using form_builder.Utils.ServiceCollectionExtensions;
+using form_builder.Utils.Startup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -49,9 +49,12 @@ namespace form_builder
                 .AddSesEmailConfiguration(Configuration.GetSection("Ses")["Accesskey"], Configuration.GetSection("Ses")["Secretkey"])
                 .AddGateways(Configuration)
                 .AddIOptionsConfiguration(Configuration)
+                .AddUtilities()
                 .ConfigureAddressProviders()
+                .ConfigureDynamicLookDataProviders()
                 .ConfigureOrganisationProviders()
                 .ConfigureStreetProviders()
+                .ConfigureSubmitProviders()
                 .ConfigurePaymentProviders()
                 .ConfigureBookingProviders()
                 .ConfigureDocumentCreationProviders()
@@ -59,11 +62,11 @@ namespace form_builder
                 .ConfigureFormatters()
                 .ConfigureEmailProviders(HostingEnvironment)
                 .AddHelpers()
+                .AddSchemaIntegrityValidation()
                 .AddAttributes()
                 .AddServices()
                 .AddWorkflows()
                 .AddFactories()
-                .AddCache()
                 .AddAntiforgery(_ => 
                     {
                         _.Cookie.Name = ".formbuilder.antiforgery.v2";

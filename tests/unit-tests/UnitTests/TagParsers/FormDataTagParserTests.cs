@@ -14,8 +14,8 @@ namespace form_builder_tests.UnitTests.TagParsers
     public class FormDataTagParserTests
     {
         private readonly IEnumerable<IFormatter> _formatters;
-        private readonly Mock<IFormatter> _mockFormatter = new Mock<IFormatter>();
-        private FormDataTagParser _tagParser;
+        private readonly Mock<IFormatter> _mockFormatter = new();
+        private readonly FormDataTagParser _tagParser;
 
         public FormDataTagParserTests()
         {
@@ -50,7 +50,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         }
 
         [Fact]
-        public void Parse_ShouldReturnInitalValue_WhenNoValuesAre_To_BeReplaced()
+        public void Parse_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
@@ -69,7 +69,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         }
 
         [Fact]
-        public void Parse_ShouldReturnInitalValue_When_NoTag_MatchesRegex()
+        public void Parse_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)

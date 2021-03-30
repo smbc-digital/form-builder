@@ -29,22 +29,19 @@ namespace form_builder.Providers.Transforms.Lookups
             {
                 var s3Result = await _s3Gateway.GetObject(_configuration["S3BucketKey"], $"{_environment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName}.json");
 
-                using (Stream responseStream = s3Result.ResponseStream)
-                using (StreamReader reader = new StreamReader(responseStream))
-                {
-                    var responseBody = reader.ReadToEnd();
-                    return JsonConvert.DeserializeObject<T>(responseBody);
-                }
+                using Stream responseStream = s3Result.ResponseStream;
+                using StreamReader sr = new(responseStream);
+                using JsonReader reader = new JsonTextReader(sr);
+                JsonSerializer serializer = new();
+                return serializer.Deserialize<T>(reader);
             }
             catch (AmazonS3Exception e)
             {
-                var ex = new Exception($"S3LookupTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_environment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName} ", e);
-                throw ex;
+                throw new Exception($"S3LookupTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_environment.EnvironmentName.ToS3EnvPrefix()}/Lookups/{schemaName} ", e);
             }
             catch (Exception e)
             {
-                var ex = new Exception($"S3LookupTransformDataProvider: An error has occured while attempting to deserialise object, Exception: {e.Message}", e);
-                throw ex;
+                throw new Exception($"S3LookupTransformDataProvider: An error has occured while attempting to deserialise object, Exception: {e.Message}", e);
             }
         }
     }

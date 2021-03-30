@@ -6,5 +6,6 @@
         public const string Automatic = "automatic";
         public const string SearchResultsKeyPostFix = "-search-results";
         public const string SubPathViewModelKey = "subPath";
+        public const string Dynamic = "dynamic";
     }
 }

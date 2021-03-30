@@ -9,7 +9,6 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
@@ -17,10 +16,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 {
     public class AddressManualTests
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
-        private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        private readonly Mock<IViewRender> _mockIViewRender = new ();
+        private readonly Mock<IElementHelper> _mockElementHelper = new ();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
 
         public AddressManualTests()
         {
@@ -47,7 +45,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var formAnswers = new FormAnswers();
             //Act
-            var result = await element.RenderAsync(
+            await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 string.Empty,
@@ -58,7 +56,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 formAnswers);
 
             //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressManual"), It.IsAny<form_builder.Models.Elements.AddressManual>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "AddressManual"), It.IsAny<AddressManual>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
             _mockElementHelper.Verify(_ => _.CurrentValue(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()), Times.Exactly(4));
         }
 
@@ -87,7 +85,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             var formAnswers = new FormAnswers();
             //Act
-            var result = await element.RenderAsync(
+            await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 string.Empty,

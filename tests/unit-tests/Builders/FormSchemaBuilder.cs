@@ -18,9 +18,10 @@ namespace form_builder_tests.Builders
         private bool _generateReferenceNumber = false;
         public string _generatedReferenceNumberMapping { get; set; }
         public string _referencePrefix { get; set; }
-        private List<EDocumentType> _documentType = new List<EDocumentType>();
-        private List<IAction> _formActions = new List<IAction>();
-        private List<EnvironmentAvailability> _environmentAvailability = new List<EnvironmentAvailability>();
+        private List<EDocumentType> _documentType = new();
+        private List<IAction> _formActions = new();
+        private List<EnvironmentAvailability> _environmentAvailability = new();
+        private List<Breadcrumb> _breadcrumbs = new();
 
         public FormSchema Build() => new FormSchema
         {
@@ -37,7 +38,8 @@ namespace form_builder_tests.Builders
             FormActions = _formActions,
             GenerateReferenceNumber = _generateReferenceNumber,
             ReferencePrefix = _referencePrefix,
-            GeneratedReferenceNumberMapping = _generatedReferenceNumberMapping
+            GeneratedReferenceNumberMapping = _generatedReferenceNumberMapping,
+            BreadCrumbs = _breadcrumbs
         };
 
         public FormSchemaBuilder WithBaseUrl(string baseUrl)
@@ -120,6 +122,13 @@ namespace form_builder_tests.Builders
             _generateReferenceNumber = true;
             _generatedReferenceNumberMapping = mapping;
             _referencePrefix = prefix;
+
+            return this;
+        }
+
+        public FormSchemaBuilder WithBreadcrumbs(List<Breadcrumb> breadcrumbs)
+        {
+            _breadcrumbs = breadcrumbs;
 
             return this;
         }

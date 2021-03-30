@@ -19,12 +19,12 @@ namespace form_builder_tests.UnitTests.Helpers
 {
     public class ElementHelperTests
     {
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
-        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new ();
+        private readonly Mock<IElementMapper> _mockElementMapper = new ();
+        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new ();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new ();
         private readonly ElementHelper _elementHelper;
-        private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
+        private readonly Mock<IElementHelper> _mockElementHelper = new ();
 
         public ElementHelperTests()
         {
@@ -340,7 +340,7 @@ namespace form_builder_tests.UnitTests.Helpers
                .WithLabel("Label").Build();
 
             // Act & Assert
-            var ex = Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
+            Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
         }
 
         [Fact]
@@ -634,7 +634,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" } } } } }));
 
-            var Behaviour = new BehaviourBuilder()
+            var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
                 .Build();
 
@@ -646,7 +646,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithPageSlug("page-one")
-                .WithBehaviour(Behaviour)
+                .WithBehaviour(behaviour)
                 .Build();
 
             var formSchema = new FormSchemaBuilder()

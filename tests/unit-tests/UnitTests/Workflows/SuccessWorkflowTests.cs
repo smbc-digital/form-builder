@@ -19,9 +19,9 @@ namespace form_builder_tests.UnitTests.Workflows
     public class SuccessWorkflowTests
     {
         private readonly SuccessWorkflow _workflow;
-        private readonly Mock<IPageService> _mockPageService = new Mock<IPageService>();
-        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
-        private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new Mock<IActionsWorkflow>();
+        private readonly Mock<IPageService> _mockPageService = new();
+        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
+        private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new();
 
         public SuccessWorkflowTests()
         {
