@@ -22,21 +22,22 @@ namespace form_builder.Validators.IntegrityChecks.Form
             var bookingProviders = schema.Pages
                 .Where(page => page.Elements is not null)
                 .SelectMany(page => page.Elements
-                .Where(element => element.Type.Equals(EElementType.Booking))
-                .Select(element => element.Properties.BookingProvider)
-                .Distinct());
+                    .Where(element => element.Type.Equals(EElementType.Booking))
+                .Select(element => element.Properties.BookingProvider));
 
-            if (bookingProviders.Count() > 1)
+            if (bookingProviders.Distinct().Count() > 1)
                 result.AddFailureMessage($"Booking Element Check, Form contains different booking provider. Only one provider allows on for form");
 
             var requiredFields = new[] { "customer.firstname", "customer.lastname" };
             foreach (var requiredField in requiredFields)
             {
-                if (!schema.Pages.Any(page => page.Elements.Any(element => 
+                if (!schema.Pages.Any(page => page.Elements.Any(element =>
                     element.Properties is not null &&
                     element.Properties.TargetMapping is not null &&
                     element.Properties.TargetMapping.Equals(requiredField, StringComparison.OrdinalIgnoreCase))))
-                        result.AddFailureMessage($"Booking Element Check, Booking element requires {requiredField} elements for reservation.");
+                {
+                    result.AddFailureMessage($"Booking Element Check, Booking element requires {requiredField} elements for reservation.");
+                }
             }
 
             return result;
