@@ -73,7 +73,7 @@ namespace form_builder.Providers.Booking
                 throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned 400 status code, gateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
 
             if (result.StatusCode.Equals(HttpStatusCode.NotFound))
-                throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned not found for appointmetnId: {request.AppointmentId}");
+                throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned not found for appointmentId: {request.AppointmentId}");
 
             if (!result.IsSuccessStatusCode)
                 throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {JsonConvert.SerializeObject(result)}");
@@ -88,7 +88,7 @@ namespace form_builder.Providers.Booking
             var response = await _gateway.Cancel(bookingId.ToString());
 
             if (response.StatusCode.Equals(HttpStatusCode.BadRequest))
-                throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway returned 400 status code, Gateway recieved bad request, Request:{bookingId}, Response: {JsonConvert.SerializeObject(response)}");
+                throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway returned 400 status code, Gateway received bad request, Request:{bookingId}, Response: {JsonConvert.SerializeObject(response)}");
 
             if (response.StatusCode.Equals(HttpStatusCode.NotFound))
                 throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway return 404 not found for bookingId {bookingId}");

@@ -28,13 +28,13 @@ namespace form_builder_tests.UnitTests.Services
     public class MappingServiceTests
     {
         private readonly MappingService _service;
-        private readonly Mock<ISchemaProvider> _mockSchemaProvider = new Mock<ISchemaProvider>();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistrubutedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IElementMapper> _mockElementMapper = new Mock<IElementMapper>();
-        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
-        private readonly Mock<ILogger<MappingService>> _mockLogger = new Mock<ILogger<MappingService>>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
+        private readonly Mock<ISchemaProvider> _mockSchemaProvider = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<IElementMapper> _mockElementMapper = new();
+        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
+        private readonly Mock<ILogger<MappingService>> _mockLogger = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new();
 
         public MappingServiceTests()
         {
@@ -56,7 +56,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {
                     Pages = new List<PageAnswers>()
@@ -72,7 +72,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
 
-            _service = new MappingService(_mockDistrubutedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockLogger.Object);
+            _service = new MappingService(_mockDistributedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -82,7 +82,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.Map("form", "guid");
 
             // Assert
-            _mockDistrubutedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -257,7 +257,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
                    Pages = new List<PageAnswers>()
@@ -313,7 +313,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
                    Pages = new List<PageAnswers>()
@@ -368,7 +368,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
                    Pages = new List<PageAnswers>()
@@ -399,11 +399,6 @@ namespace form_builder_tests.UnitTests.Services
                 .WithQuestionId("file")
                 .Build();
 
-            var element2 = new ElementBuilder()
-                .WithType(type)
-                .WithQuestionId("filetwo")
-                .Build();
-
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithValidatedModel(true)
@@ -417,7 +412,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
                    Pages = new List<PageAnswers>()
@@ -427,7 +422,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(null);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(new List<File> { new File() });
+                .Returns(new List<File> { new() });
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -479,20 +474,20 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
                    Pages = new List<PageAnswers>()
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "file"), It.IsAny<FormAnswers>()))
-                .Returns(new List<File> { new File() });
+                .Returns(new List<File> { new() });
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filetwo"), It.IsAny<FormAnswers>()))
                 .Returns(null);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filethree"), It.IsAny<FormAnswers>()))
-                .Returns(new List<File> { new File() });
+                .Returns(new List<File> { new() });
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -528,7 +523,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
                    Pages = new List<PageAnswers>(),
@@ -641,22 +636,22 @@ namespace form_builder_tests.UnitTests.Services
             _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
                 .Returns("Address 1");
 
-            _mockDistrubutedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {
                     Pages = new List<PageAnswers>
                     {
-                        new PageAnswers
+                        new()
                         {
                             PageSlug = "page-one",
                             Answers = new List<Answers>
                             {
-                                new Answers
+                                new()
                                 {
                                     QuestionId = "address",
                                     Response = "Address 1"
                                 },
-                                new Answers
+                                new()
                                 {
                                     QuestionId = "firstname",
                                     Response = "firstname"

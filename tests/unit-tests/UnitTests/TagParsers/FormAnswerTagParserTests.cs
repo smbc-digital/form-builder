@@ -14,10 +14,10 @@ namespace form_builder_tests.UnitTests.TagParsers
     public class FormAnswerTagParserTests
     {
         private readonly IEnumerable<IFormatter> _formatters;
-        private readonly Mock<IFormatter> _mockFormatter = new Mock<IFormatter>();
-        private readonly Mock<IFormatter> _mockFormatterTwo = new Mock<IFormatter>();
+        private readonly Mock<IFormatter> _mockFormatter = new();
+        private readonly Mock<IFormatter> _mockFormatterTwo = new();
 
-        private FormAnswerTagParser _tagParser;
+        private readonly FormAnswerTagParser _tagParser;
 
         public FormAnswerTagParserTests()
         {
@@ -110,11 +110,11 @@ namespace form_builder_tests.UnitTests.TagParsers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = "firstname",
                                 Response = "testfirstname"
@@ -146,16 +146,16 @@ namespace form_builder_tests.UnitTests.TagParsers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = "firstname",
                                 Response = "testfirstname"
                             },
-                            new Answers
+                            new()
                             {
                                 QuestionId = "lastname",
                                 Response = "testlastname"
@@ -188,11 +188,11 @@ namespace form_builder_tests.UnitTests.TagParsers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = "firstname",
                                 Response = "value"
@@ -226,11 +226,11 @@ namespace form_builder_tests.UnitTests.TagParsers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = "firstname",
                                 Response = "value"
@@ -266,11 +266,11 @@ namespace form_builder_tests.UnitTests.TagParsers
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = "firstname",
                                 Response = "value"

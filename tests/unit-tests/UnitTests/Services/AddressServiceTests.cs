@@ -20,10 +20,10 @@ namespace form_builder_tests.UnitTests.Services
     public class AddressServiceTests
     {
         private readonly AddressService _service;
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IAddressProvider> _addressProvider = new Mock<IAddressProvider>();
-        private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<IPageHelper> _pageHelper = new();
+        private readonly Mock<IAddressProvider> _addressProvider = new();
+        private readonly Mock<IPageFactory> _mockPageContentFactory = new();
         private readonly IEnumerable<IAddressProvider> _addressProviders;
 
         public AddressServiceTests()
@@ -47,11 +47,11 @@ namespace form_builder_tests.UnitTests.Services
                 Path = "page-one",
                 Pages = new List<PageAnswers>()
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = $"{questionId}-postcode",
                                 Response = "sk11aa"
@@ -102,11 +102,11 @@ namespace form_builder_tests.UnitTests.Services
                 Path = "page-one",
                 Pages = new List<PageAnswers>()
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = $"{questionId}-postcode",
                                 Response = ""
@@ -208,7 +208,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            Assert.Equal($"AddressService::ProcessSearchAddress, An exception has occured while attempting to perform postcode lookup on Provider '{addressProvider}' with searchterm 'SK11aa' Exception:", result.Message);
+            Assert.Equal($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to perform postcode lookup on Provider '{addressProvider}' with searchterm 'SK11aa' Exception:", result.Message);
         }
 
         [Fact]
@@ -245,7 +245,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
-            Assert.StartsWith($"AddressService::ProcessSearchAddress, An exception has occured while attempting to perform postcode lookup on Provider '{testAddressProvider}' with searchterm 'SK11aa' Exception:", result.Message);
+            Assert.StartsWith($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to perform postcode lookup on Provider '{testAddressProvider}' with searchterm 'SK11aa' Exception:", result.Message);
         }
     }
 }

@@ -38,7 +38,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings = new();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new();
-        private readonly List<ILookupProvider> _mockLookupProviders = new List<ILookupProvider>();
+        private readonly List<ILookupProvider> _mockLookupProviders = new ();
         private readonly FakeLookupProvider _lookupProvider = new();
         private readonly Mock<IActionHelper> _mockActionHelper = new();
 
@@ -178,7 +178,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Setup(_ => _.CurrentValue(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()))
                 .Returns("SK1 3XE");
 
-            var element = (form_builder.Models.Elements.Address)new ElementBuilder()
+            var element = (Address)new ElementBuilder()
                 .WithType(EElementType.Address)
                 .WithPropertyText("text")
                 .WithQuestionId("address-test")
@@ -189,8 +189,13 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithElement(element)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {
+                    LookUpConstants.SubPathViewModelKey, 
+                    LookUpConstants.Automatic
+                }
+            };
 
             var schema = new FormSchemaBuilder()
                 .WithName("form-name")
@@ -285,6 +290,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var formAnswers = new FormAnswers();
+
             //Act
             await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers);
 
@@ -353,6 +359,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             var formAnswers = new FormAnswers();
+
             //Act
             await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers);
 

@@ -13,7 +13,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 {
     public class LinkTagParserTests
     {
-        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new Mock<IEnumerable<IFormatter>>();
+        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
         private readonly LinkTagParser _tagParser;
 
         public LinkTagParserTests()
@@ -43,7 +43,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
 
         [Fact]
-        public void FormatContent_ShouldReturnValidFormatedText()
+        public void FormatContent_ShouldReturnValidFormattedText()
         {
             var url = "www.stockport.gov.uk";
             var linkText = "link text";
@@ -53,7 +53,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
 
         [Fact]
-        public void Parse_ShouldReturnInitalValue_WhenNoValuesAre_To_BeReplaced()
+        public void Parse_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
@@ -72,7 +72,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         }
 
         [Fact]
-        public void Parse_ShouldReturnInitalValue_When_NoTag_MatchesRegex()
+        public void Parse_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)

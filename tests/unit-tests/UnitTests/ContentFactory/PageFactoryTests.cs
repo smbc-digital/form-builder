@@ -15,15 +15,15 @@ namespace form_builder_tests.UnitTests.ContentFactory
     public class PageFactoryTests
     {
         private readonly PageFactory _factory;
-        private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new Mock<IEnumerable<ITagParser>>();
-        private readonly Mock<ITagParser> _tagParser = new Mock<ITagParser>();        
+        private readonly Mock<IPageHelper> _mockPageHelper = new ();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new ();
+        private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new ();
+        private readonly Mock<ITagParser> _tagParser = new ();      
 
         public PageFactoryTests()
         {
-            var _mockTagParsersItems = new List<ITagParser>();
-            _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => _mockTagParsersItems.GetEnumerator());
+            var mockTagParsersItems = new List<ITagParser>();
+            _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => mockTagParsersItems.GetEnumerator());
 
             _factory = new PageFactory(_mockPageHelper.Object, _mockTagParsers.Object, _mockDistributedCacheWrapper.Object);
         }

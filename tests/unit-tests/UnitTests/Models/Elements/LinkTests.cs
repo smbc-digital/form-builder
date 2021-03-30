@@ -15,9 +15,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 {
     public class LinkTests
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
-        private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IViewRender> _mockIViewRender = new ();
+        private readonly Mock<IElementHelper> _mockElementHelper = new ();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
 
         public LinkTests()
         {
@@ -47,8 +47,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Build();
 
             FormAnswers formAnswers = new FormAnswers();
+
             //Act
-            var result = await element.RenderAsync(
+            await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 string.Empty,

@@ -20,9 +20,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 {
     public class BookingTests
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
-        private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IViewRender> _mockIViewRender = new ();
+        private readonly Mock<IElementHelper> _mockElementHelper = new ();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
 
         public BookingTests()
         {
@@ -51,7 +51,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
-            var bookignInfo = new List<object>
+            var bookingInfo = new List<object>
             {
                 new BookingInformation
                 {
@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var formAnswers = new FormAnswers();
 
             //Act
-            var result = await element.RenderAsync(
+            await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 string.Empty,
@@ -71,7 +71,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 schema,
                 _mockHostingEnv.Object,
                 formAnswers,
-                bookignInfo);
+                bookingInfo);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "Booking"), It.IsAny<Booking>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -121,7 +121,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
-            var bookignInfo = new List<object>
+            var bookingInfo = new List<object>
             {
                 new BookingInformation
                 {
@@ -137,7 +137,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var formAnswers = new FormAnswers();
 
             //Act
-            var result = await element.RenderAsync(
+            await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 string.Empty,
@@ -146,7 +146,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 schema,
                 _mockHostingEnv.Object,
                 formAnswers,
-                bookignInfo);
+                bookingInfo);
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "CheckYourBooking"), It.IsAny<Booking>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
@@ -185,7 +185,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithBaseUrl(baseUrl)
                 .Build();
 
-            var bookignInfo = new List<object>
+            var bookingInfo = new List<object>
             {
                 new BookingInformation
                 {
@@ -212,7 +212,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var formAnswers = new FormAnswers();
 
             //Act
-            var result = await element.RenderAsync(
+            await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 string.Empty,
@@ -221,19 +221,19 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 schema,
                 _mockHostingEnv.Object,
                 formAnswers,
-                bookignInfo);
+                bookingInfo);
 
             //Assert
-            var bookignElement = Assert.IsType<Booking>(element);
-            Assert.Equal($"/booking/{baseUrl}/{pageUrl}/month", bookignElement.MonthSelectionPostUrl);
-            Assert.NotEmpty(bookignElement.Calendar);
-            Assert.NotEmpty(bookignElement.Appointments);
-            Assert.Equal("form Name", bookignElement.FormName);
-            Assert.Equal(DateTime.Today.AddMonths(-1), bookignElement.FirstAvailableMonth);
-            Assert.Equal(DateTime.Today, bookignElement.CurrentSelectedMonth);
-            Assert.False(bookignElement.IsAppointmentTypeFullDay);
-            Assert.False(bookignElement.DisplayInsetText);
-            Assert.Equal(string.Empty, bookignElement.InsetText);
+            var bookingElement = Assert.IsType<Booking>(element);
+            Assert.Equal($"/booking/{baseUrl}/{pageUrl}/month", bookingElement.MonthSelectionPostUrl);
+            Assert.NotEmpty(bookingElement.Calendar);
+            Assert.NotEmpty(bookingElement.Appointments);
+            Assert.Equal("form Name", bookingElement.FormName);
+            Assert.Equal(DateTime.Today.AddMonths(-1), bookingElement.FirstAvailableMonth);
+            Assert.Equal(DateTime.Today, bookingElement.CurrentSelectedMonth);
+            Assert.False(bookingElement.IsAppointmentTypeFullDay);
+            Assert.False(bookingElement.DisplayInsetText);
+            Assert.Equal(string.Empty, bookingElement.InsetText);
         }
 
         [Fact]
@@ -266,7 +266,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form Name")
                 .Build();
 
-            var bookignInfo = new List<object>
+            var bookingInfo = new List<object>
             {
                 new BookingInformation
                 {
@@ -293,7 +293,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var formAnswers = new FormAnswers();
 
             //Act
-            var result = await element.RenderAsync(
+            await element.RenderAsync(
                 _mockIViewRender.Object,
                 _mockElementHelper.Object,
                 string.Empty,
@@ -302,20 +302,20 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 schema,
                 _mockHostingEnv.Object,
                 formAnswers,
-                bookignInfo);
+                bookingInfo);
 
             //Assert
-            var bookignElement = Assert.IsType<Booking>(element);
-            Assert.NotNull(bookignElement.SelectedBooking);
-            Assert.NotEmpty(bookignElement.Appointments);
-            Assert.Equal("form Name", bookignElement.FormName);
-            Assert.Equal(DateTime.Today.AddMonths(-1), bookignElement.FirstAvailableMonth);
-            Assert.Equal(DateTime.Today, bookignElement.CurrentSelectedMonth);
-            Assert.Equal(DateTime.Today.AddHours(-1), bookignElement.AppointmentStartTime);
-            Assert.Equal(DateTime.Today.AddHours(1), bookignElement.AppointmentEndTime);
-            Assert.True(bookignElement.IsAppointmentTypeFullDay);
-            Assert.True(bookignElement.DisplayInsetText);
-            Assert.Equal("You can select a date but you cannot select a time. We’ll be with you between 11pm and 1am.", bookignElement.InsetText);
+            var bookingElement = Assert.IsType<Booking>(element);
+            Assert.NotNull(bookingElement.SelectedBooking);
+            Assert.NotEmpty(bookingElement.Appointments);
+            Assert.Equal("form Name", bookingElement.FormName);
+            Assert.Equal(DateTime.Today.AddMonths(-1), bookingElement.FirstAvailableMonth);
+            Assert.Equal(DateTime.Today, bookingElement.CurrentSelectedMonth);
+            Assert.Equal(DateTime.Today.AddHours(-1), bookingElement.AppointmentStartTime);
+            Assert.Equal(DateTime.Today.AddHours(1), bookingElement.AppointmentEndTime);
+            Assert.True(bookingElement.IsAppointmentTypeFullDay);
+            Assert.True(bookingElement.DisplayInsetText);
+            Assert.Equal("You can select a date but you cannot select a time. We’ll be with you between 11pm and 1am.", bookingElement.InsetText);
         }
 
         [Fact]
@@ -341,7 +341,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
-            var bookignInfo = new List<object>
+            var bookingInfo = new List<object>
             {
                 new BookingInformation
                 {
@@ -374,12 +374,12 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 schema,
                 _mockHostingEnv.Object,
                 formAnswers,
-                bookignInfo);
+                bookingInfo);
 
             //Assert
-            var bookignElement = Assert.IsType<Booking>(element);
-            Assert.NotNull(bookignElement.Properties.Value);
-            Assert.Equal(date.ToString(), bookignElement.Properties.Value);
+            var bookingElement = Assert.IsType<Booking>(element);
+            Assert.NotNull(bookingElement.Properties.Value);
+            Assert.Equal(date.ToString(), bookingElement.Properties.Value);
         }
 
         [Fact]
@@ -405,7 +405,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
-            var bookignInfo = new List<object>
+            var bookingInfo = new List<object>
             {
                 new BookingInformation
                 {
@@ -440,11 +440,11 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 schema,
                 _mockHostingEnv.Object,
                 formAnswers,
-                bookignInfo);
+                bookingInfo);
 
             //Assert
-            var bookignElement = Assert.IsType<Booking>(element);
-            Assert.Null(bookignElement.Properties.Value);
+            var bookingElement = Assert.IsType<Booking>(element);
+            Assert.Null(bookingElement.Properties.Value);
         }
 
 
@@ -472,7 +472,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
-            var bookignInfo = new List<object>
+            var bookingInfo = new List<object>
             {
                 new BookingInformation
                 {
@@ -515,15 +515,15 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 schema,
                 _mockHostingEnv.Object,
                 formAnswers,
-                bookignInfo);
+                bookingInfo);
 
             //Assert
-            var bookignElement = Assert.IsType<Booking>(element);
-            Assert.Single(bookignElement.Times);
-            Assert.Equal(2, bookignElement.Times.First().MorningAppointments.Appointments.Count);
-            Assert.Single(bookignElement.Times.First().AfternoonAppointments.Appointments);
-            Assert.Equal(ETimePeriod.Morning, bookignElement.Times.First().TimePeriodCurrentlySelected);
-            Assert.Equal("test", bookignElement.Times.First().MorningAppointments.BookingType);
+            var bookingElement = Assert.IsType<Booking>(element);
+            Assert.Single(bookingElement.Times);
+            Assert.Equal(2, bookingElement.Times.First().MorningAppointments.Appointments.Count);
+            Assert.Single(bookingElement.Times.First().AfternoonAppointments.Appointments);
+            Assert.Equal(ETimePeriod.Morning, bookingElement.Times.First().TimePeriodCurrentlySelected);
+            Assert.Equal("test", bookingElement.Times.First().MorningAppointments.BookingType);
         }
 
         [Fact]
@@ -550,7 +550,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithName("form-name")
                 .Build();
 
-            var bookignInfo = new List<object>
+            var bookingInfo = new List<object>
             {
                 new BookingInformation
                 {
@@ -583,15 +583,15 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 schema,
                 _mockHostingEnv.Object,
                 formAnswers,
-                bookignInfo);
+                bookingInfo);
 
             //Assert
-            var bookignElement = Assert.IsType<Booking>(element);
-            Assert.Single(bookignElement.Times);
-            Assert.Empty(bookignElement.Times.First().MorningAppointments.Appointments);
-            Assert.Single(bookignElement.Times.First().AfternoonAppointments.Appointments);
-            Assert.Equal(ETimePeriod.Afternoon, bookignElement.Times.First().TimePeriodCurrentlySelected);
-            Assert.Equal("test2", bookignElement.Times.First().MorningAppointments.BookingType);
+            var bookingElement = Assert.IsType<Booking>(element);
+            Assert.Single(bookingElement.Times);
+            Assert.Empty(bookingElement.Times.First().MorningAppointments.Appointments);
+            Assert.Single(bookingElement.Times.First().AfternoonAppointments.Appointments);
+            Assert.Equal(ETimePeriod.Afternoon, bookingElement.Times.First().TimePeriodCurrentlySelected);
+            Assert.Equal("test2", bookingElement.Times.First().MorningAppointments.BookingType);
         }
     }
 }

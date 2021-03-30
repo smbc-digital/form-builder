@@ -23,11 +23,11 @@ namespace form_builder_tests.UnitTests.ContentFactory
     public class SuccessPageContentFactoryTests
     {
         private readonly SuccessPageFactory _factory;
-        private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
-        private readonly Mock<ISessionHelper> _mockSessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IPageHelper> _mockPageHelper = new ();
+        private readonly Mock<IPageFactory> _mockPageContentFactory = new ();
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new ();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new ();
+        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new ();
 
         public SuccessPageContentFactoryTests()
         {
@@ -252,10 +252,10 @@ namespace form_builder_tests.UnitTests.ContentFactory
             _mockSessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
             _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             Assert.Single(pageCallback.Elements);
-            Assert.Equal(pageCallback.PageSlug, "booking-cancel-success");
-            Assert.Equal(pageCallback.BannerTitle, "You've successfully cancelled your appointment");
-            Assert.Equal(pageCallback.LeadingParagraph, "We've received your cancellation request");
-            Assert.Equal(pageCallback.Title, "Success");
+            Assert.Equal("booking-cancel-success", pageCallback.PageSlug);
+            Assert.Equal("You've successfully cancelled your appointment",pageCallback.BannerTitle);
+            Assert.Equal("We've received your cancellation request", pageCallback.LeadingParagraph);
+            Assert.Equal("Success", pageCallback.Title);
             Assert.True(pageCallback.HideTitle);
         }
     }

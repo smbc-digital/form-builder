@@ -137,7 +137,7 @@ namespace form_builder.Services.SubmitService
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occurred while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             }
 
             if (response.Content != null)

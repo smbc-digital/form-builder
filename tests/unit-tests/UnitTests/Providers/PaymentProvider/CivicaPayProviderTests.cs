@@ -20,11 +20,11 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
     public class CivicaPayProviderTests
     {
         private readonly IPaymentProvider _civicaPayProvider;
-        private readonly Mock<ICivicaPayGateway> _mockCivicaPayGateway = new Mock<ICivicaPayGateway>();
-        private readonly Mock<IOptions<CivicaPaymentConfiguration>> _civicaPayConfig = new Mock<IOptions<CivicaPaymentConfiguration>>();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        private readonly Mock<ILogger<CivicaPayProvider>> _logger = new Mock<ILogger<CivicaPayProvider>>();
+        private readonly Mock<ICivicaPayGateway> _mockCivicaPayGateway = new ();
+        private readonly Mock<IOptions<CivicaPaymentConfiguration>> _civicaPayConfig = new();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+        private readonly Mock<ILogger<CivicaPayProvider>> _logger = new();
 
         public CivicaPayProviderTests()
         {

@@ -15,9 +15,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 {
     public class StreetTests
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new Mock<IViewRender>();
-        private readonly Mock<IElementHelper> _mockElementHelper = new Mock<IElementHelper>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+        private readonly Mock<IViewRender> _mockIViewRender = new ();
+        private readonly Mock<IElementHelper> _mockElementHelper = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
 
         public StreetTests()
         {
@@ -53,7 +53,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             await element.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, formAnswers);
 
             // Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("StreetSelect")), It.IsAny<form_builder.Models.Elements.Street>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("StreetSelect")), It.IsAny<Street>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
 
         [Fact]

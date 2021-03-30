@@ -36,23 +36,23 @@ namespace form_builder_tests.UnitTests.Services
     public class BookingServiceTests
     {
         private readonly BookingService _service;
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<IPageHelper> _mockPageHelper = new();
         private readonly IEnumerable<IBookingProvider> _bookingProviders;
-        private readonly Mock<IBookingProvider> _bookingProvider = new Mock<IBookingProvider>();
-        private readonly Mock<IPageFactory> _mockPageFactory = new Mock<IPageFactory>();
-        private readonly Mock<IMappingService> _mockMappingService = new Mock<IMappingService>();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockdistributedCacheExpirationConfiguration = new Mock<IOptions<DistributedCacheExpirationConfiguration>>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        private readonly DistributedCacheExpirationConfiguration _cacheConfig = new DistributedCacheExpirationConfiguration { Booking = 5, BookingNoAppointmentsAvailable = 10 };
-        private readonly Mock<ISchemaFactory> _schemaFactory = new Mock<ISchemaFactory>();
-        private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
-        private readonly Mock<IHashUtil> _hashUtil = new Mock<IHashUtil>();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        private readonly Mock<IBookingProvider> _bookingProvider = new();
+        private readonly Mock<IPageFactory> _mockPageFactory = new();
+        private readonly Mock<IMappingService> _mockMappingService = new();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+        private readonly DistributedCacheExpirationConfiguration _cacheConfig = new() { Booking = 5, BookingNoAppointmentsAvailable = 10 };
+        private readonly Mock<ISchemaFactory> _schemaFactory = new();
+        private readonly Mock<ISessionHelper> _sessionHelper = new();
+        private readonly Mock<IHashUtil> _hashUtil = new();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
 
         public BookingServiceTests()
         {
-            _mockdistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(_cacheConfig);
+            _mockDistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(_cacheConfig);
             _mockMappingService
                 .Setup(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, object>>(), It.IsAny<string>()))
                 .ReturnsAsync(new BookingRequest { Customer = new Customer() });
@@ -74,7 +74,7 @@ namespace form_builder_tests.UnitTests.Services
               _schemaFactory.Object,
               _sessionHelper.Object,
               _hashUtil.Object,
-              _mockdistributedCacheExpirationConfiguration.Object,
+              _mockDistributedCacheExpirationConfiguration.Object,
               _mockHttpContextAccessor.Object);
         }
 
@@ -112,7 +112,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new AvailabilityDayResponse { Date = date });
 
             _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new List<AvailabilityDayResponse> { new AvailabilityDayResponse() });
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
@@ -157,7 +157,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new AvailabilityDayResponse { Date = date });
 
             _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new List<AvailabilityDayResponse> { new AvailabilityDayResponse() });
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
@@ -276,13 +276,13 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new AvailabilityDayResponse());
 
             _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new List<AvailabilityDayResponse> { new AvailabilityDayResponse() });
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals($"testBookingProvider-{guid}"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new BoookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse { AppointmentTimes = new List<AppointmentTime> { new AppointmentTime { StartTime = startTime, EndTime = endTime } } } }));
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new BoookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse { AppointmentTimes = new List<AppointmentTime> { new() { StartTime = startTime, EndTime = endTime } } } }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
@@ -443,7 +443,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var bookingInformationCacheKey = $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
             _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new List<AvailabilityDayResponse> { new AvailabilityDayResponse() });
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
 
             _sessionHelper.Setup(_ => _.GetSessionGuid())
                 .Returns("guid");

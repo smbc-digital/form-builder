@@ -6,8 +6,6 @@ using form_builder.Controllers;
 using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Factories.Schema;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Services.BookingService;
 using form_builder.Services.BookingService.Entities;
@@ -25,11 +23,9 @@ namespace form_builder_tests.UnitTests.Controllers
     {
         private readonly BookingController _bookingController;
 
-        private readonly Mock<IBookingService> _bookingService = new Mock<IBookingService>();
-        private readonly Mock<IPageService> _pageService = new Mock<IPageService>();
-        private readonly Mock<ISchemaFactory> _schemaFactory = new Mock<ISchemaFactory>();
-        private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
-        private readonly Mock<ISessionHelper> _sessionHelper = new Mock<ISessionHelper>();
+        private readonly Mock<IBookingService> _bookingService = new ();
+        private readonly Mock<IPageService> _pageService = new ();
+        private readonly Mock<ISchemaFactory> _schemaFactory = new ();
 
         public BookingControllerTests()
         {
@@ -83,17 +79,17 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task CancelBooking_Should_Throw_ApplicatioException_When_Id_IsEmpty()
+        public async Task CancelBooking_Should_Throw_ApplicationException_When_Id_IsEmpty()
         {
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.CancelBooking("hash", Guid.Empty, "path"));
-            Assert.StartsWith("BookingController::CancelBooking, Invalid parameters recieved. Id:", result.Message);
+            Assert.StartsWith("BookingController::CancelBooking, Invalid parameters received. Id:", result.Message);
         }
 
         [Fact]
-        public async Task CancelBooking_Should_Throw_ApplicatioException_When_Hash_IsEmpty()
+        public async Task CancelBooking_Should_Throw_ApplicationException_When_Hash_IsEmpty()
         {
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.CancelBooking(string.Empty, Guid.NewGuid(), "path"));
-            Assert.StartsWith("BookingController::CancelBooking, Invalid parameters recieved. Id:", result.Message);
+            Assert.StartsWith("BookingController::CancelBooking, Invalid parameters received. Id:", result.Message);
         }
 
 
@@ -110,7 +106,7 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task CancelBooking_Should_Reutn_View_WhenAble_To_Cancel_Booking()
+        public async Task CancelBooking_Should_Return_View_WhenAble_To_Cancel_Booking()
         {
             _bookingService.Setup(_ => _.ValidateCancellationRequest(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>()))
                 .ReturnsAsync(new CancelledAppointmentInformation());
@@ -123,21 +119,21 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task CancelBookingPost_Should_Throw_ApplicatioException_When_Id_IsEmpty()
+        public async Task CancelBookingPost_Should_Throw_ApplicationException_When_Id_IsEmpty()
         {
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.CancelBookingPost("hash", Guid.Empty, "path"));
-            Assert.StartsWith("BookingController::CancelBookingPost, Invalid parameters recieved. Id:", result.Message);
+            Assert.StartsWith("BookingController::CancelBookingPost, Invalid parameters received. Id:", result.Message);
         }
 
         [Fact]
-        public async Task CancelBookingPost_Should_Throw_ApplicatioException_When_Hash_IsEmpty()
+        public async Task CancelBookingPost_Should_Throw_ApplicationException_When_Hash_IsEmpty()
         {
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.CancelBookingPost(string.Empty, Guid.NewGuid(), "path"));
-            Assert.StartsWith("BookingController::CancelBookingPost, Invalid parameters recieved. Id:", result.Message);
+            Assert.StartsWith("BookingController::CancelBookingPost, Invalid parameters received. Id:", result.Message);
         }
 
         [Fact]
-        public async Task CancelBookingPost_Should_Reutn_Success_View_WhenBooking_Cancelled_Successfully()
+        public async Task CancelBookingPost_Should_Return_Success_View_WhenBooking_Cancelled_Successfully()
         {
             var result = await _bookingController.CancelBookingPost("hash", Guid.NewGuid(), "path");
 

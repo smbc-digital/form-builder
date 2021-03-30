@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using form_builder.Configuration;
 using form_builder.Providers.ReferenceNumbers;
 using Microsoft.Extensions.Options;
@@ -9,9 +8,10 @@ namespace form_builder_tests.UnitTests.Providers.ReferenceNumberProviders
 {
     public class ReferenceNumberProviderTests
     {
-        private ReferenceNumberProvider _referenceNumberProvider;
-        private const string _prefix = "TEST";
-        private Mock<IOptions<FormConfiguration>> _mockFormConfiguration = new Mock<IOptions<FormConfiguration>>();
+        private readonly ReferenceNumberProvider _referenceNumberProvider;
+        private readonly Mock<IOptions<FormConfiguration>> _mockFormConfiguration = new();
+
+        private const string PREFIX = "TEST";
 
         public ReferenceNumberProviderTests() 
         {
@@ -41,7 +41,7 @@ namespace form_builder_tests.UnitTests.Providers.ReferenceNumberProviders
         public void ReferenceNumberProvider_Returns_Correct_Length_Reference()
         {
             // Act
-            string result = _referenceNumberProvider.GetReference(_prefix, length: 8);
+            string result = _referenceNumberProvider.GetReference(PREFIX, length: 8);
 
             // Assert
             Assert.Equal(12, result.Length);

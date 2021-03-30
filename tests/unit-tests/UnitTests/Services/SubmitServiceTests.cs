@@ -27,14 +27,14 @@ namespace form_builder_tests.UnitTests.Services
     public class SubmitServiceTests
     {
         private readonly SubmitService _service;
-        private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
-        private readonly Mock<IPageHelper> _mockPageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IWebHostEnvironment> _mockEnvironment = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IOptions<SubmissionServiceConfiguration>> _mockIOptions = new Mock<IOptions<SubmissionServiceConfiguration>>();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new Mock<ISchemaFactory>();
-        private readonly Mock<IReferenceNumberProvider> _mockReferenceNumberProvider = new Mock<IReferenceNumberProvider>();
-        private readonly Mock<ISubmitProvider> _mockSubmitProvider = new Mock<ISubmitProvider>();
+        private readonly Mock<IGateway> _mockGateway = new();
+        private readonly Mock<IPageHelper> _mockPageHelper = new();
+        private readonly Mock<IWebHostEnvironment> _mockEnvironment = new();
+        private readonly Mock<IOptions<SubmissionServiceConfiguration>> _mockIOptions = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
+        private readonly Mock<IReferenceNumberProvider> _mockReferenceNumberProvider = new();
+        private readonly Mock<ISubmitProvider> _mockSubmitProvider = new();
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
 
         public SubmitServiceTests()
@@ -402,7 +402,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
             // Assert
-            Assert.StartsWith("SubmitService::PaymentSubmission, An exception has occured while attempting to call ", result.Message);
+            Assert.StartsWith("SubmitService::PaymentSubmission, An exception has occurred while attempting to call ", result.Message);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 
@@ -484,7 +484,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.PaymentSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
             // Assert
-            Assert.StartsWith($"SubmitService::PaymentSubmission, Gateway", result.Message);
+            Assert.StartsWith("SubmitService::PaymentSubmission, Gateway", result.Message);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 

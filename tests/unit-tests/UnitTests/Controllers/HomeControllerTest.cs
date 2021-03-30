@@ -27,13 +27,13 @@ namespace form_builder_tests.UnitTests.Controllers
     public class HomeControllerTest
     {
         private readonly HomeController _homeController;
-        private readonly Mock<IPageService> _pageService = new Mock<IPageService>();
-        private readonly Mock<ISubmitWorkflow> _submitWorkflow = new Mock<ISubmitWorkflow>();
-        private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new Mock<IPaymentWorkflow>();
-        private readonly Mock<IFileUploadService> _mockFileUploadService = new Mock<IFileUploadService>();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new Mock<IActionsWorkflow>();
-        private readonly Mock<ISuccessWorkflow> _mockSuccessWorkflow = new Mock<ISuccessWorkflow>();
+        private readonly Mock<IPageService> _pageService = new ();
+        private readonly Mock<ISubmitWorkflow> _submitWorkflow = new ();
+        private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new ();
+        private readonly Mock<IFileUploadService> _mockFileUploadService = new ();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
+        private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new ();
+        private readonly Mock<ISuccessWorkflow> _mockSuccessWorkflow = new ();
 
         public HomeControllerTest()
         {
@@ -218,7 +218,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             // Act & Assert
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _homeController.Index("form", "page-one", viewModel, null));
-            Assert.Equal($"The provided behaviour type 'Unknown' is not valid", result.Message);
+            Assert.Equal("The provided behaviour type 'Unknown' is not valid", result.Message);
 
         }
 
@@ -436,7 +436,7 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task Index_ShouldRedirect_WhenOnRedirectIsTrue_WithNoAdditionalRouteValues_WhenNoQueryParamtersPassed()
+        public async Task Index_ShouldRedirect_WhenOnRedirectIsTrue_WithNoAdditionalRouteValues_WhenNoQueryParametersPassed()
         {
             // Arrange
             _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IQueryCollection>()))
@@ -460,7 +460,7 @@ namespace form_builder_tests.UnitTests.Controllers
             var result = await _homeController.Submit("form");
 
             // Assert
-            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.IsType<RedirectToActionResult>(result);
             _submitWorkflow.Verify(_ => _.Submit(It.IsAny<string>()), Times.Once);
         }
 
@@ -487,7 +487,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry($"test", "test")
+                .WithEntry("test", "test")
                 .Build();
 
             _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
@@ -581,7 +581,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
-                .WithEntry($"test", "test")
+                .WithEntry("test", "test")
                 .Build();
 
             _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))

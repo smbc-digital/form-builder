@@ -12,7 +12,7 @@ namespace form_builder_tests.UnitTests.Services
 {
     public class IncomingDataHelperTests
     {
-        private readonly IncomingDataHelper _helper = new IncomingDataHelper();
+        private readonly IncomingDataHelper _helper = new();
 
         [Fact]
         public void AddIncomingFormDataValues_Post_ShouldThrowException_WhenIncomingValueIsNull()
@@ -273,7 +273,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public void AddIncomingFormDataValues_Get_ShouldReturn_EmptyObjectt_WhenOptional_AndValueNotSupplied()
+        public void AddIncomingFormDataValues_Get_ShouldReturn_EmptyObject_WhenOptional_AndValueNotSupplied()
         {
             // Arrange
             var behaviour = new BehaviourBuilder()

@@ -20,11 +20,11 @@ namespace form_builder_tests.UnitTests.Services
     public class StreetServiceTests
     {
         private readonly StreetService _service;
-        private readonly Mock<IDistributedCacheWrapper> _distributedCache = new Mock<IDistributedCacheWrapper>();
-        private readonly Mock<IPageHelper> _pageHelper = new Mock<IPageHelper>();
-        private readonly Mock<IStreetProvider> _streetProvider = new Mock<IStreetProvider>();
+        private readonly Mock<IDistributedCacheWrapper> _distributedCache = new();
+        private readonly Mock<IPageHelper> _pageHelper = new();
+        private readonly Mock<IStreetProvider> _streetProvider = new();
         private IEnumerable<IStreetProvider> _streetProviders;
-        private readonly Mock<IPageFactory> _mockPageContentFactory = new Mock<IPageFactory>();
+        private readonly Mock<IPageFactory> _mockPageContentFactory = new();
 
         public StreetServiceTests()
         {
@@ -47,11 +47,11 @@ namespace form_builder_tests.UnitTests.Services
                 Path = "page-one",
                 Pages = new List<PageAnswers>()
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = questionId,
                                 Response = "searchTerm"
@@ -107,11 +107,11 @@ namespace form_builder_tests.UnitTests.Services
                 Path = "page-one",
                 Pages = new List<PageAnswers>()
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = questionId,
                                 Response = ""
@@ -161,11 +161,11 @@ namespace form_builder_tests.UnitTests.Services
                 Path = "page-one",
                 Pages = new List<PageAnswers>()
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = "test-street",
                                 Response = "streetname"
@@ -176,7 +176,7 @@ namespace form_builder_tests.UnitTests.Services
                 },
                 FormData = new Dictionary<string, object>
                 {
-                    {"page-one-search-results", new List<object>{ }}
+                    { "page-one-search-results", new List<object>() }
                 }
             };
 
@@ -221,11 +221,11 @@ namespace form_builder_tests.UnitTests.Services
                 Path = "page-one",
                 Pages = new List<PageAnswers>()
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 QuestionId = "test-street",
                                 Response = "old search term"
