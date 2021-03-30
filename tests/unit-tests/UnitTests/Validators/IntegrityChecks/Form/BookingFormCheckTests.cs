@@ -108,6 +108,60 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
        }
 
         [Fact]
+        public void BookingFormCheck_IsValid_If_FormSchema_Contains_Multiple_BookingElements_But_Same_Provider()
+        {
+            // Arrange
+            var customerFirstName = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithTargetMapping("customer.firstname")
+                .Build();
+
+            var customerLastName = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithTargetMapping("customer.lastname")
+                .Build();
+
+            var page1 = new PageBuilder()
+                .WithElement(customerFirstName)
+                .WithElement(customerLastName)
+                .Build();
+
+            var bookingElement = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testprovider")
+                .Build();
+
+            // Arrange
+            var bookingElement2 = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testprovider")
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithElement(bookingElement)
+                .Build();
+
+            var page3 = new PageBuilder()
+                .WithPageSlug(BookingConstants.NO_APPOINTMENT_AVAILABLE)
+                .WithElement(bookingElement2)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithName("test-name")
+                .WithPage(page1)
+                .WithPage(page2)
+                .WithPage(page3)
+                .Build();
+
+            // Act
+            BookingFormCheck check = new();
+            var result = check.Validate(schema);
+
+            // Assert
+            Assert.True(result.IsValid);
+        }
+
+        [Fact]
         public void BookingFormCheck_Should_Return_Failure_Message_If_FormSchema_Contains_Multiple_BookingProviders()
         {
             // Arrange
@@ -167,7 +221,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
         public void BookingFormCheck_Should_Return_Failure_Message_If_FormSchema_Contains_Multiple_BookingProviders_OnDifferentPages()
         {
             // Arrange
-             var customerFirstName = new ElementBuilder()
+            var customerFirstName = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithTargetMapping("customer.firstname")
                 .Build();
