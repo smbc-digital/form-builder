@@ -31,12 +31,11 @@ namespace form_builder.Providers.Transforms.ReusableElements
             {
                 var s3Result = await _s3Gateway.GetObject(_configuration["S3BucketKey"], $"{_environment.EnvironmentName.ToS3EnvPrefix()}/Elements/{schemaName}.json");
 
-                using (Stream responseStream = s3Result.ResponseStream)
-                using (StreamReader reader = new StreamReader(responseStream))
-                {
-                    var responseBody = reader.ReadToEnd();
-                    return JsonConvert.DeserializeObject<Element>(responseBody);
-                }
+                using Stream responseStream = s3Result.ResponseStream;
+                using StreamReader sr = new(responseStream);
+                using JsonReader reader = new JsonTextReader(sr);
+                JsonSerializer serializer = new();
+                return serializer.Deserialize<IElement>(reader);
             }
             catch (AmazonS3Exception e)
             {
