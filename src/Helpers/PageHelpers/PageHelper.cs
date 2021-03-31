@@ -73,6 +73,9 @@ namespace form_builder.Helpers.PageHelpers
                     await AddDynamicOptions(element, formAnswers);
                 }
 
+                if (element.Properties.OrderAlphabetically)
+                    element.Properties.Options =  element.Properties.Options.OrderBy(o => o.Text).ToList<Option>();
+
                 string html = await element.RenderAsync(
                     _viewRender, _elementHelper, guid,
                     viewModel, page, baseForm, _environment,
