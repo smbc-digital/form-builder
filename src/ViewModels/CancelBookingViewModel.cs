@@ -10,7 +10,6 @@ namespace form_builder.ViewModels
         public string Hash { get; set; }
         public string BaseURL { get; set; }
         public Guid Id { get; set; }
-        public bool Cancellable { get; set; }
         public DateTime BookingDate { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
