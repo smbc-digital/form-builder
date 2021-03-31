@@ -81,7 +81,21 @@ namespace form_builder.Providers.Booking
             return result.ResponseContent;
         }
 
-        public Task<AppointmentInformation> GetBooking(Guid bookingId) => throw new NotImplementedException();
+        public async Task<BookingInformationResponse> GetBooking(Guid bookingId)
+        {
+            var response = await _gateway.GetBooking(bookingId);
+
+            if (response.StatusCode.Equals(HttpStatusCode.NotFound))
+                throw new ApplicationException($"BookingProvider::GetBooking, BookingServiceGateway returned not found for bookingId: {bookingId}");
+
+            if (response.StatusCode.Equals(HttpStatusCode.BadRequest))
+               throw new ApplicationException($"BookingProvider::GetBooking, BookingServiceGateway returned 400 status code, gateway received a bad request for bookingId {bookingId}, Response: {JsonConvert.SerializeObject(response)}");
+
+            if (!response.IsSuccessStatusCode)
+                throw new ApplicationException($"BookingProvider::GetBooking, Gateway returned with non success status code of {response.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
+
+            return response.ResponseContent;
+        }
 
         public async Task Cancel(Guid bookingId)
         {

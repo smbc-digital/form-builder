@@ -223,7 +223,7 @@ namespace form_builder.Services.BookingService
 
             var bookingInformation = await _bookingProviders.Get(provider).GetBooking(bookingGuid);
 
-            if (!bookingInformation.Cancellable)
+            if (!bookingInformation.CanCustomerCancel)
                 throw new BookingCannotBeCancelledException($"BookingSerivice::ValidateCancellationRequest, booking: {bookingGuid} specified it can not longer be cancelled");
 
            var envStartPageUrl =  _environment.EnvironmentName.Equals("local") ?
@@ -235,12 +235,11 @@ namespace form_builder.Services.BookingService
                 FormName = formSchema.FormName,
                 StartPageUrl = formSchema.StartPageUrl.StartsWith("https://") || formSchema.StartPageUrl.StartsWith("http://") ? formSchema.StartPageUrl : envStartPageUrl,
                 BaseURL = formSchema.BaseURL,
-                BookingDate = bookingInformation.BookingDate,
-                Id = bookingInformation.AppointmentId,
-                Cancellable = bookingInformation.Cancellable,
+                BookingDate = bookingInformation.Date,
+                Id = bookingInformation.Id,
                 StartTime = bookingInformation.StartTime,
                 EndTime = bookingInformation.EndTime,
-                IsFullday = bookingInformation.IsFullday,
+                IsFullday = bookingInformation.IsFullDay,
                 Hash = hash,
             };
         }
