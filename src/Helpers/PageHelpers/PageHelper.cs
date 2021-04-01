@@ -74,7 +74,7 @@ namespace form_builder.Helpers.PageHelpers
                 }
 
                 if (element.Properties.OrderOptionsAlphabetically)
-                    element.Properties.Options =  element.Properties.Options.OrderBy(o => o.Text).ToList<Option>();
+                    element.Properties.Options.Sort((x, y) => x.Text.CompareTo(y.Text));
 
                 string html = await element.RenderAsync(
                     _viewRender, _elementHelper, guid,
