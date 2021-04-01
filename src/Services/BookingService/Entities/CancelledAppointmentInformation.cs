@@ -11,7 +11,6 @@ namespace form_builder.Services.BookingService.Entities
         public DateTime BookingDate { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
-        public bool Cancellable { get; set; }
         public string Hash { get; set; }
         public bool IsFullday { get; set; }
     }

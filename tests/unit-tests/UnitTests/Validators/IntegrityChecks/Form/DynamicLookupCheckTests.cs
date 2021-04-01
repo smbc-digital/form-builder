@@ -9,12 +9,17 @@ using form_builder.Validators.IntegrityChecks.Form;
 using form_builder_tests.Builders;
 using Moq;
 using Xunit;
+using System.Linq;
 
 namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 {
     public class DynamicLookupCheckTests
     {
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+        private readonly DynamicLookupCheck _integrityCheck;
+
+        public DynamicLookupCheckTests() => 
+            _integrityCheck = new DynamicLookupCheck(_mockHostingEnv.Object, new List<ILookupProvider>());
 
         [Theory]
         [InlineData("local", "int", "Fake", "TestToken", "https://myapi.com")] // 1) No Match:  environment for current Environment Name
@@ -49,13 +54,40 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .WithName("test-name")
                 .Build();
 
-            var check = new DynamicLookupCheck(_mockHostingEnv.Object, new List<ILookupProvider>() { new FakeLookupProvider() });
-
             // Act
-            var result = check.Validate(schema);
+            var result = _integrityCheck.Validate(schema);
 
             // Assert
             Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public void Validate_ShouldReturnFalse_When_LookupIs_Dynamic_ButHas_NoSources()
+        {
+            // Arrange
+            var questionId = "testQuestionId";
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("testEnv");
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Radio)
+                .WithQuestionId(questionId)
+                .WithLookup("dynamic")
+                .Build();
+
+            var page = new PageBuilder().WithElement(element).Build();
+            List<Page> pages = new() { page };
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithName("test-name")
+                .Build();
+
+            // Act
+            var result = _integrityCheck.Validate(schema);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Equal($"FAILURE - Dynamic Lookup Check, dynamic lookup with questionId {questionId} requires a LookupSource", result.Messages.First());
         }
     }
 }

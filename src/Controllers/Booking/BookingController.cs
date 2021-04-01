@@ -68,7 +68,6 @@ namespace form_builder.Controllers
                     BookingDate = appointment.BookingDate,
                     StartTime = appointment.StartTime,
                     EndTime = appointment.EndTime,
-                    Cancellable = appointment.Cancellable,
                     Hash = hash,
                     IsFullday = appointment.IsFullday,
                     DisplayBreadCrumbs = false,

@@ -172,27 +172,25 @@ namespace form_builder.Providers.Booking
             return Task.FromResult("Test, Test St, Stockport SK1 3UR");
         }
 
-        public Task<AppointmentInformation> GetBooking(Guid bookingId)
+        public Task<BookingInformationResponse> GetBooking(Guid bookingId)
         {
             if (bookingId.Equals(Guid.Parse(BOOKING_CANNOT_BE_CANCELLED)))
             {
-                return Task.FromResult(new AppointmentInformation
+                return Task.FromResult(new BookingInformationResponse
                 {
-                    BookingDate = new DateTime(2021, 4, 13),
-                    Cancellable = false,
+                    Date = new DateTime(2021, 4, 13),
+                    CanCustomerCancel = false,
                     StartTime = new TimeSpan(1,1,1),
-                    EndTime = new TimeSpan(2,1, 1),
-                    IsFullday = false
+                    EndTime = new TimeSpan(2,1, 1)
                 });
             }
 
-            return Task.FromResult(new AppointmentInformation
+            return Task.FromResult(new BookingInformationResponse
             {
-                BookingDate = new DateTime(2021, 3, 13),
-                Cancellable = true,
+                Date = new DateTime(2021, 3, 13),
+                CanCustomerCancel = true,
                 StartTime = new TimeSpan(2, 1, 1),
-                EndTime = new TimeSpan(23, 1, 1),
-                IsFullday = false
+                EndTime = new TimeSpan(23, 1, 1)
             });
         }
 

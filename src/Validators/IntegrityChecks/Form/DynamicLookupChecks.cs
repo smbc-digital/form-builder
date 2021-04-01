@@ -37,9 +37,9 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             foreach (var element in elements)
             {
-                if (element.Properties.LookupSources is not null)
+                if (element.Properties.LookupSources is null || !element.Properties.LookupSources.Any())
                 {
-                    result.AddFailureMessage($"Any Condition Type Check, any condition type requires a comparison value in form.");
+                    result.AddFailureMessage($"Dynamic Lookup Check, dynamic lookup with questionId {element.Properties.QuestionId} requires a LookupSource");
                     return result;
                 }
 
