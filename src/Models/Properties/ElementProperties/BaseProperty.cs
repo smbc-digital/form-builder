@@ -66,6 +66,6 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public bool isConditionalElement { get; set; } = false;
 
-        public bool OrderAlphabetically { get; set; } = true;
+        public bool OrderOptionsAlphabetically { get; set; } = true;
     }
 }

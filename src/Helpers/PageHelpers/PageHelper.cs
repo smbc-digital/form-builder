@@ -73,7 +73,7 @@ namespace form_builder.Helpers.PageHelpers
                     await AddDynamicOptions(element, formAnswers);
                 }
 
-                if (element.Properties.OrderAlphabetically)
+                if (element.Properties.OrderOptionsAlphabetically)
                     element.Properties.Options =  element.Properties.Options.OrderBy(o => o.Text).ToList<Option>();
 
                 string html = await element.RenderAsync(
