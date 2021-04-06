@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using form_builder.Builders;
 using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.ViewRender;
 using form_builder.Models;
@@ -86,6 +88,41 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("StreetSearch")), It.IsAny<Element>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+        }
+
+        [Fact]
+        public void GetLabelText_ShouldGenerate_CorrectLabel_WhenSummaryLabel_IsDefined()
+        {
+            var label = "Custom label";
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Street)
+                .WithQuestionId("street-test")
+                .WithSummaryLabel(label)
+                .Build();
+
+            //Act
+            var result = element.GetLabelText(string.Empty);
+
+            //Assert
+            Assert.Equal(label, result);
+        }
+
+        [Fact]
+        public void GetLabelText_ShouldGenerate_CorrectLabel_WhenSummaryLabel_Is_Not_Defined()
+        {
+            var pageTitle = "Page Title";
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Street)
+                .WithQuestionId("street-test")
+                .Build();
+
+            //Act
+            var result = element.GetLabelText(pageTitle);
+
+            //Assert
+            Assert.Equal(pageTitle, result);
         }
     }
 }
