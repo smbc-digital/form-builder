@@ -399,7 +399,7 @@ namespace form_builder.Utils.Startup
             services.Configure<AwsSesKeysConfiguration>(configuration.GetSection("Ses"));
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection("ReCaptchaConfiguration"));
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
-            services.Configure<TagManagerConfiguration>(TagManagerId => configuration.GetValue<string>("GoogleTagManagerId"));
+            services.Configure<TagManagerConfiguration>(TagManagerId => configuration.GetValue<string>("TagManagerId"));
             services.Configure<HashConfiguration>(configuration.GetSection("HashConfiguration"));
 
             return services;
