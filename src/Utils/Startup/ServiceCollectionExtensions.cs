@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +9,8 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Notify.Client;
+using Notify.Interfaces;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
@@ -79,6 +83,7 @@ using form_builder.Workflows.SuccessWorkflow;
 using form_builder.Utils.Hash;
 using form_builder.Providers.Submit;
 using form_builder.Providers.Transforms.PaymentConfiguration;
+using form_builder.Providers.EmailTemplateProvider;
 
 namespace form_builder.Utils.Startup
 {
@@ -216,6 +221,13 @@ namespace form_builder.Utils.Startup
         {
             services.AddSingleton<IBookingProvider, FakeBookingProvider>();
             services.AddSingleton<IBookingProvider, BookingProvider>();
+
+            return services;
+        }
+        public static IServiceCollection ConfigureEmailTemplateProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<IEmailTemplateProvider, FakeEmailTemplateProvider>();
+            services.AddSingleton<IEmailTemplateProvider, NotifyEmailTemplateProvider>();
 
             return services;
         }
@@ -401,6 +413,17 @@ namespace form_builder.Utils.Startup
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
             services.Configure<TagManagerConfiguration>(TagManagerId => configuration.GetValue<string>("GoogleTagManagerId"));
             services.Configure<HashConfiguration>(configuration.GetSection("HashConfiguration"));
+            services.Configure<NotifyConfiguration>(configuration.GetSection(NotifyConfiguration.ConfigValue));
+
+            return services;
+        }
+
+        public static IServiceCollection AddGovUkServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            var clientHandler = new HttpClientHandler { Proxy = new WebProxy("172.16.0.166:8080") };
+            var client = new HttpClient(clientHandler);
+            services.AddSingleton<IAsyncNotificationClient, NotificationClient>(_ =>
+            new NotificationClient(new HttpClientWrapper(client), configuration.GetSection(NotifyConfiguration.ConfigValue)["Key"]));
 
             return services;
         }

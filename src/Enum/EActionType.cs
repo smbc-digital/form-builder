@@ -6,6 +6,7 @@
         RetrieveExternalData,
         UserEmail,
         BackOfficeEmail,
-        Validate
+        Validate,
+        EmailTemplate
     }
 }

@@ -66,6 +66,7 @@ namespace form_builder.Controllers
             string subPath = "")
         {
             var queryParamters = Request.Query;
+            
             var response = await _pageService.ProcessPage(form, path, subPath, queryParamters);
 
             if (response == null)
