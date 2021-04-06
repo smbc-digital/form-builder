@@ -45,7 +45,7 @@ namespace form_builder.Models.Elements
         public bool DisplayNextMonthArrow => NextSelectableMonth <= new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(Properties.SearchPeriod);
         [JsonIgnore]
         public bool DisplayPreviousMonthArrow => new DateTime(CurrentSelectedMonth.Date.Year, CurrentSelectedMonth.Date.Month, 1) > FirstAvailableMonth;
-        public override string GetLabelText(string pageTitle) => $"Booking{(Properties.Optional ? " (optional)" : string.Empty)}";
+        public override string GetLabelText(string pageTitle) => $"{(string.IsNullOrEmpty(Properties.SummaryLabel) ? "Booking" : Properties.SummaryLabel)}{(Properties.Optional ? " (optional)" : string.Empty)}";
         public string FormName { get; set; }
         public string ReservedBookingId { get; set; }
         public string ReservedBookingDate { get; set; }

@@ -34,6 +34,6 @@ namespace form_builder.Models.Elements
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
-        public override string GetLabelText(string pageTitle) => "Map";
+        public override string GetLabelText(string pageTitle) => string.IsNullOrEmpty(Properties.SummaryLabel) ? "Map" : Properties.SummaryLabel;
     }
 }

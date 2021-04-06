@@ -105,5 +105,40 @@ namespace form_builder_tests.UnitTests.Models.Elements
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"), It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
             Assert.Equal(2, callback.Items.Count);
         }
+
+        [Fact]
+        public void GetLabelText_ShouldGenerate_CorrectLabel_WhenSummaryLabel_IsDefined()
+        {
+            var label = "Custom label";
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Street)
+                .WithQuestionId("org-test")
+                .WithSummaryLabel(label)
+                .Build();
+
+            //Act
+            var result = element.GetLabelText(string.Empty);
+
+            //Assert
+            Assert.Equal(label, result);
+        }
+
+        [Fact]
+        public void GetLabelText_ShouldGenerate_CorrectLabel_WhenSummaryLabel_Is_Not_Defined()
+        {
+            var pageTitle = "Page Title";
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Street)
+                .WithQuestionId("org-test")
+                .Build();
+
+            //Act
+            var result = element.GetLabelText(pageTitle);
+
+            //Assert
+            Assert.Equal(pageTitle, result);
+        }
     }
 }
