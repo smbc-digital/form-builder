@@ -70,37 +70,38 @@ namespace form_builder.Services.BookingService
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<BookingProcessEntity> Get(string baseUrl, Page currentPage, string guid)
+        public async Task<BookingProcessEntity> Get(string baseUrl, Page currentPage, string sessionGuid)
         {
-            var bookingElement = currentPage.Elements
-                .Where(_ => _.Type == EElementType.Booking)
-                .FirstOrDefault();
+            var bookingElement = currentPage.Elements.FirstOrDefault(element => element.Type.Equals(EElementType.Booking));
 
-            var appointmentTimes = new List<AvailabilityDayResponse>();
+            List<AvailabilityDayResponse> appointmentTimes = new();
 
             var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
-            var cachedAnswers = _distributedCache.GetString(guid);
-
-            if (cachedAnswers != null)
+            var cachedAnswers = _distributedCache.GetString(sessionGuid);
+            FormAnswers convertedAnswers = new();
+            if (cachedAnswers is not null)
             {
-                var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
                 if (convertedAnswers.FormData.ContainsKey(bookingInformationCacheKey))
                 {
-                    var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
-                    var cachedInfo = new List<object> { cachedBookingInformation };
+                    var cachedBookingInformation = JsonConvert
+                        .DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
+                    List<object> cachedInfo = new() { cachedBookingInformation };
                     return new BookingProcessEntity { BookingInfo = cachedInfo };
                 }
             }
 
             var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
 
-            var nextAvailability = await RetrieveNextAvailability(bookingElement, bookingProvider);
+            // HERE : 
+            var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+            if (appointmentType.AppointmentId.Equals(Guid.Empty) && !string.IsNullOrEmpty(appointmentType.AppointmentIdKey))
+                _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
+
+            var nextAvailability = await RetrieveNextAvailability(bookingElement, bookingProvider, appointmentType);
 
             if (nextAvailability.BookingHasNoAvailableAppointments)
                 return new BookingProcessEntity { BookingHasNoAvailableAppointments = true };
-
-            var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
 
             appointmentTimes = await bookingProvider.GetAvailability(new AvailabilityRequest
             {
@@ -124,7 +125,7 @@ namespace form_builder.Services.BookingService
                 bookingInformation.AppointmentEndTime = DateTime.Today.Add(nextAvailability.DayResponse.AppointmentTimes.First().EndTime);
             }
 
-            _pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, guid, baseUrl);
+            _pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, sessionGuid, baseUrl);
             var bookingInfo = new List<object> { bookingInformation };
             return new BookingProcessEntity { BookingInfo = bookingInfo };
         }
@@ -177,7 +178,13 @@ namespace form_builder.Services.BookingService
 
             var bookingSearchResultsKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
+            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var cachedAnswers = _distributedCache.GetString(guid);
+            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+
             var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+            if (appointmentType.AppointmentId.Equals(Guid.Empty) && !string.IsNullOrEmpty(appointmentType.AppointmentIdKey))
+                _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
 
             var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
                 .GetAvailability(new AvailabilityRequest
@@ -188,11 +195,7 @@ namespace form_builder.Services.BookingService
                     OptionalResources = appointmentType.OptionalResources
                 });
 
-            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
-            var cachedAnswers = _distributedCache.GetString(guid);
-            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
             var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
-
             var bookingInformation = new BookingInformation
             {
                 Appointments = appointmentTimes,
@@ -213,7 +216,7 @@ namespace form_builder.Services.BookingService
 
             var formSchema = await _schemaFactory.Build(formName);
 
-            if(formSchema is null)
+            if (formSchema is null)
                 throw new ApplicationException($"BookingService::ValidateCancellationRequest, Provided formname '{formName}' is not valid and cannot be resolved");
 
             var provider = formSchema.Pages
@@ -226,11 +229,11 @@ namespace form_builder.Services.BookingService
             if (!bookingInformation.CanCustomerCancel)
                 throw new BookingCannotBeCancelledException($"BookingSerivice::ValidateCancellationRequest, booking: {bookingGuid} specified it can not longer be cancelled");
 
-           var envStartPageUrl =  _environment.EnvironmentName.Equals("local") ?
-                $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{formName}/{formSchema.StartPageUrl}" :
-                $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formName}/{formSchema.StartPageUrl}";
+            var envStartPageUrl = _environment.EnvironmentName.Equals("local") ?
+                 $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{formName}/{formSchema.StartPageUrl}" :
+                 $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formName}/{formSchema.StartPageUrl}";
 
-            return new CancelledAppointmentInformation 
+            return new CancelledAppointmentInformation
             {
                 FormName = formSchema.FormName,
                 StartPageUrl = formSchema.StartPageUrl.StartsWith("https://") || formSchema.StartPageUrl.StartsWith("http://") ? formSchema.StartPageUrl : envStartPageUrl,
@@ -251,7 +254,7 @@ namespace form_builder.Services.BookingService
 
             var formSchema = await _schemaFactory.Build(formName);
 
-            if(formSchema is null)
+            if (formSchema is null)
                 throw new ApplicationException($"BookingService::Cancel, Provided formname '{formName}' is not valid and cannot be resolved");
 
             var provider = formSchema.Pages
@@ -262,23 +265,18 @@ namespace form_builder.Services.BookingService
             await _bookingProviders.Get(provider).Cancel(bookingGuid);
         }
 
-        private async Task<BoookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider)
+        private async Task<BoookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider, AppointmentType appointmentType)
         {
-            var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
             var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{appointmentType.AppointmentId}{appointmentType.OptionalResources.CreateKeyFromResources()}";
             var bookingNextAvailabilityCachedResponse = _distributedCache.GetString(bookingNextAvailabilityCachedKey);
-
-            var nextAvailability = new AvailabilityDayResponse();
-            var result = new BoookingNextAvailabilityEntity();
-            if (bookingNextAvailabilityCachedResponse != null)
-            {
+            if (bookingNextAvailabilityCachedResponse is not null)
                 return JsonConvert.DeserializeObject<BoookingNextAvailabilityEntity>(bookingNextAvailabilityCachedResponse);
-            }
-            else
+
+            AvailabilityDayResponse nextAvailability;
+            BoookingNextAvailabilityEntity result;
+            try
             {
-                try
-                {
-                    nextAvailability = await bookingProvider
+                nextAvailability = await bookingProvider
                     .NextAvailability(new AvailabilityRequest
                     {
                         StartDate = DateTime.Now,
@@ -286,17 +284,16 @@ namespace form_builder.Services.BookingService
                         AppointmentId = appointmentType.AppointmentId,
                         OptionalResources = appointmentType.OptionalResources
                     });
-                }
-                catch (BookingNoAvailabilityException)
-                {
-                    result = new BoookingNextAvailabilityEntity { BookingHasNoAvailableAppointments = true };
-                    _ = _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.BookingNoAppointmentsAvailable);
-                    return result;
-                }
+            }
+            catch (BookingNoAvailabilityException)
+            {
+                result = new BoookingNextAvailabilityEntity { BookingHasNoAvailableAppointments = true };
+                await _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.BookingNoAppointmentsAvailable);
+                return result;
             }
 
             result = new BoookingNextAvailabilityEntity { DayResponse = nextAvailability };
-            _ = _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.Booking);
+            await _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.Booking);
             return result;
         }
 
@@ -362,7 +359,7 @@ namespace form_builder.Services.BookingService
         private async Task<Guid> ReserveAppointment(Booking bookingElement, Dictionary<string, dynamic> viewModel, string form, string guid)
         {
             var reservedBookingId = bookingElement.ReservedIdQuestionId;
-            
+
             var reservedBookingDate = bookingElement.ReservedDateQuestionId;
             var reservedBookingStartTime = bookingElement.ReservedStartTimeQuestionId;
             var reservedBookingEndTime = bookingElement.ReservedEndTimeQuestionId;
@@ -407,11 +404,10 @@ namespace form_builder.Services.BookingService
         private async Task<string> GetReservedBookingLocation(Booking bookingElement, BookingRequest bookingRequest)
         {
             var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
-            var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
             var location = await bookingProvider.GetLocation(new LocationRequest
             {
-                AppointmentId = appointmentType.AppointmentId,
-                OptionalResources = appointmentType.OptionalResources
+                AppointmentId = bookingRequest.AppointmentId,
+                OptionalResources = bookingRequest.OptionalResources
             });
 
             if (string.IsNullOrEmpty(location))
