@@ -7,11 +7,13 @@ namespace form_builder.Providers.TemplatedEmailProvider
 {
     public class NotifyTemplatedEmailProvider : ITemplatedEmailProvider
     {
+        private readonly IAsyncNotificationClient _notifyClient;
+
+        public NotifyTemplatedEmailProvider(IAsyncNotificationClient notifyClient) => _notifyClient = notifyClient;
+
         public string ProviderName { get => "SMBC"; }
 
-        public Task SendEmailAsync(string emailAddress, string templateId, Dictionary<string, dynamic> personalisation)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task SendEmailAsync(string emailAddress, string templateId, Dictionary<string, dynamic> personalisation) =>
+                await _notifyClient.SendEmailAsync(emailAddress, templateId, personalisation);
     }
 }

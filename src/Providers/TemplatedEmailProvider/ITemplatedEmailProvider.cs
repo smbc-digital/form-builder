@@ -5,7 +5,7 @@ namespace form_builder.Providers.TemplatedEmailProvider
 {
     public interface ITemplatedEmailProvider
     {
-        string ProviderName { get; }
+        public string ProviderName { get => "SMBC"; }
 
         Task SendEmailAsync(string emailAddress, string templateId, Dictionary<string, dynamic> personalisation);
     }

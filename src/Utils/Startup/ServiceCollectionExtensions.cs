@@ -83,7 +83,8 @@ using form_builder.Workflows.SuccessWorkflow;
 using form_builder.Utils.Hash;
 using form_builder.Providers.Submit;
 using form_builder.Providers.Transforms.PaymentConfiguration;
-using form_builder.Providers.EmailTemplateProvider;
+using form_builder.Providers.TemplatedEmailProvider;
+using form_builder.Services.TemplatedEmailService;
 
 namespace form_builder.Utils.Startup
 {
@@ -344,6 +345,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IRetrieveExternalDataService, RetrieveExternalDataService>();
             services.AddSingleton<IEmailService, EmailService>();
             services.AddSingleton<IValidateService, ValidateService>();
+            services.AddSingleton<ITemplatedEmailService, TemplatedEmailService>();
 
             return services;
         }

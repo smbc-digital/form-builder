@@ -1,9 +1,9 @@
 ﻿using Notify.Interfaces;
-using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 
-namespace form_builder.Providers.EmailTemplateProvider
+namespace form_builder.Providers.TemplatedEmailProvider
 {
     public class FakeTemplatedEmailProvider : ITemplatedEmailProvider
     {
@@ -13,7 +13,9 @@ namespace form_builder.Providers.EmailTemplateProvider
 
         public string ProviderName { get => "Fake"; }
 
-        public async Task SendEmailAsync(string emailAddress, string templateId, Dictionary<string, dynamic> personalisation) =>
-                await _notifyClient.SendEmailAsync(emailAddress, templateId, personalisation);
+        public async Task SendEmailAsync(
+            string emailAddress,
+            string templateId,
+            Dictionary<string, dynamic> personalisation) => await Task.FromResult(HttpStatusCode.OK);
     }
 }
