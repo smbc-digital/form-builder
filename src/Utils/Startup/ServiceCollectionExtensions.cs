@@ -226,8 +226,8 @@ namespace form_builder.Utils.Startup
         }
         public static IServiceCollection ConfigureEmailTemplateProviders(this IServiceCollection services)
         {
-            services.AddSingleton<IEmailTemplateProvider, FakeEmailTemplateProvider>();
-            services.AddSingleton<IEmailTemplateProvider, NotifyEmailTemplateProvider>();
+            services.AddSingleton<ITemplatedEmailProvider, FakeTemplatedEmailProvider>();
+            services.AddSingleton<ITemplatedEmailProvider, NotifyTemplatedEmailProvider>();
 
             return services;
         }

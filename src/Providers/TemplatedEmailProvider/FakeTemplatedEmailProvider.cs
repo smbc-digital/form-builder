@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace form_builder.Providers.EmailTemplateProvider
 {
-    public class FakeEmailTemplateProvider : IEmailTemplateProvider
+    public class FakeTemplatedEmailProvider : ITemplatedEmailProvider
     {
         private readonly IAsyncNotificationClient _notifyClient;
 
-        public FakeEmailTemplateProvider(IAsyncNotificationClient notifyClient) => _notifyClient = notifyClient;
+        public FakeTemplatedEmailProvider(IAsyncNotificationClient notifyClient) => _notifyClient = notifyClient;
 
         public string ProviderName { get => "Fake"; }
 

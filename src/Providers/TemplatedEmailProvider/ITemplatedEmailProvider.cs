@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace form_builder.Providers.EmailTemplateProvider
+namespace form_builder.Providers.TemplatedEmailProvider
 {
-    public interface IEmailTemplateProvider
+    public interface ITemplatedEmailProvider
     {
         string ProviderName { get; }
 

@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace form_builder.Providers.EmailTemplateProvider
+namespace form_builder.Providers.TemplatedEmailProvider
 {
-    public class NotifyEmailTemplateProvider : IEmailTemplateProvider
+    public class NotifyTemplatedEmailProvider : ITemplatedEmailProvider
     {
         public string ProviderName { get => "SMBC"; }
 

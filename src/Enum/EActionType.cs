@@ -7,6 +7,6 @@
         UserEmail,
         BackOfficeEmail,
         Validate,
-        EmailTemplate
+        TemplatedEmail
     }
 }
