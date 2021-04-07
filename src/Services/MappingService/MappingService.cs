@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
@@ -61,8 +62,10 @@ namespace form_builder.Services.MappingService
         public async Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form)
         {
             var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
-            
-            var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+
+            AppointmentType appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+            if (appointmentType.AppointmentId.Equals(Guid.Empty) && !string.IsNullOrEmpty(appointmentType.AppointmentIdKey))
+                MapAppointmentId(appointmentType, convertedAnswers);
 
             return new BookingRequest
             {
@@ -71,6 +74,16 @@ namespace form_builder.Services.MappingService
                 StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form),
                 OptionalResources = appointmentType.OptionalResources
             };
+        }
+
+        public void MapAppointmentId(AppointmentType appointmentType, FormAnswers answers)
+        {
+            Answers value = answers.Pages
+                .SelectMany(page => page.Answers)
+                .FirstOrDefault(answer => answer.QuestionId.Equals(appointmentType.AppointmentIdKey));
+
+            if (value is not null && value.Response is not null)
+                appointmentType.AppointmentId = new Guid((string)value.Response);
         }
 
         private async Task<(FormAnswers convertedAnswers, FormSchema baseForm)> GetFormAnswers(string form, string sessionGuid)
