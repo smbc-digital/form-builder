@@ -67,5 +67,7 @@ namespace form_builder.Models.Properties.ElementProperties
         public bool isConditionalElement { get; set; } = false;
 
         public bool OrderOptionsAlphabetically { get; set; } = false;
+
+        public string SummaryLabel {get;set;} = string.Empty;
     }
 }
