@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Helpers.ActionsHelpers;
@@ -15,8 +16,16 @@ namespace form_builder.Models.Actions
 
         public override async Task ProcessTemplatedEmail(IActionHelper actionHelper, ITemplatedEmailProvider templatedEmailProvider, Dictionary<string, dynamic> personalisation, FormAnswers formAnswers)
         {
-            await templatedEmailProvider
-                .SendEmailAsync(actionHelper.GetEmailToAddresses(this, formAnswers), Properties.TemplateId, personalisation);
+            var emailAddressList = actionHelper.GetEmailToAddresses(this, formAnswers).Split(',').ToList();
+            var reference = formAnswers.AdditionalFormData["GeneratedReference"];
+
+            personalisation.Add("reference", reference.ToString());
+
+            foreach (var emailAddress in emailAddressList)
+            {
+                await templatedEmailProvider
+                    .SendEmailAsync(emailAddress, Properties.TemplateId, personalisation);
+            }
         }
     }
 }
