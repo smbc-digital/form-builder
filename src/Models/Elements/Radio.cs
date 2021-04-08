@@ -28,6 +28,10 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForLabel(this);
             elementHelper.CheckForRadioOptions(this);
             elementHelper.ReCheckPreviousRadioOptions(this);
+
+            if (Properties.OrderOptionsAlphabetically)
+                Properties.Options.Sort((x, y) => x.Text.CompareTo(y.Text));
+
             return await viewRender.RenderAsync(Type.ToString(), this);
         }
     }
