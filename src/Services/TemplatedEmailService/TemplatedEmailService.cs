@@ -42,10 +42,11 @@ namespace form_builder.Services.TemplatedEmailService
             var formData = _distributedCache.GetString(sessionGuid);
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-            var templatedEmailProvider = _templatedEmailProviders.Get(actions.Select(action => action.Properties.EmailTemplateProvider).FirstOrDefault());
 
             foreach (var action in actions)
             {
+                var templatedEmailProvider = _templatedEmailProviders.Get(action.Properties.EmailTemplateProvider);
+
                 await action.ProcessTemplatedEmail(
                     _actionHelper,
                     templatedEmailProvider,
