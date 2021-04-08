@@ -466,7 +466,7 @@ namespace form_builder.Utils.Startup
             }
 
             services.AddDataProtection().SetApplicationName("formbuilder");
-            services.AddSingleton<IDistributedCacheWrapper, DistributedCacheWrapper>();
+            services.AddTransient<IDistributedCacheWrapper, DistributedCacheWrapper>();
 
             return services;
         }
