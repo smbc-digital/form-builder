@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -8,6 +10,8 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Notify.Client;
+using Notify.Interfaces;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
@@ -80,6 +84,8 @@ using form_builder.Workflows.SuccessWorkflow;
 using form_builder.Utils.Hash;
 using form_builder.Providers.Submit;
 using form_builder.Providers.Transforms.PaymentConfiguration;
+using form_builder.Providers.TemplatedEmailProvider;
+using form_builder.Services.TemplatedEmailService;
 
 namespace form_builder.Utils.Startup
 {
@@ -220,6 +226,13 @@ namespace form_builder.Utils.Startup
 
             return services;
         }
+        public static IServiceCollection ConfigureEmailTemplateProviders(this IServiceCollection services)
+        {
+            services.AddSingleton<ITemplatedEmailProvider, FakeTemplatedEmailProvider>();
+            services.AddSingleton<ITemplatedEmailProvider, NotifyTemplatedEmailProvider>();
+
+            return services;
+        }
 
         public static IServiceCollection ConfigureOrganisationProviders(this IServiceCollection services)
         {
@@ -333,6 +346,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IRetrieveExternalDataService, RetrieveExternalDataService>();
             services.AddSingleton<IEmailService, EmailService>();
             services.AddSingleton<IValidateService, ValidateService>();
+            services.AddSingleton<ITemplatedEmailService, TemplatedEmailService>();
 
             return services;
         }
@@ -402,6 +416,17 @@ namespace form_builder.Utils.Startup
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
             services.Configure<TagManagerConfiguration>(TagManagerId => TagManagerId.TagManagerId = configuration.GetValue<string>("TagManagerId"));
             services.Configure<HashConfiguration>(configuration.GetSection("HashConfiguration"));
+            services.Configure<NotifyConfiguration>(configuration.GetSection(NotifyConfiguration.ConfigValue));
+
+            return services;
+        }
+
+        public static IServiceCollection AddGovUkServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            var clientHandler = new HttpClientHandler();
+            var client = new HttpClient(clientHandler);
+            services.AddSingleton<IAsyncNotificationClient, NotificationClient>(_ =>
+            new NotificationClient(new HttpClientWrapper(client), configuration.GetSection(NotifyConfiguration.ConfigValue)["Key"]));
 
             return services;
         }

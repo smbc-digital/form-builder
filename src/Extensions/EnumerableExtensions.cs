@@ -7,6 +7,7 @@ using form_builder.Providers.Lookup;
 using form_builder.Providers.Organisation;
 using form_builder.Providers.Street;
 using form_builder.Providers.Submit;
+using form_builder.Providers.TemplatedEmailProvider;
 using form_builder.TagParsers.Formatters;
 
 namespace form_builder.Extensions
@@ -33,5 +34,8 @@ namespace form_builder.Extensions
 
         public static ISubmitProvider Get(this IEnumerable<ISubmitProvider> value, string providerName) =>
             value.Single(_ => _.ProviderName == providerName);
+
+        public static ITemplatedEmailProvider Get(this IEnumerable<ITemplatedEmailProvider> value, string providerName) =>
+           value.Single(_ => _.ProviderName == providerName);
     }
 }
