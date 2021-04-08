@@ -6,7 +6,6 @@ using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
-using StockportGovUK.NetStandard.Models.Booking.Request;
 
 namespace form_builder.Builders
 {
@@ -426,6 +425,20 @@ namespace form_builder.Builders
         public ElementBuilder WithIsDateEqualityAllowed(bool allowed)
         {
             _property.IsDateEqualityAllowed = allowed;
+
+            return this;
+        }
+
+        public ElementBuilder WithSummaryLabel(string value)
+        {
+            _property.SummaryLabel = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithOrderOptionsAlphabetically(bool value)
+        {
+            _property.OrderOptionsAlphabetically = value;
 
             return this;
         }

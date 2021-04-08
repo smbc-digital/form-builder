@@ -39,5 +39,6 @@ namespace form_builder.Helpers.ElementHelpers
         List<PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema);
 
         string GenerateDocumentUploadUrl(Element element, FormSchema formSchema, FormAnswers formAnswers);
+        void OrderOptionsAlphabetically(Element element);
     }
 }

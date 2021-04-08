@@ -239,5 +239,11 @@ namespace form_builder.Helpers.ElementHelpers
                 ? $"{urlOrigin}{urlPath}"
                 : $"{urlOrigin}v2/{urlPath}";
         }
+
+        public void OrderOptionsAlphabetically(Element element)
+        {
+            if (element.Properties.OrderOptionsAlphabetically)
+                element.Properties.Options.Sort((x, y) => x.Text.CompareTo(y.Text));
+        }
     }
 }

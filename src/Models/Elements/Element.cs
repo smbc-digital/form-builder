@@ -115,6 +115,8 @@ namespace form_builder.Models.Elements
 
         private bool DisplayOptional => Properties.Optional;
 
-        public virtual string GetLabelText(string pageTitle) => $"{Properties.Label}{(Properties.Optional ? " (optional)" : string.Empty)}";
+        public virtual string GetLabelText(string pageTitle) => $"{(string.IsNullOrEmpty(Properties.SummaryLabel) ? Properties.Label : Properties.SummaryLabel)}{GetIsOptionalLabelText()}";
+
+        protected string GetIsOptionalLabelText() => $"{(Properties.Optional ? " (optional)" : string.Empty)}";
     }
 }

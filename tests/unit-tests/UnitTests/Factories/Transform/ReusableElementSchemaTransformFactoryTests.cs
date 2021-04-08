@@ -257,6 +257,50 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
+        public async Task Transform_ShouldCall_TransformDataProvider_And_ShouldUpdate_SummaryLabel_WhenSupplied()
+        {
+            // Arrange
+            var summaryLabel = "custom summary label";
+            _transformDataProvider
+                .Setup(_ => _.Get(It.IsAny<string>()))
+                .ReturnsAsync(new Textbox
+                {
+                    Properties = new BaseProperty
+                    {
+                        QuestionId = "ReusableTest"
+                    }
+                });
+
+            ReusableElementSchemaTransformFactory = new ReusableElementSchemaTransformFactory(_transformDataProvider.Object);
+
+            var element = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("ReusableTest")
+                .WithSummaryLabel(summaryLabel)
+                .Build();
+
+            element.ElementRef = "test";
+
+            // Act
+            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema
+            {
+                Pages = new List<Page>{
+                    new Page()
+                    {
+                        Elements = new List<IElement>
+                        {
+                            element
+                        }
+                    }
+                }
+            });
+
+            // Assert
+            Assert.IsType<FormSchema>(result);
+            Assert.Equal(summaryLabel, result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.SummaryLabel);
+        }
+
+        [Fact]
         public async Task Transform_ShouldCall_TransformDataProvider_And_ShouldUpdate_Hint_WhenSupplied()
         {
             // Arrange

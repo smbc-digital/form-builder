@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -413,7 +414,7 @@ namespace form_builder.Utils.Startup
             services.Configure<AwsSesKeysConfiguration>(configuration.GetSection("Ses"));
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection("ReCaptchaConfiguration"));
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
-            services.Configure<TagManagerConfiguration>(TagManagerId => configuration.GetValue<string>("GoogleTagManagerId"));
+            services.Configure<TagManagerConfiguration>(TagManagerId => TagManagerId.TagManagerId = configuration.GetValue<string>("TagManagerId"));
             services.Configure<HashConfiguration>(configuration.GetSection("HashConfiguration"));
             services.Configure<NotifyConfiguration>(configuration.GetSection(NotifyConfiguration.ConfigValue));
 
@@ -437,10 +438,18 @@ namespace form_builder.Utils.Startup
             switch (storageProviderConfiguration["Type"])
             {
                 case "Redis":
-                    services.AddStackExchangeRedisCache(options =>
+                    services.AddStackExchangeRedisCache(options => 
                     {
-                        options.Configuration = storageProviderConfiguration["Address"];
-                        options.InstanceName = storageProviderConfiguration["InstanceName"];
+                        options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions
+                        {
+                            EndPoints = 
+                            {
+                                { storageProviderConfiguration["Address"] ?? "127.0.0.1",  6379}
+                            },
+                            ClientName = storageProviderConfiguration["InstanceName"] ?? Assembly.GetEntryAssembly()?.GetName().Name,
+                            SyncTimeout = 30000,
+                            AsyncTimeout = 30000
+                        };
                     });
 
                     var redis = ConnectionMultiplexer.Connect(storageProviderConfiguration["Address"]);
