@@ -735,5 +735,77 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal($"{urlOrigin}{urlPath}", results);
             Assert.Contains(caseReference, results);
         }
+
+        [Fact]
+        public void OrderOptionsAlphabetically_Should_OrderOptions_When_OrderOptionsAlphabetically_Is_True()
+        {
+            //Arrange          
+            var options = new List<Option> {
+                new Option {
+                    Text = "X",
+                    Value = "X"
+                },
+                new Option {
+                    Text = "A",
+                    Value = "A"
+                }
+            };
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Checkbox)
+                .WithOptions(options)
+                .WithOrderOptionsAlphabetically(true)
+                .WithQuestionId("test")
+                .Build();
+
+            var elementHelper = new ElementHelper(
+                _mockDistributedCacheWrapper.Object,
+                _mockElementMapper.Object,
+                _mockWebHostEnvironment.Object,
+                _mockHttpContextAccessor.Object
+                );
+            //Act
+            elementHelper.OrderOptionsAlphabetically(element);
+
+        //Assert
+            Assert.Equal("A", element.Properties.Options[0].Text);
+            Assert.Equal("X", element.Properties.Options[1].Text);
+        }
+
+        [Fact]
+        public void OrderOptionsAlphabetically_Should_Not_OrderOptions_When_OrderOptionsAlphabetically_Is_False()
+        {
+            //Arrange          
+            var options = new List<Option> {
+                new Option {
+                    Text = "X",
+                    Value = "X"
+                },
+                new Option {
+                    Text = "A",
+                    Value = "A"
+                }
+            };
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Checkbox)
+                .WithOptions(options)
+                .WithOrderOptionsAlphabetically(false)
+                .WithQuestionId("test")
+                .Build();
+
+            var elementHelper = new ElementHelper(
+                _mockDistributedCacheWrapper.Object,
+                _mockElementMapper.Object,
+                _mockWebHostEnvironment.Object,
+                _mockHttpContextAccessor.Object
+                );
+            //Act
+            elementHelper.OrderOptionsAlphabetically(element);
+
+            //Assert
+            Assert.Equal("X", element.Properties.Options[0].Text);
+            Assert.Equal("A", element.Properties.Options[1].Text);
+        }
     }
 }

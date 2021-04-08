@@ -435,5 +435,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithOrderOptionsAlphabetically(bool value)
+        {
+            _property.OrderOptionsAlphabetically = value;
+
+            return this;
+        }
     }
 }
