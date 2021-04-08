@@ -3,7 +3,6 @@
     public partial class BaseActionProperty
     {
         public string TemplateId { get; set; }
-
-        public string EmailTo { get; set; }
+        public string EmailTemplateProvider { get; set; }
     }
 }

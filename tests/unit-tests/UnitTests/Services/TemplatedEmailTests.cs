@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(formData);
 
-            _templatedEmailService = new TemplatedEmailService(_mockTemplatedEmailProvider.Object, _mockActionHelper.Object, _mockSessionHelper.Object, _mockDistributedCache.Object);
+            _templatedEmailService = new TemplatedEmailService(_mockTemplatedEmailProviders.Object, _mockActionHelper.Object, _mockSessionHelper.Object, _mockDistributedCache.Object);
         }
 
         [Fact]

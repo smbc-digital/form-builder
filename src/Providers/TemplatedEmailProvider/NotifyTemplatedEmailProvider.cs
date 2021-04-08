@@ -11,7 +11,7 @@ namespace form_builder.Providers.TemplatedEmailProvider
 
         public NotifyTemplatedEmailProvider(IAsyncNotificationClient notifyClient) => _notifyClient = notifyClient;
 
-        public string ProviderName { get => "SMBC"; }
+        public string ProviderName { get => "Notify"; }
 
         public async Task SendEmailAsync(string emailAddress, string templateId, Dictionary<string, dynamic> personalisation) =>
                 await _notifyClient.SendEmailAsync(emailAddress, templateId, personalisation);
