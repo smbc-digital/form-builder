@@ -126,7 +126,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = _actionHelper.GetEmailToAddresses(_formSchema.FormActions.FirstOrDefault(), _mappingEntity.FormAnswers);
 
             // Assert
-            Assert.Equal("testResponse.email@test.com,email.test@test.com,", result);
+            Assert.Equal("testResponse.email@test.com,email.test@test.com", result);
         }
 
         [Theory]

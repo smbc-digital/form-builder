@@ -422,7 +422,6 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddGovUkServices(this IServiceCollection services, IConfiguration configuration)
         {
-            //var clientHandler = new HttpClientHandler { Proxy = new WebProxy("172.16.0.166:8080") };
             var clientHandler = new HttpClientHandler();
             var client = new HttpClient(clientHandler);
             services.AddSingleton<IAsyncNotificationClient, NotificationClient>(_ =>

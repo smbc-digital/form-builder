@@ -6,6 +6,7 @@ using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Services.EmailService;
 using form_builder.Services.RetrieveExternalDataService;
+using form_builder.Services.TemplatedEmailService;
 using form_builder.Services.ValidateService;
 using form_builder.Workflows.ActionsWorkflow;
 using Moq;
@@ -20,10 +21,16 @@ namespace form_builder_tests.UnitTests.Workflows
         private readonly Mock<IEmailService> _mockEmailService = new();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<IValidateService> _mockValidateService = new();
+        private readonly Mock<ITemplatedEmailService> _mockTemplatedEmailService = new();
 
         public ActionsWorkflowTests()
         {
-            _actionsWorkflow = new ActionsWorkflow(_mockRetrieveExternalDataService.Object, _mockEmailService.Object, _mockSchemaFactory.Object, _mockValidateService.Object);
+            _actionsWorkflow = new ActionsWorkflow(
+                _mockRetrieveExternalDataService.Object,
+                _mockEmailService.Object,
+                _mockSchemaFactory.Object,
+                _mockValidateService.Object,
+                _mockTemplatedEmailService.Object);
         }
 
         [Fact]
