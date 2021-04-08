@@ -76,5 +76,27 @@ namespace form_builder_tests.UnitTests.Workflows
             // Assert
             _mockValidateService.Verify(_ => _.Process(page.PageActions, It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Once);
         }
+
+        [Fact]
+        public async Task Process_ShouldCallTemplatedEmailService_IfTemplatedEmailActionExists()
+        {
+            // Arrange
+            var page = new Page
+            {
+                PageActions = new List<IAction>
+                {
+                    new RetrieveExternalData
+                    {
+                        Type = EActionType.TemplatedEmail
+                    }
+                }
+            };
+
+            // Act
+            await _actionsWorkflow.Process(page.PageActions, new FormSchema(), "form");
+
+            // Assert
+            _mockTemplatedEmailService.Verify(_ => _.ProcessTemplatedEmail(page.PageActions), Times.Once);
+        }
     }
 }
