@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -413,18 +412,10 @@ namespace form_builder.Utils.Startup
             switch (storageProviderConfiguration["Type"])
             {
                 case "Redis":
-                    services.AddStackExchangeRedisCache(options => 
+                    services.AddStackExchangeRedisCache(options =>
                     {
-                        options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions
-                        {
-                            EndPoints = 
-                            {
-                                { storageProviderConfiguration["Address"] ?? "127.0.0.1",  6379}
-                            },
-                            ClientName = storageProviderConfiguration["InstanceName"] ?? Assembly.GetEntryAssembly()?.GetName().Name,
-                            SyncTimeout = 30000,
-                            AsyncTimeout = 30000
-                        };
+                        options.Configuration = storageProviderConfiguration["Address"];
+                        options.InstanceName = storageProviderConfiguration["InstanceName"];
                     });
 
                     var redis = ConnectionMultiplexer.Connect(storageProviderConfiguration["Address"]);
