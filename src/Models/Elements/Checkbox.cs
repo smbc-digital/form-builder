@@ -28,9 +28,7 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckForCheckBoxListValues(this);
-
-            if (Properties.OrderOptionsAlphabetically)
-                Properties.Options.Sort((x, y) => x.Text.CompareTo(y.Text));
+            elementHelper.OrderOptionsAlphabetically(this);
 
             return viewRender.RenderAsync(Type.ToString(), this);
         }
