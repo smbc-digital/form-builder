@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
@@ -20,27 +19,11 @@ namespace form_builder_tests.UnitTests.Models.Elements
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
 
         [Fact]
-        public async Task RenderAsync_Should_OrderOptions_When_OrderOptionsAlphabetically_Is_True()
+        public async Task RenderAsync_Should_Call_ElementHelper_ToCheck_If_Options_NeedToBeOrdered()
         {
             //Arrange
-            Checkbox callback = new ();
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Checkbox>(), null))
-                .Callback<string, Checkbox, Dictionary<string, object>>((x, y, z) => callback = y);
-
-            var options = new List<Option> {
-                new Option {
-                    Text = "X",
-                    Value = "X"
-                },
-                new Option {
-                    Text = "A",
-                    Value = "A"
-                }
-            };
-
             var element = new ElementBuilder()
-                .WithType(EElementType.Checkbox)
-                .WithOptions(options)
+                .WithType(EElementType.Radio)
                 .WithOrderOptionsAlphabetically(true)
                 .WithQuestionId("test")
                 .Build();
@@ -60,53 +43,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 formAnswers);
 
             //Assert
-            Assert.Equal("A",callback.Properties.Options[0].Text);
-            Assert.Equal("X",callback.Properties.Options[1].Text);
-        }
-      
-        [Fact]
-        public async Task RenderAsync_Should_Not_OrderOptions_When_OrderOptionsAlphabetically_Is_False()
-        {
-              //Arrange
-            Checkbox callback = new ();
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<Checkbox>(), null))
-                .Callback<string, Checkbox, Dictionary<string, object>>((x, y, z) => callback = y);
-
-            var options = new List<Option> {
-                new Option {
-                    Text = "X",
-                    Value = "X"
-                },
-                new Option {
-                    Text = "A",
-                    Value = "A"
-                }
-            };
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.Checkbox)
-                .WithOptions(options)
-                .WithOrderOptionsAlphabetically(false)
-                .WithQuestionId("test")
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
-
-            var formAnswers = new FormAnswers();
-            //Act
-            await element.RenderAsync(
-                _mockIViewRender.Object,
-                _mockElementHelper.Object,
-                "",
-                viewModel,
-                new Page(),
-                new FormSchema(),
-                _mockHostingEnv.Object,
-                formAnswers);
-
-            //Assert
-            Assert.Equal("X",callback.Properties.Options[0].Text);
-            Assert.Equal("A",callback.Properties.Options[1].Text);
+            _mockElementHelper.Verify(_ => _.OrderOptionsAlphabetically(It.IsAny<Element>()), Times.Once);
         }
     }
 }
