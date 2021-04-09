@@ -27,6 +27,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Moq;
+using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 using Xunit;
@@ -81,25 +82,42 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Get_ShouldRetrieve_BookingInformation_FromFormData_WhenStoredInCache()
         {
-            var bookingInfo = new BookingInformation();
+            var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
+            string sessionGuid = "session";
 
-            _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object> { { $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", bookingInfo } } }));
+            BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
+            _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers
+                {
+                    FormData = new Dictionary<string, object>
+                    {
+                        { 
+                            $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo
+                        }
+                    } 
+                }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("bookingQuestion")
                 .Build();
 
+            element.Properties.AppointmentTypes = new()
+            {
+                new AppointmentType
+                {
+                    Environment = "test",
+                    AppointmentId = appointmentId
+                }
+            };
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();
 
-            var result = await _service.Get("form", page, "guid");
+            BookingProcessEntity result = await _service.Get("form", page, sessionGuid);
 
-            Assert.IsType<BookingProcessEntity>(result);
-            Assert.NotNull(result.BookingInfo);
-            _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))), Times.Once);
+            _mockDistributedCache.Verify(_ => _.GetString(sessionGuid), Times.Once);
         }
 
         [Fact]
@@ -115,7 +133,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
+                .Returns(JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
