@@ -34,7 +34,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .WithFormActions(action)
                 .Build();
 
-            var check = new TemplatedEmailActionCheck(_mockHostingEnv.Object);
+            var check = new TemplatedEmailActionCheck();
 
             // Act & Assert
             var result = check.Validate(schema);
