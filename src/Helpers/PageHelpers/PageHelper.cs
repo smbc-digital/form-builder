@@ -63,7 +63,8 @@ namespace form_builder.Helpers.PageHelpers
             var formModel = new FormBuilderViewModel();
 
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
-                formModel.RawHTML += await _viewRender.RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
+                formModel.RawHTML += await _viewRender
+                    .RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
 
             foreach (var element in page.Elements)
             {
@@ -73,12 +74,9 @@ namespace form_builder.Helpers.PageHelpers
                     await AddDynamicOptions(element, formAnswers);
                 }
 
-                string html = await element.RenderAsync(
-                    _viewRender, _elementHelper, guid,
-                    viewModel, page, baseForm, _environment,
-                    formAnswers, results);
+                string html = await element.RenderAsync(_viewRender, _elementHelper, guid, viewModel, page, baseForm, _environment, formAnswers, results);
 
-                if (element.Properties.isConditionalElement)
+                if (element.Properties is not null && element.Properties.isConditionalElement)
                 {
                     formModel.RawHTML = formModel.RawHTML.Replace($"{SystemConstants.CONDITIONAL_ELEMENT_REPLACEMENT}{element.Properties.QuestionId}", html);
                 }
