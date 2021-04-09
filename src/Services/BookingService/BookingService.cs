@@ -101,8 +101,7 @@ namespace form_builder.Services.BookingService
                 }
             }
 
-            // HERE : add this check to IntegrityChecks ( at least one matching criteria )
-            if (appointmentType.AppointmentId.Equals(Guid.Empty)) // && !string.IsNullOrEmpty(appointmentType.AppointmentIdKey)
+            if (appointmentType.AppointmentId.Equals(Guid.Empty))
                 _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
 
             var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);

@@ -805,5 +805,38 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             Assert.Equal("MappingService::GetCustomerDetails, Booking request form data for form base-url does not contain required customer object", result.Message);
         }
+        
+        [Fact]
+        public void MapAppointmentId_Should_Replace_EmptyGuid_With_AnswerValueAppointmentIdFromKey()
+        {
+            // Arrange
+            string appointmentIdkey = "appointmentId";
+            string appointmentId = "022ebc92-1c51-4a68-a079-f6edefc63a07";
+            AppointmentType appointmentType = new() { Environment = "test", AppointmentIdKey = appointmentIdkey };
+            FormAnswers fromAnswers = new()
+            {
+                Pages = new()
+                {
+                    new()
+                    {
+                        Answers = new()
+                        {
+                            new()
+                            {
+                                QuestionId = appointmentIdkey,
+                                Response = appointmentId
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Act
+            _service.MapAppointmentId(appointmentType, fromAnswers);
+
+            // Assert
+            Assert.False(appointmentType.AppointmentId.Equals(Guid.Empty));
+            Assert.Equal(appointmentType.AppointmentId.ToString(), appointmentId);
+        }
     }
 }
