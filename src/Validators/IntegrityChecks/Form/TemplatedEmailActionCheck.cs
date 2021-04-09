@@ -10,11 +10,6 @@ namespace form_builder.Validators.IntegrityChecks.Form
 {
     public class TemplatedEmailActionCheck : IFormSchemaIntegrityCheck
     {
-        private readonly IWebHostEnvironment _environment;
-
-        public TemplatedEmailActionCheck(IWebHostEnvironment enviroment) =>
-            _environment = enviroment;
-
         public IntegrityCheckResult Validate(FormSchema schema)
         {
             IntegrityCheckResult result = new();
@@ -32,9 +27,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 string provider = action.Properties.EmailTemplateProvider;
 
                 if (string.IsNullOrEmpty(provider))
-                {
                     result.AddFailureMessage("Templated Email Action, there is no 'EmailTemplateProvider'");
-                }
 
                 if (string.IsNullOrEmpty(action.Properties.TemplateId))
                     result.AddFailureMessage("Templated Email Action, there is no 'TemplateId' provided");
