@@ -17,16 +17,40 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 return result;
 
             if (!schema.Pages.Any(page => page.PageSlug.Equals(BookingConstants.NO_APPOINTMENT_AVAILABLE, StringComparison.OrdinalIgnoreCase)))
-                result.AddFailureMessage($"Booking Element Check, Form contains booking element, but is missing required page with slug {BookingConstants.NO_APPOINTMENT_AVAILABLE}.");
+                result.AddFailureMessage($"Booking Form Check: Contains booking element, but is missing required page with slug {BookingConstants.NO_APPOINTMENT_AVAILABLE}.");
 
-            var bookingProviders = schema.Pages
-                .Where(page => page.Elements is not null)
+            var pagesWithElements = schema.Pages
+                .Where(page => page.Elements is not null);
+
+            var bookingElements = pagesWithElements
                 .SelectMany(page => page.Elements
-                    .Where(element => element.Type.Equals(EElementType.Booking))
-                .Select(element => element.Properties.BookingProvider));
+                    .Where(element => element.Type
+                        .Equals(EElementType.Booking)));
 
-            if (bookingProviders.Distinct().Count() > 1)
-                result.AddFailureMessage($"Booking Element Check, Form contains different booking provider. Only one provider allows on for form");
+            if (bookingElements.Select(element => element.Properties.BookingProvider).Distinct().Count() > 1)
+                result.AddFailureMessage($"Booking Form Check: Contains different booking provider. Only one provider allows on for form");
+
+            var validatableElements = pagesWithElements.SelectMany(page => page.ValidatableElements);
+
+            foreach (var bookingElement in bookingElements)
+            {
+                foreach (var appointmentType in bookingElement.Properties.AppointmentTypes)
+                {
+                    if (appointmentType.AppointmentId.Equals(Guid.Empty) && 
+                        !bookingElement.Properties.BookingProvider.Equals(BookingConstants.FAKE_PROVIDER, StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (string.IsNullOrEmpty(appointmentType.AppointmentIdKey))
+                        {
+                            result.AddFailureMessage($"Booking Form Check: Contains empty Guid as AppointmentId and no AppointmentIdKey on {appointmentType.Environment}, with a non-fake provider");
+                        }
+                        else
+                        {
+                            if (!validatableElements.Any(element => element.Properties.QuestionId.Equals(appointmentType.AppointmentIdKey, StringComparison.Ordinal)))
+                                result.AddFailureMessage($"Booking Form Check: AppointmentIdKey does not exist... check corresponding QuestionId on your previous page.");
+                        }
+                    }
+                }
+            }
 
             var requiredFields = new[] { "customer.firstname", "customer.lastname" };
             foreach (var requiredField in requiredFields)
