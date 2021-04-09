@@ -10,14 +10,6 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 {
     public class TemplatedEmailActionCheckTests
     {
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-
-        public TemplatedEmailActionCheckTests()
-        {
-            _mockHostingEnv.Setup(_ => _.EnvironmentName)
-                            .Returns("local");
-        }
-
         [Theory]
         [InlineData("", "FAILURE - Templated Email Action, there is no 'EmailTemplateProvider'")]
         [InlineData("questionId", "FAILURE - Templated Email Action, there is no 'TemplateId' provided")]
