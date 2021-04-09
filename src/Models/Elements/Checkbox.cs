@@ -28,6 +28,7 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckForCheckBoxListValues(this);
+            elementHelper.OrderOptionsAlphabetically(this);
 
             return viewRender.RenderAsync(Type.ToString(), this);
         }

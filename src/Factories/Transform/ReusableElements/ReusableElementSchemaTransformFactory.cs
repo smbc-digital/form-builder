@@ -84,6 +84,9 @@ namespace form_builder.Factories.Transform.ReusableElements
             if (!string.IsNullOrEmpty(reusableElement.Properties.CustomValidationMessage))
                 substituteElement.Properties.CustomValidationMessage = reusableElement.Properties.CustomValidationMessage;
 
+            if (!string.IsNullOrEmpty(reusableElement.Properties.SummaryLabel))
+                substituteElement.Properties.SummaryLabel = reusableElement.Properties.SummaryLabel;
+
             return substituteElement;
         }
 

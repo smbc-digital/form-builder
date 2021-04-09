@@ -56,7 +56,7 @@ namespace form_builder.Factories.Schema
                 if (data != null)
                     return JsonConvert.DeserializeObject<FormSchema>(data);
             }
-
+            
             FormSchema formSchema = await _schemaProvider.Get<FormSchema>(formKey);
             formSchema = await _reusableElementSchemaFactory.Transform(formSchema);
             formSchema = _lookupSchemaFactory.Transform(formSchema);

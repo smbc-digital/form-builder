@@ -28,6 +28,8 @@ namespace form_builder.Models.Elements
             elementHelper.CheckForLabel(this);
             elementHelper.CheckForRadioOptions(this);
             elementHelper.ReCheckPreviousRadioOptions(this);
+            elementHelper.OrderOptionsAlphabetically(this);
+
             return await viewRender.RenderAsync(Type.ToString(), this);
         }
     }
