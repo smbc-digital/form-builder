@@ -214,7 +214,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             // Assert
             Assert.False(result.IsValid);
             Assert.Single(result.Messages);
-            Assert.Equal($"{IntegrityChecksConstants.FAILURE}Booking Element Check, Form contains different booking provider. Only one provider allows on for form", result.Messages.First());
+            Assert.StartsWith(IntegrityChecksConstants.FAILURE, result.Messages.First());
         }
 
         [Fact]
@@ -270,7 +270,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             // Assert
             Assert.False(result.IsValid);
             Assert.Single(result.Messages);
-            Assert.Equal($"{IntegrityChecksConstants.FAILURE}Booking Element Check, Form contains different booking provider. Only one provider allows on for form", result.Messages.First());
+            Assert.StartsWith(IntegrityChecksConstants.FAILURE, result.Messages.First());
         }
     }
 }     
