@@ -63,8 +63,10 @@ namespace form_builder.Services.MappingService
         {
             var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
 
-            AppointmentType appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
-            if (appointmentType.AppointmentId.Equals(Guid.Empty) && !string.IsNullOrEmpty(appointmentType.AppointmentIdKey))
+            AppointmentType appointmentType = bookingElement.Properties.AppointmentTypes
+                .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+
+            if (appointmentType.AppointmentId.Equals(Guid.Empty))
                 MapAppointmentId(appointmentType, convertedAnswers);
 
             return new BookingRequest
