@@ -72,11 +72,17 @@ namespace form_builder.Services.BookingService
 
         public async Task<BookingProcessEntity> Get(string baseUrl, Page currentPage, string sessionGuid)
         {
-            var bookingElement = currentPage.Elements.FirstOrDefault(element => element.Type.Equals(EElementType.Booking));
+            var bookingElement = currentPage.Elements
+                .First(element => element.Type
+                    .Equals(EElementType.Booking));
 
             List<AvailabilityDayResponse> appointmentTimes = new();
 
             var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+
+            var appointmentType = bookingElement.Properties.AppointmentTypes
+                .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+
             var cachedAnswers = _distributedCache.GetString(sessionGuid);
             FormAnswers convertedAnswers = new();
             if (cachedAnswers is not null)
@@ -86,17 +92,20 @@ namespace form_builder.Services.BookingService
                 {
                     var cachedBookingInformation = JsonConvert
                         .DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
-                    List<object> cachedInfo = new() { cachedBookingInformation };
-                    return new BookingProcessEntity { BookingInfo = cachedInfo };
+
+                    if (appointmentType.AppointmentId.Equals(Guid.Empty))
+                        _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
+
+                    if (appointmentType.AppointmentId.Equals(cachedBookingInformation.AppointmentTypeId))
+                        return new BookingProcessEntity { BookingInfo = new() { cachedBookingInformation } };
                 }
             }
 
-            var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
-
-            // HERE : 
-            var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
-            if (appointmentType.AppointmentId.Equals(Guid.Empty) && !string.IsNullOrEmpty(appointmentType.AppointmentIdKey))
+            // HERE : add this check to IntegrityChecks ( at least one matching criteria )
+            if (appointmentType.AppointmentId.Equals(Guid.Empty)) // && !string.IsNullOrEmpty(appointmentType.AppointmentIdKey)
                 _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
+
+            var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
 
             var nextAvailability = await RetrieveNextAvailability(bookingElement, bookingProvider, appointmentType);
 
@@ -111,8 +120,9 @@ namespace form_builder.Services.BookingService
                 OptionalResources = appointmentType.OptionalResources
             });
 
-            var bookingInformation = new BookingInformation
+            BookingInformation bookingInformation = new()
             {
+                AppointmentTypeId = appointmentType.AppointmentId,
                 Appointments = appointmentTimes,
                 CurrentSearchedMonth = new DateTime(nextAvailability.DayResponse.Date.Year, nextAvailability.DayResponse.Date.Month, 1),
                 FirstAvailableMonth = new DateTime(nextAvailability.DayResponse.Date.Year, nextAvailability.DayResponse.Date.Month, 1),
@@ -126,8 +136,8 @@ namespace form_builder.Services.BookingService
             }
 
             _pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, sessionGuid, baseUrl);
-            var bookingInfo = new List<object> { bookingInformation };
-            return new BookingProcessEntity { BookingInfo = bookingInfo };
+
+            return new BookingProcessEntity { BookingInfo = new() { bookingInformation } };
         }
 
         public async Task<ProcessRequestEntity> ProcessBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -163,9 +173,9 @@ namespace form_builder.Services.BookingService
             var requestedMonth = DateTime.Parse(viewModel[BookingConstants.BOOKING_MONTH_REQUEST].ToString());
 
             var currentDate = DateTime.Now;
-            var bookingElement = currentPage.Elements
-                .Where(_ => _.Type == EElementType.Booking)
-                .FirstOrDefault();
+            var bookingElement = (Booking)currentPage.Elements
+                .First(element => element.Type.
+                    Equals(EElementType.Booking));
 
             if (requestedMonth.Month == currentDate.Month && requestedMonth.Year == currentDate.Year)
                 requestedMonth = currentDate;
@@ -183,7 +193,7 @@ namespace form_builder.Services.BookingService
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
             var appointmentType = bookingElement.Properties.AppointmentTypes.GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
-            if (appointmentType.AppointmentId.Equals(Guid.Empty) && !string.IsNullOrEmpty(appointmentType.AppointmentIdKey))
+            if (appointmentType.AppointmentId.Equals(Guid.Empty))
                 _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
 
             var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
@@ -196,8 +206,9 @@ namespace form_builder.Services.BookingService
                 });
 
             var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
-            var bookingInformation = new BookingInformation
+            BookingInformation bookingInformation = new()
             {
+                AppointmentTypeId = appointmentType.AppointmentId,
                 Appointments = appointmentTimes,
                 CurrentSearchedMonth = requestedMonth,
                 FirstAvailableMonth = cachedBookingInformation.FirstAvailableMonth,
@@ -348,12 +359,10 @@ namespace form_builder.Services.BookingService
         private async Task<ProcessRequestEntity> ProcessCheckYourBooking(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path, Booking element)
         {
             await ReserveAppointment(element, viewModel, baseForm.BaseURL, guid);
+
             _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
-            return new ProcessRequestEntity
-            {
-                Page = currentPage
-            };
+            return new ProcessRequestEntity { Page = currentPage };
         }
 
         private async Task<Guid> ReserveAppointment(Booking bookingElement, Dictionary<string, dynamic> viewModel, string form, string guid)

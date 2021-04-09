@@ -6,6 +6,7 @@ namespace form_builder.Models.Booking
 {
     public class BookingInformation
     {
+        public Guid AppointmentTypeId { get; set; }
         public DateTime CurrentSearchedMonth { get; set; }
         public DateTime FirstAvailableMonth { get; set; }
         public List<AvailabilityDayResponse> Appointments { get; set; }

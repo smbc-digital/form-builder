@@ -2,6 +2,7 @@ namespace form_builder.Constants
 {
     public class BookingConstants
     {
+        public const string FAKE_PROVIDER = "Fake";
         public const string APPOINTMENT_TYPE_SEARCH_RESULTS = "appointment-search-results";
         public const string APPOINTMENT_ID = "appointment-id";
         public const string APPOINTMENT_DATE = "appointment-date";
