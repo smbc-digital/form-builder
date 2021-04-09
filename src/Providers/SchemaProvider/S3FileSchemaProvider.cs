@@ -81,18 +81,19 @@ namespace form_builder.Providers.SchemaProvider
                 return new List<string>();
             }
 
-            var result = new ListObjectsV2Response();
+            ListObjectsV2Response result = new ();
+            string bucketSearchPrefix = $"{_environment.EnvironmentName.ToS3EnvPrefix()}/{_configuration["ApplicationVersion"]}/";
             try
             {
-                result = await _s3Gateway.ListObjectsV2(_configuration["S3BucketKey"], $"{_environment.EnvironmentName.ToS3EnvPrefix()}/{_configuration["ApplicationVersion"]}");
+                result = await _s3Gateway.ListObjectsV2(_configuration["S3BucketKey"], bucketSearchPrefix);
             }
             catch (Exception e)
             {
-                _logger.LogWarning($"S3FileSchemaProvider::IndexSchema, Failed to retrieve list of forms from s3 bucket {_environment.EnvironmentName.ToS3EnvPrefix()}/{_configuration["ApplicationVersion"]}, Exception: {e.Message}");
+                _logger.LogWarning($"S3FileSchemaProvider::IndexSchema, Failed to retrieve list of forms from s3 bucket {bucketSearchPrefix}, Exception: {e.Message}");
                 return new List<string>();
             }
 
-            var indexKeys = result.S3Objects.Select(_ => _.Key).ToList();
+            var indexKeys = result.S3Objects.Select(_ => _.Key.Remove(0, bucketSearchPrefix.Length)).ToList();
 
             _ = _distributedCacheWrapper.SetStringAsync(CacheConstants.INDEX_SCHEMA, JsonConvert.SerializeObject(indexKeys), _distributedCacheExpirationConfiguration.Index);
 
@@ -112,7 +113,7 @@ namespace form_builder.Providers.SchemaProvider
             else
                 indexSchema = JsonConvert.DeserializeObject<List<string>>(cachedIndexSchema);
 
-            return indexSchema.Any(_ => _.Contains(schemaName));
+            return indexSchema.Any(_ => _.ToLower().Equals($"{schemaName.ToLower()}.json"));
         }
     }
 }
