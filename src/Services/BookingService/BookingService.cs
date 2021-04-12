@@ -183,8 +183,6 @@ namespace form_builder.Services.BookingService
             if (requestedMonth < currentDate)
                 throw new ApplicationException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is before today");
 
-            var bookingSearchResultsKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
-
             var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
             var cachedAnswers = _distributedCache.GetString(guid);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
@@ -216,7 +214,7 @@ namespace form_builder.Services.BookingService
                 AppointmentStartTime = cachedBookingInformation.AppointmentStartTime
             };
 
-            _pageHelper.SaveFormData(bookingSearchResultsKey, bookingInformation, guid, baseForm.BaseURL);
+            _pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, guid, baseForm.BaseURL);
         }
 
         public async Task<CancelledAppointmentInformation> ValidateCancellationRequest(string formName, Guid bookingGuid, string hash)
