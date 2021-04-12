@@ -1,7 +1,6 @@
 ﻿using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Actions;
-using Microsoft.AspNetCore.Hosting;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,20 +16,21 @@ namespace form_builder.Validators.IntegrityChecks.Form
             List<IAction> actions = schema.FormActions
                 .Where(formAction => formAction.Type.Equals(EActionType.TemplatedEmail))
                 .Concat(schema.Pages.SelectMany(page => page.PageActions)
-                .Where(pageAction => pageAction.Type.Equals(EActionType.TemplatedEmail))).ToList();
+                    .Where(pageAction => pageAction.Type.Equals(EActionType.TemplatedEmail))).ToList();
 
             if (actions.Count == 0)
                 return result;
 
             actions.ForEach(action =>
             {
-                string provider = action.Properties.EmailTemplateProvider;
-
-                if (string.IsNullOrEmpty(provider))
+                if (string.IsNullOrEmpty(action.Properties.EmailTemplateProvider))
                     result.AddFailureMessage("Templated Email Action, there is no 'EmailTemplateProvider'");
 
                 if (string.IsNullOrEmpty(action.Properties.TemplateId))
                     result.AddFailureMessage("Templated Email Action, there is no 'TemplateId' provided");
+
+                if (string.IsNullOrEmpty(action.Properties.To))
+                    result.AddFailureMessage("Templated Email Action, there is no 'To' provided");
             });
 
             return result;
