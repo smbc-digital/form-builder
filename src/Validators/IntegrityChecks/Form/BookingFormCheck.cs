@@ -36,8 +36,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
             {
                 foreach (var appointmentType in bookingElement.Properties.AppointmentTypes)
                 {
-                    if (appointmentType.AppointmentId.Equals(Guid.Empty) && 
-                        !bookingElement.Properties.BookingProvider.Equals(BookingConstants.FAKE_PROVIDER, StringComparison.OrdinalIgnoreCase))
+                    if (appointmentType.AppointmentId.Equals(Guid.Empty) && !bookingElement.Properties.BookingProvider.Equals(BookingConstants.FAKE_PROVIDER, StringComparison.OrdinalIgnoreCase))
                     {
                         if (string.IsNullOrEmpty(appointmentType.AppointmentIdKey))
                         {
@@ -45,7 +44,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                         }
                         else
                         {
-                            if (!validatableElements.Any(element => element.Properties.QuestionId.Equals(appointmentType.AppointmentIdKey, StringComparison.Ordinal)))
+                            if (!validatableElements.Any(element => element.Properties.QuestionId is not null && element.Properties.QuestionId.Equals(appointmentType.AppointmentIdKey, StringComparison.Ordinal)))
                                 result.AddFailureMessage($"Booking Form Check: AppointmentIdKey does not exist... check corresponding QuestionId on your previous page.");
                         }
                     }
