@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Providers.TemplatedEmailProvider;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Notify.Interfaces;
+using Notify.Models.Responses;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Providers.TemplatedEmailProvider
@@ -12,8 +15,8 @@ namespace form_builder_tests.UnitTests.Providers.TemplatedEmailProvider
     public class NotifyTemplatedEmailProviderTests
     {
         private readonly NotifyTemplatedEmailProvider _notifyProvider;
-        private readonly Mock<IAsyncNotificationClient> _mockClient = new();
-        private readonly Mock<ILogger<NotifyTemplatedEmailProvider>> _mockLogger = new();
+        private readonly Mock<IAsyncNotificationClient> _mockClient = new Mock<IAsyncNotificationClient>();
+        private readonly Mock<ILogger<NotifyTemplatedEmailProvider>> _mockLogger = new Mock<ILogger<NotifyTemplatedEmailProvider>>();
 
         public NotifyTemplatedEmailProviderTests()
         {
@@ -27,7 +30,7 @@ namespace form_builder_tests.UnitTests.Providers.TemplatedEmailProvider
             _mockClient
                 .Setup(_ => _.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>()))
-                .Throws(new Exception("errorMessage"));
+                .ThrowsAsync(new Exception("error"));
 
             // Act
             _notifyProvider.SendEmailAsync("emailAddress", "templateId", new Dictionary<string, dynamic>());

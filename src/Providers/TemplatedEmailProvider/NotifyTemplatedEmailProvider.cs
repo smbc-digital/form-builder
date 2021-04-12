@@ -23,15 +23,11 @@ namespace form_builder.Providers.TemplatedEmailProvider
         public Task SendEmailAsync(string emailAddress, string templateId,
             Dictionary<string, dynamic> personalisation)
         {
-            try
-            {
-                return _notifyClient.SendEmailAsync(emailAddress, templateId, personalisation);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Notify email provider :: email failed to send using template id {templateId}: {ex.Message}");
-                return null;
-            }
+            var result = _notifyClient.SendEmailAsync(emailAddress, templateId, personalisation);
+            if (!result.IsCompletedSuccessfully)
+                _logger.LogError($"Notify email provider :: email failed to send using template id {templateId}: {result.Exception.Message}");
+
+            return null;
         }
     }
 }
