@@ -28,7 +28,7 @@ namespace form_builder.Providers.TemplatedEmailProvider
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Notify email provider :: email not sent: {ex.Message}");
+                _logger.LogError($"Notify email provider :: email failed to send using template id {templateId}: {ex.Message}");
             }
         }
                 
