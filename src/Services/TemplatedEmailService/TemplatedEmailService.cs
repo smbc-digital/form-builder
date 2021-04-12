@@ -41,16 +41,18 @@ namespace form_builder.Services.TemplatedEmailService
 
             var formData = _distributedCache.GetString(sessionGuid);
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
-
+              
             foreach (var action in actions)
             {
                 var templatedEmailProvider = _templatedEmailProviders.Get(action.Properties.EmailTemplateProvider);
+                var convertedAnswers = formAnswers.AllAnswers.ToDictionary(x => x.QuestionId, x => x.Response);
+                var personalisation = new Dictionary<string, dynamic>();
+                action.Properties.Personlisation.ForEach(field => { personalisation.Add(field, convertedAnswers[field]); });
 
                 await action.ProcessTemplatedEmail(
                     _actionHelper,
                     templatedEmailProvider,
-                    new Dictionary<string, dynamic>(),
+                    personalisation,
                     formAnswers);
             }
         }
