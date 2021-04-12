@@ -10,5 +10,6 @@ namespace form_builder.Models
         public Guid AppointmentId { get; set; }
         public string AppointmentIdKey { get; set; }
         public List<BookingResource> OptionalResources { get; set; } = new List<BookingResource>();
+        public bool NeedsMapping => AppointmentId.Equals(Guid.Empty) && !string.IsNullOrEmpty(AppointmentIdKey);
     }
 }
