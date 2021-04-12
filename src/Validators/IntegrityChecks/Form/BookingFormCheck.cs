@@ -36,17 +36,28 @@ namespace form_builder.Validators.IntegrityChecks.Form
             {
                 foreach (var appointmentType in bookingElement.Properties.AppointmentTypes)
                 {
-                    if (appointmentType.AppointmentId.Equals(Guid.Empty) && !bookingElement.Properties.BookingProvider.Equals(BookingConstants.FAKE_PROVIDER, StringComparison.OrdinalIgnoreCase))
+                    if (!appointmentType.NeedsMapping)
+                        continue;
+
+                    var sourceElement = validatableElements
+                        .SingleOrDefault(element =>
+                            element.Properties.QuestionId is not null &&
+                            element.Properties.QuestionId
+                                .Equals(appointmentType.AppointmentIdKey, StringComparison.Ordinal));
+
+                    if (sourceElement is not null && sourceElement.Properties.Options is not null)
                     {
-                        if (string.IsNullOrEmpty(appointmentType.AppointmentIdKey))
+                        foreach (var option in sourceElement.Properties.Options)
                         {
-                            result.AddFailureMessage($"Booking Form Check: Contains empty Guid as AppointmentId and no AppointmentIdKey on {appointmentType.Environment}, with a non-fake provider");
+                            if (!Guid.TryParse(option.Value, out Guid _))
+                            {
+                                result.AddFailureMessage($"Booking Form Check: AppointmentIdKey Value on {appointmentType.Environment} is not a Guid. Check value for option= \"Text\": \"{option.Text}\" .");
+                            }
                         }
-                        else
-                        {
-                            if (!validatableElements.Any(element => element.Properties.QuestionId is not null && element.Properties.QuestionId.Equals(appointmentType.AppointmentIdKey, StringComparison.Ordinal)))
-                                result.AddFailureMessage($"Booking Form Check: AppointmentIdKey does not exist... check corresponding QuestionId on your previous page.");
-                        }
+                    }
+                    else
+                    {
+                        result.AddFailureMessage($"Booking Form Check: AppointmentIdKey does not exist... check corresponding QuestionId on your previous page.");
                     }
                 }
             }

@@ -82,7 +82,7 @@ namespace form_builder.Services.MappingService
         {
             Answers value = answers.Pages
                 .SelectMany(page => page.Answers)
-                .FirstOrDefault(answer => answer.QuestionId.Equals(appointmentType.AppointmentIdKey));
+                .SingleOrDefault(answer => answer.QuestionId.Equals(appointmentType.AppointmentIdKey));
 
             if (value is not null && value.Response is not null)
                 appointmentType.AppointmentId = new Guid((string)value.Response);
