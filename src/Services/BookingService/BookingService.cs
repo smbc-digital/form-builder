@@ -88,21 +88,19 @@ namespace form_builder.Services.BookingService
             if (cachedAnswers is not null)
             {
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+
+                if (appointmentType.AppointmentId.Equals(Guid.Empty) && !string.IsNullOrEmpty(appointmentType.AppointmentIdKey))
+                    _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
+
                 if (convertedAnswers.FormData.ContainsKey(bookingInformationCacheKey))
                 {
                     var cachedBookingInformation = JsonConvert
                         .DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
 
-                    if (appointmentType.AppointmentId.Equals(Guid.Empty))
-                        _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
-
                     if (appointmentType.AppointmentId.Equals(cachedBookingInformation.AppointmentTypeId))
                         return new BookingProcessEntity { BookingInfo = new() { cachedBookingInformation } };
                 }
             }
-
-            if (appointmentType.AppointmentId.Equals(Guid.Empty))
-                _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
 
             var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
 
