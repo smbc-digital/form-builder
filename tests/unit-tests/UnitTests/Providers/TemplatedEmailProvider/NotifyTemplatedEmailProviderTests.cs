@@ -24,7 +24,7 @@ namespace form_builder_tests.UnitTests.Providers.TemplatedEmailProvider
         }
 
         [Fact]
-        public void SendEmailAsync_ShouldCallLogger_IfExceptionThrown()
+        public async Task SendEmailAsync_ShouldCallLogger_IfExceptionThrown()
         {
             // Arrange
             _mockClient
@@ -33,7 +33,7 @@ namespace form_builder_tests.UnitTests.Providers.TemplatedEmailProvider
                 .ThrowsAsync(new Exception("error"));
 
             // Act
-            _notifyProvider.SendEmailAsync("emailAddress", "templateId", new Dictionary<string, dynamic>());
+            await _notifyProvider.SendEmailAsync("emailAddress", "templateId", new Dictionary<string, dynamic>());
 
             // Assert
             _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);

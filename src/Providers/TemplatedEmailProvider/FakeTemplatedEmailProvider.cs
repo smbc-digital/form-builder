@@ -1,6 +1,4 @@
-﻿using Notify.Interfaces;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace form_builder.Providers.TemplatedEmailProvider
