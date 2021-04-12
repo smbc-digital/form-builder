@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Notify.Interfaces;
@@ -19,18 +20,18 @@ namespace form_builder.Providers.TemplatedEmailProvider
 
         public string ProviderName { get => "Notify"; }
 
-        public async Task SendEmailAsync(string emailAddress, string templateId,
+        public Task SendEmailAsync(string emailAddress, string templateId,
             Dictionary<string, dynamic> personalisation)
         {
             try
             {
-                await _notifyClient.SendEmailAsync(emailAddress, templateId, personalisation);
+                return _notifyClient.SendEmailAsync(emailAddress, templateId, personalisation);
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Notify email provider :: email failed to send using template id {templateId}: {ex.Message}");
+                return null;
             }
         }
-                
     }
 }
