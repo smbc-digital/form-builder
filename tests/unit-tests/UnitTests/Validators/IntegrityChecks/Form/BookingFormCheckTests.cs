@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using form_builder.Builders;
 using form_builder.Constants;
@@ -11,12 +12,35 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
     public class BookingFormCheckTests
     {
         [Theory]
-        [InlineData("customer.firstname", "customer.lastname", "test-page")]
-        [InlineData("customer.firstname", "customerlastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
-        [InlineData("customerfirstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
-        public void BookingFormCheck_IsNotValid(string firstName, string lastName,string pageSlug)
+        [InlineData("AppointmentId", "", "", "Real_Provider", "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+        [InlineData("AppointmentI", "AppointmentId", "", "Real_Provider", "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+        [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customer.firstname", "customer.lastname", "test-page")]
+        [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customer.firstname", "customerlastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+        [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customerfirstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+        public void BookingFormCheck_IsNotValid(
+            string questionId,
+            string appointmentIdKey,
+            string appointmentIdGuid,
+            string bookingProvider,
+            string firstName,
+            string lastName,
+            string pageSlug)
         {
             // Arrange
+            var realAppointmentId = "022ebc92-1c51-4a68-a079-f6edefc63a07";
+            var selectAppointmentType = new ElementBuilder()
+                .WithType(EElementType.Select)
+                .WithQuestionId(questionId)
+                .WithOptions(new()
+                {
+                    new()
+                    {
+                        Text = "Appointment Type",
+                        Value = realAppointmentId
+                    }
+                })
+                .Build();
+
             var customerFirstName = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithTargetMapping(firstName)
@@ -28,12 +52,20 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Build();
 
             var page1 = new PageBuilder()
+                .WithElement(selectAppointmentType)
                 .WithElement(customerFirstName)
                 .WithElement(customerLastName)
                 .Build();
 
             var bookingElement = new ElementBuilder()
                 .WithType(EElementType.Booking)
+                .WithBookingProvider(bookingProvider)
+                .WithAppointmentType(new()
+                {
+                    Environment = "any",
+                    AppointmentId = string.IsNullOrEmpty(appointmentIdGuid) ? new Guid() : new Guid(appointmentIdGuid),
+                    AppointmentIdKey = appointmentIdKey
+                })
                 .Build();
 
             var page2 = new PageBuilder()
@@ -57,30 +89,62 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
+            Assert.Collection(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
 
-        [Fact]
-        public void BookingFormCheck_IsValid()
+        [Theory]
+        [InlineData("", "", "", BookingConstants.FAKE_PROVIDER, "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+        [InlineData("AppointmentId", "AppointmentId", "", "Real_Provider", "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+        [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+        public void BookingFormCheck_IsValid(
+            string questionId,
+            string appointmentIdKey,
+            string appointmentIdGuid,
+            string bookingProvider,
+            string firstName,
+            string lastName,
+            string pageSlug)
         {
             // Arrange
+            var realAppointmentId = "022ebc92-1c51-4a68-a079-f6edefc63a07";
+            var selectAppointmentType = new ElementBuilder()
+                .WithType(EElementType.Select)
+                .WithQuestionId(questionId)
+                .WithOptions(new()
+                {
+                    new()
+                    {
+                        Text = "Appointment Type",
+                        Value = realAppointmentId
+                    }
+                })
+                .Build();
+
             var customerFirstName = new ElementBuilder()
                 .WithType(EElementType.Textbox)
-                .WithTargetMapping("customer.firstname")
+                .WithTargetMapping(firstName)
                 .Build();
 
             var customerLastName = new ElementBuilder()
                 .WithType(EElementType.Textbox)
-                .WithTargetMapping("customer.lastname")
+                .WithTargetMapping(lastName)
                 .Build();
 
             var page1 = new PageBuilder()
+                .WithElement(selectAppointmentType)
                 .WithElement(customerFirstName)
                 .WithElement(customerLastName)
                 .Build();
 
             var bookingElement = new ElementBuilder()
                 .WithType(EElementType.Booking)
+                .WithBookingProvider(bookingProvider)
+                .WithAppointmentType(new()
+                {
+                    Environment = "any",
+                    AppointmentId = string.IsNullOrEmpty(appointmentIdGuid) ? new Guid() : new Guid(appointmentIdGuid),
+                    AppointmentIdKey = appointmentIdKey
+                })
                 .Build();
 
             var page2 = new PageBuilder()
@@ -88,7 +152,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Build();
 
             var page3 = new PageBuilder()
-                .WithPageSlug(BookingConstants.NO_APPOINTMENT_AVAILABLE)
+                .WithPageSlug(pageSlug)
                 .Build();
 
             var schema = new FormSchemaBuilder()
