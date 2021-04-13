@@ -31,9 +31,6 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
                 if (string.IsNullOrEmpty(action.Properties.To))
                     result.AddFailureMessage("Templated Email Action, there is no 'To' provided");
-
-                if (action.Properties.Personlisation is null || action.Properties.Personlisation.Count.Equals(0))
-                    result.AddFailureMessage("Templated Email Action, there is no 'Personlisation' field(s) added");
             });
 
             return result;

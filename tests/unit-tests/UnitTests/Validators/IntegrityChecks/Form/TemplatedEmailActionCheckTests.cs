@@ -12,7 +12,6 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
         [InlineData("", "templateId", "emailAddress", "FAILURE - Templated Email Action, there is no 'EmailTemplateProvider'")]
         [InlineData("provider", "", "emailAddress", "FAILURE - Templated Email Action, there is no 'TemplateId' provided")]
         [InlineData("provider", "templateId", "", "FAILURE - Templated Email Action, there is no 'To' provided")]
-        [InlineData("provider", "templateId", "emailAddress", "FAILURE - Templated Email Action, there is no 'Personlisation' field(s) added")]
         public void TemplatedEmailActionCheck_ShouldAddCorrectErrorMessage_WhenActionIsMissingProperties(
             string provider, string templateId, string to, string expectedErrorMessage)
         {
