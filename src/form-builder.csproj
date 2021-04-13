@@ -11,6 +11,7 @@
     <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="5.0.1" />
     <PackageReference Include="AWSSDK.S3" Version="3.5.9.1" />
     <PackageReference Include="AWSSDK.SimpleEmail" Version="3.5.0.73" />
+    <PackageReference Include="GovukNotify" Version="4.0.0" />
     <PackageReference Include="JsonSubTypes" Version="1.8.0" />
     <PackageReference Include="MailKit" Version="2.10.1" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="5.0.3" />
@@ -35,7 +36,6 @@
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-	<PackageReference Include="GovukNotify" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup>

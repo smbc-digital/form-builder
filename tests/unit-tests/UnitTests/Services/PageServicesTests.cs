@@ -1349,15 +1349,5 @@ namespace form_builder_tests.UnitTests.Services
             _bookingService.Verify(_ => _.ProcessBooking(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
         }
-
-        public async Task GetCancelBookingSuccessPage_Should_Return_SuccessPageEntity()
-        {
-            var result = await _service.GetCancelBookingSuccessPage("form");
-
-            Assert.IsType<SuccessPageEntity>(result);
-            _mockSchemaFactory.Verify(_ => _.Build(It.Is<string>(_ => _.Equals("form"))), Times.Once);
-            _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
-            _mockSuccessPageFactory.Verify(_ => _.BuildBooking(It.Is<string>(_ => _.Equals("form")), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>()), Times.Once);
-        }
     }
 }
