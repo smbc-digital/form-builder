@@ -51,6 +51,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IHashUtil> _hashUtil = new();
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
 
+        const string environmentName = "test";
+
         public BookingServiceTests()
         {
             _mockDistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(_cacheConfig);
@@ -63,7 +65,7 @@ namespace form_builder_tests.UnitTests.Services
                 _bookingProvider.Object
             };
 
-            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns(environmentName);
 
             _service = new BookingService(
               _mockDistributedCache.Object,
@@ -80,6 +82,85 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task Get_Should_CallMapAppointmentId_WhenAppointmentType_HasAppointmentIdKey()
+        {
+            // Arrange
+            var questionId = "bookingQuestion";
+            var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
+            string sessionGuid = "session";
+
+            BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
+            _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers
+                {
+                    FormData = new Dictionary<string, object> { { $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo } }
+                }));
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId(questionId)
+                .WithAppointmentType(new AppointmentType
+                {
+                    Environment = environmentName,
+                    AppointmentIdKey = questionId
+                })
+                .Build();
+
+            var page = new PageBuilder().WithElement(element).Build();
+
+            // Act
+            try
+            {
+                _ = await _service.Get("form", page, sessionGuid);
+            }
+            catch
+            {
+                // Assert
+                _mockMappingService.Verify(mappingService =>
+                    mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Once);
+            }
+        }
+
+        [Fact]
+        public async Task Get_Should_Not_CallMapAppointmentId_WhenAppointmentType_HasAppointmentId()
+        {
+            // Arrange
+            var questionId = "bookingQuestion";
+            var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
+            string sessionGuid = "session";
+
+            BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
+            _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers
+                {
+                    FormData = new Dictionary<string, object> { { $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo } }
+                }));
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId(questionId)
+                .WithAppointmentType(new AppointmentType
+                {
+                    Environment = environmentName, AppointmentId = appointmentId 
+                })
+                .Build();
+
+            var page = new PageBuilder().WithElement(element).Build();
+
+            // Act
+            try
+            {
+                _ = await _service.Get("form", page, sessionGuid);
+            }
+            catch
+            {
+                // Assert
+                _mockMappingService.Verify(mappingService =>
+                    mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Never);
+            }
+        }
+
+        [Fact]
         public async Task Get_ShouldRetrieve_BookingInformation_FromFormData_WhenStoredInCache()
         {
             var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
@@ -91,10 +172,10 @@ namespace form_builder_tests.UnitTests.Services
                 {
                     FormData = new Dictionary<string, object>
                     {
-                        { 
+                        {
                             $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo
                         }
-                    } 
+                    }
                 }));
 
             var element = new ElementBuilder()
@@ -322,6 +403,129 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal(DateTime.Today.Add(startTime), bookingInfo.AppointmentStartTime);
             Assert.Equal(DateTime.Today.Add(endTime), bookingInfo.AppointmentEndTime);
             Assert.Single(bookingInfo.Appointments);
+        }
+
+        [Fact]
+        public async Task ProcessMonthRequest_Should_CallMapAppointmentId_WhenAppointmentType_HasAppointmentIdKey()
+        {
+            // Arrange
+            var questionId = "bookingQuestion";
+            var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
+            string sessionGuid = "session";
+
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(sessionGuid);
+
+            BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
+            _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers
+                {
+                    FormData = new Dictionary<string, object> { { $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo } }
+                }));
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId(questionId)
+                .WithAppointmentType(new AppointmentType
+                {
+                    Environment = "test",
+                    AppointmentIdKey = questionId
+                })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("path")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("form")
+                .WithPage(page)
+                .Build();
+
+            _schemaFactory.Setup(_ => _.Build("form"))
+                .ReturnsAsync(formSchema);
+
+            Dictionary<string, object> viewModel = new()
+            {
+                {
+                    BookingConstants.BOOKING_MONTH_REQUEST, DateTime.UtcNow
+                }
+            };
+
+            // Act
+            try
+            {
+                await _service.ProcessMonthRequest(viewModel, "form", "path");
+            }
+            catch
+            {
+                // Assert
+                _mockMappingService.Verify(mappingService =>
+                    mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Once);
+            }
+        }
+
+        [Fact]
+        public async Task ProcessMonthRequest_Should_Not_CallMapAppointmentId_WhenAppointmentType_HasAppointmentId()
+        {
+            // Arrange
+            var questionId = "bookingQuestion";
+            var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
+            string sessionGuid = "session";
+
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(sessionGuid);
+
+            BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
+            _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers
+                {
+                    FormData = new Dictionary<string, object> { { $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo } }
+                }));
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId(questionId)
+                .WithAppointmentType(new AppointmentType
+                {
+                    Environment = "test",
+                    AppointmentId = appointmentId
+                })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("path")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("form")
+                .WithPage(page)
+                .Build();
+
+            _schemaFactory.Setup(_ => _.Build("form"))
+                .ReturnsAsync(formSchema);
+
+            Dictionary<string, object> viewModel = new()
+            {
+                {
+                    BookingConstants.BOOKING_MONTH_REQUEST,
+                    DateTime.UtcNow
+                }
+            };
+
+            // Act
+            try
+            {
+                await _service.ProcessMonthRequest(viewModel, "form", "path");
+            }
+            catch
+            {
+                // Assert
+                _mockMappingService.Verify(mappingService =>
+                    mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Never);
+            }
         }
 
         [Fact]
