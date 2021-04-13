@@ -47,6 +47,8 @@ namespace form_builder.Services.TemplatedEmailService
                 var templatedEmailProvider = _templatedEmailProviders.Get(action.Properties.EmailTemplateProvider);
                 var convertedAnswers = formAnswers.AllAnswers.ToDictionary(x => x.QuestionId, x => x.Response);
                 var personalisation = new Dictionary<string, dynamic>();
+
+                if(!convertedAnswers.Count.Equals(0))
                 action.Properties.Personlisation.ForEach(field => { personalisation.Add(field, convertedAnswers[field]); });
 
                 await action.ProcessTemplatedEmail(

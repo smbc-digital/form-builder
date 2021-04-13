@@ -31,6 +31,9 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
                 if (string.IsNullOrEmpty(action.Properties.TemplateId))
                     result.AddFailureMessage("Templated Email Action, there is no 'TemplateId' provided");
+
+                if (action.Properties.Personlisation is null || action.Properties.Personlisation.Count.Equals(0))
+                    result.AddFailureMessage("Templated Email Action, there is no 'Personlisation' field(s) added");
             });
 
             return result;
