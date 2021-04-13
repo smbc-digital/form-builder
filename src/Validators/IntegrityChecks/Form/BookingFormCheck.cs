@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Constants;
+using form_builder.Models.Elements;
 
 namespace form_builder.Validators.IntegrityChecks.Form
 {
@@ -39,7 +40,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                     if (!appointmentType.NeedsMapping)
                         continue;
 
-                    var sourceElement = validatableElements
+                    IElement sourceElement = validatableElements
                         .SingleOrDefault(element =>
                             element.Properties.QuestionId is not null &&
                             element.Properties.QuestionId
@@ -47,6 +48,21 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
                     if (sourceElement is not null && sourceElement.Properties.Options is not null)
                     {
+                        int pageNumber = 0, sourceElementPage = 0, bookingElementPage = 0;
+                        foreach (var page in pagesWithElements)
+                        {
+                            if (page.ValidatableElements.Any(element => element.Properties.QuestionId is not null && element.Properties.QuestionId.Equals(appointmentType.AppointmentIdKey, StringComparison.Ordinal)))
+                                sourceElementPage = pageNumber;
+
+                            if (page.Elements.Any(element => element.Equals(bookingElement)))
+                                bookingElementPage = pageNumber;
+
+                            pageNumber++;
+                        }
+
+                        if (sourceElementPage >= bookingElementPage)
+                            result.AddFailureMessage($"Booking Form Check: Source For AppointmentIdKey is not on previous page.");
+
                         foreach (var option in sourceElement.Properties.Options)
                         {
                             if (!Guid.TryParse(option.Value, out Guid _))
