@@ -12,7 +12,6 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
     public class BookingFormCheckTests
     {
         [Theory]
-        [InlineData("AppointmentId", "", "", "Real_Provider", "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
         [InlineData("AppointmentI", "AppointmentId", "", "Real_Provider", "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
         [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customer.firstname", "customer.lastname", "test-page")]
         [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customer.firstname", "customerlastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
