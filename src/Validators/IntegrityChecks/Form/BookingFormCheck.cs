@@ -18,7 +18,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 return result;
 
             if (!schema.Pages.Any(page => page.PageSlug.Equals(BookingConstants.NO_APPOINTMENT_AVAILABLE, StringComparison.OrdinalIgnoreCase)))
-                result.AddFailureMessage($"Booking Form Check: Contains booking element, but is missing required page with slug {BookingConstants.NO_APPOINTMENT_AVAILABLE}.");
+                result.AddFailureMessage(BookingConstants.INTEGRITY_FAILURE_MESSAGE_NOAPPOINTMENTPAGE);
 
             var pagesWithElements = schema.Pages
                 .Where(page => page.Elements is not null);
@@ -29,7 +29,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                         .Equals(EElementType.Booking)));
 
             if (bookingElements.Select(element => element.Properties.BookingProvider).Distinct().Count() > 1)
-                result.AddFailureMessage($"Booking Form Check: Contains different booking provider. Only one provider allows on for form");
+                result.AddFailureMessage(BookingConstants.INTEGRITY_FAILURE_MESSAGE_DUPLICATEPROVIDER);
 
             var validatableElements = pagesWithElements.SelectMany(page => page.ValidatableElements);
 
@@ -61,19 +61,19 @@ namespace form_builder.Validators.IntegrityChecks.Form
                         }
 
                         if (sourceElementPage >= bookingElementPage)
-                            result.AddFailureMessage($"Booking Form Check: Source For AppointmentIdKey is not on previous page.");
+                            result.AddFailureMessage(BookingConstants.INTEGRITY_FAILURE_MESSAGE_APPOINTMENTIDKEY_SOURCE_NOTONPREVIOUSPAGE);
 
                         foreach (var option in sourceElement.Properties.Options)
                         {
                             if (!Guid.TryParse(option.Value, out Guid _))
                             {
-                                result.AddFailureMessage($"Booking Form Check: AppointmentIdKey Value on {appointmentType.Environment} is not a Guid. Check value for option= \"Text\": \"{option.Text}\" .");
+                                result.AddFailureMessage($"{BookingConstants.INTEGRITY_FAILURE_MESSAGE_APPOINTMENTIDKEY_SOURCE_VALUENOTGUID} Check Option wth \"Text\": \"{option.Text}\" on {appointmentType.Environment}.");
                             }
                         }
                     }
                     else
                     {
-                        result.AddFailureMessage($"Booking Form Check: AppointmentIdKey does not exist... check corresponding QuestionId on your previous page.");
+                        result.AddFailureMessage(BookingConstants.INTEGRITY_FAILURE_MESSAGE_APPOINTMENTIDKEY_DOESNOTEXIST);
                     }
                 }
             }
@@ -86,7 +86,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                     element.Properties.TargetMapping is not null &&
                     element.Properties.TargetMapping.Equals(requiredField, StringComparison.OrdinalIgnoreCase))))
                 {
-                    result.AddFailureMessage($"Booking Element Check, Booking element requires {requiredField} elements for reservation.");
+                    result.AddFailureMessage($"{BookingConstants.INTEGRITY_FAILURE_MESSAGE_REQUIREDFIELDS} {requiredField} required for booking api.");
                 }
             }
 
