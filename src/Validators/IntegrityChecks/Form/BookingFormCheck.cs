@@ -37,7 +37,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
             {
                 foreach (var appointmentType in bookingElement.Properties.AppointmentTypes)
                 {
-                    if (!appointmentType.NeedsMapping)
+                    if (!appointmentType.NeedsAppointmentIdMapping)
                         continue;
 
                     IElement sourceElement = validatableElements
