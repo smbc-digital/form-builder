@@ -20,5 +20,12 @@ namespace form_builder.Constants
         public const string APPOINTMENT_TIME_OF_DAY_MORNING = "Morning";
         public const string APPOINTMENT_TIME_OF_DAY_AFTERNOON = "Afternoon";
         public const string APPOINTMENT_LOCATION = "appointment-location";
+
+        public const string INTEGRITY_FAILURE_MESSAGE_NOAPPOINTMENTPAGE = "Booking Form Check: Contains booking element, but is missing required page with slug \"no-appointment-available\".";
+        public const string INTEGRITY_FAILURE_MESSAGE_REQUIREDFIELDS = "Booking Form Check: Required Field missing.";
+        public const string INTEGRITY_FAILURE_MESSAGE_DUPLICATEPROVIDER = "Booking Form Check: Contains different booking provider. Only one provider allows on for form.";
+        public const string INTEGRITY_FAILURE_MESSAGE_APPOINTMENTIDKEY_SOURCE_NOTONPREVIOUSPAGE = "Booking Form Check: Source For AppointmentIdKey is not on previous page.";
+        public const string INTEGRITY_FAILURE_MESSAGE_APPOINTMENTIDKEY_DOESNOTEXIST = "Booking Form Check: AppointmentIdKey does not exist... check corresponding QuestionId on your previous page.";
+        public const string INTEGRITY_FAILURE_MESSAGE_APPOINTMENTIDKEY_SOURCE_VALUENOTGUID = "Booking Form Check: AppointmentIdKey Value is not a Guid. Check value for option.";
     }
 }
