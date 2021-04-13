@@ -115,9 +115,13 @@ namespace form_builder_tests.UnitTests.Services
             }
             catch
             {
+
+            }
+            finally
+            {
                 // Assert
                 _mockMappingService.Verify(mappingService =>
-                    mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Once);
+                        mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Once);
             }
         }
 
@@ -141,7 +145,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithQuestionId(questionId)
                 .WithAppointmentType(new AppointmentType
                 {
-                    Environment = environmentName, AppointmentId = appointmentId 
+                    Environment = environmentName,
+                    AppointmentId = appointmentId
                 })
                 .Build();
 
@@ -153,6 +158,10 @@ namespace form_builder_tests.UnitTests.Services
                 _ = await _service.Get("form", page, sessionGuid);
             }
             catch
+            {
+
+            }
+            finally
             {
                 // Assert
                 _mockMappingService.Verify(mappingService =>
@@ -449,7 +458,8 @@ namespace form_builder_tests.UnitTests.Services
             Dictionary<string, object> viewModel = new()
             {
                 {
-                    BookingConstants.BOOKING_MONTH_REQUEST, DateTime.UtcNow
+                    BookingConstants.BOOKING_MONTH_REQUEST,
+                    DateTime.UtcNow
                 }
             };
 
@@ -459,6 +469,10 @@ namespace form_builder_tests.UnitTests.Services
                 await _service.ProcessMonthRequest(viewModel, "form", "path");
             }
             catch
+            {
+
+            }
+            finally
             {
                 // Assert
                 _mockMappingService.Verify(mappingService =>
