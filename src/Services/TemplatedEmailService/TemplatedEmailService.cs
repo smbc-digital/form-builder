@@ -47,12 +47,12 @@ namespace form_builder.Services.TemplatedEmailService
                 var templatedEmailProvider = _templatedEmailProviders.Get(action.Properties.EmailTemplateProvider);
                 var convertedAnswers = formAnswers.AllAnswers.ToDictionary(x => x.QuestionId, x => x.Response);
                 var personalisation = new Dictionary<string, dynamic>();
-               
-                if (!convertedAnswers.Count.Equals(0) && action.Properties.Personalisation is not null)
-                {
+
+                if (action.Properties.IncludeCaseReference)
                     personalisation.Add("reference", formAnswers.CaseReference);
+
+                if (!convertedAnswers.Count.Equals(0) && action.Properties.Personalisation is not null)          
                     action.Properties.Personalisation.ForEach(field => { personalisation.Add(field, convertedAnswers[field]); });
-                }
                 
                 action.ProcessTemplatedEmail(
                     _actionHelper,
