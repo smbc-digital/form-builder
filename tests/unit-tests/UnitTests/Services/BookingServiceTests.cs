@@ -479,6 +479,12 @@ namespace form_builder_tests.UnitTests.Services
 
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(sessionGuid);
 
+            _bookingProvider.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new AvailabilityDayResponse { Date = new() });
+
+            _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
+
             BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
             _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
@@ -488,7 +494,7 @@ namespace form_builder_tests.UnitTests.Services
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
-                .WithBookingProvider("testBookingProvider")
+                .WithBookingProvider(bookingProvider)
                 .WithQuestionId(questionId)
                 .WithAppointmentType(new AppointmentType
                 {
@@ -519,16 +525,11 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             // Act
-            try
-            {
-                await _service.ProcessMonthRequest(viewModel, "form", "path");
-            }
-            catch
-            {
-                // Assert
-                _mockMappingService.Verify(mappingService =>
-                    mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Never);
-            }
+            await _service.ProcessMonthRequest(viewModel, "form", "path");
+
+            // Assert
+            _mockMappingService.Verify(mappingService =>
+                mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Never);
         }
 
         [Fact]
