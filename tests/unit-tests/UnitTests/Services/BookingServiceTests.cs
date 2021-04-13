@@ -489,7 +489,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {
-                    FormData = new Dictionary<string, object> { { $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo } }
+                    FormData = new Dictionary<string, object> { { $"{questionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo } }
                 }));
 
             var element = new ElementBuilder()
