@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Notify.Interfaces;
@@ -29,7 +28,7 @@ namespace form_builder.Providers.TemplatedEmailProvider
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Notify email provider :: email failed to send using template id {templateId}: {ex.Message}");
+                _logger.LogError($"NotifyTemplatedEmailProvider::SendEmailAsync, email failed to send using template id {templateId}: {ex.Message}");
             }
         }
     }

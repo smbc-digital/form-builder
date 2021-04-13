@@ -53,7 +53,6 @@ namespace form_builder.Services.TemplatedEmailService
                     new Dictionary<string, dynamic>(),
                     formAnswers);
             }
-
             return null;
         }
     }

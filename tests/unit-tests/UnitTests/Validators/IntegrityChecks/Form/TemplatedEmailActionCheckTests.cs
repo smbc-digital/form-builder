@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using form_builder.Enum;
 using form_builder.Validators.IntegrityChecks.Form;
 using form_builder_tests.Builders;
