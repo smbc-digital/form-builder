@@ -525,6 +525,7 @@ namespace form_builder.Utils.Startup
                 o.ViewLocationFormats.Add("/Views/Shared/Time/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/TimeInput/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/Warning/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Summary/{0}" + RazorViewEngine.ViewExtension);
             });
 
             return services;
