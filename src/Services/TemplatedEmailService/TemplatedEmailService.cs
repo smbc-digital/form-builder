@@ -32,7 +32,7 @@ namespace form_builder.Services.TemplatedEmailService
             _distributedCache = distributedCache;
         }
 
-        public async Task ProcessTemplatedEmail(List<IAction> actions)
+        public Task ProcessTemplatedEmail(List<IAction> actions)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
@@ -47,12 +47,13 @@ namespace form_builder.Services.TemplatedEmailService
             {
                 var templatedEmailProvider = _templatedEmailProviders.Get(action.Properties.EmailTemplateProvider);
 
-                await action.ProcessTemplatedEmail(
+                action.ProcessTemplatedEmail(
                     _actionHelper,
                     templatedEmailProvider,
                     new Dictionary<string, dynamic>(),
                     formAnswers);
             }
+            return null;
         }
     }
 }

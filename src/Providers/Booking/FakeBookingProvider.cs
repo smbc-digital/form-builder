@@ -126,7 +126,6 @@ namespace form_builder.Providers.Booking
                         .WithDay(new DateTime(2021, request.StartDate.Month, 7), 1, true)
                         .Build();
                     break;
-                    break;
                 default:
                     break;
             }

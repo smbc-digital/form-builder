@@ -9,11 +9,11 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
     public class EmailActionCheckTests
     {
         [Theory]
-        [InlineData("", "subject", "from", "to", "FAILURE - Email Actions Check, Content doesn't have a value")]
-        [InlineData("content", "", "from", "to", "FAILURE - Email Actions Check, Subject doesn't have a value")]
-        [InlineData("content", "subject", "", "to", "FAILURE - Email Actions Check, From doesn't have a value")]
-        [InlineData("content", "subject", "from", "", "FAILURE - Email Actions Check, To doesn't have a value")]
-        public void CheckEmailAction_IsNotValid_WhenActionDoesNotContain_Content_or_Subject_or_To_or_From(string content, string subject, string from, string to, string message)
+        [InlineData("", "subject", "from", "to")]
+        [InlineData("content", "", "from", "to")]
+        [InlineData("content", "subject", "", "to")]
+        [InlineData("content", "subject", "from", "")]
+        public void CheckEmailAction_IsNotValid_WhenActionDoesNotContain_Content_or_Subject_or_To_or_From(string content, string subject, string from, string to)
         {
             // Arrange
             var action = new ActionBuilder()
