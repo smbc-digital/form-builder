@@ -84,8 +84,7 @@ namespace form_builder.Services.MappingService
                 .SelectMany(page => page.Answers)
                 .SingleOrDefault(answer => answer.QuestionId.Equals(appointmentType.AppointmentIdKey));
 
-            if (value is not null && value.Response is not null)
-                appointmentType.AppointmentId = new Guid((string)value.Response);
+            appointmentType.AppointmentId = new Guid((string)value.Response);
         }
 
         private async Task<(FormAnswers convertedAnswers, FormSchema baseForm)> GetFormAnswers(string form, string sessionGuid)
@@ -95,7 +94,7 @@ namespace form_builder.Services.MappingService
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
             convertedAnswers.FormName = form;
 
-            if(convertedAnswers.Pages == null || !convertedAnswers.Pages.Any())
+            if (convertedAnswers.Pages == null || !convertedAnswers.Pages.Any())
                 _logger.LogWarning($"MappingService::GetFormAnswers, Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}");
 
             return (convertedAnswers, baseForm);
@@ -122,8 +121,8 @@ namespace form_builder.Services.MappingService
         {
             var data = new ExpandoObject() as IDictionary<string, dynamic>;
             formSchema.Pages.SelectMany(_ => _.ValidatableElements)
-                .Where(x => !string.IsNullOrEmpty(x.Properties.TargetMapping) 
-                            && x.Properties.TargetMapping.ToLower().StartsWith("customer.") 
+                .Where(x => !string.IsNullOrEmpty(x.Properties.TargetMapping)
+                            && x.Properties.TargetMapping.ToLower().StartsWith("customer.")
                             && !x.Properties.TargetMapping.ToLower().Equals("customer.address"))
                 .ToList()
                 .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
