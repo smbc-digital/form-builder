@@ -16,7 +16,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
         [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customer.firstname", "customer.lastname", "test-page")]
         [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customer.firstname", "customerlastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
         [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customerfirstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
-        public void BookingFormCheck_IsNotValid(
+        public void BookingFormCheck_IsNotValid_WillFailOnOneAspect(
             string questionId,
             string appointmentIdKey,
             string appointmentIdGuid,
@@ -88,7 +88,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Collection(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
+            Assert.Single(result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE)));
         }
 
         [Theory]
@@ -167,7 +167,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 
             // Assert
             Assert.True(result.IsValid);
-            Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
+            Assert.Empty(result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE)));
        }
 
         [Fact]
@@ -222,6 +222,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 
             // Assert
             Assert.True(result.IsValid);
+            Assert.Empty(result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE)));
         }
 
         [Fact]
@@ -273,11 +274,12 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             // Act
             BookingFormCheck check = new();
             var result = check.Validate(schema);
+            var failureMessages = result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE));
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Single(result.Messages);
-            Assert.StartsWith(IntegrityChecksConstants.FAILURE, result.Messages.First());
+            Assert.Single(failureMessages);
+            Assert.Contains(BookingConstants.INTEGRITY_FAILURE_MESSAGE_DUPLICATEPROVIDER, failureMessages.First());
         }
 
         [Fact]
@@ -329,11 +331,12 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             // Act
             BookingFormCheck check = new();
             var result = check.Validate(schema);
+            var failureMessages = result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE));
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Single(result.Messages);
-            Assert.StartsWith(IntegrityChecksConstants.FAILURE, result.Messages.First());
+            Assert.Single(failureMessages);
+            Assert.Contains(BookingConstants.INTEGRITY_FAILURE_MESSAGE_DUPLICATEPROVIDER, failureMessages.First());
         }
     }
 }     
