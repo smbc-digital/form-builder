@@ -89,7 +89,7 @@ namespace form_builder.Services.BookingService
             {
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-                if (appointmentType.NeedsMapping)
+                if (appointmentType.NeedsAppointmentIdMapping)
                     _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
 
                 if (convertedAnswers.FormData.ContainsKey(bookingInformationCacheKey))
@@ -190,7 +190,7 @@ namespace form_builder.Services.BookingService
             var appointmentType = bookingElement.Properties.AppointmentTypes
                 .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
 
-            if (appointmentType.NeedsMapping)
+            if (appointmentType.NeedsAppointmentIdMapping)
                 _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
 
             var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)

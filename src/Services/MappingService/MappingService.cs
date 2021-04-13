@@ -66,7 +66,7 @@ namespace form_builder.Services.MappingService
             AppointmentType appointmentType = bookingElement.Properties.AppointmentTypes
                 .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
 
-            if (appointmentType.NeedsMapping)
+            if (appointmentType.NeedsAppointmentIdMapping)
                 MapAppointmentId(appointmentType, convertedAnswers);
 
             return new BookingRequest
