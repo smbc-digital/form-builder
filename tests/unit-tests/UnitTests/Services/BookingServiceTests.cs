@@ -52,14 +52,18 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
 
         const string environmentName = "test";
+        const string bookingProvider = "testBookingProvider";
 
         public BookingServiceTests()
         {
             _mockDistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(_cacheConfig);
+
             _mockMappingService
                 .Setup(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, object>>(), It.IsAny<string>()))
                 .ReturnsAsync(new BookingRequest { Customer = new Customer() });
-            _bookingProvider.Setup(_ => _.ProviderName).Returns("testBookingProvider");
+
+            _bookingProvider.Setup(_ => _.ProviderName).Returns(bookingProvider);
+
             _bookingProviders = new List<IBookingProvider>
             {
                 _bookingProvider.Object
@@ -89,16 +93,19 @@ namespace form_builder_tests.UnitTests.Services
             var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
             string sessionGuid = "session";
 
-            BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
+            _bookingProvider.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new AvailabilityDayResponse { Date = new() });
+
+            _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
+
             _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
-                .Returns(JsonConvert.SerializeObject(new FormAnswers
-                {
-                    FormData = new Dictionary<string, object> { { $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo } }
-                }));
+                .Returns(JsonConvert.SerializeObject(new FormAnswers()));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId(questionId)
+                .WithBookingProvider(bookingProvider)
                 .WithAppointmentType(new AppointmentType
                 {
                     Environment = environmentName,
@@ -109,20 +116,11 @@ namespace form_builder_tests.UnitTests.Services
             var page = new PageBuilder().WithElement(element).Build();
 
             // Act
-            try
-            {
-                _ = await _service.Get("form", page, sessionGuid);
-            }
-            catch
-            {
+            _ = await _service.Get("form", page, sessionGuid);
 
-            }
-            finally
-            {
-                // Assert
-                _mockMappingService.Verify(mappingService =>
-                        mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Once);
-            }
+            // Assert
+            _mockMappingService.Verify(mappingService =>
+                    mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Once);
         }
 
         [Fact]
@@ -133,16 +131,19 @@ namespace form_builder_tests.UnitTests.Services
             var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
             string sessionGuid = "session";
 
-            BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
+            _bookingProvider.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new AvailabilityDayResponse { Date = new() });
+
+            _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
+
             _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
-                .Returns(JsonConvert.SerializeObject(new FormAnswers
-                {
-                    FormData = new Dictionary<string, object> { { $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo } }
-                }));
+                .Returns(JsonConvert.SerializeObject(new()));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId(questionId)
+                .WithBookingProvider(bookingProvider)
                 .WithAppointmentType(new AppointmentType
                 {
                     Environment = environmentName,
@@ -153,20 +154,11 @@ namespace form_builder_tests.UnitTests.Services
             var page = new PageBuilder().WithElement(element).Build();
 
             // Act
-            try
-            {
-                _ = await _service.Get("form", page, sessionGuid);
-            }
-            catch
-            {
+            _ = await _service.Get("form", page, sessionGuid);
 
-            }
-            finally
-            {
-                // Assert
-                _mockMappingService.Verify(mappingService =>
-                    mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Never);
-            }
+            // Assert
+            _mockMappingService.Verify(mappingService =>
+                mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Never);
         }
 
         [Fact]
@@ -424,16 +416,22 @@ namespace form_builder_tests.UnitTests.Services
 
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(sessionGuid);
 
+            _bookingProvider.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new AvailabilityDayResponse { Date = new() });
+
+            _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
+
             BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
             _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {
-                    FormData = new Dictionary<string, object> { { $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo } }
+                    FormData = new Dictionary<string, object> { { $"{questionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo } }
                 }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
-                .WithBookingProvider("testBookingProvider")
+                .WithBookingProvider(bookingProvider)
                 .WithQuestionId(questionId)
                 .WithAppointmentType(new AppointmentType
                 {
@@ -464,20 +462,11 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             // Act
-            try
-            {
-                await _service.ProcessMonthRequest(viewModel, "form", "path");
-            }
-            catch
-            {
+            await _service.ProcessMonthRequest(viewModel, "form", "path");
 
-            }
-            finally
-            {
-                // Assert
-                _mockMappingService.Verify(mappingService =>
-                    mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Once);
-            }
+            // Assert
+            _mockMappingService.Verify(mappingService =>
+                mappingService.MapAppointmentId(It.IsAny<AppointmentType>(), It.IsAny<FormAnswers>()), Times.Once);
         }
 
         [Fact]
