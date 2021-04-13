@@ -51,7 +51,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task Process_ShouldCallSendEmailAsync_ForTemplatedEmailType()
+        public void Process_ShouldCallSendEmailAsync_ForTemplatedEmailType()
         {
             // Arrange
             var action = new ActionBuilder()
@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns("test@testemail.com");
 
             // Act
-            await _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action });
+            _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action });
 
             // Assert
             _mockTemplatedEmailProvider.Verify(_ => _.SendEmailAsync(

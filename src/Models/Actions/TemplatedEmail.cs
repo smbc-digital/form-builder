@@ -14,15 +14,17 @@ namespace form_builder.Models.Actions
             Type = EActionType.TemplatedEmail;
         }
 
-        public override async Task ProcessTemplatedEmail(IActionHelper actionHelper, ITemplatedEmailProvider templatedEmailProvider, Dictionary<string, dynamic> personalisation, FormAnswers formAnswers)
+        public override Task ProcessTemplatedEmail(IActionHelper actionHelper, ITemplatedEmailProvider templatedEmailProvider, Dictionary<string, dynamic> personalisation, FormAnswers formAnswers)
         {
             var emailAddressList = actionHelper.GetEmailToAddresses(this, formAnswers).Split(',').ToList();
 
             foreach (var emailAddress in emailAddressList)
             {
-                await templatedEmailProvider
+                templatedEmailProvider
                     .SendEmailAsync(emailAddress, Properties.TemplateId, personalisation);
             }
+
+            return null;
         }
     }
 }

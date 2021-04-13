@@ -20,7 +20,7 @@ namespace form_builder.Models.Actions
             throw new System.NotImplementedException();
         }
 
-        public virtual async Task ProcessTemplatedEmail(IActionHelper actionHelper, ITemplatedEmailProvider templatedEmailProvider, Dictionary<string, dynamic> personalisation, FormAnswers formAnswers)
+        public virtual Task ProcessTemplatedEmail(IActionHelper actionHelper, ITemplatedEmailProvider templatedEmailProvider, Dictionary<string, dynamic> personalisation, FormAnswers formAnswers)
         {
             throw new System.NotImplementedException();
         }

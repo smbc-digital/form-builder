@@ -32,7 +32,7 @@ namespace form_builder.Services.TemplatedEmailService
             _distributedCache = distributedCache;
         }
 
-        public async Task ProcessTemplatedEmail(List<IAction> actions)
+        public Task ProcessTemplatedEmail(List<IAction> actions)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
@@ -51,12 +51,14 @@ namespace form_builder.Services.TemplatedEmailService
                 if(!convertedAnswers.Count.Equals(0))
                 action.Properties.Personlisation.ForEach(field => { personalisation.Add(field, convertedAnswers[field]); });
 
-                await action.ProcessTemplatedEmail(
+                action.ProcessTemplatedEmail(
                     _actionHelper,
                     templatedEmailProvider,
                     personalisation,
                     formAnswers);
             }
+
+            return null;
         }
     }
 }

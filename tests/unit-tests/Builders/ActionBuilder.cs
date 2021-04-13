@@ -46,6 +46,21 @@ namespace form_builder_tests.Builders
 
             return this;
         }
+
+        public ActionBuilder WithTemplateId(string templateId)
+        {
+            _actionProperties.TemplateId = templateId;
+
+            return this;
+        }
+
+        public ActionBuilder WithProvider(string provider)
+        {
+            _actionProperties.EmailTemplateProvider = provider;
+
+            return this;
+        }
+
         public ActionBuilder WithContent(string content)
         {
             _actionProperties.Content = content;
