@@ -313,6 +313,8 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, TemplatedEmailActionCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ValidateActionCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, SummaryElementFormCheck>();
+            
 
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();

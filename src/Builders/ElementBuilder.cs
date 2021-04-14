@@ -442,5 +442,15 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder withSummarySection(Section value)
+        {
+            if (_property.Sections is null)
+                _property.Sections = new List<Section>();
+
+            _property.Sections.Add(value);
+
+            return this;
+        }
     }
 }

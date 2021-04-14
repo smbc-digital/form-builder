@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using form_builder.Models;
 
 namespace form_builder.ViewModels
 {
-    public class SummarySectionViewModel
+    public class SummarySectionsViewModel
     {
         public List<SummarySection> Sections = new List<SummarySection>();
         public bool AllowEditing { get; set; }
@@ -12,7 +13,8 @@ namespace form_builder.ViewModels
     public class SummarySection
     {
         public string Title { get; set; }
-        public bool DisplaySectionHeading => !string.IsNullOrEmpty(Title);
         public List<PageSummary> Pages { get; set; }
+        public bool ContainsPages => Pages is not null && Pages.Any();
+        public bool DisplaySectionHeading => !string.IsNullOrEmpty(Title);
     }
 }
