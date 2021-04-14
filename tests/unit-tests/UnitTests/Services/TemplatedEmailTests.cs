@@ -123,7 +123,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             Assert.Equal(personalisationSent["reference"], "test-ref");
-            Assert.Equal("1", personalisationSent.Count.ToString());
+            Assert.Single(personalisationSent);
         }
 
         [Fact]
@@ -173,7 +173,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             Assert.Equal(personalisationSent["firstname"], "test");
-            Assert.Equal("1" , personalisationSent.Count.ToString());
+            Assert.Single(personalisationSent);
         }
     }
 }

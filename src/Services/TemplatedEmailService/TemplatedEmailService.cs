@@ -51,7 +51,7 @@ namespace form_builder.Services.TemplatedEmailService
                 if (action.Properties.IncludeCaseReference)
                     personalisation.Add("reference", formAnswers.CaseReference);
 
-                if (!convertedAnswers.Count.Equals(0) && action.Properties.Personalisation is not null)          
+                if (action.Properties.Personalisation is not null && !convertedAnswers.Count.Equals(0))          
                     action.Properties.Personalisation.ForEach(field => { personalisation.Add(field, convertedAnswers[field]); });
                 
                 action.ProcessTemplatedEmail(
