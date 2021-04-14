@@ -42,15 +42,22 @@ namespace form_builder.Services.TemplatedEmailService
             var formData = _distributedCache.GetString(sessionGuid);
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-
             foreach (var action in actions)
             {
                 var templatedEmailProvider = _templatedEmailProviders.Get(action.Properties.EmailTemplateProvider);
+                var convertedAnswers = formAnswers.AllAnswers.ToDictionary(x => x.QuestionId, x => x.Response);
+                var personalisation = new Dictionary<string, dynamic>();
 
+                if (action.Properties.IncludeCaseReference)
+                    personalisation.Add("reference", formAnswers.CaseReference);
+
+                if (action.Properties.Personalisation is not null && !convertedAnswers.Count.Equals(0))          
+                    action.Properties.Personalisation.ForEach(field => { personalisation.Add(field, convertedAnswers[field]); });
+                
                 action.ProcessTemplatedEmail(
                     _actionHelper,
                     templatedEmailProvider,
-                    new Dictionary<string, dynamic>(),
+                    personalisation,
                     formAnswers);
             }
             return null;
