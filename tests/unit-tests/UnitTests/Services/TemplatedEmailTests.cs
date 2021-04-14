@@ -111,21 +111,19 @@ namespace form_builder_tests.UnitTests.Services
             };
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            var personalisation = new Dictionary<string, dynamic>();
+            var personalisationSent = new Dictionary<string, dynamic>();
+
             _mockTemplatedEmailProvider
-                .Setup(_ => _.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()))
-                .Callback<string, string, Dictionary<string, dynamic>>((a, b, c) => personalisation = c);
+                .Setup(_ => _.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<Dictionary<string, dynamic>>()))
+                .Callback<string, string, Dictionary<string, dynamic>>((emailAddress, templateId, personalisation) => personalisationSent = personalisation);
 
             // Act
             _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action });
-            // Assert
-            _mockTemplatedEmailProvider.Verify(_ => _.SendEmailAsync(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
 
-            Assert.Equal(personalisation["reference"], "test-ref");
-            Assert.Equal("1", personalisation.Count.ToString());
+            // Assert
+            Assert.Equal(personalisationSent["reference"], "test-ref");
+            Assert.Equal("1", personalisationSent.Count.ToString());
         }
 
         [Fact]
@@ -165,75 +163,17 @@ namespace form_builder_tests.UnitTests.Services
             };
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            var personalisation = new Dictionary<string, dynamic>();
+            var personalisationSent = new Dictionary<string, dynamic>();
             _mockTemplatedEmailProvider
                 .Setup(_ => _.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()))
-                .Callback<string, string, Dictionary<string, dynamic>>((a, b, c) => personalisation = c);
-
-            // Act
-            _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action });
-            // Assert
-            _mockTemplatedEmailProvider.Verify(_ => _.SendEmailAsync(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
-
-            Assert.Equal(personalisation["firstname"], "test");
-            Assert.Equal("1" , personalisation.Count.ToString());
-        }
-
-        [Fact]
-        public void Process_ShouldCallSendEmailAsync_WithNoPersonalisationAndNoCaseReference()
-        {
-            // Arrange
-            var action = new ActionBuilder()
-               .WithActionType(EActionType.TemplatedEmail)
-               .WithTo("test@abc.com")
-               .WithTemplateId("123")
-               .WithProvider("Notify")
-               .WithCaseReference(false)
-               .Build();
-
-            _mockActionHelper.Setup(_ => _.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()))
-                .Returns("test@testemail.com");
-
-            var cacheData = new FormAnswers
-            {
-                CaseReference = "test-ref",
-                Path = "page-one",
-                Pages = new List<PageAnswers>()
-                {
-                    new()
-                    {
-                        Answers = new List<Answers>
-                        {
-                            new()
-                            {
-                                QuestionId = "firstname",
-                                Response = "test"
-                            }
-                        },
-                        PageSlug = "page-one"
-                    }
-                }
-            };
-            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
-
-            var personalisation = new Dictionary<string, dynamic>();
-            _mockTemplatedEmailProvider
-                .Setup(_ => _.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()))
-                .Callback<string, string, Dictionary<string, dynamic>>((a, b, c) => personalisation = c);
+                .Callback<string, string, Dictionary<string, dynamic>>((emailAddress, templateId, personalisation) => personalisationSent = personalisation);
 
             // Act
             _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action });
 
             // Assert
-            _mockTemplatedEmailProvider.Verify(_ => _.SendEmailAsync(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
-
-            Assert.Equal("0", personalisation.Count.ToString());
+            Assert.Equal(personalisationSent["firstname"], "test");
+            Assert.Equal("1" , personalisationSent.Count.ToString());
         }
     }
 }
