@@ -33,9 +33,9 @@ namespace form_builder_tests.Builders
             return this;
         }
 
-        public ActionBuilder WithCaseReference(bool add)
+        public ActionBuilder WithCaseReference(bool includeCaseReference)
         {
-            _actionProperties.IncludeCaseReference = add;
+            _actionProperties.IncludeCaseReference = includeCaseReference;
 
             return this;
         }

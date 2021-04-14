@@ -84,6 +84,59 @@ namespace form_builder_tests.UnitTests.Services
                .WithTemplateId("123")
                .WithProvider("Notify")
                .WithCaseReference(true)
+               .Build();
+
+            _mockActionHelper.Setup(_ => _.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()))
+                .Returns("test@testemail.com");
+
+            var cacheData = new FormAnswers
+            {
+                CaseReference = "test-ref",
+                Path = "page-one",
+                Pages = new List<PageAnswers>()
+                {
+                    new()
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new()
+                            {
+                                QuestionId = "firstname",
+                                Response = "test"
+                            }
+                        },
+                        PageSlug = "page-one"
+                    }
+                }
+            };
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+
+            var personalisation = new Dictionary<string, dynamic>();
+            _mockTemplatedEmailProvider
+                .Setup(_ => _.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()))
+                .Callback<string, string, Dictionary<string, dynamic>>((a, b, c) => personalisation = c);
+
+            // Act
+            _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action });
+            // Assert
+            _mockTemplatedEmailProvider.Verify(_ => _.SendEmailAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
+
+            Assert.Equal(personalisation["reference"], "test-ref");
+            Assert.Equal("1", personalisation.Count.ToString());
+        }
+
+        [Fact]
+        public void Process_ShouldCallSendEmailAsync_WithPersonalisation()
+        {
+            // Arrange
+            var action = new ActionBuilder()
+               .WithActionType(EActionType.TemplatedEmail)
+               .WithTo("test@abc.com")
+               .WithTemplateId("123")
+               .WithProvider("Notify")
                .WithPersonalisation(new List<string> { "firstname" })
                .Build();
 
@@ -126,11 +179,11 @@ namespace form_builder_tests.UnitTests.Services
                 It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
 
             Assert.Equal(personalisation["firstname"], "test");
-            Assert.Equal(personalisation["reference"], "test-ref");
+            Assert.Equal("1" , personalisation.Count.ToString());
         }
 
         [Fact]
-        public void Process_ShouldCallSendEmailAsync_WithNoPersonalisation()
+        public void Process_ShouldCallSendEmailAsync_WithNoPersonalisationAndNoCaseReference()
         {
             // Arrange
             var action = new ActionBuilder()
