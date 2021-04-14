@@ -71,7 +71,6 @@ namespace form_builder_tests.UnitTests.Services
                 It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
         }
 
-        //verify if u have some personalisation that passed into the provider
         [Fact]
         public void Process_ShouldCallSendEmailAsync_IfPersonalisationIsValid()
         {
