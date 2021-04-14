@@ -33,6 +33,20 @@ namespace form_builder_tests.Builders
             return this;
         }
 
+        public ActionBuilder WithCaseReference(bool includeCaseReference)
+        {
+            _actionProperties.IncludeCaseReference = includeCaseReference;
+
+            return this;
+        }
+
+        public ActionBuilder WithPersonalisation(List<string> personalisation)
+        {
+            _actionProperties.Personalisation = personalisation;
+
+            return this;
+        }
+
         public ActionBuilder WithTo(string to)
         {
             _actionProperties.To = to;
