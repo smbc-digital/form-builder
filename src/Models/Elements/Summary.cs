@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
@@ -34,7 +32,7 @@ namespace form_builder.Models.Elements
 
             if (Properties.HasSummarySectionsDefined)
             {
-                var summaryViewModel = new SummarySectionViewModel
+                var summaryViewModel = new SummarySectionsViewModel
                 {
                     Sections = Properties.Sections.Select(_ => new SummarySection
                     {
@@ -47,7 +45,7 @@ namespace form_builder.Models.Elements
                 return await viewRender.RenderAsync(Type.ToString(), summaryViewModel);
             }
 
-            var summaryViewModelSingleSection = new SummarySectionViewModel
+            var summaryViewModelSingleSection = new SummarySectionsViewModel
             {
                 AllowEditing = Properties.AllowEditing,
                 Sections = new List<SummarySection>()
@@ -59,30 +57,6 @@ namespace form_builder.Models.Elements
             };
 
             return await viewRender.RenderAsync(Type.ToString(), summaryViewModelSingleSection);
-
-            htmlContent.AppendHtmlLine("<dl class=\"govuk-summary-list govuk-!-margin-bottom-9\">");
-            foreach (var pageSummary in pages)
-            {
-                foreach (var answer in pageSummary.Answers)
-                {
-                    htmlContent.AppendHtmlLine("<div class=\"govuk-summary-list__row\">");
-                    htmlContent.AppendHtmlLine($"<dt class=\"govuk-summary-list__key\">{answer.Key}</dt>");
-                    htmlContent.AppendHtmlLine($"<dd class=\"govuk-summary-list__value\">{answer.Value}</dd>");
-
-                    if (Properties != null && Properties.AllowEditing)
-                        htmlContent.AppendHtmlLine($"<dd class=\"govuk-summary-list__actions\"><a class=\"govuk-link\" href=\"{pageSummary.PageSlug}\">Change <span class=\"govuk-visually-hidden\">{answer.Key}</span></a></dd>");
-
-                    htmlContent.AppendHtmlLine("</div>");
-                }
-            }
-            htmlContent.AppendHtmlLine("</dl>");
-
-            using (var writer = new StringWriter())
-            {
-                htmlContent.WriteTo(writer, HtmlEncoder.Default);
-
-                return writer.ToString();
-            }
         }
     }
 }

@@ -1,28 +1,31 @@
-@model SummarySectionViewModel
+@model SummarySectionsViewModel
 
 @foreach (var summarySection in Model.Sections)
 {
-    @if(summarySection.DisplaySectionHeading)
+    @if(summarySection.ContainsPages)
     {
-        <h2 class="govuk-heading-m">@summarySection.Title</h2>
-    }
-
-    <dl class="govuk-summary-list govuk-!-margin-bottom-9\">
-        @foreach (var pageSummary in summarySection.Pages)
+        @if(summarySection.DisplaySectionHeading)
         {
-            @foreach (var answer in pageSummary.Answers)
-            {
-                <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">@answer.Key</dt>
-                <dd class="govuk-summary-list__value">@answer.Value</dd>
-
-                    @if (Model.AllowEditing){
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" href="@pageSummary.PageSlug">Change <span class="govuk-visually-hidden">@answer.Key</span></a>
-                        </dd>
-                    }
-                </div>
-            }
+            <h2 class="govuk-heading-m">@summarySection.Title</h2>
         }
-    </dl>
+
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9\">
+            @foreach (var pageSummary in summarySection.Pages)
+            {
+                @foreach (var answer in pageSummary.Answers)
+                {
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">@answer.Key</dt>
+                        <dd class="govuk-summary-list__value">@Html.Raw(answer.Value)</dd>
+
+                        @if (Model.AllowEditing){
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" href="@pageSummary.PageSlug">Change <span class="govuk-visually-hidden">@answer.Key</span></a>
+                            </dd>
+                        }
+                    </div>
+                }
+            }
+        </dl>
+    }
 }
