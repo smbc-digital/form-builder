@@ -70,5 +70,34 @@ namespace form_builder_tests.UnitTests.Services
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
         }
+
+        //verify if u have some personalisation that passed into the provider
+        [Fact]
+        public void Process_ShouldCallSendEmailAsync_IfPersonalisationIsValid()
+        {
+            // Arrange
+            var action = new ActionBuilder()
+               .WithActionType(EActionType.TemplatedEmail)
+               .Build();
+
+            _mockActionHelper.Setup(_ => _.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()))
+                .Returns("test@testemail.com");
+
+            var personalisation = new Dictionary<string, dynamic>();
+
+            _mockTemplatedEmailProvider
+                .Setup(_ => _.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()))
+                .Callback(() => personalisation.Add("test", "test"));
+            // Act
+            _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action });
+
+            // Assert
+            _mockTemplatedEmailProvider.Verify(_ => _.SendEmailAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
+
+            Assert.Equal("test", "test");
+        }
     }
 }
