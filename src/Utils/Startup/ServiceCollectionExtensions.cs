@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
