@@ -7,7 +7,7 @@ namespace form_builder.Models.Properties.ElementProperties
     {
         public bool AllowEditing { get; set; }
         public List<Section> Sections { get; set; }
-        public bool HasSummarySectionsDefined => Sections != null && Sections.Any();
+        public bool HasSummarySectionsDefined => Sections is not null && Sections.Any();
     }
 
     public class Section
