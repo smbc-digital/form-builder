@@ -16,7 +16,6 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             var summaryElements = schema.Pages.SelectMany(page => page.Elements.Where(element => element.Type.Equals(EElementType.Summary))).ToList();
 
-
             summaryElements.ForEach((element) =>
             {
                 var properties = element.Properties;

@@ -315,7 +315,6 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, SummaryElementFormCheck>();
             
-
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, SubmitSlugsHaveAllPropertiesCheck>();
