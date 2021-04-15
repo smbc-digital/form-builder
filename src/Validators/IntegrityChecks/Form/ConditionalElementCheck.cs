@@ -23,7 +23,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             List<IElement> conditionalElements = schema.Pages
                 .Where(page => page.Elements is not null)
-                .SelectMany(page => page.ValidatableElements)
+                .SelectMany(page => page.Elements)
                 .Where(element => element.Properties.isConditionalElement)
                 .ToList();
 
