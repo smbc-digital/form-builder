@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
@@ -313,7 +312,8 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, TemplatedEmailActionCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ValidateActionCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
-
+            services.AddSingleton<IFormSchemaIntegrityCheck, SummaryElementFormCheck>();
+            
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, SubmitSlugsHaveAllPropertiesCheck>();
@@ -525,6 +525,7 @@ namespace form_builder.Utils.Startup
                 o.ViewLocationFormats.Add("/Views/Shared/Time/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/TimeInput/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/Warning/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/Summary/{0}" + RazorViewEngine.ViewExtension);
             });
 
             return services;
