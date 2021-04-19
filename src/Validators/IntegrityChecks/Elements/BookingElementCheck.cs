@@ -29,7 +29,21 @@ namespace form_builder.Validators.IntegrityChecks.Elements
 
             if (appointmentTypeForEnv is null)
             {
-                result.AddFailureMessage($"Booking Element Check, No appointment type found for current environment or empty AppointmentID.");
+                result.AddFailureMessage("Booking Element Check, No AppointmentType found for current environment.");
+                return result;
+            }
+
+            if (appointmentTypeForEnv.AppointmentId == Guid.Empty &&
+                string.IsNullOrEmpty(appointmentTypeForEnv.AppointmentIdKey))
+            {
+                result.AddFailureMessage("Booking Element Check, You must supply either an AppointmentId or an AppointmentIdKey in the AppointmentType.");
+                return result;
+            }
+
+            if (appointmentTypeForEnv.AppointmentId != Guid.Empty &&
+                !string.IsNullOrEmpty(appointmentTypeForEnv.AppointmentIdKey))
+            {
+                result.AddFailureMessage("Booking Element Check, You cannot use both AppointmentId and AppointmentIdKey in the AppointmentType.");
                 return result;
             }
 
@@ -39,7 +53,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             foreach (var resource in appointmentTypeForEnv.OptionalResources)
             {
                 if (resource.Quantity <= 0)
-                    result.AddFailureMessage($"Booking Element Check, Booking element '{element.Properties.QuestionId}', optional resources are invalid, cannot have a quantity less than 0.");
+                    result.AddFailureMessage($"Booking Element Check, Booking element '{element.Properties.QuestionId}', optional resources are invalid, cannot have a quantity of 0 or less.");
 
                 if (resource.ResourceId.Equals(Guid.Empty))
                     result.AddFailureMessage($"Booking Element Check, Booking element '{element.Properties.QuestionId}', optional resources are invalid, ResourceId cannot be an empty Guid.");
