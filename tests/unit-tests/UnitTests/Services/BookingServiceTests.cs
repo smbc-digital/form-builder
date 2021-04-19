@@ -866,7 +866,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessBooking_Should_NotCall_BookingProvider_WhenReservedDateAndTime_IsSame_AsCurrentSelectedDateTime()
+        public async Task ProcessBooking_Should_NotCall_BookingProvider_WhenReservedDateAndTimeAndAppointmentId_IsSame_AsCurrentSelectedDateTimeAndAppointmentId()
         {
             var appointmentTypeGuid = new Guid();
             var element = new ElementBuilder()
@@ -893,6 +893,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_END_TIME}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}", Guid.NewGuid().ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_APPOINTMENT_ID}", appointmentTypeGuid.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}", date.ToString() },
@@ -934,6 +935,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}",date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_END_TIME}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}", Guid.NewGuid().ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_APPOINTMENT_ID}", appointmentTypeGuid.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}", date.ToString() },
@@ -948,6 +950,50 @@ namespace form_builder_tests.UnitTests.Services
             _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
         }
 
+        [Fact]
+        public async Task ProcessBooking_Should_Call_BookingProvider_When_SelectedAppointmentId_IsDifferent_To_ReservedAppointmentId()
+        {
+
+            var selectedAppointmentTypeGuid = Guid.NewGuid();
+            var reservedAppointmentTypeGuid = Guid.NewGuid();
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithAppointmentType(new AppointmentType { AppointmentId = selectedAppointmentTypeGuid, Environment = "test" })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("base-form")
+                .Build();
+
+            var date = DateTime.Now;
+
+            var model = new Dictionary<string, object>{
+                { LookUpConstants.SubPathViewModelKey, BookingConstants.CHECK_YOUR_BOOKING },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_DATE}", date.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}",date.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_END_TIME}", date.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}", Guid.NewGuid().ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_APPOINTMENT_ID}", reservedAppointmentTypeGuid.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}", date.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", date.ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}", date.ToString() },
+            };
+
+
+
+            await _service.ProcessBooking(model, page, formSchema, "guid", "path");
+
+            _bookingProvider.Verify(_ => _.Reserve(It.IsAny<BookingRequest>()), Times.Once);
+            _mockMappingService.Verify(_ => _.MapBookingRequest(It.IsAny<string>(), It.IsAny<IElement>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
+        }
 
         [Fact]
         public async Task ProcessBooking_Should_Call_BookingProvider_When_SelectedStartTime_IsDifferent_To_ReservedDateAndTime()
@@ -977,6 +1023,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", date.AddHours(1).ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_END_TIME}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}", Guid.NewGuid().ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_APPOINTMENT_ID}", appointmentTypeGuid.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}", date.ToString() }
@@ -1017,6 +1064,7 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_START_TIME}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.APPOINTMENT_END_TIME}", date.AddHours(1).ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}", Guid.NewGuid().ToString() },
+                { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_APPOINTMENT_ID}", appointmentTypeGuid.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_DATE}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_START_TIME}", date.ToString() },
                 { $"{element.Properties.QuestionId}-{BookingConstants.RESERVED_BOOKING_END_TIME}", date.ToString() },

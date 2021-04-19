@@ -365,6 +365,7 @@ namespace form_builder.Services.BookingService
         private async Task<Guid> ReserveAppointment(Booking bookingElement, Dictionary<string, dynamic> viewModel, string form, string guid)
         {
             var reservedBookingId = bookingElement.ReservedIdQuestionId;
+            var reservedBookingAppointmentId = bookingElement.ReservedAppointmentIdQuestionId;
 
             var reservedBookingDate = bookingElement.ReservedDateQuestionId;
             var reservedBookingStartTime = bookingElement.ReservedStartTimeQuestionId;
@@ -380,18 +381,24 @@ namespace form_builder.Services.BookingService
 
             if (viewModel.ContainsKey(reservedBookingId) && !string.IsNullOrEmpty((string)viewModel[reservedBookingId]))
             {
+                var currentSelectedAppointmentId = bookingRequest.AppointmentId.ToString();
                 var currentSelectedDate = (string)viewModel[currentlySelectedBookingDate];
                 var currentSelectedStartTime = (string)viewModel[currentlySelectedBookingStartTime];
                 var currentSelectedEndTime = (string)viewModel[currentlySelectedBookingEndTime];
+                var previouslyReservedAppointmentId = (string) viewModel[reservedBookingAppointmentId];
                 var previouslyReservedAppointmentDate = (string)viewModel[reservedBookingDate];
                 var previouslyReservedAppointmentStartTime = (string)viewModel[reservedBookingStartTime];
                 var previouslyReservedAppointmentEndTime = (string)viewModel[reservedBookingEndTime];
 
-                if (currentSelectedDate.Equals(previouslyReservedAppointmentDate) && currentSelectedStartTime.Equals(previouslyReservedAppointmentStartTime) && currentSelectedEndTime.Equals(previouslyReservedAppointmentEndTime))
+                if (currentSelectedDate.Equals(previouslyReservedAppointmentDate) 
+                        && currentSelectedStartTime.Equals(previouslyReservedAppointmentStartTime) 
+                        && currentSelectedEndTime.Equals(previouslyReservedAppointmentEndTime)
+                        && currentSelectedAppointmentId.Equals(previouslyReservedAppointmentId))
                     return Guid.Parse(viewModel[reservedBookingId]);
             }
 
             viewModel.Remove(reservedBookingId);
+            viewModel.Remove(reservedBookingAppointmentId);
             viewModel.Remove(reservedBookingDate);
             viewModel.Remove(reservedBookingStartTime);
             viewModel.Remove(reservedBookingEndTime);
@@ -399,6 +406,7 @@ namespace form_builder.Services.BookingService
             var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
                 .Reserve(bookingRequest);
 
+            viewModel.Add(reservedBookingAppointmentId, bookingRequest.AppointmentId.ToString());
             viewModel.Add(reservedBookingDate, viewModel[currentlySelectedBookingDate]);
             viewModel.Add(reservedBookingStartTime, viewModel[currentlySelectedBookingStartTime]);
             viewModel.Add(reservedBookingEndTime, viewModel[currentlySelectedBookingEndTime]);
