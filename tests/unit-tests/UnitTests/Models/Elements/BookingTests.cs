@@ -449,7 +449,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
 
         [Fact]
-        public async Task RenderAsync_Should_Create_Times_When_On_CalendarJourney_WhenAppointentIsNot_FullDay()
+        public async Task RenderAsync_Should_Create_Times_When_On_CalendarJourney_WhenAppointmentIsNot_FullDay()
         {
             //Arrange
             var date = DateTime.Now;
