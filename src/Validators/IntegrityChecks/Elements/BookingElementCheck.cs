@@ -37,14 +37,12 @@ namespace form_builder.Validators.IntegrityChecks.Elements
                 string.IsNullOrEmpty(appointmentTypeForEnv.AppointmentIdKey))
             {
                 result.AddFailureMessage("Booking Element Check, You must supply either an AppointmentId or an AppointmentIdKey in the AppointmentType.");
-                return result;
             }
 
             if (appointmentTypeForEnv.AppointmentId != Guid.Empty &&
                 !string.IsNullOrEmpty(appointmentTypeForEnv.AppointmentIdKey))
             {
                 result.AddFailureMessage("Booking Element Check, You cannot use both AppointmentId and AppointmentIdKey in the AppointmentType.");
-                return result;
             }
 
             if (appointmentTypeForEnv.OptionalResources.Count == 0)
