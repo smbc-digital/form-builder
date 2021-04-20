@@ -454,6 +454,7 @@ namespace form_builder.Utils.Startup
                     });
 
                     var redis = ConnectionMultiplexer.Connect(storageProviderConfiguration["Address"]);
+                    redis.IncludePerformanceCountersInExceptions = true;
                     services.AddDataProtection().PersistKeysToStackExchangeRedis(redis, $"{storageProviderConfiguration["InstanceName"]}DataProtection-Keys");
                     break;
 
