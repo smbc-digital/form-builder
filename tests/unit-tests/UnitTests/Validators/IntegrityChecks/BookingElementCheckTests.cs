@@ -1,62 +1,70 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Hosting;
-using StockportGovUK.NetStandard.Models.Booking.Request;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Validators.IntegrityChecks.Elements;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
 using Moq;
+using StockportGovUK.NetStandard.Models.Booking.Request;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 {
     public class BookingElementCheckTests
     {
+        private readonly BookingElementCheck _bookingElementCheck;
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
-        
+
+        public BookingElementCheckTests()
+        {
+            _mockHostingEnv.Setup(environment => environment.EnvironmentName).Returns("local");
+
+            _bookingElementCheck = new BookingElementCheck(_mockHostingEnv.Object);
+        }
+
+        private AppointmentType BuildAppointmentType(string env, Guid appointmentId, string appointmentIdKey)
+            => new AppointmentTypeBuilder()
+                .WithEnvironment(env)
+                .WithAppointmentId(appointmentId)
+                .WithAppointmentIdKey(appointmentIdKey)
+                .Build();
+
+        private Element BuildBookingElement(string provider, AppointmentType appointmentType)
+            => new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithBookingProvider(provider)
+                .WithAppointmentType(appointmentType)
+                .Build();
+
         [Theory]
-        [InlineData(EElementType.Booking, "local", "local", "provider", false, 0, "00000000-0000-0000-0000-000000000000")]
-        [InlineData(EElementType.Booking, "local", "local", "provider", true, 1, "69339C97-3924-477B-8D90-0986596072CE")]
-        public void BookingElementCheck_ReturnValid(
-            EElementType elementType, 
-            string actualEnv, 
-            string appointmentTypeEnv, 
-            string provider, 
-            bool optionalResource,
-            int optionalResourceCount,
-            Guid optionalResourceId)
+        [InlineData(false, 0, "00000000-0000-0000-0000-000000000000")]
+        [InlineData(true, 1, "69339C97-3924-477B-8D90-0986596072CE")]
+        public void BookingElementCheck_ReturnValid_OptionalResourcesChecks(bool optionalResource, int optionalResourceQuantity, Guid optionalResourceId)
         {
             // Arrange
-            _mockHostingEnv.Setup(environment => environment.EnvironmentName).Returns(actualEnv);
-
-            var appointmentType = new AppointmentTypeBuilder()
-                .WithEnvironment(appointmentTypeEnv)
-                .Build();
+            var appointmentType = BuildAppointmentType("local", Guid.NewGuid(), string.Empty);
 
             if (optionalResource)
             {
                 appointmentType.OptionalResources = new List<BookingResource>
                 {
-                    new BookingResource
+                    new ()
                     { 
-                        Quantity = optionalResourceCount,
+                        Quantity = optionalResourceQuantity,
                         ResourceId = optionalResourceId
                     }
                 };
             }
 
-            var element = new ElementBuilder()
-               .WithType(elementType)
-               .WithQuestionId("booking")
-               .WithBookingProvider(provider)
-               .WithAppointmentType(appointmentType)
-               .Build();
+            var element = BuildBookingElement("provider", appointmentType);
 
             // Act
-            var check = new BookingElementCheck(_mockHostingEnv.Object);
-            var result = check.Validate(element);
+            var result = _bookingElementCheck.Validate(element);
 
             // Assert
             Assert.True(result.IsValid);
@@ -64,48 +72,127 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
         }
 
         [Theory]
-        [InlineData(EElementType.Booking, "local", "local", "provider", true, 0, "69339C97-3924-477B-8D90-0986596072CE")]
-        [InlineData(EElementType.Booking, "local", "local", "provider", true, 1, "00000000-0000-0000-0000-000000000000")]
-        [InlineData(EElementType.Booking, "local", "int", "provider", false, 0, "00000000-0000-0000-0000-000000000000")]
-        [InlineData(EElementType.Booking, "local", "local", "", false, 0, "00000000-0000-0000-0000-000000000000")]
-        public void BookingElementCheck_ReturnInValid(
-            EElementType elementType,
-            string actualEnv,
-            string appointmentTypeEnv,
-            string provider,
-            bool optionalResource,
-            int optionalResourceCount,
-            Guid optionalResourceId)
+        [InlineData("00000000-0000-0000-0000-000000000000", "69339C97-3924-477B-8D90-0986596072CE")]
+        [InlineData("69339C97-3924-477B-8D90-0986596072CE", "")]
+        public void BookingElementCheck_ReturnValid_AppointmentId_Or_AppointmentIdKeySet(string appointmentId, string appointmentIdKey)
         {
             // Arrange
-            _mockHostingEnv.Setup(environment => environment.EnvironmentName).Returns(actualEnv);
+            var appointmentType = BuildAppointmentType("local", new Guid(appointmentId), appointmentIdKey);
 
-            var appointmentType = new AppointmentTypeBuilder()
-                .WithEnvironment(appointmentTypeEnv)
-                .Build();
-
-            if (optionalResource)
-            {
-                appointmentType.OptionalResources = new List<BookingResource>
-                {
-                    new BookingResource
-                    {
-                        Quantity = optionalResourceCount,
-                        ResourceId = optionalResourceId
-                    }
-                };
-            }
-
-            var element = new ElementBuilder()
-               .WithType(elementType)
-               .WithQuestionId("booking")
-               .WithBookingProvider(provider)
-               .WithAppointmentType(appointmentType)
-               .Build();
+            var element = BuildBookingElement("provider", appointmentType);
 
             // Act
-            var check = new BookingElementCheck(_mockHostingEnv.Object);
-            var result = check.Validate(element);
+            var result = _bookingElementCheck.Validate(element);
+
+            // Assert
+            Assert.True(result.IsValid);
+            Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
+        }
+
+        [Fact]
+        public void BookingElementCheck_ShouldReturnInvalid_When_OptionalResourceQuantity_IsZeroOrLess()
+        {
+            // Arrange
+            var appointmentType = BuildAppointmentType("local", Guid.NewGuid(), string.Empty);
+
+            appointmentType.OptionalResources = new List<BookingResource>
+            {
+                new ()
+                {
+                    Quantity = 0,
+                    ResourceId = Guid.NewGuid()
+                }
+            };
+
+            var element = BuildBookingElement("provider", appointmentType);
+
+            // Act
+            var result = _bookingElementCheck.Validate(element);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
+        }
+
+        [Fact]
+        public void BookingElementCheck_ShouldReturnInvalid_When_OptionalResourceId_IsEmptyGuid()
+        {
+            // Arrange
+            var appointmentType = BuildAppointmentType("local", Guid.NewGuid(), string.Empty);
+
+            appointmentType.OptionalResources = new List<BookingResource>
+            {
+                new ()
+                {
+                    Quantity = 1,
+                    ResourceId = new Guid()
+                }
+            };
+
+            var element = BuildBookingElement("provider", appointmentType);
+
+            // Act
+            var result = _bookingElementCheck.Validate(element);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
+        }
+
+        [Fact]
+        public void BookingElementCheck_ShouldReturnInvalid_When_NoAppointmentType_ForEnvironment()
+        {
+            // Arrange
+            var appointmentType = BuildAppointmentType("int", Guid.NewGuid(), string.Empty);
+            var element = BuildBookingElement("provider", appointmentType);
+
+            // Act
+            var result = _bookingElementCheck.Validate(element);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
+        }
+
+        [Fact]
+        public void BookingElementCheck_ShouldReturnInvalid_When_AppointmentId_And_AppointmentIdKey_AreNotSet()
+        {
+            // Arrange
+            var appointmentType = BuildAppointmentType("local", new Guid(), string.Empty);
+            var element = BuildBookingElement("provider", appointmentType);
+
+            // Act
+            var result = _bookingElementCheck.Validate(element);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
+        }
+
+        [Fact]
+        public void BookingElementCheck_ShouldReturnInvalid_When_AppointmentId_And_AppointmentIdKey_AreBothSet()
+        {
+            // Arrange
+            var appointmentType = BuildAppointmentType("local", Guid.NewGuid(), "69339C97-3924-477B-8D90-0986596072CE");
+            var element = BuildBookingElement("provider", appointmentType);
+
+            // Act
+            var result = _bookingElementCheck.Validate(element);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
+        }
+
+        [Fact]
+        public void BookingElementCheck_ShouldReturnInvalid_When_ProviderNotSet()
+        {
+            // Arrange
+            var appointmentType = BuildAppointmentType("local", Guid.NewGuid(), string.Empty);
+            var element = BuildBookingElement(string.Empty, appointmentType);
+
+            // Act
+            var result = _bookingElementCheck.Validate(element);
 
             // Assert
             Assert.False(result.IsValid);

@@ -9,18 +9,27 @@ namespace form_builder_tests.Builders
     {
         private string _environment = "test";
         private Guid _appointmentId = Guid.NewGuid();
+        private string _appointmentIdKey = "00000000-0000-0000-0000-000000000000";
         private List<BookingResource> _optionalResources = new List<BookingResource>();
 
         public AppointmentType Build() => new AppointmentType
         {
             Environment = _environment,
             AppointmentId = _appointmentId,
+            AppointmentIdKey = _appointmentIdKey,
             OptionalResources = _optionalResources
         };
 
         public AppointmentTypeBuilder WithAppointmentId(Guid value)
         {
             _appointmentId = value;
+
+            return this;
+        }
+
+        public AppointmentTypeBuilder WithAppointmentIdKey(string value)
+        {
+            _appointmentIdKey = value;
 
             return this;
         }

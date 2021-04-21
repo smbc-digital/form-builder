@@ -7,7 +7,8 @@
     @* Do not delete - this is to temporarily ensure hitting "enter" on the form, triggers submit, 
         AND not to trigger the first submit input on the page which was previously either "next" or "prev" month *@
     <input type="submit" tabindex="-1" class="govuk-visually-hidden" />
-
+    
+    @Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_APPOINTMENT_ID), Model.ReservedAppointmentId)
     @Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_DATE), Model.ReservedBookingDate)
     @Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_START_TIME), Model.ReservedBookingStartTime)
     @Html.Hidden(Model.GetCustomItemId(BookingConstants.RESERVED_BOOKING_END_TIME), Model.ReservedBookingEndTime)
