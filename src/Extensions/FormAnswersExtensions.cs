@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -14,7 +13,7 @@ namespace form_builder.Extensions
                 answer.Pages,
                 answer.Pages.SelectMany(_ => _.Answers).ToDictionary(x => x.QuestionId, x => x.Response),
                 schema.Pages,
-                !String.IsNullOrEmpty(answer.Path) && answer.Path.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH) ? answer.Path : schema.FirstPageSlug,
+                !string.IsNullOrEmpty(answer.Path) && answer.Path.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH) ? answer.Path : schema.FirstPageSlug,
                 new List<PageAnswers>());
 
         private static List<PageAnswers> RecursivelyReduceAnswers(
@@ -24,26 +23,24 @@ namespace form_builder.Extensions
             string currentPageSlug,
             List<PageAnswers> reducedAnswers)
         {
-            var page = new Page();
             var currentAnswer = answers.Find(_ => _.PageSlug.Equals(currentPageSlug));
-            if (currentAnswer == null)
-                return reducedAnswers;
 
             var currentSchema = schema.FindAll(_ => _.PageSlug.Equals(currentPageSlug));
-            if (currentSchema == null)
+            if (!currentSchema.Any())
                 return reducedAnswers;
 
-            page = currentSchema.Count > 1
-                ? currentSchema.FirstOrDefault(page => page.CheckPageMeetsConditions(answersDictionary))
+            var page = currentSchema.Count > 1
+                ? currentSchema.FirstOrDefault(currentPage => currentPage.CheckPageMeetsConditions(answersDictionary))
                 : currentSchema.FirstOrDefault();
 
-            if (page == null)
+            if (page is null)
                 return reducedAnswers;
 
-            reducedAnswers.Add(currentAnswer);
+            if (currentAnswer is not null)
+                reducedAnswers.Add(currentAnswer);
 
             var behaviour = page.GetNextPage(answersDictionary);
-            if (behaviour.BehaviourType != EBehaviourType.GoToPage)
+            if (behaviour is null || behaviour.BehaviourType != EBehaviourType.GoToPage)
                 return reducedAnswers;
 
             return RecursivelyReduceAnswers(answers, answersDictionary, schema, behaviour.PageSlug, reducedAnswers);
