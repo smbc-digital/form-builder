@@ -32,6 +32,7 @@ using form_builder.Workflows.ActionsWorkflow;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -61,8 +62,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IIncomingDataHelper> _mockIncomingDataHelper = new();
         private readonly Mock<ISuccessPageFactory> _mockSuccessPageFactory = new();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new();
-
         private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new();
+        private readonly Mock<ILogger<IPageService>> _mockLogger = new();
 
         public PageServicesTests()
         {
@@ -103,7 +104,7 @@ namespace form_builder_tests.UnitTests.Services
             });
 
             _service = new PageService(_validators.Object, _mockPageHelper.Object, _sessionHelper.Object, _addressService.Object, _fileUploadService.Object, _streetService.Object, _organisationService.Object,
-            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _bookingService.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object, _mockActionsWorkflow.Object);
+            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _bookingService.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object, _mockActionsWorkflow.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -150,7 +151,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ShouldThrowException_IfFormIsNotAvailable()
+        public async Task ProcessPage_ShouldReturnNull_IfFormIsNotAvailable()
         {
             var schema = new FormSchemaBuilder()
                 .WithEnvironmentAvailability("local", false)
@@ -159,7 +160,9 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPage("form", "page-one", "", new QueryCollection()));
+            var result = await _service.ProcessPage("form", "page-one", "", new QueryCollection());
+            _mockLogger.Verify(_ => _.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+            Assert.Null(result);
         }
 
         [Fact]

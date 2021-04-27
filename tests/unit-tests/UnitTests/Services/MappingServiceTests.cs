@@ -838,5 +838,66 @@ namespace form_builder_tests.UnitTests.Services
             Assert.False(appointmentType.AppointmentId.Equals(Guid.Empty));
             Assert.Equal(appointmentType.AppointmentId.ToString(), appointmentId);
         }
+
+        [Fact]
+        public async Task MapAppointmentId_ShouldThrowException_WhenSessionHasExpired()
+        {
+            // Arrange
+            var page = new PageBuilder()
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
+                .Build();
+
+            var viewModel = new Dictionary<string, object>();
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.MapBookingRequest(string.Empty, element, viewModel, "testform"));
+            Assert.Equal("MappingService::GetFormAnswers Session has expired", result.Message);
+        }
+
+        [Fact]
+        public async Task MapAppointmentId_ShouldThrowException_WhenSession_Data_IsNull()
+        {
+            // Arrange
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(() => null);
+
+            var page = new PageBuilder()
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
+                .Build();
+
+            var viewModel = new Dictionary<string, object>();
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.MapBookingRequest("guid", element, viewModel, "testform"));
+            Assert.Equal("MappingService::GetFormAnswers, Session data is null", result.Message);
+        }
     }
 }
