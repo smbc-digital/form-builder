@@ -162,8 +162,6 @@ namespace form_builder.Services.BookingService
             if (currentPage is null)
                 throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
-            var guid = _sessionHelper.GetSessionGuid();
-
             if (!viewModel.ContainsKey(BookingConstants.BOOKING_MONTH_REQUEST))
                 throw new ApplicationException("BookingService::ProcessMonthRequest, request for appointment did not contain requested month");
 
@@ -183,8 +181,17 @@ namespace form_builder.Services.BookingService
             if (requestedMonth < currentDate)
                 throw new ApplicationException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is before today");
 
-            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var guid = _sessionHelper.GetSessionGuid();
+
+            if (string.IsNullOrEmpty(guid))
+                throw new ApplicationException("BookingService::ProcessMonthRequest Session has expired");
+
             var cachedAnswers = _distributedCache.GetString(guid);
+
+            if(cachedAnswers is null)
+                throw new ApplicationException("BookingService::ProcessMonthRequest, Session has expired");
+
+            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
             var appointmentType = bookingElement.Properties.AppointmentTypes
