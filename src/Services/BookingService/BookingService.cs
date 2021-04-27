@@ -189,7 +189,7 @@ namespace form_builder.Services.BookingService
             var cachedAnswers = _distributedCache.GetString(guid);
 
             if(cachedAnswers is null)
-                throw new ApplicationException("BookingService::ProcessMonthRequest, Session has expired");
+                throw new ApplicationException("BookingService::ProcessMonthRequest, Session data is null");
 
             var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);

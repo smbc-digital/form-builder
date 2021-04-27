@@ -470,6 +470,115 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task ProcessMonthRequest_Should_ThrowApplicationException_WhenSessionData_Is_Null()
+        {
+            // Arrange
+            var questionId = "bookingQuestion";
+            var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
+            var sessionGuid = "guid";
+
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(sessionGuid);
+
+            _bookingProvider.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new AvailabilityDayResponse { Date = new() });
+
+            _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
+
+            BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
+            _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
+                .Returns(() => null);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider(bookingProvider)
+                .WithQuestionId(questionId)
+                .WithAppointmentType(new AppointmentType
+                {
+                    Environment = "test",
+                    AppointmentIdKey = questionId
+                })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("path")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("form")
+                .WithPage(page)
+                .Build();
+
+            _schemaFactory.Setup(_ => _.Build("form"))
+                .ReturnsAsync(formSchema);
+
+            Dictionary<string, object> viewModel = new()
+            {
+                {
+                    BookingConstants.BOOKING_MONTH_REQUEST,
+                    DateTime.UtcNow
+                }
+            };
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(viewModel, "form", "path"));
+            Assert.Equal("BookingService::ProcessMonthRequest, Session data is null", result.Message);
+        }
+
+        [Fact]
+        public async Task ProcessMonthRequest_Should_ThrowApplicationException_WhenSessionId_IsEmpty()
+        {
+            // Arrange
+            var questionId = "bookingQuestion";
+            var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
+
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+
+            _bookingProvider.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new AvailabilityDayResponse { Date = new() });
+
+            _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider(bookingProvider)
+                .WithQuestionId(questionId)
+                .WithAppointmentType(new AppointmentType
+                {
+                    Environment = "test",
+                    AppointmentIdKey = questionId
+                })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("path")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("form")
+                .WithPage(page)
+                .Build();
+
+            _schemaFactory.Setup(_ => _.Build("form"))
+                .ReturnsAsync(formSchema);
+
+            Dictionary<string, object> viewModel = new()
+            {
+                {
+                    BookingConstants.BOOKING_MONTH_REQUEST,
+                    DateTime.UtcNow
+                }
+            };
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessMonthRequest(viewModel, "form", "path"));
+            Assert.Equal("BookingService::ProcessMonthRequest Session has expired", result.Message);
+        }
+
+        [Fact]
         public async Task ProcessMonthRequest_Should_Not_CallMapAppointmentId_WhenAppointmentType_HasAppointmentId()
         {
             // Arrange
