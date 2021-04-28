@@ -116,9 +116,6 @@ namespace form_builder.Models
         {
             var conditionValidator = new ConditionValidator();
 
-            if (Behaviours.Count == 0)
-                return null;
-
             if (Behaviours.Count == 1)
                 return Behaviours.FirstOrDefault();
 
