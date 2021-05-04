@@ -27,6 +27,7 @@ using form_builder.ViewModels;
 using form_builder.Workflows.ActionsWorkflow;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -52,6 +53,7 @@ namespace form_builder.Services.PageService
         private readonly IPageFactory _pageContentFactory;
         private readonly IIncomingDataHelper _incomingDataHelper;
         private readonly IActionsWorkflow _actionsWorkflow;
+        private readonly ILogger<IPageService> _logger;
 
         public PageService(
             IEnumerable<IElementValidator> validators,
@@ -71,7 +73,8 @@ namespace form_builder.Services.PageService
             IMappingService mappingService,
             IPayService payService,
             IIncomingDataHelper incomingDataHelper,
-            IActionsWorkflow actionsWorkflow)
+            IActionsWorkflow actionsWorkflow,
+            ILogger<IPageService> logger)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -91,6 +94,7 @@ namespace form_builder.Services.PageService
             _mappingService = mappingService;
             _incomingDataHelper = incomingDataHelper;
             _actionsWorkflow = actionsWorkflow;
+            _logger = logger;
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParamters)
@@ -112,7 +116,10 @@ namespace form_builder.Services.PageService
                 return null;
 
             if (!baseForm.IsAvailable(_environment.EnvironmentName))
-                throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
+            {
+                _logger.LogWarning($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
+                return null;
+            }
 
             var formData = _distributedCache.GetString(sessionGuid);
 
