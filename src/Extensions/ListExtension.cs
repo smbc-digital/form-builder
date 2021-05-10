@@ -10,7 +10,7 @@ namespace form_builder.Extensions
         {
             value = value.Select(_ => _.Replace(".", string.Empty)).ToList();
             return value.Count > 1
-                  ? string.Join(", ", value.Take(value.Count - 1)).ToUpper() + $" or {value.Last().ToUpper()}"
+                  ? string.Join(", ", value.Take(value.Count - 1)).ToUpper() + $" and {value.Last().ToUpper()}"
                   : value.First().ToUpper();
         }
 
