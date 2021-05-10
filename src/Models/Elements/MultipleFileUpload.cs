@@ -19,7 +19,7 @@ namespace form_builder.Models.Elements
             Type = EElementType.MultipleFileUpload;
         }
 
-        public string AllowFileTypeText { get { return Properties.AllowedFileTypes?.ToReadableFileType() ?? SystemConstants.AcceptedMimeTypes.ToReadableFileType(); } }
+        public string AllowFileTypeText { get { return Properties.AllowedFileTypes?.ToReadableFileType("and") ?? SystemConstants.AcceptedMimeTypes.ToReadableFileType("and"); } }
         public string MaxFileSizeText { get { return $"{(Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes == 0 ? SystemConstants.DefaultMaxFileSize.ToReadableMaxFileSize() : Properties.MaxFileSize)}MB"; } }
         public string MaxCombinedFileSizeText { get { return $"{(Properties.MaxCombinedFileSize == 0 ? SystemConstants.DefaultMaxCombinedFileSize.ToReadableMaxFileSize() : Properties.MaxCombinedFileSize)}MB"; } }
         public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
