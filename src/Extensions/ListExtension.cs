@@ -6,11 +6,11 @@ namespace form_builder.Extensions
 {
     public static class ListExtension
     {
-        public static string ToReadableFileType(this List<string> value)
+        public static string ToReadableFileType(this List<string> value, string joiner)
         {
             value = value.Select(_ => _.Replace(".", string.Empty)).ToList();
             return value.Count > 1
-                  ? string.Join(", ", value.Take(value.Count - 1)).ToUpper() + $" and {value.Last().ToUpper()}"
+                  ? string.Join(", ", value.Take(value.Count - 1)).ToUpper() + $" {joiner} {value.Last().ToUpper()}"
                   : value.First().ToUpper();
         }
 
