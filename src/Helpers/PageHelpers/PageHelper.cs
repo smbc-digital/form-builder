@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
@@ -66,6 +67,40 @@ namespace form_builder.Helpers.PageHelpers
                 formModel.RawHTML += await _viewRender
                     .RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
 
+            if (page.AllowAddAnother)
+            {
+                // somehow get the increment value ie. how many fieldsets do we need to render
+                var increment = 1;
+                // get the list of input elements required (ignore submit/continue)
+                var inputElements = page.Elements.Where(_ => _.Type.Equals(EElementType.Textbox)).ToList();
+                // for each fieldset, start a fieldset, then for each element add the element html inside the fieldset using the increment, end the fieldset
+                string html = "";
+                for (var i = 0; i <= increment; i++)
+                {
+                    html += "<fieldset class='govuk-fieldset'><legend class='govuk-fieldset__legend govuk-fieldset__legend--m'>Person</legend>";
+                    foreach (var element in inputElements)
+                    {
+                        element.Properties.QuestionIdIncrement = i;
+                        html += await element.RenderAsync(_viewRender, _elementHelper, guid, viewModel, page, baseForm,
+                            _environment, formAnswers, results);
+                    }
+
+                    html += "</fieldset>";
+                }
+                // add the addAnother button
+                html += "<button data-prevent-double-click='true'data-disable-on-click = true class='govuk-button govuk-button--secondary' id='addAnother' 'aria-describedby=add-another' data-module='govuk-button'> Add another </button>";
+                // add the submit button
+                foreach (var element in page.Elements.Where(_ => _.Type.Equals(EElementType.Button)))
+                {
+                    html += await element.RenderAsync(_viewRender, _elementHelper, guid, viewModel, page, baseForm,
+                        _environment, formAnswers, results);
+                }
+
+                // return the formModel
+                formModel.RawHTML += html;
+                return formModel;
+            }
+            
             foreach (var element in page.Elements)
             {
                 if (!string.IsNullOrEmpty(element.Lookup) &&
@@ -134,7 +169,7 @@ namespace form_builder.Helpers.PageHelpers
             element.Properties.Options.AddRange(lookupOptions);
         }
 
-        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
+        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false, bool isAddAnotherPage = false)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -154,7 +189,18 @@ namespace form_builder.Helpers.PageHelpers
             foreach (var item in viewModel)
             {
                 if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
-                    answers.Add(new Answers { QuestionId = item.Key, Response = item.Value });
+                    if (isAddAnotherPage)
+                    {
+                        var keyAnswers = item.Value.ToString().Split(',');
+                        for (var i = 0; i < keyAnswers.Length; i++)
+                        {
+                            answers.Add(new Answers { QuestionId = $"{item.Key}[{i}]", Response = keyAnswers[i]});
+                        }
+                    }
+                    else
+                    {
+                        answers.Add(new Answers { QuestionId = item.Key, Response = item.Value });
+                    }
             }
 
             if ((files == null || !files.Any()) && currentPageAnswers.Answers != null && currentPageAnswers.Answers.Any() && isPageValid && appendMultipleFileUploadParts)

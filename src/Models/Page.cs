@@ -41,6 +41,8 @@ namespace form_builder.Models
 
         public string LeadingParagraph { get; set; }
 
+        public bool AllowAddAnother { get; set; } = true;
+
         [JsonIgnore] public bool IsValid => !InvalidElements.Any();
 
         public bool HasIncomingValues => IncomingValues.Any();
