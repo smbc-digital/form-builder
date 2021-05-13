@@ -69,8 +69,26 @@ namespace form_builder.Helpers.PageHelpers
 
             if (page.AllowAddAnother)
             {
+                var subPath = viewModel["subPath"];
+                var currentAnswers = formAnswers.AllAnswers.Where(_ => _.QuestionId.Contains(page.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Textbox)).Properties.QuestionId)).ToList();
+                var listOfIncrementNumbers = new List<int>();
+                foreach (var answer in currentAnswers)
+                {
+                    int pFrom = answer.QuestionId.IndexOf("[") + "[".Length;
+                    int pTo = answer.QuestionId.LastIndexOf("]");
+
+                    listOfIncrementNumbers.Add(int.Parse(answer.QuestionId.Substring(pFrom, pTo - pFrom)));
+                }
+
+                var currentIncrement = listOfIncrementNumbers.Count > 0 ? listOfIncrementNumbers.Max(_ => _) : 0;
+
+                //var currentIncrement = formAnswers.AllAnswers
+                //    .Count(_ => _.QuestionId
+                //        .Contains(page.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Textbox)).Properties.QuestionId));
                 // somehow get the increment value ie. how many fieldsets do we need to render
-                var increment = 1;
+                bool addAnother = subPath.Equals("add-another");
+
+                var increment = listOfIncrementNumbers.Count == 0 ? 0 : addAnother ? currentIncrement + 1 : currentIncrement;
                 // get the list of input elements required (ignore submit/continue)
                 var inputElements = page.Elements.Where(_ => _.Type.Equals(EElementType.Textbox)).ToList();
                 // for each fieldset, start a fieldset, then for each element add the element html inside the fieldset using the increment, end the fieldset
@@ -78,6 +96,10 @@ namespace form_builder.Helpers.PageHelpers
                 for (var i = 0; i <= increment; i++)
                 {
                     html += "<fieldset class='govuk-fieldset'><legend class='govuk-fieldset__legend govuk-fieldset__legend--m'>Person</legend>";
+                    if (increment > 0)
+                    {
+                        html += $"<button data-prevent-double-click='true'data-disable-on-click = true class='govuk-button govuk-button--secondary' name='remove-{i}' id='remove-{i}' 'aria-describedby=remove' data-module='govuk-button'> Remove </button>";
+                    }
                     foreach (var element in inputElements)
                     {
                         element.Properties.QuestionIdIncrement = i;
@@ -88,7 +110,7 @@ namespace form_builder.Helpers.PageHelpers
                     html += "</fieldset>";
                 }
                 // add the addAnother button
-                html += "<button data-prevent-double-click='true'data-disable-on-click = true class='govuk-button govuk-button--secondary' id='addAnother' 'aria-describedby=add-another' data-module='govuk-button'> Add another </button>";
+                html += $"<button data-prevent-double-click='true'data-disable-on-click = true class='govuk-button govuk-button--secondary' name='addAnother-{increment}' id='addAnother' 'aria-describedby=add-another' data-module='govuk-button'> Add another </button>";
                 // add the submit button
                 foreach (var element in page.Elements.Where(_ => _.Type.Equals(EElementType.Button)))
                 {
@@ -194,7 +216,15 @@ namespace form_builder.Helpers.PageHelpers
                         var keyAnswers = item.Value.ToString().Split(',');
                         for (var i = 0; i < keyAnswers.Length; i++)
                         {
-                            answers.Add(new Answers { QuestionId = $"{item.Key}[{i}]", Response = keyAnswers[i]});
+                            if (currentPageAnswers.Answers != null && currentPageAnswers.Answers.Any(_ => _.QuestionId.Equals($"{item.Key}[{i}]")))
+                            {
+                                answers.Remove(new Answers {QuestionId = $"{item.Key}[{i}]"});
+                            }
+
+                            if (!string.IsNullOrEmpty(keyAnswers[i]))
+                            {
+                                answers.Add(new Answers { QuestionId = $"{item.Key}[{i}]", Response = keyAnswers[i] });
+                            }
                         }
                     }
                     else
