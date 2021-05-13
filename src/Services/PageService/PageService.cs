@@ -14,6 +14,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
+using form_builder.Services.AddAnotherService;
 using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
 using form_builder.Services.FileUploadService;
@@ -49,6 +50,7 @@ namespace form_builder.Services.PageService
         private readonly IPayService _payService;
         private readonly IBookingService _bookingService;
         private readonly IMappingService _mappingService;
+        private readonly IAddAnotherService _addAnotherService;
         private readonly ISuccessPageFactory _successPageContentFactory;
         private readonly IPageFactory _pageContentFactory;
         private readonly IIncomingDataHelper _incomingDataHelper;
@@ -74,7 +76,8 @@ namespace form_builder.Services.PageService
             IPayService payService,
             IIncomingDataHelper incomingDataHelper,
             IActionsWorkflow actionsWorkflow,
-            ILogger<IPageService> logger)
+            ILogger<IPageService> logger,
+            IAddAnotherService addAnotherService)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -95,6 +98,7 @@ namespace form_builder.Services.PageService
             _incomingDataHelper = incomingDataHelper;
             _actionsWorkflow = actionsWorkflow;
             _logger = logger;
+            _addAnotherService = addAnotherService;
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParamters)
@@ -232,7 +236,7 @@ namespace form_builder.Services.PageService
             currentPage.Validate(viewModel, _validators, baseForm);
 
             if (currentPage.AllowAddAnother)
-                return await ProcessAddAnother(viewModel, currentPage, baseForm, sessionGuid, path);
+                return await _addAnotherService.ProcessAddAnother(viewModel, currentPage, baseForm, sessionGuid, path);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
                 return await _addressService.ProcessAddress(viewModel, currentPage, baseForm, sessionGuid, path);
@@ -265,92 +269,6 @@ namespace form_builder.Services.PageService
             return new ProcessRequestEntity
             {
                 Page = currentPage
-            };
-        }
-
-        public async Task<ProcessRequestEntity> ProcessAddAnother(Dictionary<string, dynamic> viewModel,
-            Page currentPage,
-            FormSchema baseForm,
-            string guid,
-            string path)
-        {
-            string removeKey = viewModel.Keys.FirstOrDefault(_ => _.Contains("remove"));
-
-            if (!string.IsNullOrEmpty(removeKey))
-            {
-                var incrementToRemove = int.Parse(removeKey.Split('-')[1]);
-                var listOfAnswers = viewModel["name"].ToString().Split(',');
-                var newList = new List<string>();
-                for (var i = 0; i < listOfAnswers.Length; i++)
-                {
-                    if (i != incrementToRemove)
-                    {
-                        newList.Add(listOfAnswers[i]);
-                    }
-                }
-                
-                var newAnswer = string.Join(',', newList);
-                viewModel["name"] = newAnswer;
-            }
-
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid, false, currentPage.AllowAddAnother);
-
-            if (!string.IsNullOrEmpty(removeKey))
-            {
-                return new ProcessRequestEntity
-                {
-                    RedirectToAction = true,
-                    RedirectAction = "Index",
-                    RouteValues = new
-                    {
-                        form = baseForm.BaseURL,
-                        path,
-                        subPath = "remove"
-                    }
-                };
-            }
-
-            string key = viewModel.Keys.FirstOrDefault(_ => _.Contains("addAnother"));
-
-            if (currentPage.IsValid && string.IsNullOrEmpty(key))
-            {
-                return new ProcessRequestEntity
-                {
-                    Page = currentPage
-                };
-            }
-
-            int increment = 0;
-
-            if (!string.IsNullOrEmpty(key))
-            {
-                var splitKey = key.Split('-');
-                increment = int.Parse(splitKey[1]);
-            }
-
-            if (!currentPage.IsValid)
-            {
-                viewModel.Add("increment", increment);
-
-                var invalidFormModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, guid);
-
-                return new ProcessRequestEntity
-                {
-                    Page = currentPage,
-                    ViewModel = invalidFormModel
-                };
-            }
-
-            return new ProcessRequestEntity
-            {
-                RedirectToAction = true,
-                RedirectAction = "Index",
-                RouteValues = new
-                {
-                    form = baseForm.BaseURL,
-                    path,
-                    subPath = "add-another"
-                }
             };
         }
 

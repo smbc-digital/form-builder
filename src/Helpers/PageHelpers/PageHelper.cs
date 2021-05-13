@@ -70,9 +70,16 @@ namespace form_builder.Helpers.PageHelpers
             if (page.AllowAddAnother)
             {
                 var subPath = viewModel["subPath"];
-                var currentAnswers = formAnswers.AllAnswers.Where(_ => _.QuestionId.Contains(page.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Textbox)).Properties.QuestionId)).ToList();
+
+                var pageAnswers = new List<Answers>();
+                if (formAnswers.Pages != null &&
+                    formAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(page.PageSlug)) != null)
+                {
+                    pageAnswers = formAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(page.PageSlug)).Answers;
+                }
+
                 var listOfIncrementNumbers = new List<int>();
-                foreach (var answer in currentAnswers)
+                foreach (var answer in pageAnswers)
                 {
                     int pFrom = answer.QuestionId.IndexOf("[") + "[".Length;
                     int pTo = answer.QuestionId.LastIndexOf("]");
@@ -82,20 +89,18 @@ namespace form_builder.Helpers.PageHelpers
 
                 var currentIncrement = listOfIncrementNumbers.Count > 0 ? listOfIncrementNumbers.Max(_ => _) : 0;
 
-                //var currentIncrement = formAnswers.AllAnswers
-                //    .Count(_ => _.QuestionId
-                //        .Contains(page.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Textbox)).Properties.QuestionId));
                 // somehow get the increment value ie. how many fieldsets do we need to render
                 bool addAnother = subPath.Equals("add-another");
 
                 var increment = listOfIncrementNumbers.Count == 0 ? 0 : addAnother ? currentIncrement + 1 : currentIncrement;
                 // get the list of input elements required (ignore submit/continue)
-                var inputElements = page.Elements.Where(_ => _.Type.Equals(EElementType.Textbox)).ToList();
+
+                var inputElements = page.AddAnotherCompatibleElements.ToList();
                 // for each fieldset, start a fieldset, then for each element add the element html inside the fieldset using the increment, end the fieldset
                 string html = "";
                 for (var i = 0; i <= increment; i++)
                 {
-                    html += "<fieldset class='govuk-fieldset'><legend class='govuk-fieldset__legend govuk-fieldset__legend--m'>Person</legend>";
+                    html += $"<fieldset class='govuk-fieldset'><legend class='govuk-fieldset__legend govuk-fieldset__legend--m'>{page.AddAnotherFieldsetHeading}</legend>";
                     if (increment > 0)
                     {
                         html += $"<button data-prevent-double-click='true'data-disable-on-click = true class='govuk-button govuk-button--secondary' name='remove-{i}' id='remove-{i}' 'aria-describedby=remove' data-module='govuk-button'> Remove </button>";

@@ -84,6 +84,7 @@ using form_builder.Utils.Hash;
 using form_builder.Providers.Submit;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.TemplatedEmailProvider;
+using form_builder.Services.AddAnotherService;
 using form_builder.Services.TemplatedEmailService;
 
 namespace form_builder.Utils.Startup
@@ -136,7 +137,6 @@ namespace form_builder.Utils.Startup
 
             return services;
         }
-
 
         public static IServiceCollection AddGateways(this IServiceCollection services, IConfiguration configuration)
         {
@@ -202,6 +202,7 @@ namespace form_builder.Utils.Startup
 
             return services;
         }
+        
         public static IServiceCollection ConfigureAddressProviders(this IServiceCollection services)
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
@@ -225,6 +226,7 @@ namespace form_builder.Utils.Startup
 
             return services;
         }
+        
         public static IServiceCollection ConfigureEmailTemplateProviders(this IServiceCollection services)
         {
             services.AddSingleton<ITemplatedEmailProvider, FakeTemplatedEmailProvider>();
@@ -334,6 +336,7 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
+            services.AddSingleton<IAddAnotherService, AddAnotherService>();
             services.AddSingleton<IAddressService, AddressService>();
             services.AddSingleton<IBookingService, BookingService>();
             services.AddSingleton<IPageService, PageService>();

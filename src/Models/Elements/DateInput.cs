@@ -30,9 +30,9 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Day = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, DAY_EXTENSION);
-            Properties.Month = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, MONTH_EXTENSION);
-            Properties.Year = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, YEAR_EXTENSION);
+            Properties.Day = elementHelper.CurrentValue(page.AllowAddAnother ? $"{Properties.QuestionId}[{Properties.QuestionIdIncrement}]" : Properties.QuestionId, viewModel, formAnswers, DAY_EXTENSION);
+            Properties.Month = elementHelper.CurrentValue(page.AllowAddAnother ? $"{Properties.QuestionId}[{Properties.QuestionIdIncrement}]" : Properties.QuestionId, viewModel, formAnswers, MONTH_EXTENSION);
+            Properties.Year = elementHelper.CurrentValue(page.AllowAddAnother ? $"{Properties.QuestionId}[{Properties.QuestionIdIncrement}]" : Properties.QuestionId, viewModel, formAnswers, YEAR_EXTENSION);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckAllDateRestrictionsAreNotEnabled(this);

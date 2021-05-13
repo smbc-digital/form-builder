@@ -43,6 +43,8 @@ namespace form_builder.Models
 
         public bool AllowAddAnother { get; set; } = false;
 
+        public string AddAnotherFieldsetHeading { get; set; }
+
         [JsonIgnore] public bool IsValid => !InvalidElements.Any();
 
         public bool HasIncomingValues => IncomingValues.Any();
@@ -103,6 +105,11 @@ namespace form_builder.Models
             element.Type == EElementType.Textbox ||
             element.Type == EElementType.DateInput ||
             element.Type == EElementType.TimeInput
+        );
+
+        public IEnumerable<IElement> AddAnotherCompatibleElements => Elements.Where(element =>
+            element.Type == EElementType.Textbox ||
+            element.Type == EElementType.DateInput
         );
 
 		public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm)
