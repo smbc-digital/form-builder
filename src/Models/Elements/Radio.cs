@@ -23,7 +23,7 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
+            Properties.Value = elementHelper.CurrentValue(Properties.IsAddAnotherElement ? $"{Properties.QuestionId}[{Properties.QuestionIdIncrement}]" : Properties.QuestionId, viewModel, formAnswers);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckForRadioOptions(this);

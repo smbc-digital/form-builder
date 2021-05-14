@@ -25,7 +25,7 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
+            Properties.Value = elementHelper.CurrentValue(Properties.IsAddAnotherElement ? $"{Properties.QuestionId}[{Properties.QuestionIdIncrement}]" : Properties.QuestionId, viewModel, formAnswers);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckForMaxLength(this);
@@ -37,8 +37,8 @@ namespace form_builder.Models.Elements
         {
             var properties = new Dictionary<string, dynamic>()
             {
-                { "name", Properties.QuestionId },
-                { "id", Properties.QuestionId },
+                { "name", Properties.IsAddAnotherElement ? $"{Properties.QuestionId}[{Properties.QuestionIdIncrement}]" : Properties.QuestionId },
+                { "id", Properties.IsAddAnotherElement ? $"{Properties.QuestionId}[{Properties.QuestionIdIncrement}]" : Properties.QuestionId },
                 { "value", Properties.Value},
                 { "spellcheck", Properties.Spellcheck.ToString().ToLower() }
             };

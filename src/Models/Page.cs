@@ -109,8 +109,10 @@ namespace form_builder.Models
 
         public IEnumerable<IElement> AddAnotherCompatibleElements => Elements.Where(element =>
             element.Type == EElementType.Textbox ||
+            element.Type == EElementType.Textarea ||
             element.Type == EElementType.DateInput ||
-            element.Type == EElementType.DatePicker
+            element.Type == EElementType.DatePicker ||
+            element.Type == EElementType.Radio
         );
 
 		public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm)

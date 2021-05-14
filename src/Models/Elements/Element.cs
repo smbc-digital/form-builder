@@ -63,7 +63,7 @@ namespace form_builder.Models.Elements
 
         public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "") => new Dictionary<string, dynamic>();
 
-        public string GetListItemId(int index) => $"{QuestionId}-{index}";
+        public string GetListItemId(int index) => Properties.IsAddAnotherElement ? $"{QuestionId}-{index}[{Properties.QuestionIdIncrement}]" : $"{QuestionId}-{index}";
 
         public string GetCustomItemId(string key) => Properties.IsAddAnotherElement ? $"{QuestionId}-{key}[{Properties.QuestionIdIncrement}]" : $"{QuestionId}-{key}";
 
