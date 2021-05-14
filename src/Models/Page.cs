@@ -80,6 +80,7 @@ namespace form_builder.Models
         }
 
         public IEnumerable<IElement> ValidatableElements => Elements.Where(element =>
+                element.Type == EElementType.AddAnother ||
                 element.Type == EElementType.Address ||
                 element.Type == EElementType.AddressManual ||
                 element.Type == EElementType.Booking ||
@@ -117,9 +118,23 @@ namespace form_builder.Models
 
 		public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm)
 		{
-			ValidatableElements.RemoveUnusedConditionalElements(viewModel)
-            .ForEach(element => {
-				element.Validate(viewModel, validators, baseForm);
+			var validatableElements = ValidatableElements.RemoveUnusedConditionalElements(viewModel);
+            validatableElements.ForEach(element => {
+                if (element.Type.Equals(EElementType.AddAnother))
+                {
+                    foreach (var addAnotherElement in element.Properties.Elements)
+                    {
+                        addAnotherElement.Validate(viewModel, validators, baseForm);
+                    }
+                    if (element.Properties.Elements.Any(_ => !_.IsValid))
+                    {
+                        element.SetAddAnotherValidation(false);
+                    }
+                }
+                else
+                {
+                    element.Validate(viewModel, validators, baseForm);
+                }
 			});
 			IsValidated = true;
 		}

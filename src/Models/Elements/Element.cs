@@ -59,6 +59,17 @@ namespace form_builder.Models.Elements
             }
         }
 
+        public void SetAddAnotherValidation(bool isValid)
+        {
+            if (!isValid)
+            {
+                validationResult = new ValidationResult
+                {
+                    IsValid = false
+                };
+            }
+        }
+
         public virtual string GenerateFieldsetProperties() => string.Empty;
 
         public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "") => new Dictionary<string, dynamic>();

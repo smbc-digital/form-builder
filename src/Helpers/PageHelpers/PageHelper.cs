@@ -157,7 +157,7 @@ namespace form_builder.Helpers.PageHelpers
                 if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
                     if (isAddAnotherPage)
                     {
-                        var keyAnswers = item.Value.ToString().Split(',');
+                        var keyAnswers = string.IsNullOrEmpty(item.Value) ? string.Empty : item.Value.ToString().Split(',');
                         for (var i = 0; i < keyAnswers.Length; i++)
                         {
                             if (currentPageAnswers.Answers != null && currentPageAnswers.Answers.Any(_ => _.QuestionId.Equals($"{item.Key}[{i}]")))

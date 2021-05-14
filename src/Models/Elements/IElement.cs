@@ -26,6 +26,8 @@ namespace form_builder.Models.Elements
 
         void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm);
 
+        void SetAddAnotherValidation(bool isValid);
+
         Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,

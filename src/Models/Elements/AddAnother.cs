@@ -66,7 +66,7 @@ namespace form_builder.Models.Elements
             string html = "";
             for (var i = 0; i <= increment; i++)
             {
-                html += $"<fieldset class='govuk-fieldset'><legend class='govuk-fieldset__legend govuk-fieldset__legend--m'>{page.AddAnotherFieldsetHeading}</legend>";
+                html += $"<fieldset class='govuk-fieldset'><legend class='govuk-fieldset__legend govuk-fieldset__legend--m'>{Properties.Label}</legend>";
                 if (increment > 0)
                 {
                     html += $"<button data-prevent-double-click='true'data-disable-on-click = true class='govuk-button govuk-button--secondary' name='remove-{i}' id='remove-{i}' 'aria-describedby=remove' data-module='govuk-button'> Remove </button>";
