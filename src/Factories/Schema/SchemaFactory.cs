@@ -61,6 +61,20 @@ namespace form_builder.Factories.Schema
             formSchema = await _reusableElementSchemaFactory.Transform(formSchema);
             formSchema = _lookupSchemaFactory.Transform(formSchema);
 
+            foreach (var page in formSchema.Pages)
+            {
+                foreach (var element in page.Elements)
+                {
+                    if (element.Type.Equals(EElementType.AddAnother))
+                    {
+                        foreach (var addAnotherElement in element.Properties.Elements)
+                        {
+                            addAnotherElement.Properties.IsAddAnotherElement = true;
+                        }
+                    }
+                }
+            }
+
             await _formSchemaIntegrityValidator.Validate(formSchema);
 
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)

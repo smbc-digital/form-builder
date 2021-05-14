@@ -88,18 +88,8 @@ namespace form_builder.Services.AddAnotherService
                 };
             }
 
-            int increment = 0;
-
-            if (!string.IsNullOrEmpty(key))
-            {
-                var splitKey = key.Split('-');
-                increment = int.Parse(splitKey[1]);
-            }
-
             if (!currentPage.IsValid)
             {
-                viewModel.Add("increment", increment);
-
                 var invalidFormModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, guid);
 
                 return new ProcessRequestEntity

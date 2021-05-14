@@ -37,5 +37,5 @@
 
     <partial name="Error" />
 
-    @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
+    @Html.TextBox($"{Model.QuestionId}[{Model.Properties.QuestionIdIncrement}]", Model.Properties.Value, elements)
 </div>
