@@ -67,6 +67,8 @@ namespace form_builder.Models.Elements
 
         public string GetCustomItemId(string key) => Properties.IsAddAnotherElement ? $"{QuestionId}-{key}[{Properties.QuestionIdIncrement}]" : $"{QuestionId}-{key}";
 
+        public string GetItemId() => Properties.IsAddAnotherElement ? $"{QuestionId}[{Properties.QuestionIdIncrement}]" : QuestionId;
+
         public string GetCustomHintId(string key) => $"{GetCustomItemId(key)}-hint";
 
         public string GetCustomErrorId(string key) => $"{GetCustomItemId(key)}-error";
