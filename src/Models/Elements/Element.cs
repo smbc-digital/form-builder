@@ -59,26 +59,15 @@ namespace form_builder.Models.Elements
             }
         }
 
-        public void SetAddAnotherValidation(bool isValid)
-        {
-            if (!isValid)
-            {
-                validationResult = new ValidationResult
-                {
-                    IsValid = false
-                };
-            }
-        }
-
         public virtual string GenerateFieldsetProperties() => string.Empty;
 
         public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "") => new Dictionary<string, dynamic>();
 
-        public string GetListItemId(int index) => Properties.IsAddAnotherElement ? $"{QuestionId}-{index}[{Properties.QuestionIdIncrement}]" : $"{QuestionId}-{index}";
+        public string GetListItemId(int index) => Properties.IsAddAnotherElement ? $"{QuestionId}-{index}_{Properties.QuestionIdIncrement}" : $"{QuestionId}-{index}";
 
-        public string GetCustomItemId(string key) => Properties.IsAddAnotherElement ? $"{QuestionId}-{key}[{Properties.QuestionIdIncrement}]" : $"{QuestionId}-{key}";
+        public string GetCustomItemId(string key) => Properties.IsAddAnotherElement ? $"{QuestionId}-{key}_{Properties.QuestionIdIncrement}" : $"{QuestionId}-{key}";
 
-        public string GetItemId() => Properties.IsAddAnotherElement ? $"{QuestionId}[{Properties.QuestionIdIncrement}]" : QuestionId;
+        public string GetItemId() => Properties.IsAddAnotherElement ? $"{QuestionId}_{Properties.QuestionIdIncrement}" : QuestionId;
 
         public string GetCustomHintId(string key) => $"{GetCustomItemId(key)}-hint";
 

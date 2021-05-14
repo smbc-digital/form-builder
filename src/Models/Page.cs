@@ -43,8 +43,6 @@ namespace form_builder.Models
 
         public bool AllowAddAnother { get; set; } = false;
 
-        public string AddAnotherFieldsetHeading { get; set; }
-
         [JsonIgnore] public bool IsValid => !InvalidElements.Any();
 
         public bool HasIncomingValues => IncomingValues.Any();
@@ -80,7 +78,6 @@ namespace form_builder.Models
         }
 
         public IEnumerable<IElement> ValidatableElements => Elements.Where(element =>
-                element.Type == EElementType.AddAnother ||
                 element.Type == EElementType.Address ||
                 element.Type == EElementType.AddressManual ||
                 element.Type == EElementType.Booking ||
@@ -113,29 +110,17 @@ namespace form_builder.Models
             element.Type == EElementType.Textarea ||
             element.Type == EElementType.DateInput ||
             element.Type == EElementType.DatePicker ||
-            element.Type == EElementType.Radio
+            element.Type == EElementType.Radio ||
+            element.Type == EElementType.Checkbox ||
+            element.Type == EElementType.TimeInput
         );
 
 		public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm)
 		{
-			var validatableElements = ValidatableElements.RemoveUnusedConditionalElements(viewModel);
-            validatableElements.ForEach(element => {
-                if (element.Type.Equals(EElementType.AddAnother))
-                {
-                    foreach (var addAnotherElement in element.Properties.Elements)
-                    {
-                        addAnotherElement.Validate(viewModel, validators, baseForm);
-                    }
-                    if (element.Properties.Elements.Any(_ => !_.IsValid))
-                    {
-                        element.SetAddAnotherValidation(false);
-                    }
-                }
-                else
-                {
+            ValidatableElements.RemoveUnusedConditionalElements(viewModel)
+                .ForEach(element => {
                     element.Validate(viewModel, validators, baseForm);
-                }
-			});
+                });
 			IsValidated = true;
 		}
 

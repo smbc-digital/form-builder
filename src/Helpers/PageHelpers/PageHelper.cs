@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
-using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
@@ -135,7 +134,31 @@ namespace form_builder.Helpers.PageHelpers
             element.Properties.Options.AddRange(lookupOptions);
         }
 
-        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false, bool isAddAnotherPage = false)
+        public void RemoveAnswers(Dictionary<string, dynamic> answersToRemove, string guid, string path)
+        {
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+            var currentPageAnswers = new PageAnswers();
+
+            if (!string.IsNullOrEmpty(formData))
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+            if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == path.ToLower()))
+            {
+                currentPageAnswers = convertedAnswers.Pages.Where(_ => _.PageSlug == path.ToLower()).ToList().FirstOrDefault();
+                convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageSlug != path.ToLower()).ToList();
+            }
+
+            foreach (var item in answersToRemove)
+            {
+                var answer = currentPageAnswers.Answers.FirstOrDefault(_ => _.QuestionId.Equals(item.Key));
+                currentPageAnswers.Answers.Remove(answer);
+            }
+
+            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+        }
+
+        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -155,26 +178,7 @@ namespace form_builder.Helpers.PageHelpers
             foreach (var item in viewModel)
             {
                 if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
-                    if (isAddAnotherPage)
-                    {
-                        var keyAnswers = string.IsNullOrEmpty(item.Value) ? string.Empty : item.Value.ToString().Split(',');
-                        for (var i = 0; i < keyAnswers.Length; i++)
-                        {
-                            if (currentPageAnswers.Answers != null && currentPageAnswers.Answers.Any(_ => _.QuestionId.Equals($"{item.Key}[{i}]")))
-                            {
-                                answers.Remove(new Answers {QuestionId = $"{item.Key}[{i}]"});
-                            }
-
-                            if (!string.IsNullOrEmpty(keyAnswers[i]))
-                            {
-                                answers.Add(new Answers { QuestionId = $"{item.Key}[{i}]", Response = keyAnswers[i] });
-                            }
-                        }
-                    }
-                    else
-                    {
-                        answers.Add(new Answers { QuestionId = item.Key, Response = item.Value });
-                    }
+                    answers.Add(new Answers { QuestionId = item.Key, Response = item.Value });
             }
 
             if ((files == null || !files.Any()) && currentPageAnswers.Answers != null && currentPageAnswers.Answers.Any() && isPageValid && appendMultipleFileUploadParts)

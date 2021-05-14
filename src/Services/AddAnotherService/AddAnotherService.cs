@@ -23,45 +23,51 @@ namespace form_builder.Services.AddAnotherService
             _disallowedKeys = disallowedKeys.Value;
         }
 
-        public async Task<ProcessRequestEntity> ProcessAddAnother(Dictionary<string, dynamic> viewModel,
+        public async Task<ProcessRequestEntity> ProcessAddAnother(
+            Dictionary<string, dynamic> viewModel,
             Page currentPage,
             FormSchema baseForm,
             string guid,
             string path)
         {
             string removeKey = viewModel.Keys.FirstOrDefault(_ => _.Contains("remove"));
+            var updatedViewModel = new Dictionary<string, dynamic>();
 
             if (!string.IsNullOrEmpty(removeKey))
             {
                 var incrementToRemove = int.Parse(removeKey.Split('-')[1]);
-
-                var questions = new Dictionary<string, dynamic>();
+                var answersToRemove = new Dictionary<string, dynamic>();
                 foreach (var item in viewModel)
                 {
                     if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
                     {
-                        questions[item.Key] = item.Value;
-                    }
-                }
-
-                foreach (var question in questions)
-                {
-                    var questionAnswers = question.Value.ToString().Split(',');
-                    var newList = new List<string>();
-                    for (var j = 0; j < questionAnswers.Length; j++)
-                    {
-                        if (j != incrementToRemove)
+                        if (item.Key.EndsWith(incrementToRemove.ToString()))
                         {
-                            newList.Add(questionAnswers[j]);
+                            answersToRemove.Add(item.Key, item.Value);
+                        }
+                        else
+                        {
+                            var splitQuestionId = item.Key.Split('_');
+                            var currentQuestionIncrement = int.Parse(splitQuestionId[1]);
+                            if (currentQuestionIncrement > incrementToRemove)
+                            {
+                                updatedViewModel.Add($"{splitQuestionId[0]}_{currentQuestionIncrement - 1}", item.Value);
+                            }
                         }
                     }
-
-                    var newAnswer = string.Join(',', newList);
-                    viewModel[question.Key] = newAnswer;
+                    else
+                    {
+                        updatedViewModel.Add(item.Key, item.Value);
+                    }
                 }
-            }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid, false, currentPage.AllowAddAnother);
+                _pageHelper.RemoveAnswers(answersToRemove, guid, path);
+                _pageHelper.SaveAnswers(updatedViewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            }
+            else
+            {
+                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            }
 
             if (!string.IsNullOrEmpty(removeKey))
             {
@@ -78,7 +84,7 @@ namespace form_builder.Services.AddAnotherService
                 };
             }
 
-            string key = viewModel.Keys.FirstOrDefault(_ => _.Contains("addAnother"));
+            var key = viewModel.Keys.FirstOrDefault(_ => _.Contains("addAnother"));
 
             if (currentPage.IsValid && string.IsNullOrEmpty(key))
             {

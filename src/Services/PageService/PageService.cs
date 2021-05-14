@@ -253,7 +253,7 @@ namespace form_builder.Services.PageService
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Booking))
                 return await _bookingService.ProcessBooking(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid, false, currentPage.AllowAddAnother);
+            _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
             if (!currentPage.IsValid)
             {

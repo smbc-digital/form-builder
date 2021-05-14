@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
@@ -51,15 +50,13 @@ namespace form_builder.Models.Elements
             var listOfIncrementNumbers = new List<int>();
             foreach (var answer in pageAnswers)
             {
-                int pFrom = answer.QuestionId.IndexOf("[") + "[".Length;
-                int pTo = answer.QuestionId.LastIndexOf("]");
+                string num = answer.QuestionId[answer.QuestionId.Length - 1].ToString();
 
-                listOfIncrementNumbers.Add(int.Parse(answer.QuestionId.Substring(pFrom, pTo - pFrom)));
+                listOfIncrementNumbers.Add(int.Parse(num));
             }
 
             var currentIncrement = listOfIncrementNumbers.Count > 0 ? listOfIncrementNumbers.Max(_ => _) : 0;
 
-            // somehow get the increment value ie. how many fieldsets do we need to render
             bool addAnother = subPath.Equals("add-another");
 
             var increment = listOfIncrementNumbers.Count == 0 ? 0 : addAnother ? currentIncrement + 1 : currentIncrement;
@@ -80,9 +77,8 @@ namespace form_builder.Models.Elements
 
                 html += "</fieldset>";
             }
-            // add the addAnother button
+            
             html += $"<button data-prevent-double-click='true'data-disable-on-click = true class='govuk-button govuk-button--secondary' name='addAnother' id='addAnother' 'aria-describedby=add-another' data-module='govuk-button'> Add another </button>";
-
 
             return html;
         }

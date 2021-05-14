@@ -31,13 +31,13 @@ namespace form_builder.Models.Elements
             List<object> results = null)
         {
             Properties.Day = Properties.IsAddAnotherElement ?
-                elementHelper.CurrentValue($"{Properties.QuestionId}{DAY_EXTENSION}[{Properties.QuestionIdIncrement}]", viewModel, formAnswers, "") :
+                elementHelper.CurrentValue($"{Properties.QuestionId}{DAY_EXTENSION}_{Properties.QuestionIdIncrement}", viewModel, formAnswers, "") :
                 elementHelper.CurrentValue($"{Properties.QuestionId}", viewModel, formAnswers, DAY_EXTENSION);
             Properties.Month = Properties.IsAddAnotherElement ?
-                elementHelper.CurrentValue($"{Properties.QuestionId}{MONTH_EXTENSION}[{Properties.QuestionIdIncrement}]", viewModel, formAnswers, "") :
+                elementHelper.CurrentValue($"{Properties.QuestionId}{MONTH_EXTENSION}_{Properties.QuestionIdIncrement}", viewModel, formAnswers, "") :
                 elementHelper.CurrentValue($"{Properties.QuestionId}", viewModel, formAnswers, MONTH_EXTENSION);
             Properties.Year = Properties.IsAddAnotherElement ?
-                elementHelper.CurrentValue($"{Properties.QuestionId}{YEAR_EXTENSION}[{Properties.QuestionIdIncrement}]", viewModel, formAnswers, "") :
+                elementHelper.CurrentValue($"{Properties.QuestionId}{YEAR_EXTENSION}_{Properties.QuestionIdIncrement}", viewModel, formAnswers, "") :
                 elementHelper.CurrentValue($"{Properties.QuestionId}", viewModel, formAnswers, YEAR_EXTENSION);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
