@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
@@ -73,35 +72,5 @@ namespace form_builder.Models
             Pages.SelectMany(_ => _.Elements)
                 .SingleOrDefault(_ => _.Properties.QuestionId == questionId);
 
-        public bool HasElement(string questionId) =>
-            Pages.SelectMany(_ => _.Elements)
-                .Any(_ => _.Properties.QuestionId == questionId);
-
-        public bool IsAvailable(string environment)
-        {
-            var environmentAvailability = EnvironmentAvailabilities.SingleOrDefault(_ => _.Environment.ToLower().Equals(environment.ToLower()));
-            return environmentAvailability == null || environmentAvailability.IsAvailable;
-        }
-
-        public List<EnabledForBase> IsEnabledFor(string environment)
-        {
-            var environmentAvailability = EnvironmentAvailabilities.SingleOrDefault(_ => _.Environment.ToLower().Equals(environment.ToLower()));
-
-            if (environmentAvailability is null)
-                return null;
-
-            if(environmentAvailability.EnabledFor is not null)
-            {
-                var enabledForList = environmentAvailability.EnabledFor.FirstOrDefault(_ => _.Type.Equals(ETimeWindowType.TimeWindow));
-                enabledForList.
-                foreach (var item in enabledForList)
-                {
-                    var type = item.Type;
-                    var start = item.Properties.Start;
-                    var end = item.Properties.End;
-                }
-            }
-            return null;
-        }
     }
 }
