@@ -17,6 +17,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
 using form_builder.Services.FileUploadService;
+using form_builder.Services.FormAvailabilityServics;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService.Entities;
@@ -53,6 +54,7 @@ namespace form_builder.Services.PageService
         private readonly IPageFactory _pageContentFactory;
         private readonly IIncomingDataHelper _incomingDataHelper;
         private readonly IActionsWorkflow _actionsWorkflow;
+        private readonly IFormAvailabilityServics _formAvailabilityServics;
         private readonly ILogger<IPageService> _logger;
 
         public PageService(
@@ -74,6 +76,7 @@ namespace form_builder.Services.PageService
             IPayService payService,
             IIncomingDataHelper incomingDataHelper,
             IActionsWorkflow actionsWorkflow,
+            IFormAvailabilityServics formAvailabilityServics,
             ILogger<IPageService> logger)
         {
             _validators = validators;
@@ -89,6 +92,7 @@ namespace form_builder.Services.PageService
             _successPageContentFactory = successPageFactory;
             _pageContentFactory = pageFactory;
             _environment = environment;
+            _formAvailabilityServics = formAvailabilityServics;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _payService = payService;
             _mappingService = mappingService;
@@ -115,7 +119,7 @@ namespace form_builder.Services.PageService
             if (baseForm == null)
                 return null;
 
-            if (!baseForm.IsAvailable(_environment.EnvironmentName))
+            if (!_formAvailabilityServics.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
             {
                 _logger.LogWarning($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
                 return null;
@@ -213,7 +217,7 @@ namespace form_builder.Services.PageService
         {
             FormSchema baseForm = await _schemaFactory.Build(form);
 
-            if (!baseForm.IsAvailable(_environment.EnvironmentName))
+            if (!_formAvailabilityServics.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
 
             var currentPage = baseForm.GetPage(_pageHelper, path);

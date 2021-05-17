@@ -85,6 +85,8 @@ using form_builder.Providers.Submit;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.TemplatedEmailProvider;
 using form_builder.Services.TemplatedEmailService;
+using form_builder.EnabledFor;
+using form_builder.Services.FormAvailabilityServics;
 
 namespace form_builder.Utils.Startup
 {
@@ -225,6 +227,14 @@ namespace form_builder.Utils.Startup
 
             return services;
         }
+
+        public static IServiceCollection ConfigureEnabledFor(this IServiceCollection services)
+        {
+            services.AddSingleton<IEnabledFor, TimeWindow>();
+
+            return services;
+        }
+
         public static IServiceCollection ConfigureEmailTemplateProviders(this IServiceCollection services)
         {
             services.AddSingleton<ITemplatedEmailProvider, FakeTemplatedEmailProvider>();
@@ -348,6 +358,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IEmailService, EmailService>();
             services.AddSingleton<IValidateService, ValidateService>();
             services.AddSingleton<ITemplatedEmailService, TemplatedEmailService>();
+            services.AddSingleton<IFormAvailabilityServics, FormAvailabilityServics>();
 
             return services;
         }

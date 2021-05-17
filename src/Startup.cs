@@ -62,6 +62,7 @@ namespace form_builder
                 .ConfigureDocumentCreationProviders()
                 .ConfigureFormAnswersProviders()
                 .ConfigureFormatters()
+                .ConfigureEnabledFor()
                 .ConfigureEmailProviders(HostingEnvironment)
                 .AddHelpers()
                 .AddSchemaIntegrityValidation()
