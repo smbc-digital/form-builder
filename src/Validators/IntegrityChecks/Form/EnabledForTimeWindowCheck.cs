@@ -13,11 +13,12 @@ namespace form_builder.Validators.IntegrityChecks.Form
         {
             IntegrityCheckResult result = new();
 
-            if (schema.EnvironmentAvailabilities.SelectMany(_ => _.EnabledFor).Any(_ => _.Type.Equals(EEnabledFor.Unknown)))
+            if (schema.EnvironmentAvailabilities.Where(_ => _.EnabledFor is not null).SelectMany(_ => _.EnabledFor).Any(_ => _.Type.Equals(EEnabledFor.Unknown)))
                 result.AddFailureMessage("EnabledFor Check, Unknown EnabledFor type configured.");
 
-            var TimeWindows = schema.EnvironmentAvailabilities.SelectMany(_ => _.EnabledFor)
-                    .Where(_ => _.Type.Equals(EEnabledFor.TimeWindow));
+            var TimeWindows = schema.EnvironmentAvailabilities.Where(_ => _.EnabledFor is not null)
+                .SelectMany(_ => _.EnabledFor)
+                .Where(_ => _.Type.Equals(EEnabledFor.TimeWindow));
 
             if (TimeWindows.Any())
             {               
@@ -25,7 +26,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 {
                     if (timeWindow.Properties is null)
                     {
-                        result.AddFailureMessage("EnabledFor Check,EnabledFor Properties must be defined");
+                        result.AddFailureMessage("EnabledFor Check, EnabledFor Properties must be defined");
                     }
                     else {
                         if (timeWindow.Properties.Start.Equals(DateTime.MinValue) && timeWindow.Properties.End.Equals(DateTime.MaxValue))
