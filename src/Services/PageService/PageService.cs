@@ -17,7 +17,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
 using form_builder.Services.FileUploadService;
-using form_builder.Services.FormAvailabilityServics;
+using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService.Entities;
@@ -54,7 +54,7 @@ namespace form_builder.Services.PageService
         private readonly IPageFactory _pageContentFactory;
         private readonly IIncomingDataHelper _incomingDataHelper;
         private readonly IActionsWorkflow _actionsWorkflow;
-        private readonly IFormAvailabilityServics _formAvailabilityServics;
+        private readonly IFormAvailabilityService _formAvailabilityServics;
         private readonly ILogger<IPageService> _logger;
 
         public PageService(
@@ -76,7 +76,7 @@ namespace form_builder.Services.PageService
             IPayService payService,
             IIncomingDataHelper incomingDataHelper,
             IActionsWorkflow actionsWorkflow,
-            IFormAvailabilityServics formAvailabilityServics,
+            IFormAvailabilityService formAvailabilityServics,
             ILogger<IPageService> logger)
         {
             _validators = validators;

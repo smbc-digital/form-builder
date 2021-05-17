@@ -86,7 +86,7 @@ using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.TemplatedEmailProvider;
 using form_builder.Services.TemplatedEmailService;
 using form_builder.EnabledFor;
-using form_builder.Services.FormAvailabilityServics;
+using form_builder.Services.FormAvailabilityService;
 
 namespace form_builder.Utils.Startup
 {
@@ -359,7 +359,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IEmailService, EmailService>();
             services.AddSingleton<IValidateService, ValidateService>();
             services.AddSingleton<ITemplatedEmailService, TemplatedEmailService>();
-            services.AddSingleton<IFormAvailabilityServics, FormAvailabilityServics>();
+            services.AddSingleton<IFormAvailabilityService, FormAvailabilityService>();
 
             return services;
         }
