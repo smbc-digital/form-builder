@@ -7,6 +7,7 @@ using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models.Actions;
 using form_builder.Models.Elements;
+using static form_builder.Models.EnvironmentAvailability;
 
 namespace form_builder.Models
 {
@@ -80,6 +81,27 @@ namespace form_builder.Models
         {
             var environmentAvailability = EnvironmentAvailabilities.SingleOrDefault(_ => _.Environment.ToLower().Equals(environment.ToLower()));
             return environmentAvailability == null || environmentAvailability.IsAvailable;
+        }
+
+        public List<EnabledForBase> IsEnabledFor(string environment)
+        {
+            var environmentAvailability = EnvironmentAvailabilities.SingleOrDefault(_ => _.Environment.ToLower().Equals(environment.ToLower()));
+
+            if (environmentAvailability is null)
+                return null;
+
+            if(environmentAvailability.EnabledFor is not null)
+            {
+                var enabledForList = environmentAvailability.EnabledFor.FirstOrDefault(_ => _.Type.Equals(ETimeWindowType.TimeWindow));
+                enabledForList.
+                foreach (var item in enabledForList)
+                {
+                    var type = item.Type;
+                    var start = item.Properties.Start;
+                    var end = item.Properties.End;
+                }
+            }
+            return null;
         }
     }
 }
