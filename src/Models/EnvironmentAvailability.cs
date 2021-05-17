@@ -15,16 +15,5 @@ namespace form_builder.Models
         public bool IsAvailable { get; set; }
 
         public List<EnabledForBase> EnabledFor { get; set; }
-
-        public class EnabledForBase
-        {
-            public string Type { get; set; }
-        }
-
-        public class TimeWindow : EnabledForBase
-        {           
-            public DateTime Start { get; set; } = DateTime.MinValue;
-            public DateTime End { get; set; } = DateTime.MaxValue;
-        }
     }
 }
