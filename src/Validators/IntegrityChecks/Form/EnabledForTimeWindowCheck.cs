@@ -20,18 +20,22 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 .Where(_ => _.Type.Equals(EEnabledFor.TimeWindow));
 
             if (TimeWindows.Any())
-            {               
+            {
                 foreach (var timeWindow in TimeWindows)
                 {
                     if (timeWindow.Properties is null)
                     {
                         result.AddFailureMessage("EnabledFor Check, EnabledFor Properties must be defined");
                     }
-                    else {
+                    else
+                    {
                         if (timeWindow.Properties.Start.Equals(DateTime.MinValue) && timeWindow.Properties.End.Equals(DateTime.MaxValue))
                             result.AddFailureMessage("EnabledFor Check, Start and End cannot be Min and Max Value.");
-                    }                               
-                }     
+
+                        if (timeWindow.Properties.Start > timeWindow.Properties.End)
+                            result.AddFailureMessage("EnabledFor Check, Start Date cannot be after End Date or End Date cannot be after Start Date");
+                    }
+                }
             }
             return result;
         }
