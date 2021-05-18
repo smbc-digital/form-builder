@@ -14,4 +14,9 @@
             break;
     }
 }
-<h1 class="@cssClass">@Model.Properties.Text</h1>
+<h1 class="@cssClass">@Model.Properties.Text
+    @if (Model.Properties.Optional)
+    {
+        <span class="smbc-body">(optional)</span>
+    }
+</h1>
