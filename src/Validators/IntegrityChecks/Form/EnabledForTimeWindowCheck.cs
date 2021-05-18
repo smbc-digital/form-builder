@@ -33,7 +33,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                             result.AddFailureMessage("EnabledFor Check, Start and End cannot be Min and Max Value.");
 
                         if (timeWindow.Properties.Start > timeWindow.Properties.End)
-                            result.AddFailureMessage("EnabledFor Check, Start Date cannot be after End Date or End Date cannot be after Start Date");
+                            result.AddFailureMessage("EnabledFor Check, Start Date cannot be after End Date.");
                     }
                 }
             }
