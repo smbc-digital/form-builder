@@ -106,7 +106,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             var result = _integrityCheck.Validate(schema);
             Assert.Single(result.Messages);
             Assert.False(result.IsValid);
-            Assert.Equal($"{IntegrityChecksConstants.FAILURE}EnabledFor Check, Start Date cannot be after End Date or End Date cannot be after Start Date", result.Messages.FirstOrDefault());
+            Assert.Equal($"{IntegrityChecksConstants.FAILURE}EnabledFor Check, Start Date cannot be after End Date.", result.Messages.FirstOrDefault());
         }
 
         [Fact]
@@ -133,7 +133,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             var result = _integrityCheck.Validate(schema);
             Assert.Single(result.Messages);
             Assert.False(result.IsValid);
-            Assert.Equal($"{IntegrityChecksConstants.FAILURE}EnabledFor Check, Start Date cannot be after End Date or End Date cannot be after Start Date", result.Messages.FirstOrDefault());
+            Assert.Equal($"{IntegrityChecksConstants.FAILURE}EnabledFor Check, Start Date cannot be after End Date.", result.Messages.FirstOrDefault());
         }
 
         [Fact]
