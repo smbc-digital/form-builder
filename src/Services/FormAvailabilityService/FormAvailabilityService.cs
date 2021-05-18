@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using form_builder.EnabledFor;
 using form_builder.Extensions;
 using form_builder.Models;
+using form_builder.Providers.EnabledFor;
 
 namespace form_builder.Services.FormAvailabilityService
 {
@@ -12,8 +12,8 @@ namespace form_builder.Services.FormAvailabilityService
     }
     public class FormAvailabilityService : IFormAvailabilityService
     {
-        private readonly IEnumerable<IEnabledFor> _enabledFor;
-        public FormAvailabilityService(IEnumerable<IEnabledFor> enabledFor) => _enabledFor = enabledFor;
+        private readonly IEnumerable<IEnabledForProvider> _enabledFor;
+        public FormAvailabilityService(IEnumerable<IEnabledForProvider> enabledFor) => _enabledFor = enabledFor;
 
         public bool IsAvailable(List<EnvironmentAvailability> availability, string environment)
         {

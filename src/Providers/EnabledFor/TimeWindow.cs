@@ -2,9 +2,9 @@ using System;
 using form_builder.Enum;
 using form_builder.Models;
 
-namespace form_builder.EnabledFor
+namespace form_builder.Providers.EnabledFor
 {
-    public class TimeWindow : IEnabledFor
+    public class TimeWindow : IEnabledForProvider
     {
         public EEnabledFor Type => EEnabledFor.TimeWindow;
         public bool IsAvailable(EnabledForBase enabledFor) 
