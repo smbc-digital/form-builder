@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
@@ -63,8 +64,10 @@ namespace form_builder.Helpers.PageHelpers
             var formModel = new FormBuilderViewModel();
 
             if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
+            {
                 formModel.RawHTML += await _viewRender
-                    .RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle() } });
+                    .RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle(), Optional = page.DisplayOptionalInTitle } });
+            }   
 
             foreach (var element in page.Elements)
             {
