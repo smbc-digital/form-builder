@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using form_builder.EnabledFor;
+using form_builder.Providers.EnabledFor;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Properties.EnabledForProperties;
@@ -14,8 +14,8 @@ namespace form_builder_tests.UnitTests.Services
     public class FormAvailabilityServicsTests
     {
         private readonly FormAvailabilityService _service;
-        private readonly Mock<IEnabledFor> _mockEnabledFor = new();
-        private readonly Mock<IEnumerable<IEnabledFor>> _mockEnabledForProviders = new();
+        private readonly Mock<IEnabledForProvider> _mockEnabledFor = new();
+        private readonly Mock<IEnumerable<IEnabledForProvider>> _mockEnabledForProviders = new();
 
         public FormAvailabilityServicsTests()
         {
@@ -24,7 +24,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockEnabledFor.Setup(_ => _.IsAvailable(It.IsAny<EnabledForBase>()))
                 .Returns(true);
 
-            var enabledForItems = new List<IEnabledFor> { _mockEnabledFor.Object };
+            var enabledForItems = new List<IEnabledForProvider> { _mockEnabledFor.Object };
             _mockEnabledForProviders
                 .Setup(m => m.GetEnumerator())
                 .Returns(() => enabledForItems.GetEnumerator());

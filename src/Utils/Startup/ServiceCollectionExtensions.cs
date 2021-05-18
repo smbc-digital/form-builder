@@ -52,6 +52,7 @@ using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
+using form_builder.Providers.EnabledFor;
 using form_builder.Providers.Street;
 using form_builder.Providers.Transforms.Lookups;
 using form_builder.Providers.Transforms.ReusableElements;
@@ -85,7 +86,6 @@ using form_builder.Providers.Submit;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.TemplatedEmailProvider;
 using form_builder.Services.TemplatedEmailService;
-using form_builder.EnabledFor;
 using form_builder.Services.FormAvailabilityService;
 
 namespace form_builder.Utils.Startup
@@ -230,7 +230,7 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection ConfigureEnabledFor(this IServiceCollection services)
         {
-            services.AddSingleton<IEnabledFor, TimeWindow>();
+            services.AddSingleton<IEnabledForProvider, TimeWindow>();
 
             return services;
         }

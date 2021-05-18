@@ -1,10 +1,10 @@
 using System;
-using form_builder.EnabledFor;
+using form_builder.Providers.EnabledFor;
 using form_builder.Models;
 using form_builder.Models.Properties.EnabledForProperties;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Services
+namespace form_builder_tests.UnitTests.Providers.EnabledFor
 {
     public class TimeWindowTests
     {
