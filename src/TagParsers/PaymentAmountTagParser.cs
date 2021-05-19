@@ -25,17 +25,18 @@ namespace form_builder.TagParsers
             var matches =
                 page.Elements.Any(_ => _.Properties.Text != null && Regex.IsMatch(_.Properties.Text));
 
-            if (!matches) return page;
-
-            var paymentAmount = _payService.GetFormPaymentInformation(formAnswers.FormName, page).Result;
-
-            page.Elements.Select((element) =>
+            if (matches)
             {
-                if (!string.IsNullOrEmpty(element.Properties?.Text))
-                    element.Properties.Text = Parse(element.Properties.Text, paymentAmount.Settings.Amount, Regex);
+                var paymentInfo = _payService.GetFormPaymentInformation(formAnswers.FormName, page).Result;
 
-                return element;
-            }).ToList();
+                page.Elements.Select((element) =>
+                {
+                    if (!string.IsNullOrEmpty(element.Properties?.Text))
+                        element.Properties.Text = Parse(element.Properties.Text, paymentInfo.Settings.Amount, Regex);
+
+                    return element;
+                }).ToList();
+            }
 
             return page;
         }
