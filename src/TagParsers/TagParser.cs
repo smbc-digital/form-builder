@@ -1,10 +1,10 @@
+using form_builder.Extensions;
+using form_builder.TagParsers.Formatters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using form_builder.Extensions;
-using form_builder.TagParsers.Formatters;
 
 namespace form_builder.TagParsers
 {
@@ -58,6 +58,20 @@ namespace form_builder.TagParsers
                 replacementText.Remove(match.Index - 2, match.Length + 4);
                 replacementText.Insert(match.Index - 2, formatContent(content));
                 return Parse(replacementText.ToString(), regex, data, formatContent);
+            }
+
+            return value;
+        }
+
+        public string Parse(string value, string parseValue, Regex regex)
+        {
+            var match = regex.Match(value);
+            if (match.Success)
+            {
+                var replacementText = new StringBuilder(value);
+                replacementText.Remove(match.Index - 2, match.Length + 4);
+                replacementText.Insert(match.Index - 2, parseValue);
+                return replacementText.ToString();
             }
 
             return value;
