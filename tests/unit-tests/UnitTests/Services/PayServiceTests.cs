@@ -279,7 +279,7 @@ namespace form_builder_tests.UnitTests.Services
             var page = new PageBuilder().Build();
 
             // Act
-            await _service.GetFormPaymentInformation(GetMappingEntityData(), "testForm", page);
+            await _service.GetFormPaymentInformation("testForm", page);
 
             // Assert
             _mockPaymentConfigProvider.Verify(_ => _.Get<List<PaymentInformation>>(), Times.Once);
@@ -296,7 +296,7 @@ namespace form_builder_tests.UnitTests.Services
                     Content = new StringContent("100.00")
                 });
 
-            var result = await _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page);
+            var result = await _service.GetFormPaymentInformation("complexCalculationForm", page);
 
             Assert.Equal("100.00", result.Settings.Amount);
         }
@@ -308,7 +308,7 @@ namespace form_builder_tests.UnitTests.Services
             var page = new PageBuilder().Build();
 
             // Act
-            var result = await _service.GetFormPaymentInformation(GetMappingEntityData(), "testForm", page);
+            var result = await _service.GetFormPaymentInformation("testForm", page);
 
             // Assert
             Assert.Equal("12.65", result.Settings.Amount);
@@ -327,7 +327,7 @@ namespace form_builder_tests.UnitTests.Services
             var page = new PageBuilder().Build();
 
             // Act
-            await Assert.ThrowsAsync<Exception>(() => _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page));
+            await Assert.ThrowsAsync<Exception>(() => _service.GetFormPaymentInformation("complexCalculationForm", page));
         }
 
         [Fact]
@@ -341,7 +341,7 @@ namespace form_builder_tests.UnitTests.Services
                     Content = null
                 });
 
-            var result = await Assert.ThrowsAsync<Exception>(() => _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page));
+            var result = await Assert.ThrowsAsync<Exception>(() => _service.GetFormPaymentInformation("complexCalculationForm", page));
             Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty payment amount within content", result.Message);
         }
 
@@ -356,7 +356,7 @@ namespace form_builder_tests.UnitTests.Services
                     Content = new StringContent(string.Empty)
                 });
 
-            var result = await Assert.ThrowsAsync<Exception>(() => _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page));
+            var result = await Assert.ThrowsAsync<Exception>(() => _service.GetFormPaymentInformation("complexCalculationForm", page));
             Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty payment amount within content", result.Message);
         }
     }
