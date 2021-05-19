@@ -22,6 +22,11 @@ namespace form_builder.TagParsers
 
         public Page Parse(Page page, FormAnswers formAnswers)
         {
+            var matches =
+                page.Elements.Any(_ => _.Properties.Text != null && Regex.IsMatch(_.Properties.Text));
+
+            if (!matches) return page;
+
             var paymentAmount = _payService.GetFormPaymentInformation(formAnswers.FormName, page).Result;
 
             page.Elements.Select((element) =>
