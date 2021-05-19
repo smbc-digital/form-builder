@@ -55,7 +55,6 @@ namespace form_builder_tests.UnitTests.Services
                         PaymentProvider = "testPaymentProvider",
                         Settings = new Settings
                         {
-                            ComplexCalculationRequired = false,
                             Amount = "12.65"
                         }
                     },
@@ -65,7 +64,7 @@ namespace form_builder_tests.UnitTests.Services
                         PaymentProvider = "invalidPaymentProvider",
                         Settings = new Settings
                         {
-                            ComplexCalculationRequired = false
+                            Amount = "10.00"
                         }
                     },
                     new()
@@ -74,7 +73,15 @@ namespace form_builder_tests.UnitTests.Services
                         PaymentProvider = "testPaymentProvider",
                         Settings = new Settings
                         {
-                            ComplexCalculationRequired = true
+                            CalculationSlugs = new List<SubmitSlug>
+                            {
+                                new SubmitSlug
+                                {
+                                    URL = "url",
+                                    Environment = "local",
+                                    AuthToken = "token"
+                                }
+                            }
                         }
                     }
                 });
@@ -269,22 +276,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task GetFormPaymentInformation_ShouldCallIPaymentConfigurationTransformProvider()
         {
             // Arrange
-            var page = new PageBuilder().WithElement(new Element
-            {
-                Type = EElementType.PaymentSummary,
-                Properties = new BaseProperty
-                {
-                    CalculationSlugs = new List<SubmitSlug>
-                    {
-                        new()
-                        {
-                            Environment = "local",
-                            URL = "url",
-                            AuthToken = "auth"
-                        }
-                    }
-                }
-            }).Build();
+            var page = new PageBuilder().Build();
 
             // Act
             await _service.GetFormPaymentInformation(GetMappingEntityData(), "testForm", page);
@@ -296,22 +288,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task GetFormPaymentInformation_ShouldCallGatewayIfComplexCalculationRequired()
         {
-            var page = new PageBuilder().WithElement(new Element
-            {
-                Type = EElementType.PaymentSummary,
-                Properties = new BaseProperty
-                {
-                    CalculationSlugs = new List<SubmitSlug>
-                    {
-                        new()
-                        {
-                            Environment = "local",
-                            URL = "url",
-                            AuthToken = "auth"
-                        }
-                    }
-                }
-            }).Build();
+            var page = new PageBuilder().Build();
 
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
@@ -328,20 +305,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task GetFormPaymentInformation_ShouldReturnAmountFromConfig()
         {
             // Arrange
-            var page = new PageBuilder().WithElement(new Element
-            {
-                Type = EElementType.PaymentSummary,
-                Properties = new BaseProperty
-                {
-                    CalculationSlugs = new List<SubmitSlug>
-                    {
-                        new()
-                        {
-                            Environment = "local"
-                        }
-                    }
-                }
-            }).Build();
+            var page = new PageBuilder().Build();
 
             // Act
             var result = await _service.GetFormPaymentInformation(GetMappingEntityData(), "testForm", page);
@@ -360,20 +324,7 @@ namespace form_builder_tests.UnitTests.Services
                     StatusCode = HttpStatusCode.InternalServerError
                 });
 
-            var page = new PageBuilder().WithElement(new Element
-            {
-                Type = EElementType.PaymentSummary,
-                Properties = new BaseProperty
-                {
-                    CalculationSlugs = new List<SubmitSlug>
-                    {
-                        new()
-                        {
-                            Environment = "local"
-                        }
-                    }
-                }
-            }).Build();
+            var page = new PageBuilder().Build();
 
             // Act
             await Assert.ThrowsAsync<Exception>(() => _service.GetFormPaymentInformation(GetMappingEntityData(), "complexCalculationForm", page));
@@ -382,22 +333,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task GetFormPaymentInformation_ShouldCallGatewayResponseIsNull()
         {
-            var page = new PageBuilder().WithElement(new Element
-            {
-                Type = EElementType.PaymentSummary,
-                Properties = new BaseProperty
-                {
-                    CalculationSlugs = new List<SubmitSlug>
-                    {
-                        new()
-                        {
-                            Environment = "local",
-                            URL = "url",
-                            AuthToken = "auth"
-                        }
-                    }
-                }
-            }).Build();
+            var page = new PageBuilder().Build();
 
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
@@ -412,22 +348,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task GetFormPaymentInformation_ShouldCallGatewayResponseIsWhitespace()
         {
-            var page = new PageBuilder().WithElement(new Element
-            {
-                Type = EElementType.PaymentSummary,
-                Properties = new BaseProperty
-                {
-                    CalculationSlugs = new List<SubmitSlug>
-                    {
-                        new()
-                        {
-                            Environment = "local",
-                            URL = "url",
-                            AuthToken = "auth"
-                        }
-                    }
-                }
-            }).Build();
+            var page = new PageBuilder().Build();
 
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage

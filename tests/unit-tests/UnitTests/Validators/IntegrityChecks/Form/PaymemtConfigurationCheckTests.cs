@@ -68,7 +68,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
         }
 
         [Fact]
-        public async Task PaymentConfigurationCheck_IsValid_WhenConfigFound_ForForm_WithProvider()
+        public async Task PaymentConfigurationCheck_IsNotValid_WhenConfigFound_ForForm_ButStaticAmountAndCalculationSlugsAreNotSet()
         {
             // Arrange
             _mockPaymentConfigProvider
@@ -77,6 +77,91 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 {
                     new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings() }
                 });
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithName("test-name")
+                .WithBaseUrl("test-name")
+                .Build();
+
+            // Act
+            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockPaymentProviders.Object, _mockPaymentConfigProvider.Object);
+
+            // Assert
+            var result = await check.ValidateAsync(schema);
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task PaymentConfigurationCheck_IsValid_WhenConfigFound_ForForm_WithProviderAndStaticAmount()
+        {
+            // Arrange
+            _mockPaymentConfigProvider
+                .Setup(_ => _.Get<List<PaymentInformation>>())
+                .ReturnsAsync(new List<PaymentInformation>
+                {
+                    new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings { Amount = "10.00"} }
+                });
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithName("test-name")
+                .WithBaseUrl("test-name")
+                .Build();
+
+            // Act
+            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockPaymentProviders.Object, _mockPaymentConfigProvider.Object);
+
+            // Assert
+            var result = await check.ValidateAsync(schema);
+            Assert.True(result.IsValid);
+        }
+
+        [Fact]
+        public async Task PaymentConfigurationCheck_IsValid_WhenConfigFound_ForForm_WithProviderAndCalculationSlugs()
+        {
+            // Arrange
+            _mockPaymentConfigProvider
+                .Setup(_ => _.Get<List<PaymentInformation>>())
+                .ReturnsAsync(new List<PaymentInformation>
+                {
+                    new PaymentInformation
+                    {
+                        FormName = "test-name", 
+                        PaymentProvider = "testProvider", 
+                        Settings = new Settings
+                        {
+                            CalculationSlugs = new List<SubmitSlug>
+                            {
+                                new SubmitSlug
+                                {
+                                    URL = "https://",
+                                    Environment = "non-local",
+                                    AuthToken = "token"
+                                }
+                            }
+                        }
+                    }
+                });
+
+            _mockHostingEnv.Setup(_ => _.EnvironmentName)
+                .Returns("non-local");
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitAndPay)
@@ -108,7 +193,23 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Setup(_ => _.Get<List<PaymentInformation>>())
                 .ReturnsAsync(new List<PaymentInformation>
                 {
-                    new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings { ComplexCalculationRequired = true } }
+                    new PaymentInformation 
+                    { 
+                        FormName = "test-name", 
+                        PaymentProvider = "testProvider", 
+                        Settings = new Settings
+                        {
+                            CalculationSlugs = new List<SubmitSlug>
+                            {
+                                new SubmitSlug
+                                {
+                                    URL = "https://",
+                                    Environment = "non-local",
+                                    AuthToken = "token"
+                                }
+                            }
+                        }
+                    }
                 });
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName)
@@ -120,14 +221,8 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .WithBehaviourType(EBehaviourType.SubmitAndPay)
                 .Build();
 
-            var element = new ElementBuilder()
-                .WithType(EElementType.PaymentSummary)
-                .WithCalculationSlugs(new SubmitSlug { Environment = "non-local", URL = "https://www.test.com" })
-                .Build();
-
             var page = new PageBuilder()
                 .WithBehaviour(behaviour)
-                .WithElement(element)
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -152,7 +247,23 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Setup(_ => _.Get<List<PaymentInformation>>())
                 .ReturnsAsync(new List<PaymentInformation>
                 {
-                    new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings { ComplexCalculationRequired = true } }
+                    new PaymentInformation
+                    {
+                        FormName = "test-name", 
+                        PaymentProvider = "testProvider",
+                        Settings = new Settings
+                        {
+                            CalculationSlugs = new List<SubmitSlug>
+                            {
+                                new SubmitSlug
+                                {
+                                    URL = "http://",
+                                    Environment = "non-local",
+                                    AuthToken = "token"
+                                }
+                            }
+                        }
+                    }
                 });
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName)
@@ -164,14 +275,8 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .WithBehaviourType(EBehaviourType.SubmitAndPay)
                 .Build();
 
-            var element = new ElementBuilder()
-                .WithType(EElementType.PaymentSummary)
-                .WithCalculationSlugs(new SubmitSlug { Environment = "non-local", URL = "http://www.test.com" })
-                .Build();
-
             var page = new PageBuilder()
                 .WithBehaviour(behaviour)
-                .WithElement(element)
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -198,10 +303,8 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Setup(_ => _.Get<List<PaymentInformation>>())
                 .ReturnsAsync(new List<PaymentInformation>
                 {
-                    new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings { ComplexCalculationRequired = true } }
+                    new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings {  } }
                 });
-
-            var pages = new List<Page>();
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitAndPay)

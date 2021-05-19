@@ -47,7 +47,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             if (formPaymentInformation is null)
             {
-                result.AddFailureMessage($"No payment information configured.");
+                result.AddFailureMessage($"PaymentConfiguration::No payment information configured.");
                 return result;
             }
 
@@ -57,21 +57,37 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             if (paymentProvider is null)
             {
-                result.AddFailureMessage($"No payment provider configured for provider '{formPaymentInformation.PaymentProvider}'");
+                result.AddFailureMessage($"PaymentConfiguration::No payment provider configured for provider '{formPaymentInformation.PaymentProvider}'");
                 return result;
             }
 
-            if (formPaymentInformation.Settings.ComplexCalculationRequired)
+            if (formPaymentInformation.Settings.CalculationSlugs is not null && formPaymentInformation.Settings.CalculationSlugs.Any() &&
+                !string.IsNullOrEmpty(formPaymentInformation.Settings.Amount))
             {
-                var paymentSummaryElement = schema.Pages
-                    .SelectMany(page => page.Elements)
-                    .First(element => element.Type.Equals(EElementType.PaymentSummary));
+                result.AddFailureMessage("PaymentConfiguration::Only amount or calculationSlugs can be provided");
+                return result;
+            }
+
+            if ((formPaymentInformation.Settings.CalculationSlugs is null || !formPaymentInformation.Settings.CalculationSlugs.Any()) &&
+                string.IsNullOrEmpty(formPaymentInformation.Settings.Amount))
+            {
+                result.AddFailureMessage("PaymentConfiguration::Either amount or calculationSlugs must be provided");
+                return result;
+            }
+
+            if (formPaymentInformation.Settings.CalculationSlugs is not null && formPaymentInformation.Settings.CalculationSlugs.Any())
+            {
+                if (!formPaymentInformation.Settings.CalculationSlugs.Any(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToLower())))
+                {
+                    result.AddFailureMessage($"PaymentConfiguration::CalculationSlugs not provided for {_environment.EnvironmentName.ToLower()}");
+                    return result;
+                }
 
                 if (!_environment.IsEnvironment("local") &&
-                    !paymentSummaryElement.Properties.CalculationSlugs
+                    !formPaymentInformation.Settings.CalculationSlugs
                         .Where(submitSlug => !submitSlug.Environment.Equals("local", StringComparison.OrdinalIgnoreCase))
                         .Any(submitSlug => submitSlug.URL.StartsWith("https://")))
-                    result.AddFailureMessage($"PaymentSummary::CalculateCostUrl must start with https");
+                    result.AddFailureMessage($"PaymentConfiguration::CalculateCostUrl must start with https");
             }
 
             return result;

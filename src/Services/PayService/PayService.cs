@@ -110,21 +110,17 @@ namespace form_builder.Services.PayService
             if (formPaymentConfig == null)
                 throw new Exception($"PayService:: No payment information found for {form}");
 
-            if (formPaymentConfig.Settings.ComplexCalculationRequired)
-                formPaymentConfig.Settings.Amount = await CalculateAmountAsync(formData, page);
+            if (string.IsNullOrEmpty(formPaymentConfig.Settings.Amount))
+                formPaymentConfig.Settings.Amount = await CalculateAmountAsync(formData, formPaymentConfig);
 
             return formPaymentConfig;
         }
 
-        private async Task<string> CalculateAmountAsync(MappingEntity formData, Page page)
+        private async Task<string> CalculateAmountAsync(MappingEntity formData, PaymentInformation formPaymentConfig)
         {
             try
             {
-                var paymentSummary = page.Elements.FirstOrDefault(_ => _.Type == EElementType.PaymentSummary);
-                if (paymentSummary == null)
-                    throw new Exception($"PayService::CalculateAmountAsync, No payment summary element found for {formData.BaseForm.FormName} within page {page.PageSlug}");
-
-                var postUrl = paymentSummary.Properties.CalculationSlugs.FirstOrDefault(_ =>
+                var postUrl = formPaymentConfig.Settings.CalculationSlugs.FirstOrDefault(_ =>
                     _.Environment.ToLower().Equals(_hostingEnvironment.EnvironmentName.ToLower()));
 
                 if (postUrl?.URL == null || postUrl.AuthToken == null)

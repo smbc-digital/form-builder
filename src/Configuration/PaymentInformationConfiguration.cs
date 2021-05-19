@@ -1,4 +1,7 @@
-﻿namespace form_builder.Configuration
+﻿using System.Collections.Generic;
+using form_builder.Models;
+
+namespace form_builder.Configuration
 {
     public class PaymentInformation
     {
@@ -13,6 +16,6 @@
         public string Amount { get; set; }
         public string CatalogueId { get; set; }
         public string Description { get; set; }
-        public bool ComplexCalculationRequired { get; set; }
+        public List<SubmitSlug> CalculationSlugs { get; set; }
     }
 }
