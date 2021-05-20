@@ -61,33 +61,24 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 return result;
             }
 
-            if (formPaymentInformation.Settings.CalculationSlugs is not null && formPaymentInformation.Settings.CalculationSlugs.Any() &&
+            if (formPaymentInformation.Settings.CalculationSlug is not null &&
                 !string.IsNullOrEmpty(formPaymentInformation.Settings.Amount))
             {
-                result.AddFailureMessage("PaymentConfiguration::Only amount or calculationSlugs can be provided");
+                result.AddFailureMessage("PaymentConfiguration::Only amount or calculationSlug can be provided");
                 return result;
             }
 
-            if ((formPaymentInformation.Settings.CalculationSlugs is null || !formPaymentInformation.Settings.CalculationSlugs.Any()) &&
+            if (formPaymentInformation.Settings.CalculationSlug is null &&
                 string.IsNullOrEmpty(formPaymentInformation.Settings.Amount))
             {
                 result.AddFailureMessage("PaymentConfiguration::Either amount or calculationSlugs must be provided");
                 return result;
             }
 
-            if (formPaymentInformation.Settings.CalculationSlugs is not null && formPaymentInformation.Settings.CalculationSlugs.Any())
+            if (formPaymentInformation.Settings.CalculationSlug is not null)
             {
-                if (!formPaymentInformation.Settings.CalculationSlugs.Any(_ => _.Environment.ToLower().Equals(_environment.EnvironmentName.ToLower())))
-                {
-                    result.AddFailureMessage($"PaymentConfiguration::CalculationSlugs not provided for {_environment.EnvironmentName.ToLower()}");
-                    return result;
-                }
-
-                if (!_environment.IsEnvironment("local") &&
-                    !formPaymentInformation.Settings.CalculationSlugs
-                        .Where(submitSlug => !submitSlug.Environment.Equals("local", StringComparison.OrdinalIgnoreCase))
-                        .Any(submitSlug => submitSlug.URL.StartsWith("https://")))
-                    result.AddFailureMessage($"PaymentConfiguration::CalculateCostUrl must start with https");
+                if (!_environment.IsEnvironment("local") && !formPaymentInformation.Settings.CalculationSlug.URL.StartsWith("https://"))
+                    result.AddFailureMessage("PaymentConfiguration::CalculateCostUrl must start with https");
             }
 
             return result;

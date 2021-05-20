@@ -126,10 +126,9 @@ namespace form_builder.Services.PayService
         {
             try
             {
-                var postUrl = formPaymentConfig.Settings.CalculationSlugs.FirstOrDefault(_ =>
-                    _.Environment.ToLower().Equals(_hostingEnvironment.EnvironmentName.ToLower()));
+                var postUrl = formPaymentConfig.Settings.CalculationSlug;
 
-                if (postUrl?.URL == null || postUrl.AuthToken == null)
+                if (postUrl.URL == null || postUrl.AuthToken == null)
                     throw new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
 
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);

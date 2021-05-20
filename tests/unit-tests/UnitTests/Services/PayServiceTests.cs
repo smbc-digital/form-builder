@@ -73,14 +73,11 @@ namespace form_builder_tests.UnitTests.Services
                         PaymentProvider = "testPaymentProvider",
                         Settings = new Settings
                         {
-                            CalculationSlugs = new List<SubmitSlug>
+                            CalculationSlug =  new SubmitSlug
                             {
-                                new SubmitSlug
-                                {
-                                    URL = "url",
-                                    Environment = "local",
-                                    AuthToken = "token"
-                                }
+                                URL = "url",
+                                Environment = "local",
+                                AuthToken = "token"
                             }
                         }
                     }

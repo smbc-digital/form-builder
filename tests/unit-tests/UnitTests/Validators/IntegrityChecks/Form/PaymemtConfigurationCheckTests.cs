@@ -147,14 +147,10 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                         PaymentProvider = "testProvider", 
                         Settings = new Settings
                         {
-                            CalculationSlugs = new List<SubmitSlug>
+                            CalculationSlug = new SubmitSlug
                             {
-                                new SubmitSlug
-                                {
-                                    URL = "https://",
-                                    Environment = "non-local",
-                                    AuthToken = "token"
-                                }
+                                URL = "https://",
+                                AuthToken = "token"
                             }
                         }
                     }
@@ -199,14 +195,10 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                         PaymentProvider = "testProvider", 
                         Settings = new Settings
                         {
-                            CalculationSlugs = new List<SubmitSlug>
+                            CalculationSlug = new SubmitSlug
                             {
-                                new SubmitSlug
-                                {
-                                    URL = "https://",
-                                    Environment = "non-local",
-                                    AuthToken = "token"
-                                }
+                                URL = "https://",
+                                AuthToken = "token"
                             }
                         }
                     }
@@ -253,14 +245,11 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                         PaymentProvider = "testProvider",
                         Settings = new Settings
                         {
-                            CalculationSlugs = new List<SubmitSlug>
+                            CalculationSlug = new SubmitSlug
                             {
-                                new SubmitSlug
-                                {
-                                    URL = "http://",
-                                    Environment = "non-local",
-                                    AuthToken = "token"
-                                }
+                                URL = "http://",
+                                Environment = "non-local",
+                                AuthToken = "token"
                             }
                         }
                     }

@@ -16,6 +16,6 @@ namespace form_builder.Configuration
         public string Amount { get; set; }
         public string CatalogueId { get; set; }
         public string Description { get; set; }
-        public List<SubmitSlug> CalculationSlugs { get; set; }
+        public SubmitSlug CalculationSlug { get; set; }
     }
 }
