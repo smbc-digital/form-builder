@@ -53,8 +53,7 @@ namespace form_builder.Services.PayService
 
         public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string sessionGuid)
         {
-            var page = formData.BaseForm.GetPage(_pageHelper, "payment-summary");
-            var paymentInformation = await GetFormPaymentInformation(form, page);
+            var paymentInformation = await GetFormPaymentInformation(form);
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
             return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, paymentInformation);
@@ -68,7 +67,7 @@ namespace form_builder.Services.PayService
                 throw new Exception($"PayService:: No mapping entity found for {form}");
 
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
-            var paymentInformation = await GetFormPaymentInformation(form, currentPage);
+            var paymentInformation = await GetFormPaymentInformation(form);
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
@@ -81,6 +80,8 @@ namespace form_builder.Services.PayService
                 paymentProvider.VerifyPaymentResponse(responseCode);
                 await _gateway.PostAsync(postUrl.CallbackUrl,
                     new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString() });
+
+                _pageHelper.SavePaymentAmount(sessionGuid, paymentInformation.Settings.Amount);
                 return reference;
             }
             catch (PaymentDeclinedException)
@@ -102,7 +103,7 @@ namespace form_builder.Services.PayService
             }
         }
 
-        public async Task<PaymentInformation> GetFormPaymentInformation(string form, Page page)
+        public async Task<PaymentInformation> GetFormPaymentInformation(string form)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var mappingEntity = await _mappingService.Map(sessionGuid, form);

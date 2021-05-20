@@ -18,14 +18,14 @@ namespace form_builder_tests.UnitTests.TagParsers
     {
         private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
         private readonly PaymentAmountTagParser _tagParser;
-        private readonly Mock<IPayService> _paymentService = new();
+        private readonly Mock<IPayService> _mockPaymentService = new();
 
         public PaymentAmountTagParserTests()
         {
-            _paymentService.Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<Page>()))
-                           .ReturnsAsync(new PaymentInformation() { Settings = new Settings { Amount = "£1"} });
+            _mockPaymentService.Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                           .ReturnsAsync(new PaymentInformation() { Settings = new Settings { Amount = "10.00"} });
 
-            _tagParser = new PaymentAmountTagParser(_mockFormatters.Object, _paymentService.Object);
+            _tagParser = new PaymentAmountTagParser(_mockFormatters.Object, _mockPaymentService.Object);
         }
 
         [Fact]
@@ -38,13 +38,46 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithLeadingParagraph("{{PaymentAmount}}")
                 .Build();
 
             var formAnswer = new FormAnswers();
 
             var result = _tagParser.Parse(page, formAnswer);
 
-            Assert.True(result.Elements.Select(_ => _.Properties.Text.Equals("£1")).FirstOrDefault());
+            Assert.Equal("10.00",result.Elements.First().Properties.Text);
+            Assert.Equal("10.00", result.LeadingParagraph);
+        }
+
+        [Fact]
+        public void Parse_ShouldCallPayService_IfAmountNotInFormAnswers()
+        {
+            var page = new PageBuilder()
+                .WithLeadingParagraph("{{PaymentAmount}}")
+                .Build();
+
+            var formAnswer = new FormAnswers();
+
+            var result = _tagParser.Parse(page, formAnswer);
+
+            _mockPaymentService.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public void Parse_ShouldNotCallPayService_IfAmountInFormAnswers()
+        {
+            var page = new PageBuilder()
+                .WithLeadingParagraph("{{PaymentAmount}}")
+                .Build();
+
+            var formAnswer = new FormAnswers
+            {
+                PaymentAmount = "15.00"
+            };
+
+            var result = _tagParser.Parse(page, formAnswer);
+
+            _mockPaymentService.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Never);
         }
     }
 }

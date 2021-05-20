@@ -1128,7 +1128,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveFormFileAnswer_ShouldNotSave_ExisitingFiles_IfUploadedTwice_InDistributedCache()
+        public void SaveFormFileAnswer_ShouldNotSave_ExistingFiles_IfUploadedTwice_InDistributedCache()
         {
             // Arrange
             var questionId = "fileUpload";
@@ -1204,6 +1204,16 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(guid)), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
             var callbackData = JsonConvert.DeserializeObject<FormAnswers>(callbackValue);
             Assert.Single(callbackData.AdditionalFormData);
+        }
+
+        [Fact]
+        public void SavePaymentAmount_ShouldCallDistributedCache()
+        {
+            var sessionGuid = Guid.NewGuid().ToString();
+            _pageHelper.SavePaymentAmount(sessionGuid, "10.00" );
+
+            _mockDistributedCache.Verify(_ => _.GetString(sessionGuid), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(sessionGuid, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

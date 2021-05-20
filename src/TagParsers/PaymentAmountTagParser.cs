@@ -22,17 +22,30 @@ namespace form_builder.TagParsers
 
         public Page Parse(Page page, FormAnswers formAnswers)
         {
-            if (page.Elements.Any(_ => _.Properties.Text != null && Regex.IsMatch(_.Properties.Text)))
+            var leadingParagraphRegexIsMatch = !string.IsNullOrEmpty(page.LeadingParagraph) && Regex.IsMatch(page.LeadingParagraph);
+            var pageHasElementsMatchingRegex = page.Elements.Any(_ => _.Properties.Text != null && Regex.IsMatch(_.Properties.Text));
+
+            if (leadingParagraphRegexIsMatch || pageHasElementsMatchingRegex)
             {
-                var paymentInfo = _payService.GetFormPaymentInformation(formAnswers.FormName, page).Result;
+                var paymentAmount = !string.IsNullOrEmpty(formAnswers.PaymentAmount) 
+                        ? formAnswers.PaymentAmount 
+                        : _payService.GetFormPaymentInformation(formAnswers.FormName).Result.Settings.Amount;
 
-                page.Elements.Select((element) =>
+                if (leadingParagraphRegexIsMatch)
                 {
-                    if (!string.IsNullOrEmpty(element.Properties?.Text))
-                        element.Properties.Text = Parse(element.Properties.Text, paymentInfo.Settings.Amount, Regex);
+                    page.LeadingParagraph = Parse(page.LeadingParagraph, paymentAmount, Regex);
+                }
 
-                    return element;
-                }).ToList();
+                if (pageHasElementsMatchingRegex)
+                {
+                    page.Elements.Select((element) =>
+                    {
+                        if (!string.IsNullOrEmpty(element.Properties?.Text))
+                            element.Properties.Text = Parse(element.Properties.Text, paymentAmount, Regex);
+
+                        return element;
+                    }).ToList();
+                }
             }
 
             return page;
