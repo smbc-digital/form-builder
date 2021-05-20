@@ -33,12 +33,12 @@ namespace form_builder_tests.UnitTests.TagParsers
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
-                .WithPropertyText("{{PaymentAmount}}")
+                .WithPropertyText("{{PAYMENTAMOUNT}}")
                 .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
-                .WithLeadingParagraph("{{PaymentAmount}}")
+                .WithLeadingParagraph("{{PAYMENTAMOUNT}}")
                 .Build();
 
             var formAnswer = new FormAnswers();
@@ -53,7 +53,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         public void Parse_ShouldCallPayService_IfAmountNotInFormAnswers()
         {
             var page = new PageBuilder()
-                .WithLeadingParagraph("{{PaymentAmount}}")
+                .WithLeadingParagraph("{{PAYMENTAMOUNT}}")
                 .Build();
 
             var formAnswer = new FormAnswers();
@@ -67,7 +67,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         public void Parse_ShouldNotCallPayService_IfAmountInFormAnswers()
         {
             var page = new PageBuilder()
-                .WithLeadingParagraph("{{PaymentAmount}}")
+                .WithLeadingParagraph("{{PAYMENTAMOUNT}}")
                 .Build();
 
             var formAnswer = new FormAnswers

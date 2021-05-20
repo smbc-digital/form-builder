@@ -18,7 +18,7 @@ namespace form_builder.TagParsers
             _payService = payService;
         }
 
-        public Regex Regex => new Regex("(?<={{)PaymentAmount.*?(?=}})", RegexOptions.Compiled);
+        public Regex Regex => new Regex("(?<={{)PAYMENTAMOUNT.*?(?=}})", RegexOptions.Compiled);
 
         public Page Parse(Page page, FormAnswers formAnswers)
         {
