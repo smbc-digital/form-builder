@@ -22,10 +22,7 @@ namespace form_builder.TagParsers
 
         public Page Parse(Page page, FormAnswers formAnswers)
         {
-            var matches =
-                page.Elements.Any(_ => _.Properties.Text != null && Regex.IsMatch(_.Properties.Text));
-
-            if (matches)
+            if (page.Elements.Any(_ => _.Properties.Text != null && Regex.IsMatch(_.Properties.Text)))
             {
                 var paymentInfo = _payService.GetFormPaymentInformation(formAnswers.FormName, page).Result;
 
