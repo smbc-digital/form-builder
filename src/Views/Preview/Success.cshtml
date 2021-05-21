@@ -1,0 +1,20 @@
+@model SuccessViewModel
+@{
+    ViewData["Title"] = Model.FormName;
+    ViewData["PageTitle"] = Model.PageTitle;
+    ViewData["FeedbackPhase"] = Model.FeedbackPhase;
+    ViewData["FeedbackForm"] = Model.FeedbackForm;
+    ViewData["BannerTitle"] = Model.BannerTitle;
+    ViewData["LeadingParagraph"] = Model.LeadingParagraph;
+    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadcrumbs;
+    ViewData["Breadcrumbs"] = Model.Breadcrumbs;
+    ViewData["PreviewMode"] = Model.PreviewMode;
+}
+
+<div class="smbc-panel smbc-panel--confirmation">
+    <h1 class="govuk-panel__title">Success</h1>
+    <div class="govuk-body-l">Your test form has succesfully been added and will be avaibale for 30 minutes via the url below</div>
+    <div class="smbc-panel__body smbc-!-font-word-break">
+        <a class="govuk-link" href="/components/">Form url</a>
+    </div>
+</div>

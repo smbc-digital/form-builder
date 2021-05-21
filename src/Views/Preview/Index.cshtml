@@ -1,0 +1,16 @@
+@model form_builder.ViewModels.FormBuilderViewModel
+@{
+    ViewData["Title"] = Model.FormName;
+    ViewData["PageTitle"] = Model.PageTitle;
+    ViewData["FeedbackForm"] = Model.FeedbackForm;
+    ViewData["FeedbackPhase"] = Model.FeedbackPhase;
+    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadCrumbs;
+    ViewData["Breadcrumbs"] = Model.BreadCrumbs;
+    ViewData["PreviewMode"] = Model.PreviewMode;
+}
+
+@using (Html.BeginForm("IndexPost", "Preview", new {}, FormMethod.Post, false, new { autocomplete = "on", novalidate = "novalidate", enctype = "multipart/form-data" }) )
+{
+    @Html.AntiForgeryToken()
+    @Html.Raw(Model.RawHTML)
+}
