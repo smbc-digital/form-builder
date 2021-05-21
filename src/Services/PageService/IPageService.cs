@@ -19,6 +19,7 @@ namespace form_builder.Services.PageService
         Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
 
         Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType, FormSchema formSchema);
+
         Task<SuccessPageEntity> GetCancelBookingSuccessPage(string form);
     }
 }

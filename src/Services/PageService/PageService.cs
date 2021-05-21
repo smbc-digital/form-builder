@@ -164,13 +164,6 @@ namespace form_builder.Services.PageService
                     searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
             }
 
-            if (page.Elements.Any(_ => _.Type == EElementType.PaymentSummary))
-            {
-                var data = await _mappingService.Map(sessionGuid, form);
-                var paymentAmount = await _payService.GetFormPaymentInformation(data, form, page);
-                page.Elements.First(_ => _.Type == EElementType.PaymentSummary).Properties.Value = paymentAmount.Settings.Amount;
-            }
-
             if (page.HasIncomingGetValues)
             {
                 var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
