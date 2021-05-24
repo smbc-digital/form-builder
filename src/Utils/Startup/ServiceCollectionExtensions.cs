@@ -486,6 +486,47 @@ namespace form_builder.Utils.Startup
             return services;
         }
 
+        public static IServiceCollection AddFileStorageProvider(this IServiceCollection services, IConfiguration configuration)
+        {
+            var storageProviderConfiguration = configuration.GetSection("FileStorageProvider");
+
+            switch (storageProviderConfiguration["Type"])
+            {
+                case "Redis":
+                    services.AddStackExchangeRedisCache(options =>
+                    {
+                        options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions
+                        {
+                            EndPoints =
+                            {
+                                { storageProviderConfiguration["Address"] ?? "127.0.0.1",  6379}
+                            },
+                            ClientName = storageProviderConfiguration["InstanceName"] ?? Assembly.GetEntryAssembly()?.GetName().Name,
+                            SyncTimeout = 30000,
+                            AsyncTimeout = 30000
+                        };
+                    });
+
+                    var redis = ConnectionMultiplexer.Connect(storageProviderConfiguration["Address"]);
+                    redis.IncludePerformanceCountersInExceptions = true;
+                    services.AddDataProtection().PersistKeysToStackExchangeRedis(redis, $"{storageProviderConfiguration["InstanceName"]}DataProtection-Keys");
+                    break;
+
+                case "Application":
+                    services.AddDistributedMemoryCache();
+                    break;
+
+                default:
+                    services.AddDistributedMemoryCache();
+                    break;
+            }
+
+            services.AddDataProtection().SetApplicationName("formbuilder");
+            services.AddTransient<IDistributedCacheWrapper, FileStorageProvider>();
+
+            return services;
+        }
+
         public static IServiceCollection AddReferenceNumberProvider(this IServiceCollection services)
         {
             services.AddTransient<IReferenceNumberProvider, ReferenceNumberProvider>();

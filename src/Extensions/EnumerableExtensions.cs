@@ -11,6 +11,7 @@ using form_builder.Providers.Submit;
 using form_builder.Providers.EnabledFor;
 using form_builder.Providers.TemplatedEmailProvider;
 using form_builder.TagParsers.Formatters;
+using form_builder.Providers.StorageProvider;
 
 namespace form_builder.Extensions
 {
@@ -42,5 +43,8 @@ namespace form_builder.Extensions
 
         public static IEnabledForProvider Get(this IEnumerable<IEnabledForProvider> value, EEnabledFor providerName) =>
            value.Single(_ => _.Type.Equals(providerName));
+
+        public static IDistributedCacheWrapper Get(this IEnumerable<IDistributedCacheWrapper> value, ECache providerName) =>
+          value.Single(_ => _.ProviderName.Equals(providerName));
     }
 }
