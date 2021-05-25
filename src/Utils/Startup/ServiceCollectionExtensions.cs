@@ -87,6 +87,7 @@ using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.TemplatedEmailProvider;
 using form_builder.Services.TemplatedEmailService;
 using form_builder.Services.FormAvailabilityService;
+using form_builder.Services.PreviewService;
 
 namespace form_builder.Utils.Startup
 {
@@ -361,6 +362,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IValidateService, ValidateService>();
             services.AddSingleton<ITemplatedEmailService, TemplatedEmailService>();
             services.AddSingleton<IFormAvailabilityService, FormAvailabilityService>();
+            services.AddSingleton<IPreviewService, PreviewService>();
 
             return services;
         }
@@ -425,6 +427,7 @@ namespace form_builder.Utils.Startup
             services.Configure<CivicaPaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
             services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection("DistributedCacheExpiration"));
             services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>("UseDistributedCache"));
+            services.Configure<PreviewModeConfiguration>(cacheOptions => cacheOptions.IsEnabled = configuration.GetValue<bool>("AllowPreviewMode"));
             services.Configure<AwsSesKeysConfiguration>(configuration.GetSection("Ses"));
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection("ReCaptchaConfiguration"));
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));

@@ -6,7 +6,7 @@ using form_builder.Models;
 
 namespace form_builder.Controllers
 {
-    [Route("preview")]
+    [Route("[Controller]")]
     public class PreviewController : Controller
     {
         private readonly IPreviewService _previewService;

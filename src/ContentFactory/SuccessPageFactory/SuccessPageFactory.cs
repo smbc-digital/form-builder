@@ -91,7 +91,8 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                 BannerTitle = page.BannerTitle,
                 LeadingParagraph = page.LeadingParagraph,
                 DisplayBreadcrumbs = page.DisplayBreadCrumbs,
-                Breadcrumbs = baseForm.BreadCrumbs
+                Breadcrumbs = baseForm.BreadCrumbs,
+                IsInPreviewMode = result.IsInPreviewMode
             };
         }
 
@@ -115,7 +116,8 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                 BannerTitle = page.BannerTitle,
                 LeadingParagraph = page.LeadingParagraph,
                 DisplayBreadcrumbs = page.DisplayBreadCrumbs,
-                Breadcrumbs = baseForm.BreadCrumbs
+                Breadcrumbs = baseForm.BreadCrumbs,
+                IsInPreviewMode = result.IsInPreviewMode
             };
         }
 

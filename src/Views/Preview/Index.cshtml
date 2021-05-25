@@ -6,7 +6,7 @@
     ViewData["FeedbackPhase"] = Model.FeedbackPhase;
     ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadCrumbs;
     ViewData["Breadcrumbs"] = Model.BreadCrumbs;
-    ViewData["PreviewMode"] = Model.PreviewMode;
+    ViewData["PreviewMode"] = Model.IsInPreviewMode;
 }
 
 @using (Html.BeginForm("IndexPost", "Preview", new {}, FormMethod.Post, false, new { autocomplete = "on", novalidate = "novalidate", enctype = "multipart/form-data" }) )

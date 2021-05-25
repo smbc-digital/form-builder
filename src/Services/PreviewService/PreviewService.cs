@@ -18,6 +18,7 @@ using Microsoft.Extensions.Options;
 using form_builder.Factories.Schema;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using form_builder.Constants;
 
 namespace form_builder.Services.PreviewService
 {
@@ -64,14 +65,14 @@ namespace form_builder.Services.PreviewService
 
         public async Task<FormBuilderViewModel> GetPreviewPage() 
         {
-            if(!_previewModeConfiguration.PreviewMode)
+            if(!_previewModeConfiguration.IsEnabled)
                 throw new ApplicationException("PreviewService: Request to access preview service recieved but preview service is disabled in current enviroment");
         
-            return await _pageContentFactory.Build(PreviewPage(), new Dictionary<string, dynamic>(), new FormSchema(), string.Empty);
+            return await _pageContentFactory.Build(PreviewPage(), new Dictionary<string, dynamic>(), new FormSchema{ BaseURL = "preview" }, string.Empty);
         }
         public void ExitPreviewMode()
         {
-             if(!_previewModeConfiguration.PreviewMode)
+             if(!_previewModeConfiguration.IsEnabled)
                 throw new ApplicationException("PreviewService: Request to exit preview mode recieved but preview service is disabled in current enviroment");
 
             var previewFormKey = _httpContextAccessor.HttpContext.Request.Cookies["PreviewMode"];
@@ -81,7 +82,7 @@ namespace form_builder.Services.PreviewService
 
         public async Task<ProcessPreviewRequestEntity> VerifyPreviewRequest(IEnumerable<CustomFormFile> fileUpload)
         {
-            if(!_previewModeConfiguration.PreviewMode)
+            if(!_previewModeConfiguration.IsEnabled)
                 throw new ApplicationException("PreviewService: Request to upload from in preview service recieved but preview service is disabled in current enviroment");
 
             var viewModel = new Dictionary<string, dynamic>();
@@ -94,7 +95,7 @@ namespace form_builder.Services.PreviewService
 
             if (!previewPage.IsValid)
             {
-                var formModel = await _pageContentFactory.Build(previewPage, viewModel, new FormSchema { Pages = new List<Page> { previewPage } }, string.Empty);
+                var formModel = await _pageContentFactory.Build(previewPage, viewModel, new FormSchema { Pages = new List<Page> { previewPage }, BaseURL = "preview" }, string.Empty);
 
                 return new ProcessPreviewRequestEntity
                 {
@@ -103,7 +104,7 @@ namespace form_builder.Services.PreviewService
                 };
             }
 
-            var previewKey = Guid.NewGuid();
+            var previewKey = $"{PreviewConstants.PREVIEW_MODE_PREFIX}{Guid.NewGuid().ToString()}";
             List<DocumentModel> fileContent = viewModel.Values.First();
 
             var t = Convert.FromBase64String(fileContent.First().Content);
@@ -111,15 +112,15 @@ namespace form_builder.Services.PreviewService
 
             try
             {
-                var formSchema = await _schemaFactory.Build(previewKey.ToString(), true);
-                formSchema.BaseURL = previewKey.ToString();
+                var formSchema = await _schemaFactory.Build(previewKey);
+                formSchema.BaseURL = previewKey;
                 await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix("v2")}{previewKey}", JsonConvert.SerializeObject(formSchema), _distributedCacheExpirationConfiguration.FormJson);
             }
             catch (Exception e)
             {
                 _distributedCache.Remove($"{ESchemaType.FormJson.ToESchemaTypePrefix("v2")}{previewKey}");
                 var errorPage = PreviewErrorPage(e.Message);
-                var formModel = await _pageContentFactory.Build(errorPage, viewModel, new FormSchema { Pages = new List<Page> { errorPage } }, string.Empty);
+                var formModel = await _pageContentFactory.Build(errorPage, viewModel, new FormSchema { Pages = new List<Page> { errorPage }, BaseURL = "preview"  }, string.Empty);
                 return new ProcessPreviewRequestEntity
                 {
                     Page = errorPage,
@@ -130,7 +131,7 @@ namespace form_builder.Services.PreviewService
 
             var cookieOptions = new CookieOptions();
             cookieOptions.Secure = true;
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("PreviewMode", previewKey.ToString(), cookieOptions);
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("PreviewMode", previewKey, cookieOptions);
 
             return new ProcessPreviewRequestEntity
             {

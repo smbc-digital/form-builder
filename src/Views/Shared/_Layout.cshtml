@@ -3,6 +3,7 @@
     var feedbackPhase = (string)ViewData["FeedbackPhase"];
     var displayBreadcrumbs = (bool)ViewData["DisplayBreadcrumbs"];
     var breadcrumbs = ViewData["Breadcrumbs"];
+    var displayPreviewModeBanner = (bool)ViewData["PreviewMode"];
 }
 
 <!doctype html>
@@ -27,6 +28,11 @@
     <div role="navigation">
         <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
     </div>
+
+    @if(displayPreviewModeBanner)
+    {
+        <partial name="PreviewMode" />
+    }
 
     <partial name="Header" />
 

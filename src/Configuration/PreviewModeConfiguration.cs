@@ -2,6 +2,6 @@ namespace form_builder.Configuration
 {
     public class PreviewModeConfiguration
     {
-        public bool PreviewMode { get; set; }
+        public bool IsEnabled { get; set; }
     }
 }

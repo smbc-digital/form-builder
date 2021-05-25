@@ -442,5 +442,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithLabelAsH1(bool value)
+        {
+            _property.LabelAsH1 = value;
+
+            return this;
+        }
     }
 }
