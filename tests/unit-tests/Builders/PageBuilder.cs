@@ -9,6 +9,7 @@ namespace form_builder_tests.Builders
     {
         private string _title = "TestTitle";
         private string _pageSlug = "test-url";
+        private string _leadingParagraph = "Leading paragraph";
         private bool _isValidated = false;
         private List<IElement> _elements = new List<IElement>();
         private List<Behaviour> _behaviours = new List<Behaviour>();
@@ -22,6 +23,7 @@ namespace form_builder_tests.Builders
             {
                 Title = _title,
                 PageSlug = _pageSlug,
+                LeadingParagraph = _leadingParagraph,
                 IsValidated = _isValidated,
                 Behaviours = _behaviours,
                 Elements = _elements,
@@ -48,6 +50,13 @@ namespace form_builder_tests.Builders
         public PageBuilder WithPageSlug(string url)
         {
             _pageSlug = url;
+
+            return this;
+        }
+
+        public PageBuilder WithLeadingParagraph(string leadingParagraph)
+        {
+            _leadingParagraph = leadingParagraph;
 
             return this;
         }
