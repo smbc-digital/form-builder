@@ -46,6 +46,12 @@ namespace form_builder.Validators
 
             var fileTypes = documentModel.Select(_ => new MimeTypeFile { FileType = Convert.FromBase64String(_.Content).GetFileType(), File = _ });
             var invalidFiles = new List<MimeTypeFile>();
+            //TODO: I need replacing
+            return new ValidationResult
+                    {
+                        IsValid = true
+                    };
+
             if (fileTypes != null)
             {
                 var availableFileTypes = fileTypes.Where(_ => _ != null && _.FileType != null);
