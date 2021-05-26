@@ -13,6 +13,7 @@ using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
+using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
@@ -37,6 +38,7 @@ namespace form_builder.Services.PageService
     public class PageService : IPageService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IFileStorageProvider _fileStorage;
         private readonly IEnumerable<IElementValidator> _validators;
         private readonly IPageHelper _pageHelper;
         private readonly ISessionHelper _sessionHelper;
@@ -77,7 +79,8 @@ namespace form_builder.Services.PageService
             IIncomingDataHelper incomingDataHelper,
             IActionsWorkflow actionsWorkflow,
             IFormAvailabilityService formAvailabilityServics,
-            ILogger<IPageService> logger)
+            ILogger<IPageService> logger,
+            IFileStorageProvider fileStorage)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -99,6 +102,7 @@ namespace form_builder.Services.PageService
             _incomingDataHelper = incomingDataHelper;
             _actionsWorkflow = actionsWorkflow;
             _logger = logger;
+            _fileStorage = fileStorage;
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParamters)
@@ -317,7 +321,7 @@ namespace form_builder.Services.PageService
                     {
                         convertedFileUploadAnswer.ForEach((_) =>
                         {
-                            _distributedCache.Remove(_.Key);
+                            _fileStorage.Remove(_.Key);
                         });
                     }
                 });

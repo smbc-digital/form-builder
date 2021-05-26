@@ -12,6 +12,7 @@ using form_builder.Factories.Schema;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
+using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
@@ -26,6 +27,7 @@ namespace form_builder.Services.MappingService
     public class MappingService : IMappingService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IFileStorageProvider _fileStorage;
         private readonly IElementMapper _elementMapper;
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
@@ -37,7 +39,8 @@ namespace form_builder.Services.MappingService
             ISchemaFactory schemaFactory,
             IWebHostEnvironment environment,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            ILogger<MappingService> logger)
+            ILogger<MappingService> logger,
+            IFileStorageProvider fileStorage)
         {
             _distributedCache = distributedCache;
             _elementMapper = elementMapper;
@@ -45,6 +48,7 @@ namespace form_builder.Services.MappingService
             _environment = environment;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _logger = logger;
+            _fileStorage = fileStorage;
         }
 
         public async Task<MappingEntity> Map(string sessionGuid, string form)
@@ -95,12 +99,21 @@ namespace form_builder.Services.MappingService
                 throw new ApplicationException("MappingService::GetFormAnswers Session has expired");
 
             var sessionData = _distributedCache.GetString(sessionGuid);
+            var sessionFile = _fileStorage.GetString(sessionGuid);
 
             if(sessionData is null)
                 throw new ApplicationException("MappingService::GetFormAnswers, Session data is null");
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
+            var answers = JsonConvert.DeserializeObject<List<Answers>>(sessionFile);
+
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
+
+            convertedAnswers.Pages?.Add(new PageAnswers
+            {
+                Answers = answers
+            });
+
             convertedAnswers.FormName = form;
 
             if (convertedAnswers.Pages == null || !convertedAnswers.Pages.Any())
