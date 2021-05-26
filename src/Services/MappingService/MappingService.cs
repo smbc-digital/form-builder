@@ -105,13 +105,13 @@ namespace form_builder.Services.MappingService
                 throw new ApplicationException("MappingService::GetFormAnswers, Session data is null");
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
-            var answers = JsonConvert.DeserializeObject<List<Answers>>(sessionFile);
 
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
 
+            if(sessionFile != null)
             convertedAnswers.Pages?.Add(new PageAnswers
             {
-                Answers = answers
+                Answers = JsonConvert.DeserializeObject<List<Answers>>(sessionFile)
             });
 
             convertedAnswers.FormName = form;

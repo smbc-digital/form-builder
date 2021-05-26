@@ -105,6 +105,8 @@ namespace form_builder_tests.UnitTests.Services
 
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
+            _fileStorage.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+
             _mockDistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
             {
                 FormJson = 1
@@ -858,8 +860,8 @@ namespace form_builder_tests.UnitTests.Services
             await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileOneKey)), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileTwoKey)), Times.Once);
+            _fileStorage.Verify(_ => _.Remove(It.Is<string>(x => x == fileOneKey)), Times.Once);
+            _fileStorage.Verify(_ => _.Remove(It.Is<string>(x => x == fileTwoKey)), Times.Once);
         }
 
 
@@ -947,10 +949,10 @@ namespace form_builder_tests.UnitTests.Services
             await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileOneKey)), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileTwoKey)), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileThreeKey)), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileFourKey)), Times.Once);
+            _fileStorage.Verify(_ => _.Remove(It.Is<string>(x => x == fileOneKey)), Times.Once);
+            _fileStorage.Verify(_ => _.Remove(It.Is<string>(x => x == fileTwoKey)), Times.Once);
+            _fileStorage.Verify(_ => _.Remove(It.Is<string>(x => x == fileThreeKey)), Times.Once);
+            _fileStorage.Verify(_ => _.Remove(It.Is<string>(x => x == fileFourKey)), Times.Once);
         }
 
         [Fact]
