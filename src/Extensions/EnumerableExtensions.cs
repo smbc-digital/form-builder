@@ -11,7 +11,7 @@ using form_builder.Providers.Submit;
 using form_builder.Providers.EnabledFor;
 using form_builder.Providers.TemplatedEmailProvider;
 using form_builder.TagParsers.Formatters;
-using form_builder.Providers.StorageProvider;
+using form_builder.Providers.FileStorage;
 
 namespace form_builder.Extensions
 {

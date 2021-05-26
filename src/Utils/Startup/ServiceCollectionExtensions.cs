@@ -87,6 +87,7 @@ using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.TemplatedEmailProvider;
 using form_builder.Services.TemplatedEmailService;
 using form_builder.Services.FormAvailabilityService;
+using form_builder.Providers.FileStorage;
 
 namespace form_builder.Utils.Startup
 {

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace form_builder.Providers.StorageProvider
+namespace form_builder.Providers.FileStorage
 {
     public interface IFileStorageProvider
     {

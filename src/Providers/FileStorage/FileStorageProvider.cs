@@ -5,7 +5,7 @@ using form_builder.Configuration;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 
-namespace form_builder.Providers.StorageProvider
+namespace form_builder.Providers.FileStorage
 {
     /**
      * IDistributedCacheWrapper
