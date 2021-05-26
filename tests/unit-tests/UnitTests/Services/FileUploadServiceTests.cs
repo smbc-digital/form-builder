@@ -26,7 +26,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly FileUploadService _service;
         private readonly Mock<IEnumerable<IElementValidator>> _validators = new();
         private readonly Mock<IElementValidator> _testValidator = new();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<IFileStorageProvider> _mockDistributedCache = new();
         private readonly Mock<IPageFactory> _mockPageFactory = new();
         private readonly Mock<IPageHelper> _mockPageHelper = new();
 

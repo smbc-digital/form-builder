@@ -33,6 +33,7 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IWebHostEnvironment _environment;
         private readonly FormConfiguration _disallowedKeys;
         private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IFileStorageProvider _fileStorage;
         private readonly IEnumerable<ILookupProvider> _lookupProviders;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
@@ -40,11 +41,13 @@ namespace form_builder.Helpers.PageHelpers
             IOptions<FormConfiguration> disallowedKeys, IWebHostEnvironment enviroment,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ISessionHelper sessionHelper, IEnumerable<ILookupProvider> lookupProviders,
-            IActionHelper actionHelper)
+            IActionHelper actionHelper,
+            IFileStorageProvider fileStorage)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
             _distributedCache = distributedCache;
+            _fileStorage = fileStorage;
             _disallowedKeys = disallowedKeys.Value;
             _environment = enviroment;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
@@ -272,7 +275,7 @@ namespace form_builder.Helpers.PageHelpers
 
                 for (int i = 0; i < fileContent.Count; i++)
                 {
-                    _distributedCache.SetStringAsync(keys[i], JsonConvert.SerializeObject(fileContent[i]), _distributedCacheExpirationConfiguration.FileUpload);
+                    _fileStorage.SetStringAsync(keys[i], JsonConvert.SerializeObject(fileContent[i]), _distributedCacheExpirationConfiguration.FileUpload);
                 }
 
                 fileUploadModel.AddRange(filsToAdd.Select((_, index) => new FileUploadModel

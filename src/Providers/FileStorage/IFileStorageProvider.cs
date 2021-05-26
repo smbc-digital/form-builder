@@ -4,8 +4,10 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace form_builder.Providers.StorageProvider
 {
-    public interface IDistributedCacheWrapper
+    public interface IFileStorageProvider
     {
+        string ProviderName { get; }
+
         string GetString(string key);
 
         Task<byte[]> GetAsync(string key, CancellationToken token = default);

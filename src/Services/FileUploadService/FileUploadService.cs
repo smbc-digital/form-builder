@@ -16,15 +16,15 @@ namespace form_builder.Services.FileUploadService
 {
     public class FileUploadService : IFileUploadService
     {
-        private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IFileStorageProvider _fileStorage;
         private readonly IPageFactory _pageFactory;
         private readonly IPageHelper _pageHelper;
 
-        public FileUploadService(IDistributedCacheWrapper distributedCache,
+        public FileUploadService(IFileStorageProvider fileStorage,
             IPageFactory pageFactory,
             IPageHelper pageHelper)
         {
-            _distributedCache = distributedCache;
+            _fileStorage = fileStorage;
             _pageFactory = pageFactory;
             _pageHelper = pageHelper;
         }
@@ -68,7 +68,7 @@ namespace form_builder.Services.FileUploadService
             string path,
             string sessionGuid)
         {
-            var cachedAnswers = _distributedCache.GetString(sessionGuid);
+            var cachedAnswers = _fileStorage.GetString(sessionGuid);
 
             var convertedAnswers = cachedAnswers == null
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
@@ -81,8 +81,8 @@ namespace form_builder.Services.FileUploadService
             response.Remove(fileToRemove);
             convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path)).Answers.FirstOrDefault().Response = response;
 
-            _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
-            _distributedCache.Remove(fileToRemove.Key);
+            _fileStorage.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
+            _fileStorage.Remove(fileToRemove.Key);
 
             return new ProcessRequestEntity
             {
