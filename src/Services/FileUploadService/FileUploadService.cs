@@ -154,8 +154,10 @@ namespace form_builder.Services.FileUploadService
 
             if (!modelStateIsValid)
             {
-                var newViewModel = new Dictionary<string, dynamic>();
-                newViewModel.Add("modelStateInvalid", null);
+                var newViewModel = new Dictionary<string, dynamic>
+                {
+                    { "modelStateInvalid", null }
+                };
 
                 var formModel = await _pageFactory.Build(currentPage, newViewModel, baseForm, guid);
 

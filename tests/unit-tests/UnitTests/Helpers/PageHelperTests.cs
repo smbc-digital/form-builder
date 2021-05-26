@@ -16,6 +16,7 @@ using form_builder.Helpers.ViewRender;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
+using form_builder.Providers.FileStorage;
 using form_builder.Providers.Lookup;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.RetrieveExternalDataService.Entities;
@@ -34,6 +35,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IViewRender> _mockIViewRender = new();
         private readonly Mock<IElementHelper> _mockElementHelper = new();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<IFileStorageProvider> _mockFileStorageProvider = new();
         private readonly Mock<IOptions<FormConfiguration>> _mockDisallowedKeysOptions = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings = new();
@@ -69,7 +71,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockDistributedCacheExpirationSettings.Object,
                 _mockSessionHelper.Object, _mockLookupProviders,
-                _mockActionHelper.Object);
+                _mockActionHelper.Object, _mockFileStorageProvider.Object);
         }
 
         [Fact]
@@ -1023,7 +1025,7 @@ namespace form_builder_tests.UnitTests.Helpers
             // Assert
             Assert.NotNull(results);
             Assert.Equal(3, results.Count());
-            var itemData = Assert.IsType<List<FileUploadModel>>(results[2].Response);
+            Assert.IsType<List<FileUploadModel>>(results[2].Response);
             Assert.StartsWith("file-fileUpload_FileQuestionId-", results[2].Response[0].Key);
         }
 
