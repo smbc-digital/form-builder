@@ -17,6 +17,7 @@ using form_builder.Services.MappingService.Entities;
 using form_builder.Services.SubmitService;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
@@ -35,6 +36,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<IReferenceNumberProvider> _mockReferenceNumberProvider = new();
         private readonly Mock<ISubmitProvider> _mockSubmitProvider = new();
+
+        private readonly Mock<ILogger<SubmitService>> _mockLogger = new();
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
 
         public SubmitServiceTests()
@@ -68,7 +71,7 @@ namespace form_builder_tests.UnitTests.Services
                 _mockSubmitProvider.Object
             };
 
-            _service = new SubmitService(_mockGateway.Object, _mockPageHelper.Object, _mockEnvironment.Object, _mockIOptions.Object, _mockDistributedCache.Object, _mockSchemaFactory.Object, _mockReferenceNumberProvider.Object, _submitProviders);
+            _service = new SubmitService(_mockGateway.Object, _mockPageHelper.Object, _mockEnvironment.Object, _mockIOptions.Object, _mockDistributedCache.Object, _mockSchemaFactory.Object, _mockReferenceNumberProvider.Object, _submitProviders, _mockLogger.Object);
         }
 
         [Fact]
