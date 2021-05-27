@@ -5,7 +5,7 @@ using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Mappers;
 using form_builder.Models;
-using form_builder.Providers.StorageProvider;
+using form_builder.Providers.FileStorage;
 using form_builder.Utils.Extensions;
 using form_builder.Utils.Hash;
 using Moq;
@@ -20,7 +20,7 @@ namespace form_builder_tests.UnitTests.Mappers
     public class ElementMapperTests
     {
         private readonly ElementMapper _elementMapper;
-        private readonly Mock<IDistributedCacheWrapper> _wrapper = new ();
+        private readonly Mock<IFileStorageProvider> fileStorage = new ();
         private readonly Mock<IHashUtil> _mockHashUtil = new ();
 
         public ElementMapperTests()
@@ -29,7 +29,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Setup(_ => _.Hash(It.IsAny<string>()))
                 .Returns("hashedId");
 
-            _elementMapper = new ElementMapper(_wrapper.Object, _mockHashUtil.Object);
+            _elementMapper = new ElementMapper(fileStorage.Object, _mockHashUtil.Object);
         }
 
         [Fact]
@@ -735,7 +735,7 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var key = "fileUpload_fileUploadTestKey";
-            _wrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+            fileStorage.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns("testfile");
 
             var formAnswers = new FormAnswers
@@ -763,7 +763,7 @@ namespace form_builder_tests.UnitTests.Mappers
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
-            _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+            fileStorage.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             var model = Assert.IsType<List<File>>(result);
             Assert.Equal("testfile", model[0].Content);
         }
@@ -773,10 +773,10 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var key = "fileUpload_fileUploadTestKey";
-            _wrapper.Setup(_ => _.GetString(It.Is<string>(_ => _ == "datakeyfile1")))
+            fileStorage.Setup(_ => _.GetString(It.Is<string>(_ => _ == "datakeyfile1")))
                 .Returns("file1content");
 
-            _wrapper.Setup(_ => _.GetString(It.Is<string>(_ => _ == "datakeyfile2")))
+            fileStorage.Setup(_ => _.GetString(It.Is<string>(_ => _ == "datakeyfile2")))
                 .Returns("file2content");
 
             var formAnswers = new FormAnswers
@@ -808,7 +808,7 @@ namespace form_builder_tests.UnitTests.Mappers
             var result = _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
-            _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Exactly(2));
+            fileStorage.Verify(_ => _.GetString(It.IsAny<string>()), Times.Exactly(2));
             var model = Assert.IsType<List<File>>(result);
             Assert.Equal("file1content", model[0].Content);
             Assert.Equal("file2content", model[1].Content);
@@ -823,7 +823,7 @@ namespace form_builder_tests.UnitTests.Mappers
         {
             // Arrange
             var key = "fileUploadTestKey";
-            _wrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+            fileStorage.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(() => null);
 
             var formAnswers = new FormAnswers
@@ -886,7 +886,7 @@ namespace form_builder_tests.UnitTests.Mappers
             _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
-            _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
+            fileStorage.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
