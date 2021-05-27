@@ -9,6 +9,7 @@ using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.FileStorage;
+using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Newtonsoft.Json;
 
@@ -16,14 +17,17 @@ namespace form_builder.Services.FileUploadService
 {
     public class FileUploadService : IFileUploadService
     {
+        private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IFileStorageProvider _fileStorage;
         private readonly IPageFactory _pageFactory;
         private readonly IPageHelper _pageHelper;
 
-        public FileUploadService(IFileStorageProvider fileStorage,
+        public FileUploadService(IDistributedCacheWrapper distributedCache, 
+            IFileStorageProvider fileStorage,
             IPageFactory pageFactory,
             IPageHelper pageHelper)
         {
+            _distributedCache = distributedCache;
             _fileStorage = fileStorage;
             _pageFactory = pageFactory;
             _pageHelper = pageHelper;
@@ -68,7 +72,7 @@ namespace form_builder.Services.FileUploadService
             string path,
             string sessionGuid)
         {
-            var cachedAnswers = _fileStorage.GetString(sessionGuid);
+            var cachedAnswers = _distributedCache.GetString(sessionGuid);
 
             var convertedAnswers = cachedAnswers == null
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
@@ -81,7 +85,7 @@ namespace form_builder.Services.FileUploadService
             response.Remove(fileToRemove);
             convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path)).Answers.FirstOrDefault().Response = response;
 
-            _fileStorage.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
+            _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
             _fileStorage.Remove(fileToRemove.Key);
 
             return new ProcessRequestEntity

@@ -27,7 +27,6 @@ namespace form_builder.Services.MappingService
     public class MappingService : IMappingService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly IFileStorageProvider _fileStorage;
         private readonly IElementMapper _elementMapper;
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
@@ -39,8 +38,7 @@ namespace form_builder.Services.MappingService
             ISchemaFactory schemaFactory,
             IWebHostEnvironment environment,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            ILogger<MappingService> logger,
-            IFileStorageProvider fileStorage)
+            ILogger<MappingService> logger)
         {
             _distributedCache = distributedCache;
             _elementMapper = elementMapper;
@@ -48,7 +46,6 @@ namespace form_builder.Services.MappingService
             _environment = environment;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _logger = logger;
-            _fileStorage = fileStorage;
         }
 
         public async Task<MappingEntity> Map(string sessionGuid, string form)

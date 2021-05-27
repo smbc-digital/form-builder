@@ -10,6 +10,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.FileStorage;
+using form_builder.Providers.StorageProvider;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Validators;
@@ -26,7 +27,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly FileUploadService _service;
         private readonly Mock<IEnumerable<IElementValidator>> _validators = new();
         private readonly Mock<IElementValidator> _testValidator = new();
-        private readonly Mock<IFileStorageProvider> _mockDistributedCache = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<IFileStorageProvider> _mockFileStorage = new();
         private readonly Mock<IPageFactory> _mockPageFactory = new();
         private readonly Mock<IPageHelper> _mockPageHelper = new();
 
@@ -64,7 +66,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
 
-            _service = new FileUploadService(_mockDistributedCache.Object, _mockPageFactory.Object, _mockPageHelper.Object);
+            _service = new FileUploadService(_mockDistributedCache.Object, _mockFileStorage.Object, _mockPageFactory.Object, _mockPageHelper.Object);
         }
 
         [Fact]

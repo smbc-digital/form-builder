@@ -74,7 +74,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
 
-            _service = new MappingService(_mockDistributedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockLogger.Object, _mockFileStorage.Object);
+            _service = new MappingService(_mockDistributedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockLogger.Object);
         }
 
         [Fact]
