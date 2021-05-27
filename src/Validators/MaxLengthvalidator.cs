@@ -17,7 +17,7 @@ namespace form_builder.Validators
                 };
             }
 
-            if (element.Type == EElementType.FileUpload || element.Type == EElementType.Map)
+            if (element.Type == EElementType.FileUpload || element.Type == EElementType.Map || element.Type == EElementType.Checkbox)
             {
                 return new ValidationResult
                 {

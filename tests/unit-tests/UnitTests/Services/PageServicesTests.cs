@@ -19,6 +19,7 @@ using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
 using form_builder.Services.BookingService.Entities;
 using form_builder.Services.FileUploadService;
+using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService;
@@ -32,6 +33,7 @@ using form_builder.Workflows.ActionsWorkflow;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -61,11 +63,15 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IIncomingDataHelper> _mockIncomingDataHelper = new();
         private readonly Mock<ISuccessPageFactory> _mockSuccessPageFactory = new();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new();
-
+        private readonly Mock<IFormAvailabilityService> _mockFormAvailabilityService = new();
         private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new();
+        private readonly Mock<ILogger<IPageService>> _mockLogger = new();
 
         public PageServicesTests()
         {
+            _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
+                .Returns(true);
+
             _validator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
                 .Returns(new ValidationResult { IsValid = false });
 
@@ -103,7 +109,7 @@ namespace form_builder_tests.UnitTests.Services
             });
 
             _service = new PageService(_validators.Object, _mockPageHelper.Object, _sessionHelper.Object, _addressService.Object, _fileUploadService.Object, _streetService.Object, _organisationService.Object,
-            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _bookingService.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object, _mockActionsWorkflow.Object);
+            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _bookingService.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object, _mockActionsWorkflow.Object,_mockFormAvailabilityService.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -150,8 +156,11 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ShouldThrowException_IfFormIsNotAvailable()
+        public async Task ProcessPage_ShouldReturnNull_IfFormIsNotAvailable()
         {
+            _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
+                .Returns(false);
+
             var schema = new FormSchemaBuilder()
                 .WithEnvironmentAvailability("local", false)
                 .Build();
@@ -159,12 +168,18 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPage("form", "page-one", "", new QueryCollection()));
+            var result = await _service.ProcessPage("form", "page-one", "", new QueryCollection());
+            _mockLogger.Verify(_ => _.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+            _mockFormAvailabilityService.Verify(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()), Times.Once);
+            Assert.Null(result);
         }
 
         [Fact]
         public async Task ProcessRequest_ShouldThrowException_IfFormIsNotAvailable()
         {
+            _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
+                .Returns(false);
+
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
 
             var schema = new FormSchemaBuilder()
@@ -177,6 +192,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null, true));
+            _mockFormAvailabilityService.Verify(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]

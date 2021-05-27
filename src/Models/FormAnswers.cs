@@ -19,6 +19,8 @@ namespace form_builder.Models
 
         public string CaseReference { get; set; }
 
+        public string PaymentAmount { get; set; }
+
         public string StartPageUrl { get; set; }
 
         public Dictionary<string, object> FormData { get; set; } = new Dictionary<string, object>();

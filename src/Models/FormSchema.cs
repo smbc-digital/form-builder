@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models.Actions;
 using form_builder.Models.Elements;
+using static form_builder.Models.EnvironmentAvailability;
 
 namespace form_builder.Models
 {
@@ -72,14 +72,5 @@ namespace form_builder.Models
             Pages.SelectMany(_ => _.Elements)
                 .SingleOrDefault(_ => _.Properties.QuestionId == questionId);
 
-        public bool HasElement(string questionId) =>
-            Pages.SelectMany(_ => _.Elements)
-                .Any(_ => _.Properties.QuestionId == questionId);
-
-        public bool IsAvailable(string environment)
-        {
-            var environmentAvailability = EnvironmentAvailabilities.SingleOrDefault(_ => _.Environment.ToLower().Equals(environment.ToLower()));
-            return environmentAvailability == null || environmentAvailability.IsAvailable;
-        }
     }
 }

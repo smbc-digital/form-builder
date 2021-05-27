@@ -90,7 +90,16 @@ namespace form_builder.Services.MappingService
         private async Task<(FormAnswers convertedAnswers, FormSchema baseForm)> GetFormAnswers(string form, string sessionGuid)
         {
             var baseForm = await _schemaFactory.Build(form);
-            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
+
+            if (string.IsNullOrEmpty(sessionGuid))
+                throw new ApplicationException("MappingService::GetFormAnswers Session has expired");
+
+            var sessionData = _distributedCache.GetString(sessionGuid);
+
+            if(sessionData is null)
+                throw new ApplicationException("MappingService::GetFormAnswers, Session data is null");
+
+            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
             convertedAnswers.FormName = form;
 

@@ -52,6 +52,7 @@ using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
+using form_builder.Providers.EnabledFor;
 using form_builder.Providers.Street;
 using form_builder.Providers.Transforms.Lookups;
 using form_builder.Providers.Transforms.ReusableElements;
@@ -85,6 +86,7 @@ using form_builder.Providers.Submit;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.TemplatedEmailProvider;
 using form_builder.Services.TemplatedEmailService;
+using form_builder.Services.FormAvailabilityService;
 
 namespace form_builder.Utils.Startup
 {
@@ -133,6 +135,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<ITagParser, FormAnswerTagParser>();
             services.AddTransient<ITagParser, FormDataTagParser>();
             services.AddTransient<ITagParser, LinkTagParser>();
+            services.AddTransient<ITagParser, PaymentAmountTagParser>();
 
             return services;
         }
@@ -225,6 +228,14 @@ namespace form_builder.Utils.Startup
 
             return services;
         }
+
+        public static IServiceCollection ConfigureEnabledFor(this IServiceCollection services)
+        {
+            services.AddSingleton<IEnabledForProvider, TimeWindow>();
+
+            return services;
+        }
+
         public static IServiceCollection ConfigureEmailTemplateProviders(this IServiceCollection services)
         {
             services.AddSingleton<ITemplatedEmailProvider, FakeTemplatedEmailProvider>();
@@ -313,6 +324,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, ValidateActionCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, SummaryElementFormCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, EnabledForTimeWindowCheck>();
             
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
@@ -348,6 +360,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IEmailService, EmailService>();
             services.AddSingleton<IValidateService, ValidateService>();
             services.AddSingleton<ITemplatedEmailService, TemplatedEmailService>();
+            services.AddSingleton<IFormAvailabilityService, FormAvailabilityService>();
 
             return services;
         }

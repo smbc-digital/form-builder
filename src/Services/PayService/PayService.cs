@@ -53,8 +53,7 @@ namespace form_builder.Services.PayService
 
         public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string sessionGuid)
         {
-            var page = formData.BaseForm.GetPage(_pageHelper, "payment-summary");
-            var paymentInformation = await GetFormPaymentInformation(formData, form, page);
+            var paymentInformation = await GetFormPaymentInformation(form);
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
             return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, paymentInformation);
@@ -68,7 +67,7 @@ namespace form_builder.Services.PayService
                 throw new Exception($"PayService:: No mapping entity found for {form}");
 
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
-            var paymentInformation = await GetFormPaymentInformation(mappingEntity, form, currentPage);
+            var paymentInformation = await GetFormPaymentInformation(form);
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
@@ -81,6 +80,8 @@ namespace form_builder.Services.PayService
                 paymentProvider.VerifyPaymentResponse(responseCode);
                 await _gateway.PostAsync(postUrl.CallbackUrl,
                     new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString() });
+
+                _pageHelper.SavePaymentAmount(sessionGuid, paymentInformation.Settings.Amount);
                 return reference;
             }
             catch (PaymentDeclinedException)
@@ -102,32 +103,32 @@ namespace form_builder.Services.PayService
             }
         }
 
-        public async Task<PaymentInformation> GetFormPaymentInformation(MappingEntity formData, string form, Page page)
+        public async Task<PaymentInformation> GetFormPaymentInformation(string form)
         {
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var mappingEntity = await _mappingService.Map(sessionGuid, form);
+            if (mappingEntity == null)
+                throw new Exception($"PayService:: No mapping entity found for {form}");
+
             var paymentConfig = await _paymentConfigProvider.Get<List<PaymentInformation>>();
             var formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName == form);
 
             if (formPaymentConfig == null)
                 throw new Exception($"PayService:: No payment information found for {form}");
 
-            if (formPaymentConfig.Settings.ComplexCalculationRequired)
-                formPaymentConfig.Settings.Amount = await CalculateAmountAsync(formData, page);
+            if (string.IsNullOrEmpty(formPaymentConfig.Settings.Amount))
+                formPaymentConfig.Settings.Amount = await GetPaymentAmountAsync(mappingEntity, formPaymentConfig);
 
             return formPaymentConfig;
         }
 
-        private async Task<string> CalculateAmountAsync(MappingEntity formData, Page page)
+        private async Task<string> GetPaymentAmountAsync(MappingEntity formData, PaymentInformation formPaymentConfig)
         {
             try
             {
-                var paymentSummary = page.Elements.FirstOrDefault(_ => _.Type == EElementType.PaymentSummary);
-                if (paymentSummary == null)
-                    throw new Exception($"PayService::CalculateAmountAsync, No payment summary element found for {formData.BaseForm.FormName} within page {page.PageSlug}");
+                var postUrl = formPaymentConfig.Settings.CalculationSlug;
 
-                var postUrl = paymentSummary.Properties.CalculationSlugs.FirstOrDefault(_ =>
-                    _.Environment.ToLower().Equals(_hostingEnvironment.EnvironmentName.ToLower()));
-
-                if (postUrl?.URL == null || postUrl.AuthToken == null)
+                if (postUrl.URL == null || postUrl.AuthToken == null)
                     throw new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
 
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);

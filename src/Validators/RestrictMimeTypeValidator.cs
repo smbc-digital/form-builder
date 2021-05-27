@@ -71,7 +71,7 @@ namespace form_builder.Validators
 
         private ValidationResult MultiFileUpload(List<string> allowedFileTypes, List<MimeTypeFile> invalidFiles, List<DocumentModel> documentModel)
         {
-            var fileTypesErrorMessage = allowedFileTypes.ToReadableFileType();
+            var fileTypesErrorMessage = allowedFileTypes.ToReadableFileType("or");
 
             var validationMessage = documentModel.Count == 1
                 ? $"The selected file must be a {fileTypesErrorMessage}."
@@ -86,7 +86,7 @@ namespace form_builder.Validators
 
         private ValidationResult SingleFileUpload(List<string> allowedFileTypes, List<DocumentModel> documentModel)
         {
-            var fileTypesErrorMessage = allowedFileTypes.ToReadableFileType();
+            var fileTypesErrorMessage = allowedFileTypes.ToReadableFileType("or");
 
             return new ValidationResult
             {

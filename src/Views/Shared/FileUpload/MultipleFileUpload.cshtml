@@ -13,7 +13,7 @@
 
 <partial name="InsetText" model="Model.Properties.IAG" />
 
-<p class="smbc-body">You can upload @Model.AllowFileTypeText.</p>
+<p class="smbc-body">You can upload @Model.AllowFileTypeText files.</p>
 <p class="smbc-body">The maximum individual file size is @Model.MaxFileSizeText.</p>
 <p class="smbc-body">The total size of all your added files must not be more than @Model.MaxCombinedFileSizeText.</p>
 
@@ -53,11 +53,6 @@
 
 </div>
 
-@if (Model.CurrentFilesUploaded.Any() && Model.Properties.DisplayReCaptcha)
-{
-    <partial name="Recaptcha" model="Model.IsModelStateValid" />
-}
-
 <button data-prevent-double-click="true"
         data-disable-on-click=true
         class="@uploadButtonCss"
@@ -66,6 +61,11 @@
         data-module="govuk-button">
     @ButtonConstants.UPLOAD_FILES_TEXT
 </button>
+
+@if (Model.CurrentFilesUploaded.Any() && Model.Properties.DisplayReCaptcha)
+{
+    <partial name="Recaptcha" model="Model.IsModelStateValid" />
+}
 
 @if (Model.DisplaySubmitButton)
 {
