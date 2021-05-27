@@ -149,6 +149,7 @@ namespace form_builder.Services.PreviewService
                 .WithLabelAsH1(true)
                 .WithLabel("Preview Mode")
                 .WithAcceptedMimeType(".json")
+                .WithAcceptedMimeType(".txt")
                 .Build();
 
             var submitButton = new ElementBuilder()
