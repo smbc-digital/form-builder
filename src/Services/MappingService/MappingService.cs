@@ -99,7 +99,6 @@ namespace form_builder.Services.MappingService
                 throw new ApplicationException("MappingService::GetFormAnswers Session has expired");
 
             var sessionData = _distributedCache.GetString(sessionGuid);
-            var sessionFile = _fileStorage.GetString(sessionGuid);
 
             if(sessionData is null)
                 throw new ApplicationException("MappingService::GetFormAnswers, Session data is null");
@@ -107,12 +106,6 @@ namespace form_builder.Services.MappingService
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
-
-            if(sessionFile != null)
-            convertedAnswers.Pages?.Add(new PageAnswers
-            {
-                Answers = JsonConvert.DeserializeObject<List<Answers>>(sessionFile)
-            });
 
             convertedAnswers.FormName = form;
 
