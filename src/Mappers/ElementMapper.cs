@@ -7,7 +7,7 @@ using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Providers.StorageProvider;
+using form_builder.Providers.FileStorage;
 using form_builder.Utils.Extensions;
 using form_builder.Utils.Hash;
 using Newtonsoft.Json;
@@ -20,12 +20,12 @@ namespace form_builder.Mappers
 {
     public class ElementMapper : IElementMapper
     {
-        private readonly IDistributedCacheWrapper _distributedCacheWrapper;
+        private readonly IFileStorageProvider _fileStorage;
         private readonly IHashUtil _hashUtil;
 
-        public ElementMapper(IDistributedCacheWrapper distributedCacheWrapper, IHashUtil hashUtil)
+        public ElementMapper(IFileStorageProvider fileStorage, IHashUtil hashUtil)
         {
-            _distributedCacheWrapper = distributedCacheWrapper;
+            _fileStorage = fileStorage;
             _hashUtil = hashUtil;
         } 
 
@@ -175,7 +175,7 @@ namespace form_builder.Mappers
 
                 foreach (var file in uploadedFiles)
                 {
-                    var fileData = _distributedCacheWrapper.GetString(file.Key);
+                    var fileData = _fileStorage.GetString(file.Key);
 
                     if (fileData == null)
                         throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {file.Key} from the distributed cache");
