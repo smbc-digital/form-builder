@@ -68,7 +68,7 @@ namespace form_builder.Services.SubmitService
                 _pageHelper.SaveCaseReference(sessionGuid, _referenceNumberProvider.GetReference(baseForm.ReferencePrefix), true, baseForm.GeneratedReferenceNumberMapping);
         }
 
-        public async Task<string> ProcessSgitubmission(MappingEntity mappingEntity, string form, string sessionGuid)
+        public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
             var baseForm = await _schemaFactory.Build(form);
             var reference = string.Empty;
