@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace form_builder.Services.FileUploadService
@@ -18,19 +20,22 @@ namespace form_builder.Services.FileUploadService
     public class FileUploadService : IFileUploadService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly IFileStorageProvider _fileStorage;
+        private readonly IEnumerable<IFileStorageProvider> _fileStorages;
         private readonly IPageFactory _pageFactory;
         private readonly IPageHelper _pageHelper;
+        private readonly IConfiguration _configuration;
 
-        public FileUploadService(IDistributedCacheWrapper distributedCache, 
-            IFileStorageProvider fileStorage,
+        public FileUploadService(IDistributedCacheWrapper distributedCache,
+            IEnumerable<IFileStorageProvider> fileStorages,
             IPageFactory pageFactory,
-            IPageHelper pageHelper)
+            IPageHelper pageHelper,
+            IConfiguration configuration)
         {
             _distributedCache = distributedCache;
-            _fileStorage = fileStorage;
+            _fileStorages = fileStorages;
             _pageFactory = pageFactory;
             _pageHelper = pageHelper;
+            _configuration = configuration;
         }
 
         public Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload)
@@ -86,7 +91,12 @@ namespace form_builder.Services.FileUploadService
             convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path)).Answers.FirstOrDefault().Response = response;
 
             _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
-            _fileStorage.Remove(fileToRemove.Key);
+
+            var fileStorageType = _configuration["FileStorageProvider:Type"];
+            string providerName = fileStorageType.Equals("Application") || fileStorageType.Equals("Redis") ? "DistrbutedCache" : fileStorageType;
+
+            var fileStorageProvider = _fileStorages.Get(providerName);
+            fileStorageProvider.Remove(fileToRemove.Key);
 
             return new ProcessRequestEntity
             {

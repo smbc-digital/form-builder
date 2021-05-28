@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using form_builder.Configuration;
+﻿using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -12,7 +6,6 @@ using form_builder.Factories.Schema;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
@@ -21,6 +14,11 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace form_builder.Services.MappingService
 {
@@ -97,7 +95,7 @@ namespace form_builder.Services.MappingService
 
             var sessionData = _distributedCache.GetString(sessionGuid);
 
-            if(sessionData is null)
+            if (sessionData is null)
                 throw new ApplicationException("MappingService::GetFormAnswers, Session data is null");
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);

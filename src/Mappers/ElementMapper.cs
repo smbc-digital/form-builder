@@ -10,6 +10,7 @@ using form_builder.Models.Elements;
 using form_builder.Providers.FileStorage;
 using form_builder.Utils.Extensions;
 using form_builder.Utils.Hash;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
@@ -20,13 +21,17 @@ namespace form_builder.Mappers
 {
     public class ElementMapper : IElementMapper
     {
-        private readonly IFileStorageProvider _fileStorage;
+        private readonly IEnumerable<IFileStorageProvider> _fileStorages;
         private readonly IHashUtil _hashUtil;
+        private readonly IConfiguration _configuration;
 
-        public ElementMapper(IFileStorageProvider fileStorage, IHashUtil hashUtil)
+        public ElementMapper(IEnumerable<IFileStorageProvider> fileStorages,
+            IHashUtil hashUtil,
+            IConfiguration configuration)
         {
-            _fileStorage = fileStorage;
+            _fileStorages = fileStorages;
             _hashUtil = hashUtil;
+            _configuration = configuration;
         } 
 
         public T GetAnswerValue<T>(IElement element, FormAnswers formAnswers) => (T)GetAnswerValue(element, formAnswers);
@@ -173,9 +178,14 @@ namespace form_builder.Mappers
             {
                 List<FileUploadModel> uploadedFiles = JsonConvert.DeserializeObject<List<FileUploadModel>>(value.Response.ToString());
 
+                var fileStorageType = _configuration["FileStorageProvider:Type"];
+                string providerName = fileStorageType.Equals("Application") || fileStorageType.Equals("Redis") ? "DistrbutedCache" : fileStorageType;
+
+                var fileStorageProvider = _fileStorages.Get(providerName);
+
                 foreach (var file in uploadedFiles)
                 {
-                    var fileData = _fileStorage.GetString(file.Key);
+                    var fileData = fileStorageProvider.GetString(file.Key);
 
                     if (fileData == null)
                         throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {file.Key} from the distributed cache");

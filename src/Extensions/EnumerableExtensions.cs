@@ -44,7 +44,7 @@ namespace form_builder.Extensions
         public static IEnabledForProvider Get(this IEnumerable<IEnabledForProvider> value, EEnabledFor providerName) =>
            value.Single(_ => _.Type.Equals(providerName));
 
-        public static IFileStorageProvider Get(this IEnumerable<IFileStorageProvider> value, ECache providerName) =>
-          value.Single(_ => _.ProviderName.Equals(providerName));
+        public static IFileStorageProvider Get(this IEnumerable<IFileStorageProvider> value, string providerName) =>
+            value.Single(_ => _.ProviderName.Equals(providerName, StringComparison.OrdinalIgnoreCase));
     }
 }
