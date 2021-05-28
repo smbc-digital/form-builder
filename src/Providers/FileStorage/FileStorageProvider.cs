@@ -17,7 +17,7 @@ namespace form_builder.Providers.FileStorage
         private readonly IDistributedCache _distributedCache;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
-        public string ProviderName { get => "DistrbutedCache"; }
+        public string ProviderName { get => "DistributedCache"; }
 
         public FileStorageProvider(IDistributedCache distributedCache, IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {

@@ -22,6 +22,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -35,7 +36,8 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IViewRender> _mockIViewRender = new();
         private readonly Mock<IElementHelper> _mockElementHelper = new();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
-        private readonly Mock<IFileStorageProvider> _mockFileStorageProvider = new();
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
+        private readonly Mock<IFileStorageProvider> _fileStorageProvider = new();
         private readonly Mock<IOptions<FormConfiguration>> _mockDisallowedKeysOptions = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings = new();
@@ -43,9 +45,18 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly List<ILookupProvider> _mockLookupProviders = new ();
         private readonly FakeLookupProvider _lookupProvider = new();
         private readonly Mock<IActionHelper> _mockActionHelper = new();
+        private readonly Mock<IConfiguration> _mockConfiguration = new();
 
         public PageHelperTests()
         {
+            _mockConfiguration.Setup(_ => _["FileStorageProvider:Type"]).Returns("Redis");
+
+            _fileStorageProvider.Setup(_ => _.ProviderName).Returns("DistributedCache");
+            _fileStorageProviders = new List<IFileStorageProvider>
+            {
+                _fileStorageProvider.Object
+            };
+
             _mockDisallowedKeysOptions.Setup(_ => _.Value).Returns(new FormConfiguration
             {
                 DisallowedAnswerKeys = new[]
@@ -71,7 +82,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockDistributedCacheExpirationSettings.Object,
                 _mockSessionHelper.Object, _mockLookupProviders,
-                _mockActionHelper.Object, _mockFileStorageProvider.Object);
+                _mockActionHelper.Object, _fileStorageProviders, _mockConfiguration.Object);
         }
 
         [Fact]
@@ -646,7 +657,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection, true);
 
             // Assert
-            _mockFileStorageProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
@@ -717,8 +728,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void
-        SaveAnswers_ShouldReplaceFilUploadReference_WithinFormAnswers_IfAnswerAlreadyExists_InDistributedCache()
+        public void SaveAnswers_ShouldReplaceFilUploadReference_WithinFormAnswers_IfAnswerAlreadyExists_InDistributedCache()
         {
             // Arrange
             var callbackCacheProvider = string.Empty;
@@ -1126,7 +1136,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
 
             // Assert
-            _mockFileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Exactly(2));
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Exactly(2));
         }
 
         [Fact]
@@ -1171,7 +1181,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
 
             // Assert
-            _mockFileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once());
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once());
         }
 
         [Fact]

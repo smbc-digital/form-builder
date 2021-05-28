@@ -16,6 +16,7 @@ using form_builder.Services.PageService.Entities;
 using form_builder.Validators;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Newtonsoft.Json;
 using Xunit;
@@ -28,9 +29,11 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IEnumerable<IElementValidator>> _validators = new();
         private readonly Mock<IElementValidator> _testValidator = new();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
-        private readonly Mock<IFileStorageProvider> _mockFileStorage = new();
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
+        private readonly Mock<IFileStorageProvider> _fileStorageProvider = new();
         private readonly Mock<IPageFactory> _mockPageFactory = new();
         private readonly Mock<IPageHelper> _mockPageHelper = new();
+        private readonly Mock<IConfiguration> _mockConfiguration = new();
 
         private static readonly Element _element = new ElementBuilder()
             .WithType(EElementType.MultipleFileUpload)
@@ -50,6 +53,14 @@ namespace form_builder_tests.UnitTests.Services
 
         public FileUploadServiceTests()
         {
+            _mockConfiguration.Setup(_ => _["FileStorageProvider:Type"]).Returns("Redis");
+
+            _fileStorageProvider.Setup(_ => _.ProviderName).Returns("DistributedCache");
+            _fileStorageProviders = new List<IFileStorageProvider>
+            {
+                _fileStorageProvider.Object
+            };
+
             _mockPageFactory
                 .Setup(_ => _.Build(It.IsAny<Page>(),
                     It.IsAny<Dictionary<string, dynamic>>(),
@@ -66,7 +77,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
 
-            _service = new FileUploadService(_mockDistributedCache.Object, _mockFileStorage.Object, _mockPageFactory.Object, _mockPageHelper.Object);
+            _service = new FileUploadService(_mockDistributedCache.Object, _fileStorageProviders, _mockPageFactory.Object, _mockPageHelper.Object, _mockConfiguration.Object);
         }
 
         [Fact]
