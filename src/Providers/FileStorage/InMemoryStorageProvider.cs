@@ -12,17 +12,15 @@ namespace form_builder.Providers.FileStorage
      * Due to IDistributedCache using static methods and the inability to moq static methods. 
      * This is a wrapper around IDistributedCache to allow testing of static methods
      **/
-    public class FileStorageProvider : IFileStorageProvider
+    public class InMemoryStorageProvider : IFileStorageProvider
     {
         private readonly IDistributedCache _distributedCache;
-        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
 
-        public string ProviderName { get => "DistributedCache"; }
+        public string ProviderName { get => "Application"; }
 
-        public FileStorageProvider(IDistributedCache distributedCache, IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
+        public InMemoryStorageProvider(IDistributedCache distributedCache, IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
         {
             _distributedCache = distributedCache;
-            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
         }
 
         public string GetString(string key) => _distributedCache.GetString(key);

@@ -322,13 +322,8 @@ namespace form_builder.Services.PageService
                     List<FileUploadModel> convertedFileUploadAnswer = JsonConvert.DeserializeObject<List<FileUploadModel>>(formFileAnswerData.ToString());
 
                     var fileStorageType = _configuration["FileStorageProvider:Type"];
-
-                    if (fileStorageType == null)
-                        throw new Exception($"PageService::RemoveFile: An error has occurred while attempting to retrieve an FileStorageProvider:Type from the config");
-
-                    string providerName = fileStorageType.Equals("Application") || fileStorageType.Equals("Redis") ? "DistributedCache" : fileStorageType;
-
-                    var fileStorageProvider = _fileStorages.Get(providerName);
+                    
+                    var fileStorageProvider = _fileStorages.Get(fileStorageType);
 
                     if (convertedFileUploadAnswer != null && convertedFileUploadAnswer.Any())
                     {

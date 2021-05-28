@@ -179,13 +179,8 @@ namespace form_builder.Mappers
                 List<FileUploadModel> uploadedFiles = JsonConvert.DeserializeObject<List<FileUploadModel>>(value.Response.ToString());
 
                 var fileStorageType = _configuration["FileStorageProvider:Type"];
-
-                if (fileStorageType == null)
-                    throw new Exception($"ElemntMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an FileStorageProvider:Type from the config");
-
-                string providerName = fileStorageType.Equals("Application") || fileStorageType.Equals("Redis") ? "DistributedCache" : fileStorageType;
-
-                var fileStorageProvider = _fileStorages.Get(providerName);
+              
+                var fileStorageProvider = _fileStorages.Get(fileStorageType);
 
                 foreach (var file in uploadedFiles)
                 {

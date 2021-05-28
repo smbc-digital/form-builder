@@ -76,7 +76,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             _mockConfiguration.Setup(_ => _["FileStorageProvider:Type"]).Returns("Redis");
 
-            _fileStorageProvider.Setup(_ => _.ProviderName).Returns("DistributedCache");
+            _fileStorageProvider.Setup(_ => _.ProviderName).Returns("Redis");
             _fileStorageProviders = new List<IFileStorageProvider>
             {
                 _fileStorageProvider.Object

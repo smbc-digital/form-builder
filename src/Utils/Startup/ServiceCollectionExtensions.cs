@@ -495,7 +495,8 @@ namespace form_builder.Utils.Startup
             AddServiceCacheType(services, configuration.GetSection("FileStorageProvider"));
 
             services.AddDataProtection().SetApplicationName("formbuilder");
-            services.AddTransient<IFileStorageProvider, FileStorageProvider>();
+            services.AddTransient<IFileStorageProvider, RedisFileStorageProvider>();
+            services.AddTransient<IFileStorageProvider, InMemoryStorageProvider>();
 
             return services;
         }

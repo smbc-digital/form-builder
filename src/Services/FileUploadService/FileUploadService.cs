@@ -94,13 +94,9 @@ namespace form_builder.Services.FileUploadService
             _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
 
             var fileStorageType = _configuration["FileStorageProvider:Type"];
+           
+            var fileStorageProvider = _fileStorages.Get(fileStorageType);
 
-            if (fileStorageType == null)
-                throw new Exception($"FileUploadService::RemoveFile: An error has occurred while attempting to retrieve an FileStorageProvider:Type from the config");
-
-            string providerName = fileStorageType.Equals("Application") || fileStorageType.Equals("Redis") ? "DistributedCache" : fileStorageType;
-
-            var fileStorageProvider = _fileStorages.Get(providerName);
             fileStorageProvider.Remove(fileToRemove.Key);
 
             return new ProcessRequestEntity
