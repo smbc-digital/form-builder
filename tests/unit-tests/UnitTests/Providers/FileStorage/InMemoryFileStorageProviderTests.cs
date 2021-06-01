@@ -24,7 +24,7 @@ namespace form_builder_tests.UnitTests.Providers.FileStorage
         }
 
         [Fact]
-        public void Call_GetString_ReturnCacheAsString()
+        public void GetString_ShouldCallDistributedCacheGetString()
         {
             _inMemoryStorageProvider.GetString(It.IsAny<string>());
 
@@ -32,7 +32,7 @@ namespace form_builder_tests.UnitTests.Providers.FileStorage
         }
 
         [Fact]
-        public void Call_Remove_CacheData()
+        public void Remove_ShouldCallDistributedCacheRemove()
         {
             _inMemoryStorageProvider.Remove(It.IsAny<string>());
 
@@ -40,7 +40,7 @@ namespace form_builder_tests.UnitTests.Providers.FileStorage
         }
 
         [Fact]
-        public void Call_SetStringAsync_ReturnTask()
+        public void SetStringAsync_ShouldCallDistributedCacheSetStringAsync()
         {
             _inMemoryStorageProvider.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>());
 

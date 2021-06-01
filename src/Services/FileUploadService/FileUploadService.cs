@@ -26,13 +26,13 @@ namespace form_builder.Services.FileUploadService
         private readonly IConfiguration _configuration;
 
         public FileUploadService(IDistributedCacheWrapper distributedCache,
-            IEnumerable<IFileStorageProvider> fileStorages,
+            IEnumerable<IFileStorageProvider> fileStorageProviders,
             IPageFactory pageFactory,
             IPageHelper pageHelper,
             IConfiguration configuration)
         {
             _distributedCache = distributedCache;
-            _fileStorageProviders = fileStorages;
+            _fileStorageProviders = fileStorageProviders;
             _pageFactory = pageFactory;
             _pageHelper = pageHelper;
             _configuration = configuration;

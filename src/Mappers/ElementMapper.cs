@@ -25,11 +25,11 @@ namespace form_builder.Mappers
         private readonly IHashUtil _hashUtil;
         private readonly IConfiguration _configuration;
 
-        public ElementMapper(IEnumerable<IFileStorageProvider> fileStorages,
+        public ElementMapper(IEnumerable<IFileStorageProvider> fileStorageProviders,
             IHashUtil hashUtil,
             IConfiguration configuration)
         {
-            _fileStorageProviders = fileStorages;
+            _fileStorageProviders = fileStorageProviders;
             _hashUtil = hashUtil;
             _configuration = configuration;
         } 

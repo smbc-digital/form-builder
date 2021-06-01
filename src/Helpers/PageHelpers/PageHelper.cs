@@ -39,18 +39,21 @@ namespace form_builder.Helpers.PageHelpers
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IConfiguration _configuration;
 
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
-            IOptions<FormConfiguration> disallowedKeys, IWebHostEnvironment enviroment,
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper,
+            IDistributedCacheWrapper distributedCache,
+            IOptions<FormConfiguration> disallowedKeys,
+            IWebHostEnvironment enviroment,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            ISessionHelper sessionHelper, IEnumerable<ILookupProvider> lookupProviders,
+            ISessionHelper sessionHelper,
+            IEnumerable<ILookupProvider> lookupProviders,
             IActionHelper actionHelper,
-            IEnumerable<IFileStorageProvider> fileStorages,
+            IEnumerable<IFileStorageProvider> fileStorageProviders,
             IConfiguration configuration)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
             _distributedCache = distributedCache;
-            _fileStorageProviders = fileStorages;
+            _fileStorageProviders = fileStorageProviders;
             _disallowedKeys = disallowedKeys.Value;
             _environment = enviroment;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;

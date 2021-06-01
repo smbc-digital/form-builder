@@ -82,7 +82,7 @@ namespace form_builder.Services.PageService
             IActionsWorkflow actionsWorkflow,
             IFormAvailabilityService formAvailabilityServics,
             ILogger<IPageService> logger,
-            IEnumerable<IFileStorageProvider> fileStorages,
+            IEnumerable<IFileStorageProvider> fileStorageProviders,
             IConfiguration configuration)
         {
             _validators = validators;
@@ -105,7 +105,7 @@ namespace form_builder.Services.PageService
             _incomingDataHelper = incomingDataHelper;
             _actionsWorkflow = actionsWorkflow;
             _logger = logger;
-            _fileStorageProviders = fileStorages;
+            _fileStorageProviders = fileStorageProviders;
             _configuration = configuration;
         }
 
