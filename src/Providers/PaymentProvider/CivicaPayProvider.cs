@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StockportGovUK.NetStandard.Gateways.CivicaPay;
 using StockportGovUK.NetStandard.Models.Civica.Pay.Request;
+using Newtonsoft.Json;
 
 namespace form_builder.Providers.PaymentProvider
 {
@@ -66,7 +67,7 @@ namespace form_builder.Providers.PaymentProvider
             var civicaResponse = await _civicaPayGateway.CreateImmediateBasketAsync(basket);
 
             if (civicaResponse.StatusCode != HttpStatusCode.OK)
-                throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code {civicaResponse.StatusCode}, HttpResponse: {civicaResponse}");
+                throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code {civicaResponse.StatusCode}, HttpResponse: {JsonConvert.SerializeObject(civicaResponse)}");
 
             return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, reference);
         }
