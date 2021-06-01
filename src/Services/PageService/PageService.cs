@@ -39,7 +39,7 @@ namespace form_builder.Services.PageService
     public class PageService : IPageService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly IEnumerable<IFileStorageProvider> _fileStorages;
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
         private readonly IEnumerable<IElementValidator> _validators;
         private readonly IPageHelper _pageHelper;
         private readonly ISessionHelper _sessionHelper;
@@ -105,7 +105,7 @@ namespace form_builder.Services.PageService
             _incomingDataHelper = incomingDataHelper;
             _actionsWorkflow = actionsWorkflow;
             _logger = logger;
-            _fileStorages = fileStorages;
+            _fileStorageProviders = fileStorages;
             _configuration = configuration;
         }
 
@@ -323,7 +323,7 @@ namespace form_builder.Services.PageService
 
                     var fileStorageType = _configuration["FileStorageProvider:Type"];
                     
-                    var fileStorageProvider = _fileStorages.Get(fileStorageType);
+                    var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
 
                     if (convertedFileUploadAnswer != null && convertedFileUploadAnswer.Any())
                     {

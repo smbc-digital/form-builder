@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -21,7 +20,7 @@ namespace form_builder.Services.FileUploadService
     public class FileUploadService : IFileUploadService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly IEnumerable<IFileStorageProvider> _fileStorages;
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
         private readonly IPageFactory _pageFactory;
         private readonly IPageHelper _pageHelper;
         private readonly IConfiguration _configuration;
@@ -33,7 +32,7 @@ namespace form_builder.Services.FileUploadService
             IConfiguration configuration)
         {
             _distributedCache = distributedCache;
-            _fileStorages = fileStorages;
+            _fileStorageProviders = fileStorages;
             _pageFactory = pageFactory;
             _pageHelper = pageHelper;
             _configuration = configuration;
@@ -95,7 +94,7 @@ namespace form_builder.Services.FileUploadService
 
             var fileStorageType = _configuration["FileStorageProvider:Type"];
            
-            var fileStorageProvider = _fileStorages.Get(fileStorageType);
+            var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
 
             fileStorageProvider.Remove(fileToRemove.Key);
 

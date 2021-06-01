@@ -34,7 +34,7 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IWebHostEnvironment _environment;
         private readonly FormConfiguration _disallowedKeys;
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly IEnumerable<IFileStorageProvider> _fileStorages;
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
         private readonly IEnumerable<ILookupProvider> _lookupProviders;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IConfiguration _configuration;
@@ -50,7 +50,7 @@ namespace form_builder.Helpers.PageHelpers
             _viewRender = viewRender;
             _elementHelper = elementHelper;
             _distributedCache = distributedCache;
-            _fileStorages = fileStorages;
+            _fileStorageProviders = fileStorages;
             _disallowedKeys = disallowedKeys.Value;
             _environment = enviroment;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
@@ -280,7 +280,7 @@ namespace form_builder.Helpers.PageHelpers
 
                 var fileStorageType = _configuration["FileStorageProvider:Type"];
                 
-                var fileStorageProvider = _fileStorages.Get(fileStorageType);
+                var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
 
                 for (int i = 0; i < fileContent.Count; i++)
                 {

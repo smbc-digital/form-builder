@@ -21,7 +21,7 @@ namespace form_builder.Mappers
 {
     public class ElementMapper : IElementMapper
     {
-        private readonly IEnumerable<IFileStorageProvider> _fileStorages;
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
         private readonly IHashUtil _hashUtil;
         private readonly IConfiguration _configuration;
 
@@ -29,7 +29,7 @@ namespace form_builder.Mappers
             IHashUtil hashUtil,
             IConfiguration configuration)
         {
-            _fileStorages = fileStorages;
+            _fileStorageProviders = fileStorages;
             _hashUtil = hashUtil;
             _configuration = configuration;
         } 
@@ -180,7 +180,7 @@ namespace form_builder.Mappers
 
                 var fileStorageType = _configuration["FileStorageProvider:Type"];
               
-                var fileStorageProvider = _fileStorages.Get(fileStorageType);
+                var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
 
                 foreach (var file in uploadedFiles)
                 {
