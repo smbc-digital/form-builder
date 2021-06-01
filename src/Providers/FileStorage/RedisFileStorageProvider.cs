@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using form_builder.Configuration;
+using form_builder.Providers.StorageProvider;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Options;
 
 namespace form_builder.Providers.FileStorage
 {
@@ -14,11 +13,11 @@ namespace form_builder.Providers.FileStorage
      **/
     public class RedisFileStorageProvider : IFileStorageProvider
     {
-        private readonly IDistributedCache _distributedCache;
+        private readonly IDistributedCacheWrapper _distributedCache;
 
         public string ProviderName { get => "Redis"; }
 
-        public RedisFileStorageProvider(IDistributedCache distributedCache, IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
+        public RedisFileStorageProvider(IDistributedCacheWrapper distributedCache)
         {
             _distributedCache = distributedCache;
         }
@@ -29,12 +28,7 @@ namespace form_builder.Providers.FileStorage
 
         public Task SetStringAsync(string key, string value, int expiration, CancellationToken token = default)
         {
-            var distributedCacheOptions = new DistributedCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTime.Now.AddMinutes(expiration)
-            };
-
-            return _distributedCache.SetStringAsync(key, value, distributedCacheOptions, token);
+            return _distributedCache.SetStringAsync(key, value, expiration, token);
         }
     }
 }
