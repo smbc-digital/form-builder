@@ -1,4 +1,7 @@
-﻿namespace form_builder.ViewModels
+﻿using System.Collections.Generic;
+using form_builder.Models;
+
+namespace form_builder.ViewModels
 {
     public class PaymentViewModel
     {
@@ -14,6 +17,8 @@
 
         public string StartPageUrl { get; set; }
 
-        public bool HideBackButton { get; set; } = true;
+        public bool HideBackButton { get; set; } = false;
+        public bool DisplayBreadCrumbs { get; set; }
+        public List<Breadcrumb> BreadCrumbs { get; set; }
     }
 }
