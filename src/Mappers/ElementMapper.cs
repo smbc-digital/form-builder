@@ -7,9 +7,10 @@ using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Providers.StorageProvider;
+using form_builder.Providers.FileStorage;
 using form_builder.Utils.Extensions;
 using form_builder.Utils.Hash;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
@@ -20,13 +21,17 @@ namespace form_builder.Mappers
 {
     public class ElementMapper : IElementMapper
     {
-        private readonly IDistributedCacheWrapper _distributedCacheWrapper;
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
         private readonly IHashUtil _hashUtil;
+        private readonly IConfiguration _configuration;
 
-        public ElementMapper(IDistributedCacheWrapper distributedCacheWrapper, IHashUtil hashUtil)
+        public ElementMapper(IEnumerable<IFileStorageProvider> fileStorageProviders,
+            IHashUtil hashUtil,
+            IConfiguration configuration)
         {
-            _distributedCacheWrapper = distributedCacheWrapper;
+            _fileStorageProviders = fileStorageProviders;
             _hashUtil = hashUtil;
+            _configuration = configuration;
         } 
 
         public T GetAnswerValue<T>(IElement element, FormAnswers formAnswers) => (T)GetAnswerValue(element, formAnswers);
@@ -173,9 +178,13 @@ namespace form_builder.Mappers
             {
                 List<FileUploadModel> uploadedFiles = JsonConvert.DeserializeObject<List<FileUploadModel>>(value.Response.ToString());
 
+                var fileStorageType = _configuration["FileStorageProvider:Type"];
+              
+                var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
+
                 foreach (var file in uploadedFiles)
                 {
-                    var fileData = _distributedCacheWrapper.GetString(file.Key);
+                    var fileData = fileStorageProvider.GetString(file.Key);
 
                     if (fileData == null)
                         throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {file.Key} from the distributed cache");

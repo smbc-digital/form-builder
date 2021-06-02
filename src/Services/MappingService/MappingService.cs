@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
@@ -96,11 +95,13 @@ namespace form_builder.Services.MappingService
 
             var sessionData = _distributedCache.GetString(sessionGuid);
 
-            if(sessionData is null)
+            if (sessionData is null)
                 throw new ApplicationException("MappingService::GetFormAnswers, Session data is null");
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
+
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
+
             convertedAnswers.FormName = form;
 
             if (convertedAnswers.Pages == null || !convertedAnswers.Pages.Any())

@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
-using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
@@ -14,11 +13,13 @@ using form_builder.Helpers.ViewRender;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
+using form_builder.Providers.FileStorage;
 using form_builder.Providers.Lookup;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -33,24 +34,33 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IWebHostEnvironment _environment;
         private readonly FormConfiguration _disallowedKeys;
         private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
         private readonly IEnumerable<ILookupProvider> _lookupProviders;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
+        private readonly IConfiguration _configuration;
 
-        public PageHelper(IViewRender viewRender, IElementHelper elementHelper, IDistributedCacheWrapper distributedCache,
-            IOptions<FormConfiguration> disallowedKeys, IWebHostEnvironment enviroment,
+        public PageHelper(IViewRender viewRender, IElementHelper elementHelper,
+            IDistributedCacheWrapper distributedCache,
+            IOptions<FormConfiguration> disallowedKeys,
+            IWebHostEnvironment enviroment,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            ISessionHelper sessionHelper, IEnumerable<ILookupProvider> lookupProviders,
-            IActionHelper actionHelper)
+            ISessionHelper sessionHelper,
+            IEnumerable<ILookupProvider> lookupProviders,
+            IActionHelper actionHelper,
+            IEnumerable<IFileStorageProvider> fileStorageProviders,
+            IConfiguration configuration)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
             _distributedCache = distributedCache;
+            _fileStorageProviders = fileStorageProviders;
             _disallowedKeys = disallowedKeys.Value;
             _environment = enviroment;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _sessionHelper = sessionHelper;
             _lookupProviders = lookupProviders;
             _actionHelper = actionHelper;
+            _configuration = configuration;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(
@@ -270,9 +280,14 @@ namespace form_builder.Helpers.PageHelpers
 
                 var fileContent = filsToAdd.Select(_ => _.Base64EncodedContent).ToList();
 
+
+                var fileStorageType = _configuration["FileStorageProvider:Type"];
+                
+                var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
+
                 for (int i = 0; i < fileContent.Count; i++)
                 {
-                    _distributedCache.SetStringAsync(keys[i], JsonConvert.SerializeObject(fileContent[i]), _distributedCacheExpirationConfiguration.FileUpload);
+                    fileStorageProvider.SetStringAsync(keys[i], JsonConvert.SerializeObject(fileContent[i]), _distributedCacheExpirationConfiguration.FileUpload);
                 }
 
                 fileUploadModel.AddRange(filsToAdd.Select((_, index) => new FileUploadModel

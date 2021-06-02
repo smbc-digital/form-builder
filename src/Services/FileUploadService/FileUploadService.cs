@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace form_builder.Services.FileUploadService
@@ -17,16 +20,22 @@ namespace form_builder.Services.FileUploadService
     public class FileUploadService : IFileUploadService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
         private readonly IPageFactory _pageFactory;
         private readonly IPageHelper _pageHelper;
+        private readonly IConfiguration _configuration;
 
         public FileUploadService(IDistributedCacheWrapper distributedCache,
+            IEnumerable<IFileStorageProvider> fileStorageProviders,
             IPageFactory pageFactory,
-            IPageHelper pageHelper)
+            IPageHelper pageHelper,
+            IConfiguration configuration)
         {
             _distributedCache = distributedCache;
+            _fileStorageProviders = fileStorageProviders;
             _pageFactory = pageFactory;
             _pageHelper = pageHelper;
+            _configuration = configuration;
         }
 
         public Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload)
@@ -82,7 +91,12 @@ namespace form_builder.Services.FileUploadService
             convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path)).Answers.FirstOrDefault().Response = response;
 
             _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
-            _distributedCache.Remove(fileToRemove.Key);
+
+            var fileStorageType = _configuration["FileStorageProvider:Type"];
+           
+            var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
+
+            fileStorageProvider.Remove(fileToRemove.Key);
 
             return new ProcessRequestEntity
             {
@@ -154,8 +168,10 @@ namespace form_builder.Services.FileUploadService
 
             if (!modelStateIsValid)
             {
-                var newViewModel = new Dictionary<string, dynamic>();
-                newViewModel.Add("modelStateInvalid", null);
+                var newViewModel = new Dictionary<string, dynamic>
+                {
+                    { "modelStateInvalid", null }
+                };
 
                 var formModel = await _pageFactory.Build(currentPage, newViewModel, baseForm, guid);
 
