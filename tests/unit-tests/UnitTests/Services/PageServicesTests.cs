@@ -14,11 +14,13 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Elements;
+using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
 using form_builder.Services.BookingService.Entities;
 using form_builder.Services.FileUploadService;
+using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService;
@@ -37,6 +39,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using Xunit;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace form_builder_tests.UnitTests.Services
 {
@@ -53,6 +56,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IFileUploadService> _fileUploadService = new();
         private readonly Mock<IOrganisationService> _organisationService = new();
         private readonly Mock<IDistributedCacheWrapper> _distributedCache = new();
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
+        private readonly Mock<IFileStorageProvider> _fileStorageProvider = new();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new();
         private readonly Mock<IWebHostEnvironment> _mockEnvironment = new();
@@ -62,11 +67,24 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IIncomingDataHelper> _mockIncomingDataHelper = new();
         private readonly Mock<ISuccessPageFactory> _mockSuccessPageFactory = new();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new();
+        private readonly Mock<IFormAvailabilityService> _mockFormAvailabilityService = new();
         private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new();
         private readonly Mock<ILogger<IPageService>> _mockLogger = new();
+        private readonly Mock<IConfiguration> _mockConfiguration = new();
 
         public PageServicesTests()
         {
+            _mockConfiguration.Setup(_ => _["FileStorageProvider:Type"]).Returns("Redis");
+
+            _fileStorageProvider.Setup(_ => _.ProviderName).Returns("Redis");
+            _fileStorageProviders = new List<IFileStorageProvider>
+            {
+                _fileStorageProvider.Object
+            };
+
+            _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
+                .Returns(true);
+
             _validator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
                 .Returns(new ValidationResult { IsValid = false });
 
@@ -98,13 +116,16 @@ namespace form_builder_tests.UnitTests.Services
 
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
+            _fileStorageProvider.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+
             _mockDistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
             {
                 FormJson = 1
             });
 
             _service = new PageService(_validators.Object, _mockPageHelper.Object, _sessionHelper.Object, _addressService.Object, _fileUploadService.Object, _streetService.Object, _organisationService.Object,
-            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _bookingService.Object, _mockSchemaFactory.Object, _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object, _mockActionsWorkflow.Object, _mockLogger.Object);
+            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _bookingService.Object, _mockSchemaFactory.Object,
+            _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object, _mockActionsWorkflow.Object,_mockFormAvailabilityService.Object, _mockLogger.Object, _fileStorageProviders, _mockConfiguration.Object);
         }
 
         [Fact]
@@ -153,6 +174,9 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldReturnNull_IfFormIsNotAvailable()
         {
+            _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
+                .Returns(false);
+
             var schema = new FormSchemaBuilder()
                 .WithEnvironmentAvailability("local", false)
                 .Build();
@@ -162,12 +186,16 @@ namespace form_builder_tests.UnitTests.Services
 
             var result = await _service.ProcessPage("form", "page-one", "", new QueryCollection());
             _mockLogger.Verify(_ => _.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+            _mockFormAvailabilityService.Verify(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()), Times.Once);
             Assert.Null(result);
         }
 
         [Fact]
         public async Task ProcessRequest_ShouldThrowException_IfFormIsNotAvailable()
         {
+            _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
+                .Returns(false);
+
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
 
             var schema = new FormSchemaBuilder()
@@ -180,6 +208,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null, true));
+            _mockFormAvailabilityService.Verify(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -843,8 +872,8 @@ namespace form_builder_tests.UnitTests.Services
             await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileOneKey)), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileTwoKey)), Times.Once);
+            _fileStorageProvider.Verify(_ => _.Remove(It.Is<string>(x => x == fileOneKey)), Times.Once);
+            _fileStorageProvider.Verify(_ => _.Remove(It.Is<string>(x => x == fileTwoKey)), Times.Once);
         }
 
 
@@ -932,10 +961,10 @@ namespace form_builder_tests.UnitTests.Services
             await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
 
             // Assert
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileOneKey)), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileTwoKey)), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileThreeKey)), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == fileFourKey)), Times.Once);
+            _fileStorageProvider.Verify(_ => _.Remove(It.Is<string>(x => x == fileOneKey)), Times.Once);
+            _fileStorageProvider.Verify(_ => _.Remove(It.Is<string>(x => x == fileTwoKey)), Times.Once);
+            _fileStorageProvider.Verify(_ => _.Remove(It.Is<string>(x => x == fileThreeKey)), Times.Once);
+            _fileStorageProvider.Verify(_ => _.Remove(It.Is<string>(x => x == fileFourKey)), Times.Once);
         }
 
         [Fact]

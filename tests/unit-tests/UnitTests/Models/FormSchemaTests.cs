@@ -14,64 +14,6 @@ namespace form_builder_tests.UnitTests.Models
         private readonly Mock<IPageHelper> _mockPageHelper = new();
 
         [Fact]
-        public void IsAvailable_ShouldReturn_True_WhenNoEnvironmentAvailabilitiesAreSpecified()
-        {
-            // Arrange
-            var formSchema = new FormSchema();
-
-            // Act
-            var result = formSchema.IsAvailable("Int");
-
-            // Assert
-            Assert.True(result);
-        }
-
-        [Fact]
-        public void IsAvailable_ShouldReturn_True_WhenRequestedEnvironmentAvailabilitiesIsNotSpecified()
-        {
-            // Arrange
-            var formSchema = new FormSchemaBuilder()
-                .WithEnvironmentAvailability("prod", false)
-                .Build();
-
-            // Act
-            var result = formSchema.IsAvailable("Int");
-
-            // Assert
-            Assert.True(result);
-        }
-
-        [Fact]
-        public void IsAvailable_ShouldReturn_True_WhenRequestedEnvironmentAvailabilitiesIsSpecified_And_IsAvailableEqualsTrue()
-        {
-            // Arrange
-            var formSchema = new FormSchemaBuilder()
-                .WithEnvironmentAvailability("Int", true)
-                .Build();
-
-            // Act
-            var result = formSchema.IsAvailable("Int");
-
-            // Assert
-            Assert.True(result);
-        }
-
-        [Fact]
-        public void IsAvailable_ShouldReturn_False_WhenRequestedEnvironmentAvailabilitiesIsSpecified_And_IsAvailableEqualsFalse()
-        {
-            // Arrange
-            var formSchema = new FormSchemaBuilder()
-                .WithEnvironmentAvailability("Int", false)
-                .Build();
-
-            // Act
-            var result = formSchema.IsAvailable("Int");
-
-            // Assert
-            Assert.False(result);
-        }
-
-        [Fact]
         public void GetPage_ShouldThrowException_If_PageIsNull()
         {
             // Arrange

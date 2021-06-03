@@ -4,17 +4,15 @@
     ViewData["PageTitle"] = Model.PageTitle;
     ViewData["FeedbackForm"] = Model.FeedbackForm;
     ViewData["FeedbackPhase"] = Model.FeedbackPhase;
+    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadCrumbs;
+    ViewData["Breadcrumbs"] = Model.BreadCrumbs;
 }
 
-<h1 class="govuk-heading-l">We're sorry, there was a problem with the form</h1>
-
+<h1 class="govuk-heading-l">We’re sorry, there was a problem with the payment</h1>
 <p class="smbc-body">
     No money has been taken from your account, please try again if you want to continue.
 </p>
 
-<p class="smbc-body">Your reference number is @Model.Reference</p>
-<p class="smbc-body">If this problem continues, ring the contact centre on 0161 217 6111 and give them your reference number to continue.</p>
-
-<a class="govuk-button" href=@Model.PaymentUrl>Go back to try the payment again</a>
+<a class="govuk-button" href=@Model.PaymentUrl>Try the payment again</a>
 <br />
-<a class="govuk-link" href="https://www.stockport.gov.uk">Go to home page</a>
+<a class="govuk-button govuk-button--secondary" href="https://www.stockport.gov.uk">Go to the homepage</a>

@@ -13,11 +13,13 @@ using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
+using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddAnotherService;
 using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
 using form_builder.Services.FileUploadService;
+using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService.Entities;
@@ -28,6 +30,7 @@ using form_builder.ViewModels;
 using form_builder.Workflows.ActionsWorkflow;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -37,6 +40,7 @@ namespace form_builder.Services.PageService
     public class PageService : IPageService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
         private readonly IEnumerable<IElementValidator> _validators;
         private readonly IPageHelper _pageHelper;
         private readonly ISessionHelper _sessionHelper;
@@ -55,7 +59,9 @@ namespace form_builder.Services.PageService
         private readonly IPageFactory _pageContentFactory;
         private readonly IIncomingDataHelper _incomingDataHelper;
         private readonly IActionsWorkflow _actionsWorkflow;
+        private readonly IFormAvailabilityService _formAvailabilityServics;
         private readonly ILogger<IPageService> _logger;
+        private readonly IConfiguration _configuration;
 
         public PageService(
             IEnumerable<IElementValidator> validators,
@@ -76,8 +82,11 @@ namespace form_builder.Services.PageService
             IPayService payService,
             IIncomingDataHelper incomingDataHelper,
             IActionsWorkflow actionsWorkflow,
+            IAddAnotherService addAnotherService,
+            IFormAvailabilityService formAvailabilityServics,
             ILogger<IPageService> logger,
-            IAddAnotherService addAnotherService)
+            IEnumerable<IFileStorageProvider> fileStorageProviders,
+            IConfiguration configuration)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -92,6 +101,7 @@ namespace form_builder.Services.PageService
             _successPageContentFactory = successPageFactory;
             _pageContentFactory = pageFactory;
             _environment = environment;
+            _formAvailabilityServics = formAvailabilityServics;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _payService = payService;
             _mappingService = mappingService;
@@ -99,6 +109,8 @@ namespace form_builder.Services.PageService
             _actionsWorkflow = actionsWorkflow;
             _logger = logger;
             _addAnotherService = addAnotherService;
+            _fileStorageProviders = fileStorageProviders;
+            _configuration = configuration;
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParamters)
@@ -119,7 +131,7 @@ namespace form_builder.Services.PageService
             if (baseForm == null)
                 return null;
 
-            if (!baseForm.IsAvailable(_environment.EnvironmentName))
+            if (!_formAvailabilityServics.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
             {
                 _logger.LogWarning($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
                 return null;
@@ -162,13 +174,6 @@ namespace form_builder.Services.PageService
 
                 if (convertedAnswers.FormData.ContainsKey($"{path}{LookUpConstants.SearchResultsKeyPostFix}"))
                     searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
-            }
-
-            if (page.Elements.Any(_ => _.Type == EElementType.PaymentSummary))
-            {
-                var data = await _mappingService.Map(sessionGuid, form);
-                var paymentAmount = await _payService.GetFormPaymentInformation(data, form, page);
-                page.Elements.First(_ => _.Type == EElementType.PaymentSummary).Properties.Value = paymentAmount.Settings.Amount;
             }
 
             if (page.HasIncomingGetValues)
@@ -217,7 +222,7 @@ namespace form_builder.Services.PageService
         {
             FormSchema baseForm = await _schemaFactory.Build(form);
 
-            if (!baseForm.IsAvailable(_environment.EnvironmentName))
+            if (!_formAvailabilityServics.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
 
             var currentPage = baseForm.GetPage(_pageHelper, path);
@@ -323,11 +328,15 @@ namespace form_builder.Services.PageService
                     var formFileAnswerData = formAnswers.Pages.SelectMany(_ => _.Answers).FirstOrDefault(_ => _.QuestionId == $"{fileElement.Properties.QuestionId}{FileUploadConstants.SUFFIX}")?.Response ?? string.Empty;
                     List<FileUploadModel> convertedFileUploadAnswer = JsonConvert.DeserializeObject<List<FileUploadModel>>(formFileAnswerData.ToString());
 
+                    var fileStorageType = _configuration["FileStorageProvider:Type"];
+                    
+                    var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
+
                     if (convertedFileUploadAnswer != null && convertedFileUploadAnswer.Any())
                     {
                         convertedFileUploadAnswer.ForEach((_) =>
                         {
-                            _distributedCache.Remove(_.Key);
+                            fileStorageProvider.Remove(_.Key);
                         });
                     }
                 });

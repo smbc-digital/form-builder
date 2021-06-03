@@ -25,6 +25,8 @@ namespace form_builder.Models
 
         public bool DisplayBreadCrumbs { get; set; }
 
+        public bool DisplayOptionalInTitle { get; set; } = false;
+
         public List<IElement> Elements { get; set; }
 
         public List<Behaviour> Behaviours { get; set; }

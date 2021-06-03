@@ -47,7 +47,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             if (formPaymentInformation is null)
             {
-                result.AddFailureMessage($"No payment information configured.");
+                result.AddFailureMessage($"PaymentConfiguration::No payment information configured.");
                 return result;
             }
 
@@ -57,21 +57,28 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             if (paymentProvider is null)
             {
-                result.AddFailureMessage($"No payment provider configured for provider '{formPaymentInformation.PaymentProvider}'");
+                result.AddFailureMessage($"PaymentConfiguration::No payment provider configured for provider '{formPaymentInformation.PaymentProvider}'");
                 return result;
             }
 
-            if (formPaymentInformation.Settings.ComplexCalculationRequired)
+            if (formPaymentInformation.Settings.CalculationSlug is not null &&
+                !string.IsNullOrEmpty(formPaymentInformation.Settings.Amount))
             {
-                var paymentSummaryElement = schema.Pages
-                    .SelectMany(page => page.Elements)
-                    .First(element => element.Type.Equals(EElementType.PaymentSummary));
+                result.AddFailureMessage("PaymentConfiguration::Only amount or calculationSlug can be provided");
+                return result;
+            }
 
-                if (!_environment.IsEnvironment("local") &&
-                    !paymentSummaryElement.Properties.CalculationSlugs
-                        .Where(submitSlug => !submitSlug.Environment.Equals("local", StringComparison.OrdinalIgnoreCase))
-                        .Any(submitSlug => submitSlug.URL.StartsWith("https://")))
-                    result.AddFailureMessage($"PaymentSummary::CalculateCostUrl must start with https");
+            if (formPaymentInformation.Settings.CalculationSlug is null &&
+                string.IsNullOrEmpty(formPaymentInformation.Settings.Amount))
+            {
+                result.AddFailureMessage("PaymentConfiguration::Either amount or calculationSlugs must be provided");
+                return result;
+            }
+
+            if (formPaymentInformation.Settings.CalculationSlug is not null)
+            {
+                if (!_environment.IsEnvironment("local") && !formPaymentInformation.Settings.CalculationSlug.URL.StartsWith("https://"))
+                    result.AddFailureMessage("PaymentConfiguration::CalculateCostUrl must start with https");
             }
 
             return result;

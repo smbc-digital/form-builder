@@ -32,7 +32,6 @@
         MultipleFileUpload,
         Numeric,
         Organisation,
-        PaymentSummary,
         Radio,
         Reusable,
         Select,

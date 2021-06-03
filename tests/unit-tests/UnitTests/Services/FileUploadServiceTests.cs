@@ -9,12 +9,14 @@ using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Models.Elements;
+using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Validators;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Newtonsoft.Json;
 using Xunit;
@@ -27,8 +29,11 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IEnumerable<IElementValidator>> _validators = new();
         private readonly Mock<IElementValidator> _testValidator = new();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
+        private readonly Mock<IFileStorageProvider> _fileStorageProvider = new();
         private readonly Mock<IPageFactory> _mockPageFactory = new();
         private readonly Mock<IPageHelper> _mockPageHelper = new();
+        private readonly Mock<IConfiguration> _mockConfiguration = new();
 
         private static readonly Element _element = new ElementBuilder()
             .WithType(EElementType.MultipleFileUpload)
@@ -48,6 +53,14 @@ namespace form_builder_tests.UnitTests.Services
 
         public FileUploadServiceTests()
         {
+            _mockConfiguration.Setup(_ => _["FileStorageProvider:Type"]).Returns("Redis");
+
+            _fileStorageProvider.Setup(_ => _.ProviderName).Returns("Redis");
+            _fileStorageProviders = new List<IFileStorageProvider>
+            {
+                _fileStorageProvider.Object
+            };
+
             _mockPageFactory
                 .Setup(_ => _.Build(It.IsAny<Page>(),
                     It.IsAny<Dictionary<string, dynamic>>(),
@@ -64,7 +77,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
 
-            _service = new FileUploadService(_mockDistributedCache.Object, _mockPageFactory.Object, _mockPageHelper.Object);
+            _service = new FileUploadService(_mockDistributedCache.Object, _fileStorageProviders, _mockPageFactory.Object, _mockPageHelper.Object, _mockConfiguration.Object);
         }
 
         [Fact]
@@ -145,10 +158,10 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var callbackCacheProvider = string.Empty;
             var cachedAnswers =
-                "{\"FormName\":\"file-upload\",\"Path\":\"page-one\",\"CaseReference\":null,\"StartPageUrl\":null,\"FormData\":{},\"AdditionalFormData\":{},\"Pages\":[{\"PageSlug\":\"page-one\",\"Answers\":[{\"QuestionId\":\"fileUpload-fileupload\",\"Response\":[{\"Key\":\"file-fileUpload-fileupload-b3df0129-c527-4fb8-8cd6-e35e622116f6\",\"TrustedOriginalFileName\":\"SMBC.png\",\"UntrustedOriginalFileName\":\"SMBC.png\",\"Content\":null,\"FileSize\":26879,\"FileName\":null}]}]}]}";
+                "{\"FormName\":\"file-upload\",\"Path\":\"page-one\",\"CaseReference\":null,\"PaymentAmount\":null,\"StartPageUrl\":null,\"FormData\":{},\"AdditionalFormData\":{},\"Pages\":[{\"PageSlug\":\"page-one\",\"Answers\":[{\"QuestionId\":\"fileUpload-fileupload\",\"Response\":[{\"Key\":\"file-fileUpload-fileupload-b3df0129-c527-4fb8-8cd6-e35e622116f6\",\"TrustedOriginalFileName\":\"SMBC.png\",\"UntrustedOriginalFileName\":\"SMBC.png\",\"Content\":null,\"FileSize\":26879,\"FileName\":null}]}]}]}";
 
             var updatedAnswers =
-                "{\"FormName\":\"file-upload\",\"Path\":\"page-one\",\"CaseReference\":null,\"StartPageUrl\":null,\"FormData\":{},\"AdditionalFormData\":{},\"Pages\":[{\"PageSlug\":\"page-one\",\"Answers\":[{\"QuestionId\":\"fileUpload-fileupload\",\"Response\":[]}]}]}";
+                "{\"FormName\":\"file-upload\",\"Path\":\"page-one\",\"CaseReference\":null,\"PaymentAmount\":null,\"StartPageUrl\":null,\"FormData\":{},\"AdditionalFormData\":{},\"Pages\":[{\"PageSlug\":\"page-one\",\"Answers\":[{\"QuestionId\":\"fileUpload-fileupload\",\"Response\":[]}]}]}";
 
             var viewModel = new Dictionary<string, dynamic>
             {

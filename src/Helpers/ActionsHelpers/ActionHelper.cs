@@ -87,7 +87,9 @@ namespace form_builder.Helpers.ActionsHelpers
             var formAnswerDictionary = formAnswers.Pages.SelectMany(_ => _.Answers).Select(x => new Answers { QuestionId = x.QuestionId, Response = x.Response }).ToList();
             formAnswerDictionary.AddRange(formAnswers.AdditionalFormData.Select(x => new Answers { QuestionId = x.Key, Response = x.Value }).ToList());
 
-            var answer = RecursiveGetAnswerValue(match.Value, formAnswerDictionary.First(a => a.QuestionId.Equals(splitTargets[0])));
+            var answer = formAnswerDictionary.Any(a => a.QuestionId.Equals(splitTargets[0]))
+                ? RecursiveGetAnswerValue(match.Value, formAnswerDictionary.First(a => a.QuestionId.Equals(splitTargets[0])))
+                : string.Empty;
 
             return current.Replace($"{{{{{match.Groups[0].Value}}}}}", answer);
         }

@@ -33,6 +33,7 @@ using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
+using form_builder.Providers.EnabledFor;
 using form_builder.Providers.Street;
 using form_builder.Providers.Submit;
 using form_builder.Providers.TemplatedEmailProvider;
@@ -86,6 +87,8 @@ using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
+using form_builder.Services.FormAvailabilityService;
+using form_builder.Providers.FileStorage;
 
 namespace form_builder.Utils.Startup
 {
@@ -134,6 +137,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<ITagParser, FormAnswerTagParser>();
             services.AddTransient<ITagParser, FormDataTagParser>();
             services.AddTransient<ITagParser, LinkTagParser>();
+            services.AddTransient<ITagParser, PaymentAmountTagParser>();
 
             return services;
         }
@@ -226,7 +230,14 @@ namespace form_builder.Utils.Startup
 
             return services;
         }
-        
+
+        public static IServiceCollection ConfigureEnabledFor(this IServiceCollection services)
+        {
+            services.AddSingleton<IEnabledForProvider, TimeWindow>();
+
+            return services;
+        }
+
         public static IServiceCollection ConfigureEmailTemplateProviders(this IServiceCollection services)
         {
             services.AddSingleton<ITemplatedEmailProvider, FakeTemplatedEmailProvider>();
@@ -315,6 +326,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, ValidateActionCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, SummaryElementFormCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, EnabledForTimeWindowCheck>();
             
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
@@ -351,6 +363,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IEmailService, EmailService>();
             services.AddSingleton<IValidateService, ValidateService>();
             services.AddSingleton<ITemplatedEmailService, TemplatedEmailService>();
+            services.AddSingleton<IFormAvailabilityService, FormAvailabilityService>();
 
             return services;
         }
@@ -437,16 +450,24 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddStorageProvider(this IServiceCollection services, IConfiguration configuration)
         {
-            var storageProviderConfiguration = configuration.GetSection("StorageProvider");
+            AddServiceCacheType(services, configuration.GetSection("StorageProvider"));
 
+            services.AddDataProtection().SetApplicationName("formbuilder");
+            services.AddTransient<IDistributedCacheWrapper, DistributedCacheWrapper>();
+
+            return services;
+        }
+
+        private static void AddServiceCacheType(IServiceCollection services, IConfigurationSection storageProviderConfiguration)
+        {
             switch (storageProviderConfiguration["Type"])
             {
                 case "Redis":
-                    services.AddStackExchangeRedisCache(options => 
+                    services.AddStackExchangeRedisCache(options =>
                     {
                         options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions
                         {
-                            EndPoints = 
+                            EndPoints =
                             {
                                 { storageProviderConfiguration["Address"] ?? "127.0.0.1",  6379}
                             },
@@ -469,9 +490,15 @@ namespace form_builder.Utils.Startup
                     services.AddDistributedMemoryCache();
                     break;
             }
+        }
+
+        public static IServiceCollection AddFileStorageProvider(this IServiceCollection services, IConfiguration configuration)
+        {
+            AddServiceCacheType(services, configuration.GetSection("FileStorageProvider"));
 
             services.AddDataProtection().SetApplicationName("formbuilder");
-            services.AddTransient<IDistributedCacheWrapper, DistributedCacheWrapper>();
+            services.AddTransient<IFileStorageProvider, RedisFileStorageProvider>();
+            services.AddTransient<IFileStorageProvider, InMemoryStorageProvider>();
 
             return services;
         }

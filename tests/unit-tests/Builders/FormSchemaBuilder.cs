@@ -110,6 +110,18 @@ namespace form_builder_tests.Builders
             return this;
         }
 
+        public FormSchemaBuilder WithEnvironmentAvailability(string environment, bool isAvailable, List<EnabledForBase> enabedFor)
+        {
+            _environmentAvailability.Add(new EnvironmentAvailability
+            {
+                Environment = environment,
+                IsAvailable = isAvailable,
+                EnabledFor = enabedFor
+            });
+
+            return this;
+        }
+
         public FormSchemaBuilder WithFormActions(IAction formAction)
         {
             _formActions.Add(formAction);

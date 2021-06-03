@@ -36,7 +36,7 @@ namespace form_builder.ContentFactory.PageFactory
                 var cachedAnswers = _distributedCache.GetString(sessionGuid);
 
                 formAnswers = cachedAnswers == null
-                    ? new FormAnswers { Pages = new List<PageAnswers>() }
+                    ? new FormAnswers { Pages = new List<PageAnswers>(), FormName = baseForm.BaseURL }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
             }
 
