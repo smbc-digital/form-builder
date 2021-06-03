@@ -25,7 +25,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void GenerateQuestionAndAnswersList_ShouldReturn_List_Without_NonValidatable_Elements()
         {
             // Arrange
-            _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns("test value");
+            _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).ReturnsAsync("test value");
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
             var labelText = "I am a label";
 
@@ -75,7 +75,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var value = "value";
             _mockElementMapper
                 .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(value);
+                .ReturnsAsync(value);
 
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
             var labelText = "I am a label";
@@ -111,7 +111,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var value = "value";
             _mockElementMapper
                 .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(value);
+                .ReturnsAsync(value);
 
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
             var titleText = "I am a title";
@@ -144,7 +144,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var value = "value";
             _mockElementMapper
                 .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(value);
+                .ReturnsAsync(value);
 
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
             var labelText = "I am a label";
@@ -195,7 +195,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var value = "file.txt";
             _mockElementMapper
                 .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(value);
+                .ReturnsAsync(value);
 
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
             var labelText = "I am a label";

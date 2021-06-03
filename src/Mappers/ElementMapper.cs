@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -34,9 +35,13 @@ namespace form_builder.Mappers
             _configuration = configuration;
         } 
 
-        public T GetAnswerValue<T>(IElement element, FormAnswers formAnswers) => (T)GetAnswerValue(element, formAnswers);
+        public async Task<T> GetAnswerValue<T>(IElement element, FormAnswers formAnswers)
+        {
+            var value = await GetAnswerValue(element, formAnswers);
+            return (T)value;
+        }
 
-        public object GetAnswerValue(IElement element, FormAnswers formAnswers)
+        public async Task<object> GetAnswerValue(IElement element, FormAnswers formAnswers)
         {
             var key = element.Properties.QuestionId;
 
@@ -68,7 +73,7 @@ namespace form_builder.Mappers
 
                 case EElementType.FileUpload:
                 case EElementType.MultipleFileUpload:
-                    return GetFileUploadElementValue(key, formAnswers);
+                    return await GetFileUploadElementValue(key, formAnswers);
                 case EElementType.Booking:
                     return GetBookingElementValue(key, formAnswers);
                 default:
@@ -97,7 +102,7 @@ namespace form_builder.Mappers
             return "Checked";
         }
 
-        public string GetAnswerStringValue(IElement question, FormAnswers formAnswers)
+        public async Task<string> GetAnswerStringValue(IElement question, FormAnswers formAnswers)
         {
             if (question.Type == EElementType.FileUpload || question.Type == EElementType.MultipleFileUpload)
             {
@@ -118,7 +123,7 @@ namespace form_builder.Mappers
                 return fileUploadData.Any() ? fileUploadData.Select(_ => _.TrustedOriginalFileName).Aggregate((cur, acc) => $"{acc} \\r\\n\\ {cur}") : string.Empty;
             }
 
-            object value = GetAnswerValue(question, formAnswers);
+            object value = await GetAnswerValue(question, formAnswers);
 
             if (value == null)
                 return string.Empty;
@@ -163,7 +168,7 @@ namespace form_builder.Mappers
             }
         }
 
-        private object GetFileUploadElementValue(string key, FormAnswers formAnswers)
+        private async Task<object> GetFileUploadElementValue(string key, FormAnswers formAnswers)
         {
             key = $"{key}{FileUploadConstants.SUFFIX}";
 
@@ -184,7 +189,7 @@ namespace form_builder.Mappers
 
                 foreach (var file in uploadedFiles)
                 {
-                    var fileData = fileStorageProvider.GetString(file.Key);
+                    var fileData = await fileStorageProvider.GetString(file.Key);
 
                     if (fileData == null)
                         throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {file.Key} from the distributed cache");

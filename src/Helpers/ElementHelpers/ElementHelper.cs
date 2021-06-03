@@ -219,7 +219,7 @@ namespace form_builder.Helpers.ElementHelpers
 
                 formSchemaQuestions.ForEach(question =>
                 {
-                    var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
+                    var answer = _elementMapper.GetAnswerStringValue(question, formAnswers).Result;
                     summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
                 });
 
