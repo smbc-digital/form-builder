@@ -1,6 +1,7 @@
-﻿using System.Threading.Tasks;
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
+using System;
+using System.Threading.Tasks;
 
 namespace form_builder.Gateways
 {
@@ -30,6 +31,22 @@ namespace form_builder.Gateways
             };
 
             return await _s3client.ListObjectsV2Async(listRequest);
+        }
+
+        public async Task DeleteObject(string bucketName, string filename)
+        {
+            await _s3client.DeleteObjectAsync(bucketName, filename);
+        }
+
+        public async Task PutObject(string bucketName, string filename)
+        {
+            var putObjectRequest = new PutObjectRequest
+            {
+                BucketName = bucketName,
+                Key = filename
+            };
+
+            await _s3client.PutObjectAsync(putObjectRequest);
         }
     }
 }

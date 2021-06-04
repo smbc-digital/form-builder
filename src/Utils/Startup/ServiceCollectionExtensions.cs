@@ -497,7 +497,7 @@ namespace form_builder.Utils.Startup
             services.AddDataProtection().SetApplicationName("formbuilder");
             services.AddTransient<IFileStorageProvider, RedisFileStorageProvider>();
             services.AddTransient<IFileStorageProvider, InMemoryStorageProvider>();
-            services.AddTransient<IFileStorageProvider, s3FileStorageProvider>();
+            services.AddTransient<IFileStorageProvider, S3FileStorageProvider>();
 
             return services;
         }
