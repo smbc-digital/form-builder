@@ -92,7 +92,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Callback<string, SummarySectionsViewModel, Dictionary<string, object>>((x,y,z) => callback = y);
 
             _mockElementHelper.Setup(_ => _.GenerateQuestionAndAnswersList(It.IsAny<string>(), It.IsAny<FormSchema>()))
-                .Returns(new List<PageSummary>{new PageSummary { PageSlug = "page-one" }});
+                .ReturnsAsync(new List<PageSummary>{new PageSummary { PageSlug = "page-one" }});
 
             //Act
             await element.RenderAsync(

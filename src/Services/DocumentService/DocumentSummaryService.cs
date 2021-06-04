@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Helpers.DocumentCreation;
 using form_builder.Models;
@@ -24,20 +25,20 @@ namespace form_builder.Services.DocumentService
             _documentCreationHelper = documentCreationHelper;
         }
 
-        public byte[] GenerateDocument(DocumentSummaryEntity entity)
+        public async Task<byte[]> GenerateDocument(DocumentSummaryEntity entity)
         {
             switch (entity.DocumentType)
             {
                 case EDocumentType.Txt:
-                    return GenerateTextFile(entity.PreviousAnswers, entity.FormSchema);
+                    return await GenerateTextFile(entity.PreviousAnswers, entity.FormSchema);
                 default:
                     throw new Exception("DocumentSummaryService::GenerateDocument, Unknown Document type request for Summary");
             }
         }
 
-        private byte[] GenerateTextFile(FormAnswers formAnswers, FormSchema formSchema)
+        private async Task<byte[]> GenerateTextFile(FormAnswers formAnswers, FormSchema formSchema)
         {
-            var data = _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+            var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
             return _textfileProvider.CreateDocument(data);
         }

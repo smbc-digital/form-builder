@@ -29,7 +29,7 @@ namespace form_builder.Services.MappingService
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IWebHostEnvironment _environment;
-        private ILogger<MappingService> _logger;
+        private readonly ILogger<MappingService> _logger;
 
         public MappingService(IDistributedCacheWrapper distributedCache,
             IElementMapper elementMapper,
@@ -162,11 +162,6 @@ namespace form_builder.Services.MappingService
             formSchema.Pages.SelectMany(_ => _.ValidatableElements)
                 .ToList()
                 .ForEach(async _ => data = await RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
-
-            //foreach (var _ in formSchema.Pages.SelectMany(_ => _.ValidatableElements))
-            //{
-            //    data = await RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data);
-            //}
 
             if (formAnswers.AdditionalFormData.Any())
                 data = AddNonQuestionAnswers(data, formAnswers.AdditionalFormData);

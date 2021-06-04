@@ -28,7 +28,7 @@ namespace form_builder.Models.Elements
             List<object> results = null)
         {
             var htmlContent = new HtmlContentBuilder();
-            var pages = elementHelper.GenerateQuestionAndAnswersList(guid, formSchema);
+            var pages = await elementHelper.GenerateQuestionAndAnswersList(guid, formSchema);
 
             if (Properties.HasSummarySectionsDefined)
             {

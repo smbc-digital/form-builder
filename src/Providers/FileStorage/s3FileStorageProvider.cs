@@ -10,7 +10,7 @@ namespace form_builder.Providers.FileStorage
 {
     public class S3FileStorageProvider : IFileStorageProvider
     {
-        public string ProviderName { get => "s3"; }
+        public string ProviderName { get => "S3"; }
         private readonly IS3Gateway _s3Gateway;
         private readonly IConfiguration _configuration;
 
