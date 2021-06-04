@@ -43,6 +43,7 @@ namespace form_builder
                 .AddTagParsers()
                 .AddReferenceNumberProvider()
                 .AddStorageProvider(Configuration)
+                .AddFileStorageProvider(Configuration)
                 .AddSchemaProvider(HostingEnvironment)
                 .AddTransformDataProvider(HostingEnvironment)
                 .AddAmazonS3Client(Configuration.GetSection("AmazonS3Configuration")["AccessKey"], Configuration.GetSection("AmazonS3Configuration")["SecretKey"])

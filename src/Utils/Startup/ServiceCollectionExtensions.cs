@@ -87,6 +87,7 @@ using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.TemplatedEmailProvider;
 using form_builder.Services.TemplatedEmailService;
 using form_builder.Services.FormAvailabilityService;
+using form_builder.Providers.FileStorage;
 
 namespace form_builder.Utils.Startup
 {
@@ -447,16 +448,24 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddStorageProvider(this IServiceCollection services, IConfiguration configuration)
         {
-            var storageProviderConfiguration = configuration.GetSection("StorageProvider");
+            AddServiceCacheType(services, configuration.GetSection("StorageProvider"));
 
+            services.AddDataProtection().SetApplicationName("formbuilder");
+            services.AddTransient<IDistributedCacheWrapper, DistributedCacheWrapper>();
+
+            return services;
+        }
+
+        private static void AddServiceCacheType(IServiceCollection services, IConfigurationSection storageProviderConfiguration)
+        {
             switch (storageProviderConfiguration["Type"])
             {
                 case "Redis":
-                    services.AddStackExchangeRedisCache(options => 
+                    services.AddStackExchangeRedisCache(options =>
                     {
                         options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions
                         {
-                            EndPoints = 
+                            EndPoints =
                             {
                                 { storageProviderConfiguration["Address"] ?? "127.0.0.1",  6379}
                             },
@@ -479,9 +488,15 @@ namespace form_builder.Utils.Startup
                     services.AddDistributedMemoryCache();
                     break;
             }
+        }
+
+        public static IServiceCollection AddFileStorageProvider(this IServiceCollection services, IConfiguration configuration)
+        {
+            AddServiceCacheType(services, configuration.GetSection("FileStorageProvider"));
 
             services.AddDataProtection().SetApplicationName("formbuilder");
-            services.AddTransient<IDistributedCacheWrapper, DistributedCacheWrapper>();
+            services.AddTransient<IFileStorageProvider, RedisFileStorageProvider>();
+            services.AddTransient<IFileStorageProvider, InMemoryStorageProvider>();
 
             return services;
         }

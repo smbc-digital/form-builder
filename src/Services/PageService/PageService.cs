@@ -13,6 +13,7 @@ using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
+using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
@@ -28,6 +29,7 @@ using form_builder.ViewModels;
 using form_builder.Workflows.ActionsWorkflow;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -37,6 +39,7 @@ namespace form_builder.Services.PageService
     public class PageService : IPageService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
         private readonly IEnumerable<IElementValidator> _validators;
         private readonly IPageHelper _pageHelper;
         private readonly ISessionHelper _sessionHelper;
@@ -56,6 +59,7 @@ namespace form_builder.Services.PageService
         private readonly IActionsWorkflow _actionsWorkflow;
         private readonly IFormAvailabilityService _formAvailabilityServics;
         private readonly ILogger<IPageService> _logger;
+        private readonly IConfiguration _configuration;
 
         public PageService(
             IEnumerable<IElementValidator> validators,
@@ -77,7 +81,9 @@ namespace form_builder.Services.PageService
             IIncomingDataHelper incomingDataHelper,
             IActionsWorkflow actionsWorkflow,
             IFormAvailabilityService formAvailabilityServics,
-            ILogger<IPageService> logger)
+            ILogger<IPageService> logger,
+            IEnumerable<IFileStorageProvider> fileStorageProviders,
+            IConfiguration configuration)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -99,6 +105,8 @@ namespace form_builder.Services.PageService
             _incomingDataHelper = incomingDataHelper;
             _actionsWorkflow = actionsWorkflow;
             _logger = logger;
+            _fileStorageProviders = fileStorageProviders;
+            _configuration = configuration;
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParamters)
@@ -313,11 +321,15 @@ namespace form_builder.Services.PageService
                     var formFileAnswerData = formAnswers.Pages.SelectMany(_ => _.Answers).FirstOrDefault(_ => _.QuestionId == $"{fileElement.Properties.QuestionId}{FileUploadConstants.SUFFIX}")?.Response ?? string.Empty;
                     List<FileUploadModel> convertedFileUploadAnswer = JsonConvert.DeserializeObject<List<FileUploadModel>>(formFileAnswerData.ToString());
 
+                    var fileStorageType = _configuration["FileStorageProvider:Type"];
+                    
+                    var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
+
                     if (convertedFileUploadAnswer != null && convertedFileUploadAnswer.Any())
                     {
                         convertedFileUploadAnswer.ForEach((_) =>
                         {
-                            _distributedCache.Remove(_.Key);
+                            fileStorageProvider.Remove(_.Key);
                         });
                     }
                 });
