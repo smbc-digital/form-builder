@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Amazon.S3.Model.Internal.MarshallTransformations;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
@@ -51,9 +52,7 @@ namespace form_builder.Services.PageService
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IWebHostEnvironment _environment;
-        private readonly IPayService _payService;
         private readonly IBookingService _bookingService;
-        private readonly IMappingService _mappingService;
         private readonly IAddAnotherService _addAnotherService;
         private readonly ISuccessPageFactory _successPageContentFactory;
         private readonly IPageFactory _pageContentFactory;
@@ -78,8 +77,6 @@ namespace form_builder.Services.PageService
             IPageFactory pageFactory,
             IBookingService bookingService,
             ISchemaFactory schemaFactory,
-            IMappingService mappingService,
-            IPayService payService,
             IIncomingDataHelper incomingDataHelper,
             IActionsWorkflow actionsWorkflow,
             IAddAnotherService addAnotherService,
@@ -103,8 +100,6 @@ namespace form_builder.Services.PageService
             _environment = environment;
             _formAvailabilityServics = formAvailabilityServics;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
-            _payService = payService;
-            _mappingService = mappingService;
             _incomingDataHelper = incomingDataHelper;
             _actionsWorkflow = actionsWorkflow;
             _logger = logger;
@@ -113,7 +108,7 @@ namespace form_builder.Services.PageService
             _configuration = configuration;
         }
 
-        public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParamters)
+        public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters, string tempData)
         {
             if (string.IsNullOrEmpty(path))
                 _sessionHelper.RemoveSessionGuid();
@@ -182,7 +177,7 @@ namespace form_builder.Services.PageService
                 if (!string.IsNullOrEmpty(formData))
                     convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-                var result = _incomingDataHelper.AddIncomingFormDataValues(page, queryParamters, convertedAnswers);
+                var result = _incomingDataHelper.AddIncomingFormDataValues(page, queryParameters, convertedAnswers);
                 _pageHelper.SaveNonQuestionAnswers(result, form, path, sessionGuid);
             }
 
@@ -204,6 +199,9 @@ namespace form_builder.Services.PageService
 
                 searchResults = bookingProcessEntity.BookingInfo;
             }
+
+            if (page.Elements.Any(_ => _.Type.Equals(EElementType.AddAnother)))
+                page = _addAnotherService.ReplaceAddAnotherWithElements(page, tempData is not null && tempData.Equals("addAnotherFieldset"), sessionGuid);
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
 
@@ -238,9 +236,12 @@ namespace form_builder.Services.PageService
             if (currentPage.HasIncomingPostValues)
                 viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.AddAnother))
+                currentPage = _addAnotherService.GenerateAddAnotherElementsForValidation(currentPage, viewModel);
+
             currentPage.Validate(viewModel, _validators, baseForm);
 
-            if (currentPage.AllowAddAnother)
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.AddAnother))
                 return await _addAnotherService.ProcessAddAnother(viewModel, currentPage, baseForm, sessionGuid, path);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))

@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Models.Elements
 {
-    public class Checkbox : Element
+    public class PostbackButton : Element
     {
-        public Checkbox()
+        public PostbackButton()
         {
-            Type = EElementType.Checkbox;
+            Type = EElementType.PostbackButton;
         }
 
         public override Task<string> RenderAsync(IViewRender viewRender,
@@ -24,13 +24,9 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
-            elementHelper.CheckForQuestionId(this);
-            elementHelper.CheckForLabel(this);
-            elementHelper.CheckForCheckBoxListValues(this);
-            elementHelper.OrderOptionsAlphabetically(this);
-
-            return viewRender.RenderAsync(Type.ToString(), this);
-        }
+            return Task.FromResult($"<button formaction='{Properties.Action}' formmethod='post' data-prevent-double-click='true'data-disable-on-click = true class='govuk-button govuk-button--secondary' name='{Properties.Name}' id='{Properties.Name}' 'aria-describedby=remove' data-module='govuk-button'> {Properties.Label} </button>");
+        } 
+            
+            
     }
 }

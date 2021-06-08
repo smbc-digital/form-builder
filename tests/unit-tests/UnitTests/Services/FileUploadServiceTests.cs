@@ -291,7 +291,7 @@ namespace form_builder_tests.UnitTests.Services
                 It.IsAny<string>(), fileUpload, true);
 
             // Assert
-            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<CustomFormFile>>(), true, true, false), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<CustomFormFile>>(), true, true), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
             Assert.Equal("page-one", result.Page.PageSlug);
             Assert.False(result.RedirectToAction);
@@ -320,7 +320,7 @@ namespace form_builder_tests.UnitTests.Services
                 "path", fileUpload, true);
 
             // Assert
-            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<CustomFormFile>>(), true, true, false), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<CustomFormFile>>(), true, true), Times.Once);
             Assert.IsType<ProcessRequestEntity>(result);
             Assert.True(result.RedirectToAction);
             Assert.Equal("Index", result.RedirectAction);
@@ -343,7 +343,7 @@ namespace form_builder_tests.UnitTests.Services
                 "path", fileUpload, false);
 
             // Assert
-            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<CustomFormFile>>(), true, true, false), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<CustomFormFile>>(), true, true), Times.Once);
         }
 
         [Fact]
@@ -356,7 +356,7 @@ namespace form_builder_tests.UnitTests.Services
                 "path", null, false);
 
             // Assert
-            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<CustomFormFile>>(), It.IsAny<bool>(), true, false), Times.Never);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<CustomFormFile>>(), It.IsAny<bool>(), true), Times.Never);
         }
 
         [Fact]
@@ -384,7 +384,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.IsType<ProcessRequestEntity>(result);
             Assert.False(result.RedirectToAction);
             Assert.NotNull(result.Page);
-            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), fileUpload, true, true, false), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), fileUpload, true, true), Times.Once);
         }
 
         [Fact]
@@ -463,7 +463,7 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             Assert.IsType<ProcessRequestEntity>(result);
             Assert.False(result.RedirectToAction);
-            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), null, true, true, false), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), null, true, true), Times.Once);
         }
     }
 }

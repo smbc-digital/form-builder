@@ -30,15 +30,9 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            Properties.Day = Properties.IsAddAnotherElement ?
-                elementHelper.CurrentValue($"{Properties.QuestionId}{DAY_EXTENSION}_{Properties.QuestionIdIncrement}", viewModel, formAnswers, "") :
-                elementHelper.CurrentValue($"{Properties.QuestionId}", viewModel, formAnswers, DAY_EXTENSION);
-            Properties.Month = Properties.IsAddAnotherElement ?
-                elementHelper.CurrentValue($"{Properties.QuestionId}{MONTH_EXTENSION}_{Properties.QuestionIdIncrement}", viewModel, formAnswers, "") :
-                elementHelper.CurrentValue($"{Properties.QuestionId}", viewModel, formAnswers, MONTH_EXTENSION);
-            Properties.Year = Properties.IsAddAnotherElement ?
-                elementHelper.CurrentValue($"{Properties.QuestionId}{YEAR_EXTENSION}_{Properties.QuestionIdIncrement}", viewModel, formAnswers, "") :
-                elementHelper.CurrentValue($"{Properties.QuestionId}", viewModel, formAnswers, YEAR_EXTENSION);
+            Properties.Day = elementHelper.CurrentValue($"{Properties.QuestionId}", viewModel, formAnswers, DAY_EXTENSION);
+            Properties.Month = elementHelper.CurrentValue($"{Properties.QuestionId}", viewModel, formAnswers, MONTH_EXTENSION);
+            Properties.Year = elementHelper.CurrentValue($"{Properties.QuestionId}", viewModel, formAnswers, YEAR_EXTENSION);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
             elementHelper.CheckAllDateRestrictionsAreNotEnabled(this);

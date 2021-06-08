@@ -1,4 +1,5 @@
-﻿using form_builder.Models;
+﻿using System.Collections.Generic;
+using form_builder.Models;
 using form_builder.ViewModels;
 
 namespace form_builder.Services.PageService.Entities
@@ -28,5 +29,7 @@ namespace form_builder.Services.PageService.Entities
         public string RedirectAction { get; set; } = string.Empty;
 
         public object RouteValues { get; set; }
+
+        public string TempData { get; set; }
     }
 }

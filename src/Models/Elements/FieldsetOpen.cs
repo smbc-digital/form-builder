@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Models.Elements
 {
-    public class Checkbox : Element
+    public class FieldsetOpen : Element
     {
-        public Checkbox()
+        public FieldsetOpen()
         {
-            Type = EElementType.Checkbox;
+            Type = EElementType.FieldsetOpen;
         }
 
         public override Task<string> RenderAsync(IViewRender viewRender,
@@ -22,15 +22,6 @@ namespace form_builder.Models.Elements
             FormSchema formSchema,
             IWebHostEnvironment environment,
             FormAnswers formAnswers,
-            List<object> results = null)
-        {
-            Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
-            elementHelper.CheckForQuestionId(this);
-            elementHelper.CheckForLabel(this);
-            elementHelper.CheckForCheckBoxListValues(this);
-            elementHelper.OrderOptionsAlphabetically(this);
-
-            return viewRender.RenderAsync(Type.ToString(), this);
-        }
+            List<object> results = null) => Task.FromResult($"<fieldset class='govuk-fieldset'><legend class='govuk-fieldset__legend govuk-fieldset__legend--m'>{Properties.Label}</legend>");
     }
 }

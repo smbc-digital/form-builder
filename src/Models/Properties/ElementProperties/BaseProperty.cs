@@ -8,10 +8,6 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public string QuestionId { get; set; }
 
-        public int QuestionIdIncrement { get; set; } = -1;
-        
-        public bool IsAddAnotherElement { get; set; } = false;
-
         public virtual string Label { get; set; }
 
         public virtual bool StrongLabel { get; set; } = true;

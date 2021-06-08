@@ -18,6 +18,18 @@ namespace form_builder.Models.Elements
             validationResult = new ValidationResult();
         }
 
+        public Element(IElement element)
+        {
+            Type = element.Type;
+            Properties = element.Properties;
+            validationResult = new ValidationResult();
+        }
+
+        public Element Clone()
+        {
+            return new(this);
+        }
+
         public EElementType Type { get; set; }
 
         public BaseProperty Properties { get; set; }
@@ -61,13 +73,13 @@ namespace form_builder.Models.Elements
 
         public virtual string GenerateFieldsetProperties() => string.Empty;
 
-        public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "") => new Dictionary<string, dynamic>();
+        public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "") => new();
 
-        public string GetListItemId(int index) => Properties.IsAddAnotherElement ? $"{QuestionId}-{index}_{Properties.QuestionIdIncrement}" : $"{QuestionId}-{index}";
+        public string GetListItemId(int index) => $"{QuestionId}-{index}";
 
-        public string GetCustomItemId(string key) => Properties.IsAddAnotherElement ? $"{QuestionId}-{key}_{Properties.QuestionIdIncrement}" : $"{QuestionId}-{key}";
+        public string GetCustomItemId(string key) => $"{QuestionId}-{key}";
 
-        public string GetItemId() => Properties.IsAddAnotherElement ? $"{QuestionId}_{Properties.QuestionIdIncrement}" : QuestionId;
+        public string GetItemId() => QuestionId;
 
         public string GetCustomHintId(string key) => $"{GetCustomItemId(key)}-hint";
 

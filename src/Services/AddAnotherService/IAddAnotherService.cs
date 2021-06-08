@@ -7,6 +7,10 @@ namespace form_builder.Services.AddAnotherService
 {
     public interface IAddAnotherService
     {
+        Page ReplaceAddAnotherWithElements(Page currentPage, bool addEmptyFieldset, string sessionGuid);
+
+        Page GenerateAddAnotherElementsForValidation(Page currentPage, Dictionary<string, dynamic> viewModel);
+
         Task<ProcessRequestEntity> ProcessAddAnother(
             Dictionary<string, dynamic> viewModel,
             Page currentPage,
