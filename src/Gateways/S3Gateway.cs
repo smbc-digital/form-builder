@@ -1,6 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
-using System;
+using Amazon.S3.Transfer;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace form_builder.Gateways
@@ -38,15 +39,22 @@ namespace form_builder.Gateways
             await _s3client.DeleteObjectAsync(bucketName, filename);
         }
 
-        public async Task PutObject(string bucketName, string filename)
+        public async Task PutObject(string bucketName, string filename, string imageContent)
         {
-            var putObjectRequest = new PutObjectRequest
-            {
-                BucketName = bucketName,
-                Key = filename
-            };
+            var fileTransferUtility = new TransferUtility(_s3client);
 
-            await _s3client.PutObjectAsync(putObjectRequest);
+            using (var ms = new System.IO.MemoryStream(Encoding.ASCII.GetBytes(imageContent)))
+            {
+                await fileTransferUtility.UploadAsync(ms, bucketName, filename);
+            }
+           
+            //var putObjectRequest = new PutObjectRequest
+            //{
+            //    BucketName = bucketName,
+            //    Key = filename
+            //};
+
+            //var response = await _s3client.PutObjectAsync(putObjectRequest);
         }
     }
 }

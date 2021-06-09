@@ -57,7 +57,7 @@ namespace form_builder.Providers.FileStorage
         {
             try
             {
-                await _s3Gateway.PutObject(_configuration["FileStorageProvider:S3BucketName"], filename);
+                await _s3Gateway.PutObject(_configuration["FileStorageProvider:S3BucketName"], filename, value);
             }
             catch (AmazonS3Exception e)
             {
