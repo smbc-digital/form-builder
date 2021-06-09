@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Configuration;
@@ -104,8 +105,6 @@ namespace form_builder.Services.AddAnotherService
                                 Properties = new BaseProperty
                                 {
                                     Label = "Remove",
-                                    Action = "Remove",
-                                    Controller = "AddAnother",
                                     Name = $"remove-{i}"
                                 }
                             });
@@ -132,9 +131,7 @@ namespace form_builder.Services.AddAnotherService
                         Properties = new BaseProperty
                         {
                             Label = "Add another",
-                            Name = "addAnotherFieldset",
-                            Action = "AddAnother",
-                            Controller = "AddAnother"
+                            Name = "addAnotherFieldset"
                         }
                     });
                 }
@@ -158,17 +155,20 @@ namespace form_builder.Services.AddAnotherService
             {
                 if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
                 {
-                    if (item.Key.EndsWith(incrementToRemove.ToString()))
+                    var splitQuestionId = item.Key.Split('-');
+                    var currentQuestionIncrement = int.Parse(splitQuestionId[1]);
+                    if (currentQuestionIncrement == incrementToRemove)
                     {
                         answersToRemove.Add(item.Key, item.Value);
                     }
                     else
                     {
-                        var splitQuestionId = item.Key.Split('-');
-                        var currentQuestionIncrement = int.Parse(splitQuestionId[1]);
                         if (currentQuestionIncrement > incrementToRemove)
                         {
-                            updatedViewModel.Add($"{splitQuestionId[0]}-{currentQuestionIncrement - 1}", item.Value);
+                            splitQuestionId[1] = $"{currentQuestionIncrement - 1}";
+                            var newQuestionId = string.Join('-', splitQuestionId);
+
+                            updatedViewModel.Add(newQuestionId, item.Value);
                         }
                         else
                         {
@@ -199,15 +199,6 @@ namespace form_builder.Services.AddAnotherService
             if (!string.IsNullOrEmpty(removeKey))
             {
                 RemoveFieldset(viewModel, currentPage, baseForm, guid, path, removeKey);
-            }
-            else
-            {
-                if (currentPage.IsValid)
-                    _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-            }
-
-            if (!string.IsNullOrEmpty(removeKey))
-            {
                 return new ProcessRequestEntity
                 {
                     RedirectToAction = true,
@@ -219,6 +210,19 @@ namespace form_builder.Services.AddAnotherService
                     }
                 };
             }
+
+            if (!currentPage.IsValid)
+            {
+                var invalidFormModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, guid);
+
+                return new ProcessRequestEntity
+                {
+                    Page = currentPage,
+                    ViewModel = invalidFormModel
+                };
+            }
+
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
             if (currentPage.IsValid && addAnotherFieldset)
             {
@@ -232,17 +236,6 @@ namespace form_builder.Services.AddAnotherService
                         path
                     },
                     TempData = "addAnotherFieldset"
-                };
-            }
-
-            if (!currentPage.IsValid)
-            {
-                var invalidFormModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, guid);
-
-                return new ProcessRequestEntity
-                {
-                    Page = currentPage,
-                    ViewModel = invalidFormModel
                 };
             }
 

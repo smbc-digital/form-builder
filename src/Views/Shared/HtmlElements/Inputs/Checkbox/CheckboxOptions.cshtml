@@ -7,7 +7,7 @@
             <input class="govuk-checkboxes__input"
                    type="checkbox"
                    value="@Model.Properties.Options[i].Value"
-                   name="@Model.GetItemId()"
+                   name="@Model.Properties.QuestionId"
                    id="@Model.GetListItemId(i)"
                    @(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? $"data-aria-controls=conditional-{i}" : string.Empty)
                    @(Model.Properties.Options[i].HasHint ? $"aria-describedby={Model.GetListItemHintId(i)}" : string.Empty)

@@ -24,7 +24,7 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            return Task.FromResult($"<button formaction='{Properties.Action}' formmethod='post' data-prevent-double-click='true'data-disable-on-click = true class='govuk-button govuk-button--secondary' name='{Properties.Name}' id='{Properties.Name}' 'aria-describedby=remove' data-module='govuk-button'> {Properties.Label} </button>");
+            return Task.FromResult($"<button formmethod='post' data-prevent-double-click='true'data-disable-on-click = true class='govuk-button govuk-button--secondary' name='{Properties.Name}' id='{Properties.Name}' 'aria-describedby={Properties.Name}' data-module='govuk-button'> {Properties.Label} </button>");
         } 
             
             
