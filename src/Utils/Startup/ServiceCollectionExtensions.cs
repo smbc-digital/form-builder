@@ -10,6 +10,7 @@ using form_builder.Configuration;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Factories.Schema;
+using form_builder.Factories.Transform.AddAnother;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Gateways;
@@ -386,6 +387,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<ISchemaFactory, SchemaFactory>();
             services.AddTransient<ILookupSchemaTransformFactory, LookupSchemaTransformFactory>();
             services.AddTransient<IReusableElementSchemaTransformFactory, ReusableElementSchemaTransformFactory>();
+            services.AddTransient<IAddAnotherSchemaTransformFactory, AddAnotherSchemaTransformFactory>();
 
             return services;
         }

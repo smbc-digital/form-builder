@@ -6,5 +6,7 @@ namespace form_builder.Factories.Schema
     public interface ISchemaFactory
     {
         Task<FormSchema> Build(string formKey);
+
+        Task UpdateSchemaCache(FormSchema formSchema);
     }
 }

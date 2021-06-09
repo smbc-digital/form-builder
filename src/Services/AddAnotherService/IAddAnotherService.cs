@@ -2,12 +2,13 @@
 using System.Threading.Tasks;
 using form_builder.Models;
 using form_builder.Services.PageService.Entities;
+using form_builder.Validators;
 
 namespace form_builder.Services.AddAnotherService
 {
     public interface IAddAnotherService
     {
-        Page ReplaceAddAnotherWithElements(Page currentPage, bool addEmptyFieldset, string sessionGuid);
+        (FormSchema dynamicFormSchema, Page dynamicCurrentPage) GetDynamicPageFromFormData(Page currentPage, string guid);
 
         Page GenerateAddAnotherElementsForValidation(Page currentPage, Dictionary<string, dynamic> viewModel);
 
@@ -16,6 +17,7 @@ namespace form_builder.Services.AddAnotherService
             Page currentPage,
             FormSchema baseForm,
             string guid,
-            string path);
+            string path,
+            IEnumerable<IElementValidator> validators);
     }
 }

@@ -10,6 +10,7 @@ using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
+using form_builder.Factories.Transform.AddAnother;
 using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -61,6 +62,7 @@ namespace form_builder.Services.PageService
         private readonly IFormAvailabilityService _formAvailabilityServics;
         private readonly ILogger<IPageService> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IAddAnotherSchemaTransformFactory _addAnotherSchemaTransformFactory;
 
         public PageService(
             IEnumerable<IElementValidator> validators,
@@ -83,7 +85,8 @@ namespace form_builder.Services.PageService
             IFormAvailabilityService formAvailabilityServics,
             ILogger<IPageService> logger,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
-            IConfiguration configuration)
+            IConfiguration configuration, 
+            IAddAnotherSchemaTransformFactory addAnotherSchemaTransformFactory)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -106,6 +109,7 @@ namespace form_builder.Services.PageService
             _addAnotherService = addAnotherService;
             _fileStorageProviders = fileStorageProviders;
             _configuration = configuration;
+            _addAnotherSchemaTransformFactory = addAnotherSchemaTransformFactory;
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters, string tempData)
@@ -160,23 +164,18 @@ namespace form_builder.Services.PageService
                 throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
             List<object> searchResults = null;
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+
+            if (!string.IsNullOrEmpty(formData))
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
             if (subPath.Equals(LookUpConstants.Automatic) || subPath.Equals(LookUpConstants.Manual))
             {
-                var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-
-                if (!string.IsNullOrEmpty(formData))
-                    convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
                 if (convertedAnswers.FormData.ContainsKey($"{path}{LookUpConstants.SearchResultsKeyPostFix}"))
                     searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
             }
 
             if (page.HasIncomingGetValues)
             {
-                var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-                if (!string.IsNullOrEmpty(formData))
-                    convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
                 var result = _incomingDataHelper.AddIncomingFormDataValues(page, queryParameters, convertedAnswers);
                 _pageHelper.SaveNonQuestionAnswers(result, form, path, sessionGuid);
             }
@@ -201,7 +200,18 @@ namespace form_builder.Services.PageService
             }
 
             if (page.Elements.Any(_ => _.Type.Equals(EElementType.AddAnother)))
-                page = _addAnotherService.ReplaceAddAnotherWithElements(page, tempData is not null && tempData.Equals("addAnotherFieldset"), sessionGuid);
+            {
+                if (!convertedAnswers.FormData.ContainsKey("dynamicFormSchema"))
+                {
+                    var dynamicFormSchema = _addAnotherSchemaTransformFactory.Transform(baseForm);
+                    _pageHelper.SaveFormData("dynamicFormSchema", dynamicFormSchema, sessionGuid, form);
+                    page = dynamicFormSchema.GetPage(_pageHelper, path);
+                }
+                else
+                {
+                    page = _addAnotherService.GetDynamicPageFromFormData(page, sessionGuid).dynamicCurrentPage;
+                }
+            }
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
 
@@ -237,12 +247,12 @@ namespace form_builder.Services.PageService
                 viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.AddAnother))
-                currentPage = _addAnotherService.GenerateAddAnotherElementsForValidation(currentPage, viewModel);
+                currentPage = _addAnotherService.GetDynamicPageFromFormData(currentPage, sessionGuid).dynamicCurrentPage;
 
             currentPage.Validate(viewModel, _validators, baseForm);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.AddAnother))
-                return await _addAnotherService.ProcessAddAnother(viewModel, currentPage, baseForm, sessionGuid, path);
+                return await _addAnotherService.ProcessAddAnother(viewModel, currentPage, baseForm, sessionGuid, path, _validators);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
                 return await _addressService.ProcessAddress(viewModel, currentPage, baseForm, sessionGuid, path);

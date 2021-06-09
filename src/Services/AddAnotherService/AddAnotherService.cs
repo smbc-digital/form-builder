@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
+using form_builder.Extensions;
+using form_builder.Factories.Schema;
+using form_builder.Factories.Transform.AddAnother;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
+using form_builder.Validators;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -22,12 +26,21 @@ namespace form_builder.Services.AddAnotherService
         private readonly IPageFactory _pageContentFactory;
         private readonly FormConfiguration _disallowedKeys;
         private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IAddAnotherSchemaTransformFactory _addAnotherSchemaTransformFactory;
+        private readonly ISchemaFactory _schemaFactory;
 
-        public AddAnotherService(IPageHelper pageHelper, IPageFactory pageContentFactory, IOptions<FormConfiguration> disallowedKeys, IDistributedCacheWrapper distributedCache)
+        public AddAnotherService(IPageHelper pageHelper, 
+            IPageFactory pageContentFactory, 
+            IOptions<FormConfiguration> disallowedKeys, 
+            IDistributedCacheWrapper distributedCache, 
+            IAddAnotherSchemaTransformFactory addAnotherSchemaTransformFactory, 
+            ISchemaFactory schemaFactory)
         {
             _pageHelper = pageHelper;
             _pageContentFactory = pageContentFactory;
             _distributedCache = distributedCache;
+            _addAnotherSchemaTransformFactory = addAnotherSchemaTransformFactory;
+            _schemaFactory = schemaFactory;
             _disallowedKeys = disallowedKeys.Value;
         }
 
@@ -52,31 +65,19 @@ namespace form_builder.Services.AddAnotherService
             return currentPage;
         }
 
-        public Page ReplaceAddAnotherWithElements(Page currentPage, bool addEmptyFieldset, string sessionGuid)
+        public (FormSchema dynamicFormSchema, Page dynamicCurrentPage) GetDynamicPageFromFormData(Page currentPage, string guid)
         {
-            var formData = _distributedCache.GetString(sessionGuid);
-            var formAnswers = !string.IsNullOrEmpty(formData)
-                ? JsonConvert.DeserializeObject<FormAnswers>(formData)
-                : new FormAnswers { Pages = new List<PageAnswers>() };
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
-            var pageAnswers = new List<Answers>();
-            if (formAnswers.Pages != null &&
-                formAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(currentPage.PageSlug)) != null)
-            {
-                pageAnswers = formAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(currentPage.PageSlug)).Answers;
-            }
+            if (!string.IsNullOrEmpty(formData))
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-            var listOfFieldsetIncrements = pageAnswers.Select(answer => int.Parse(answer.QuestionId.Split('-')[1])).ToList();
+            FormSchema dynamicFormSchema = JsonConvert.DeserializeObject<FormSchema>(convertedAnswers.FormData["dynamicFormSchema"].ToString());
+            Page dynamicCurrentPage =
+                dynamicFormSchema.Pages.FirstOrDefault(_ => _.PageSlug.Equals(currentPage.PageSlug));
 
-            var currentIncrement = listOfFieldsetIncrements.Count > 0 ? listOfFieldsetIncrements.Max(_ => _) : 0;
-            var maxFieldsetIncrement = listOfFieldsetIncrements.Count == 0 ? 0 : addEmptyFieldset ? currentIncrement + 1 : currentIncrement;
-            var addAnotherElement = currentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother));
-            var indexOfAddAnother = currentPage.Elements.IndexOf(addAnotherElement);
-            var addAnotherReplacementElements = GenerateListOfIncrementedElements(currentPage.Elements, maxFieldsetIncrement);
-
-            currentPage.Elements.InsertRange(indexOfAddAnother, addAnotherReplacementElements);
-
-            return currentPage;
+            return (dynamicFormSchema, dynamicCurrentPage);
         }
 
         private IEnumerable<IElement> GenerateListOfIncrementedElements(IReadOnlyCollection<IElement> currentPageElements, int maxFieldsetIncrement)
@@ -183,7 +184,7 @@ namespace form_builder.Services.AddAnotherService
             }
 
             _pageHelper.RemoveAnswers(answersToRemove, guid, path);
-            _pageHelper.SaveAnswers(updatedViewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            _pageHelper.SaveAnswers(updatedViewModel, guid, baseForm.BaseURL, null, true);
         }
 
         public async Task<ProcessRequestEntity> ProcessAddAnother(
@@ -191,14 +192,34 @@ namespace form_builder.Services.AddAnotherService
             Page currentPage,
             FormSchema baseForm,
             string guid,
-            string path)
+            string path,
+            IEnumerable<IElementValidator> validators)
         {
             string removeKey = viewModel.Keys.FirstOrDefault(_ => _.Contains("remove"));
-            bool addAnotherFieldset = viewModel.Keys.Any(_ => _.Equals("addAnotherFieldset"));
+            bool addEmptyFieldset = viewModel.Keys.Any(_ => _.Equals("addAnotherFieldset"));
 
+            var (dynamicFormSchema, dynamicCurrentPage) = GetDynamicPageFromFormData(currentPage, guid);
+
+            if ((addEmptyFieldset && currentPage.IsValid) || !string.IsNullOrEmpty(removeKey))
+            {
+                var baseFormAddAnotherElement = dynamicFormSchema.GetPage(_pageHelper, path).Elements
+                    .FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother));
+
+                if (addEmptyFieldset)
+                    baseForm.GetPage(_pageHelper, path).Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.CurrentNumberOfFieldsets = 
+                        baseFormAddAnotherElement.Properties.CurrentNumberOfFieldsets + 1;
+
+                if (!string.IsNullOrEmpty(removeKey))
+                    baseForm.GetPage(_pageHelper, path).Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.CurrentNumberOfFieldsets =
+                        baseFormAddAnotherElement.Properties.CurrentNumberOfFieldsets - 1;
+
+                var updatedFormSchema = _addAnotherSchemaTransformFactory.Transform(baseForm);
+                _pageHelper.SaveFormData("dynamicFormSchema", updatedFormSchema, guid, baseForm.BaseURL);
+            }
+            
             if (!string.IsNullOrEmpty(removeKey))
             {
-                RemoveFieldset(viewModel, currentPage, baseForm, guid, path, removeKey);
+                RemoveFieldset(viewModel, dynamicCurrentPage, baseForm, guid, path, removeKey);
                 return new ProcessRequestEntity
                 {
                     RedirectToAction = true,
@@ -211,9 +232,11 @@ namespace form_builder.Services.AddAnotherService
                 };
             }
 
-            if (!currentPage.IsValid)
+            dynamicCurrentPage.Validate(viewModel, validators, dynamicFormSchema);
+
+            if (!dynamicCurrentPage.IsValid)
             {
-                var invalidFormModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, guid);
+                var invalidFormModel = await _pageContentFactory.Build(dynamicCurrentPage, viewModel, baseForm, guid);
 
                 return new ProcessRequestEntity
                 {
@@ -222,9 +245,9 @@ namespace form_builder.Services.AddAnotherService
                 };
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, dynamicCurrentPage.IsValid);
 
-            if (currentPage.IsValid && addAnotherFieldset)
+            if (dynamicCurrentPage.IsValid && addEmptyFieldset)
             {
                 return new ProcessRequestEntity
                 {
@@ -241,7 +264,7 @@ namespace form_builder.Services.AddAnotherService
 
             return new ProcessRequestEntity
             {
-                Page = currentPage
+                Page = dynamicCurrentPage
             };
         }
     }
