@@ -333,6 +333,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, SubmitSlugsHaveAllPropertiesCheck>();
 
+            services.AddSingleton<IElementSchemaIntegrityCheck, AddAnotherElementCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, AbsoluteDateValidationsCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, AcceptedFileUploadFileTypesCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, AddressNoManualTextIsSetCheck>();

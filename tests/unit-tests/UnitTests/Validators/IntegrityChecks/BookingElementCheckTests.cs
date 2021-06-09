@@ -33,7 +33,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithAppointmentIdKey(appointmentIdKey)
                 .Build();
 
-        private Element BuildBookingElement(string provider, AppointmentType appointmentType)
+        private IElement BuildBookingElement(string provider, AppointmentType appointmentType)
             => new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
