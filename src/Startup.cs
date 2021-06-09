@@ -55,6 +55,7 @@ namespace form_builder
                     _.IdleTimeout = TimeSpan.FromMinutes(30);
                     _.Cookie.Path = "/";
                     _.Cookie.Name = ".formbuilderv1";
+                    _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 });
 
             services.AddTransient<ICache, Cache.Cache>();
