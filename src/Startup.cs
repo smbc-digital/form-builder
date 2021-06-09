@@ -51,16 +51,10 @@ namespace form_builder
                 .AddServices()
                 .AddWorkflows()
                 .AddFactories()
-                .AddAntiforgery(options => 
-                {
-                    options.Cookie.Name = ".formbuilder.antiforgery.v1";
-                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                })
                 .AddSession(_ => {
                     _.IdleTimeout = TimeSpan.FromMinutes(30);
                     _.Cookie.Path = "/";
                     _.Cookie.Name = ".formbuilderv1";
-                    _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 });
 
             services.AddTransient<ICache, Cache.Cache>();
