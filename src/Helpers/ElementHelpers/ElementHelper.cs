@@ -209,7 +209,6 @@ namespace form_builder.Helpers.ElementHelpers
                     PageSlug = page.PageSlug
                 };
 
-                var summaryBuilder = new SummaryDictionaryBuilder();
                 var formSchemaQuestions = page.ValidatableElements
                     .Where(_ => _ != null)
                     .ToList();
@@ -217,17 +216,39 @@ namespace form_builder.Helpers.ElementHelpers
                 if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())
                     continue;
 
-                formSchemaQuestions.ForEach(question =>
-                {
-                    var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
-                    summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
-                });
-
-                pageSummary.Answers = summaryBuilder.Build();
+                pageSummary.Answers = GenerateSummaryAnswers(formSchemaQuestions, page, formAnswers);
                 formSummary.Add(pageSummary);
             }
 
             return formSummary;
+        }
+
+        public Dictionary<string, string> GenerateSummaryAnswers(List<IElement> formSchemaQuestions, Page page, FormAnswers formAnswers)
+        {
+            SummaryDictionaryBuilder summaryBuilder = new();
+
+            formSchemaQuestions.ForEach(element =>
+            {
+                var answer = _elementMapper.GetAnswerStringValue(element, formAnswers);
+                var summaryLabelText = string.Empty;
+                var IsAnotherElementType = element.Properties.QuestionId.Contains(":");
+
+                if (IsAnotherElementType)
+                {
+                    var indexOfColon = element.Properties.QuestionId.IndexOf(':');
+                    var indexOfAddAnother = element.Properties.QuestionId.Substring(indexOfColon + 1, 1);
+                    var OneBasedIndex = int.Parse(indexOfAddAnother) + 1;
+                    summaryLabelText = $"{OneBasedIndex} : {element.GetLabelText(page.Title)}";
+                }
+                else
+                {
+                    summaryLabelText = element.GetLabelText(page.Title);
+                }
+
+                summaryBuilder.Add(summaryLabelText, answer, element.Type);
+            });
+
+            return summaryBuilder.Build();
         }
 
         public string GenerateDocumentUploadUrl(Element element, FormSchema formSchema, FormAnswers formAnswers)
