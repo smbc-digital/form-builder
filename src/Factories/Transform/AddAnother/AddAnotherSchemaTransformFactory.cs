@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -27,7 +25,7 @@ namespace form_builder.Factories.Transform.AddAnother
             return formSchema;
         }
 
-        public Page TransformPage(Page currentPage)
+        private Page TransformPage(Page currentPage)
         {
             var newListOfElements = new List<IElement>();
             foreach (var element in currentPage.Elements)

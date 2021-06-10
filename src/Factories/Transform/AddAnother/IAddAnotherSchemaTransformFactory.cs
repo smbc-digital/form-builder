@@ -9,7 +9,5 @@ namespace form_builder.Factories.Transform.AddAnother
     public interface IAddAnotherSchemaTransformFactory
     {
         FormSchema Transform(FormSchema formSchema);
-
-        Page TransformPage(Page currentPage);
     }
 }

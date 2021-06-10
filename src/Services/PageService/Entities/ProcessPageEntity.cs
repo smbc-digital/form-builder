@@ -29,7 +29,5 @@ namespace form_builder.Services.PageService.Entities
         public string RedirectAction { get; set; } = string.Empty;
 
         public object RouteValues { get; set; }
-
-        public string TempData { get; set; }
     }
 }

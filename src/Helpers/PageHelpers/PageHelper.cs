@@ -176,6 +176,51 @@ namespace form_builder.Helpers.PageHelpers
             element.Properties.Options.AddRange(lookupOptions);
         }
 
+        public void RemoveFieldset(Dictionary<string, dynamic> viewModel,
+            string form,
+            string guid,
+            string path,
+            string removeKey)
+        {
+            var updatedViewModel = new Dictionary<string, dynamic>();
+
+            var incrementToRemove = int.Parse(removeKey.Split('-')[1]);
+            var answersToRemove = new Dictionary<string, dynamic>();
+            foreach (var item in viewModel)
+            {
+                if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
+                {
+                    var splitQuestionId = item.Key.Split(':');
+                    var currentQuestionIncrement = int.Parse(splitQuestionId[1]);
+                    if (currentQuestionIncrement == incrementToRemove)
+                    {
+                        answersToRemove.Add(item.Key, item.Value);
+                    }
+                    else
+                    {
+                        if (currentQuestionIncrement > incrementToRemove)
+                        {
+                            splitQuestionId[1] = $"{currentQuestionIncrement - 1}";
+                            var newQuestionId = string.Join(':', splitQuestionId);
+
+                            updatedViewModel.Add(newQuestionId, item.Value);
+                        }
+                        else
+                        {
+                            updatedViewModel.Add(item.Key, item.Value);
+                        }
+                    }
+                }
+                else
+                {
+                    updatedViewModel.Add(item.Key, item.Value);
+                }
+            }
+
+            RemoveAnswers(answersToRemove, guid, path);
+            SaveAnswers(updatedViewModel, guid, form, null, true);
+        }
+
         public void RemoveAnswers(Dictionary<string, dynamic> answersToRemove, string guid, string path)
         {
             var formData = _distributedCache.GetString(guid);

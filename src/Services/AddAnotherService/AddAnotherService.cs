@@ -4,15 +4,11 @@ using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
-using form_builder.Factories.Schema;
 using form_builder.Factories.Transform.AddAnother;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
-using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
-using form_builder.Validators;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace form_builder.Services.AddAnotherService
 {
@@ -21,18 +17,15 @@ namespace form_builder.Services.AddAnotherService
         private readonly IPageHelper _pageHelper;
         private readonly IPageFactory _pageContentFactory;
         private readonly FormConfiguration _disallowedKeys;
-        private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IAddAnotherSchemaTransformFactory _addAnotherSchemaTransformFactory;
 
         public AddAnotherService(IPageHelper pageHelper, 
             IPageFactory pageContentFactory, 
-            IOptions<FormConfiguration> disallowedKeys, 
-            IDistributedCacheWrapper distributedCache, 
+            IOptions<FormConfiguration> disallowedKeys,
             IAddAnotherSchemaTransformFactory addAnotherSchemaTransformFactory)
         {
             _pageHelper = pageHelper;
             _pageContentFactory = pageContentFactory;
-            _distributedCache = distributedCache;
             _addAnotherSchemaTransformFactory = addAnotherSchemaTransformFactory;
             _disallowedKeys = disallowedKeys.Value;
         }
@@ -66,7 +59,7 @@ namespace form_builder.Services.AddAnotherService
             
             if (!string.IsNullOrEmpty(removeKey))
             {
-                RemoveFieldset(viewModel, baseForm.BaseURL, guid, path, removeKey);
+                _pageHelper.RemoveFieldset(viewModel, baseForm.BaseURL, guid, path, removeKey);
                 return new ProcessRequestEntity
                 {
                     RedirectToAction = true,
@@ -110,51 +103,6 @@ namespace form_builder.Services.AddAnotherService
             {
                 Page = dynamicCurrentPage
             };
-        }
-
-        private void RemoveFieldset(Dictionary<string, dynamic> viewModel,
-            string form,
-            string guid,
-            string path,
-            string removeKey)
-        {
-            var updatedViewModel = new Dictionary<string, dynamic>();
-
-            var incrementToRemove = int.Parse(removeKey.Split('-')[1]);
-            var answersToRemove = new Dictionary<string, dynamic>();
-            foreach (var item in viewModel)
-            {
-                if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
-                {
-                    var splitQuestionId = item.Key.Split(':');
-                    var currentQuestionIncrement = int.Parse(splitQuestionId[1]);
-                    if (currentQuestionIncrement == incrementToRemove)
-                    {
-                        answersToRemove.Add(item.Key, item.Value);
-                    }
-                    else
-                    {
-                        if (currentQuestionIncrement > incrementToRemove)
-                        {
-                            splitQuestionId[1] = $"{currentQuestionIncrement - 1}";
-                            var newQuestionId = string.Join(':', splitQuestionId);
-
-                            updatedViewModel.Add(newQuestionId, item.Value);
-                        }
-                        else
-                        {
-                            updatedViewModel.Add(item.Key, item.Value);
-                        }
-                    }
-                }
-                else
-                {
-                    updatedViewModel.Add(item.Key, item.Value);
-                }
-            }
-
-            _pageHelper.RemoveAnswers(answersToRemove, guid, path);
-            _pageHelper.SaveAnswers(updatedViewModel, guid, form, null, true);
         }
     }
 }
