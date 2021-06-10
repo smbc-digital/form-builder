@@ -67,7 +67,7 @@ namespace form_builder.Controllers
             string subPath = "")
         {
             var queryParamters = Request.Query;
-            var response = await _pageService.ProcessPage(form, path, subPath, queryParamters, TempData["tempData"]?.ToString());
+            var response = await _pageService.ProcessPage(form, path, subPath, queryParamters);
 
             if (response == null)
                 return RedirectToAction("NotFound", "Error");
@@ -107,7 +107,6 @@ namespace form_builder.Controllers
 
             if (currentPageResult.RedirectToAction && !string.IsNullOrWhiteSpace(currentPageResult.RedirectAction))
             {
-                TempData["tempData"] = currentPageResult.TempData;
                 return RedirectToAction(currentPageResult.RedirectAction, currentPageResult.RouteValues ?? new { form, path });
             }
 

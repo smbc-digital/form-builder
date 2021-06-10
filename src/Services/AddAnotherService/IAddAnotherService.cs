@@ -8,9 +8,7 @@ namespace form_builder.Services.AddAnotherService
 {
     public interface IAddAnotherService
     {
-        (FormSchema dynamicFormSchema, Page dynamicCurrentPage) GetDynamicPageFromFormData(Page currentPage, string guid);
-
-        Page GenerateAddAnotherElementsForValidation(Page currentPage, Dictionary<string, dynamic> viewModel);
+        (FormSchema dynamicFormSchema, Page dynamicCurrentPage) GetDynamicFormSchema(Page currentPage, string guid);
 
         Task<ProcessRequestEntity> ProcessAddAnother(
             Dictionary<string, dynamic> viewModel,
@@ -18,6 +16,6 @@ namespace form_builder.Services.AddAnotherService
             FormSchema baseForm,
             string guid,
             string path,
-            IEnumerable<IElementValidator> validators);
+            FormSchema dynamicFormSchema);
     }
 }

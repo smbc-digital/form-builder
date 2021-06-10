@@ -112,7 +112,7 @@ namespace form_builder.Services.PageService
             _addAnotherSchemaTransformFactory = addAnotherSchemaTransformFactory;
         }
 
-        public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters, string tempData)
+        public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
         {
             if (string.IsNullOrEmpty(path))
                 _sessionHelper.RemoveSessionGuid();
@@ -209,7 +209,7 @@ namespace form_builder.Services.PageService
                 }
                 else
                 {
-                    page = _addAnotherService.GetDynamicPageFromFormData(page, sessionGuid).dynamicCurrentPage;
+                    page = _addAnotherService.GetDynamicFormSchema(page, sessionGuid).dynamicCurrentPage;
                 }
             }
 
@@ -247,12 +247,13 @@ namespace form_builder.Services.PageService
                 viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.AddAnother))
-                currentPage = _addAnotherService.GetDynamicPageFromFormData(currentPage, sessionGuid).dynamicCurrentPage;
+            {
+                var (dynamicFormSchema, dynamicCurrentPage) = _addAnotherService.GetDynamicFormSchema(currentPage, sessionGuid);
+                dynamicCurrentPage.Validate(viewModel, _validators, baseForm);
+                return await _addAnotherService.ProcessAddAnother(viewModel, dynamicCurrentPage, baseForm, sessionGuid, path, dynamicFormSchema);
+            }
 
             currentPage.Validate(viewModel, _validators, baseForm);
-
-            if (currentPage.Elements.Any(_ => _.Type == EElementType.AddAnother))
-                return await _addAnotherService.ProcessAddAnother(viewModel, currentPage, baseForm, sessionGuid, path, _validators);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
                 return await _addressService.ProcessAddress(viewModel, currentPage, baseForm, sessionGuid, path);
