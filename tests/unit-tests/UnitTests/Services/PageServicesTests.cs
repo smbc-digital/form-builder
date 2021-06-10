@@ -9,6 +9,7 @@ using form_builder.ContentFactory.PageFactory;
 using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
+using form_builder.Factories.Transform.AddAnother;
 using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -16,6 +17,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
+using form_builder.Services.AddAnotherService;
 using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
 using form_builder.Services.BookingService.Entities;
@@ -61,8 +63,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new();
         private readonly Mock<IWebHostEnvironment> _mockEnvironment = new();
-        private readonly Mock<IPayService> _payService = new();
-        private readonly Mock<IMappingService> _mappingService = new();
         private readonly Mock<IPageFactory> _mockPageFactory = new();
         private readonly Mock<IIncomingDataHelper> _mockIncomingDataHelper = new();
         private readonly Mock<ISuccessPageFactory> _mockSuccessPageFactory = new();
@@ -71,6 +71,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new();
         private readonly Mock<ILogger<IPageService>> _mockLogger = new();
         private readonly Mock<IConfiguration> _mockConfiguration = new();
+        private readonly Mock<IAddAnotherService> _mockAddAnotherService = new();
+        private readonly Mock<IAddAnotherSchemaTransformFactory> _mockAddAdnotherSchemaTransformFactory = new();
 
         public PageServicesTests()
         {
@@ -123,9 +125,28 @@ namespace form_builder_tests.UnitTests.Services
                 FormJson = 1
             });
 
-            _service = new PageService(_validators.Object, _mockPageHelper.Object, _sessionHelper.Object, _addressService.Object, _fileUploadService.Object, _streetService.Object, _organisationService.Object,
-            _distributedCache.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockEnvironment.Object, _mockSuccessPageFactory.Object, _mockPageFactory.Object, _bookingService.Object, _mockSchemaFactory.Object,
-            _mappingService.Object, _payService.Object, _mockIncomingDataHelper.Object, _mockActionsWorkflow.Object,_mockFormAvailabilityService.Object, _mockLogger.Object, _fileStorageProviders, _mockConfiguration.Object);
+            _service = new PageService(
+                _validators.Object, 
+                _mockPageHelper.Object, 
+                _sessionHelper.Object, 
+                _addressService.Object, 
+                _fileUploadService.Object, 
+                _streetService.Object, 
+                _organisationService.Object, 
+                _distributedCache.Object, 
+                _mockDistributedCacheExpirationConfiguration.Object,
+                _mockEnvironment.Object, 
+                _mockSuccessPageFactory.Object, 
+                _mockPageFactory.Object, 
+                _bookingService.Object, 
+                _mockSchemaFactory.Object,
+                _mockIncomingDataHelper.Object, 
+                _mockActionsWorkflow.Object, 
+                _mockAddAnotherService.Object, 
+                _mockFormAvailabilityService.Object, 
+                _mockLogger.Object, _fileStorageProviders, 
+                _mockConfiguration.Object, 
+                _mockAddAdnotherSchemaTransformFactory.Object);
         }
 
         [Fact]
