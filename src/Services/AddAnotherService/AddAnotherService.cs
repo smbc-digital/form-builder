@@ -37,22 +37,6 @@ namespace form_builder.Services.AddAnotherService
             _disallowedKeys = disallowedKeys.Value;
         }
 
-        public (FormSchema dynamicFormSchema, Page dynamicCurrentPage) GetDynamicFormSchema(Page currentPage, string guid)
-        {
-            var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-
-            if (!string.IsNullOrEmpty(formData))
-                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
-            FormSchema dynamicFormSchema = JsonConvert.DeserializeObject<FormSchema>(convertedAnswers.FormData["dynamicFormSchema"].ToString());
-            Page dynamicCurrentPage = dynamicFormSchema.GetPage(_pageHelper, currentPage.PageSlug);
-
-            return (dynamicFormSchema, dynamicCurrentPage);
-        }
-
-        
-
         public async Task<ProcessRequestEntity> ProcessAddAnother(
             Dictionary<string, dynamic> viewModel,
             Page dynamicCurrentPage,
@@ -142,7 +126,7 @@ namespace form_builder.Services.AddAnotherService
             {
                 if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
                 {
-                    var splitQuestionId = item.Key.Split('-');
+                    var splitQuestionId = item.Key.Split(':');
                     var currentQuestionIncrement = int.Parse(splitQuestionId[1]);
                     if (currentQuestionIncrement == incrementToRemove)
                     {
@@ -153,7 +137,7 @@ namespace form_builder.Services.AddAnotherService
                         if (currentQuestionIncrement > incrementToRemove)
                         {
                             splitQuestionId[1] = $"{currentQuestionIncrement - 1}";
-                            var newQuestionId = string.Join('-', splitQuestionId);
+                            var newQuestionId = string.Join(':', splitQuestionId);
 
                             updatedViewModel.Add(newQuestionId, item.Value);
                         }

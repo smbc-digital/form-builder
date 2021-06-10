@@ -209,7 +209,7 @@ namespace form_builder.Services.PageService
                 }
                 else
                 {
-                    page = _addAnotherService.GetDynamicFormSchema(page, sessionGuid).dynamicCurrentPage;
+                    page = _pageHelper.GetDynamicFormSchema(page, sessionGuid).dynamicCurrentPage;
                 }
             }
 
@@ -248,7 +248,7 @@ namespace form_builder.Services.PageService
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.AddAnother))
             {
-                var (dynamicFormSchema, dynamicCurrentPage) = _addAnotherService.GetDynamicFormSchema(currentPage, sessionGuid);
+                var (dynamicFormSchema, dynamicCurrentPage) = _pageHelper.GetDynamicFormSchema(currentPage, sessionGuid);
                 dynamicCurrentPage.Validate(viewModel, _validators, baseForm);
                 return await _addAnotherService.ProcessAddAnother(viewModel, dynamicCurrentPage, baseForm, sessionGuid, path, dynamicFormSchema);
             }

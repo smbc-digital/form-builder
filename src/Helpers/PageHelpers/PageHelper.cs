@@ -88,7 +88,21 @@ namespace form_builder.Helpers.PageHelpers
                     await AddDynamicOptions(element, formAnswers);
                 }
 
-                string html = await element.RenderAsync(_viewRender, _elementHelper, guid, viewModel, page, baseForm, _environment, formAnswers, results);
+                string html = string.Empty;
+
+                if (page.Elements.Any(_ => _.Type.Equals(EElementType.Summary)) &&
+                    baseForm.Pages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.AddAnother))))
+                {
+                    // Get the dynamic FormSchema from the saved answers
+                    var (dynamicFormSchema, dynamicCurrentPage) = GetDynamicFormSchema(page, guid);
+                    // html = element.RenderAsync but pass the dynamic FormSchema not the base one
+                    html = await element.RenderAsync(_viewRender, _elementHelper, guid, viewModel, page,
+                        dynamicFormSchema, _environment, formAnswers, results);
+                }
+                else
+                {
+                    html = await element.RenderAsync(_viewRender, _elementHelper, guid, viewModel, page, baseForm, _environment, formAnswers, results);
+                }
 
                 if (element.Properties is not null && element.Properties.isConditionalElement)
                 {
@@ -101,6 +115,20 @@ namespace form_builder.Helpers.PageHelpers
             }
 
             return formModel;
+        }
+
+        public (FormSchema dynamicFormSchema, Page dynamicCurrentPage) GetDynamicFormSchema(Page currentPage, string guid)
+        {
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+
+            if (!string.IsNullOrEmpty(formData))
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+            FormSchema dynamicFormSchema = JsonConvert.DeserializeObject<FormSchema>(convertedAnswers.FormData["dynamicFormSchema"].ToString());
+            Page dynamicCurrentPage = dynamicFormSchema.GetPage(this, currentPage.PageSlug);
+
+            return (dynamicFormSchema, dynamicCurrentPage);
         }
 
         public async Task AddDynamicOptions(IElement element, FormAnswers formAnswers)

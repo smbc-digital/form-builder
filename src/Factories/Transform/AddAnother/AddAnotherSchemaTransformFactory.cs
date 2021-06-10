@@ -79,7 +79,7 @@ namespace form_builder.Factories.Transform.AddAnother
                         foreach (var element in addAnotherElement.Properties.Elements)
                         {
                             var incrementedElement = JsonConvert.DeserializeObject<IElement>(JsonConvert.SerializeObject(element));
-                            incrementedElement.Properties.QuestionId = $"{element.Properties.QuestionId}-{i}";
+                            incrementedElement.Properties.QuestionId = $"{element.Properties.QuestionId}:{i}:";
                             addAnotherReplacementElements.Add(incrementedElement);
                         }
 
