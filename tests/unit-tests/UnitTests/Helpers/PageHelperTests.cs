@@ -485,6 +485,48 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
+        public void GetDynamicFormSchema_ShouldReturn_DynamicFormSchema_And_DynamicFormPage()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.AddAnother)
+                .WithLabel("Person")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            var convertedAnswers = new FormAnswers
+            {
+                FormData = new Dictionary<string, object>
+                {
+                    {
+                        "dynamicFormSchema", schema
+                    }
+                }
+            };
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(convertedAnswers));
+
+            // Act
+            var (schemaResult, pageResult) = _pageHelper.GetDynamicFormSchema(page, "123456");
+
+            // Assert
+            Assert.IsType<FormSchema>(schemaResult);
+            Assert.Equal(JsonConvert.SerializeObject(schema), JsonConvert.SerializeObject(schemaResult));
+            Assert.IsType<Page>(pageResult);
+            Assert.Equal(JsonConvert.SerializeObject(page), JsonConvert.SerializeObject(pageResult));
+        }
+
+        [Fact]
         public void SaveAnswers_ShouldCallCacheProvider()
         {
             // Arrange

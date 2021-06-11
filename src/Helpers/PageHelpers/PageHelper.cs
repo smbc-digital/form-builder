@@ -216,33 +216,8 @@ namespace form_builder.Helpers.PageHelpers
                     updatedViewModel.Add(item.Key, item.Value);
                 }
             }
-
-            RemoveAnswers(answersToRemove, guid, path);
+            
             SaveAnswers(updatedViewModel, guid, form, null, true);
-        }
-
-        public void RemoveAnswers(Dictionary<string, dynamic> answersToRemove, string guid, string path)
-        {
-            var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-            var currentPageAnswers = new PageAnswers();
-
-            if (!string.IsNullOrEmpty(formData))
-                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
-            if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == path.ToLower()))
-            {
-                currentPageAnswers = convertedAnswers.Pages.Where(_ => _.PageSlug == path.ToLower()).ToList().FirstOrDefault();
-                convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageSlug != path.ToLower()).ToList();
-            }
-
-            foreach (var item in answersToRemove)
-            {
-                var answer = currentPageAnswers.Answers.FirstOrDefault(_ => _.QuestionId.Equals(item.Key));
-                currentPageAnswers.Answers.Remove(answer);
-            }
-
-            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
         public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)

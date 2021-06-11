@@ -72,6 +72,13 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithName(string name)
+        {
+            _property.Name = name;
+
+            return this;
+        }
+
         public ElementBuilder WithAddressLabel(string label)
         {
             _property.AddressLabel = label;
