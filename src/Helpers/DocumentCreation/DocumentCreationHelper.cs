@@ -31,7 +31,7 @@ namespace form_builder.Helpers.DocumentCreation
                     var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
                     summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
 
-                    summaryBuilder.AddBlankLine(answer);
+                    summaryBuilder.AddBlankLine();
                 });
             }
 
