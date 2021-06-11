@@ -1,10 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using form_builder.Builders.Document;
-<<<<<<< HEAD
-=======
 using form_builder.Extensions;
->>>>>>> develop
 using form_builder.Mappers;
 using form_builder.Models;
 
