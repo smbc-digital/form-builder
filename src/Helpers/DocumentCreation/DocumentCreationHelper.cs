@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using form_builder.Builders.Document;
+<<<<<<< HEAD
+=======
+using form_builder.Extensions;
+>>>>>>> develop
 using form_builder.Mappers;
 using form_builder.Models;
 
@@ -14,12 +18,16 @@ namespace form_builder.Helpers.DocumentCreation
         public List<string> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema)
         {
             var summaryBuilder = new SummaryAnswerBuilder();
+            var reducedAnswers = FormAnswersExtensions.GetReducedAnswers(formAnswers, formSchema);
 
-            formSchema.Pages.ForEach(page =>
+            foreach (var page in formSchema.Pages.ToList())
             {
                 var formSchemaQuestions = page.ValidatableElements
                     .Where(_ => _ != null)
                     .ToList();
+
+                if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())
+                    continue;
 
                 formSchemaQuestions.ForEach(question =>
                 {
@@ -28,7 +36,7 @@ namespace form_builder.Helpers.DocumentCreation
 
                     summaryBuilder.AddBlankLine();
                 });
-            });
+            }
 
             return summaryBuilder.Build();
         }
