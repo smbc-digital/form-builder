@@ -14,7 +14,7 @@ namespace form_builder_tests.UnitTests.Helpers
     public class DocumentCreationHelperTests
     {
         private readonly DocumentCreationHelper _documentCreation;
-        private readonly Mock<IElementMapper> _mockElementMapper = new ();
+        private readonly Mock<IElementMapper> _mockElementMapper = new();
 
         public DocumentCreationHelperTests()
         {
@@ -22,157 +22,161 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void GenerateQuestionAndAnswersList_ShouldReturn_List_Without_NonValidatable_Elements()
+        public void GenerateQuestionAndAnswersList_ShouldReturn_Summary_With_SingleAnswer_And_NewLine()
         {
             // Arrange
             _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns("test value");
-            var formAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-            var labelText = "I am a label";
+            var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers>() } } };
 
             var element = new ElementBuilder()
-                .WithType(EElementType.H1)
+                .WithType(EElementType.Textarea)
+                .WithQuestionId("QuestionId")
+                .WithLabel("I am a label")
+                .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithPageSlug("page-one")
+                .WithElement(element)
+                .WithBehaviour(behaviour)
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            // Act
+            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+
+            Assert.Equal(2, result.Count);
+        }
+
+        [Fact]
+        public void GenerateQuestionAndAnswersList_ShouldRemove_OtherPages_NotRelated_ToJourney_WhenBuilding_Answers()
+        {
+            // Arrange
+            _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns("test value");
+            var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers>() }, new PageAnswers { PageSlug = "page-two", Answers = new List<Answers>() }, new PageAnswers { PageSlug = "page-three", Answers = new List<Answers>() } } };
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textarea)
+                .WithQuestionId("QuestionIdOne")
+                .WithLabel("I am a label")
                 .Build();
 
             var element2 = new ElementBuilder()
-                .WithType(EElementType.P)
+                .WithType(EElementType.Textarea)
+                .WithQuestionId("QuestionIdtwo")
+                .WithLabel("I am a label")
                 .Build();
 
             var element3 = new ElementBuilder()
                 .WithType(EElementType.Textarea)
-                .WithQuestionId("QuestionId")
-                .WithLabel(labelText)
+                .WithQuestionId("QuestionIdthree")
+                .WithLabel("I am a label")
+                .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("page-three")
+                .Build();
+
+            var condition = new ConditionBuilder()
+                .WithConditionType(ECondition.EqualTo)
+                .WithQuestionId("QuestionIdOne")
+                .WithComparisonValue("orange")
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithCondition(condition)
+                .WithPageSlug("page-two")
+                .Build();
+
+            var behaviour3 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("page-three")
+                .Build();
+
+            var behaviour4 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
                 .Build();
 
             var page = new PageBuilder()
+                .WithPageSlug("page-one")
                 .WithElement(element)
+                .WithBehaviour(behaviour)
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithPageSlug("page-two")
                 .WithElement(element2)
+                .WithBehaviour(behaviour3)
+                .Build();
+
+            var page3 = new PageBuilder()
+                .WithPageSlug("page-three")
                 .WithElement(element3)
+                .WithBehaviour(behaviour4)
                 .Build();
 
             var formSchema = new FormSchemaBuilder()
                 .WithPage(page)
+                .WithPage(page2)
+                .WithPage(page3)
                 .Build();
 
             // Act
             var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
-            Assert.Equal(2, result.Count);
-            Assert.Equal($"{labelText}: test value", result[0]);
-        }
-
-        [Theory]
-        [InlineData(EElementType.Textbox)]
-        [InlineData(EElementType.Textarea)]
-        [InlineData(EElementType.Checkbox)]
-        [InlineData(EElementType.Radio)]
-        [InlineData(EElementType.DateInput)]
-        [InlineData(EElementType.DatePicker)]
-        [InlineData(EElementType.Select)]
-        [InlineData(EElementType.TimeInput)]
-        public void GenerateQuestionAndAnswersList_ShouldReturn_ListWithSingleItem_For_ElementType(EElementType type)
-        {
-            // Arrange
-            var value = "value";
-            _mockElementMapper
-                .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(value);
-
-            var formAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-            var labelText = "I am a label";
-
-            var element = new ElementBuilder()
-                .WithType(type)
-                .WithQuestionId("testQuestion")
-                .WithLabel(labelText)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            // Act
-            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
-
-            Assert.Equal(2, result.Count);
-            Assert.Equal($"{labelText}: {value}", result[0]);
-        }
-
-        [Theory]
-        [InlineData(EElementType.Address)]
-        [InlineData(EElementType.Street)]
-        [InlineData(EElementType.Organisation)]
-        public void GenerateQuestionAndAnswersList_ShouldReturn_TitleAsLabel_For_ElementType(EElementType type)
-        {
-            // Arrange
-            var value = "value";
-            _mockElementMapper
-                .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(value);
-
-            var formAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-            var titleText = "I am a title";
-
-            var element = new ElementBuilder()
-                .WithType(type)
-                .WithQuestionId("testQuestion")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageTitle(titleText)
-                .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            // Act
-            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
-
-            Assert.Equal(2, result.Count);
-            Assert.Equal($"{titleText}: {value}", result[0]);
+            Assert.Equal(4, result.Count);
         }
 
         [Fact]
-        public void GenerateQuestionAndAnswersList_ShouldReturn_ListOfMultipleItems()
+        public void GenerateQuestionAndAnswersList_ShouldNot_Add_NewLines_IfAnswer_Returned_Was_Null_Or_Empty()
         {
             // Arrange
-            var value = "value";
-            _mockElementMapper
-                .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(value);
-
-            var formAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-            var labelText = "I am a label";
-            var labelText2 = "second label";
-            var labelText3 = "third label";
+            var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers>() } } };
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
-                .WithQuestionId("testQuestion1")
-                .WithLabel(labelText)
+                .WithQuestionId("QuestionId")
+                .WithLabel("I am a label")
                 .Build();
 
             var element2 = new ElementBuilder()
                 .WithType(EElementType.Textarea)
-                .WithQuestionId("testQuestion2")
-                .WithLabel(labelText2)
+                .WithQuestionId("QuestionIdTwo")
+                .WithLabel("I am a label")
                 .Build();
 
             var element3 = new ElementBuilder()
-                .WithType(EElementType.Select)
-                .WithQuestionId("testQuestion3")
-                .WithLabel(labelText3)
+                .WithType(EElementType.Textarea)
+                .WithQuestionId("QuestionIdThree")
+                .WithLabel("I am a label")
+                .Build();
+
+            var element4 = new ElementBuilder()
+                .WithType(EElementType.Textarea)
+                .WithQuestionId("QuestionIdFour")
+                .WithLabel("I am a label")
+                .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
                 .Build();
 
             var page = new PageBuilder()
+                .WithPageSlug("page-one")
                 .WithElement(element)
                 .WithElement(element2)
                 .WithElement(element3)
+                .WithElement(element4)
+                .WithBehaviour(behaviour)
                 .Build();
 
             var formSchema = new FormSchemaBuilder()
@@ -182,51 +186,7 @@ namespace form_builder_tests.UnitTests.Helpers
             // Act
             var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
-            Assert.Equal(6, result.Count);
-            Assert.Equal($"{labelText}: {value}", result[0]);
-            Assert.Equal($"{labelText2}: {value}", result[2]);
-            Assert.Equal($"{labelText3}: {value}", result[4]);
-        }
-
-        [Fact]
-        public void GenerateQuestionAndAnswersList_ShouldReturn_FilesData()
-        {
-            // Arrange
-            var value = "file.txt";
-            _mockElementMapper
-                .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(value);
-
-            var formAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-            var labelText = "I am a label";
-            var labelText2 = "second label";
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.MultipleFileUpload)
-                .WithQuestionId("testQuestion1")
-                .WithLabel(labelText)
-                .Build();
-
-            var element2 = new ElementBuilder()
-                .WithType(EElementType.FileUpload)
-                .WithQuestionId("testQuestion2")
-                .WithLabel(labelText2)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithElement(element2)
-                .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            // Act
-            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
-
-            Assert.Equal($"{labelText}: {value}", result[4]);
-            Assert.Equal($"{labelText2}: {value}", result[5]);
+            Assert.Empty(result);
         }
     }
 }

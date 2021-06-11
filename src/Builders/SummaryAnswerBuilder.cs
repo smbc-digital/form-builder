@@ -31,8 +31,11 @@ namespace form_builder.Builders.Document
             return _data;
         }
 
-        public void AddBlankLine()
+        public void AddBlankLine(string answer)
         {
+            if (string.IsNullOrWhiteSpace(answer))
+                return;
+            
             _data.Add(string.Empty);
         }
     }
