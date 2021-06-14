@@ -50,7 +50,7 @@ namespace form_builder.Factories.Schema
             _userPageTransformFactories = userPageTransformFactories;
         }
 
-        public async Task<FormSchema> Build(string formKey, string pageSlug = "")
+        public async Task<FormSchema> Build(string formKey)
         {
             if (!_schemaProvider.ValidateSchemaName(formKey).Result)
                 return null;

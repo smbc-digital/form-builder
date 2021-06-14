@@ -63,14 +63,14 @@ namespace form_builder.Services.SubmitService
 
         public async Task PreProcessSubmission(string form, string sessionGuid)
         {
-            var baseForm = await _schemaFactory.Build(form, string.Empty);
+            var baseForm = await _schemaFactory.Build(form);
             if (baseForm.GenerateReferenceNumber)
                 _pageHelper.SaveCaseReference(sessionGuid, _referenceNumberProvider.GetReference(baseForm.ReferencePrefix), true, baseForm.GeneratedReferenceNumberMapping);
         }
 
         public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
-            var baseForm = await _schemaFactory.Build(form, string.Empty);
+            var baseForm = await _schemaFactory.Build(form);
             var reference = string.Empty;
 
             if (baseForm.GenerateReferenceNumber)

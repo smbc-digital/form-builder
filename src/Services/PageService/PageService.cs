@@ -118,7 +118,7 @@ namespace form_builder.Services.PageService
                 _sessionHelper.SetSessionGuid(sessionGuid);
             }
 
-            var baseForm = await _schemaFactory.Build(form, path);
+            var baseForm = await _schemaFactory.Build(form);
 
             if (baseForm == null)
                 return null;
@@ -207,7 +207,7 @@ namespace form_builder.Services.PageService
             IEnumerable<CustomFormFile> files,
             bool modelStateIsValid)
         {
-            FormSchema baseForm = await _schemaFactory.Build(form, path);
+            FormSchema baseForm = await _schemaFactory.Build(form);
 
             if (!_formAvailabilityServics.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
@@ -336,7 +336,7 @@ namespace form_builder.Services.PageService
 
         public async Task<SuccessPageEntity> GetCancelBookingSuccessPage(string form)
         {
-            var baseForm = await _schemaFactory.Build(form, string.Empty);
+            var baseForm = await _schemaFactory.Build(form);
             var sessionGuid = _sessionHelper.GetSessionGuid();
             return await _successPageContentFactory.BuildBooking(form, baseForm, sessionGuid, new FormAnswers());
         }

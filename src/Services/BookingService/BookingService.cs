@@ -153,7 +153,7 @@ namespace form_builder.Services.BookingService
 
         public async Task ProcessMonthRequest(Dictionary<string, object> viewModel, string form, string path)
         {
-            var baseForm = await _schemaFactory.Build(form, path);
+            var baseForm = await _schemaFactory.Build(form);
 
             if (baseForm is null)
                 throw new ApplicationException($"Requested form '{form}' could not be found.");
@@ -229,7 +229,7 @@ namespace form_builder.Services.BookingService
             if (!_hashUtil.Check(bookingGuid.ToString(), hash))
                 throw new ApplicationException($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity");
 
-            var formSchema = await _schemaFactory.Build(formName, string.Empty);
+            var formSchema = await _schemaFactory.Build(formName);
 
             if (formSchema is null)
                 throw new ApplicationException($"BookingService::ValidateCancellationRequest, Provided formname '{formName}' is not valid and cannot be resolved");
@@ -267,7 +267,7 @@ namespace form_builder.Services.BookingService
             if (!_hashUtil.Check(bookingGuid.ToString(), hash))
                 throw new ApplicationException($"BookingService::Cancel, Booking guid does not match hash, unable to verify request integrity");
 
-            var formSchema = await _schemaFactory.Build(formName, string.Empty);
+            var formSchema = await _schemaFactory.Build(formName);
 
             if (formSchema is null)
                 throw new ApplicationException($"BookingService::Cancel, Provided formname '{formName}' is not valid and cannot be resolved");

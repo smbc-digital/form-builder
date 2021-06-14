@@ -88,7 +88,7 @@ namespace form_builder.Services.MappingService
 
         private async Task<(FormAnswers convertedAnswers, FormSchema baseForm)> GetFormAnswers(string form, string sessionGuid)
         {
-            var baseForm = await _schemaFactory.Build(form, string.Empty);
+            var baseForm = await _schemaFactory.Build(form);
 
             if (string.IsNullOrEmpty(sessionGuid))
                 throw new ApplicationException("MappingService::GetFormAnswers Session has expired");
