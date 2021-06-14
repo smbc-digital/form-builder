@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Models.Elements
 {
-    public class PostbackButton : Element
+    public class Fieldset : Element
     {
-        public PostbackButton()
+        public Fieldset()
         {
-            Type = EElementType.PostbackButton;
+            Type = EElementType.Fieldset;
         }
 
         public override Task<string> RenderAsync(IViewRender viewRender,
@@ -22,11 +22,6 @@ namespace form_builder.Models.Elements
             FormSchema formSchema,
             IWebHostEnvironment environment,
             FormAnswers formAnswers,
-            List<object> results = null)
-        {
-            return Task.FromResult($"<button formmethod='post' data-prevent-double-click='true'data-disable-on-click = true class='govuk-button govuk-button--secondary' name='{Properties.Name}' id='{Properties.Name}' 'aria-describedby={Properties.Name}' data-module='govuk-button'> {Properties.Label} </button>");
-        } 
-            
-            
+            List<object> results = null) => viewRender.RenderAsync("Fieldset", this);
     }
 }

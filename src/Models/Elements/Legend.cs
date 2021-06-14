@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Models.Elements
 {
-    public class FieldsetClose : Element
+    public class Legend : Element
     {
-        public FieldsetClose()
+        public Legend()
         {
-            Type = EElementType.FieldsetClose;
+            Type = EElementType.Legend;
         }
 
         public override Task<string> RenderAsync(IViewRender viewRender,
@@ -22,6 +22,9 @@ namespace form_builder.Models.Elements
             FormSchema formSchema,
             IWebHostEnvironment environment,
             FormAnswers formAnswers,
-            List<object> results = null) => Task.FromResult("</fieldset>");
+            List<object> results = null)
+        {
+            return viewRender.RenderAsync("LegendH1", this);
+        }
     }
 }

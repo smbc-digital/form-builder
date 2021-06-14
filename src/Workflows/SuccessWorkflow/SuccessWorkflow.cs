@@ -23,7 +23,7 @@ namespace form_builder.Workflows.SuccessWorkflow
 
         public async Task<SuccessPageEntity> Process(EBehaviourType behaviourType, string form)
         {
-            var baseForm = await _schemaFactory.Build(form);
+            var baseForm = await _schemaFactory.Build(form, string.Empty);
 
             if (baseForm.FormActions.Any())
                 await _actionsWorkflow.Process(baseForm.FormActions, baseForm, form);

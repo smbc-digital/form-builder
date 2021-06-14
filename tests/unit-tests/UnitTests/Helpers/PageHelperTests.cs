@@ -485,45 +485,64 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void GetDynamicFormSchema_ShouldReturn_DynamicFormSchema_And_DynamicFormPage()
+        public void RemoveFieldset_RemoveAnswersFromCache()
         {
             // Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.AddAnother)
-                .WithLabel("Person")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithValidatedModel(true)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            var convertedAnswers = new FormAnswers
+            var callbackCacheProvider = string.Empty;
+            var removeKey = "remove-0";
+            var viewModel = new Dictionary<string, dynamic>
             {
-                FormData = new Dictionary<string, object>
                 {
-                    {
-                        "dynamicFormSchema", schema
-                    }
+                    "answer:0:", "answer0"
+                },
+                {
+                    "answer:1:", "answer1"
+                },
+                {
+                    "Path", "page-one"
                 }
             };
 
+            var existingAnswers = JsonConvert.SerializeObject(new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers
+                    {
+                        PageSlug = "page-one",
+                        Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                QuestionId = "answer:0:",
+                                Response = "answer0"
+                            },
+                            new Answers
+                            {
+                                QuestionId = "answer:1:",
+                                Response = "answer1"
+                            }
+                        }
+                    }
+                }
+            });
+
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns(JsonConvert.SerializeObject(convertedAnswers));
+                .Returns(existingAnswers);
+
+            _mockDistributedCache
+                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
             // Act
-            var (schemaResult, pageResult) = _pageHelper.GetDynamicFormSchema(page, "123456");
+            _pageHelper.RemoveFieldset(viewModel, "form", Guid.NewGuid().ToString(), "page-one", removeKey);
+            var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
             // Assert
-            Assert.IsType<FormSchema>(schemaResult);
-            Assert.Equal(JsonConvert.SerializeObject(schema), JsonConvert.SerializeObject(schemaResult));
-            Assert.IsType<Page>(pageResult);
-            Assert.Equal(JsonConvert.SerializeObject(page), JsonConvert.SerializeObject(pageResult));
+            Assert.Equal("answer:0:", callbackModel.Pages[0].Answers[0].QuestionId);
+            Assert.Equal("answer1", callbackModel.Pages[0].Answers[0].Response);
+            Assert.Single(callbackModel.Pages[0].Answers);
         }
 
         [Fact]

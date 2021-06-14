@@ -103,7 +103,7 @@ namespace form_builder.Controllers
         [Route("{formName}/cannot-cancel-booking")]
         public async Task<IActionResult> CannotCancel(string formName) 
         {
-            var formSchema = await _schemaFactory.Build(formName);
+            var formSchema = await _schemaFactory.Build(formName, string.Empty);
 
             return View("CannotCancel", new FormBuilderViewModel 
             {

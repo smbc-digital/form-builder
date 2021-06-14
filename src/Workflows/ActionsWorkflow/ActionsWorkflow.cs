@@ -36,7 +36,7 @@ namespace form_builder.Workflows.ActionsWorkflow
         public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
         {
             if (formSchema == null)
-                formSchema = await _schemaFactory.Build(formName);
+                formSchema = await _schemaFactory.Build(formName, string.Empty);
 
             if (actions.Any(_ => _.Type.Equals(EActionType.RetrieveExternalData)))
                 await _retrieveExternalDataService.Process(actions.Where(_ => _.Type == EActionType.RetrieveExternalData).ToList(), formSchema, formName);

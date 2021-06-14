@@ -10,7 +10,7 @@ using form_builder.Configuration;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Factories.Schema;
-using form_builder.Factories.Transform.AddAnother;
+using form_builder.Factories.Transform.UserSchema;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Gateways;
@@ -388,7 +388,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<ISchemaFactory, SchemaFactory>();
             services.AddTransient<ILookupSchemaTransformFactory, LookupSchemaTransformFactory>();
             services.AddTransient<IReusableElementSchemaTransformFactory, ReusableElementSchemaTransformFactory>();
-            services.AddTransient<IAddAnotherSchemaTransformFactory, AddAnotherSchemaTransformFactory>();
+            services.AddTransient<IUserPageTransformFactory, AddAnotherPageTransformFactory>();
 
             return services;
         }
@@ -531,6 +531,7 @@ namespace form_builder.Utils.Startup
                 o.ViewLocationFormats.Add("/Views/Shared/FileUpload/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Button/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Fieldset/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Footer/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Header/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Headings/{0}" + RazorViewEngine.ViewExtension);

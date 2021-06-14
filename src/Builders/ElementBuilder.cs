@@ -72,13 +72,6 @@ namespace form_builder.Builders
             return this;
         }
 
-        public ElementBuilder WithName(string name)
-        {
-            _property.Name = name;
-
-            return this;
-        }
-
         public ElementBuilder WithAddressLabel(string label)
         {
             _property.AddressLabel = label;
@@ -266,6 +259,13 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithButtonName(string buttonName)
+        {
+            _property.ButtonName = buttonName;
+
+            return this;
+        }
+
         public ElementBuilder WithUpperLimitValidationMessage(string message)
         {
             _property.UpperLimitValidationMessage = message;
@@ -429,6 +429,13 @@ namespace form_builder.Builders
         public ElementBuilder WithSummaryLabel(string value)
         {
             _property.SummaryLabel = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithOpeningTagValue(bool value)
+        {
+            _property.OpeningTag = value;
 
             return this;
         }

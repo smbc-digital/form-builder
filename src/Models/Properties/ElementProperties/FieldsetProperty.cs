@@ -2,6 +2,6 @@
 {
     public partial class BaseProperty
     {
-        public string Name { get; set; }
+        public bool OpeningTag { get; set; }
     }
 }

@@ -9,9 +9,9 @@ namespace form_builder.Helpers.PageHelpers
     {
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, FormAnswers formAnswers, List<object> results = null);
 
-        (FormSchema dynamicFormSchema, Page dynamicCurrentPage) GetDynamicFormSchema(Page currentPage, string guid);
-
         void RemoveFieldset(Dictionary<string, dynamic> viewModel, string form, string guid, string path, string removeKey);
+
+        FormAnswers GetSavedAnswers(string guid);
 
         void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false);
 

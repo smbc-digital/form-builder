@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Configuration;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
-using form_builder.Factories.Transform.AddAnother;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Services.PageService.Entities;
-using Microsoft.Extensions.Options;
 
 namespace form_builder.Services.AddAnotherService
 {
@@ -16,18 +13,12 @@ namespace form_builder.Services.AddAnotherService
     {
         private readonly IPageHelper _pageHelper;
         private readonly IPageFactory _pageContentFactory;
-        private readonly FormConfiguration _disallowedKeys;
-        private readonly IAddAnotherSchemaTransformFactory _addAnotherSchemaTransformFactory;
 
         public AddAnotherService(IPageHelper pageHelper, 
-            IPageFactory pageContentFactory, 
-            IOptions<FormConfiguration> disallowedKeys,
-            IAddAnotherSchemaTransformFactory addAnotherSchemaTransformFactory)
+            IPageFactory pageContentFactory)
         {
             _pageHelper = pageHelper;
             _pageContentFactory = pageContentFactory;
-            _addAnotherSchemaTransformFactory = addAnotherSchemaTransformFactory;
-            _disallowedKeys = disallowedKeys.Value;
         }
 
         public async Task<ProcessRequestEntity> ProcessAddAnother(
@@ -35,26 +26,25 @@ namespace form_builder.Services.AddAnotherService
             Page dynamicCurrentPage,
             FormSchema baseForm,
             string guid,
-            string path,
-            FormSchema dynamicFormSchema)
+            string path)
         {
             string removeKey = viewModel.Keys.FirstOrDefault(_ => _.Contains("remove"));
             bool addEmptyFieldset = viewModel.Keys.Any(_ => _.Equals("addAnotherFieldset"));
 
+            FormAnswers convertedFormAnswers = _pageHelper.GetSavedAnswers(guid);
+
             if ((addEmptyFieldset && dynamicCurrentPage.IsValid) || !string.IsNullOrEmpty(removeKey))
             {
-                var dynamicAddAnotherElement = dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother));
+                var formDataIncrementKey = $"addAnotherFieldset-{dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.QuestionId}";
+                var currentIncrement = convertedFormAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedFormAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 0;
 
                 if (addEmptyFieldset)
-                    baseForm.GetPage(_pageHelper, path).Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.CurrentNumberOfFieldsets =
-                        dynamicAddAnotherElement.Properties.CurrentNumberOfFieldsets + 1;
+                    currentIncrement++;
 
                 if (!string.IsNullOrEmpty(removeKey))
-                    baseForm.GetPage(_pageHelper, path).Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.CurrentNumberOfFieldsets =
-                        dynamicAddAnotherElement.Properties.CurrentNumberOfFieldsets - 1;
-
-                var updatedFormSchema = _addAnotherSchemaTransformFactory.Transform(baseForm);
-                _pageHelper.SaveFormData("dynamicFormSchema", updatedFormSchema, guid, baseForm.BaseURL);
+                    currentIncrement--;
+                
+                _pageHelper.SaveFormData(formDataIncrementKey, currentIncrement, guid, baseForm.BaseURL);
             }
             
             if (!string.IsNullOrEmpty(removeKey))

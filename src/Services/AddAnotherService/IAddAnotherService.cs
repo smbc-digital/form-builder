@@ -12,7 +12,6 @@ namespace form_builder.Services.AddAnotherService
             Page currentPage,
             FormSchema baseForm,
             string guid,
-            string path,
-            FormSchema dynamicFormSchema);
+            string path);
     }
 }

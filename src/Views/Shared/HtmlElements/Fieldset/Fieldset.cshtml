@@ -1,0 +1,10 @@
+﻿@model Fieldset
+
+@if (Model.Properties.OpeningTag)
+{
+    @Html.BeginFieldSet(Model, new[] { "govuk-fieldset" })
+}
+else
+{
+    @Html.EndFieldSet()
+}

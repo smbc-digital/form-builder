@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Amazon.S3.Model.Internal.MarshallTransformations;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
@@ -10,7 +9,6 @@ using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
-using form_builder.Factories.Transform.AddAnother;
 using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -22,10 +20,8 @@ using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.FormAvailabilityService;
-using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService.Entities;
-using form_builder.Services.PayService;
 using form_builder.Services.StreetService;
 using form_builder.Validators;
 using form_builder.ViewModels;
@@ -62,7 +58,6 @@ namespace form_builder.Services.PageService
         private readonly IFormAvailabilityService _formAvailabilityServics;
         private readonly ILogger<IPageService> _logger;
         private readonly IConfiguration _configuration;
-        private readonly IAddAnotherSchemaTransformFactory _addAnotherSchemaTransformFactory;
 
         public PageService(
             IEnumerable<IElementValidator> validators,
@@ -85,8 +80,7 @@ namespace form_builder.Services.PageService
             IFormAvailabilityService formAvailabilityServics,
             ILogger<IPageService> logger,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
-            IConfiguration configuration, 
-            IAddAnotherSchemaTransformFactory addAnotherSchemaTransformFactory)
+            IConfiguration configuration)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -109,7 +103,6 @@ namespace form_builder.Services.PageService
             _addAnotherService = addAnotherService;
             _fileStorageProviders = fileStorageProviders;
             _configuration = configuration;
-            _addAnotherSchemaTransformFactory = addAnotherSchemaTransformFactory;
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
@@ -125,7 +118,7 @@ namespace form_builder.Services.PageService
                 _sessionHelper.SetSessionGuid(sessionGuid);
             }
 
-            var baseForm = await _schemaFactory.Build(form);
+            var baseForm = await _schemaFactory.Build(form, path);
 
             if (baseForm == null)
                 return null;
@@ -199,20 +192,6 @@ namespace form_builder.Services.PageService
                 searchResults = bookingProcessEntity.BookingInfo;
             }
 
-            if (page.Elements.Any(_ => _.Type.Equals(EElementType.AddAnother)))
-            {
-                if (!convertedAnswers.FormData.ContainsKey("dynamicFormSchema"))
-                {
-                    var dynamicFormSchema = _addAnotherSchemaTransformFactory.Transform(baseForm);
-                    _pageHelper.SaveFormData("dynamicFormSchema", dynamicFormSchema, sessionGuid, form);
-                    page = dynamicFormSchema.GetPage(_pageHelper, path);
-                }
-                else
-                {
-                    page = _pageHelper.GetDynamicFormSchema(page, sessionGuid).dynamicCurrentPage;
-                }
-            }
-
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
 
             return new ProcessPageEntity
@@ -228,7 +207,7 @@ namespace form_builder.Services.PageService
             IEnumerable<CustomFormFile> files,
             bool modelStateIsValid)
         {
-            FormSchema baseForm = await _schemaFactory.Build(form);
+            FormSchema baseForm = await _schemaFactory.Build(form, path);
 
             if (!_formAvailabilityServics.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
@@ -246,14 +225,10 @@ namespace form_builder.Services.PageService
             if (currentPage.HasIncomingPostValues)
                 viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
-            if (currentPage.Elements.Any(_ => _.Type == EElementType.AddAnother))
-            {
-                var (dynamicFormSchema, dynamicCurrentPage) = _pageHelper.GetDynamicFormSchema(currentPage, sessionGuid);
-                dynamicCurrentPage.Validate(viewModel, _validators, baseForm);
-                return await _addAnotherService.ProcessAddAnother(viewModel, dynamicCurrentPage, baseForm, sessionGuid, path, dynamicFormSchema);
-            }
-
             currentPage.Validate(viewModel, _validators, baseForm);
+
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.AddAnother))
+                return await _addAnotherService.ProcessAddAnother(viewModel, currentPage, baseForm, sessionGuid, path);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
                 return await _addressService.ProcessAddress(viewModel, currentPage, baseForm, sessionGuid, path);
@@ -361,7 +336,7 @@ namespace form_builder.Services.PageService
 
         public async Task<SuccessPageEntity> GetCancelBookingSuccessPage(string form)
         {
-            var baseForm = await _schemaFactory.Build(form);
+            var baseForm = await _schemaFactory.Build(form, string.Empty);
             var sessionGuid = _sessionHelper.GetSessionGuid();
             return await _successPageContentFactory.BuildBooking(form, baseForm, sessionGuid, new FormAnswers());
         }
