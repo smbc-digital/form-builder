@@ -34,7 +34,6 @@
         MultipleFileUpload,
         Numeric,
         Organisation,
-        PostbackButton,
         Radio,
         Reusable,
         Select,

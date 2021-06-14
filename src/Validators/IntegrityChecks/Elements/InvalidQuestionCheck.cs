@@ -13,7 +13,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             if (element.Properties is null || string.IsNullOrEmpty(element.Properties.QuestionId))
                 return result;
 
-            Regex regex = new(@"^[a-zA-Z0-9:]+$", RegexOptions.IgnoreCase);
+            Regex regex = new(@"^[a-zA-Z]+$", RegexOptions.IgnoreCase);
 
             if (!regex.IsMatch(element.Properties.QuestionId))
                 result.AddFailureMessage($"The provided json contains invalid QuestionIDs, '{element.Properties.QuestionId}' contains invalid characters");

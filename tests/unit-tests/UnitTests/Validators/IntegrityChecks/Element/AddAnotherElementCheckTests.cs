@@ -78,7 +78,6 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
         [InlineData(EElementType.MultipleFileUpload)]
         [InlineData(EElementType.Numeric)]
         [InlineData(EElementType.Organisation)]
-        [InlineData(EElementType.Reusable)]
         [InlineData(EElementType.Select)]
         [InlineData(EElementType.Span)]
         [InlineData(EElementType.Street)]
