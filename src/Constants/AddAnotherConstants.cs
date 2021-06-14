@@ -12,7 +12,8 @@ namespace form_builder.Constants
             EElementType.DatePicker,
             EElementType.Radio,
             EElementType.Checkbox,
-            EElementType.TimeInput
+            EElementType.TimeInput,
+            EElementType.Reusable
         };
     }
 }

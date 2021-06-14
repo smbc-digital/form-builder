@@ -50,7 +50,7 @@ namespace form_builder.Factories.Schema
             _userPageTransformFactories = userPageTransformFactories;
         }
 
-        public async Task<FormSchema> Build(string formKey)
+        public async Task<FormSchema> Build(string formKey, string sessionGuid = "")
         {
             if (!_schemaProvider.ValidateSchemaName(formKey).Result)
                 return null;
@@ -66,7 +66,7 @@ namespace form_builder.Factories.Schema
                     formSchema = JsonConvert.DeserializeObject<FormSchema>(data);
                     foreach (var page in formSchema.Pages)
                     {
-                        _userPageTransformFactories.Aggregate(page, (current, userPageFactory) => userPageFactory.Transform(current));
+                        _userPageTransformFactories.Aggregate(page, (current, userPageFactory) => userPageFactory.Transform(current, sessionGuid));
                     }
 
                     return formSchema;
@@ -74,17 +74,19 @@ namespace form_builder.Factories.Schema
             }
             
             formSchema = await _schemaProvider.Get<FormSchema>(formKey);
+
             formSchema = await _reusableElementSchemaFactory.Transform(formSchema);
             formSchema = _lookupSchemaFactory.Transform(formSchema);
 
             await _formSchemaIntegrityValidator.Validate(formSchema);
-            foreach (var page in formSchema.Pages)
-            {
-                _userPageTransformFactories.Aggregate(page, (current, userPageFactory) => userPageFactory.Transform(current));
-            }
 
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)
                 await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}", JsonConvert.SerializeObject(formSchema), _distributedCacheExpirationConfiguration.FormJson);
+
+            foreach (var page in formSchema.Pages)
+            {
+                _userPageTransformFactories.Aggregate(page, (current, userPageFactory) => userPageFactory.Transform(current, sessionGuid));
+            }
 
             return formSchema;
         }

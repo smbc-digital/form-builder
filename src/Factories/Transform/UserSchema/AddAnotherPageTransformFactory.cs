@@ -22,14 +22,14 @@ namespace form_builder.Factories.Transform.UserSchema
             _sessionHelper = sessionHelper;
         }
 
-        public Page Transform(Page page)
+        public Page Transform(Page page, string sessionGuid)
         {
             var newListOfElements = new List<IElement>();
             foreach (var element in page.Elements)
             {
                 if (element.Type.Equals(EElementType.AddAnother))
                 {
-                    newListOfElements.AddRange(GenerateListOfIncrementedElements(page.Elements));
+                    newListOfElements.AddRange(GenerateListOfIncrementedElements(page.Elements, sessionGuid));
                 }
 
                 newListOfElements.Add(element);
@@ -40,15 +40,18 @@ namespace form_builder.Factories.Transform.UserSchema
             return page;
         }
 
-        private IEnumerable<IElement> GenerateListOfIncrementedElements(IReadOnlyCollection<IElement> currentPageElements)
+        private IEnumerable<IElement> GenerateListOfIncrementedElements(IReadOnlyCollection<IElement> currentPageElements, string sessionGuid)
         {
             var addAnotherElement = currentPageElements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother));
             var addAnotherReplacementElements = new List<IElement>();
-            var sessionGuid = _sessionHelper.GetSessionGuid();
             if (string.IsNullOrEmpty(sessionGuid))
             {
-                sessionGuid = Guid.NewGuid().ToString();
-                _sessionHelper.SetSessionGuid(sessionGuid);
+                sessionGuid = _sessionHelper.GetSessionGuid();
+                if (string.IsNullOrEmpty(sessionGuid))
+                {
+                    sessionGuid = Guid.NewGuid().ToString();
+                    _sessionHelper.SetSessionGuid(sessionGuid);
+                }
             }
 
             var convertedAnswers = _pageHelper.GetSavedAnswers(sessionGuid);

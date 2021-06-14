@@ -4,6 +4,6 @@ namespace form_builder.Factories.Transform.UserSchema
 {
     public interface IUserPageTransformFactory
     {
-        Page Transform(Page page);
+        Page Transform(Page page, string sessionGuid);
     }
 }
