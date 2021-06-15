@@ -34,14 +34,6 @@ namespace form_builder.Validators.IntegrityChecks.Elements
                 return result;
             }
 
-            foreach (IElement nestedElement in nestedElements)
-            {
-                if (!AddAnotherConstants.ValidElements.Any(elementType => elementType.Equals(nestedElement.Type)))
-                {
-                    result.AddFailureMessage($"Add Another Element Check : Invalid - {nestedElement.Type} not valid element type for this feature.");
-                }
-            }
-
             return result;
         }
         public async Task<IntegrityCheckResult> ValidateAsync(IElement element) => await Task.Run(() => Validate(element));
