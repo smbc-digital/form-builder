@@ -259,6 +259,13 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithButtonName(string buttonName)
+        {
+            _property.ButtonName = buttonName;
+
+            return this;
+        }
+
         public ElementBuilder WithUpperLimitValidationMessage(string message)
         {
             _property.UpperLimitValidationMessage = message;
@@ -426,6 +433,13 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithOpeningTagValue(bool value)
+        {
+            _property.OpeningTag = value;
+
+            return this;
+        }
+
         public ElementBuilder WithOrderOptionsAlphabetically(bool value)
         {
             _property.OrderOptionsAlphabetically = value;
@@ -439,6 +453,16 @@ namespace form_builder.Builders
                 _property.Sections = new List<Section>();
 
             _property.Sections.Add(value);
+
+            return this;
+        }
+
+        public ElementBuilder WithNestedElement(Element element)
+        {
+            if (_property.Elements is null)
+                _property.Elements = new List<IElement> { element };
+            else
+                _property.Elements.Add(element);
 
             return this;
         }

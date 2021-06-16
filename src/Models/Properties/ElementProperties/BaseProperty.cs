@@ -14,6 +14,8 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public bool Optional { get; set; } = false;
 
+        public bool IsDynamicallyGeneratedElement { get; set; } = false;
+
         public bool? Email { get; set; }
 
         public bool? Telephone { get; set; }

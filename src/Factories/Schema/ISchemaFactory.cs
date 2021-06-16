@@ -5,6 +5,6 @@ namespace form_builder.Factories.Schema
 {
     public interface ISchemaFactory
     {
-        Task<FormSchema> Build(string formKey);
+        Task<FormSchema> Build(string formKey, string sessionGuid = "");
     }
 }

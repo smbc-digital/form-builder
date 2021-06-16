@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
@@ -145,6 +146,61 @@ namespace form_builder.Helpers.PageHelpers
                 throw new Exception("Dynamic lookup: GetAsync cannot get IList<Options>.");
 
             element.Properties.Options.AddRange(lookupOptions);
+        }
+
+        public void RemoveFieldset(Dictionary<string, dynamic> viewModel,
+            string form,
+            string guid,
+            string path,
+            string removeKey)
+        {
+            var updatedViewModel = new Dictionary<string, dynamic>();
+
+            var incrementToRemove = int.Parse(removeKey.Split('-')[1]);
+            var answersToRemove = new Dictionary<string, dynamic>();
+            foreach (var item in viewModel)
+            {
+                if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
+                {
+                    var splitQuestionId = item.Key.Split(':');
+                    var currentQuestionIncrement = int.Parse(splitQuestionId[1]);
+                    if (currentQuestionIncrement == incrementToRemove)
+                    {
+                        answersToRemove.Add(item.Key, item.Value);
+                    }
+                    else
+                    {
+                        if (currentQuestionIncrement > incrementToRemove)
+                        {
+                            splitQuestionId[1] = $"{currentQuestionIncrement - 1}";
+                            var newQuestionId = string.Join(':', splitQuestionId);
+
+                            updatedViewModel.Add(newQuestionId, item.Value);
+                        }
+                        else
+                        {
+                            updatedViewModel.Add(item.Key, item.Value);
+                        }
+                    }
+                }
+                else
+                {
+                    updatedViewModel.Add(item.Key, item.Value);
+                }
+            }
+            
+            SaveAnswers(updatedViewModel, guid, form, null, true);
+        }
+
+        public FormAnswers GetSavedAnswers(string guid)
+        {
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+
+            if (!string.IsNullOrEmpty(formData))
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+            return convertedAnswers;
         }
 
         public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
