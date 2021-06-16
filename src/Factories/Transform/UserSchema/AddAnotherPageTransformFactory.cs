@@ -83,7 +83,7 @@ namespace form_builder.Factories.Transform.UserSchema
                                 .WithButtonId($"remove-{i}")
                                 .WithButtonName($"remove-{i}")
                                 .WithPropertyText("Remove")
-                                .WithClassName("govuk-button--secondary smbc-button--remove")
+                                .WithClassName("govuk-button--secondary smbc-button__remove--add-another")
                                 .Build());
                         }
 
