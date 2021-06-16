@@ -89,6 +89,7 @@ namespace form_builder.Factories.Transform.UserSchema
                         {
                             var incrementedElement = JsonConvert.DeserializeObject<IElement>(JsonConvert.SerializeObject(element));
                             incrementedElement.Properties.QuestionId = $"{element.Properties.QuestionId}:{i}:";
+                            incrementedElement.Properties.IsDynamicallyGeneratedElement = true;
                             addAnotherReplacementElements.Add(incrementedElement);
                         }
 

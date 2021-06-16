@@ -78,6 +78,7 @@ namespace form_builder.Models
         }
 
         public IEnumerable<IElement> ValidatableElements => Elements.Where(element =>
+                element.Type == EElementType.AddAnother ||
                 element.Type == EElementType.Address ||
                 element.Type == EElementType.AddressManual ||
                 element.Type == EElementType.Booking ||

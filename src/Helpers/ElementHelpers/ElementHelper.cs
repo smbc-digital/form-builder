@@ -198,7 +198,7 @@ namespace form_builder.Helpers.ElementHelpers
         public List<PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema)
         {
             var formAnswers = GetFormData(guid);
-            var reducedAnswers = FormAnswersExtensions.GetReducedAnswers(formAnswers, formSchema);
+            var reducedAnswers = formAnswers.GetReducedAnswers(formSchema);
             var formSummary = new List<PageSummary>();
 
             foreach (var page in formSchema.Pages.ToList())
@@ -231,14 +231,13 @@ namespace form_builder.Helpers.ElementHelpers
             {
                 var answer = _elementMapper.GetAnswerStringValue(element, formAnswers);
                 var summaryLabelText = string.Empty;
-                var IsAnotherElementType = element.Properties.QuestionId.Contains(":");
+                var isGroupedAnswer = element.Properties.QuestionId.Contains(":");
 
-                if (IsAnotherElementType)
+                if (isGroupedAnswer)
                 {
-                    var indexOfColon = element.Properties.QuestionId.IndexOf(':');
-                    var indexOfAddAnother = element.Properties.QuestionId.Substring(indexOfColon + 1, 1);
-                    var OneBasedIndex = int.Parse(indexOfAddAnother) + 1;
-                    summaryLabelText = $"{OneBasedIndex} : {element.GetLabelText(page.Title)}";
+                    var splitAnswer = element.Properties.QuestionId.Split(':');
+                    var questionIncrementForDisplay = int.Parse(splitAnswer[1]) + 1;
+                    summaryLabelText = $"{questionIncrementForDisplay} : {element.GetLabelText(page.Title)}";
                 }
                 else
                 {

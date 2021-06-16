@@ -173,10 +173,16 @@ namespace form_builder.Services.MappingService
         {
             var splitTargets = targetMapping.Split(".");
 
+            if (element.Properties.IsDynamicallyGeneratedElement)
+                return obj;
+
             if (splitTargets.Length == 1)
             {
                 if (element.Type == EElementType.FileUpload || element.Type == EElementType.MultipleFileUpload)
                     return CheckAndCreateForFileUpload(splitTargets[0], element, formAnswers, obj);
+
+                if (element.Type == EElementType.AddAnother)
+                    return CheckAndCreateForAddAnother(splitTargets[0], element, formAnswers, obj);
 
                 object answerValue = _elementMapper.GetAnswerValue(element, formAnswers);
                 if (answerValue != null && obj.TryGetValue(splitTargets[0], out var objectValue))
@@ -201,6 +207,29 @@ namespace form_builder.Services.MappingService
 
             obj.Remove(splitTargets[0]);
             obj.Add(splitTargets[0], subObject);
+
+            return obj;
+        }
+
+        private IDictionary<string, dynamic> CheckAndCreateForAddAnother(string target, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
+        {
+            var numberOfIncrements = int.Parse(formAnswers.FormData[$"addAnotherFieldset-{element.Properties.QuestionId}"].ToString());
+            var answers = new List<IDictionary<string, dynamic>>();
+
+            for (var i = 0; i <= numberOfIncrements; i++)
+            {
+                var fieldsetAnswers = new Dictionary<string, dynamic>();
+                foreach (var nestedElement in element.Properties.Elements)
+                {
+                    var incrementedElement = JsonConvert.DeserializeObject<IElement>(JsonConvert.SerializeObject(nestedElement));
+                    incrementedElement.Properties.QuestionId = $"{nestedElement.Properties.QuestionId}:{i}:";
+                    fieldsetAnswers = (Dictionary<string, dynamic>) RecursiveCheckAndCreate(string.IsNullOrEmpty(nestedElement.Properties.TargetMapping) ? nestedElement.Properties.QuestionId : nestedElement.Properties.TargetMapping, incrementedElement, formAnswers, fieldsetAnswers);
+                }
+
+                answers.Add(fieldsetAnswers);
+            }
+
+            obj.Add(target, answers);
 
             return obj;
         }
