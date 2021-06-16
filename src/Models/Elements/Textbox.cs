@@ -36,7 +36,7 @@ namespace form_builder.Models.Elements
             var properties = new Dictionary<string, dynamic>()
             {
                 { "name", Properties.QuestionId },
-                { "id", Properties.QuestionId},
+                { "id", Properties.QuestionId },
                 { "maxlength", Properties.MaxLength },
                 { "value", Properties.Value},
                 { "spellcheck", Properties.Spellcheck.ToString().ToLower() }

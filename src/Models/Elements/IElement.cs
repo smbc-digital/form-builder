@@ -24,8 +24,6 @@ namespace form_builder.Models.Elements
 
         bool IsValid { get; }
 
-        Element Clone();
-
         void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm);
 
         Task<string> RenderAsync(IViewRender viewRender,

@@ -22,9 +22,6 @@ namespace form_builder.Models.Elements
             FormSchema formSchema,
             IWebHostEnvironment environment,
             FormAnswers formAnswers,
-            List<object> results = null)
-        {
-            return Task.FromResult(string.Empty);
-        }
+            List<object> results = null) => Task.FromResult(string.Empty);
     }
 }

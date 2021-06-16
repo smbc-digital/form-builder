@@ -22,9 +22,6 @@ namespace form_builder.Models.Elements
             FormSchema formSchema,
             IWebHostEnvironment environment,
             FormAnswers formAnswers,
-            List<object> results = null)
-        {
-            return viewRender.RenderAsync("LegendH1", this);
-        }
+            List<object> results = null) => viewRender.RenderAsync("LegendH1", this);
     }
 }

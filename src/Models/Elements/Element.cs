@@ -18,18 +18,6 @@ namespace form_builder.Models.Elements
             validationResult = new ValidationResult();
         }
 
-        public Element(IElement element)
-        {
-            Type = element.Type;
-            Properties = element.Properties;
-            validationResult = new ValidationResult();
-        }
-
-        public Element Clone()
-        {
-            return new(this);
-        }
-
         public EElementType Type { get; set; }
 
         public BaseProperty Properties { get; set; }
@@ -78,8 +66,6 @@ namespace form_builder.Models.Elements
         public string GetListItemId(int index) => $"{QuestionId}-{index}";
 
         public string GetCustomItemId(string key) => $"{QuestionId}-{key}";
-
-        public string GetItemId() => QuestionId;
 
         public string GetCustomHintId(string key) => $"{GetCustomItemId(key)}-hint";
 
