@@ -120,7 +120,7 @@ namespace form_builder_tests.UnitTests.Services
                     "question:0:", "answer"
                 },
                 {
-                    "question:1:", "answer"
+                    "question:1:", null
                 },
                 {
                     "remove-0", "remove"
@@ -145,7 +145,6 @@ namespace form_builder_tests.UnitTests.Services
                 .WithElement(addAnotherElement)
                 .WithValidatedModel(true)
                 .WithPageSlug("page-one")
-                .WithValidatedModel(true)
                 .Build();
 
             var baseSchema = new FormSchemaBuilder()

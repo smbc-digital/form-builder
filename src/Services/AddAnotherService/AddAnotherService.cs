@@ -33,7 +33,7 @@ namespace form_builder.Services.AddAnotherService
 
             FormAnswers convertedFormAnswers = _pageHelper.GetSavedAnswers(guid);
 
-            if (dynamicCurrentPage.IsValid)
+            if (dynamicCurrentPage.IsValid  || !string.IsNullOrEmpty(removeKey))
             {
                 var formDataIncrementKey = $"addAnotherFieldset-{dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.QuestionId}";
                 var currentIncrement = convertedFormAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedFormAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 0;
