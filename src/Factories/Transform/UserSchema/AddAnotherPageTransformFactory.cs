@@ -73,7 +73,7 @@ namespace form_builder.Factories.Transform.UserSchema
                         addAnotherReplacementElements.Add(new ElementBuilder()
                             .WithType(EElementType.Legend)
                             .WithLabel(addAnotherElement.Properties.Label)
-                            .WithClassName("smbc-add-another--legend")
+                            .WithClassName("smbc-add-another--legend govuk-!-width-full")
                             .Build());
 
                         if (maxFieldsetIncrements > 0)
