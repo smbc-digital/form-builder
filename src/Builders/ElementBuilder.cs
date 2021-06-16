@@ -456,5 +456,15 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithNestedElement(Element element)
+        {
+            if (_property.Elements is null)
+                _property.Elements = new List<IElement> { element };
+            else
+                _property.Elements.Add(element);
+
+            return this;
+        }
     }
 }

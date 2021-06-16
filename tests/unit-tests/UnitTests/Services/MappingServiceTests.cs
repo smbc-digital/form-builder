@@ -504,6 +504,56 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task Map_ShouldReturnExpandoObject_WithListOfObjects_ForAddAnotherElement()
+        {
+            // Arrange
+            var textboxElement = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("text")
+                .Build();
+
+            var addAnotherElement = new ElementBuilder()
+                .WithType(EElementType.AddAnother)
+                .WithQuestionId("person")
+                .WithNestedElement(textboxElement)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(addAnotherElement)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns(new { });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers
+                {
+                    Pages = new List<PageAnswers>(),
+                    FormData = new Dictionary<string, object> { { "addAnotherFieldset-person", 0 } }
+                }));
+
+            // Act
+            var result = await _service.Map("form", "guid");
+
+            // Assert
+            var resultData = Assert.IsType<ExpandoObject>(result.Data);
+            dynamic castResultsData = resultData;
+
+            Assert.NotNull(castResultsData.person);
+            Assert.IsType<List<IDictionary<string, dynamic>>>(castResultsData.person);
+            Assert.Single(castResultsData.person);
+        }
+
+        [Fact]
         public async Task Map_ShouldReturnExpandoObject_WithAdditionalFormAnswersData()
         {
             // Arrange

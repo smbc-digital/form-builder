@@ -213,7 +213,11 @@ namespace form_builder.Services.MappingService
 
         private IDictionary<string, dynamic> CheckAndCreateForAddAnother(string target, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
         {
-            var numberOfIncrements = int.Parse(formAnswers.FormData[$"addAnotherFieldset-{element.Properties.QuestionId}"].ToString());
+            var savedIncrementValue = formAnswers.FormData[$"addAnotherFieldset-{element.Properties.QuestionId}"].ToString();
+            if (string.IsNullOrEmpty(savedIncrementValue))
+                throw new ApplicationException($"MappingService::CheckAndCreateForAddAnother, Fieldset increment value not found in FormData in saved answers for questionId {element.Properties.QuestionId}");
+
+            var numberOfIncrements = int.Parse(savedIncrementValue);
             var answers = new List<IDictionary<string, dynamic>>();
 
             for (var i = 0; i <= numberOfIncrements; i++)

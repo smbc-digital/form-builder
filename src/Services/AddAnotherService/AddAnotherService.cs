@@ -62,6 +62,8 @@ namespace form_builder.Services.AddAnotherService
                 };
             }
 
+            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, dynamicCurrentPage.IsValid);
+
             if (!dynamicCurrentPage.IsValid)
             {
                 var invalidFormModel = await _pageContentFactory.Build(dynamicCurrentPage, viewModel, baseForm, guid);
@@ -72,8 +74,6 @@ namespace form_builder.Services.AddAnotherService
                     ViewModel = invalidFormModel
                 };
             }
-
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, dynamicCurrentPage.IsValid);
 
             if (dynamicCurrentPage.IsValid && addEmptyFieldset)
             {
