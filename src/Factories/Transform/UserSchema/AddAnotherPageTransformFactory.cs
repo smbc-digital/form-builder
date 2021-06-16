@@ -73,7 +73,7 @@ namespace form_builder.Factories.Transform.UserSchema
                         addAnotherReplacementElements.Add(new ElementBuilder()
                             .WithType(EElementType.Legend)
                             .WithLabel(addAnotherElement.Properties.Label)
-                            .WithClassName("smbc-add-another--legend govuk-!-width-full")
+                            .WithClassName("smbc-add-another--legend")
                             .Build());
 
                         if (maxFieldsetIncrements > 0)
@@ -83,7 +83,7 @@ namespace form_builder.Factories.Transform.UserSchema
                                 .WithButtonId($"remove-{i}")
                                 .WithButtonName($"remove-{i}")
                                 .WithPropertyText("Remove")
-                                .WithClassName("govuk-button--secondary smbc-button--remove")
+                                .WithClassName("govuk-button--secondary smbc-button__remove--add-another")
                                 .Build());
                         }
 
