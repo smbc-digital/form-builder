@@ -17,6 +17,14 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 foreach (var element in page.ValidatableElements)
                 {
                     questionIds.Add(element.Properties.QuestionId);
+
+                    if (element.Properties.Elements is not null && element.Properties.Elements.Count > 0)
+                    {
+                        foreach (var nestedElement in element.Properties.Elements)
+                        {
+                            questionIds.Add(nestedElement.Properties.QuestionId);
+                        }
+                    }
                 }
             }
 
