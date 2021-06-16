@@ -2,7 +2,7 @@
 
 @if (Model.Properties.OpeningTag)
 {
-    @Html.BeginFieldSet(Model, new[] { "govuk-fieldset" })
+    @Html.BeginFieldSet(Model, new[] { "govuk-fieldset", @Model.Properties.ClassName })
 }
 else
 {

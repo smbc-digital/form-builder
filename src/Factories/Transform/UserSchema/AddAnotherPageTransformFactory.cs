@@ -67,11 +67,13 @@ namespace form_builder.Factories.Transform.UserSchema
                         addAnotherReplacementElements.Add(new ElementBuilder()
                             .WithType(EElementType.Fieldset)
                             .WithOpeningTagValue(true)
+                            .WithClassName("smbc-add-another--fieldset")
                             .Build());
 
                         addAnotherReplacementElements.Add(new ElementBuilder()
                             .WithType(EElementType.Legend)
                             .WithLabel(addAnotherElement.Properties.Label)
+                            .WithClassName("smbc-add-another--legend")
                             .Build());
 
                         if (maxFieldsetIncrements > 0)
@@ -81,7 +83,7 @@ namespace form_builder.Factories.Transform.UserSchema
                                 .WithButtonId($"remove-{i}")
                                 .WithButtonName($"remove-{i}")
                                 .WithPropertyText("Remove")
-                                .WithClassName("govuk-button--secondary")
+                                .WithClassName("govuk-button--secondary smbc-button--remove")
                                 .Build());
                         }
 
