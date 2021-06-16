@@ -36,6 +36,7 @@ namespace form_builder
             services.AddControllersWithViews();
             services.AddRazorPages();
 
+            services.AddDetection();
             services
                 .AddRazorViewEngineViewLocations()
                 .ConfigureCookiePolicy()
@@ -120,6 +121,8 @@ namespace form_builder
                 app.UseMiddleware<AppExceptionHandling>()
                     .UseHsts();
             }
+
+            app.UseDetection();
 
             app.UseMiddleware<HeaderConfiguration>()
                 .UseSession()
