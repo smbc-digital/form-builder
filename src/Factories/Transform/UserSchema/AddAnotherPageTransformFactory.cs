@@ -115,7 +115,7 @@ namespace form_builder.Factories.Transform.UserSchema
                             .WithButtonId("addAnotherFieldset")
                             .WithButtonName("addAnotherFieldset")
                             .WithPropertyText($"Add another {addAnotherElement.Properties.AppendText}")
-                            .WithClassName("govuk-button--secondary")
+                            .WithClassName("govuk-button--secondary govuk-!-display-block ")
                             .Build());
                     }
                 }
