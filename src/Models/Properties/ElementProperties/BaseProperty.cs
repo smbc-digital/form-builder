@@ -6,6 +6,8 @@ namespace form_builder.Models.Properties.ElementProperties
     {
         public string Text { get; set; }
 
+        public string AppendText { get; set; }
+
         public string QuestionId { get; set; }
 
         public virtual string Label { get; set; }

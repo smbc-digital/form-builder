@@ -32,6 +32,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .WithQuestionId("person")
                 .WithType(EElementType.AddAnother)
                 .WithNestedElement(textboxElement)
+                .WithAppendText("person")
                 .Build();
 
             addAnotherElement.Properties.Elements = new List<IElement> { textboxElement };
@@ -107,13 +108,14 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             var result = _transformFactory.Transform(_page, "guid");
             var removeButtonZero = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("remove-1"));
             var removeButtonOne = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("remove-2"));
-            var addAnotherButton = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("addAnotherFieldset"));
+            var addAnotherButton = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("addAnotherFieldset")).ToList();
 
             // Assert
             Assert.Equal(3, result.Elements.Count(_ => _.Type.Equals(EElementType.Button)));
             Assert.Single(removeButtonZero);
             Assert.Single(removeButtonOne);
             Assert.Single(addAnotherButton);
+            Assert.Equal("Add another person", addAnotherButton[0].Properties.Text);
         }
 
         [Fact]

@@ -480,5 +480,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithAppendText(string value)
+        {
+            _property.AppendText = value;
+
+            return this;
+        }
     }
 }
