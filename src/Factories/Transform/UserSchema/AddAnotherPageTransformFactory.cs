@@ -89,7 +89,7 @@ namespace form_builder.Factories.Transform.UserSchema
                                 .WithButtonId($"remove-{i}")
                                 .WithButtonName($"remove-{i}")
                                 .WithPropertyText("Remove")
-                                .WithClassName("smbc-button__remove--add-another smbc-button--link govuk-!-margin-bottom-9")
+                                .WithClassName("smbc-button--link--left smbc-button--link govuk-!-margin-bottom-9")
                                 .Build());
                         }
 
