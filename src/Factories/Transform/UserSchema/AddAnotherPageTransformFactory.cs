@@ -56,36 +56,23 @@ namespace form_builder.Factories.Transform.UserSchema
 
             var convertedAnswers = _pageHelper.GetSavedAnswers(sessionGuid);
             var formDataIncrementKey = $"addAnotherFieldset-{addAnotherElement.Properties.QuestionId}";
-            var maxFieldsetIncrements = convertedAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 0;
+            var fieldsetIncrements = convertedAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
 
             foreach (var pageElement in currentPageElements)
             {
                 if (pageElement.Type.Equals(EElementType.AddAnother))
                 {
-                    for (var i = 0; i <= maxFieldsetIncrements; i++)
+                    for (var i = 1; i <= fieldsetIncrements; i++)
                     {
                         addAnotherReplacementElements.Add(new ElementBuilder()
                             .WithType(EElementType.Fieldset)
                             .WithOpeningTagValue(true)
-                            .WithClassName("smbc-add-another--fieldset")
                             .Build());
 
                         addAnotherReplacementElements.Add(new ElementBuilder()
                             .WithType(EElementType.Legend)
                             .WithLabel(addAnotherElement.Properties.Label)
-                            .WithClassName("smbc-add-another--legend")
                             .Build());
-
-                        if (maxFieldsetIncrements > 0)
-                        {
-                            addAnotherReplacementElements.Add(new ElementBuilder()
-                                .WithType(EElementType.Button)
-                                .WithButtonId($"remove-{i}")
-                                .WithButtonName($"remove-{i}")
-                                .WithPropertyText("Remove")
-                                .WithClassName("govuk-button--secondary smbc-button__remove--add-another")
-                                .Build());
-                        }
 
                         foreach (var element in addAnotherElement.Properties.Elements)
                         {
@@ -95,19 +82,33 @@ namespace form_builder.Factories.Transform.UserSchema
                             addAnotherReplacementElements.Add(incrementedElement);
                         }
 
+                        if (fieldsetIncrements > 1)
+                        {
+                            addAnotherReplacementElements.Add(new ElementBuilder()
+                                .WithType(EElementType.Button)
+                                .WithButtonId($"remove-{i}")
+                                .WithButtonName($"remove-{i}")
+                                .WithPropertyText("Remove")
+                                .WithClassName("smbc-button--link")
+                                .Build());
+                        }
+
                         addAnotherReplacementElements.Add(new ElementBuilder()
                             .WithType(EElementType.Fieldset)
                             .WithOpeningTagValue(false)
                             .Build());
                     }
 
-                    addAnotherReplacementElements.Add(new ElementBuilder()
-                        .WithType(EElementType.Button)
-                        .WithButtonId("addAnotherFieldset")
-                        .WithButtonName("addAnotherFieldset")
-                        .WithPropertyText("Add another")
-                        .WithClassName("govuk-button--secondary")
-                        .Build());
+                    if (fieldsetIncrements < addAnotherElement.Properties.MaximumFieldsets)
+                    {
+                        addAnotherReplacementElements.Add(new ElementBuilder()
+                            .WithType(EElementType.Button)
+                            .WithButtonId("addAnotherFieldset")
+                            .WithButtonName("addAnotherFieldset")
+                            .WithPropertyText("Add another")
+                            .WithClassName("govuk-button--secondary")
+                            .Build());
+                    }
                 }
             }
 

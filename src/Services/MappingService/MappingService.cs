@@ -227,7 +227,7 @@ namespace form_builder.Services.MappingService
             var numberOfIncrements = int.Parse(savedIncrementValue);
             var answers = new List<IDictionary<string, dynamic>>();
 
-            for (var i = 0; i <= numberOfIncrements; i++)
+            for (var i = 1; i <= numberOfIncrements; i++)
             {
                 var fieldsetAnswers = new Dictionary<string, dynamic>();
                 foreach (var nestedElement in element.Properties.Elements)

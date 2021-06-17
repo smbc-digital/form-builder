@@ -466,5 +466,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithMaximumFieldsets(int value)
+        {
+            _property.MaximumFieldsets = value;
+
+            return this;
+        }
     }
 }
