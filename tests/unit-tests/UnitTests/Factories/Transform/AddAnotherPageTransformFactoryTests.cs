@@ -163,5 +163,52 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             Assert.True(textboxZero[0].Properties.IsDynamicallyGeneratedElement);
             Assert.True(textboxOne[0].Properties.IsDynamicallyGeneratedElement);
         }
+
+        [Fact]
+        public void Transform_ShouldReturnCorrectOptions_ForElementWithConditionalElements()
+        {
+            // Arrange
+            var options = new List<Option>
+            {
+                new Option
+                {
+                    ConditionalElementId = "optionOne"
+                }
+            };
+
+            var radioElement = new ElementBuilder()
+                .WithQuestionId("radio")
+                .WithType(EElementType.Radio)
+                .WithOptions(options)
+                .Build();
+
+            var textbox = new ElementBuilder()
+                .WithQuestionId("optionOne")
+                .WithType(EElementType.Textbox)
+                .WithIsConditionalElement(true)
+                .Build();
+
+            var addAnotherElement = new ElementBuilder()
+                .WithLabel("Person")
+                .WithQuestionId("person")
+                .WithType(EElementType.AddAnother)
+                .WithNestedElement(radioElement)
+                .WithNestedElement(textbox)
+                .Build();
+
+            addAnotherElement.Properties.Elements = new List<IElement> { radioElement };
+
+            var page = new PageBuilder()
+                .WithPageSlug("people")
+                .WithElement(addAnotherElement)
+                .Build();
+
+            // Act
+            var result = _transformFactory.Transform(page, "guid");
+            var radioOne = result.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Radio) && _.Properties.QuestionId.Equals("radio:1:"));
+
+            // Assert
+            Assert.Equal("optionOne:1:", radioOne.Properties.Options[0].ConditionalElementId);
+        }
     }
 }
