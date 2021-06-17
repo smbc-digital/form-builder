@@ -53,6 +53,64 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task ProcessAddAnother_ShouldThrow_If_AddEmptyFieldsetTrue_And_CurrentIncrementIsSameOrGreaterThanMaximumFieldsets()
+        {
+            // Arrange
+            var formAnswers = new FormAnswers
+            {
+                FormData = new Dictionary<string, object>
+                {
+                    { "addAnotherFieldset-person", 10 }
+                }
+            };
+
+            _mockPageHelper
+                .Setup(_ => _.GetSavedAnswers(It.IsAny<string>()))
+                .Returns(formAnswers);
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {
+                    "question:0:", "answer"
+                },
+                {
+                    "addAnotherFieldset", "addAnother"
+                }
+            };
+
+            var addAnotherElement = new ElementBuilder()
+                .WithType(EElementType.AddAnother)
+                .WithLabel("Person")
+                .WithQuestionId("person")
+                .Build();
+
+            var textboxElement = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithLabel("Name")
+                .WithQuestionId("question")
+                .Build();
+
+            addAnotherElement.Properties.Elements = new List<IElement> { textboxElement };
+
+            var page = new PageBuilder()
+                .WithElement(addAnotherElement)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var baseSchema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithBaseUrl("form")
+                .Build();
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _addAnotherService.ProcessAddAnother(viewModel, page, baseSchema, Guid.NewGuid().ToString(), "page-one"));
+
+            // Assert
+            Assert.Equal("AddAnotherService::ProcessAddAnother, maximum number of fieldsets exceeded", result.Message);
+        }
+
+        [Fact]
         public async Task ProcessAddAnother_ShouldIncreaseIncrement_And_SaveFormDataIncrement_WhenViewModelIsValid_And_AddEmptyFieldsetTrue()
         {
             // Arrange
