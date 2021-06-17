@@ -45,7 +45,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             {
                 FormData = new Dictionary<string, object>
                 {
-                    { "addAnotherFieldset-person", 1 }
+                    { "addAnotherFieldset-person", 2 }
                 }
             };
 
@@ -105,8 +105,8 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         {
             // Act
             var result = _transformFactory.Transform(_page, "guid");
-            var removeButtonZero = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("remove-0"));
-            var removeButtonOne = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("remove-1"));
+            var removeButtonZero = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("remove-1"));
+            var removeButtonOne = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("remove-2"));
             var addAnotherButton = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("addAnotherFieldset"));
 
             // Assert
@@ -117,12 +117,44 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
+        public void Transform_ShouldNotReturnAddAnotherButtonElement_WhenMaximumFieldsetsReached()
+        {
+            // Act
+            var textboxElement = new ElementBuilder()
+                .WithQuestionId("textbox")
+                .WithType(EElementType.Textbox)
+                .Build();
+
+            var addAnotherElement = new ElementBuilder()
+                .WithLabel("Person")
+                .WithQuestionId("person")
+                .WithType(EElementType.AddAnother)
+                .WithNestedElement(textboxElement)
+                .WithMaximumFieldsets(2)
+                .Build();
+
+            addAnotherElement.Properties.Elements = new List<IElement> { textboxElement };
+
+            var page = new PageBuilder()
+                .WithPageSlug("people")
+                .WithElement(addAnotherElement)
+                .Build();
+
+            var result = _transformFactory.Transform(page, "guid");
+            var addAnotherButton = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("addAnotherFieldset")).ToList();
+
+            // Assert
+            Assert.Equal(2, result.Elements.Count(_ => _.Type.Equals(EElementType.Button)));
+            Assert.Empty(addAnotherButton);
+        }
+
+        [Fact]
         public void Transform_ShouldReturnCorrect_TextboxElements()
         {
             // Act
             var result = _transformFactory.Transform(_page, "guid");
-            var textboxZero = result.Elements.Where(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox:0:")).ToList();
-            var textboxOne = result.Elements.Where(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox:1:")).ToList();
+            var textboxZero = result.Elements.Where(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox:1:")).ToList();
+            var textboxOne = result.Elements.Where(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox:2:")).ToList();
 
             // Assert
             Assert.Equal(2, result.Elements.Count(_ => _.Type.Equals(EElementType.Textbox)));

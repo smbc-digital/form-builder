@@ -36,7 +36,7 @@ namespace form_builder.Services.AddAnotherService
             if (dynamicCurrentPage.IsValid  || !string.IsNullOrEmpty(removeKey))
             {
                 var formDataIncrementKey = $"addAnotherFieldset-{dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.QuestionId}";
-                var currentIncrement = convertedFormAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedFormAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 0;
+                var currentIncrement = convertedFormAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedFormAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
 
                 if (addEmptyFieldset)
                     currentIncrement++;

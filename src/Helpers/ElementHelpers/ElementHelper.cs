@@ -236,7 +236,7 @@ namespace form_builder.Helpers.ElementHelpers
                 if (isGroupedAnswer)
                 {
                     var splitAnswer = element.Properties.QuestionId.Split(':');
-                    var questionIncrementForDisplay = int.Parse(splitAnswer[1]) + 1;
+                    var questionIncrementForDisplay = int.Parse(splitAnswer[1]);
                     summaryLabelText = $"{questionIncrementForDisplay} : {element.GetLabelText(page.Title)}";
                 }
                 else
