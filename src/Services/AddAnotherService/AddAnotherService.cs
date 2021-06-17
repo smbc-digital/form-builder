@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.ContentFactory.PageFactory;
@@ -6,6 +7,7 @@ using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Services.PageService.Entities;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace form_builder.Services.AddAnotherService
 {
@@ -32,12 +34,16 @@ namespace form_builder.Services.AddAnotherService
             bool addEmptyFieldset = viewModel.Keys.Any(_ => _.Equals("addAnotherFieldset"));
 
             FormAnswers convertedFormAnswers = _pageHelper.GetSavedAnswers(guid);
+            var maximumFieldsets = dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type == EElementType.AddAnother).Properties.MaximumFieldsets;
 
             if (dynamicCurrentPage.IsValid  || !string.IsNullOrEmpty(removeKey))
             {
                 var formDataIncrementKey = $"addAnotherFieldset-{dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.QuestionId}";
                 var currentIncrement = convertedFormAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedFormAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
 
+                if (addEmptyFieldset && currentIncrement >= maximumFieldsets)
+                    throw new ApplicationException("AddAnotherService::ProcessAddAnother, maximum number of fieldsets exceeded");
+                
                 if (addEmptyFieldset)
                     currentIncrement++;
 
