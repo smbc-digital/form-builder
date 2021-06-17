@@ -78,6 +78,15 @@ namespace form_builder.Factories.Transform.UserSchema
                         {
                             var incrementedElement = JsonConvert.DeserializeObject<IElement>(JsonConvert.SerializeObject(element));
                             incrementedElement.Properties.QuestionId = $"{element.Properties.QuestionId}:{i}:";
+                            if (incrementedElement.Properties.Options.Any(_ => _.HasConditionalElement))
+                            {
+                                foreach (var option in incrementedElement.Properties.Options)
+                                {
+                                    if (!string.IsNullOrEmpty(option.ConditionalElementId))
+                                        option.ConditionalElementId = $"{option.ConditionalElementId}:{i}:";
+                                }
+                            }
+
                             incrementedElement.Properties.IsDynamicallyGeneratedElement = true;
                             addAnotherReplacementElements.Add(incrementedElement);
                         }
@@ -89,7 +98,7 @@ namespace form_builder.Factories.Transform.UserSchema
                                 .WithButtonId($"remove-{i}")
                                 .WithButtonName($"remove-{i}")
                                 .WithPropertyText("Remove")
-                                .WithClassName("smbc-button__remove--add-another smbc-button--link govuk-!-margin-bottom-9")
+                                .WithClassName("smbc-button--link smbc-!-align-left govuk-!-margin-bottom-9")
                                 .Build());
                         }
 
