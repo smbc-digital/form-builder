@@ -2,6 +2,7 @@
 @{
     var elements = Model.GenerateElementProperties();
     var baseCssClasses = "govuk-input";
+    var fieldsetIncrement = Model.Properties.QuestionId.Split(':').Length > 1 ? $"-{Model.Properties.QuestionId.Split(':')[1]}" : null;
 
     switch (Model.Properties.Width)
     {
@@ -45,7 +46,7 @@
                    id="@Model.GetListItemId(i)"
                    @(Model.Properties.Options[i].HasHint ? $"aria-describedby={Model.GetListItemHintId(i)}" : string.Empty)
                    @(Model.Properties.Checked || Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty)
-                   @(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? $"data-aria-controls=conditional-{i}" : string.Empty) />
+                   @(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? $"data-aria-controls=conditional-{i}{fieldsetIncrement}" : string.Empty) />
 
             <label class="govuk-label govuk-radios__label @strongLabel"
                    for="@Model.GetListItemId(i)">
@@ -61,7 +62,7 @@
 
         @if (!string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElementId))
         {
-            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i">
+            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i@fieldsetIncrement">
                 @SystemConstants.CONDITIONAL_ELEMENT_REPLACEMENT@Model.Properties.Options[i].ConditionalElementId
             </div>
         }
