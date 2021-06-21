@@ -78,11 +78,7 @@ namespace form_builder_tests.UnitTests.Services
                 }
             };
 
-            var addAnotherElement = new ElementBuilder()
-                .WithType(EElementType.AddAnother)
-                .WithLabel("Person")
-                .WithQuestionId("person")
-                .Build();
+            
 
             var textboxElement = new ElementBuilder()
                 .WithType(EElementType.Textbox)
@@ -90,7 +86,12 @@ namespace form_builder_tests.UnitTests.Services
                 .WithQuestionId("question")
                 .Build();
 
-            addAnotherElement.Properties.Elements = new List<IElement> { textboxElement };
+            var addAnotherElement = new ElementBuilder()
+                .WithType(EElementType.AddAnother)
+                .WithLabel("Person")
+                .WithQuestionId("person")
+                .WithNestedElement(textboxElement)
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(addAnotherElement)

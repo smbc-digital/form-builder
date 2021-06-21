@@ -247,7 +247,7 @@ namespace form_builder.Helpers.ElementHelpers
             return formSummary;
         }
 
-        public int GetCurrentAddAnotherIncrement(IElement addAnotherElement, FormAnswers formAnswers)
+        public int GetAddAnotherNumberOfFieldsets(IElement addAnotherElement, FormAnswers formAnswers)
         {
             var formDataIncrementKey = $"addAnotherFieldset-{addAnotherElement.Properties.QuestionId}";
             return formAnswers.FormData.ContainsKey(formDataIncrementKey) 

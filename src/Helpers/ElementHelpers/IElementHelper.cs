@@ -38,7 +38,7 @@ namespace form_builder.Helpers.ElementHelpers
 
         List<PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema);
 
-        int GetCurrentAddAnotherIncrement(IElement addAnotherElement, FormAnswers formAnswers);
+        int GetAddAnotherNumberOfFieldsets(IElement addAnotherElement, FormAnswers formAnswers);
 
         string GenerateDocumentUploadUrl(Element element, FormSchema formSchema, FormAnswers formAnswers);
 
