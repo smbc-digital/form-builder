@@ -210,7 +210,7 @@ namespace form_builder.Helpers.ElementHelpers
                 {
                     var listOfPageSummary = new List<PageSummary>();
                     var addAnotherElement = page.Elements.FirstOrDefault(_ => _.Type == EElementType.AddAnother);
-                    var currentIncrement = GetCurrentAddAnotherIncrement(addAnotherElement, formAnswers);
+                    var currentIncrement = GetAddAnotherNumberOfFieldsets(addAnotherElement, formAnswers);
                     for (var i = 1; i <= currentIncrement; i++)
                     {
                         var addAnotherPageSummary = new PageSummary

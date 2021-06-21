@@ -93,7 +93,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Callback<string, SummarySectionsViewModel, Dictionary<string, object>>((x,y,z) => callback = y);
 
             _mockElementHelper.Setup(_ => _.GenerateQuestionAndAnswersList(It.IsAny<string>(), It.IsAny<FormSchema>()))
-                .Returns(new List<PageSummary>{new PageSummary { PageSlug = "page-one" }});
+                .Returns(new List<PageSummary>{new PageSummary { PageSlug = "page-one", Answers = new Dictionary<string, string> { { "question", "answer" } } }});
 
             //Act
             await element.RenderAsync(
@@ -181,7 +181,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                     new PageSummary { PageSlug = "page-one", Answers = new Dictionary<string, string> { { "question", "answer" } } }
                 });
 
-            _mockElementHelper.Setup(_ => _.GetCurrentAddAnotherIncrement(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(1);
+            _mockElementHelper.Setup(_ => _.GetAddAnotherNumberOfFieldsets(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(1);
 
             //Act
             await summaryElement.RenderAsync(
@@ -294,7 +294,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                     new PageSummary { PageSlug = "page-one", Answers = new Dictionary<string, string> { { "question", "answer" } } }
                 });
 
-            _mockElementHelper.Setup(_ => _.GetCurrentAddAnotherIncrement(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(1);
+            _mockElementHelper.Setup(_ => _.GetAddAnotherNumberOfFieldsets(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(1);
 
             //Act
             await summaryElement.RenderAsync(
