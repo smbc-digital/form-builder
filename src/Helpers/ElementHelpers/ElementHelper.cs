@@ -209,22 +209,17 @@ namespace form_builder.Helpers.ElementHelpers
                 if (page.Elements.Any(_ => _.Type == EElementType.AddAnother))
                 {
                     var listOfPageSummary = new List<PageSummary>();
-                    // Get increment value from formAnswers
                     var addAnotherElement = page.Elements.FirstOrDefault(_ => _.Type == EElementType.AddAnother);
-                    var formDataIncrementKey = $"addAnotherFieldset-{addAnotherElement.Properties.QuestionId}";
-                    var currentIncrement = formAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(formAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
-                    // For each increment
+                    var currentIncrement = GetCurrentAddAnotherIncrement(addAnotherElement, formAnswers);
                     for (var i = 1; i <= currentIncrement; i++)
                     {
                         var addAnotherPageSummary = new PageSummary
                         {
                             PageTitle = addAnotherElement.GetLabelText(page.Title),
-                            PageSlug = $"{addAnotherElement.Properties.QuestionId}-{i}"
+                            PageSlug = $"{page.PageSlug}-{addAnotherElement.Properties.QuestionId}-{i}"
                         };
 
-                        // Get matching elements from page for the increment eg element where questionId contains increment
                         var listOfNestedElements = page.ValidatableElements.Where(_ => _.Properties.QuestionId.Contains($":{i}:")).ToList();
-                        // Call GenerateSummaryAnswers with matching elements
                         addAnotherPageSummary.Answers = GenerateSummaryAnswers(listOfNestedElements, page, formAnswers, false);
                         listOfPageSummary.Add(addAnotherPageSummary);
                     }
@@ -250,6 +245,14 @@ namespace form_builder.Helpers.ElementHelpers
             }
 
             return formSummary;
+        }
+
+        public int GetCurrentAddAnotherIncrement(IElement addAnotherElement, FormAnswers formAnswers)
+        {
+            var formDataIncrementKey = $"addAnotherFieldset-{addAnotherElement.Properties.QuestionId}";
+            return formAnswers.FormData.ContainsKey(formDataIncrementKey) 
+                ? int.Parse(formAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) 
+                : throw new ApplicationException($"ElementHelper::GetCurrentAddAnotherIncrement, FormData key not found for {formDataIncrementKey}");
         }
 
         public Dictionary<string, string> GenerateSummaryAnswers(List<IElement> formSchemaQuestions, Page page, FormAnswers formAnswers, bool ignoreDynamicallyGeneratedElements)
