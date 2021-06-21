@@ -450,7 +450,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaFactory.Setup(_ => _.Build("form"))
+            _schemaFactory.Setup(_ => _.Build("form", It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
             Dictionary<string, object> viewModel = new()
@@ -510,7 +510,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaFactory.Setup(_ => _.Build("form"))
+            _schemaFactory.Setup(_ => _.Build("form", It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
             Dictionary<string, object> viewModel = new()
@@ -562,7 +562,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaFactory.Setup(_ => _.Build("form"))
+            _schemaFactory.Setup(_ => _.Build("form", It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
             Dictionary<string, object> viewModel = new()
@@ -622,7 +622,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaFactory.Setup(_ => _.Build("form"))
+            _schemaFactory.Setup(_ => _.Build("form", It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
             Dictionary<string, object> viewModel = new()
@@ -664,7 +664,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaFactory.Setup(_ => _.Build("form"))
+            _schemaFactory.Setup(_ => _.Build("form", It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
             // Assert
@@ -699,7 +699,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaFactory.Setup(_ => _.Build("base-form"))
+            _schemaFactory.Setup(_ => _.Build("base-form", It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
             var model = new Dictionary<string, object>{
@@ -738,7 +738,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaFactory.Setup(_ => _.Build("base-form"))
+            _schemaFactory.Setup(_ => _.Build("base-form", It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
             var model = new Dictionary<string, object>{
@@ -786,7 +786,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object> { { bookingInformationCacheKey, new BookingInformation() } } }));
 
-            _schemaFactory.Setup(_ => _.Build("form"))
+            _schemaFactory.Setup(_ => _.Build("form", It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
             var model = new Dictionary<string, object>{
@@ -804,7 +804,7 @@ namespace form_builder_tests.UnitTests.Services
         public async void ProcessMonthRequest_Should_Throw_ApplicationException_When_InvalidForm()
         {
             //
-            _schemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+            _schemaFactory.Setup(_ => _.Build(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync((FormSchema)null);
 
             // Arrange
@@ -842,7 +842,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithBaseUrl(form)
                 .Build();
 
-            _schemaFactory.Setup(_ => _.Build("base-form"))
+            _schemaFactory.Setup(_ => _.Build("base-form", It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
 
@@ -1225,7 +1225,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaFactory.Setup(_ => _.Build(formName))
+            _schemaFactory.Setup(_ => _.Build(formName, string.Empty))
                 .ReturnsAsync(formSchema);
 
             _bookingProvider.Setup(_ => _.GetBooking(bookingId))
@@ -1269,7 +1269,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaFactory.Setup(_ => _.Build(formName))
+            _schemaFactory.Setup(_ => _.Build(formName, string.Empty))
                 .ReturnsAsync(formSchema);
 
             _bookingProvider.Setup(_ => _.GetBooking(bookingId))
@@ -1332,7 +1332,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _schemaFactory.Setup(_ => _.Build(formName))
+            _schemaFactory.Setup(_ => _.Build(formName, string.Empty))
                 .ReturnsAsync(formSchema);
 
             //Act

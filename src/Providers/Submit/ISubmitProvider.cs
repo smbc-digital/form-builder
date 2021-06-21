@@ -1,12 +1,10 @@
-﻿using form_builder.Models;
-using form_builder.Services.MappingService.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
+using form_builder.Models;
+using form_builder.Services.MappingService.Entities;
 
-namespace form_builder.Providers.Submit {
+namespace form_builder.Providers.Submit
+{
     public interface ISubmitProvider {
         string ProviderName { get; }
 

@@ -61,7 +61,7 @@ namespace form_builder.Models.Elements
 
         public virtual string GenerateFieldsetProperties() => string.Empty;
 
-        public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "") => new Dictionary<string, dynamic>();
+        public virtual Dictionary<string, dynamic> GenerateElementProperties(string type = "") => new();
 
         public string GetListItemId(int index) => $"{QuestionId}-{index}";
 

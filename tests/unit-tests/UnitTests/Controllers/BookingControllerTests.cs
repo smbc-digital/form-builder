@@ -44,7 +44,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .WithPage(page)
                 .Build();
 
-            _schemaFactory.Setup(_ => _.Build("valid"))
+            _schemaFactory.Setup(_ => _.Build("valid",  string.Empty))
                 .ReturnsAsync(schema);
 
             _bookingController = new BookingController(_bookingService.Object, _schemaFactory.Object, _pageService.Object);
@@ -145,14 +145,14 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public async Task CannotCancel_ShouldReturn_Cannot_Cancel_View()
         {
-            _schemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+            _schemaFactory.Setup(_ => _.Build(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new FormSchema());
 
             var result = await _bookingController.CannotCancel("form");
 
             var redirectResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("CannotCancel", redirectResult.ViewName);
-            _schemaFactory.Verify(_ => _.Build(It.Is<string>(_ => _.Equals("form"))), Times.Once);
+            _schemaFactory.Verify(_ => _.Build(It.Is<string>(_ => _.Equals("form")), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]

@@ -485,6 +485,67 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
+        public void RemoveFieldset_ShouldRemoveAnswersFromCache()
+        {
+            // Arrange
+            var callbackCacheProvider = string.Empty;
+            var removeKey = "remove-0";
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {
+                    "answer:0:", "answer0"
+                },
+                {
+                    "answer:1:", "answer1"
+                },
+                {
+                    "Path", "page-one"
+                }
+            };
+
+            var existingAnswers = JsonConvert.SerializeObject(new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers
+                    {
+                        PageSlug = "page-one",
+                        Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                QuestionId = "answer:0:",
+                                Response = "answer0"
+                            },
+                            new Answers
+                            {
+                                QuestionId = "answer:1:",
+                                Response = "answer1"
+                            }
+                        }
+                    }
+                }
+            });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(existingAnswers);
+
+            _mockDistributedCache
+                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
+
+            // Act
+            _pageHelper.RemoveFieldset(viewModel, "form", Guid.NewGuid().ToString(), "page-one", removeKey);
+            var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
+
+            // Assert
+            Assert.Equal("answer:0:", callbackModel.Pages[0].Answers[0].QuestionId);
+            Assert.Equal("answer1", callbackModel.Pages[0].Answers[0].Response);
+            Assert.Single(callbackModel.Pages[0].Answers);
+        }
+
+        [Fact]
         public void SaveAnswers_ShouldCallCacheProvider()
         {
             // Arrange

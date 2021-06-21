@@ -4,6 +4,10 @@
     var inputClassesShort = "govuk-input govuk-date-input__input govuk-input--width-2";
     var inputClassesLong = "govuk-input govuk-date-input__input govuk-input--width-4";
     var labelClasses = "govuk-label";
+
+    var dayId = Model.GetCustomItemId("day");
+    var monthId = Model.GetCustomItemId("month");
+    var yearId = Model.GetCustomItemId("year");
     if (Model.Properties.StrongLabel)
     {
         labelClasses += " govuk-label--s";
@@ -34,28 +38,28 @@
     <div class="govuk-date-input">
         <div class="govuk-date-input__item">
             <div class="govuk-form-group">
-                <label class="@labelClasses" for=@Model.GetCustomItemId("day")>
+                <label class="@labelClasses" for=@dayId)>
                     Day
                 </label>
-                @Html.TextBox(Model.GetCustomItemId("day"), Model.Properties.Day, new { autocomplete = "bday-day", maxlength = "2", type = "number", @class = inputClassesShort })
+                @Html.TextBox(dayId, Model.Properties.Day, new { name = dayId, id = dayId, autocomplete = "bday-day", maxlength = "2", type = "number", @class = inputClassesShort })
             </div>
         </div>
 
         <div class="govuk-date-input__item">
             <div class="govuk-form-group">
-                <label class="@labelClasses" for=@Model.GetCustomItemId("month")>
+                <label class="@labelClasses" for=@monthId)>
                     Month
                 </label>
-                @Html.TextBox(Model.GetCustomItemId("month"), Model.Properties.Month, new { autocomplete = "bday-month", maxlength = "2", type = "number", @class = inputClassesShort })
+                @Html.TextBox(monthId, Model.Properties.Month, new { name = monthId, id = monthId, autocomplete = "bday-month", maxlength = "2", type = "number", @class = inputClassesShort })
             </div>
         </div>
 
         <div class="govuk-date-input__item">
             <div class="govuk-form-group">
-                <label class="@labelClasses" for=@Model.GetCustomItemId("year")>
+                <label class="@labelClasses" for=@yearId>
                     Year
                 </label>
-                @Html.TextBox(Model.GetCustomItemId("year"), Model.Properties.Year, new { autocomplete = "bday-year", maxlength = "4", type = "number", @class = inputClassesLong, max = maxYear })
+                @Html.TextBox(yearId, Model.Properties.Year, new { name = yearId, id = yearId, autocomplete = "bday-year", maxlength = "4", type = "number", @class = inputClassesLong, max = maxYear })
             </div>
         </div>
     </div>

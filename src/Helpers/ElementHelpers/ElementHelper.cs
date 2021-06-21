@@ -198,7 +198,7 @@ namespace form_builder.Helpers.ElementHelpers
         public List<PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema)
         {
             var formAnswers = GetFormData(guid);
-            var reducedAnswers = FormAnswersExtensions.GetReducedAnswers(formAnswers, formSchema);
+            var reducedAnswers = formAnswers.GetReducedAnswers(formSchema);
             var formSummary = new List<PageSummary>();
 
             foreach (var page in formSchema.Pages.ToList())
@@ -209,7 +209,6 @@ namespace form_builder.Helpers.ElementHelpers
                     PageSlug = page.PageSlug
                 };
 
-                var summaryBuilder = new SummaryDictionaryBuilder();
                 var formSchemaQuestions = page.ValidatableElements
                     .Where(_ => _ != null)
                     .ToList();
@@ -217,17 +216,38 @@ namespace form_builder.Helpers.ElementHelpers
                 if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())
                     continue;
 
-                formSchemaQuestions.ForEach(question =>
-                {
-                    var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
-                    summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
-                });
-
-                pageSummary.Answers = summaryBuilder.Build();
+                pageSummary.Answers = GenerateSummaryAnswers(formSchemaQuestions, page, formAnswers);
                 formSummary.Add(pageSummary);
             }
 
             return formSummary;
+        }
+
+        public Dictionary<string, string> GenerateSummaryAnswers(List<IElement> formSchemaQuestions, Page page, FormAnswers formAnswers)
+        {
+            SummaryDictionaryBuilder summaryBuilder = new();
+
+            formSchemaQuestions.ForEach(element =>
+            {
+                var answer = _elementMapper.GetAnswerStringValue(element, formAnswers);
+                var summaryLabelText = string.Empty;
+                var isGroupedAnswer = element.Properties.QuestionId.Contains(":");
+
+                if (isGroupedAnswer)
+                {
+                    var splitAnswer = element.Properties.QuestionId.Split(':');
+                    var questionIncrementForDisplay = int.Parse(splitAnswer[1]);
+                    summaryLabelText = $"{questionIncrementForDisplay} : {element.GetLabelText(page.Title)}";
+                }
+                else
+                {
+                    summaryLabelText = element.GetLabelText(page.Title);
+                }
+
+                summaryBuilder.Add(summaryLabelText, answer, element.Type);
+            });
+
+            return summaryBuilder.Build();
         }
 
         public string GenerateDocumentUploadUrl(Element element, FormSchema formSchema, FormAnswers formAnswers)

@@ -78,6 +78,7 @@ namespace form_builder.Models
         }
 
         public IEnumerable<IElement> ValidatableElements => Elements.Where(element =>
+                element.Type == EElementType.AddAnother ||
                 element.Type == EElementType.Address ||
                 element.Type == EElementType.AddressManual ||
                 element.Type == EElementType.Booking ||
@@ -105,12 +106,12 @@ namespace form_builder.Models
             element.Type == EElementType.TimeInput
         );
 
-		public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm)
+        public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm)
 		{
-			ValidatableElements.RemoveUnusedConditionalElements(viewModel)
-            .ForEach(element => {
-				element.Validate(viewModel, validators, baseForm);
-			});
+            ValidatableElements.RemoveUnusedConditionalElements(viewModel)
+                .ForEach(element => {
+                    element.Validate(viewModel, validators, baseForm);
+                });
 			IsValidated = true;
 		}
 

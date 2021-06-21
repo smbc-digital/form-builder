@@ -15,14 +15,13 @@ using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
+using form_builder.Services.AddAnotherService;
 using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.FormAvailabilityService;
-using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService.Entities;
-using form_builder.Services.PayService;
 using form_builder.Services.StreetService;
 using form_builder.Validators;
 using form_builder.ViewModels;
@@ -50,9 +49,8 @@ namespace form_builder.Services.PageService
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IWebHostEnvironment _environment;
-        private readonly IPayService _payService;
         private readonly IBookingService _bookingService;
-        private readonly IMappingService _mappingService;
+        private readonly IAddAnotherService _addAnotherService;
         private readonly ISuccessPageFactory _successPageContentFactory;
         private readonly IPageFactory _pageContentFactory;
         private readonly IIncomingDataHelper _incomingDataHelper;
@@ -76,10 +74,9 @@ namespace form_builder.Services.PageService
             IPageFactory pageFactory,
             IBookingService bookingService,
             ISchemaFactory schemaFactory,
-            IMappingService mappingService,
-            IPayService payService,
             IIncomingDataHelper incomingDataHelper,
             IActionsWorkflow actionsWorkflow,
+            IAddAnotherService addAnotherService,
             IFormAvailabilityService formAvailabilityServics,
             ILogger<IPageService> logger,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
@@ -100,16 +97,15 @@ namespace form_builder.Services.PageService
             _environment = environment;
             _formAvailabilityServics = formAvailabilityServics;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
-            _payService = payService;
-            _mappingService = mappingService;
             _incomingDataHelper = incomingDataHelper;
             _actionsWorkflow = actionsWorkflow;
             _logger = logger;
+            _addAnotherService = addAnotherService;
             _fileStorageProviders = fileStorageProviders;
             _configuration = configuration;
         }
 
-        public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParamters)
+        public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
         {
             if (string.IsNullOrEmpty(path))
                 _sessionHelper.RemoveSessionGuid();
@@ -161,24 +157,19 @@ namespace form_builder.Services.PageService
                 throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
             List<object> searchResults = null;
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+
+            if (!string.IsNullOrEmpty(formData))
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
             if (subPath.Equals(LookUpConstants.Automatic) || subPath.Equals(LookUpConstants.Manual))
             {
-                var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-
-                if (!string.IsNullOrEmpty(formData))
-                    convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
                 if (convertedAnswers.FormData.ContainsKey($"{path}{LookUpConstants.SearchResultsKeyPostFix}"))
                     searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
             }
 
             if (page.HasIncomingGetValues)
             {
-                var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-                if (!string.IsNullOrEmpty(formData))
-                    convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
-                var result = _incomingDataHelper.AddIncomingFormDataValues(page, queryParamters, convertedAnswers);
+                var result = _incomingDataHelper.AddIncomingFormDataValues(page, queryParameters, convertedAnswers);
                 _pageHelper.SaveNonQuestionAnswers(result, form, path, sessionGuid);
             }
 
@@ -235,6 +226,9 @@ namespace form_builder.Services.PageService
                 viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
             currentPage.Validate(viewModel, _validators, baseForm);
+
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.AddAnother))
+                return await _addAnotherService.ProcessAddAnother(viewModel, currentPage, baseForm, sessionGuid, path);
 
             if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
                 return await _addressService.ProcessAddress(viewModel, currentPage, baseForm, sessionGuid, path);
