@@ -1,4 +1,8 @@
-﻿using form_builder.Builders;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
@@ -10,10 +14,6 @@ using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Helpers

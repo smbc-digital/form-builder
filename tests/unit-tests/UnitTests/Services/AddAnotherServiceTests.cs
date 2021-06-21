@@ -78,8 +78,6 @@ namespace form_builder_tests.UnitTests.Services
                 }
             };
 
-            
-
             var textboxElement = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithLabel("Name")

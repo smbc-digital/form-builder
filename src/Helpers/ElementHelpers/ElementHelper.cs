@@ -12,7 +12,6 @@ using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 
 namespace form_builder.Helpers.ElementHelpers
