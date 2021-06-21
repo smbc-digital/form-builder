@@ -711,6 +711,64 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
+        public void GenerateQuestionAndAnswersList_ShouldReturnMultipleFormSummary_ForAddAnother()
+        {
+            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(
+                    new FormAnswers
+                    {
+                        Pages = new List<PageAnswers>
+                        {
+                            new PageAnswers
+                            {
+                                PageSlug = "page-one",
+                                Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" }}
+                            }
+                        },
+                        FormData = new Dictionary<string, object>
+                        {
+                            { "addAnotherFieldset-question", "1" }
+                        },
+                    }));
+
+            _mockElementMapper
+                .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns("address");
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
+            var element = new ElementBuilder()
+                .WithQuestionId("question")
+                .WithType(EElementType.AddAnother)
+                .WithLabel("Add another label")
+                .WithAddressProvider("testProvider")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithBehaviour(behaviour)
+                .WithPageTitle("Add another title")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            var result = _elementHelper.GenerateQuestionAndAnswersList("12345", formSchema);
+
+            var incrementedSummary = result.FirstOrDefault(_ => _.PageTitle.Equals("Add another label"));
+            var overallPageSummary = result.FirstOrDefault(_ => _.PageTitle.Equals("Add another title"));
+
+            Assert.NotNull(incrementedSummary);
+            Assert.Equal("page-one-question-1", incrementedSummary.PageSlug);
+            Assert.NotNull(overallPageSummary);
+            Assert.Equal("page-one", overallPageSummary.PageSlug);
+        }
+
+        [Fact]
         public void GenerateValidDocumentUploadUrl_ShouldReturnUrlWithCaseRefEncoded()
         {
             //Arrange          
@@ -883,65 +941,6 @@ namespace form_builder_tests.UnitTests.Helpers
 
             var result = Assert.Throws<ApplicationException>(() => _elementHelper.GetAddAnotherNumberOfFieldsets(element, formAnswers));
             Assert.Equal("ElementHelper::GetCurrentAddAnotherIncrement, FormData key not found for addAnotherFieldset-test-id", result.Message);
-        }
-
-        [Fact]
-        public void GenerateQuestionAndAnswersList_ShouldReturnMultipleFormSummary_ForAddAnother()
-        {
-            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    new FormAnswers
-                    {
-                        Pages = new List<PageAnswers>
-                        {
-                            new PageAnswers
-                            {
-                                PageSlug = "page-one",
-                                Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" }}
-                            }
-                        },
-                        FormData = new Dictionary<string, object>
-                        {
-                            { "addAnotherFieldset-question", "1" }
-                        },
-                    }));
-
-            _mockElementMapper
-                .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns("address");
-
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitForm)
-                .Build();
-
-            var element = new ElementBuilder()
-                .WithQuestionId("question")
-                .WithType(EElementType.AddAnother)
-                .WithLabel("Add another label")
-                .WithAddressProvider("testProvider")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .WithBehaviour(behaviour)
-                .WithPageTitle("Add another title")
-                .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            var result = _elementHelper.GenerateQuestionAndAnswersList("12345", formSchema);
-
-            var incrementedSummary = result.FirstOrDefault(_ => _.PageTitle.Equals("Add another label"));
-            var overallPageSummary = result.FirstOrDefault(_ => _.PageTitle.Equals("Add another title"));
-
-
-            Assert.NotNull(incrementedSummary);
-            Assert.Equal("page-one-question-1", incrementedSummary.PageSlug);
-            Assert.NotNull(overallPageSummary);
-            Assert.Equal("page-one", overallPageSummary.PageSlug);
         }
     }
 }
