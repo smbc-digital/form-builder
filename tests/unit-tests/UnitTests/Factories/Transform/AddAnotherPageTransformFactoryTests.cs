@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Factories.Transform.UserSchema;
 using form_builder.Helpers.PageHelpers;
@@ -46,7 +47,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             {
                 FormData = new Dictionary<string, object>
                 {
-                    { "addAnotherFieldset-person", 2 }
+                    { $"{AddAnotherConstants.IncrementKeyPrefix}person", 2 }
                 }
             };
 
@@ -108,7 +109,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             var result = _transformFactory.Transform(_page, "guid");
             var removeButtonZero = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("remove-1"));
             var removeButtonOne = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("remove-2"));
-            var addAnotherButton = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("addAnotherFieldset")).ToList();
+            var addAnotherButton = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals(AddAnotherConstants.AddAnotherButtonKey)).ToList();
 
             // Assert
             Assert.Equal(3, result.Elements.Count(_ => _.Type.Equals(EElementType.Button)));
@@ -143,7 +144,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Build();
 
             var result = _transformFactory.Transform(page, "guid");
-            var addAnotherButton = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("addAnotherFieldset")).ToList();
+            var addAnotherButton = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals(AddAnotherConstants.AddAnotherButtonKey)).ToList();
 
             // Assert
             Assert.Equal(2, result.Elements.Count(_ => _.Type.Equals(EElementType.Button)));

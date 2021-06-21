@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
@@ -30,7 +31,7 @@ namespace form_builder_tests.UnitTests.Services
             {
                 FormData = new Dictionary<string, object>
                 {
-                    { "addAnotherFieldset-person", 1 }
+                    { $"{AddAnotherConstants.IncrementKeyPrefix}person", 1 }
                 }
             };
 
@@ -60,7 +61,7 @@ namespace form_builder_tests.UnitTests.Services
             {
                 FormData = new Dictionary<string, object>
                 {
-                    { "addAnotherFieldset-person", 10 }
+                    { $"{AddAnotherConstants.IncrementKeyPrefix}person", 10 }
                 }
             };
 
@@ -74,7 +75,7 @@ namespace form_builder_tests.UnitTests.Services
                     "question:0:", "answer"
                 },
                 {
-                    "addAnotherFieldset", "addAnother"
+                    AddAnotherConstants.AddAnotherButtonKey, "addAnother"
                 }
             };
 
@@ -117,7 +118,7 @@ namespace form_builder_tests.UnitTests.Services
             {
                 FormData = new Dictionary<string, object>
                 {
-                    { "addAnotherFieldset-person", 0 }
+                    { $"{AddAnotherConstants.IncrementKeyPrefix}person", 0 }
                 }
             };
 
@@ -131,7 +132,7 @@ namespace form_builder_tests.UnitTests.Services
                     "question:0:", "answer"
                 },
                 {
-                    "addAnotherFieldset", "addAnother"
+                    AddAnotherConstants.AddAnotherButtonKey, "addAnother"
                 }
             };
 
@@ -164,7 +165,7 @@ namespace form_builder_tests.UnitTests.Services
             await _addAnotherService.ProcessAddAnother(viewModel, page, baseSchema, Guid.NewGuid().ToString(), "page-one");
 
             // Assert
-            _mockPageHelper.Verify(_ => _.SaveFormData("addAnotherFieldset-person", 1, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveFormData($"{AddAnotherConstants.IncrementKeyPrefix}person", 1, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -213,7 +214,7 @@ namespace form_builder_tests.UnitTests.Services
             await _addAnotherService.ProcessAddAnother(viewModel, page, baseSchema, Guid.NewGuid().ToString(), "page-one");
 
             // Assert
-            _mockPageHelper.Verify(_ => _.SaveFormData("addAnotherFieldset-person", 0, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveFormData($"{AddAnotherConstants.IncrementKeyPrefix}person", 0, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]

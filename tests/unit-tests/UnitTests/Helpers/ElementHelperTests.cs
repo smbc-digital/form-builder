@@ -727,7 +727,7 @@ namespace form_builder_tests.UnitTests.Helpers
                         },
                         FormData = new Dictionary<string, object>
                         {
-                            { "addAnotherFieldset-question", "1" }
+                            { $"{AddAnotherConstants.IncrementKeyPrefix}question", "1" }
                         },
                     }));
 
@@ -763,9 +763,11 @@ namespace form_builder_tests.UnitTests.Helpers
             var overallPageSummary = result.FirstOrDefault(_ => _.PageTitle.Equals("Add another title"));
 
             Assert.NotNull(incrementedSummary);
-            Assert.Equal("page-one-question-1", incrementedSummary.PageSlug);
+            Assert.Equal("page-one", incrementedSummary.PageSlug);
+            Assert.Equal("page-one-question-1", incrementedSummary.PageSummaryId);
             Assert.NotNull(overallPageSummary);
             Assert.Equal("page-one", overallPageSummary.PageSlug);
+            Assert.Equal("page-one", overallPageSummary.PageSummaryId);
         }
 
         [Fact]
@@ -904,7 +906,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 },
                 FormData = new Dictionary<string, object>
                 {
-                    { "addAnotherFieldset-test-id", "1" }
+                    { $"{AddAnotherConstants.IncrementKeyPrefix}test-id", "1" }
                 },
             };
 
@@ -940,7 +942,7 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             var result = Assert.Throws<ApplicationException>(() => _elementHelper.GetAddAnotherNumberOfFieldsets(element, formAnswers));
-            Assert.Equal("ElementHelper::GetCurrentAddAnotherIncrement, FormData key not found for addAnotherFieldset-test-id", result.Message);
+            Assert.Equal($"ElementHelper::GetCurrentAddAnotherIncrement, FormData key not found for {AddAnotherConstants.IncrementKeyPrefix}test-id", result.Message);
         }
     }
 }

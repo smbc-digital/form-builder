@@ -121,7 +121,7 @@ namespace form_builder.Models.Elements
                 Sections = Properties.Sections.Select(_ => new SummarySection
                 {
                     Title = _.Title,
-                    Pages = _.Pages.SelectMany(x => pages.Where(y => y.PageSlug.Equals(x) && y.Answers.Count > 0)).ToList()
+                    Pages = _.Pages.SelectMany(x => pages.Where(y => y.PageSummaryId.Equals(x) && y.Answers.Count > 0)).ToList()
                 }).ToList(),
                 AllowEditing = Properties.AllowEditing
             };

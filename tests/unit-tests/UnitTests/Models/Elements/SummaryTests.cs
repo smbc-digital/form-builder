@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.ViewRender;
@@ -168,7 +169,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithPage(summaryPage)
                 .Build();
 
-            var formAnswers = new FormAnswers { FormData = new Dictionary<string, object> { {"addAnotherFieldset-addAnother", 1} } };
+            var formAnswers = new FormAnswers { FormData = new Dictionary<string, object> { { $"{AddAnotherConstants.IncrementKeyPrefix}-addAnother", 1} } };
 
             _mockIViewRender.Setup(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Summary")), It.IsAny<SummarySectionsViewModel>(), It.IsAny<Dictionary<string, object>>()))
                 .Callback<string, SummarySectionsViewModel, Dictionary<string, object>>((x, y, z) => callback = y);
@@ -281,7 +282,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithPage(summaryPage)
                 .Build();
 
-            var formAnswers = new FormAnswers { FormData = new Dictionary<string, object> { { "addAnotherFieldset-addAnother", 1 } } };
+            var formAnswers = new FormAnswers { FormData = new Dictionary<string, object> { { $"{AddAnotherConstants.IncrementKeyPrefix}addAnother", 1 } } };
 
             _mockIViewRender.Setup(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Summary")), It.IsAny<SummarySectionsViewModel>(), It.IsAny<Dictionary<string, object>>()))
                 .Callback<string, SummarySectionsViewModel, Dictionary<string, object>>((x, y, z) => callback = y);
@@ -289,9 +290,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
             _mockElementHelper.Setup(_ => _.GenerateQuestionAndAnswersList(It.IsAny<string>(), It.IsAny<FormSchema>()))
                 .Returns(new List<PageSummary>
                 {
-                    new PageSummary { PageSlug = "add-another", Answers = new Dictionary<string, string> {{"question", "answer"}} },
-                    new PageSummary { PageSlug = "add-another-addAnother-1", Answers = new Dictionary<string, string> { { "question", "answer" } } },
-                    new PageSummary { PageSlug = "page-one", Answers = new Dictionary<string, string> { { "question", "answer" } } }
+                    new PageSummary { PageSummaryId = "add-another", PageSlug = "add-another", Answers = new Dictionary<string, string> {{"question", "answer"}} },
+                    new PageSummary { PageSummaryId = "add-another-addAnother-1", PageSlug = "add-another", Answers = new Dictionary<string, string> { { "question", "answer" } } },
+                    new PageSummary { PageSummaryId = "page-one", PageSlug = "page-one", Answers = new Dictionary<string, string> { { "question", "answer" } } }
                 });
 
             _mockElementHelper.Setup(_ => _.GetAddAnotherNumberOfFieldsets(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(1);
@@ -310,7 +311,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Summary")), It.IsAny<SummarySectionsViewModel>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
             Assert.Equal(3, callback.Sections.Count);
-            Assert.Single(callback.Sections.Where(_ => _.Pages.Any(_ => _.PageSlug.Equals("add-another-addAnother-1"))));
+            Assert.Single(callback.Sections.Where(_ => _.Pages.Any(_ => _.PageSummaryId.Equals("add-another-addAnother-1"))));
+            Assert.Equal(2, callback.Sections.Count(_ => _.Pages.Any(_ => _.PageSlug.Equals("add-another"))));
         }
     }
 }

@@ -215,7 +215,8 @@ namespace form_builder.Helpers.ElementHelpers
                         var addAnotherPageSummary = new PageSummary
                         {
                             PageTitle = addAnotherElement.GetLabelText(page.Title),
-                            PageSlug = $"{page.PageSlug}-{addAnotherElement.Properties.QuestionId}-{i}"
+                            PageSlug = page.PageSlug,
+                            PageSummaryId = $"{page.PageSlug}-{addAnotherElement.Properties.QuestionId}-{i}"
                         };
 
                         var listOfNestedElements = page.ValidatableElements.Where(_ => _.Properties.QuestionId.Contains($":{i}:")).ToList();
@@ -229,7 +230,8 @@ namespace form_builder.Helpers.ElementHelpers
                 var pageSummary = new PageSummary
                 {
                     PageTitle = page.Title,
-                    PageSlug = page.PageSlug
+                    PageSlug = page.PageSlug,
+                    PageSummaryId = page.PageSlug
                 };
 
                 formSchemaQuestions = page.ValidatableElements
@@ -248,7 +250,7 @@ namespace form_builder.Helpers.ElementHelpers
 
         public int GetAddAnotherNumberOfFieldsets(IElement addAnotherElement, FormAnswers formAnswers)
         {
-            var formDataIncrementKey = $"addAnotherFieldset-{addAnotherElement.Properties.QuestionId}";
+            var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
             return formAnswers.FormData.ContainsKey(formDataIncrementKey) 
                 ? int.Parse(formAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) 
                 : throw new ApplicationException($"ElementHelper::GetCurrentAddAnotherIncrement, FormData key not found for {formDataIncrementKey}");
