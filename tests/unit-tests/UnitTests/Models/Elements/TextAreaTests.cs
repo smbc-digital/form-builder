@@ -17,13 +17,10 @@ namespace form_builder_tests.UnitTests.Models.Elements
         public void GenerateElementProperties_ShouldReturnCorrectRowsSize_When_MaxLengthSupllied(int length, string expectedValue)
         {
             // Arrange
-            var questionId = "test-question-id";
-            var value = "test-value";
-
             var element = new ElementBuilder()
                 .WithType(EElementType.Textarea)
-                .WithQuestionId(questionId)
-                .WithValue(value)
+                .WithQuestionId("test-question-id")
+                .WithValue("test-value")
                 .WithMaxLength(length)
                 .Build();
 
@@ -37,16 +34,13 @@ namespace form_builder_tests.UnitTests.Models.Elements
         }
 
         [Fact]
-        public void GenerateElementProperties_ShouldReturn_DefaultRow_WhenMaxLength_NotSupplied()
+        public void GenerateElementProperties_ShouldReturn_DefaultRows_Value_WhenMaxLength_NotSupplied()
         {
             // Arrange
-            var questionId = "test-question-id";
-            var value = "test-value";
-
             var element = new ElementBuilder()
                 .WithType(EElementType.Textarea)
-                .WithQuestionId(questionId)
-                .WithValue(value)
+                .WithQuestionId("test-question-id")
+                .WithValue("test-value")
                 .Build();
 
             // Act
