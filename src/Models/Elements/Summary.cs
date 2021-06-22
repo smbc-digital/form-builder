@@ -109,7 +109,7 @@ namespace form_builder.Models.Elements
                             {
                                 $"{page.PageSlug}-{element.Properties.QuestionId}-{i}"
                             },
-                        Title = element.Properties.Label
+                        Title = element.GetLabelText(page.Title)
                     });
                 }
 
@@ -153,7 +153,7 @@ namespace form_builder.Models.Elements
                                         {
                                             $"{schemaPageForSection.PageSlug}-{addAnotherElement.Properties.QuestionId}-{i}"
                                         },
-                                    Title = addAnotherElement.Properties.Label
+                                    Title = addAnotherElement.GetLabelText(schemaPageForSection.Title)
                                 });
                             }
                         }
