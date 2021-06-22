@@ -203,49 +203,73 @@ namespace form_builder.Helpers.ElementHelpers
 
             foreach (var page in formSchema.Pages.ToList())
             {
+                var formSchemaQuestions = new List<IElement>();
+
+                if (page.Elements.Any(_ => _.Type == EElementType.AddAnother))
+                {
+                    var listOfPageSummary = new List<PageSummary>();
+                    var addAnotherElement = page.Elements.FirstOrDefault(_ => _.Type == EElementType.AddAnother);
+                    var currentIncrement = GetAddAnotherNumberOfFieldsets(addAnotherElement, formAnswers);
+                    for (var i = 1; i <= currentIncrement; i++)
+                    {
+                        var addAnotherPageSummary = new PageSummary
+                        {
+                            PageTitle = addAnotherElement.GetLabelText(page.Title),
+                            PageSlug = page.PageSlug,
+                            PageSummaryId = $"{page.PageSlug}-{addAnotherElement.Properties.QuestionId}-{i}"
+                        };
+
+                        var listOfNestedElements = page.ValidatableElements.Where(_ => _.Properties.QuestionId.Contains($":{i}:")).ToList();
+                        addAnotherPageSummary.Answers = GenerateSummaryAnswers(listOfNestedElements, page, formAnswers, false);
+                        listOfPageSummary.Add(addAnotherPageSummary);
+                    }
+                    
+                    formSummary.AddRange(listOfPageSummary);
+                }
+
                 var pageSummary = new PageSummary
                 {
                     PageTitle = page.Title,
-                    PageSlug = page.PageSlug
+                    PageSlug = page.PageSlug,
+                    PageSummaryId = page.PageSlug
                 };
 
-                var formSchemaQuestions = page.ValidatableElements
-                    .Where(_ => _ != null)
-                    .ToList();
+                formSchemaQuestions = page.ValidatableElements
+                .Where(_ => _ != null)
+                .ToList();
 
                 if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())
                     continue;
 
-                pageSummary.Answers = GenerateSummaryAnswers(formSchemaQuestions, page, formAnswers);
+                pageSummary.Answers = GenerateSummaryAnswers(formSchemaQuestions, page, formAnswers, true);
                 formSummary.Add(pageSummary);
             }
 
             return formSummary;
         }
 
-        public Dictionary<string, string> GenerateSummaryAnswers(List<IElement> formSchemaQuestions, Page page, FormAnswers formAnswers)
+        public int GetAddAnotherNumberOfFieldsets(IElement addAnotherElement, FormAnswers formAnswers)
+        {
+            var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
+            return formAnswers.FormData.ContainsKey(formDataIncrementKey) 
+                ? int.Parse(formAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) 
+                : throw new ApplicationException($"ElementHelper::GetCurrentAddAnotherIncrement, FormData key not found for {formDataIncrementKey}");
+        }
+
+        public Dictionary<string, string> GenerateSummaryAnswers(List<IElement> formSchemaQuestions, Page page, FormAnswers formAnswers, bool ignoreDynamicallyGeneratedElements)
         {
             SummaryDictionaryBuilder summaryBuilder = new();
 
-            formSchemaQuestions.ForEach(element =>
+            foreach (var element in formSchemaQuestions)
             {
-                var answer = _elementMapper.GetAnswerStringValue(element, formAnswers);
-                var summaryLabelText = string.Empty;
-                var isGroupedAnswer = element.Properties.QuestionId.Contains(":");
+                if (element.Type == EElementType.AddAnother || (element.Properties.IsDynamicallyGeneratedElement && ignoreDynamicallyGeneratedElements))
+                    continue;
 
-                if (isGroupedAnswer)
-                {
-                    var splitAnswer = element.Properties.QuestionId.Split(':');
-                    var questionIncrementForDisplay = int.Parse(splitAnswer[1]);
-                    summaryLabelText = $"{questionIncrementForDisplay} : {element.GetLabelText(page.Title)}";
-                }
-                else
-                {
-                    summaryLabelText = element.GetLabelText(page.Title);
-                }
+                var answer = _elementMapper.GetAnswerStringValue(element, formAnswers);
+                var summaryLabelText = element.GetLabelText(page.Title);
 
                 summaryBuilder.Add(summaryLabelText, answer, element.Type);
-            });
+            };
 
             return summaryBuilder.Build();
         }
