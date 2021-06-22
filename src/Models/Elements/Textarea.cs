@@ -40,11 +40,9 @@ namespace form_builder.Models.Elements
                 { "name", Properties.QuestionId },
                 { "id", Properties.QuestionId },
                 { "value", Properties.Value},
-                { "spellcheck", Properties.Spellcheck.ToString().ToLower() }
+                { "spellcheck", Properties.Spellcheck.ToString().ToLower() },
+                { "rows", Properties.MaxLength > 500 ? "15" : "5" }
             };
-
-            if (Properties.MaxLength >= 200)
-                properties.Add("rows", Properties.MaxLength > 500 ? "15" : "5");
 
             if (!DisplayAriaDescribedby)
                 return properties;
