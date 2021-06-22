@@ -94,7 +94,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .Callback<string, SummarySectionsViewModel, Dictionary<string, object>>((x,y,z) => callback = y);
 
             _mockElementHelper.Setup(_ => _.GenerateQuestionAndAnswersList(It.IsAny<string>(), It.IsAny<FormSchema>()))
-                .Returns(new List<PageSummary>{new PageSummary { PageSlug = "page-one", Answers = new Dictionary<string, string> { { "question", "answer" } } }});
+                .Returns(new List<PageSummary>{new PageSummary { PageSummaryId = "page-one", PageSlug = "page-one", Answers = new Dictionary<string, string> { { "question", "answer" } } }});
 
             //Act
             await element.RenderAsync(
@@ -177,9 +177,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
             _mockElementHelper.Setup(_ => _.GenerateQuestionAndAnswersList(It.IsAny<string>(), It.IsAny<FormSchema>()))
                 .Returns(new List<PageSummary>
                 {
-                    new PageSummary { PageSlug = "add-another", Answers = new Dictionary<string, string> {{"question", "answer"}} }, 
-                    new PageSummary { PageSlug = "add-another-addAnother-1", Answers = new Dictionary<string, string> { { "question", "answer" } } },
-                    new PageSummary { PageSlug = "page-one", Answers = new Dictionary<string, string> { { "question", "answer" } } }
+                    new PageSummary { PageSummaryId = "add-another", PageSlug = "add-another", Answers = new Dictionary<string, string> {{"question", "answer"}} }, 
+                    new PageSummary { PageSummaryId = "add-another-addAnother-1", PageSlug = "add-another", Answers = new Dictionary<string, string> { { "question", "answer" } } },
+                    new PageSummary { PageSummaryId = "page-one", PageSlug = "page-one", Answers = new Dictionary<string, string> { { "question", "answer" } } }
                 });
 
             _mockElementHelper.Setup(_ => _.GetAddAnotherNumberOfFieldsets(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(1);
@@ -198,7 +198,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Summary")), It.IsAny<SummarySectionsViewModel>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
             Assert.Equal(4, callback.Sections.Count);
-            Assert.Single(callback.Sections.Where(_ => _.Pages.Any(_ => _.PageSlug.Equals("add-another-addAnother-1"))));
+            Assert.Single(callback.Sections.Where(_ => _.Pages.Any(_ => _.PageSummaryId.Equals("add-another-addAnother-1"))));
+            Assert.Equal(2, callback.Sections.Count(_ => _.Pages.Any(_ => _.PageSlug.Equals("add-another"))));
         }
 
         [Fact]
