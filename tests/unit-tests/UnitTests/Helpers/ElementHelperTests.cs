@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using form_builder.Builders;
 using form_builder.Constants;
@@ -19,12 +20,12 @@ namespace form_builder_tests.UnitTests.Helpers
 {
     public class ElementHelperTests
     {
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new ();
-        private readonly Mock<IElementMapper> _mockElementMapper = new ();
-        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new ();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new ();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new();
+        private readonly Mock<IElementMapper> _mockElementMapper = new();
+        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
         private readonly ElementHelper _elementHelper;
-        private readonly Mock<IElementHelper> _mockElementHelper = new ();
+        private readonly Mock<IElementHelper> _mockElementHelper = new();
 
         public ElementHelperTests()
         {
@@ -666,7 +667,18 @@ namespace form_builder_tests.UnitTests.Helpers
         public void GenerateQuestionAndAnswersList_ShouldReturnFormSummary_WithPageTitleAsLabel(EElementType type, string title)
         {
             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" } } } } }));
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(
+                    new FormAnswers
+                    {
+                        Pages = new List<PageAnswers>
+                        { 
+                            new PageAnswers
+                            {
+                                PageSlug = "page-one",
+                                Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" }} 
+                            }    
+                        },
+                    }));
 
             _mockElementMapper
                 .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
@@ -696,6 +708,66 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = _elementHelper.GenerateQuestionAndAnswersList("12345", formSchema);
 
             Assert.NotNull(result[0].Answers[title]);
+        }
+
+        [Fact]
+        public void GenerateQuestionAndAnswersList_ShouldReturnMultipleFormSummary_ForAddAnother()
+        {
+            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(
+                    new FormAnswers
+                    {
+                        Pages = new List<PageAnswers>
+                        {
+                            new PageAnswers
+                            {
+                                PageSlug = "page-one",
+                                Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" }}
+                            }
+                        },
+                        FormData = new Dictionary<string, object>
+                        {
+                            { $"{AddAnotherConstants.IncrementKeyPrefix}question", "1" }
+                        },
+                    }));
+
+            _mockElementMapper
+                .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
+                .Returns("address");
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
+            var element = new ElementBuilder()
+                .WithQuestionId("question")
+                .WithType(EElementType.AddAnother)
+                .WithLabel("Add another label")
+                .WithAddressProvider("testProvider")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithBehaviour(behaviour)
+                .WithPageTitle("Add another title")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            var result = _elementHelper.GenerateQuestionAndAnswersList("12345", formSchema);
+
+            var incrementedSummary = result.FirstOrDefault(_ => _.PageTitle.Equals("Add another label"));
+            var overallPageSummary = result.FirstOrDefault(_ => _.PageTitle.Equals("Add another title"));
+
+            Assert.NotNull(incrementedSummary);
+            Assert.Equal("page-one", incrementedSummary.PageSlug);
+            Assert.Equal("page-one-question-1", incrementedSummary.PageSummaryId);
+            Assert.NotNull(overallPageSummary);
+            Assert.Equal("page-one", overallPageSummary.PageSlug);
+            Assert.Equal("page-one", overallPageSummary.PageSummaryId);
         }
 
         [Fact]
@@ -767,7 +839,7 @@ namespace form_builder_tests.UnitTests.Helpers
             //Act
             elementHelper.OrderOptionsAlphabetically(element);
 
-        //Assert
+            //Assert
             Assert.Equal("A", element.Properties.Options[0].Text);
             Assert.Equal("X", element.Properties.Options[1].Text);
         }
@@ -806,6 +878,71 @@ namespace form_builder_tests.UnitTests.Helpers
             //Assert
             Assert.Equal("X", element.Properties.Options[0].Text);
             Assert.Equal("A", element.Properties.Options[1].Text);
+        }
+
+        [Fact]
+        public void GetAddAnotherNumberOfFieldsets_ShouldReturnIncrementId_WhenFormDataContainKey()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+               .WithType(EElementType.AddAnother)
+               .WithQuestionId("test-id")
+               .WithLabel("test-text")
+               .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                    PageSlug = "test-slug",
+                    Answers = new List<Answers>{
+                        new Answers {
+                            QuestionId = "test-id",
+                            Response = "this is the value"
+                            }
+                        }
+                    }
+                },
+                FormData = new Dictionary<string, object>
+                {
+                    { $"{AddAnotherConstants.IncrementKeyPrefix}test-id", "1" }
+                },
+            };
+
+            var result = _elementHelper.GetAddAnotherNumberOfFieldsets(element, formAnswers);
+
+            Assert.IsType<int>(result);
+        }
+
+        [Fact]
+        public void GetAddAnotherNumberOfFieldsets_ShouldThrowApplicationException_WhenFormDataDoesnotContainKey()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+               .WithType(EElementType.AddAnother)
+               .WithQuestionId("test-id")
+               .WithLabel("test-text")
+               .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                    PageSlug = "test-slug",
+                    Answers = new List<Answers>{
+                        new Answers {
+                            QuestionId = "test-id",
+                            Response = "this is the value"
+                            }
+                        }
+                    }
+                },
+            };
+
+            var result = Assert.Throws<ApplicationException>(() => _elementHelper.GetAddAnotherNumberOfFieldsets(element, formAnswers));
+            Assert.Equal($"ElementHelper::GetCurrentAddAnotherIncrement, FormData key not found for {AddAnotherConstants.IncrementKeyPrefix}test-id", result.Message);
         }
     }
 }

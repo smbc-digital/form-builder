@@ -561,7 +561,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {
                     Pages = new List<PageAnswers>(),
-                    FormData = new Dictionary<string, object> { { "addAnotherFieldset-person", 1 } }
+                    FormData = new Dictionary<string, object> { { $"{AddAnotherConstants.IncrementKeyPrefix}person", 1 } }
                 }));
 
             // Act

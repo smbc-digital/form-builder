@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
@@ -30,14 +31,14 @@ namespace form_builder.Services.AddAnotherService
             string path)
         {
             string removeKey = viewModel.Keys.FirstOrDefault(_ => _.Contains("remove"));
-            bool addEmptyFieldset = viewModel.Keys.Any(_ => _.Equals("addAnotherFieldset"));
+            bool addEmptyFieldset = viewModel.Keys.Any(_ => _.Equals(AddAnotherConstants.AddAnotherButtonKey));
 
             FormAnswers convertedFormAnswers = _pageHelper.GetSavedAnswers(guid);
             var maximumFieldsets = dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type == EElementType.AddAnother).Properties.MaximumFieldsets;
 
             if (dynamicCurrentPage.IsValid  || !string.IsNullOrEmpty(removeKey))
             {
-                var formDataIncrementKey = $"addAnotherFieldset-{dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.QuestionId}";
+                var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.QuestionId}";
                 var currentIncrement = convertedFormAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedFormAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
 
                 if (addEmptyFieldset && currentIncrement >= maximumFieldsets)

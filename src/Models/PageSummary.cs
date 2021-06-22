@@ -8,6 +8,8 @@ namespace form_builder.Models
 
         public string PageSlug { get; set; }
 
+        public string PageSummaryId { get; set; }
+
         public Dictionary<string, string> Answers { get; set; }
     }
 }

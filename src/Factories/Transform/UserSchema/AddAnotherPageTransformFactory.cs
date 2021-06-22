@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using form_builder.Builders;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -55,7 +56,7 @@ namespace form_builder.Factories.Transform.UserSchema
             }
 
             var convertedAnswers = _pageHelper.GetSavedAnswers(sessionGuid);
-            var formDataIncrementKey = $"addAnotherFieldset-{addAnotherElement.Properties.QuestionId}";
+            var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
             var fieldsetIncrements = convertedAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
 
             foreach (var pageElement in currentPageElements)
@@ -112,8 +113,8 @@ namespace form_builder.Factories.Transform.UserSchema
                     {
                         addAnotherReplacementElements.Add(new ElementBuilder()
                             .WithType(EElementType.Button)
-                            .WithButtonId("addAnotherFieldset")
-                            .WithButtonName("addAnotherFieldset")
+                            .WithButtonId(AddAnotherConstants.AddAnotherButtonKey)
+                            .WithButtonName(AddAnotherConstants.AddAnotherButtonKey)
                             .WithPropertyText($"Add another {addAnotherElement.Properties.AppendText}")
                             .WithClassName("govuk-button--secondary govuk-!-display-block ")
                             .Build());
