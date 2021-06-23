@@ -6,6 +6,8 @@ namespace form_builder.Models.Properties.ActionProperties
     {
         public string TargetQuestionId { get; set; }
 
+        public bool IncludeInFormSubmission { get; set; }
+
         public List<PageActionSlug> PageActionSlugs { get; set; }
 
     }

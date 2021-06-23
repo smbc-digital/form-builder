@@ -89,9 +89,15 @@ namespace form_builder.Services.RetrieveExternalDataService
 
                 answers.Add(answer);
 
-                mappingData.FormAnswers.AdditionalFormData.Add(answer.QuestionId, answer.Response);
+                if (action.Properties.IncludeInFormSubmission)
+                {
+                    if (mappingData.FormAnswers.AdditionalFormData.TryGetValue(answer.QuestionId, out object _))
+                        mappingData.FormAnswers.AdditionalFormData.Remove(answer.QuestionId);
+
+                    mappingData.FormAnswers.AdditionalFormData.Add(answer.QuestionId, answer.Response);
+                }
             }
-            
+
             mappingData.FormAnswers.Pages.FirstOrDefault(_ => _.PageSlug.ToLower().Equals(mappingData.FormAnswers.Path.ToLower())).Answers.AddRange(answers);
 
             await _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
