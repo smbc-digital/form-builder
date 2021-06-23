@@ -10,25 +10,44 @@ namespace form_builder.Extensions
     {
         public static List<IElement> RemoveUnusedConditionalElements(this IEnumerable<IElement> elements, Dictionary<string, dynamic> viewModel)
         {
-            var listOfElemets = elements.ToList();
-            var listOfElementsWhichMayContainConditionalElements = elements.ToList().Where(_ => _.Type.Equals(EElementType.Radio) || _.Type.Equals(EElementType.Checkbox));
+            var listOfElements = elements.ToList();
+            var listOfElementsWhichMayContainConditionalElements = elements.ToList().Where(_ => (_.Type.Equals(EElementType.Radio) || _.Type.Equals(EElementType.Checkbox)) && !_.Properties.isConditionalElement).ToList();
+            var listOfConditionalElements = elements.Where(_ => _.Properties.isConditionalElement).Select(_ => _).ToList();
 
             if (!listOfElementsWhichMayContainConditionalElements.Any())
-                return listOfElemets;
+                return listOfElements;
 
             foreach (Element element in listOfElementsWhichMayContainConditionalElements)
             {
+                var listOfConditionalQuestionIds = new List<string>();
                 foreach (Option option in element.Properties.Options)
                 {
                     KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key == element.Properties.QuestionId && (element.Type.Equals(EElementType.Checkbox) ? value.Value.Contains(option.Value) : value.Value == option.Value));
                     if (option.ConditionalElementId != null && optionValue.Key == null)
                     {
                         viewModel.Remove(option.ConditionalElementId);
-                        listOfElemets.Remove(listOfElemets.FirstOrDefault(_ => _.Properties.QuestionId == option.ConditionalElementId));
+                        listOfElements.Remove(listOfElements.FirstOrDefault(_ => _.Properties.QuestionId == option.ConditionalElementId));
+                        listOfConditionalElements.Remove(listOfElements.FirstOrDefault(_ => _.Properties.QuestionId == option.ConditionalElementId));
+                    }
+
+                    listOfConditionalQuestionIds.Add(option.ConditionalElementId);
+                }
+            }
+
+            foreach (var updatedElement in listOfConditionalElements)
+            {
+                if (listOfElementsWhichMayContainConditionalElements.Any(_ =>
+                    _.Properties.Options != null && !_.Properties.Options.Any(_ =>
+                        _.ConditionalElementId  != null && _.ConditionalElementId.Equals(updatedElement.Properties.QuestionId))))
+                {
+                    if (listOfElements.Contains(updatedElement))
+                    {
+                        listOfElements.Remove(updatedElement);
                     }
                 }
             }
-            return listOfElemets;
+
+            return listOfElements;
         }
     }
 }
