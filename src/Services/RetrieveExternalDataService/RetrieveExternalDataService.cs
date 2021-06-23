@@ -81,13 +81,17 @@ namespace form_builder.Services.RetrieveExternalDataService
                 if (string.IsNullOrWhiteSpace(content))
                     throw new ApplicationException($"RetrieveExternalDataService::Process, Gateway {entity.Url} responded with empty reference");
 
-                answers.Add(new Answers
+                var answer = new Answers
                 {
                     QuestionId = action.Properties.TargetQuestionId,
                     Response = JsonConvert.DeserializeObject<string>(content)
-                });
-            }
+                };
 
+                answers.Add(answer);
+
+                mappingData.FormAnswers.AdditionalFormData.Add(answer.QuestionId, answer.Response);
+            }
+            
             mappingData.FormAnswers.Pages.FirstOrDefault(_ => _.PageSlug.ToLower().Equals(mappingData.FormAnswers.Path.ToLower())).Answers.AddRange(answers);
 
             await _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
