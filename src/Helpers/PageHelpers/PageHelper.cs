@@ -29,14 +29,12 @@ namespace form_builder.Helpers.PageHelpers
     public class PageHelper : IPageHelper
     {
         private readonly IViewRender _viewRender;
-        private readonly IActionHelper _actionHelper;
         private readonly IElementHelper _elementHelper;
         private readonly ISessionHelper _sessionHelper;
         private readonly IWebHostEnvironment _environment;
         private readonly FormConfiguration _disallowedKeys;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
-        private readonly IEnumerable<ILookupProvider> _lookupProviders;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IConfiguration _configuration;
 
@@ -46,8 +44,6 @@ namespace form_builder.Helpers.PageHelpers
             IWebHostEnvironment enviroment,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ISessionHelper sessionHelper,
-            IEnumerable<ILookupProvider> lookupProviders,
-            IActionHelper actionHelper,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
             IConfiguration configuration)
         {
@@ -59,8 +55,6 @@ namespace form_builder.Helpers.PageHelpers
             _environment = enviroment;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _sessionHelper = sessionHelper;
-            _lookupProviders = lookupProviders;
-            _actionHelper = actionHelper;
             _configuration = configuration;
         }
 

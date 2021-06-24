@@ -59,7 +59,6 @@ namespace form_builder.Services.PageService
         private readonly IFormAvailabilityService _formAvailabilityServics;
         private readonly ILogger<IPageService> _logger;
         private readonly IConfiguration _configuration;
-        private readonly IElementHelper _elementHelper;
 
         public PageService(
             IEnumerable<IElementValidator> validators,
@@ -82,7 +81,7 @@ namespace form_builder.Services.PageService
             IFormAvailabilityService formAvailabilityServics,
             ILogger<IPageService> logger,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
-            IConfiguration configuration, IElementHelper elementHelper)
+            IConfiguration configuration)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -105,7 +104,6 @@ namespace form_builder.Services.PageService
             _addAnotherService = addAnotherService;
             _fileStorageProviders = fileStorageProviders;
             _configuration = configuration;
-            _elementHelper = elementHelper;
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)

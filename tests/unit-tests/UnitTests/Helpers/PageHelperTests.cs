@@ -42,9 +42,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings = new();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new();
-        private readonly List<ILookupProvider> _mockLookupProviders = new ();
         private readonly FakeLookupProvider _lookupProvider = new();
-        private readonly Mock<IActionHelper> _mockActionHelper = new();
         private readonly Mock<IConfiguration> _mockConfiguration = new();
 
         public PageHelperTests()
@@ -75,14 +73,11 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
 
-            _mockLookupProviders.Add(_lookupProvider);
-
             _pageHelper = new PageHelper(_mockIViewRender.Object,
                 _mockElementHelper.Object, _mockDistributedCache.Object,
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockDistributedCacheExpirationSettings.Object,
-                _mockSessionHelper.Object, _mockLookupProviders,
-                _mockActionHelper.Object, _fileStorageProviders, _mockConfiguration.Object);
+                _mockSessionHelper.Object, _fileStorageProviders, _mockConfiguration.Object);
         }
 
         [Fact]
