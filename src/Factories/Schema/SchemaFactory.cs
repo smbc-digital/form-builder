@@ -66,7 +66,6 @@ namespace form_builder.Factories.Schema
                     formSchema = JsonConvert.DeserializeObject<FormSchema>(data);
                     foreach (var page in formSchema.Pages)
                     {
-                        // If page contains any element with dynamic options : continue to line 77
                         foreach (var userPageFactory in _userPageTransformFactories)
                             await userPageFactory.Transform(page, sessionGuid);
                     }

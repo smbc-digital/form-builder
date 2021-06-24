@@ -179,13 +179,6 @@ namespace form_builder.Services.PageService
             if (page.HasPageActionsGetValues)
                 await _actionsWorkflow.Process(page.PageActions, null, form);
 
-            if (page.HasDynamicLookupElements)
-            {
-                var formAnswers = _pageHelper.GetSavedAnswers(sessionGuid);
-                var dynamicLookupElement = page.Elements.FirstOrDefault(_ => _.Lookup.Equals(LookUpConstants.Dynamic));
-                await _elementHelper.AddDynamicOptions(dynamicLookupElement, formAnswers);
-            }
-
             if (page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
             {
                 var bookingProcessEntity = await _bookingService.Get(baseForm.BaseURL, page, sessionGuid);
@@ -234,13 +227,6 @@ namespace form_builder.Services.PageService
 
             if (currentPage.HasIncomingPostValues)
                 viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);
-
-            if (currentPage.HasDynamicLookupElements)
-            {
-                var formAnswers = _pageHelper.GetSavedAnswers(sessionGuid);
-                var dynamicLookupElement = currentPage.Elements.FirstOrDefault(_ => _.Lookup.Equals(LookUpConstants.Dynamic));
-                await _elementHelper.AddDynamicOptions(dynamicLookupElement, formAnswers);
-            }
 
             currentPage.Validate(viewModel, _validators, baseForm);
 

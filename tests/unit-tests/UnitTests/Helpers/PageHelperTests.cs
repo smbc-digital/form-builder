@@ -86,40 +86,6 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public async Task GenerateHtml_ShouldAddOptions_WhenFormContainsDynamicLookup()
-        {
-            //Arrange
-            var element = new ElementBuilder().WithType(EElementType.Radio).WithLookup("dynamic").Build();
-            element.Properties.LookupSources = new List<LookupSource>
-            {
-                new LookupSource
-                {
-                    EnvironmentName = "local",
-                    Provider = "Fake",
-                    AuthToken = "fake",
-                    URL = "https://myapi.com"
-                }
-            };
-
-            var page = new PageBuilder().WithElement(element).Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
-
-            var schema = new FormSchemaBuilder().WithName("form-name").Build();
-            var formAnswers = new FormAnswers();
-
-            _mockActionHelper.Setup(_ => _.GenerateUrl("https://myapi.com", formAnswers)).Returns(new RequestEntity() { IsPost = false, Url = "waste" });
-
-            //Act
-            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers, new List<object>());
-
-            //Assert
-            element = (Element)page.Elements.Single(x => !string.IsNullOrEmpty(x.Lookup) && x.Lookup.Equals("dynamic"));
-            Assert.True(element.Properties.Options.Any());
-        }
-
-        [Fact]
         public async Task GenerateHtml_ShouldRenderH1Element_WithBaseFormName()
         {
             // Arrange

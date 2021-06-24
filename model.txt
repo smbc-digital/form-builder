@@ -1,0 +1,28 @@
+{
+	public List<string> StatementApplies { get; set; }
+	public string SelectPriority { get; set; }
+	public string SelectAreaOfWork { get; set; }
+	public string DoesGroupExist { get; set; }
+	public string OrganisationTurnover { get; set; }
+	public string EmployeeAmount { get; set; }
+	public string IdeaName { get; set; }
+	public string IdeaDescription { get; set; }
+	public string IdeaBenefitPeople { get; set; }
+	public string AreaBenefitIdea { get; set; }
+	public string SupportOtherOrganisations { get; set; }
+	public string SupportYourIdea { get; set; }
+	public string HowMuchFunding { get; set; }
+	public string Spendfunding { get; set; }
+	public string SafeguardPolicies { get; set; }
+	public string GoverningDocument { get; set; }
+	public string CommunityBankAccount { get; set; }
+	public string FirstName { get; set; }
+	public string LastName { get; set; }
+	public string Email { get; set; }
+	public string Phone { get; set; }
+	public string GroupName { get; set; }
+	public string Website { get; set; }
+	public string Facebook { get; set; }
+	public string Twitter { get; set; }
+	public string OtherSocialAccounts { get; set; }
+}

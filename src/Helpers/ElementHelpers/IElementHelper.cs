@@ -37,8 +37,6 @@ namespace form_builder.Helpers.ElementHelpers
 
         FormAnswers GetFormData(string guid);
 
-        Task AddDynamicOptions(IElement element, FormAnswers formAnswers);
-
         void SaveFormData(string key, object value, string guid, string formName);
 
         Task<List<PageSummary>> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema);

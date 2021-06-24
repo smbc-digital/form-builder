@@ -52,9 +52,6 @@ namespace form_builder.Validators
                 }
             }
 
-            if (answeredValue.Contains(requiredIf[1]))
-                isValid = true;
-
             return new ValidationResult
             {
                 IsValid = isValid,
