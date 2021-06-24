@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using form_builder.Conditions;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models.Actions;
@@ -57,6 +58,7 @@ namespace form_builder.Models
         public bool HasPageActionsGetValues => PageActions.Any(_ => _.Properties.HttpActionType == EHttpActionType.Get);
         public bool HasPageActionsPostValues => PageActions.Any(_ => _.Properties.HttpActionType == EHttpActionType.Post);
 
+        public bool HasDynamicLookupElements => Elements.Any(_ => !string.IsNullOrEmpty(_.Lookup) && _.Lookup.Equals(LookUpConstants.Dynamic));
 
         public List<Condition> RenderConditions { get; set; } = new List<Condition>();
 

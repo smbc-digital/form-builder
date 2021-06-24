@@ -66,7 +66,9 @@ namespace form_builder.Factories.Schema
                     formSchema = JsonConvert.DeserializeObject<FormSchema>(data);
                     foreach (var page in formSchema.Pages)
                     {
-                        _userPageTransformFactories.Aggregate(page, (current, userPageFactory) => userPageFactory.Transform(current, sessionGuid));
+                        // If page contains any element with dynamic options : continue to line 77
+                        foreach (var userPageFactory in _userPageTransformFactories)
+                            await userPageFactory.Transform(page, sessionGuid);
                     }
 
                     return formSchema;
@@ -85,7 +87,8 @@ namespace form_builder.Factories.Schema
 
             foreach (var page in formSchema.Pages)
             {
-                _userPageTransformFactories.Aggregate(page, (current, userPageFactory) => userPageFactory.Transform(current, sessionGuid));
+                foreach (var userPageFactory in _userPageTransformFactories)
+                    await userPageFactory.Transform(page, sessionGuid);
             }
 
             return formSchema;

@@ -10,8 +10,6 @@ namespace form_builder.Helpers.PageHelpers
     {
         Task<FormBuilderViewModel> GenerateHtml(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string guid, FormAnswers formAnswers, List<object> results = null);
 
-        Task AddDynamicOptions(IElement element, FormAnswers formAnswers);
-
         void RemoveFieldset(Dictionary<string, dynamic> viewModel, string form, string guid, string path, string removeKey);
 
         FormAnswers GetSavedAnswers(string guid);

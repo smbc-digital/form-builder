@@ -9,6 +9,7 @@ using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
+using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -58,6 +59,7 @@ namespace form_builder.Services.PageService
         private readonly IFormAvailabilityService _formAvailabilityServics;
         private readonly ILogger<IPageService> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IElementHelper _elementHelper;
 
         public PageService(
             IEnumerable<IElementValidator> validators,
@@ -80,7 +82,7 @@ namespace form_builder.Services.PageService
             IFormAvailabilityService formAvailabilityServics,
             ILogger<IPageService> logger,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
-            IConfiguration configuration)
+            IConfiguration configuration, IElementHelper elementHelper)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -103,6 +105,7 @@ namespace form_builder.Services.PageService
             _addAnotherService = addAnotherService;
             _fileStorageProviders = fileStorageProviders;
             _configuration = configuration;
+            _elementHelper = elementHelper;
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
@@ -176,6 +179,13 @@ namespace form_builder.Services.PageService
             if (page.HasPageActionsGetValues)
                 await _actionsWorkflow.Process(page.PageActions, null, form);
 
+            if (page.HasDynamicLookupElements)
+            {
+                var formAnswers = _pageHelper.GetSavedAnswers(sessionGuid);
+                var dynamicLookupElement = page.Elements.FirstOrDefault(_ => _.Lookup.Equals(LookUpConstants.Dynamic));
+                await _elementHelper.AddDynamicOptions(dynamicLookupElement, formAnswers);
+            }
+
             if (page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
             {
                 var bookingProcessEntity = await _bookingService.Get(baseForm.BaseURL, page, sessionGuid);
@@ -225,51 +235,49 @@ namespace form_builder.Services.PageService
             if (currentPage.HasIncomingPostValues)
                 viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
-            var currentPageForValidation = currentPage;
-            if (currentPage.Elements.Any(_ => !string.IsNullOrEmpty(_.Lookup) && _.Lookup.Equals("dynamic")))
+            if (currentPage.HasDynamicLookupElements)
             {
-                currentPageForValidation = JsonConvert.DeserializeObject<Page>(JsonConvert.SerializeObject(currentPage));
                 var formAnswers = _pageHelper.GetSavedAnswers(sessionGuid);
-                var dynamicLookupElement = currentPageForValidation.Elements.FirstOrDefault(_ => _.Lookup.Equals("dynamic"));
-                await _pageHelper.AddDynamicOptions(dynamicLookupElement, formAnswers);
+                var dynamicLookupElement = currentPage.Elements.FirstOrDefault(_ => _.Lookup.Equals(LookUpConstants.Dynamic));
+                await _elementHelper.AddDynamicOptions(dynamicLookupElement, formAnswers);
             }
 
-            currentPageForValidation.Validate(viewModel, _validators, baseForm);
+            currentPage.Validate(viewModel, _validators, baseForm);
 
-            if (currentPageForValidation.Elements.Any(_ => _.Type == EElementType.AddAnother))
-                return await _addAnotherService.ProcessAddAnother(viewModel, currentPageForValidation, baseForm, sessionGuid, path);
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.AddAnother))
+                return await _addAnotherService.ProcessAddAnother(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            if (currentPageForValidation.Elements.Any(_ => _.Type == EElementType.Address))
-                return await _addressService.ProcessAddress(viewModel, currentPageForValidation, baseForm, sessionGuid, path);
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
+                return await _addressService.ProcessAddress(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            if (currentPageForValidation.Elements.Any(_ => _.Type == EElementType.Street))
-                return await _streetService.ProcessStreet(viewModel, currentPageForValidation, baseForm, sessionGuid, path);
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.Street))
+                return await _streetService.ProcessStreet(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            if (currentPageForValidation.Elements.Any(_ => _.Type == EElementType.Organisation))
-                return await _organisationService.ProcessOrganisation(viewModel, currentPageForValidation, baseForm, sessionGuid, path);
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.Organisation))
+                return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            if (currentPageForValidation.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
-                return await _fileUploadService.ProcessFile(viewModel, currentPageForValidation, baseForm, sessionGuid, path, files, modelStateIsValid);
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
+                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files, modelStateIsValid);
 
-            if (currentPageForValidation.Elements.Any(_ => _.Type == EElementType.Booking))
-                return await _bookingService.ProcessBooking(viewModel, currentPageForValidation, baseForm, sessionGuid, path);
+            if (currentPage.Elements.Any(_ => _.Type == EElementType.Booking))
+                return await _bookingService.ProcessBooking(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPageForValidation.IsValid);
+            _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
 
-            if (!currentPageForValidation.IsValid)
+            if (!currentPage.IsValid)
             {
-                var formModel = await _pageContentFactory.Build(currentPageForValidation, viewModel, baseForm, sessionGuid);
+                var formModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, sessionGuid);
 
                 return new ProcessRequestEntity
                 {
-                    Page = currentPageForValidation,
+                    Page = currentPage,
                     ViewModel = formModel
                 };
             }
 
             return new ProcessRequestEntity
             {
-                Page = currentPageForValidation
+                Page = currentPage
             };
         }
 

@@ -82,12 +82,6 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var element in page.Elements)
             {
-                if (!string.IsNullOrEmpty(element.Lookup) &&
-                    element.Lookup.Equals(LookUpConstants.Dynamic))
-                {
-                    await AddDynamicOptions(element, formAnswers);
-                }
-
                 string html = await element.RenderAsync(_viewRender, _elementHelper, guid, viewModel, page, baseForm, _environment, formAnswers, results);
 
                 if (element.Properties is not null && element.Properties.isConditionalElement)
@@ -103,50 +97,7 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        public async Task AddDynamicOptions(IElement element, FormAnswers formAnswers)
-        {
-            LookupSource submitDetails = element.Properties.LookupSources
-                .SingleOrDefault(x => x.EnvironmentName
-                .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
-
-            if (submitDetails == null)
-                throw new Exception("Dynamic lookup: No Environment Specific Details Found.");
-
-            RequestEntity request = _actionHelper.GenerateUrl(submitDetails.URL, formAnswers);
-
-            if (string.IsNullOrEmpty(submitDetails.Provider))
-                throw new Exception("Dynamic lookup: No Query Details Found.");
-
-            var lookupProvider = _lookupProviders.Get(submitDetails.Provider);
-            if (lookupProvider == null)
-                throw new Exception("Dynamic lookup: No Lookup Provider Found.");
-
-            List<Option> lookupOptions = new();
-            var session = _sessionHelper.GetSessionGuid();
-            var cachedAnswers = _distributedCache.GetString(session);
-            if (!string.IsNullOrEmpty(cachedAnswers))
-            {
-                var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-                var lookUpCacheResults = convertedAnswers.FormData.SingleOrDefault(x => x.Key.Equals(request.Url, StringComparison.OrdinalIgnoreCase));
-                if (!string.IsNullOrEmpty(lookUpCacheResults.Key) && lookUpCacheResults.Value != null)
-                {
-                    lookupOptions = JsonConvert.DeserializeObject<List<Option>>(JsonConvert.SerializeObject(lookUpCacheResults.Value));
-                }
-            }
-
-            if (!lookupOptions.Any())
-            {
-                lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
-
-                if (lookupOptions.Any())
-                    SaveFormData(request.Url, lookupOptions, session, formAnswers.FormName);
-            }
-
-            if (!lookupOptions.Any())
-                throw new Exception("Dynamic lookup: GetAsync cannot get IList<Options>.");
-
-            element.Properties.Options.AddRange(lookupOptions);
-        }
+        
 
         public void RemoveFieldset(Dictionary<string, dynamic> viewModel,
             string form,
