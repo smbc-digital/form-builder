@@ -11,6 +11,7 @@ using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
+using form_builder.Services.PayService;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -39,6 +40,8 @@ namespace form_builder.Services.SubmitService
 
         private readonly ILogger<SubmitService> _logger;
 
+        private readonly IPayService _payService;
+
         public SubmitService(
             IGateway gateway,
             IPageHelper pageHelper,
@@ -48,7 +51,7 @@ namespace form_builder.Services.SubmitService
             ISchemaFactory schemaFactory,
             IReferenceNumberProvider referenceNumberProvider,
             IEnumerable<ISubmitProvider> submitProviders,
-            ILogger<SubmitService> logger)
+            ILogger<SubmitService> logger, IPayService payService)
         {
             _gateway = gateway;
             _pageHelper = pageHelper;
@@ -59,6 +62,7 @@ namespace form_builder.Services.SubmitService
             _referenceNumberProvider = referenceNumberProvider;
             _submitProviders = submitProviders;
             _logger = logger;
+            _payService = payService;
         }
 
         public async Task PreProcessSubmission(string form, string sessionGuid)
@@ -66,6 +70,13 @@ namespace form_builder.Services.SubmitService
             var baseForm = await _schemaFactory.Build(form);
             if (baseForm.GenerateReferenceNumber)
                 _pageHelper.SaveCaseReference(sessionGuid, _referenceNumberProvider.GetReference(baseForm.ReferencePrefix), true, baseForm.GeneratedReferenceNumberMapping);
+
+            if (baseForm.SavePaymentAmount)
+            {
+                var config = string.IsNullOrEmpty(baseForm.PaymentConfig) ? baseForm.BaseURL : baseForm.PaymentConfig;
+                _pageHelper.SavePaymentAmount(sessionGuid, _payService.GetFormPaymentInformation(config).Result.Settings.Amount, baseForm.PaymentAmountMapping);
+            }
+                
         }
 
         public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)

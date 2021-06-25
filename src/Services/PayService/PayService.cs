@@ -81,7 +81,7 @@ namespace form_builder.Services.PayService
                 await _gateway.PostAsync(postUrl.CallbackUrl,
                     new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString() });
 
-                _pageHelper.SavePaymentAmount(sessionGuid, paymentInformation.Settings.Amount);
+                _pageHelper.SavePaymentAmount(sessionGuid, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
                 return reference;
             }
             catch (PaymentDeclinedException)
