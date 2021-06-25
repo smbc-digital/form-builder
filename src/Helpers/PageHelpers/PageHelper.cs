@@ -207,7 +207,6 @@ namespace form_builder.Helpers.PageHelpers
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             convertedAnswers.PaymentAmount = paymentAmount;
-            convertedAnswers.AdditionalFormData.Add(targetMapping, paymentAmount);
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }

@@ -173,6 +173,9 @@ namespace form_builder.Services.MappingService
             if (formAnswers.AdditionalFormData.Any())
                 data = AddNonQuestionAnswers(data, formAnswers.AdditionalFormData);
 
+            if (!string.IsNullOrEmpty(formAnswers.PaymentAmount))
+                data = AddNonQuestionAnswers(data, new Dictionary<string, object> { { formSchema.PaymentAmountMapping, formAnswers.PaymentAmount } });
+
             return data;
         }
 

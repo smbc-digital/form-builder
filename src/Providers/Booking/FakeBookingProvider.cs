@@ -93,7 +93,7 @@ namespace form_builder.Providers.Booking
             var response = new List<AvailabilityDayResponse>();
             switch (request.StartDate.Month)
             {
-                case 3:
+                case 7:
                     response = new AvailabilityDayResponseBuilder()
                         .WithDay(new DateTime(2021, request.StartDate.Month, 13), 1, true)
                         .WithDay(new DateTime(2021, request.StartDate.Month, 15), 1, true)

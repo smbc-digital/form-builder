@@ -24,6 +24,7 @@ using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Services.StreetService;
+using form_builder.TagParsers;
 using form_builder.Validators;
 using form_builder.ViewModels;
 using form_builder.Workflows.ActionsWorkflow;
@@ -59,6 +60,7 @@ namespace form_builder.Services.PageService
         private readonly IFormAvailabilityService _formAvailabilityServics;
         private readonly ILogger<IPageService> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IEnumerable<ITagParser> _tagParsers;
 
         public PageService(
             IEnumerable<IElementValidator> validators,
@@ -81,7 +83,7 @@ namespace form_builder.Services.PageService
             IFormAvailabilityService formAvailabilityServics,
             ILogger<IPageService> logger,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
-            IConfiguration configuration)
+            IConfiguration configuration, IEnumerable<ITagParser> tagParsers)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -104,6 +106,7 @@ namespace form_builder.Services.PageService
             _addAnotherService = addAnotherService;
             _fileStorageProviders = fileStorageProviders;
             _configuration = configuration;
+            _tagParsers = tagParsers;
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
@@ -288,6 +291,8 @@ namespace form_builder.Services.PageService
                 .SelectMany(_ => _.Answers)
                 .ToList()
                 .ForEach(x => answers.Add(x.QuestionId, x.Response));
+
+            _tagParsers.ToList().ForEach(_ => _.Parse(currentPageResult.Page, convertedAnswers));
 
             return currentPageResult.Page.GetNextPage(answers);
         }
