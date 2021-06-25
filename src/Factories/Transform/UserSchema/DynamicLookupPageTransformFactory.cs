@@ -58,7 +58,7 @@ namespace form_builder.Factories.Transform.UserSchema
                 .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
 
             if (submitDetails == null)
-                throw new Exception("Dynamic lookup: No Environment Specific Details Found.");
+                throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, No Environment specific details found");
 
             var session = _sessionHelper.GetSessionGuid();
             var convertedAnswers = _pageHelper.GetSavedAnswers(session);
@@ -68,12 +68,9 @@ namespace form_builder.Factories.Transform.UserSchema
             if (!string.IsNullOrEmpty(request.Url))
             {
                 if (string.IsNullOrEmpty(submitDetails.Provider))
-                    throw new Exception("Dynamic lookup: No Query Details Found.");
+                    throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, No Provider name given in LookupSources");
 
                 var lookupProvider = _lookupProviders.Get(submitDetails.Provider);
-                if (lookupProvider == null)
-                    throw new Exception("Dynamic lookup: No Lookup Provider Found.");
-
                 List<Option> lookupOptions = new();
 
                 if (convertedAnswers != null)
@@ -90,7 +87,7 @@ namespace form_builder.Factories.Transform.UserSchema
                     lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
 
                     if (!lookupOptions.Any())
-                        throw new Exception("Dynamic lookup: GetAsync cannot get IList<Options>.");
+                        throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, Provider returned no options");
                 }
 
                 _pageHelper.SaveFormData(request.Url, lookupOptions, session, convertedAnswers.FormName);

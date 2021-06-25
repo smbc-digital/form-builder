@@ -17,6 +17,7 @@ using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Factories.Transform
@@ -84,7 +85,8 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Build();
 
             // Act & Assert
-            await Assert.ThrowsAsync<Exception>(() => _dynamicLookupPageTransformFactory.Transform(page, "12345"));
+            var result = await Assert.ThrowsAsync<Exception>(() => _dynamicLookupPageTransformFactory.Transform(page, "12345"));
+            Assert.Equal("DynamicLookupPageTransformFactory::AddDynamicOptions, No Environment specific details found", result.Message);
         }
 
         [Fact]
@@ -220,6 +222,152 @@ namespace form_builder_tests.UnitTests.Factories.Transform
 
             // Assert
             _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Transform_ShouldThrowIfProviderNullOrEmpty()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithQuestionId("dynamicQuestion")
+                .WithLookup("dynamic")
+                .WithLookupSource(new LookupSource
+                {
+                    EnvironmentName = "local",
+                    URL = "test",
+                    AuthToken = "test"
+                })
+                .WithType(EElementType.Checkbox)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            // Act & Assert
+            var result = await Assert.ThrowsAsync<Exception>(() => _dynamicLookupPageTransformFactory.Transform(page, "12345"));
+            Assert.Equal("DynamicLookupPageTransformFactory::AddDynamicOptions, No Provider name given in LookupSources", result.Message);
+        }
+
+        [Fact]
+        public async Task Transform_ShouldThrowIfProviderNotFound()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithQuestionId("dynamicQuestion")
+                .WithLookup("dynamic")
+                .WithLookupSource(new LookupSource
+                {
+                    EnvironmentName = "local",
+                    URL = "test",
+                    AuthToken = "test",
+                    Provider = "not-found"
+                })
+                .WithType(EElementType.Checkbox)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() => _dynamicLookupPageTransformFactory.Transform(page, "12345"));
+        }
+
+        [Fact]
+        public async Task Transform_ShouldNotCallLookupProvider_IfOptionsFoundInCachedAnswers()
+        {
+            // Arrange
+            var formAnswers = new FormAnswers
+            {
+                FormData = new Dictionary<string, object>
+                {
+                    { "waste", new List<Option> { new Option { Text = "option", Value = "option" } } }
+                }
+            };
+
+            _mockPageHelper
+                .Setup(_ => _.GetSavedAnswers(It.IsAny<string>()))
+                .Returns(formAnswers);
+
+            var element = new ElementBuilder()
+                .WithQuestionId("dynamicQuestion")
+                .WithLookup("dynamic")
+                .WithLookupSource(new LookupSource
+                {
+                    EnvironmentName = "local",
+                    Provider = "fake",
+                    URL = "waste"
+                })
+                .WithType(EElementType.Checkbox)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            // Act
+            await _dynamicLookupPageTransformFactory.Transform(page, "12345");
+
+            // Assert
+            _fakeLookupProvider.Verify(_ => _.GetAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Transform_ShouldCallLookupProvider_IfOptionsNotFoundInCachedAnswers()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithQuestionId("dynamicQuestion")
+                .WithLookup("dynamic")
+                .WithLookupSource(new LookupSource
+                {
+                    EnvironmentName = "local",
+                    Provider = "fake",
+                    URL = "waste",
+                    AuthToken = "test"
+                })
+                .WithType(EElementType.Checkbox)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            // Act
+            await _dynamicLookupPageTransformFactory.Transform(page, "12345");
+
+            // Assert
+            _fakeLookupProvider.Verify(_ => _.GetAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Transform_ShouldThrowIfProviderReturnsNoOptions()
+        {
+            // Arrange
+            _fakeLookupProvider.Setup(_ => _.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new List<Option>());
+
+            var element = new ElementBuilder()
+                .WithQuestionId("dynamicQuestion")
+                .WithLookup("dynamic")
+                .WithLookupSource(new LookupSource
+                {
+                    EnvironmentName = "local",
+                    URL = "waste",
+                    AuthToken = "test",
+                    Provider = "fake"
+                })
+                .WithType(EElementType.Checkbox)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            // Act & Assert
+            var result = await Assert.ThrowsAsync<Exception>(() => _dynamicLookupPageTransformFactory.Transform(page, "12345"));
+            Assert.Equal("DynamicLookupPageTransformFactory::AddDynamicOptions, Provider returned no options", result.Message);
         }
     }
 }

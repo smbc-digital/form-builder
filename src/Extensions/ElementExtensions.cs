@@ -6,7 +6,7 @@ using form_builder.Models.Elements;
 
 namespace form_builder.Extensions
 {
-    public static class ElementExtentions
+    public static class ElementExtensions
     {
         public static List<IElement> RemoveUnusedConditionalElements(this IEnumerable<IElement> elements, Dictionary<string, dynamic> viewModel)
         {
@@ -19,7 +19,6 @@ namespace form_builder.Extensions
 
             foreach (Element element in listOfElementsWhichMayContainConditionalElements)
             {
-                var listOfConditionalQuestionIds = new List<string>();
                 foreach (Option option in element.Properties.Options)
                 {
                     KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key == element.Properties.QuestionId && (element.Type.Equals(EElementType.Checkbox) ? value.Value.Contains(option.Value) : value.Value == option.Value));
@@ -29,20 +28,18 @@ namespace form_builder.Extensions
                         listOfElements.Remove(listOfElements.FirstOrDefault(_ => _.Properties.QuestionId == option.ConditionalElementId));
                         listOfConditionalElements.Remove(listOfElements.FirstOrDefault(_ => _.Properties.QuestionId == option.ConditionalElementId));
                     }
-
-                    listOfConditionalQuestionIds.Add(option.ConditionalElementId);
                 }
             }
 
-            foreach (var updatedElement in listOfConditionalElements)
+            foreach (Element element in listOfConditionalElements)
             {
                 if (listOfElementsWhichMayContainConditionalElements.Any(_ =>
                     _.Properties.Options != null && !_.Properties.Options.Any(_ =>
-                        _.ConditionalElementId  != null && _.ConditionalElementId.Equals(updatedElement.Properties.QuestionId))))
+                        _.ConditionalElementId  != null && _.ConditionalElementId.Equals(element.Properties.QuestionId))))
                 {
-                    if (listOfElements.Contains(updatedElement))
+                    if (listOfElements.Contains(element))
                     {
-                        listOfElements.Remove(updatedElement);
+                        listOfElements.Remove(element);
                     }
                 }
             }
