@@ -87,6 +87,16 @@ namespace form_builder_tests.UnitTests.Helpers
         public ActionHelperTests() => _actionHelper = new ActionHelper(_mockFormatters.Object);
 
         [Fact]
+        public void GenerateUrl_ShouldReturnUnchangedBaseUrl_IfAnyTagMatchesDontExistInAnswers()
+        {
+            // Act
+            var result = _actionHelper.GenerateUrl("www.testurl.com/{{unansweredQuestion}}", _mappingEntity.FormAnswers);
+
+            // Assert
+            Assert.Equal("www.testurl.com/{{unansweredQuestion}}", result.Url);
+        }
+
+        [Fact]
         public void GenerateUrl_ShouldGenerateCorrectGetUrl_PathParameters()
         {
             // Act

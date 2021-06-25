@@ -8,7 +8,6 @@ using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -17,9 +16,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.FileStorage;
-using form_builder.Providers.Lookup;
 using form_builder.Providers.StorageProvider;
-using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -42,7 +39,6 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings = new();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new();
-        private readonly FakeLookupProvider _lookupProvider = new();
         private readonly Mock<IConfiguration> _mockConfiguration = new();
 
         public PageHelperTests()

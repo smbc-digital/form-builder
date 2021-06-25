@@ -19,14 +19,19 @@ namespace form_builder.Helpers.ActionsHelpers
         {
             var matches = TagRegex.Matches(baseUrl);
 
-            foreach (Match match in matches.ToList())
+            if (matches.Any())
             {
-                if (!formAnswers.AllAnswers.ToList().Any(_ => _.QuestionId.Equals(match.Value)))
-                    return new RequestEntity
+                foreach (Match match in matches.ToList())
+                {
+                    if (!formAnswers.AllAnswers.ToList().Any(_ => _.QuestionId.Equals(match.Value)))
                     {
-                        Url = null,
-                        IsPost = !matches.Any()
-                    };
+                        return new RequestEntity
+                        {
+                            Url = baseUrl,
+                            IsPost = !matches.Any()
+                        };
+                    }
+                }
             }
 
             var newUrl = matches.Aggregate(baseUrl, (current, match) => Replace(match, current, formAnswers));

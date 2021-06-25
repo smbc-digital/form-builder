@@ -55,7 +55,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Returns(new RequestEntity
                     {
                         IsPost = false,
-                        Url = "waste"
+                        Url = "waste=waste"
                     });
             _mockWebHostEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
 
@@ -100,7 +100,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 {
                     EnvironmentName = "local",
                     Provider = "fake",
-                    URL = "waste",
+                    URL = "waste={{wasteId}}",
                     AuthToken = "token"
                 })
                 .WithType(EElementType.Checkbox)
@@ -128,7 +128,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Returns(new RequestEntity
                 {
                     IsPost = false,
-                    Url = null
+                    Url = "waste={{wasteId}}"
                 });
 
             var element = new ElementBuilder()
@@ -138,7 +138,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 {
                     EnvironmentName = "local",
                     Provider = "fake",
-                    URL = "waste"
+                    URL = "waste={{wasteId}}"
                 })
                 .WithType(EElementType.Checkbox)
                 .Build();
@@ -163,7 +163,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Returns(new RequestEntity
                 {
                     IsPost = false,
-                    Url = null
+                    Url = "waste={{wasteId}}"
                 });
 
             var element = new ElementBuilder()
@@ -173,7 +173,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 {
                     EnvironmentName = "local",
                     Provider = "fake",
-                    URL = "waste"
+                    URL = "waste={{wasteId}}"
                 })
                 .WithType(EElementType.Checkbox)
                 .Build();
@@ -190,7 +190,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
-        public async Task Transform_ShouldNotSaveFormData_IfUrlIsNull()
+        public async Task Transform_ShouldNotSaveFormData_IfUrlCouldNotBePopulated()
         {
             // Arrange
             _mockActionHelper
@@ -198,7 +198,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Returns(new RequestEntity
                 {
                     IsPost = false,
-                    Url = null
+                    Url = "waste={{wasteId}}"
                 });
 
             var element = new ElementBuilder()
@@ -208,7 +208,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 {
                     EnvironmentName = "local",
                     Provider = "fake",
-                    URL = "waste"
+                    URL = "waste={{wasteId}}"
                 })
                 .WithType(EElementType.Checkbox)
                 .Build();
@@ -234,7 +234,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .WithLookupSource(new LookupSource
                 {
                     EnvironmentName = "local",
-                    URL = "test",
+                    URL = "waste={{wasteId}}",
                     AuthToken = "test"
                 })
                 .WithType(EElementType.Checkbox)
@@ -259,7 +259,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .WithLookupSource(new LookupSource
                 {
                     EnvironmentName = "local",
-                    URL = "test",
+                    URL = "waste={{wasteId}}",
                     AuthToken = "test",
                     Provider = "not-found"
                 })
@@ -282,7 +282,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             {
                 FormData = new Dictionary<string, object>
                 {
-                    { "waste", new List<Option> { new Option { Text = "option", Value = "option" } } }
+                    { "waste=waste", new List<Option> { new Option { Text = "option", Value = "option" } } }
                 }
             };
 
@@ -297,7 +297,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 {
                     EnvironmentName = "local",
                     Provider = "fake",
-                    URL = "waste"
+                    URL = "waste={{wasteId}}"
                 })
                 .WithType(EElementType.Checkbox)
                 .Build();
@@ -324,7 +324,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 {
                     EnvironmentName = "local",
                     Provider = "fake",
-                    URL = "waste",
+                    URL = "waste={{wasteId}}",
                     AuthToken = "test"
                 })
                 .WithType(EElementType.Checkbox)
@@ -354,7 +354,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .WithLookupSource(new LookupSource
                 {
                     EnvironmentName = "local",
-                    URL = "waste",
+                    URL = "waste={{wasteId}}",
                     AuthToken = "test",
                     Provider = "fake"
                 })

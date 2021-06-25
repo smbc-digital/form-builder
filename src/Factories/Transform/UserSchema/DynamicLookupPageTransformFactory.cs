@@ -65,7 +65,7 @@ namespace form_builder.Factories.Transform.UserSchema
 
             RequestEntity request = _actionHelper.GenerateUrl(submitDetails.URL, convertedAnswers);
 
-            if (!string.IsNullOrEmpty(request.Url))
+            if (!request.Url.Equals(submitDetails.URL))
             {
                 if (string.IsNullOrEmpty(submitDetails.Provider))
                     throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, No Provider name given in LookupSources");
