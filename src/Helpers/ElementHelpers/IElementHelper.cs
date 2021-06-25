@@ -37,8 +37,6 @@ namespace form_builder.Helpers.ElementHelpers
 
         FormAnswers GetFormData(string guid);
 
-        void SaveFormData(string key, object value, string guid, string formName);
-
         Task<List<PageSummary>> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema);
 
         int GetAddAnotherNumberOfFieldsets(IElement addAnotherElement, FormAnswers formAnswers);

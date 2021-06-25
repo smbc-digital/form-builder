@@ -196,23 +196,6 @@ namespace form_builder.Helpers.ElementHelpers
             return convertedAnswers;
         }
 
-        public void SaveFormData(string key, object value, string guid, string formName)
-        {
-            var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
-
-            if (!string.IsNullOrEmpty(formData))
-                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
-            if (convertedAnswers.FormData.ContainsKey(key))
-                convertedAnswers.FormData.Remove(key);
-
-            convertedAnswers.FormData.Add(key, value);
-            convertedAnswers.FormName = formName;
-
-            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
-        }
-
         public async Task<List<PageSummary>> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema)
         {
             var formAnswers = GetFormData(guid);

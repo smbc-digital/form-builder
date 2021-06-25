@@ -87,8 +87,6 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        
-
         public void RemoveFieldset(Dictionary<string, dynamic> viewModel,
             string form,
             string guid,
