@@ -52,9 +52,9 @@ namespace form_builder.Services.RetrieveExternalDataService
             {
                 var response = new HttpResponseMessage();
                 var submitSlug = action.Properties.PageActionSlugs.FirstOrDefault(_ =>
-                    _.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+                    _.Environment.Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
 
-                if (submitSlug == null)
+                if (submitSlug is null)
                     throw new ApplicationException("RetrieveExternalDataService::Process, there is no PageActionSlug defined for this environment");
 
                 var entity = _actionHelper.GenerateUrl(submitSlug.URL, mappingData.FormAnswers);
@@ -74,7 +74,7 @@ namespace form_builder.Services.RetrieveExternalDataService
                 if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
 
-                if (response.Content == null)
+                if (response.Content is null)
                     throw new ApplicationException($"RetrieveExternalDataService::Process, response content from {entity.Url} is null.");
 
                 var content = await response.Content.ReadAsStringAsync();
@@ -98,7 +98,7 @@ namespace form_builder.Services.RetrieveExternalDataService
                 }
             }
 
-            mappingData.FormAnswers.Pages.FirstOrDefault(_ => _.PageSlug.ToLower().Equals(mappingData.FormAnswers.Path.ToLower())).Answers.AddRange(answers);
+            mappingData.FormAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(mappingData.FormAnswers.Path, StringComparison.OrdinalIgnoreCase)).Answers.AddRange(answers);
 
             await _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
         }

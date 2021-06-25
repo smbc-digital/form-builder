@@ -12,10 +12,7 @@ namespace form_builder.Models.Elements
 {
     public class Button : Element
     {
-        public Button()
-        {
-            Type = EElementType.Button;
-        }
+        public Button() => Type = EElementType.Button;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
@@ -37,12 +34,12 @@ namespace form_builder.Models.Elements
 
         private bool CheckForBehaviour(List<Behaviour> behaviour)
         {
-            return behaviour.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay);
+            return behaviour.Any(_ => _.BehaviourType.Equals(EBehaviourType.SubmitForm) || _.BehaviourType.Equals(EBehaviourType.SubmitAndPay));
         }
 
         private bool CheckForLookups(List<IElement> element, Dictionary<string, dynamic> viewModel)
         {
-            var containsLookupElement = element.Any(_ => _.Type == EElementType.Address || _.Type == EElementType.Street || _.Type == EElementType.Organisation);
+            var containsLookupElement = element.Any(_ => _.Type.Equals(EElementType.Address) || _.Type.Equals(EElementType.Street) || _.Type.Equals(EElementType.Organisation));
 
             if (containsLookupElement && !viewModel.IsInitial())
                 return false;
@@ -57,24 +54,24 @@ namespace form_builder.Models.Elements
 
         private string GetButtonText(List<IElement> element, Dictionary<string, dynamic> viewModel, Page page)
         {
-            if (element.Any(_ => _.Type == EElementType.Address) && viewModel.IsInitial())
+            if (element.Any(_ => _.Type.Equals(EElementType.Address)) && viewModel.IsInitial())
                 return ButtonConstants.ADDRESS_SEARCH_TEXT;
 
-            if (element.Any(_ => _.Type == EElementType.Street) && viewModel.IsInitial())
+            if (element.Any(_ => _.Type.Equals(EElementType.Street)) && viewModel.IsInitial())
                 return ButtonConstants.STREET_SEARCH_TEXT;
 
-            if (element.Any(_ => _.Type == EElementType.Organisation) && viewModel.IsInitial())
+            if (element.Any(_ => _.Type.Equals(EElementType.Organisation)) && viewModel.IsInitial())
                 return ButtonConstants.ORG_SEARCH_TEXT;
 
-            if (element.Any(_ => _.Type == EElementType.Booking))
+            if (element.Any(_ => _.Type.Equals(EElementType.Booking)))
             {
-                var bookingElement = element.FirstOrDefault(_ => _.Type == EElementType.Booking);
+                var bookingElement = element.FirstOrDefault(_ => _.Type.Equals(EElementType.Booking));
 
                 if (bookingElement.Properties.CheckYourBooking && !viewModel.IsCheckYourBooking())
                     return string.IsNullOrEmpty(Properties.Text) ? ButtonConstants.NEXTSTEP_TEXT : Properties.Text;
             }
 
-            if (page.Behaviours.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay))
+            if (page.Behaviours.Any(_ => _.BehaviourType.Equals(EBehaviourType.SubmitForm) || _.BehaviourType.Equals(EBehaviourType.SubmitAndPay)))
                 return string.IsNullOrEmpty(Properties.Text) ? ButtonConstants.SUBMIT_TEXT : Properties.Text;
 
             return string.IsNullOrEmpty(Properties.Text) ? ButtonConstants.NEXTSTEP_TEXT : Properties.Text;

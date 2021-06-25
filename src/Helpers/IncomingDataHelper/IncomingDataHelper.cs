@@ -59,7 +59,7 @@ namespace form_builder.Helpers.IncomingDataHelper
         {
             var splitTargets = targetMapping.Split(".");
 
-            if (splitTargets.Length == 1)
+            if (splitTargets.Length.Equals(1))
             {
                 obj.Add(splitTargets[0], value);
                 return obj;

@@ -10,10 +10,7 @@ namespace form_builder.Models.Elements
 {
     public class FileUpload : Element
     {
-        public FileUpload()
-        {
-            Type = EElementType.FileUpload;
-        }
+        public FileUpload() => Type = EElementType.FileUpload;
 
         public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
 

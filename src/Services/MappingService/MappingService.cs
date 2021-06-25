@@ -108,7 +108,7 @@ namespace form_builder.Services.MappingService
 
             convertedAnswers.FormName = form;
 
-            if (convertedAnswers.Pages == null || !convertedAnswers.Pages.Any())
+            if (convertedAnswers.Pages is null || !convertedAnswers.Pages.Any())
             {
                 var deviceInformation = $"Device Type: {_detectionService.Device.Type}, Browser Name/Version: {_detectionService.Browser.Name}/{_detectionService.Browser.Version}, Platform Name: {_detectionService.Platform.Name}, Engine Name: {_detectionService.Engine.Name}, Crawler: {_detectionService.Crawler.IsCrawler}/{_detectionService.Crawler.Name}";
                 _logger.LogWarning($"MappingService::GetFormAnswers, Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}, {deviceInformation}");
@@ -139,8 +139,8 @@ namespace form_builder.Services.MappingService
             var data = new ExpandoObject() as IDictionary<string, dynamic>;
             formSchema.Pages.SelectMany(_ => _.ValidatableElements)
                 .Where(x => !string.IsNullOrEmpty(x.Properties.TargetMapping)
-                            && x.Properties.TargetMapping.ToLower().StartsWith("customer.")
-                            && !x.Properties.TargetMapping.ToLower().Equals("customer.address"))
+                            && x.Properties.TargetMapping.StartsWith("customer.", StringComparison.OrdinalIgnoreCase)
+                            && !x.Properties.TargetMapping.Equals("customer.address", StringComparison.OrdinalIgnoreCase))
                 .ToList()
                 .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
 
@@ -155,7 +155,7 @@ namespace form_builder.Services.MappingService
 
             var addressElement = formSchema.Pages.SelectMany(_ => _.Elements)
                 .FirstOrDefault(_ =>
-                    _.Properties.QuestionId != null &&
+                    _.Properties.QuestionId is not null &&
                     _.Properties.QuestionId.Contains(bookingElement.Properties.CustomerAddressId));
             customer.Address = _elementMapper.GetAnswerStringValue(addressElement, formAnswers);
 
@@ -183,16 +183,16 @@ namespace form_builder.Services.MappingService
             if (element.Properties.IsDynamicallyGeneratedElement)
                 return obj;
 
-            if (splitTargets.Length == 1)
+            if (splitTargets.Length.Equals(1))
             {
-                if (element.Type == EElementType.FileUpload || element.Type == EElementType.MultipleFileUpload)
+                if (element.Type.Equals(EElementType.FileUpload) || element.Type.Equals(EElementType.MultipleFileUpload))
                     return CheckAndCreateForFileUpload(splitTargets[0], element, formAnswers, obj);
 
-                if (element.Type == EElementType.AddAnother)
+                if (element.Type.Equals(EElementType.AddAnother))
                     return CheckAndCreateForAddAnother(splitTargets[0], element, formAnswers, obj);
 
                 object answerValue = _elementMapper.GetAnswerValue(element, formAnswers);
-                if (answerValue != null && obj.TryGetValue(splitTargets[0], out var objectValue))
+                if (answerValue is not null && obj.TryGetValue(splitTargets[0], out var objectValue))
                 {
                     var combinedValue = $"{objectValue} {answerValue}";
                     obj.Remove(splitTargets[0]);
@@ -200,7 +200,7 @@ namespace form_builder.Services.MappingService
                     return obj;
                 }
 
-                if (answerValue != null)
+                if (answerValue is not null)
                     obj.Add(splitTargets[0], answerValue);
 
                 return obj;
@@ -253,7 +253,7 @@ namespace form_builder.Services.MappingService
             if (obj.TryGetValue(target, out objectValue))
             {
                 var files = (List<File>)objectValue;
-                if (value != null)
+                if (value is not null)
                 {
                     obj.Remove(target);
                     files.AddRange((List<File>)value);
@@ -264,7 +264,7 @@ namespace form_builder.Services.MappingService
             }
             else
             {
-                if (value != null)
+                if (value is not null)
                 {
                     obj.Add(target, (List<File>)value);
                 }

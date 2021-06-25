@@ -172,7 +172,7 @@ namespace form_builder.Services.BookingService
                 .First(element => element.Type.
                     Equals(EElementType.Booking));
 
-            if (requestedMonth.Month == currentDate.Month && requestedMonth.Year == currentDate.Year)
+            if (requestedMonth.Month.Equals(currentDate.Month) && requestedMonth.Year.Equals(currentDate.Year))
                 requestedMonth = currentDate;
 
             if (requestedMonth > new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(bookingElement.Properties.SearchPeriod))

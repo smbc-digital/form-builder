@@ -9,26 +9,18 @@ namespace form_builder.Validators
 {
     public class StreetSearchValidator : IElementValidator
     {
-        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm) {
-            if (element.Type != EElementType.Street || (element.Type == EElementType.Street && !viewModel.IsInitial())) {
-                return new ValidationResult {
-                    IsValid = true
-                };
-            }
+        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
+        {
+            if (!element.Type.Equals(EElementType.Street) || (element.Type.Equals(EElementType.Street) && !viewModel.IsInitial()))
+                return new ValidationResult { IsValid = true };
 
             var streetElement = (Street)element;
 
-            if (!viewModel.ContainsKey(streetElement.StreetSearchQuestionId)) {
-                return new ValidationResult {
-                    IsValid = true
-                };
-            }
+            if (!viewModel.ContainsKey(streetElement.StreetSearchQuestionId))
+                return new ValidationResult { IsValid = true };
 
-            if (string.IsNullOrEmpty(viewModel[streetElement.StreetSearchQuestionId]) && element.Properties.Optional) {
-                return new ValidationResult {
-                    IsValid = true
-                };
-            }
+            if (string.IsNullOrEmpty(viewModel[streetElement.StreetSearchQuestionId]) && element.Properties.Optional)
+                return new ValidationResult { IsValid = true };
 
             var value = viewModel[streetElement.StreetSearchQuestionId];
             var isValid = true;

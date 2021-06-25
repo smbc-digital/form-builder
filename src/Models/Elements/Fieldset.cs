@@ -9,10 +9,7 @@ namespace form_builder.Models.Elements
 {
     public class Fieldset : Element
     {
-        public Fieldset()
-        {
-            Type = EElementType.Fieldset;
-        }
+        public Fieldset() => Type = EElementType.Fieldset;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,

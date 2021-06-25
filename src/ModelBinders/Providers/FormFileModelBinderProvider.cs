@@ -10,10 +10,10 @@ namespace form_builder.ModelBinders.Providers
     {
         public IModelBinder GetBinder(ModelBinderProviderContext context)
         {
-            if (context == null)
+            if (context is null)
                 throw new ArgumentNullException(nameof(context));
 
-            if (context.Metadata.ModelType == typeof(CustomFormFile))
+            if (context.Metadata.ModelType.Equals(typeof(CustomFormFile)))
                 return new BinderTypeModelBinder(typeof(CustomFormFileModelBinder));
 
             return typeof(IEnumerable<CustomFormFile>).IsAssignableFrom(context.Metadata.ModelType) ? new BinderTypeModelBinder(typeof(CustomFormFileModelBinder)) : null;

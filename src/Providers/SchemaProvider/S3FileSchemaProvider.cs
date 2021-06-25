@@ -113,7 +113,7 @@ namespace form_builder.Providers.SchemaProvider
             else
                 indexSchema = JsonConvert.DeserializeObject<List<string>>(cachedIndexSchema);
 
-            return indexSchema.Any(_ => _.ToLower().Equals($"{schemaName.ToLower()}.json"));
+            return indexSchema.Any(_ => _.Equals($"{schemaName}.json", StringComparison.OrdinalIgnoreCase));
         }
     }
 }

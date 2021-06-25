@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using form_builder.Models;
 
 namespace form_builder.Conditions
@@ -7,31 +8,30 @@ namespace form_builder.Conditions
     {
         public static bool IsEqualTo(Condition condition, Dictionary<string, dynamic> viewModel)
         {
-            var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? condition.ComparisonValue.ToLower() : condition.EqualTo.ToLower();
+            var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? condition.ComparisonValue : condition.EqualTo;
 
-            return viewModel.ContainsKey(condition.QuestionId) &&
-                   (string)viewModel[condition.QuestionId].ToLower() == val;
+            return viewModel.ContainsKey(condition.QuestionId) && (bool)viewModel[condition.QuestionId].Equals(val, StringComparison.OrdinalIgnoreCase);
         }
 
         public static bool IsNullOrEmpty(Condition condition, Dictionary<string, dynamic> viewModel)
         {
             var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? bool.Parse(condition.ComparisonValue) : condition.IsNullOrEmpty;
 
-            return viewModel.ContainsKey(condition.QuestionId) && string.IsNullOrEmpty((string)viewModel[condition.QuestionId]) == val;
+            return viewModel.ContainsKey(condition.QuestionId) && (bool)viewModel[condition.QuestionId].Equals(val, StringComparison.OrdinalIgnoreCase);
         }
 
         public static bool Contains(Condition condition, Dictionary<string, dynamic> viewModel)
         {
-            var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? condition.ComparisonValue.ToLower() : condition.CheckboxContains.ToLower();
+            var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? condition.ComparisonValue : condition.CheckboxContains;
 
-            return viewModel.ContainsKey(condition.QuestionId) && viewModel[condition.QuestionId].ToLower().Contains(val);
+            return viewModel.ContainsKey(condition.QuestionId) && viewModel[condition.QuestionId].Contains(val, StringComparison.OrdinalIgnoreCase);
         }
 
         public static bool EndsWith(Condition condition, Dictionary<string, dynamic> viewModel)
         {
-            var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? condition.ComparisonValue.ToLower() : condition.CheckboxContains.ToLower();
+            var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? condition.ComparisonValue : condition.CheckboxContains;
 
-            return viewModel.ContainsKey(condition.QuestionId) && viewModel[condition.QuestionId].ToLower().EndsWith(val);
+            return viewModel.ContainsKey(condition.QuestionId) && viewModel[condition.QuestionId].EndsWith(val, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

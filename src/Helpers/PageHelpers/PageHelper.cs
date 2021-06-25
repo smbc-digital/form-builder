@@ -64,7 +64,7 @@ namespace form_builder.Helpers.PageHelpers
         {
             var formModel = new FormBuilderViewModel();
 
-            if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
+            if (!page.PageSlug.Equals("success", StringComparison.OrdinalIgnoreCase) && !page.HideTitle)
             {
                 formModel.RawHTML += await _viewRender
                     .RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle(), Optional = page.DisplayOptionalInTitle } });
@@ -103,7 +103,7 @@ namespace form_builder.Helpers.PageHelpers
                 {
                     var splitQuestionId = item.Key.Split(':');
                     var currentQuestionIncrement = int.Parse(splitQuestionId[1]);
-                    if (currentQuestionIncrement == incrementToRemove)
+                    if (currentQuestionIncrement.Equals(incrementToRemove))
                     {
                         answersToRemove.Add(item.Key, item.Value);
                     }
@@ -151,13 +151,13 @@ namespace form_builder.Helpers.PageHelpers
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-            if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == viewModel["Path"].ToLower()))
+            if (convertedAnswers.Pages is not null && convertedAnswers.Pages.Any(_ => _.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)))
             {
-                currentPageAnswers = convertedAnswers.Pages.Where(_ => _.PageSlug == viewModel["Path"].ToLower()).ToList().FirstOrDefault();
-                convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageSlug != viewModel["Path"].ToLower()).ToList();
+                currentPageAnswers = convertedAnswers.Pages.Where(_ => _.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)).ToList().FirstOrDefault();
+                convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => !_.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            var answers = new List<Answers>();
+            List<Answers> answers = new();
 
             foreach (var item in viewModel)
             {
@@ -165,10 +165,10 @@ namespace form_builder.Helpers.PageHelpers
                     answers.Add(new Answers { QuestionId = item.Key, Response = item.Value });
             }
 
-            if ((files == null || !files.Any()) && currentPageAnswers.Answers != null && currentPageAnswers.Answers.Any() && isPageValid && appendMultipleFileUploadParts)
+            if ((files is null || !files.Any()) && currentPageAnswers.Answers is not null && currentPageAnswers.Answers.Any() && isPageValid && appendMultipleFileUploadParts)
                 answers = currentPageAnswers.Answers;
 
-            if (files != null && files.Any() && isPageValid)
+            if (files is not null && files.Any() && isPageValid)
                 answers = SaveFormFileAnswers(answers, files, appendMultipleFileUploadParts, currentPageAnswers);
 
             convertedAnswers.Pages?.Add(new PageAnswers
@@ -263,11 +263,11 @@ namespace form_builder.Helpers.PageHelpers
                 if (isMultipleFileUploadElementType)
                 {
                     var data = currentAnswersForFileUpload.Answers?.FirstOrDefault(_ => _.QuestionId.Equals(file.Key))?.Response;
-                    if (data != null)
+                    if (data is not null)
                     {
                         List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(data.ToString());
                         fileUploadModel.AddRange(response);
-                        filsToAdd = filsToAdd.Where(_ => !response.Any(x => WebUtility.HtmlEncode(_.UntrustedOriginalFileName) == x.TrustedOriginalFileName)).ToList();
+                        filsToAdd = filsToAdd.Where(_ => !response.Any(x => WebUtility.HtmlEncode(_.UntrustedOriginalFileName).Equals(x.TrustedOriginalFileName))).ToList();
                     }
                 }
 
@@ -293,10 +293,10 @@ namespace form_builder.Helpers.PageHelpers
                     FileSize = _.Length
                 }).ToList());
 
-                if (answers.Exists(_ => _.QuestionId == file.Key))
+                if (answers.Exists(_ => _.QuestionId.Equals(file.Key)))
                 {
-                    var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId == file.Key);
-                    if (fileUploadAnswer != null)
+                    var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId.Equals(file.Key));
+                    if (fileUploadAnswer is not null)
                         fileUploadAnswer.Response = fileUploadModel;
                 }
                 else

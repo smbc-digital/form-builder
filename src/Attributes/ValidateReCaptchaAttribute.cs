@@ -27,7 +27,7 @@ namespace form_builder.Attributes
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var formData = (IDictionary<string, string[]>)context.ActionArguments["formData"];
-            if (context.ActionArguments["path"].Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH) && formData != null && formData.ContainsKey("Submit"))
+            if (context.ActionArguments["path"].Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH) && formData is not null && formData.ContainsKey("Submit"))
             {
                 await DoReCaptchaValidation(context);
             }
@@ -71,7 +71,7 @@ namespace form_builder.Attributes
 
             var response = await _gateway.PostAsync(_configuration.ApiVerificationEndpoint, request, false);
 
-            if (response.Content == null)
+            if (response.Content is null)
             {
                 AddModelError(context, "Unable To Read Response From Server");
                 _logger.LogWarning("ValidateReCaptchaAttribute:: ValidateReCaptcha:: Unable To Read Response From Server");

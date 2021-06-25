@@ -11,18 +11,18 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if ((element.Type != EElementType.DatePicker && 
-                element.Type != EElementType.DateInput) || 
+            if ((!element.Type.Equals(EElementType.DatePicker) && 
+                !element.Type.Equals(EElementType.DateInput)) || 
                 string.IsNullOrEmpty(element.Properties.IsDateBeforeAbsolute))
             {
                 return new ValidationResult { IsValid = true };
             }
 
             DateTime? dateValue = new DateTime();
-            if (element.Type == EElementType.DatePicker)
+            if (element.Type.Equals(EElementType.DatePicker))
                 dateValue = DatePicker.GetDate(viewModel, element.Properties.QuestionId);
 
-            if (element.Type == EElementType.DateInput)
+            if (element.Type.Equals(EElementType.DateInput))
                 dateValue = DateInput.GetDate(viewModel, element.Properties.QuestionId);
 
             if (!dateValue.HasValue)

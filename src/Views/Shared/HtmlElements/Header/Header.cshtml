@@ -1,5 +1,5 @@
 ﻿@{
-    var isError = ViewData.Any(_ => _.Key == "IsError") 
+    var isError = ViewData.Any(_ => _.Key.Equals("IsError"))
         ? (bool)ViewData["IsError"] 
         : false;
         

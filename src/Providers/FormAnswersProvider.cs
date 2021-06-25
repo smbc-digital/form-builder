@@ -21,7 +21,7 @@ namespace form_builder.Providers
         {
             string sessionGuid = _sessionHelper.GetSessionGuid();
             string cachedAnswers = _distributedCache.GetString(sessionGuid);
-            return cachedAnswers == null
+            return cachedAnswers is null
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);    
         }

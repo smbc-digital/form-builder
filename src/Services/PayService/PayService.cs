@@ -63,7 +63,7 @@ namespace form_builder.Services.PayService
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
-            if (mappingEntity == null)
+            if (mappingEntity is null)
                 throw new Exception($"PayService:: No mapping entity found for {form}");
 
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
@@ -107,13 +107,13 @@ namespace form_builder.Services.PayService
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
-            if (mappingEntity == null)
+            if (mappingEntity is null)
                 throw new Exception($"PayService:: No mapping entity found for {form}");
 
             var paymentConfig = await _paymentConfigProvider.Get<List<PaymentInformation>>();
-            var formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName == form);
+            var formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName.Equals(form));
 
-            if (formPaymentConfig == null)
+            if (formPaymentConfig is null)
                 throw new Exception($"PayService:: No payment information found for {form}");
 
             if (string.IsNullOrEmpty(formPaymentConfig.Settings.Amount))
@@ -128,7 +128,7 @@ namespace form_builder.Services.PayService
             {
                 var postUrl = formPaymentConfig.Settings.CalculationSlug;
 
-                if (postUrl.URL == null || postUrl.AuthToken == null)
+                if (postUrl.URL is null || postUrl.AuthToken is null)
                     throw new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
 
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
@@ -137,7 +137,7 @@ namespace form_builder.Services.PayService
                 if (!response.IsSuccessStatusCode)
                     throw new Exception($"PayService::CalculateAmountAsync, Gateway returned unsuccessful status code {response.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
 
-                if (response.Content == null)
+                if (response.Content is null)
                     throw new ApplicationException($"PayService::CalculateAmountAsync, Gateway {postUrl.URL} responded with null content");
 
                 var content = await response.Content.ReadAsStringAsync();
@@ -155,9 +155,9 @@ namespace form_builder.Services.PayService
 
         private IPaymentProvider GetFormPaymentProvider(PaymentInformation paymentInfo)
         {
-            var paymentProvider = _paymentProviders.FirstOrDefault(_ => _.ProviderName == paymentInfo.PaymentProvider);
+            var paymentProvider = _paymentProviders.FirstOrDefault(_ => _.ProviderName.Equals(paymentInfo.PaymentProvider));
 
-            if (paymentProvider == null)
+            if (paymentProvider is null)
                 throw new Exception($"PayService::GetFormPaymentProvider, No payment provider configured for {paymentInfo.PaymentProvider}");
 
             return paymentProvider;

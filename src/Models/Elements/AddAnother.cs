@@ -9,10 +9,7 @@ namespace form_builder.Models.Elements
 {
     public class AddAnother : Element
     {
-        public AddAnother()
-        {
-            Type = EElementType.AddAnother;
-        }
+        public AddAnother() => Type = EElementType.AddAnother;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,

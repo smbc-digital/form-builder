@@ -57,7 +57,7 @@ namespace form_builder.Factories.Transform.UserSchema
                 .SingleOrDefault(x => x.EnvironmentName
                 .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
 
-            if (submitDetails == null)
+            if (submitDetails is null)
                 throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, No Environment specific details found");
 
             var session = _sessionHelper.GetSessionGuid();
@@ -73,10 +73,10 @@ namespace form_builder.Factories.Transform.UserSchema
                 var lookupProvider = _lookupProviders.Get(submitDetails.Provider);
                 List<Option> lookupOptions = new();
 
-                if (convertedAnswers != null)
+                if (convertedAnswers is not null)
                 {
                     var lookUpCacheResults = convertedAnswers.FormData.SingleOrDefault(x => x.Key.Equals(request.Url, StringComparison.OrdinalIgnoreCase));
-                    if (!string.IsNullOrEmpty(lookUpCacheResults.Key) && lookUpCacheResults.Value != null)
+                    if (!string.IsNullOrEmpty(lookUpCacheResults.Key) && lookUpCacheResults.Value is not null)
                     {
                         lookupOptions = JsonConvert.DeserializeObject<List<Option>>(JsonConvert.SerializeObject(lookUpCacheResults.Value));
                     }

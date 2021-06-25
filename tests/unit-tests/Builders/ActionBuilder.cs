@@ -105,7 +105,7 @@ namespace form_builder_tests.Builders
 
         public ActionBuilder WithPageActionSlug(PageActionSlug pageActionSlug)
         {
-            if (_actionProperties.PageActionSlugs == null) _actionProperties.PageActionSlugs = new List<PageActionSlug>();
+            if (_actionProperties.PageActionSlugs is null) _actionProperties.PageActionSlugs = new List<PageActionSlug>();
             _actionProperties.PageActionSlugs.Add(pageActionSlug);
 
             return this;

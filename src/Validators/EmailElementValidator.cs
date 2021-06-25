@@ -10,29 +10,14 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (element.Properties.Email != true)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+            if (!(bool)element.Properties.Email)
+                return new ValidationResult { IsValid = true };
 
             if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && element.Properties.Optional)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             if (!element.Properties.Email.HasValue || !element.Properties.Email.Value || !viewModel.ContainsKey(element.Properties.QuestionId))
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             var value = viewModel[element.Properties.QuestionId];
             var isValid = true;
@@ -40,9 +25,7 @@ namespace form_builder.Validators
             Match match = regex.Match(value);
 
             if (!match.Success)
-            {
                 isValid = false;
-            }
 
             return new ValidationResult
             {

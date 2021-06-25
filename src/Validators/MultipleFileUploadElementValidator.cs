@@ -23,7 +23,7 @@ namespace form_builder.Validators
 
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (element.Type != EElementType.MultipleFileUpload)
+            if (!element.Type.Equals(EElementType.MultipleFileUpload))
                 return new ValidationResult { IsValid = true };
 
             if (element.Properties.Optional && viewModel.ContainsKey(ButtonConstants.SUBMIT))
@@ -38,20 +38,20 @@ namespace form_builder.Validators
 
             isValid = !(value is null);
 
-            if (value == null)
+            if (value is null)
             {
                 var sessionGuid = _sessionHelper.GetSessionGuid();
                 var cachedAnswers = _distributedCache.GetString(sessionGuid);
 
-                var convertedAnswers = cachedAnswers == null
+                var convertedAnswers = cachedAnswers is null
                     ? new FormAnswers { Pages = new List<PageAnswers>() }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
                 var path = viewModel.FirstOrDefault(_ => _.Key.Equals("Path")).Value;
 
-                var pageAnswersString = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault(_ => _.QuestionId == key);
+                var pageAnswersString = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault(_ => _.QuestionId.Equals(key));
                 var response = new List<FileUploadModel>();
-                if (pageAnswersString != null)
+                if (pageAnswersString is not null)
                 {
                     response = JsonConvert.DeserializeObject<List<FileUploadModel>>(pageAnswersString.Response.ToString());
 

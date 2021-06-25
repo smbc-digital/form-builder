@@ -66,7 +66,7 @@ namespace form_builder.Providers.PaymentProvider
 
             var civicaResponse = await _civicaPayGateway.CreateImmediateBasketAsync(basket);
 
-            if (civicaResponse.StatusCode != HttpStatusCode.OK)
+            if (!civicaResponse.IsSuccessStatusCode)
                 throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code {civicaResponse.StatusCode}, HttpResponse: {JsonConvert.SerializeObject(civicaResponse)}");
 
             return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, reference);
@@ -74,10 +74,10 @@ namespace form_builder.Providers.PaymentProvider
 
         public void VerifyPaymentResponse(string responseCode)
         {
-            if (responseCode == "00022" || responseCode == "00023" || responseCode == "00001")
+            if (responseCode.Equals("00022") || responseCode.Equals("00023") || responseCode.Equals("00001"))
                 throw new PaymentDeclinedException($"CivicaPayProvider::Declined payment with response code: {responseCode}");
 
-            if (responseCode != "00000")
+            if (!responseCode.Equals("00000"))
                 throw new PaymentFailureException($"CivicaPayProvider::Payment failed with response code: {responseCode}");
         }
     }

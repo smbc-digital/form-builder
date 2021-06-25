@@ -6,7 +6,7 @@ namespace form_builder.Builders
 {
     public class AvailabilityDayResponseBuilder
     {
-        private List<AvailabilityDayResponse> _response = new List<AvailabilityDayResponse>();
+        private List<AvailabilityDayResponse> _response = new();
 
         public List<AvailabilityDayResponse> Build() => _response;
 

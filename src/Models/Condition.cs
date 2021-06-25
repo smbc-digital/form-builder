@@ -11,11 +11,11 @@ namespace form_builder.Models
         {
             get
             {
-                if (_condition != ECondition.Undefined)
+                if (!_condition.Equals(ECondition.Undefined))
                     return _condition;
 
                 //Backwards compatibility stuff
-                if (IsNullOrEmpty != null)
+                if (IsNullOrEmpty is not null)
                     return ECondition.IsNullOrEmpty;
 
                 if (!string.IsNullOrEmpty(EqualTo))
