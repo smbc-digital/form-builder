@@ -18,6 +18,22 @@ namespace form_builder.Helpers.ActionsHelpers
         public RequestEntity GenerateUrl(string baseUrl, FormAnswers formAnswers)
         {
             var matches = TagRegex.Matches(baseUrl);
+
+            if (matches.Any())
+            {
+                foreach (Match match in matches.ToList())
+                {
+                    if (!formAnswers.AllAnswers.ToList().Any(_ => _.QuestionId.Equals(match.Value)))
+                    {
+                        return new RequestEntity
+                        {
+                            Url = baseUrl,
+                            IsPost = !matches.Any()
+                        };
+                    }
+                }
+            }
+
             var newUrl = matches.Aggregate(baseUrl, (current, match) => Replace(match, current, formAnswers));
 
             return new RequestEntity
