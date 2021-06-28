@@ -47,14 +47,6 @@ namespace form_builder.Gateways
             {
                 await fileTransferUtility.UploadAsync(ms, bucketName, filename);
             }
-           
-            //var putObjectRequest = new PutObjectRequest
-            //{
-            //    BucketName = bucketName,
-            //    Key = filename
-            //};
-
-            //var response = await _s3client.PutObjectAsync(putObjectRequest);
         }
     }
 }
