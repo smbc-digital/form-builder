@@ -9,7 +9,6 @@ using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
-using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;

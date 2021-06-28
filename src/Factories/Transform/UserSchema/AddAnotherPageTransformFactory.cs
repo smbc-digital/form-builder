@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -24,7 +23,7 @@ namespace form_builder.Factories.Transform.UserSchema
             _sessionHelper = sessionHelper;
         }
 
-        public async Task<Page> Transform(Page page, string sessionGuid)
+        public Page Transform(Page page, string sessionGuid)
         {
             var newListOfElements = new List<IElement>();
             foreach (var element in page.Elements)

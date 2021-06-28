@@ -44,15 +44,6 @@ namespace form_builder.Builders
             return this;
         }
 
-        public ElementBuilder WithLookupSource(LookupSource lookupSource)
-        {
-            _property.LookupSources ??= new List<LookupSource>();
-
-            _property.LookupSources.Add(lookupSource);
-
-            return this;
-        }
-
         public ElementBuilder WithPropertyText(string propertyText)
         {
             _property.Text = propertyText;

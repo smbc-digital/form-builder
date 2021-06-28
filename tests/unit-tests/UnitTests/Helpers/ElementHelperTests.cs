@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -631,7 +630,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public async Task GenerateQuestionAndAnswersList_ShouldReturnFormSummary_WhenDataHas_PreviousAnswers()
+        public void GenerateQuestionAndAnswersList_ShouldReturnFormSummary_WhenDataHas_PreviousAnswers()
         {
             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" } } } } }));
@@ -655,7 +654,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithPage(page)
                 .Build();
 
-            var result = await _elementHelper.GenerateQuestionAndAnswersList("12345", formSchema);
+            var result = _elementHelper.GenerateQuestionAndAnswersList("12345", formSchema);
 
             Assert.NotEmpty(result);
             Assert.Single(result);
@@ -665,7 +664,7 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData(EElementType.Address, "Address Title")]
         [InlineData(EElementType.Street, "Street title")]
         [InlineData(EElementType.Organisation, "Organisation title")]
-        public async Task GenerateQuestionAndAnswersList_ShouldReturnFormSummary_WithPageTitleAsLabel(EElementType type, string title)
+        public void GenerateQuestionAndAnswersList_ShouldReturnFormSummary_WithPageTitleAsLabel(EElementType type, string title)
         {
             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(
@@ -706,13 +705,13 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithPage(page)
                 .Build();
 
-            var result = await _elementHelper.GenerateQuestionAndAnswersList("12345", formSchema);
+            var result = _elementHelper.GenerateQuestionAndAnswersList("12345", formSchema);
 
             Assert.NotNull(result[0].Answers[title]);
         }
 
         [Fact]
-        public async Task GenerateQuestionAndAnswersList_ShouldReturnMultipleFormSummary_ForAddAnother()
+        public void GenerateQuestionAndAnswersList_ShouldReturnMultipleFormSummary_ForAddAnother()
         {
             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(
@@ -758,7 +757,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithPage(page)
                 .Build();
 
-            var result = await _elementHelper.GenerateQuestionAndAnswersList("12345", formSchema);
+            var result = _elementHelper.GenerateQuestionAndAnswersList("12345", formSchema);
 
             var incrementedSummary = result.FirstOrDefault(_ => _.PageTitle.Equals("Add another label"));
             var overallPageSummary = result.FirstOrDefault(_ => _.PageTitle.Equals("Add another title"));
