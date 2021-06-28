@@ -389,7 +389,6 @@ namespace form_builder.Utils.Startup
             services.AddTransient<ILookupSchemaTransformFactory, LookupSchemaTransformFactory>();
             services.AddTransient<IReusableElementSchemaTransformFactory, ReusableElementSchemaTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, AddAnotherPageTransformFactory>();
-            services.AddTransient<IUserPageTransformFactory, DynamicLookupPageTransformFactory>();
 
             return services;
         }

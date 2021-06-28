@@ -81,21 +81,11 @@ namespace form_builder.Services.RetrieveExternalDataService
                 if (string.IsNullOrWhiteSpace(content))
                     throw new ApplicationException($"RetrieveExternalDataService::Process, Gateway {entity.Url} responded with empty reference");
 
-                var answer = new Answers
+                answers.Add(new Answers
                 {
                     QuestionId = action.Properties.TargetQuestionId,
                     Response = JsonConvert.DeserializeObject<string>(content)
-                };
-
-                answers.Add(answer);
-
-                if (action.Properties.IncludeInFormSubmission)
-                {
-                    if (mappingData.FormAnswers.AdditionalFormData.TryGetValue(answer.QuestionId, out object _))
-                        mappingData.FormAnswers.AdditionalFormData.Remove(answer.QuestionId);
-
-                    mappingData.FormAnswers.AdditionalFormData.Add(answer.QuestionId, answer.Response);
-                }
+                });
             }
 
             mappingData.FormAnswers.Pages.FirstOrDefault(_ => _.PageSlug.ToLower().Equals(mappingData.FormAnswers.Path.ToLower())).Answers.AddRange(answers);

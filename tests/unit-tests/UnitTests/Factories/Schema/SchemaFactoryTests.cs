@@ -39,7 +39,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
         {
             _mockUserPageFactory
                 .Setup(_ => _.Transform(It.IsAny<Page>(), It.IsAny<string>()))
-                .ReturnsAsync(new Page());
+                .Returns(new Page());
 
             var mockUserPageFactoryItems = new List<IUserPageTransformFactory> { _mockUserPageFactory.Object };
             _mockUserPageFactories
