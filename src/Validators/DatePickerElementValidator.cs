@@ -11,24 +11,14 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (element.Type != EElementType.DatePicker || !viewModel.ContainsKey(element.Properties.QuestionId))
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+            if (!element.Type.Equals(EElementType.DatePicker) || !viewModel.ContainsKey(element.Properties.QuestionId))
+                return new ValidationResult { IsValid = true };
 
             var date = viewModel[element.Properties.QuestionId];
 
             var isValid = !string.IsNullOrEmpty(date);
             if (!isValid && element.Properties.Optional)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             if (!isValid && !element.Properties.Optional)
             {

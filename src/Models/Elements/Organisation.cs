@@ -45,10 +45,7 @@ namespace form_builder.Models.Elements
 
         public override string GetLabelText(string pageTitle) => $"{(string.IsNullOrEmpty(Properties.SummaryLabel) ? pageTitle : Properties.SummaryLabel)}{GetIsOptionalLabelText()}";
 
-        public Organisation()
-        {
-            Type = EElementType.Organisation;
-        }
+        public Organisation() => Type = EElementType.Organisation;
 
         public override async Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
@@ -79,7 +76,7 @@ namespace form_builder.Models.Elements
                     {
                         OrganisationSearchResult searchResult;
 
-                        if (objectResult as JObject != null)
+                        if (objectResult as JObject is not null)
                             searchResult = (objectResult as JObject).ToObject<OrganisationSearchResult>();
                         else
                             searchResult = objectResult as OrganisationSearchResult;

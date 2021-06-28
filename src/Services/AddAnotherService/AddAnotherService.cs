@@ -34,7 +34,7 @@ namespace form_builder.Services.AddAnotherService
             bool addEmptyFieldset = viewModel.Keys.Any(_ => _.Equals(AddAnotherConstants.AddAnotherButtonKey));
 
             FormAnswers convertedFormAnswers = _pageHelper.GetSavedAnswers(guid);
-            var maximumFieldsets = dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type == EElementType.AddAnother).Properties.MaximumFieldsets;
+            var maximumFieldsets = dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.MaximumFieldsets;
 
             if (dynamicCurrentPage.IsValid  || !string.IsNullOrEmpty(removeKey))
             {

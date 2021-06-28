@@ -25,10 +25,10 @@ namespace form_builder.Validators.IntegrityChecks.Form
             List<IAction> actions = schema.FormActions
                 .Where(formAction => formAction.Type.Equals(EActionType.Validate))
                 .Concat(schema.Pages.SelectMany(page => page.PageActions)
-                .Where(action => action.Type == EActionType.Validate))
+                .Where(action => action.Type.Equals(EActionType.Validate)))
                 .ToList();
 
-            if (actions.Count == 0)
+            if (actions.Count.Equals(0))
                 return result;
 
             actions.ForEach(action =>

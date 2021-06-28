@@ -18,7 +18,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 .Where(element => element.Type.Equals(EElementType.Booking))
                 .ToList();
 
-            if (bookingElements.Count == 0)
+            if (bookingElements.Count.Equals(0))
                 return result;
 
             foreach (var bookingElement in bookingElements)

@@ -27,7 +27,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 .Concat(schema.Pages.SelectMany(page => page.PageActions)
                 .Where(pageAction => pageAction.Type.Equals(EActionType.RetrieveExternalData))).ToList();
 
-            if (actions.Count == 0)
+            if (actions.Count.Equals(0))
                 return result;
 
             actions.ForEach(action =>

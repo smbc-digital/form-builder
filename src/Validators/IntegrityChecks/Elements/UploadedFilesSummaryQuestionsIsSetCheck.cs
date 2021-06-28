@@ -16,7 +16,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             if (string.IsNullOrEmpty(element.Properties.Text))
                 result.AddFailureMessage("Uploaded Files Summary Question Is Set, Uploaded files summary text must not be empty.");
 
-            if (element.Properties.FileUploadQuestionIds.Count == 0)
+            if (element.Properties.FileUploadQuestionIds.Count.Equals(0))
                 result.AddFailureMessage("Uploaded Files Summary Question Is Set, Uploaded files summary must have atleast one file questionId specified to display the list of uploaded files.");
 
             return result;

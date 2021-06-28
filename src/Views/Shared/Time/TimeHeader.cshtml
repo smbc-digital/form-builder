@@ -3,7 +3,7 @@
 <div class="smbc-time__header">
     <div class="smbc-time__period">
         <input class="smbc-time__period__input" 
-            @(Model.SelectedTimePeriod == ETimePeriod.Morning ? "checked" : string.Empty) 
+            @(Model.SelectedTimePeriod.Equals(ETimePeriod.Morning) ? "checked" : string.Empty) 
             type='radio' 
             value='@BookingConstants.APPOINTMENT_TIME_OF_DAY_MORNING' 
             name='@Model.Date.Day@BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX' 
@@ -14,7 +14,7 @@
     </div>
     <div class="smbc-time__period">
         <input class="smbc-time__period__input" 
-            @(Model.SelectedTimePeriod == ETimePeriod.Afternoon ? "checked" : string.Empty) 
+            @(Model.SelectedTimePeriod.Equals(ETimePeriod.Afternoon) ? "checked" : string.Empty) 
             type='radio' 
             value='@BookingConstants.APPOINTMENT_TIME_OF_DAY_AFTERNOON' 
             name='@Model.Date.Day@BookingConstants.APPOINTMENT_TIME_OF_DAY_SUFFIX' 

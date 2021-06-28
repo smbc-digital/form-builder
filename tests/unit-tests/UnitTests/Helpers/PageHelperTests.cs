@@ -1063,26 +1063,26 @@ namespace form_builder_tests.UnitTests.Helpers
             // Arrange                                        
             var questionId = "Item1";
             var currentAnswerKey = $"file-{questionId}-{Guid.NewGuid()}";
-            var file = new List<CustomFormFile>();
-            file.Add(new CustomFormFile(null, questionId, 1, null));
+            List<CustomFormFile> file = new();
+            file.Add(new(null, questionId, 1, "test"));
 
-            var fileUpload = new List<FileUploadModel>();
-            fileUpload.Add(
-                new FileUploadModel
+            List<FileUploadModel> fileUpload = new()
+            {
+                new()
                 {
                     Key = currentAnswerKey,
                     TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
                     UntrustedOriginalFileName = "replace-me.txt",
                     FileSize = 0
                 }
-            );
+            };
 
-            var page = new PageAnswers
+            PageAnswers page = new()
             {
                 PageSlug = "path",
-                Answers = new List<Answers>
+                Answers = new()
                 {
-                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(fileUpload) }
+                    new() { QuestionId = "Item1", Response = JsonConvert.SerializeObject(fileUpload) }
                 }
             };
 

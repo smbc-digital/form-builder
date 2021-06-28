@@ -17,7 +17,7 @@ namespace form_builder.Services.DocumentService
         public DocumentSummaryService(IDocumentCreationHelper documentCreationHelper, IEnumerable<IDocumentCreation> providers)
         {
             _textfileProvider = providers
-                                    .Where(_ => _.DocumentType == EDocumentType.Txt)
+                                    .Where(_ => _.DocumentType.Equals(EDocumentType.Txt))
                                     .OrderByDescending(_ => _.Priority)
                                     .FirstOrDefault();
 

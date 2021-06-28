@@ -57,16 +57,16 @@ namespace form_builder.Services.StreetService
             string path)
         {
             var cachedAnswers = _distributedCache.GetString(guid);
-            var streetElement = currentPage.Elements.Where(_ => _.Type == EElementType.Street).FirstOrDefault();
-            var convertedAnswers = cachedAnswers == null
+            var streetElement = currentPage.Elements.Where(_ => _.Type.Equals(EElementType.Street)).FirstOrDefault();
+            var convertedAnswers = cachedAnswers is null
                         ? new FormAnswers { Pages = new List<PageAnswers>() }
                         : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
             var street = (string)convertedAnswers
                 .Pages
-                .FirstOrDefault(_ => _.PageSlug == path)
+                .FirstOrDefault(_ => _.PageSlug.Equals(path))
                 .Answers
-                .FirstOrDefault(_ => _.QuestionId == $"{streetElement.Properties.QuestionId}")
+                .FirstOrDefault(_ => _.QuestionId.Equals($"{streetElement.Properties.QuestionId}"))
                 .Response;
 
             if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
@@ -107,9 +107,9 @@ namespace form_builder.Services.StreetService
             string path)
         {
             var cachedAnswers = _distributedCache.GetString(guid);
-            var streetElement = currentPage.Elements.Where(_ => _.Type == EElementType.Street).FirstOrDefault();
+            var streetElement = currentPage.Elements.Where(_ => _.Type.Equals(EElementType.Street)).FirstOrDefault();
 
-            var convertedAnswers = cachedAnswers == null
+            var convertedAnswers = cachedAnswers is null
                         ? new FormAnswers { Pages = new List<PageAnswers>() }
                         : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
@@ -137,7 +137,7 @@ namespace form_builder.Services.StreetService
 
             var foundStreet = convertedAnswers
                 .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
-                .Answers?.FirstOrDefault(_ => _.QuestionId == streetElement.Properties.QuestionId)?
+                .Answers?.FirstOrDefault(_ => _.QuestionId.Equals(streetElement.Properties.QuestionId))?
                 .Response;
 
             List<object> searchResults;

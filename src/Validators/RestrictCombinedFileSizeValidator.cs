@@ -24,7 +24,7 @@ namespace form_builder.Validators
 
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (element.Type != EElementType.MultipleFileUpload)
+            if (!element.Type.Equals(EElementType.MultipleFileUpload))
                 return new ValidationResult { IsValid = true };
 
             var key = $"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
@@ -34,7 +34,7 @@ namespace form_builder.Validators
 
             List<DocumentModel> documentModel = viewModel[key];
 
-            if (documentModel == null)
+            if (documentModel is null)
                 return new ValidationResult { IsValid = true };
 
             var maxCombinedFileSize = element.Properties.MaxCombinedFileSize > 0 ? element.Properties.MaxCombinedFileSize * SystemConstants.OneMBInBinaryBytes : SystemConstants.DefaultMaxCombinedFileSize;
@@ -42,15 +42,15 @@ namespace form_builder.Validators
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var cachedAnswers = _distributedCache.GetString(sessionGuid);
 
-            var convertedAnswers = cachedAnswers == null
+            var convertedAnswers = cachedAnswers is null
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
             var path = viewModel.FirstOrDefault(_ => _.Key.Equals("Path")).Value;
 
-            var pageAnswersString = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault(_ => _.QuestionId == key);
-            var response = new List<FileUploadModel>();
-            if (pageAnswersString != null)
+            var pageAnswersString = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault(_ => _.QuestionId.Equals(key));
+            List<FileUploadModel> response = new();
+            if (pageAnswersString is not null)
             {
                 response = JsonConvert.DeserializeObject<List<FileUploadModel>>(pageAnswersString.Response.ToString());
             }

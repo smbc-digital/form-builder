@@ -59,10 +59,10 @@ namespace form_builder.Helpers.ElementHelpers
             {
                 var storedValue = answers.Pages?.SelectMany(_ => _.Answers);
 
-                if (storedValue != null)
+                if (storedValue is not null)
                 {
-                    var value = storedValue.FirstOrDefault(_ => _.QuestionId == $"{questionId}{suffix}");
-                    return value != null ? (T)value.Response : defaultValue;
+                    var value = storedValue.FirstOrDefault(_ => _.QuestionId.Equals($"{questionId}{suffix}"));
+                    return value is not null ? (T)value.Response : defaultValue;
                 }
                 return defaultValue;
             }
@@ -104,7 +104,7 @@ namespace form_builder.Helpers.ElementHelpers
 
         public bool CheckForRadioOptions(Element element)
         {
-            if (element.Properties.Options == null || element.Properties.Options.Count <= 1)
+            if (element.Properties.Options is null || element.Properties.Options.Count <= 1)
                 throw new Exception("A radio element requires two or more options to be present.");
 
             return true;
@@ -112,7 +112,7 @@ namespace form_builder.Helpers.ElementHelpers
 
         public bool CheckForSelectOptions(Element element)
         {
-            if (element.Properties.Options == null || element.Properties.Options.Count <= 1)
+            if (element.Properties.Options is null || element.Properties.Options.Count <= 1)
                 throw new Exception("A select element requires two or more options to be present.");
 
             return true;
@@ -120,7 +120,7 @@ namespace form_builder.Helpers.ElementHelpers
 
         public bool CheckForCheckBoxListValues(Element element)
         {
-            if (element.Properties.Options == null || element.Properties.Options.Count < 1)
+            if (element.Properties.Options is null || element.Properties.Options.Count < 1)
                 throw new Exception("A checkbox list requires one or more options to be present.");
 
             return true;
@@ -138,7 +138,7 @@ namespace form_builder.Helpers.ElementHelpers
         {
             foreach (var option in element.Properties.Options)
             {
-                if (option.Value == element.Properties.Value)
+                if (option.Value.Equals(element.Properties.Value))
                 {
                     option.Selected = true;
                 }
@@ -153,7 +153,7 @@ namespace form_builder.Helpers.ElementHelpers
         {
             foreach (var option in element.Properties.Options)
             {
-                if (option.Value == element.Properties.Value)
+                if (option.Value.Equals(element.Properties.Value))
                 {
                     option.Checked = true;
                 }
@@ -166,9 +166,9 @@ namespace form_builder.Helpers.ElementHelpers
 
         public bool CheckForProvider(Element element)
         {
-            if (string.IsNullOrEmpty(element.Properties.StreetProvider) && element.Type == EElementType.Street
-                  || string.IsNullOrEmpty(element.Properties.AddressProvider) && element.Type == EElementType.Address
-                  || string.IsNullOrEmpty(element.Properties.OrganisationProvider) && element.Type == EElementType.Organisation)
+            if (string.IsNullOrEmpty(element.Properties.StreetProvider) && element.Type.Equals(EElementType.Street)
+                  || string.IsNullOrEmpty(element.Properties.AddressProvider) && element.Type.Equals(EElementType.Address)
+                  || string.IsNullOrEmpty(element.Properties.OrganisationProvider) && element.Type.Equals(EElementType.Organisation))
                 throw new Exception($"A {element.Type} Provider must be present.");
 
             return true;
@@ -206,10 +206,10 @@ namespace form_builder.Helpers.ElementHelpers
             {
                 var formSchemaQuestions = new List<IElement>();
 
-                if (page.Elements.Any(_ => _.Type == EElementType.AddAnother))
+                if (page.Elements.Any(_ => _.Type.Equals(EElementType.AddAnother)))
                 {
-                    var listOfPageSummary = new List<PageSummary>();
-                    var addAnotherElement = page.Elements.FirstOrDefault(_ => _.Type == EElementType.AddAnother);
+                    List<PageSummary> listOfPageSummary = new();
+                    var addAnotherElement = page.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother));
                     var currentIncrement = GetAddAnotherNumberOfFieldsets(addAnotherElement, formAnswers);
                     for (var i = 1; i <= currentIncrement; i++)
                     {
@@ -236,10 +236,10 @@ namespace form_builder.Helpers.ElementHelpers
                 };
 
                 formSchemaQuestions = page.ValidatableElements
-                .Where(_ => _ != null)
+                .Where(_ => _ is not null)
                 .ToList();
 
-                if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())
+                if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug.Equals(page.PageSlug)).Select(p => p).Any())
                     continue;
 
                 pageSummary.Answers = GenerateSummaryAnswers(formSchemaQuestions, page, formAnswers, true);
@@ -263,7 +263,7 @@ namespace form_builder.Helpers.ElementHelpers
 
             foreach (var element in formSchemaQuestions)
             {
-                if (element.Type == EElementType.AddAnother || (element.Properties.IsDynamicallyGeneratedElement && ignoreDynamicallyGeneratedElements))
+                if (element.Type.Equals(EElementType.AddAnother) || (element.Properties.IsDynamicallyGeneratedElement && ignoreDynamicallyGeneratedElements))
                     continue;
 
                 var answer = _elementMapper.GetAnswerStringValue(element, formAnswers);

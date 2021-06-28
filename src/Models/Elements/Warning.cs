@@ -9,10 +9,7 @@ namespace form_builder.Models.Elements
 {
     public class Warning : Element
     {
-        public Warning()
-        {
-            Type = EElementType.InlineAlert;
-        }
+        public Warning() => Type = EElementType.InlineAlert;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,

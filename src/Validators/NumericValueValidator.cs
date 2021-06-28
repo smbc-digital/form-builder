@@ -9,21 +9,11 @@ namespace form_builder.Validators
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
             if (!element.Properties.Numeric || !viewModel.ContainsKey(element.Properties.QuestionId))
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             var value = viewModel[element.Properties.QuestionId];
             if (string.IsNullOrEmpty(value) && element.Properties.Optional)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             var isValid = int.TryParse(value, out int output);
             if (!isValid)
@@ -88,10 +78,7 @@ namespace form_builder.Validators
                 }
             }
 
-            return new ValidationResult
-            {
-                IsValid = true
-            };
+            return new ValidationResult { IsValid = true };
         }
     }
 }
