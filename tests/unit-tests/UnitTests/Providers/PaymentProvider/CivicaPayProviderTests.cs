@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
                 .Returns(new HostString("www.test.com"));
 
             _mockCivicaPayGateway.Setup(_ => _.CreateImmediateBasketAsync(It.IsAny<CreateImmediateBasketRequest>()))
-                .ReturnsAsync(new HttpResponse<CreateImmediateBasketResponse> { StatusCode = HttpStatusCode.OK, ResponseContent = new CreateImmediateBasketResponse { BasketReference = "testRef", BasketToken = "testBasketToken" } });
+                .ReturnsAsync(new HttpResponse<CreateImmediateBasketResponse> { IsSuccessStatusCode = true, StatusCode = HttpStatusCode.OK, ResponseContent = new CreateImmediateBasketResponse { BasketReference = "testRef", BasketToken = "testBasketToken" } });
 
             _civicaPayConfig.Setup(_ => _.Value).Returns(new CivicaPaymentConfiguration { CustomerId = "testId", ApiPassword = "test" });
 

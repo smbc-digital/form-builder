@@ -68,7 +68,7 @@ namespace form_builder.Helpers.PageHelpers
             {
                 formModel.RawHTML += await _viewRender
                     .RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle(), Optional = page.DisplayOptionalInTitle } });
-            }   
+            }
 
             foreach (var element in page.Elements)
             {
@@ -127,7 +127,7 @@ namespace form_builder.Helpers.PageHelpers
                     updatedViewModel.Add(item.Key, item.Value);
                 }
             }
-            
+
             SaveAnswers(updatedViewModel, guid, form, null, true);
         }
 
@@ -201,7 +201,7 @@ namespace form_builder.Helpers.PageHelpers
         public void SavePaymentAmount(string guid, string paymentAmount)
         {
             var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers {Pages = new List<PageAnswers>() };
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
@@ -233,10 +233,10 @@ namespace form_builder.Helpers.PageHelpers
                 return;
 
             var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers 
-            { 
-                Pages = new List<PageAnswers>(), 
-                FormName = form, 
+            var convertedAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>(),
+                FormName = form,
                 Path = path
             };
 
@@ -258,8 +258,8 @@ namespace form_builder.Helpers.PageHelpers
         {
             files.GroupBy(_ => _.QuestionId).ToList().ForEach(file =>
             {
-                var fileUploadModel = new List<FileUploadModel>();
-                var filsToAdd = file.ToList();
+                List<FileUploadModel> fileUploadModel = new();
+                var filesToAdd = file.ToList();
                 if (isMultipleFileUploadElementType)
                 {
                     var data = currentAnswersForFileUpload.Answers?.FirstOrDefault(_ => _.QuestionId.Equals(file.Key))?.Response;
@@ -267,27 +267,25 @@ namespace form_builder.Helpers.PageHelpers
                     {
                         List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(data.ToString());
                         fileUploadModel.AddRange(response);
-                        filsToAdd = filsToAdd.Where(_ => !response.Any(x => WebUtility.HtmlEncode(_.UntrustedOriginalFileName).Equals(x.TrustedOriginalFileName))).ToList();
+                        filesToAdd = filesToAdd.Where(_ => !response.Any(x => WebUtility.HtmlEncode(_.UntrustedOriginalFileName).Equals(x.TrustedOriginalFileName))).ToList();
                     }
                 }
 
-                var keys = filsToAdd.Select(_ => $"file-{file.Key}-{Guid.NewGuid()}").ToArray();
+                IEnumerable<string> keys = filesToAdd.Select(_ => $"file-{file.Key}-{Guid.NewGuid()}");
+                IEnumerable<string> fileContent = filesToAdd.Select(_ => _.Base64EncodedContent);
 
-                var fileContent = filsToAdd.Select(_ => _.Base64EncodedContent).ToList();
+                string fileStorageType = _configuration["FileStorageProvider:Type"];
 
-
-                var fileStorageType = _configuration["FileStorageProvider:Type"];
-                
                 var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
 
-                for (int i = 0; i < fileContent.Count; i++)
+                for (int i = 0; i < fileContent.Count(); i++)
                 {
-                    fileStorageProvider.SetStringAsync(keys[i], JsonConvert.SerializeObject(fileContent[i]), _distributedCacheExpirationConfiguration.FileUpload);
+                    fileStorageProvider.SetStringAsync(keys.ElementAt(i), JsonConvert.SerializeObject(fileContent.ElementAt(i)), _distributedCacheExpirationConfiguration.FileUpload);
                 }
 
-                fileUploadModel.AddRange(filsToAdd.Select((_, index) => new FileUploadModel
+                fileUploadModel.AddRange(filesToAdd.Select((_, index) => new FileUploadModel
                 {
-                    Key = keys[index],
+                    Key = keys.ElementAt(index),
                     TrustedOriginalFileName = WebUtility.HtmlEncode(_.UntrustedOriginalFileName),
                     UntrustedOriginalFileName = _.UntrustedOriginalFileName,
                     FileSize = _.Length
@@ -301,7 +299,7 @@ namespace form_builder.Helpers.PageHelpers
                 }
                 else
                 {
-                    answers.Add(new Answers { QuestionId = file.Key, Response = fileUploadModel });
+                    answers.Add(new() { QuestionId = file.Key, Response = fileUploadModel });
                 }
             });
 

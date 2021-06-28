@@ -9,7 +9,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (!(bool)element.Properties.Postcode)
+            if (!element.Properties.Postcode.GetValueOrDefault())
                 return new ValidationResult { IsValid = true };
 
             if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && element.Properties.Optional)

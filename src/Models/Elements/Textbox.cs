@@ -46,7 +46,7 @@ namespace form_builder.Models.Elements
                 properties.Add("min", Properties.Min);
             }
 
-            if ((bool)Properties.Telephone)
+            if (Properties.Telephone.GetValueOrDefault())
                 properties["autocomplete"] = "tel";
 
             if (DisplayAriaDescribedby)

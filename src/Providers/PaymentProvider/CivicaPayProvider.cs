@@ -37,7 +37,7 @@ namespace form_builder.Providers.PaymentProvider
             if (string.IsNullOrEmpty(reference))
                 throw new PaymentFailureException("CivicaPayProvider::No valid reference");
 
-            var basket = new CreateImmediateBasketRequest
+            CreateImmediateBasketRequest basket = new()
             {
                 CallingAppIdentifier = "Basket",
                 CustomerID = _paymentConfig.CustomerId,

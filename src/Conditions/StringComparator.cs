@@ -15,9 +15,9 @@ namespace form_builder.Conditions
 
         public static bool IsNullOrEmpty(Condition condition, Dictionary<string, dynamic> viewModel)
         {
-            var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? bool.Parse(condition.ComparisonValue) : condition.IsNullOrEmpty;
+            bool val = !string.IsNullOrEmpty(condition.ComparisonValue) ? bool.Parse(condition.ComparisonValue) : (bool)condition.IsNullOrEmpty;
 
-            return viewModel.ContainsKey(condition.QuestionId) && (bool)viewModel[condition.QuestionId].Equals(val, StringComparison.OrdinalIgnoreCase);
+            return viewModel.ContainsKey(condition.QuestionId) && string.IsNullOrEmpty((string)viewModel[condition.QuestionId]).Equals(val);
         }
 
         public static bool Contains(Condition condition, Dictionary<string, dynamic> viewModel)

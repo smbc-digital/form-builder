@@ -23,9 +23,9 @@ namespace form_builder.Models
         public string FeedbackForm { get; set; }
 
         public string FeedbackPhase { get; set; }
-        
+
         public bool GenerateReferenceNumber { get; set; }
-        
+
         public string GeneratedReferenceNumberMapping { get; set; }
 
         public string ReferencePrefix { get; set; }
@@ -68,9 +68,9 @@ namespace form_builder.Models
             }
         }
 
-        public IElement GetElement(string questionId) => 
+        public IElement GetElement(string questionId) =>
             Pages.SelectMany(_ => _.Elements)
-                .SingleOrDefault(_ => _.Properties.QuestionId.Equals(questionId));
-
+            .Where(_ => _.Properties.QuestionId is not null)
+            .SingleOrDefault(_ => _.Properties.QuestionId.Equals(questionId));
     }
 }

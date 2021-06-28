@@ -184,7 +184,7 @@ namespace form_builder.Models
             }
             else
             {
-                if ((bool)pageSubmitBehaviours.FirstOrDefault()?.SubmitSlugs.Count.Equals(0))
+                if (pageSubmitBehaviours.FirstOrDefault()?.SubmitSlugs.Count == 0)
                 {
                     submitBehaviour.URL = pageSubmitBehaviours.FirstOrDefault()?.PageSlug;
                 }

@@ -7,7 +7,7 @@
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
 
-    @if ((bool)Model.Properties.StockportPostcode)
+    @if (Model.Properties.StockportPostcode.GetValueOrDefault())
     {
         <partial name="InsetText" model="Model.Properties.AddressIAG" />
     }
