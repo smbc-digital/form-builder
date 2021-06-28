@@ -5,9 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
-using form_builder.Enum;
 using form_builder.Extensions;
-using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Helpers.ViewRender;
@@ -15,9 +13,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.FileStorage;
-using form_builder.Providers.Lookup;
 using form_builder.Providers.StorageProvider;
-using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -29,14 +25,12 @@ namespace form_builder.Helpers.PageHelpers
     public class PageHelper : IPageHelper
     {
         private readonly IViewRender _viewRender;
-        private readonly IActionHelper _actionHelper;
         private readonly IElementHelper _elementHelper;
         private readonly ISessionHelper _sessionHelper;
         private readonly IWebHostEnvironment _environment;
         private readonly FormConfiguration _disallowedKeys;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
-        private readonly IEnumerable<ILookupProvider> _lookupProviders;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IConfiguration _configuration;
 
@@ -46,8 +40,6 @@ namespace form_builder.Helpers.PageHelpers
             IWebHostEnvironment enviroment,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ISessionHelper sessionHelper,
-            IEnumerable<ILookupProvider> lookupProviders,
-            IActionHelper actionHelper,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
             IConfiguration configuration)
         {
@@ -59,8 +51,6 @@ namespace form_builder.Helpers.PageHelpers
             _environment = enviroment;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _sessionHelper = sessionHelper;
-            _lookupProviders = lookupProviders;
-            _actionHelper = actionHelper;
             _configuration = configuration;
         }
 
@@ -82,12 +72,6 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var element in page.Elements)
             {
-                if (!string.IsNullOrEmpty(element.Lookup) &&
-                    element.Lookup.Equals(LookUpConstants.Dynamic))
-                {
-                    await AddDynamicOptions(element, formAnswers);
-                }
-
                 string html = await element.RenderAsync(_viewRender, _elementHelper, guid, viewModel, page, baseForm, _environment, formAnswers, results);
 
                 if (element.Properties is not null && element.Properties.isConditionalElement)
@@ -101,51 +85,6 @@ namespace form_builder.Helpers.PageHelpers
             }
 
             return formModel;
-        }
-
-        public async Task AddDynamicOptions(IElement element, FormAnswers formAnswers)
-        {
-            LookupSource submitDetails = element.Properties.LookupSources
-                .SingleOrDefault(x => x.EnvironmentName
-                .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
-
-            if (submitDetails == null)
-                throw new Exception("Dynamic lookup: No Environment Specific Details Found.");
-
-            RequestEntity request = _actionHelper.GenerateUrl(submitDetails.URL, formAnswers);
-
-            if (string.IsNullOrEmpty(submitDetails.Provider))
-                throw new Exception("Dynamic lookup: No Query Details Found.");
-
-            var lookupProvider = _lookupProviders.Get(submitDetails.Provider);
-            if (lookupProvider == null)
-                throw new Exception("Dynamic lookup: No Lookup Provider Found.");
-
-            List<Option> lookupOptions = new();
-            var session = _sessionHelper.GetSessionGuid();
-            var cachedAnswers = _distributedCache.GetString(session);
-            if (!string.IsNullOrEmpty(cachedAnswers))
-            {
-                var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-                var lookUpCacheResults = convertedAnswers.FormData.SingleOrDefault(x => x.Key.Equals(request.Url, StringComparison.OrdinalIgnoreCase));
-                if (!string.IsNullOrEmpty(lookUpCacheResults.Key) && lookUpCacheResults.Value != null)
-                {
-                    lookupOptions = JsonConvert.DeserializeObject<List<Option>>(JsonConvert.SerializeObject(lookUpCacheResults.Value));
-                }
-            }
-
-            if (!lookupOptions.Any())
-            {
-                lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
-
-                if (lookupOptions.Any())
-                    SaveFormData(request.Url, lookupOptions, session, formAnswers.FormName);
-            }
-
-            if (!lookupOptions.Any())
-                throw new Exception("Dynamic lookup: GetAsync cannot get IList<Options>.");
-
-            element.Properties.Options.AddRange(lookupOptions);
         }
 
         public void RemoveFieldset(Dictionary<string, dynamic> viewModel,

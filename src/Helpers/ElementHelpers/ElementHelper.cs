@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -195,7 +196,7 @@ namespace form_builder.Helpers.ElementHelpers
             return convertedAnswers;
         }
 
-        public List<PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema)
+        public async Task<List<PageSummary>> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema)
         {
             var formAnswers = GetFormData(guid);
             var reducedAnswers = formAnswers.GetReducedAnswers(formSchema);

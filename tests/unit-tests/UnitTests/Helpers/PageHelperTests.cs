@@ -8,7 +8,6 @@ using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -17,9 +16,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.FileStorage;
-using form_builder.Providers.Lookup;
 using form_builder.Providers.StorageProvider;
-using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -42,9 +39,6 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings = new();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new();
-        private readonly List<ILookupProvider> _mockLookupProviders = new ();
-        private readonly FakeLookupProvider _lookupProvider = new();
-        private readonly Mock<IActionHelper> _mockActionHelper = new();
         private readonly Mock<IConfiguration> _mockConfiguration = new();
 
         public PageHelperTests()
@@ -75,48 +69,11 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
 
-            _mockLookupProviders.Add(_lookupProvider);
-
             _pageHelper = new PageHelper(_mockIViewRender.Object,
                 _mockElementHelper.Object, _mockDistributedCache.Object,
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockDistributedCacheExpirationSettings.Object,
-                _mockSessionHelper.Object, _mockLookupProviders,
-                _mockActionHelper.Object, _fileStorageProviders, _mockConfiguration.Object);
-        }
-
-        [Fact]
-        public async Task GenerateHtml_ShouldAddOptions_WhenFormContainsDynamicLookup()
-        {
-            //Arrange
-            var element = new ElementBuilder().WithType(EElementType.Radio).WithLookup("dynamic").Build();
-            element.Properties.LookupSources = new List<LookupSource>
-            {
-                new LookupSource
-                {
-                    EnvironmentName = "local",
-                    Provider = "Fake",
-                    AuthToken = "fake",
-                    URL = "https://myapi.com"
-                }
-            };
-
-            var page = new PageBuilder().WithElement(element).Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
-
-            var schema = new FormSchemaBuilder().WithName("form-name").Build();
-            var formAnswers = new FormAnswers();
-
-            _mockActionHelper.Setup(_ => _.GenerateUrl("https://myapi.com", formAnswers)).Returns(new RequestEntity() { IsPost = false, Url = "waste" });
-
-            //Act
-            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers, new List<object>());
-
-            //Assert
-            element = (Element)page.Elements.Single(x => !string.IsNullOrEmpty(x.Lookup) && x.Lookup.Equals("dynamic"));
-            Assert.True(element.Properties.Options.Any());
+                _mockSessionHelper.Object, _fileStorageProviders, _mockConfiguration.Object);
         }
 
         [Fact]

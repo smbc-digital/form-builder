@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -59,30 +60,30 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
-        public void Transform_ShouldReturnCorrectNumberOfElementsOnPage()
+        public async Task Transform_ShouldReturnCorrectNumberOfElementsOnPage()
         {
             // Act
-            var result = _transformFactory.Transform(_page, "guid");
+            var result = await _transformFactory.Transform(_page, "guid");
 
             // Assert
             Assert.Equal(12, result.Elements.Count);
         }
 
         [Fact]
-        public void Transform_ShouldRetainOriginalAddnotherElement()
+        public async Task Transform_ShouldRetainOriginalAddnotherElement()
         {
             // Act
-            var result = _transformFactory.Transform(_page, "guid");
+            var result = await _transformFactory.Transform(_page, "guid");
 
             // Assert
             Assert.Single(result.Elements.Where(_ => _.Type.Equals(EElementType.AddAnother)));
         }
 
         [Fact]
-        public void Transform_ShouldReturnCorrectNumberOf_FieldsetElements()
+        public async Task Transform_ShouldReturnCorrectNumberOf_FieldsetElements()
         {
             // Act
-            var result = _transformFactory.Transform(_page, "guid");
+            var result = await _transformFactory.Transform(_page, "guid");
             var openingFieldsets = result.Elements.Count(_ => _.Type.Equals(EElementType.Fieldset) && _.Properties.OpeningTag);
             var closingFieldsets = result.Elements.Count(_ => _.Type.Equals(EElementType.Fieldset) && !_.Properties.OpeningTag);
 
@@ -93,20 +94,20 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
-        public void Transform_ShouldReturnCorrectNumberOf_LegendElements()
+        public async Task Transform_ShouldReturnCorrectNumberOf_LegendElements()
         {
             // Act
-            var result = _transformFactory.Transform(_page, "guid");
+            var result = await _transformFactory.Transform(_page, "guid");
 
             // Assert
             Assert.Equal(2, result.Elements.Count(_ => _.Type.Equals(EElementType.Legend)));
         }
 
         [Fact]
-        public void Transform_ShouldReturnCorrect_ButtonElements()
+        public async Task Transform_ShouldReturnCorrect_ButtonElements()
         {
             // Act
-            var result = _transformFactory.Transform(_page, "guid");
+            var result = await _transformFactory.Transform(_page, "guid");
             var removeButtonZero = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("remove-1"));
             var removeButtonOne = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals("remove-2"));
             var addAnotherButton = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals(AddAnotherConstants.AddAnotherButtonKey)).ToList();
@@ -120,7 +121,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
-        public void Transform_ShouldNotReturnAddAnotherButtonElement_WhenMaximumFieldsetsReached()
+        public async Task Transform_ShouldNotReturnAddAnotherButtonElement_WhenMaximumFieldsetsReached()
         {
             // Act
             var textboxElement = new ElementBuilder()
@@ -143,7 +144,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .WithElement(addAnotherElement)
                 .Build();
 
-            var result = _transformFactory.Transform(page, "guid");
+            var result = await _transformFactory.Transform(page, "guid");
             var addAnotherButton = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Equals(AddAnotherConstants.AddAnotherButtonKey)).ToList();
 
             // Assert
@@ -152,10 +153,10 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
-        public void Transform_ShouldReturnCorrect_TextboxElements()
+        public async Task Transform_ShouldReturnCorrect_TextboxElements()
         {
             // Act
-            var result = _transformFactory.Transform(_page, "guid");
+            var result = await _transformFactory.Transform(_page, "guid");
             var textboxZero = result.Elements.Where(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox:1:")).ToList();
             var textboxOne = result.Elements.Where(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox:2:")).ToList();
 
@@ -168,7 +169,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
-        public void Transform_ShouldReturnCorrectOptions_ForElementWithConditionalElements()
+        public async Task Transform_ShouldReturnCorrectOptions_ForElementWithConditionalElements()
         {
             // Arrange
             var options = new List<Option>
@@ -207,7 +208,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Build();
 
             // Act
-            var result = _transformFactory.Transform(page, "guid");
+            var result = await _transformFactory.Transform(page, "guid");
             var radioOne = result.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Radio) && _.Properties.QuestionId.Equals("radio:1:"));
 
             // Assert
