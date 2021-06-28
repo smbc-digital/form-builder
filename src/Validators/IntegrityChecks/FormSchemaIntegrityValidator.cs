@@ -48,6 +48,19 @@ namespace form_builder.Validators.IntegrityChecks
 
                     foreach (var element in page.Elements)
                     {
+                        if (element.Properties is not null &&
+                            element.Properties.Elements is not null &&
+                            element.Properties.Elements.Any())
+                        {
+                            foreach (var nestedElement in element.Properties.Elements)
+                            {
+                                foreach (var integrityCheck in _elementSchemaIntegrityChecks)
+                                {
+                                    integrityCheckResults.Add(await integrityCheck.ValidateAsync(nestedElement));
+                                }
+                            }
+                        }
+
                         foreach (var integrityCheck in _elementSchemaIntegrityChecks)
                         {
                             integrityCheckResults.Add(await integrityCheck.ValidateAsync(element));

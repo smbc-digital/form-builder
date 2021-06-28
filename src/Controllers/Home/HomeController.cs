@@ -6,6 +6,7 @@ using form_builder.Attributes;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Extensions;
+using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
@@ -105,7 +106,9 @@ namespace form_builder.Controllers
             var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload, ModelState.IsValid);
 
             if (currentPageResult.RedirectToAction && !string.IsNullOrWhiteSpace(currentPageResult.RedirectAction))
+            {
                 return RedirectToAction(currentPageResult.RedirectAction, currentPageResult.RouteValues ?? new { form, path });
+            }
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);

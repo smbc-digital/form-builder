@@ -44,6 +44,15 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithLookupSource(LookupSource lookupSource)
+        {
+            _property.LookupSources ??= new List<LookupSource>();
+
+            _property.LookupSources.Add(lookupSource);
+
+            return this;
+        }
+
         public ElementBuilder WithPropertyText(string propertyText)
         {
             _property.Text = propertyText;
@@ -259,6 +268,13 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithButtonName(string buttonName)
+        {
+            _property.ButtonName = buttonName;
+
+            return this;
+        }
+
         public ElementBuilder WithUpperLimitValidationMessage(string message)
         {
             _property.UpperLimitValidationMessage = message;
@@ -426,6 +442,13 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithOpeningTagValue(bool value)
+        {
+            _property.OpeningTag = value;
+
+            return this;
+        }
+
         public ElementBuilder WithOrderOptionsAlphabetically(bool value)
         {
             _property.OrderOptionsAlphabetically = value;
@@ -439,6 +462,37 @@ namespace form_builder.Builders
                 _property.Sections = new List<Section>();
 
             _property.Sections.Add(value);
+
+            return this;
+        }
+
+        public ElementBuilder WithNestedElement(Element element)
+        {
+            if (_property.Elements is null)
+                _property.Elements = new List<IElement> { element };
+            else
+                _property.Elements.Add(element);
+
+            return this;
+        }
+
+        public ElementBuilder WithMaximumFieldsets(int value)
+        {
+            _property.MaximumFieldsets = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithIsConditionalElement(bool value)
+        {
+            _property.isConditionalElement = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithAppendText(string value)
+        {
+            _property.AppendText = value;
 
             return this;
         }

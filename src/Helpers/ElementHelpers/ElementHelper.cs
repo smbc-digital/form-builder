@@ -199,36 +199,81 @@ namespace form_builder.Helpers.ElementHelpers
         public async Task<List<PageSummary>> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema)
         {
             var formAnswers = GetFormData(guid);
-            var reducedAnswers = FormAnswersExtensions.GetReducedAnswers(formAnswers, formSchema);
+            var reducedAnswers = formAnswers.GetReducedAnswers(formSchema);
             var formSummary = new List<PageSummary>();
 
             foreach (var page in formSchema.Pages.ToList())
             {
+                var formSchemaQuestions = new List<IElement>();
+
+                if (page.Elements.Any(_ => _.Type == EElementType.AddAnother))
+                {
+                    var listOfPageSummary = new List<PageSummary>();
+                    var addAnotherElement = page.Elements.FirstOrDefault(_ => _.Type == EElementType.AddAnother);
+                    var currentIncrement = GetAddAnotherNumberOfFieldsets(addAnotherElement, formAnswers);
+                    for (var i = 1; i <= currentIncrement; i++)
+                    {
+                        var addAnotherPageSummary = new PageSummary
+                        {
+                            PageTitle = addAnotherElement.GetLabelText(page.Title),
+                            PageSlug = page.PageSlug,
+                            PageSummaryId = $"{page.PageSlug}-{addAnotherElement.Properties.QuestionId}-{i}"
+                        };
+
+                        var listOfNestedElements = page.ValidatableElements.Where(_ => _.Properties.QuestionId.Contains($":{i}:")).ToList();
+                        addAnotherPageSummary.Answers = await GenerateSummaryAnswers(listOfNestedElements, page, formAnswers, false);
+                        listOfPageSummary.Add(addAnotherPageSummary);
+                    }
+                    
+                    formSummary.AddRange(listOfPageSummary);
+                }
+
                 var pageSummary = new PageSummary
                 {
                     PageTitle = page.Title,
-                    PageSlug = page.PageSlug
+                    PageSlug = page.PageSlug,
+                    PageSummaryId = page.PageSlug
                 };
 
-                var summaryBuilder = new SummaryDictionaryBuilder();
-                var formSchemaQuestions = page.ValidatableElements
-                    .Where(_ => _ != null)
-                    .ToList();
+                formSchemaQuestions = page.ValidatableElements
+                .Where(_ => _ != null)
+                .ToList();
 
                 if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())
                     continue;
 
-                formSchemaQuestions.ForEach(async question =>
-                {
-                    var answer = await _elementMapper.GetAnswerStringValue(question, formAnswers);
-                    summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
-                });
+                pageSummary.Answers = await GenerateSummaryAnswers(formSchemaQuestions, page, formAnswers, true);
 
-                pageSummary.Answers = summaryBuilder.Build();
                 formSummary.Add(pageSummary);
             }
 
             return formSummary;
+        }
+
+        public int GetAddAnotherNumberOfFieldsets(IElement addAnotherElement, FormAnswers formAnswers)
+        {
+            var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
+            return formAnswers.FormData.ContainsKey(formDataIncrementKey) 
+                ? int.Parse(formAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) 
+                : throw new ApplicationException($"ElementHelper::GetCurrentAddAnotherIncrement, FormData key not found for {formDataIncrementKey}");
+        }
+
+        public async Task<Dictionary<string, string>> GenerateSummaryAnswers(List<IElement> formSchemaQuestions, Page page, FormAnswers formAnswers, bool ignoreDynamicallyGeneratedElements)
+        {
+            SummaryDictionaryBuilder summaryBuilder = new();
+
+            foreach (var element in formSchemaQuestions)
+            {
+                if (element.Type == EElementType.AddAnother || (element.Properties.IsDynamicallyGeneratedElement && ignoreDynamicallyGeneratedElements))
+                    continue;
+
+                var answer = await _elementMapper.GetAnswerStringValue(element, formAnswers);
+                var summaryLabelText = element.GetLabelText(page.Title);
+
+                summaryBuilder.Add(summaryLabelText, answer, element.Type);
+            };
+
+            return summaryBuilder.Build();
         }
 
         public string GenerateDocumentUploadUrl(Element element, FormSchema formSchema, FormAnswers formAnswers)

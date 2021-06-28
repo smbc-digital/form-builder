@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Builders;
@@ -6,6 +7,7 @@ using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
+using form_builder.Factories.Transform.UserSchema;
 using form_builder.Models;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
@@ -30,9 +32,20 @@ namespace form_builder_tests.UnitTests.Factories.Schema
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new ();
         private readonly Mock<IConfiguration> _mockConfiguration = new ();
         private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new ();
+        private readonly Mock<IEnumerable<IUserPageTransformFactory>> _mockUserPageFactories = new();
+        private readonly Mock<IUserPageTransformFactory> _mockUserPageFactory = new();
 
         public SchemaFactoryTests()
         {
+            _mockUserPageFactory
+                .Setup(_ => _.Transform(It.IsAny<Page>(), It.IsAny<string>()))
+                .ReturnsAsync(new Page());
+
+            var mockUserPageFactoryItems = new List<IUserPageTransformFactory> { _mockUserPageFactory.Object };
+            _mockUserPageFactories
+                .Setup(m => m.GetEnumerator())
+                .Returns(() => mockUserPageFactoryItems.GetEnumerator());
+
             _mockConfiguration
                 .Setup(_ => _["ApplicationVersion"])
                 .Returns("v2");
@@ -51,8 +64,20 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                     UseDistributedCache = true
                 });
 
-            var formSchema = new FormSchemaBuilder()
+            var page = new PageBuilder()
                 .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockLookupSchemaFactory
+                .Setup(_ => _.Transform(It.IsAny<FormSchema>()))
+                .Returns(formSchema);
+
+            _mockReusableElementSchemaFactory
+                .Setup(_ => _.Transform(It.IsAny<FormSchema>()))
+                .ReturnsAsync(formSchema);
 
             _mockSchemaProvider
                 .Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
@@ -65,7 +90,16 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             _mockFormSchemaIntegrityValidator
                 .Setup(_ => _.Validate(It.IsAny<FormSchema>()));
 
-            _schemaFactory = new SchemaFactory(_mockDistributedCache.Object, _mockSchemaProvider.Object, _mockLookupSchemaFactory.Object, _mockReusableElementSchemaFactory.Object, _mockDistributedCacheConfiguration.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockConfiguration.Object, _mockFormSchemaIntegrityValidator.Object);
+            _schemaFactory = new SchemaFactory(
+                _mockDistributedCache.Object, 
+                _mockSchemaProvider.Object, 
+                _mockLookupSchemaFactory.Object, 
+                _mockReusableElementSchemaFactory.Object, 
+                _mockDistributedCacheConfiguration.Object, 
+                _mockDistributedCacheExpirationConfiguration.Object, 
+                _mockConfiguration.Object, 
+                _mockFormSchemaIntegrityValidator.Object,
+                _mockUserPageFactories.Object);
         }
 
         [Fact]
@@ -77,7 +111,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .ReturnsAsync(true);
 
             // Act
-            await _schemaFactory.Build("form");
+            await _schemaFactory.Build("form", string.Empty);
 
             // Assert
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);

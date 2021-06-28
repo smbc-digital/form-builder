@@ -1,6 +1,6 @@
 @if (Model.Properties.LegendAsH1 || Model.Properties.LabelAsH1)
 {
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l @Model.Properties.ClassName">
         <h1 class="govuk-fieldset__heading">
             @Model.Label
 
@@ -11,7 +11,7 @@
 }
 else
 {
-    <legend class="govuk-fieldset__legend @(Model.Properties.StrongLabel ? "govuk-fieldset__legend--m" : string.Empty)">
+    <legend class="govuk-fieldset__legend @Model.Properties.ClassName @(Model.Properties.StrongLabel ? "govuk-fieldset__legend--m" : string.Empty)">
         @Model.Label
         @if (Model.Properties.Optional && !Model.Properties.HideOptionalText)
         {

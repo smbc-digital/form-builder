@@ -32,7 +32,7 @@ namespace form_builder.Workflows.DocumentWorkflow
                 throw new DocumentExpiredException($"DocumentWorkflow::GenerateSummaryDocument, Previous answers has expired, unable to generate {documentType.ToString()} document for summary");
 
             var previousAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-            var baseForm = await _schemaFactory.Build(previousAnswers.FormName);
+            var baseForm = await _schemaFactory.Build(previousAnswers.FormName, $"document-{id}");
 
             return await _documentSummaryService.GenerateDocument(new DocumentSummaryEntity
             {

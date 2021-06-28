@@ -33,6 +33,7 @@ namespace form_builder
         {
             CultureInfo.CurrentCulture = new CultureInfo("en-GB");
             CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-GB");
+            services.AddDetection();
             services.AddControllersWithViews();
             services.AddRazorPages();
 
@@ -71,7 +72,7 @@ namespace form_builder
                 .AddServices()
                 .AddWorkflows()
                 .AddFactories()
-                .AddAntiforgery(_ => 
+                .AddAntiforgery(_ =>
                     {
                         _.Cookie.Name = ".formbuilder.antiforgery.v2";
                         _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
@@ -121,7 +122,8 @@ namespace form_builder
                     .UseHsts();
             }
 
-            app.UseMiddleware<HeaderConfiguration>()
+            app.UseDetection()
+                .UseMiddleware<HeaderConfiguration>()
                 .UseSession()
                 .UseHttpsRedirection()
                 .UseStaticFiles()
@@ -135,12 +137,12 @@ namespace form_builder
             app.UseResponseCaching();
             app.Use(async (context, next) =>
             {
-                context.Response.GetTypedHeaders().CacheControl = 
+                context.Response.GetTypedHeaders().CacheControl =
                     new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
                     {
                         NoCache = true,
                         NoStore = true
-                    };                
+                    };
 
                 await next();
             });

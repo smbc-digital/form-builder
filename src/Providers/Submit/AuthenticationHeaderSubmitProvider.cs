@@ -4,7 +4,8 @@ using form_builder.Models;
 using form_builder.Services.MappingService.Entities;
 using StockportGovUK.NetStandard.Gateways;
 
-namespace form_builder.Providers.Submit {
+namespace form_builder.Providers.Submit
+{
     public class AuthenticationHeaderSubmitProvider : ISubmitProvider
     {
         public string ProviderName => "AuthHeader";

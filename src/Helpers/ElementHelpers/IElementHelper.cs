@@ -39,7 +39,10 @@ namespace form_builder.Helpers.ElementHelpers
 
         Task<List<PageSummary>> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema);
 
+        int GetAddAnotherNumberOfFieldsets(IElement addAnotherElement, FormAnswers formAnswers);
+
         string GenerateDocumentUploadUrl(Element element, FormSchema formSchema, FormAnswers formAnswers);
+
         void OrderOptionsAlphabetically(Element element);
     }
 }

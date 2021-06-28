@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using form_builder.Conditions;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models.Actions;
@@ -57,6 +58,7 @@ namespace form_builder.Models
         public bool HasPageActionsGetValues => PageActions.Any(_ => _.Properties.HttpActionType == EHttpActionType.Get);
         public bool HasPageActionsPostValues => PageActions.Any(_ => _.Properties.HttpActionType == EHttpActionType.Post);
 
+        public bool HasDynamicLookupElements => Elements.Any(_ => !string.IsNullOrEmpty(_.Lookup) && _.Lookup.Equals(LookUpConstants.Dynamic));
 
         public List<Condition> RenderConditions { get; set; } = new List<Condition>();
 
@@ -78,6 +80,7 @@ namespace form_builder.Models
         }
 
         public IEnumerable<IElement> ValidatableElements => Elements.Where(element =>
+                element.Type == EElementType.AddAnother ||
                 element.Type == EElementType.Address ||
                 element.Type == EElementType.AddressManual ||
                 element.Type == EElementType.Booking ||
@@ -105,12 +108,12 @@ namespace form_builder.Models
             element.Type == EElementType.TimeInput
         );
 
-		public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm)
+        public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm)
 		{
-			ValidatableElements.RemoveUnusedConditionalElements(viewModel)
-            .ForEach(element => {
-				element.Validate(viewModel, validators, baseForm);
-			});
+            ValidatableElements.RemoveUnusedConditionalElements(viewModel)
+                .ForEach(element => {
+                    element.Validate(viewModel, validators, baseForm);
+                });
 			IsValidated = true;
 		}
 

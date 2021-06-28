@@ -19,6 +19,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
+using Wangkanai.Detection.Services;
 
 namespace form_builder.Services.MappingService
 {
@@ -29,19 +30,22 @@ namespace form_builder.Services.MappingService
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IWebHostEnvironment _environment;
-        private readonly ILogger<MappingService> _logger;
+        private ILogger<MappingService> _logger;
+        private readonly IDetectionService _detectionService;
 
         public MappingService(IDistributedCacheWrapper distributedCache,
             IElementMapper elementMapper,
             ISchemaFactory schemaFactory,
             IWebHostEnvironment environment,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
+            IDetectionService detectionService,
             ILogger<MappingService> logger)
         {
             _distributedCache = distributedCache;
             _elementMapper = elementMapper;
             _schemaFactory = schemaFactory;
             _environment = environment;
+            _detectionService = detectionService;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _logger = logger;
         }
@@ -105,7 +109,10 @@ namespace form_builder.Services.MappingService
             convertedAnswers.FormName = form;
 
             if (convertedAnswers.Pages == null || !convertedAnswers.Pages.Any())
-                _logger.LogWarning($"MappingService::GetFormAnswers, Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}");
+            {
+                var deviceInformation = $"Device Type: {_detectionService.Device.Type}, Browser Name/Version: {_detectionService.Browser.Name}/{_detectionService.Browser.Version}, Platform Name: {_detectionService.Platform.Name}, Engine Name: {_detectionService.Engine.Name}, Crawler: {_detectionService.Crawler.IsCrawler}/{_detectionService.Crawler.Name}";
+                _logger.LogWarning($"MappingService::GetFormAnswers, Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}, {deviceInformation}");
+            }
 
             return (convertedAnswers, baseForm);
         }
@@ -173,12 +180,19 @@ namespace form_builder.Services.MappingService
         {
             var splitTargets = targetMapping.Split(".");
 
+            if (element.Properties.IsDynamicallyGeneratedElement)
+                return obj;
+
             if (splitTargets.Length == 1)
             {
                 if (element.Type == EElementType.FileUpload || element.Type == EElementType.MultipleFileUpload)
                     return await CheckAndCreateForFileUpload(splitTargets[0], element, formAnswers, obj);
 
+                if (element.Type == EElementType.AddAnother)
+                    return await CheckAndCreateForAddAnother(splitTargets[0], element, formAnswers, obj);
+
                 object answerValue = await _elementMapper.GetAnswerValue(element, formAnswers);
+
                 if (answerValue != null && obj.TryGetValue(splitTargets[0], out var objectValue))
                 {
                     var combinedValue = $"{objectValue} {answerValue}";
@@ -201,6 +215,33 @@ namespace form_builder.Services.MappingService
 
             obj.Remove(splitTargets[0]);
             obj.Add(splitTargets[0], subObject);
+
+            return obj;
+        }
+
+        private async Task<IDictionary<string, dynamic>> CheckAndCreateForAddAnother(string target, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
+        {
+            var savedIncrementValue = formAnswers.FormData[$"{AddAnotherConstants.IncrementKeyPrefix}{element.Properties.QuestionId}"].ToString();
+            if (string.IsNullOrEmpty(savedIncrementValue))
+                throw new ApplicationException($"MappingService::CheckAndCreateForAddAnother, Fieldset increment value not found in FormData in saved answers for questionId {element.Properties.QuestionId}");
+
+            var numberOfIncrements = int.Parse(savedIncrementValue);
+            var answers = new List<IDictionary<string, dynamic>>();
+
+            for (var i = 1; i <= numberOfIncrements; i++)
+            {
+                var fieldsetAnswers = new Dictionary<string, dynamic>();
+                foreach (var nestedElement in element.Properties.Elements)
+                {
+                    var incrementedElement = JsonConvert.DeserializeObject<IElement>(JsonConvert.SerializeObject(nestedElement));
+                    incrementedElement.Properties.QuestionId = $"{nestedElement.Properties.QuestionId}:{i}:";
+                    fieldsetAnswers =  (Dictionary<string, dynamic>) await RecursiveCheckAndCreate(string.IsNullOrEmpty(nestedElement.Properties.TargetMapping) ? nestedElement.Properties.QuestionId : nestedElement.Properties.TargetMapping, incrementedElement, formAnswers, fieldsetAnswers);
+                }
+
+                answers.Add(fieldsetAnswers);
+            }
+
+            obj.Add(target, answers);
 
             return obj;
         }

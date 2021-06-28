@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Extensions;
-using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Helpers.ViewRender;
@@ -14,9 +13,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.FileStorage;
-using form_builder.Providers.Lookup;
 using form_builder.Providers.StorageProvider;
-using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -28,14 +25,12 @@ namespace form_builder.Helpers.PageHelpers
     public class PageHelper : IPageHelper
     {
         private readonly IViewRender _viewRender;
-        private readonly IActionHelper _actionHelper;
         private readonly IElementHelper _elementHelper;
         private readonly ISessionHelper _sessionHelper;
         private readonly IWebHostEnvironment _environment;
         private readonly FormConfiguration _disallowedKeys;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
-        private readonly IEnumerable<ILookupProvider> _lookupProviders;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IConfiguration _configuration;
 
@@ -45,8 +40,6 @@ namespace form_builder.Helpers.PageHelpers
             IWebHostEnvironment enviroment,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ISessionHelper sessionHelper,
-            IEnumerable<ILookupProvider> lookupProviders,
-            IActionHelper actionHelper,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
             IConfiguration configuration)
         {
@@ -58,8 +51,6 @@ namespace form_builder.Helpers.PageHelpers
             _environment = enviroment;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _sessionHelper = sessionHelper;
-            _lookupProviders = lookupProviders;
-            _actionHelper = actionHelper;
             _configuration = configuration;
         }
 
@@ -81,12 +72,6 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var element in page.Elements)
             {
-                if (!string.IsNullOrEmpty(element.Lookup) &&
-                    element.Lookup.Equals(LookUpConstants.Dynamic))
-                {
-                    await AddDynamicOptions(element, formAnswers);
-                }
-
                 string html = await element.RenderAsync(_viewRender, _elementHelper, guid, viewModel, page, baseForm, _environment, formAnswers, results);
 
                 if (element.Properties is not null && element.Properties.isConditionalElement)
@@ -102,49 +87,59 @@ namespace form_builder.Helpers.PageHelpers
             return formModel;
         }
 
-        public async Task AddDynamicOptions(IElement element, FormAnswers formAnswers)
+        public void RemoveFieldset(Dictionary<string, dynamic> viewModel,
+            string form,
+            string guid,
+            string path,
+            string removeKey)
         {
-            LookupSource submitDetails = element.Properties.LookupSources
-                .SingleOrDefault(x => x.EnvironmentName
-                .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
+            var updatedViewModel = new Dictionary<string, dynamic>();
 
-            if (submitDetails == null)
-                throw new Exception("Dynamic lookup: No Environment Specific Details Found.");
-
-            RequestEntity request = _actionHelper.GenerateUrl(submitDetails.URL, formAnswers);
-
-            if (string.IsNullOrEmpty(submitDetails.Provider))
-                throw new Exception("Dynamic lookup: No Query Details Found.");
-
-            var lookupProvider = _lookupProviders.Get(submitDetails.Provider);
-            if (lookupProvider == null)
-                throw new Exception("Dynamic lookup: No Lookup Provider Found.");
-
-            List<Option> lookupOptions = new();
-            var session = _sessionHelper.GetSessionGuid();
-            var cachedAnswers = _distributedCache.GetString(session);
-            if (!string.IsNullOrEmpty(cachedAnswers))
+            var incrementToRemove = int.Parse(removeKey.Split('-')[1]);
+            var answersToRemove = new Dictionary<string, dynamic>();
+            foreach (var item in viewModel)
             {
-                var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-                var lookUpCacheResults = convertedAnswers.FormData.SingleOrDefault(x => x.Key.Equals(request.Url, StringComparison.OrdinalIgnoreCase));
-                if (!string.IsNullOrEmpty(lookUpCacheResults.Key) && lookUpCacheResults.Value != null)
+                if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
                 {
-                    lookupOptions = JsonConvert.DeserializeObject<List<Option>>(JsonConvert.SerializeObject(lookUpCacheResults.Value));
+                    var splitQuestionId = item.Key.Split(':');
+                    var currentQuestionIncrement = int.Parse(splitQuestionId[1]);
+                    if (currentQuestionIncrement == incrementToRemove)
+                    {
+                        answersToRemove.Add(item.Key, item.Value);
+                    }
+                    else
+                    {
+                        if (currentQuestionIncrement > incrementToRemove)
+                        {
+                            splitQuestionId[1] = $"{currentQuestionIncrement - 1}";
+                            var newQuestionId = string.Join(':', splitQuestionId);
+
+                            updatedViewModel.Add(newQuestionId, item.Value);
+                        }
+                        else
+                        {
+                            updatedViewModel.Add(item.Key, item.Value);
+                        }
+                    }
+                }
+                else
+                {
+                    updatedViewModel.Add(item.Key, item.Value);
                 }
             }
+            
+            SaveAnswers(updatedViewModel, guid, form, null, true);
+        }
 
-            if (!lookupOptions.Any())
-            {
-                lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
+        public FormAnswers GetSavedAnswers(string guid)
+        {
+            var formData = _distributedCache.GetString(guid);
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
-                if (lookupOptions.Any())
-                    SaveFormData(request.Url, lookupOptions, session, formAnswers.FormName);
-            }
+            if (!string.IsNullOrEmpty(formData))
+                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-            if (!lookupOptions.Any())
-                throw new Exception("Dynamic lookup: GetAsync cannot get IList<Options>.");
-
-            element.Properties.Options.AddRange(lookupOptions);
+            return convertedAnswers;
         }
 
         public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
