@@ -105,7 +105,7 @@ namespace form_builder.Services.SubmitService
             if (!response.IsSuccessStatusCode)
                 throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occurred while attempting to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             
-            if (!baseForm.GenerateReferenceNumber && response.Content != null)
+            if (!baseForm.GenerateReferenceNumber && response.Content is not null)
             {
                 var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
                 reference = JsonConvert.DeserializeObject<string>(content);
@@ -147,7 +147,7 @@ namespace form_builder.Services.SubmitService
                 throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occurred while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             }
 
-            if (response.Content != null)
+            if (response.Content is not null)
             {
                 var content = await response.Content.ReadAsStringAsync();
 

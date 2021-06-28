@@ -9,10 +9,7 @@ namespace form_builder.Models.Elements
 {
     public class Checkbox : Element
     {
-        public Checkbox()
-        {
-            Type = EElementType.Checkbox;
-        }
+        public Checkbox() => Type = EElementType.Checkbox;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,

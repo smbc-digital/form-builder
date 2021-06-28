@@ -28,7 +28,7 @@ namespace form_builder.Workflows.DocumentWorkflow
         {
             var formData = _distributedCache.GetString($"document-{id.ToString()}");
 
-            if (formData == null)
+            if (formData is null)
                 throw new DocumentExpiredException($"DocumentWorkflow::GenerateSummaryDocument, Previous answers has expired, unable to generate {documentType.ToString()} document for summary");
 
             var previousAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);

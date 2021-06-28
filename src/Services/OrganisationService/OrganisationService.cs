@@ -53,16 +53,16 @@ namespace form_builder.Services.OrganisationService
             string path)
         {
             var cachedAnswers = _distributedCache.GetString(guid);
-            var organisationElement = currentPage.Elements.Where(_ => _.Type == EElementType.Organisation).FirstOrDefault();
-            var convertedAnswers = cachedAnswers == null
+            var organisationElement = currentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Organisation));
+            var convertedAnswers = cachedAnswers is null
                         ? new FormAnswers { Pages = new List<PageAnswers>() }
                         : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
             var organisation = (string)convertedAnswers
                 .Pages
-                .FirstOrDefault(_ => _.PageSlug == path)
+                .FirstOrDefault(_ => _.PageSlug.Equals(path))
                 .Answers
-                .FirstOrDefault(_ => _.QuestionId == $"{organisationElement.Properties.QuestionId}")
+                .FirstOrDefault(_ => _.QuestionId.Equals($"{organisationElement.Properties.QuestionId}"))
                 .Response;
 
             if (currentPage.IsValid && organisationElement.Properties.Optional && string.IsNullOrEmpty(organisation))
@@ -103,9 +103,9 @@ namespace form_builder.Services.OrganisationService
             string path)
         {
             var cachedAnswers = _distributedCache.GetString(guid);
-            var organisationElement = currentPage.Elements.Where(_ => _.Type == EElementType.Organisation).FirstOrDefault();
+            var organisationElement = currentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Organisation));
 
-            var convertedAnswers = cachedAnswers == null
+            var convertedAnswers = cachedAnswers is null
                         ? new FormAnswers { Pages = new List<PageAnswers>() }
                         : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
@@ -139,7 +139,7 @@ namespace form_builder.Services.OrganisationService
 
             var foundOrganisationSearchTerm = convertedAnswers
                 .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
-                .Answers?.FirstOrDefault(_ => _.QuestionId == organisationElement.Properties.QuestionId)?
+                .Answers?.FirstOrDefault(_ => _.QuestionId.Equals(organisationElement.Properties.QuestionId))?
                 .Response;
 
             List<object> searchResults;

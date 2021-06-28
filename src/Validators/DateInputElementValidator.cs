@@ -10,13 +10,8 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (element.Type != EElementType.DateInput)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+            if (!element.Type.Equals(EElementType.DateInput))
+                return new ValidationResult { IsValid = true };
 
             var valueDay = viewModel.ContainsKey($"{element.Properties.QuestionId}-day")
                 ? viewModel[$"{element.Properties.QuestionId}-day"]
@@ -32,12 +27,7 @@ namespace form_builder.Validators
 
             var isOptional = string.IsNullOrEmpty(valueDay) && string.IsNullOrEmpty(valueMonth) && string.IsNullOrEmpty(valueYear) && element.Properties.Optional;
             if (isOptional)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             var isValid = !string.IsNullOrEmpty(valueDay) || !string.IsNullOrEmpty(valueMonth) || !string.IsNullOrEmpty(valueYear);
             if (!isValid)

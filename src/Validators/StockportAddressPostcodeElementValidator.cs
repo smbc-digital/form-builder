@@ -11,45 +11,23 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (element.Type != EElementType.Address || (element.Type == EElementType.Address && !viewModel.IsInitial()))
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+            if (!element.Type.Equals(EElementType.Address) || (element.Type.Equals(EElementType.Address) && !viewModel.IsInitial()))
+                return new ValidationResult { IsValid = true };
 
-            if (element.Properties.StockportPostcode != true)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+            if (!element.Properties.StockportPostcode.GetValueOrDefault())
+                return new ValidationResult { IsValid = true };
 
             if ((!element.Properties.StockportPostcode.HasValue || !element.Properties.StockportPostcode.Value) || !viewModel.ContainsKey($"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"))
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             if (string.IsNullOrEmpty(viewModel[$"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"]) && element.Properties.Optional)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             var value = viewModel[$"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"];
             var isValid = true;
 
             if (!AddressConstants.STOCKPORT_POSTCODE_REGEX.Match(value).Success)
-            {
                 isValid = false;
-            }
 
             return new ValidationResult
             {

@@ -20,7 +20,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 return result;
             }
 
-            if (schema.DocumentType.Count == 0)
+            if (schema.DocumentType.Count.Equals(0))
             {
                 result.AddFailureMessage($"Document Download Check, No document download type configured.");
                 return result;

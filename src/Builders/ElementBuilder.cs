@@ -14,13 +14,13 @@ namespace form_builder.Builders
         private EElementType _type = EElementType.H1;
         private string _lookup = string.Empty;
 
-        private BaseProperty _property = new BaseProperty();
+        private BaseProperty _property = new();
 
         public Element Build()
         {
             var elementType = typeof(IElement).GetTypeInfo().Assembly
                 .GetTypes()
-                .FirstOrDefault(type => type.Name == _type.ToString());
+                .FirstOrDefault(type => type.Name.Equals( _type.ToString()));
 
             var element = (Element)Activator.CreateInstance(elementType);
 
@@ -218,7 +218,7 @@ namespace form_builder.Builders
 
         public ElementBuilder WithAppointmentType(AppointmentType value)
         {
-            if (_property.AppointmentTypes == null)
+            if (_property.AppointmentTypes is null)
                 _property.AppointmentTypes = new List<AppointmentType>();
 
             _property.AppointmentTypes.Add(value);
@@ -284,7 +284,7 @@ namespace form_builder.Builders
 
         public ElementBuilder WithAcceptedMimeType(string type)
         {
-            if (_property.AllowedFileTypes == null)
+            if (_property.AllowedFileTypes is null)
                 _property.AllowedFileTypes = new List<string>();
 
             _property.AllowedFileTypes.Add(type);

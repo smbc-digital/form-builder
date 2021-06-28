@@ -13,10 +13,7 @@ namespace form_builder.Models.Elements
 {
     public class UploadedFilesSummary : Element
     {
-        public UploadedFilesSummary()
-        {
-            Type = EElementType.UploadedFilesSummary;
-        }
+        public UploadedFilesSummary() => Type = EElementType.UploadedFilesSummary;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
@@ -36,7 +33,7 @@ namespace form_builder.Models.Elements
                 {
                     var model = elementHelper.CurrentValue<JArray>(questionId, viewModel, formAnswers, FileUploadConstants.SUFFIX);
 
-                    if (model != null && model.Any())
+                    if (model is not null && model.Any())
                     {
                         List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(model.ToString());
                         Properties.ListItems.AddRange(response.Select(_ => _.TrustedOriginalFileName));

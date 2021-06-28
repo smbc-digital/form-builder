@@ -40,7 +40,7 @@ namespace form_builder.Services.FileUploadService
 
         public Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload)
         {
-            fileUpload.Where(_ => _ != null)
+            fileUpload.Where(_ => _ is not null)
                 .ToList()
                 .GroupBy(_ => _.QuestionId)
                 .ToList()
@@ -79,7 +79,7 @@ namespace form_builder.Services.FileUploadService
         {
             var cachedAnswers = _distributedCache.GetString(sessionGuid);
 
-            var convertedAnswers = cachedAnswers == null
+            var convertedAnswers = cachedAnswers is null
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
@@ -130,7 +130,7 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            if (currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files == null || !files.Any()) && modelStateIsValid)
+            if (currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files is null || !files.Any()) && modelStateIsValid)
             {
                 if (currentPage.Elements.Where(_ => _.Type.Equals(EElementType.MultipleFileUpload)).Any(_ => _.Properties.Optional))
                     _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
@@ -141,7 +141,7 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            if (!viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files == null || !files.Any()))
+            if (!viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files is null || !files.Any()))
             {
                 return new ProcessRequestEntity
                 {
@@ -155,7 +155,7 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            if (files != null && files.Any())
+            if (files is not null && files.Any())
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
 
             if (viewModel.ContainsKey(ButtonConstants.SUBMIT) && modelStateIsValid)

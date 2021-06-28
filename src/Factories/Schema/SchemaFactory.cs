@@ -60,7 +60,7 @@ namespace form_builder.Factories.Schema
             {
                 string data = _distributedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}");
 
-                if (data != null)
+                if (data is not null)
                 {
                     formSchema = JsonConvert.DeserializeObject<FormSchema>(data);
                     foreach (var page in formSchema.Pages)

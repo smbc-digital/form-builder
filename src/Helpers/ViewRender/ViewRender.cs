@@ -56,7 +56,7 @@ namespace form_builder.Helpers.ViewRender
                     output,
                     new HtmlHelperOptions());
 
-                if (viewData != null)
+                if (viewData is not null)
                     foreach (var item in viewData)
                         viewContext.ViewData.Add(item.Key, item.Value);
 

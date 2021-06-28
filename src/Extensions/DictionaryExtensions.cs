@@ -17,7 +17,7 @@ namespace form_builder.Extensions
                 if (item.Key.EndsWith(FileUploadConstants.SUFFIX))
                     continue;
 
-                if (item.Value.Length == 1)
+                if (item.Value.Length.Equals(1))
                 {
                     if (item.Key.EndsWith(AddressConstants.SELECT_SUFFIX) && !string.IsNullOrEmpty(item.Value[0]))
                     {

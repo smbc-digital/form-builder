@@ -9,10 +9,7 @@ namespace form_builder.Models.Elements
 {
     public class Textbox : Element
     {
-        public Textbox()
-        {
-            Type = EElementType.Textbox;
-        }
+        public Textbox() => Type = EElementType.Textbox;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
@@ -49,7 +46,7 @@ namespace form_builder.Models.Elements
                 properties.Add("min", Properties.Min);
             }
 
-            if (Properties.Telephone == true)
+            if (Properties.Telephone.GetValueOrDefault())
                 properties["autocomplete"] = "tel";
 
             if (DisplayAriaDescribedby)

@@ -31,11 +31,11 @@ namespace form_builder.ContentFactory.PageFactory
 
         public async Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers = null, List<object> results = null)
         {
-            if (formAnswers == null)
+            if (formAnswers is null)
             {
                 var cachedAnswers = _distributedCache.GetString(sessionGuid);
 
-                formAnswers = cachedAnswers == null
+                formAnswers = cachedAnswers is null
                     ? new FormAnswers { Pages = new List<PageAnswers>(), FormName = baseForm.BaseURL }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
             }

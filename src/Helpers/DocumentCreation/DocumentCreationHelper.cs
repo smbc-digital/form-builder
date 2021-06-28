@@ -21,10 +21,10 @@ namespace form_builder.Helpers.DocumentCreation
             foreach (var page in formSchema.Pages.ToList())
             {
                 var formSchemaQuestions = page.ValidatableElements
-                    .Where(_ => _ != null)
+                    .Where(_ => _ is not null)
                     .ToList();
 
-                if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())
+                if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug.Equals(page.PageSlug)).Select(p => p).Any())
                     continue;
 
                 formSchemaQuestions.ForEach(async question =>

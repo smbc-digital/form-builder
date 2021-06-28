@@ -33,7 +33,7 @@ namespace form_builder.Models
         public IEnumerable<Answers> AllAnswers {
             get 
             {
-                if (this.Pages == null)
+                if (this.Pages is null)
                     return Enumerable.Empty<Answers>();
 
                 if (!this.Pages.SelectMany(_ => _.Answers).Any())

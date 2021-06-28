@@ -21,12 +21,12 @@ namespace form_builder.Extensions
             {
                 foreach (Option option in element.Properties.Options)
                 {
-                    KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key == element.Properties.QuestionId && (element.Type.Equals(EElementType.Checkbox) ? value.Value.Contains(option.Value) : value.Value == option.Value));
-                    if (option.ConditionalElementId != null && optionValue.Key == null)
+                    KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key.Equals(element.Properties.QuestionId) && (element.Type.Equals(EElementType.Checkbox) ? value.Value.Contains(option.Value) : value.Value.Equals(option.Value)));
+                    if (option.ConditionalElementId is not null && optionValue.Key is null)
                     {
                         viewModel.Remove(option.ConditionalElementId);
-                        listOfElements.Remove(listOfElements.FirstOrDefault(_ => _.Properties.QuestionId == option.ConditionalElementId));
-                        listOfConditionalElements.Remove(listOfElements.FirstOrDefault(_ => _.Properties.QuestionId == option.ConditionalElementId));
+                        listOfElements.Remove(listOfElements.FirstOrDefault(_ => _.Properties.QuestionId.Equals(option.ConditionalElementId)));
+                        listOfConditionalElements.Remove(listOfElements.FirstOrDefault(_ => _.Properties.QuestionId.Equals(option.ConditionalElementId)));
                     }
                 }
             }
@@ -34,8 +34,8 @@ namespace form_builder.Extensions
             foreach (Element element in listOfConditionalElements)
             {
                 if (listOfElementsWhichMayContainConditionalElements.Any(_ =>
-                    _.Properties.Options != null && !_.Properties.Options.Any(_ =>
-                        _.ConditionalElementId  != null && _.ConditionalElementId.Equals(element.Properties.QuestionId))))
+                    _.Properties.Options is not null && !_.Properties.Options.Any(_ =>
+                        _.ConditionalElementId  is not null && _.ConditionalElementId.Equals(element.Properties.QuestionId))))
                 {
                     if (listOfElements.Contains(element))
                     {
