@@ -34,19 +34,14 @@ namespace form_builder.Gateways
             return await _s3client.ListObjectsV2Async(listRequest);
         }
 
-        public async Task DeleteObject(string bucketName, string filename)
-        {
+        public async Task DeleteObject(string bucketName, string filename) =>
             await _s3client.DeleteObjectAsync(bucketName, filename);
-        }
 
         public async Task PutObject(string bucketName, string filename, string imageContent)
         {
             var fileTransferUtility = new TransferUtility(_s3client);
-
-            using (var ms = new System.IO.MemoryStream(Encoding.ASCII.GetBytes(imageContent)))
-            {
-                await fileTransferUtility.UploadAsync(ms, bucketName, filename);
-            }
+            using var ms = new System.IO.MemoryStream(Encoding.ASCII.GetBytes(imageContent));
+            await fileTransferUtility.UploadAsync(ms, bucketName, filename);
         }
     }
 }

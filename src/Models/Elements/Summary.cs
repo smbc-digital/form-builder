@@ -27,10 +27,8 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-
             List<PageSummary> pages = await elementHelper.GenerateQuestionAndAnswersList(guid, formSchema);
             var summaryViewModel = new SummarySectionsViewModel();
-
 
             if (formSchema.Pages.Any(_ => _.Elements.Any(_ => _.Type == EElementType.AddAnother)) && !Properties.HasSummarySectionsDefined)
             {
