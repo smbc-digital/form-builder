@@ -26,7 +26,7 @@ namespace form_builder.TagParsers
             var pageHasElementsMatchingRegex = page.Elements.Any(_ => _.Properties.Text != null && Regex.IsMatch(_.Properties.Text));
             var pageHasConditionMatchingRegex = page.Behaviours.Any(_ => _.Conditions.Any(_ => _.QuestionId is not null && Regex.IsMatch(_.QuestionId)));
 
-            if (leadingParagraphRegexIsMatch || pageHasElementsMatchingRegex)
+            if (leadingParagraphRegexIsMatch || pageHasElementsMatchingRegex || pageHasConditionMatchingRegex)
             {
                 var paymentAmount = !string.IsNullOrEmpty(formAnswers.PaymentAmount) 
                         ? formAnswers.PaymentAmount 

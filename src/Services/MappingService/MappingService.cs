@@ -54,6 +54,7 @@ namespace form_builder.Services.MappingService
         {
             var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
 
+
             return new MappingEntity
             {
                 Data = CreatePostData(convertedAnswers, baseForm),

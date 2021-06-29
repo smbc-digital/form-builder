@@ -13,6 +13,11 @@ namespace form_builder.Conditions
                    (string)viewModel[condition.QuestionId].ToLower() == val;
         }
 
+        public static bool PaymentAmountIsEqualTo(Condition condition, Dictionary<string, dynamic> viewModel)
+        {
+            return condition.QuestionId.Equals(condition.ComparisonValue);
+        }
+
         public static bool IsNullOrEmpty(Condition condition, Dictionary<string, dynamic> viewModel)
         {
             var val = !string.IsNullOrEmpty(condition.ComparisonValue) ? bool.Parse(condition.ComparisonValue) : condition.IsNullOrEmpty;

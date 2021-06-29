@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Configuration;
@@ -12,6 +13,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.PayService;
+using form_builder.TagParsers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -41,6 +43,7 @@ namespace form_builder.Services.SubmitService
         private readonly ILogger<SubmitService> _logger;
 
         private readonly IPayService _payService;
+        private readonly IEnumerable<ITagParser> _tagParsers;
 
         public SubmitService(
             IGateway gateway,
@@ -51,7 +54,7 @@ namespace form_builder.Services.SubmitService
             ISchemaFactory schemaFactory,
             IReferenceNumberProvider referenceNumberProvider,
             IEnumerable<ISubmitProvider> submitProviders,
-            ILogger<SubmitService> logger, IPayService payService)
+            ILogger<SubmitService> logger, IPayService payService, IEnumerable<ITagParser> tagParsers)
         {
             _gateway = gateway;
             _pageHelper = pageHelper;
@@ -63,6 +66,7 @@ namespace form_builder.Services.SubmitService
             _submitProviders = submitProviders;
             _logger = logger;
             _payService = payService;
+            _tagParsers = tagParsers;
         }
 
         public async Task PreProcessSubmission(string form, string sessionGuid)
@@ -110,6 +114,7 @@ namespace form_builder.Services.SubmitService
         private async Task<string> ProcessGenuineSubmission(MappingEntity mappingEntity, string form, string sessionGuid, FormSchema baseForm, string reference)
         {
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
+            _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers));
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
             HttpResponseMessage response = await _submitProviders.Get(submitSlug.Type).PostAsync(mappingEntity, submitSlug);
 
