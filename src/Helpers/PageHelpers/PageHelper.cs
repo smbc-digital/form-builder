@@ -271,8 +271,7 @@ namespace form_builder.Helpers.PageHelpers
                     }
                 }
 
-                Guid newGuid = Guid.NewGuid();
-                IEnumerable<string> keys = filesToAdd.Select(_ => $"file-{file.Key}-{newGuid}");
+                IEnumerable<string> keys = filesToAdd.Select(_ => $"file-{file.Key}-{Guid.NewGuid()}");
                 IEnumerable<string> fileContent = filesToAdd.Select(_ => _.Base64EncodedContent);
 
                 string fileStorageType = _configuration["FileStorageProvider:Type"];
