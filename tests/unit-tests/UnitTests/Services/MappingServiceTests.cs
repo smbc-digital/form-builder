@@ -193,7 +193,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(new { });
+                .ReturnsAsync(new { });
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -234,7 +234,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(new { });
+                .ReturnsAsync(new { });
 
             var schema = new FormSchemaBuilder()
                 .WithPage(page)
@@ -277,7 +277,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(new { });
+                .ReturnsAsync(new { });
 
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(schema);
@@ -345,7 +345,7 @@ namespace form_builder_tests.UnitTests.Services
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(new { });
+                .ReturnsAsync(new { });
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -400,7 +400,7 @@ namespace form_builder_tests.UnitTests.Services
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(null);
+                .ReturnsAsync(null);
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -444,10 +444,10 @@ namespace form_builder_tests.UnitTests.Services
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "file"), It.IsAny<FormAnswers>()))
-                .Returns(null);
+                .ReturnsAsync(null);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(new List<File> { new() });
+                .ReturnsAsync(new List<File> { new() });
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -506,13 +506,13 @@ namespace form_builder_tests.UnitTests.Services
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "file"), It.IsAny<FormAnswers>()))
-                .Returns(new List<File> { new() });
+                .ReturnsAsync(new List<File> { new() });
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filetwo"), It.IsAny<FormAnswers>()))
-                .Returns(null);
+                .ReturnsAsync(null);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "filethree"), It.IsAny<FormAnswers>()))
-                .Returns(new List<File> { new() });
+                .ReturnsAsync(new List<File> { new() });
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -555,7 +555,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(new { });
+                .ReturnsAsync(new { });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
@@ -606,7 +606,7 @@ namespace form_builder_tests.UnitTests.Services
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "textbox"), It.IsAny<FormAnswers>()))
-                .Returns("textbox answer");
+                .ReturnsAsync("textbox answer");
 
             // Act
             var result = await _service.Map("form", "guid");
@@ -650,7 +650,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = bookingGuid, Environment = "test" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -709,7 +709,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns("Address 1");
+                .ReturnsAsync("Address 1");
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers

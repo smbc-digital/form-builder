@@ -112,7 +112,7 @@ namespace form_builder_tests.UnitTests.Services {
 
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            _fileStorageProvider.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+            _fileStorageProvider.Setup(_ => _.GetString(It.IsAny<string>())).ReturnsAsync(JsonConvert.SerializeObject(cacheData));
 
             _mockDistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration {
                 FormJson = 1

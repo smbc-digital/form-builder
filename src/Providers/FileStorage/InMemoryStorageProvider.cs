@@ -21,9 +21,15 @@ namespace form_builder.Providers.FileStorage
             _distributedCache = distributedCache;
         }
 
-        public string GetString(string key) => _distributedCache.GetString(key);
+        public async Task<string> GetString(string key)
+        {
+            return await Task.Run(() =>
+            {
+                return _distributedCache.GetString(key);
+            });
+        }
 
-        public void Remove(string key) => _distributedCache.Remove(key);
+        public async Task Remove(string key) => await _distributedCache.RemoveAsync(key);
 
         public Task SetStringAsync(string key, string value, int expiration, CancellationToken token = default)
         {

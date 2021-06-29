@@ -7,9 +7,9 @@ namespace form_builder.Providers.FileStorage
     {
         string ProviderName { get; }
 
-        string GetString(string key);
+        Task<string> GetString(string key);
 
-        void Remove(string key);
+        Task Remove(string key);
 
         Task SetStringAsync(string key, string value, int expiration, CancellationToken token = default);
     }

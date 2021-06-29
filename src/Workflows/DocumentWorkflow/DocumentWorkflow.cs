@@ -34,7 +34,7 @@ namespace form_builder.Workflows.DocumentWorkflow
             var previousAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
             var baseForm = await _schemaFactory.Build(previousAnswers.FormName, $"document-{id}");
 
-            return _documentSummaryService.GenerateDocument(new DocumentSummaryEntity
+            return await _documentSummaryService.GenerateDocument(new DocumentSummaryEntity
             {
                 DocumentType = documentType,
                 PreviousAnswers = previousAnswers,

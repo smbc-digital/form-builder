@@ -221,7 +221,7 @@ namespace form_builder.Helpers.ElementHelpers
                         };
 
                         var listOfNestedElements = page.ValidatableElements.Where(_ => _.Properties.QuestionId.Contains($":{i}:")).ToList();
-                        addAnotherPageSummary.Answers = GenerateSummaryAnswers(listOfNestedElements, page, formAnswers, false);
+                        addAnotherPageSummary.Answers = await GenerateSummaryAnswers(listOfNestedElements, page, formAnswers, false);
                         listOfPageSummary.Add(addAnotherPageSummary);
                     }
                     
@@ -242,7 +242,8 @@ namespace form_builder.Helpers.ElementHelpers
                 if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug.Equals(page.PageSlug)).Select(p => p).Any())
                     continue;
 
-                pageSummary.Answers = GenerateSummaryAnswers(formSchemaQuestions, page, formAnswers, true);
+                pageSummary.Answers = await GenerateSummaryAnswers(formSchemaQuestions, page, formAnswers, true);
+
                 formSummary.Add(pageSummary);
             }
 
@@ -257,7 +258,7 @@ namespace form_builder.Helpers.ElementHelpers
                 : throw new ApplicationException($"ElementHelper::GetCurrentAddAnotherIncrement, FormData key not found for {formDataIncrementKey}");
         }
 
-        public Dictionary<string, string> GenerateSummaryAnswers(List<IElement> formSchemaQuestions, Page page, FormAnswers formAnswers, bool ignoreDynamicallyGeneratedElements)
+        public async Task<Dictionary<string, string>> GenerateSummaryAnswers(List<IElement> formSchemaQuestions, Page page, FormAnswers formAnswers, bool ignoreDynamicallyGeneratedElements)
         {
             SummaryDictionaryBuilder summaryBuilder = new();
 
@@ -266,7 +267,7 @@ namespace form_builder.Helpers.ElementHelpers
                 if (element.Type.Equals(EElementType.AddAnother) || (element.Properties.IsDynamicallyGeneratedElement && ignoreDynamicallyGeneratedElements))
                     continue;
 
-                var answer = _elementMapper.GetAnswerStringValue(element, formAnswers);
+                var answer = await _elementMapper.GetAnswerStringValue(element, formAnswers);
                 var summaryLabelText = element.GetLabelText(page.Title);
 
                 summaryBuilder.Add(summaryLabelText, answer, element.Type);
