@@ -180,7 +180,7 @@ namespace form_builder.Mappers
             if (value is null || value.Response is null)
                 return null;
 
-            List<FileUploadModel> uploadedFiles = value.Response.ToObject(typeof(List<FileUploadModel>));
+            List<FileUploadModel> uploadedFiles = JsonConvert.DeserializeObject<List<FileUploadModel>>(value.Response.ToString());
 
             var fileStorageProvider = _fileStorageProviders.Get(_configuration["FileStorageProvider:Type"]);
 
