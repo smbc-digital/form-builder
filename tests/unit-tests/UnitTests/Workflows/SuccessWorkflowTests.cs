@@ -23,11 +23,10 @@ namespace form_builder_tests.UnitTests.Workflows
         private readonly Mock<IPageService> _mockPageService = new();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new();
-        private readonly Mock<ISessionHelper> _mockSessionHelper = new();
 
         public SuccessWorkflowTests()
         {
-            _workflow = new SuccessWorkflow(_mockPageService.Object, _mockSchemaFactory.Object, _mockActionsWorkflow.Object, _mockSessionHelper.Object);
+            _workflow = new SuccessWorkflow(_mockPageService.Object, _mockSchemaFactory.Object, _mockActionsWorkflow.Object);
 
             var element = new ElementBuilder()
                 .WithType(EElementType.H2)
@@ -45,10 +44,6 @@ namespace form_builder_tests.UnitTests.Workflows
                 .WithBaseUrl("base-test")
                 .WithPage(page)
                 .Build();
-
-            _mockSessionHelper
-                .Setup(_ => _.GetSessionGuid())
-                .Returns("12345");
 
             _mockSchemaFactory
                 .Setup(_ => _.Build(It.IsAny<string>()))
@@ -70,51 +65,6 @@ namespace form_builder_tests.UnitTests.Workflows
 
             // Assert
             _mockSchemaFactory.Verify(_ => _.Build("form"), Times.Once);
-        }
-
-        [Fact]
-        public async Task Process_ShouldCallSessionHelper()
-        {
-            // Act
-            await _workflow.Process(EBehaviourType.SubmitForm, "form");
-
-            // Assert
-            _mockSessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
-        }
-
-        [Fact]
-        public async Task Process_ShouldCallSchemaFactory_TransformPage_ForEachPageInSchema()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.H2)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var successPage = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("success")
-                .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                .WithStartPageUrl("page-one")
-                .WithBaseUrl("base-test")
-                .WithPage(page)
-                .WithPage(successPage)
-                .Build();
-
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>())).ReturnsAsync(formSchema);
-
-            // Act
-            await _workflow.Process(EBehaviourType.SubmitForm, "form");
-
-            // Assert
-            _mockSchemaFactory.Verify(_ => _.TransformPage(page, "12345"), Times.Once);
-            _mockSchemaFactory.Verify(_ => _.TransformPage(successPage, "12345"), Times.Once);
         }
 
         [Fact]
