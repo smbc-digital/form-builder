@@ -256,50 +256,46 @@ namespace form_builder.Helpers.PageHelpers
 
         public List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload)
         {
-            files.GroupBy(_ => _.QuestionId).ToList().ForEach(file =>
+            files.GroupBy(_ => _.QuestionId).ToList().ForEach(group =>
             {
+                string questionId = group.Key;
+                IEnumerable<CustomFormFile> files = group;
                 List<FileUploadModel> fileUploadModel = new();
-                var filesToAdd = file.ToList();
+
                 if (isMultipleFileUploadElementType)
                 {
-                    var data = currentAnswersForFileUpload.Answers?.FirstOrDefault(_ => _.QuestionId.Equals(file.Key))?.Response;
+                    var data = currentAnswersForFileUpload.Answers?.FirstOrDefault(_ => _.QuestionId.Equals(questionId))?.Response;
                     if (data is not null)
                     {
                         List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(data.ToString());
                         fileUploadModel.AddRange(response);
-                        filesToAdd = filesToAdd.Where(_ => !response.Any(x => WebUtility.HtmlEncode(_.UntrustedOriginalFileName).Equals(x.TrustedOriginalFileName))).ToList();
+                        files = files.Where(_ => !response.Any(x => WebUtility.HtmlEncode(_.UntrustedOriginalFileName).Equals(x.TrustedOriginalFileName)));
                     }
                 }
 
-                IEnumerable<string> keys = filesToAdd.Select(_ => $"file-{file.Key}-{Guid.NewGuid()}").ToArray();
-                IEnumerable<string> fileContent = filesToAdd.Select(_ => _.Base64EncodedContent);
-
-                string fileStorageType = _configuration["FileStorageProvider:Type"];
-
-                var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
-
-                for (int i = 0; i < fileContent.Count(); i++)
+                var fileStorageProvider = _fileStorageProviders.Get(_configuration["FileStorageProvider:Type"]);
+                foreach (var file in files)
                 {
-                    fileStorageProvider.SetStringAsync(keys.ElementAt(i), JsonConvert.SerializeObject(fileContent.ElementAt(i)), _distributedCacheExpirationConfiguration.FileUpload);
+                    string key = $"file-{questionId}-{Guid.NewGuid()}";
+                    fileStorageProvider.SetStringAsync(key, JsonConvert.SerializeObject(file.Base64EncodedContent), _distributedCacheExpirationConfiguration.FileUpload);
+                    fileUploadModel.Add(new()
+                    {
+                        Key = key,
+                        TrustedOriginalFileName = WebUtility.HtmlEncode(file.UntrustedOriginalFileName),
+                        UntrustedOriginalFileName = file.UntrustedOriginalFileName,
+                        FileSize = file.Length
+                    });
                 }
 
-                fileUploadModel.AddRange(filesToAdd.Select((_, index) => new FileUploadModel
+                if (answers.Exists(_ => _.QuestionId.Equals(questionId)))
                 {
-                    Key = keys.ElementAt(index),
-                    TrustedOriginalFileName = WebUtility.HtmlEncode(_.UntrustedOriginalFileName),
-                    UntrustedOriginalFileName = _.UntrustedOriginalFileName,
-                    FileSize = _.Length
-                }).ToList());
-
-                if (answers.Exists(_ => _.QuestionId.Equals(file.Key)))
-                {
-                    var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId.Equals(file.Key));
+                    var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId.Equals(questionId));
                     if (fileUploadAnswer is not null)
                         fileUploadAnswer.Response = fileUploadModel;
                 }
                 else
                 {
-                    answers.Add(new() { QuestionId = file.Key, Response = fileUploadModel });
+                    answers.Add(new() { QuestionId = questionId, Response = fileUploadModel });
                 }
             });
 
