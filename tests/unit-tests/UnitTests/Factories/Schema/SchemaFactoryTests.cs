@@ -37,10 +37,6 @@ namespace form_builder_tests.UnitTests.Factories.Schema
 
         public SchemaFactoryTests()
         {
-            _mockUserPageFactory
-                .Setup(_ => _.Transform(It.IsAny<Page>(), It.IsAny<string>()))
-                .ReturnsAsync(new Page());
-
             var mockUserPageFactoryItems = new List<IUserPageTransformFactory> { _mockUserPageFactory.Object };
             _mockUserPageFactories
                 .Setup(m => m.GetEnumerator())
@@ -111,7 +107,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .ReturnsAsync(true);
 
             // Act
-            await _schemaFactory.Build("form", string.Empty);
+            await _schemaFactory.Build("form");
 
             // Assert
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);

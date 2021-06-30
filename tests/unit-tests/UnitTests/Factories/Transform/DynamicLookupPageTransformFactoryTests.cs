@@ -25,7 +25,6 @@ namespace form_builder_tests.UnitTests.Factories.Transform
     public class DynamicLookupPageTransformFactoryTests
     {
         private readonly Mock<IActionHelper> _mockActionHelper = new();
-        private readonly Mock<ISessionHelper> _mockSessionHelper = new();
         private readonly Mock<IPageHelper> _mockPageHelper = new();
         private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new();
         private readonly IEnumerable<ILookupProvider> _mockLookupProviders;
@@ -44,9 +43,6 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 _fakeLookupProvider.Object
             };
 
-            _mockSessionHelper
-                .Setup(_ => _.GetSessionGuid())
-                .Returns("12345");
             _mockPageHelper
                 .Setup(_ => _.GetSavedAnswers(It.IsAny<string>()))
                 .Returns(new FormAnswers());
@@ -60,7 +56,6 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             _mockWebHostEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
 
             _dynamicLookupPageTransformFactory = new DynamicLookupPageTransformFactory(_mockActionHelper.Object,
-                _mockSessionHelper.Object,
                 _mockLookupProviders,
                 _mockPageHelper.Object,
                 _mockWebHostEnvironment.Object);
@@ -90,7 +85,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
-        public async Task Transform_ShouldCall_SessionHelper_PageHelper_And_ActionHelper()
+        public async Task Transform_ShouldCall_PageHelper_And_ActionHelper()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -114,114 +109,8 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             await _dynamicLookupPageTransformFactory.Transform(page, "12345");
 
             // Assert
-            _mockSessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
             _mockPageHelper.Verify(_ => _.GetSavedAnswers(It.IsAny<string>()), Times.Once);
             _mockActionHelper.Verify(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task Transform_ShouldNotAddAnyOptions_IfUrlIsNull()
-        {
-            // Arrange
-            _mockActionHelper
-                .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
-                .Returns(new RequestEntity
-                {
-                    IsPost = false,
-                    Url = "waste={{wasteId}}"
-                });
-
-            var element = new ElementBuilder()
-                .WithQuestionId("dynamicQuestion")
-                .WithLookup("dynamic")
-                .WithLookupSource(new LookupSource
-                {
-                    EnvironmentName = "local",
-                    Provider = "fake",
-                    URL = "waste={{wasteId}}"
-                })
-                .WithType(EElementType.Checkbox)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            // Act
-            await _dynamicLookupPageTransformFactory.Transform(page, "12345");
-
-            // Assert
-            Assert.Empty(element.Properties.Options);
-        }
-
-        [Fact]
-        public async Task Transform_ShouldNotCallLookupProvider_IfUrlIsNull()
-        {
-            // Arrange
-            _mockActionHelper
-                .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
-                .Returns(new RequestEntity
-                {
-                    IsPost = false,
-                    Url = "waste={{wasteId}}"
-                });
-
-            var element = new ElementBuilder()
-                .WithQuestionId("dynamicQuestion")
-                .WithLookup("dynamic")
-                .WithLookupSource(new LookupSource
-                {
-                    EnvironmentName = "local",
-                    Provider = "fake",
-                    URL = "waste={{wasteId}}"
-                })
-                .WithType(EElementType.Checkbox)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            // Act
-            await _dynamicLookupPageTransformFactory.Transform(page, "12345");
-
-            // Assert
-            _fakeLookupProvider.Verify(_ => _.GetAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task Transform_ShouldNotSaveFormData_IfUrlCouldNotBePopulated()
-        {
-            // Arrange
-            _mockActionHelper
-                .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
-                .Returns(new RequestEntity
-                {
-                    IsPost = false,
-                    Url = "waste={{wasteId}}"
-                });
-
-            var element = new ElementBuilder()
-                .WithQuestionId("dynamicQuestion")
-                .WithLookup("dynamic")
-                .WithLookupSource(new LookupSource
-                {
-                    EnvironmentName = "local",
-                    Provider = "fake",
-                    URL = "waste={{wasteId}}"
-                })
-                .WithType(EElementType.Checkbox)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            // Act
-            await _dynamicLookupPageTransformFactory.Transform(page, "12345");
-
-            // Assert
-            _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]

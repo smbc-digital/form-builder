@@ -148,6 +148,17 @@ namespace form_builder.Services.PageService
             if (page is null)
                 throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
+
+            if (page.Elements.Any(_ => _.Type.Equals(EElementType.Summary)))
+            {
+                foreach (var schemaPage in baseForm.Pages)
+                    await _schemaFactory.TransformPage(schemaPage, sessionGuid);
+            }
+            else
+            {
+                await _schemaFactory.TransformPage(page, sessionGuid);
+            }
+
             List<object> searchResults = null;
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
@@ -202,15 +213,15 @@ namespace form_builder.Services.PageService
             if (!_formAvailabilityServics.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
 
-            var currentPage = baseForm.GetPage(_pageHelper, path);
-
             var sessionGuid = _sessionHelper.GetSessionGuid();
-
             if (sessionGuid is null)
                 throw new NullReferenceException($"Session guid null.");
 
+            var currentPage = baseForm.GetPage(_pageHelper, path);
             if (currentPage is null)
                 throw new NullReferenceException($"Current page '{path}' object could not be found.");
+
+            await _schemaFactory.TransformPage(currentPage, sessionGuid);
 
             if (currentPage.HasIncomingPostValues)
                 viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);

@@ -151,7 +151,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithEnvironmentAvailability("local", false)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             var result = await _service.ProcessPage("form", "page-one", "", new QueryCollection());
@@ -167,7 +167,7 @@ namespace form_builder_tests.UnitTests.Services {
 
             // Assert
             Assert.Null(result);
-            _mockSchemaFactory.Verify(_ => _.Build(It.IsAny<string>(), string.Empty), Times.Once);
+            _mockSchemaFactory.Verify(_ => _.Build(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -190,7 +190,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -227,7 +227,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -256,7 +256,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .Build();
 
             _mockSchemaFactory
-                .Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+                .Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -290,7 +290,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithBaseUrl("new-form")
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -323,7 +323,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithBaseUrl("new-form")
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -358,7 +358,7 @@ namespace form_builder_tests.UnitTests.Services {
                 StartPageUrl = "https://www.test.com/textbox/page-one"
             };
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
@@ -409,7 +409,7 @@ namespace form_builder_tests.UnitTests.Services {
                 StartPageUrl = "https://www.test.com/form/page-one"
             };
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
@@ -427,6 +427,93 @@ namespace form_builder_tests.UnitTests.Services {
         }
 
         [Fact]
+        public async Task ProcessPage_ShouldCallPageFactory_TransformPage_OnCurrentPageOnly_WhenPageIsNotASummary()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("test-textbox")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithBaseUrl("textbox")
+                .WithStartPageUrl("page-one")
+                .Build();
+
+            var viewModel = new FormBuilderViewModel
+            {
+                StartPageUrl = "https://www.test.com/textbox/page-one"
+            };
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(viewModel);
+
+            // Act
+            await _service.ProcessPage("form", "page-one", "", new QueryCollection());
+
+            // Assert
+            _mockSchemaFactory.Verify(_ => _.TransformPage(page, It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessPage_ShouldCallPageFactory_TransformPage_OnEachSchemaPage_WhenPageHasSummaryElement()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("test-textbox")
+                .Build();
+
+            var summaryElement = new ElementBuilder()
+                .WithType(EElementType.Summary)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var summaryPage = new PageBuilder()
+                .WithElement(summaryElement)
+                .WithPageSlug("summary")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithPage(summaryPage)
+                .WithBaseUrl("textbox")
+                .WithStartPageUrl("page-one")
+                .Build();
+
+            var viewModel = new FormBuilderViewModel
+            {
+                StartPageUrl = "https://www.test.com/textbox/page-one"
+            };
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(viewModel);
+
+            // Act
+            await _service.ProcessPage("form", "summary", "", new QueryCollection());
+
+            // Assert
+            _mockSchemaFactory.Verify(_ => _.TransformPage(page, It.IsAny<string>()), Times.Once);
+            _mockSchemaFactory.Verify(_ => _.TransformPage(summaryPage, It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
         public async Task ProcessRequest_ShouldThrowException_IfFormIsNotAvailable() {
             _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
                 .Returns(false);
@@ -439,11 +526,48 @@ namespace form_builder_tests.UnitTests.Services {
 
             var viewModel = new Dictionary<string, dynamic>();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null, true));
             _mockFormAvailabilityService.Verify(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessRequest_ShouldCallSchemaFactory_TransformPage()
+        {
+            // Arrange
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("textbox")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { "Guid", Guid.NewGuid().ToString() },
+                { element.Properties.QuestionId, "text" }
+            };
+
+            // Act
+            await _service.ProcessRequest("form", "page-one", viewModel, null, true);
+
+            // Assert
+            _mockSchemaFactory.Verify(_ => _.TransformPage(page, It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -467,7 +591,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -507,7 +631,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -548,7 +672,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -583,7 +707,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -621,7 +745,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -663,7 +787,7 @@ namespace form_builder_tests.UnitTests.Services {
                 StartPageUrl = "https://www.test.com/textarea/first-page"
             };
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _sessionHelper.Setup(_ => _.GetSessionGuid())
@@ -698,7 +822,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -730,7 +854,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -771,7 +895,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -812,7 +936,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -854,7 +978,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -895,7 +1019,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -932,7 +1056,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             // Act
@@ -968,7 +1092,7 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -1007,7 +1131,7 @@ namespace form_builder_tests.UnitTests.Services {
 
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), string.Empty))
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockAddAnotherService

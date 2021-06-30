@@ -49,7 +49,7 @@ namespace form_builder.Factories.Schema
             _userPageTransformFactories = userPageTransformFactories;
         }
 
-        public async Task<FormSchema> Build(string formKey, string sessionGuid = "")
+        public async Task<FormSchema> Build(string formKey)
         {
             if (!_schemaProvider.ValidateSchemaName(formKey).Result)
                 return null;
@@ -62,14 +62,7 @@ namespace form_builder.Factories.Schema
 
                 if (data is not null)
                 {
-                    formSchema = JsonConvert.DeserializeObject<FormSchema>(data);
-                    foreach (var page in formSchema.Pages)
-                    {
-                        foreach (var userPageFactory in _userPageTransformFactories)
-                            await userPageFactory.Transform(page, sessionGuid);
-                    }
-
-                    return formSchema;
+                    return JsonConvert.DeserializeObject<FormSchema>(data);
                 }
             }
             
@@ -83,13 +76,15 @@ namespace form_builder.Factories.Schema
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)
                 await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}", JsonConvert.SerializeObject(formSchema), _distributedCacheExpirationConfiguration.FormJson);
 
-            foreach (var page in formSchema.Pages)
-            {
-                foreach (var userPageFactory in _userPageTransformFactories)
-                    await userPageFactory.Transform(page, sessionGuid);
-            }
-
             return formSchema;
+        }
+
+        public async Task<Page> TransformPage(Page page, string sessionGuid)
+        {
+            foreach (var userPageFactory in _userPageTransformFactories)
+                await userPageFactory.Transform(page, sessionGuid);
+
+            return page;
         }
     }
 }

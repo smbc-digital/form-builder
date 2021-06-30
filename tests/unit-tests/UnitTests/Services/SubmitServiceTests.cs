@@ -54,7 +54,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             _mockSchemaFactory
-                .Setup(_ => _.Build(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(new FormSchema {
                     GenerateReferenceNumber = false
                 });
@@ -200,7 +200,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             _mockSchemaFactory
-                .Setup(_ => _.Build(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockPageHelper
@@ -248,7 +248,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(page);
 
             _mockSchemaFactory
-                .Setup(_ => _.Build(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockGateway
