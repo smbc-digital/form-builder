@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
+using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Models.Properties.ActionProperties;
@@ -22,10 +23,11 @@ namespace form_builder_tests.UnitTests.Workflows
         private readonly Mock<IPageService> _mockPageService = new();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new();
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new();
 
         public SuccessWorkflowTests()
         {
-            _workflow = new SuccessWorkflow(_mockPageService.Object, _mockSchemaFactory.Object, _mockActionsWorkflow.Object);
+            _workflow = new SuccessWorkflow(_mockPageService.Object, _mockSchemaFactory.Object, _mockActionsWorkflow.Object, _mockSessionHelper.Object);
 
             var element = new ElementBuilder()
                 .WithType(EElementType.H2)
@@ -44,8 +46,12 @@ namespace form_builder_tests.UnitTests.Workflows
                 .WithPage(page)
                 .Build();
 
+            _mockSessionHelper
+                .Setup(_ => _.GetSessionGuid())
+                .Returns("12345");
+
             _mockSchemaFactory
-                .Setup(_ => _.Build(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
             _mockPageService
@@ -57,13 +63,58 @@ namespace form_builder_tests.UnitTests.Workflows
         }
 
         [Fact]
-        public async Task Process_ShouldCallSchemaFactory()
+        public async Task Process_ShouldCallSchemaFactory_Build()
         {
             // Act
             await _workflow.Process(EBehaviourType.SubmitForm, "form");
 
             // Assert
-            _mockSchemaFactory.Verify(_ => _.Build("form", It.IsAny<string>()), Times.Once);
+            _mockSchemaFactory.Verify(_ => _.Build("form"), Times.Once);
+        }
+
+        [Fact]
+        public async Task Process_ShouldCallSessionHelper()
+        {
+            // Act
+            await _workflow.Process(EBehaviourType.SubmitForm, "form");
+
+            // Assert
+            _mockSessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
+        }
+
+        [Fact]
+        public async Task Process_ShouldCallSchemaFactory_TransformPage_ForEachPageInSchema()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.H2)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var successPage = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("success")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithStartPageUrl("page-one")
+                .WithBaseUrl("base-test")
+                .WithPage(page)
+                .WithPage(successPage)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>())).ReturnsAsync(formSchema);
+
+            // Act
+            await _workflow.Process(EBehaviourType.SubmitForm, "form");
+
+            // Assert
+            _mockSchemaFactory.Verify(_ => _.TransformPage(page, "12345"), Times.Once);
+            _mockSchemaFactory.Verify(_ => _.TransformPage(successPage, "12345"), Times.Once);
         }
 
         [Fact]
@@ -77,7 +128,7 @@ namespace form_builder_tests.UnitTests.Workflows
         }
 
         [Fact]
-        public async Task Process_ShouldCallActionService()
+        public async Task Process_ShouldCallActionWorkflow()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -102,7 +153,7 @@ namespace form_builder_tests.UnitTests.Workflows
                 })
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(formSchema);
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>())).ReturnsAsync(formSchema);
 
             // Act
             await _workflow.Process(EBehaviourType.SubmitForm, "form");

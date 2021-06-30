@@ -27,11 +27,12 @@ namespace form_builder.Factories.Transform.UserSchema
         public async Task<Page> Transform(Page page, string sessionGuid)
         {
             var newListOfElements = new List<IElement>();
+            var convertedAnswers = _pageHelper.GetSavedAnswers(sessionGuid);
             foreach (var element in page.Elements)
             {
                 if (element.Type.Equals(EElementType.AddAnother))
                 {
-                    newListOfElements.AddRange(GenerateListOfIncrementedElements(page.Elements, sessionGuid));
+                    newListOfElements.AddRange(GenerateListOfIncrementedElements(page.Elements, convertedAnswers));
                 }
 
                 newListOfElements.Add(element);
@@ -42,21 +43,11 @@ namespace form_builder.Factories.Transform.UserSchema
             return page;
         }
 
-        private IEnumerable<IElement> GenerateListOfIncrementedElements(IReadOnlyCollection<IElement> currentPageElements, string sessionGuid)
+        private IEnumerable<IElement> GenerateListOfIncrementedElements(IReadOnlyCollection<IElement> currentPageElements, FormAnswers convertedAnswers)
         {
             var addAnotherElement = currentPageElements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother));
             var addAnotherReplacementElements = new List<IElement>();
-            if (string.IsNullOrEmpty(sessionGuid))
-            {
-                sessionGuid = _sessionHelper.GetSessionGuid();
-                if (string.IsNullOrEmpty(sessionGuid))
-                {
-                    sessionGuid = Guid.NewGuid().ToString();
-                    _sessionHelper.SetSessionGuid(sessionGuid);
-                }
-            }
 
-            var convertedAnswers = _pageHelper.GetSavedAnswers(sessionGuid);
             var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
             var fieldsetIncrements = convertedAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
 
