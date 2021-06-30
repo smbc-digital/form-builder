@@ -33,7 +33,7 @@ namespace form_builder.Mappers
             _fileStorageProviders = fileStorageProviders;
             _hashUtil = hashUtil;
             _configuration = configuration;
-        } 
+        }
 
         public async Task<T> GetAnswerValue<T>(IElement element, FormAnswers formAnswers)
         {
@@ -171,41 +171,37 @@ namespace form_builder.Mappers
         {
             key = $"{key}{FileUploadConstants.SUFFIX}";
 
-            var listOfFiles = new List<File>();
+            List<File> listOfFiles = new();
 
-            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
-                .Where(_ => _.QuestionId.Equals(key))
-                .ToList()
-                .FirstOrDefault();
+            var value = formAnswers.Pages
+                .SelectMany(_ => _.Answers)
+                .FirstOrDefault(_ => _.QuestionId.Equals(key));
 
-            if (value is not null && value.Response is not null)
+                List<FileUploadModel> uploadedFiles = value.Response.ToObject(typeof(List<FileUploadModel>));
+            if (value is null || value.Response is null)
+                return null;
+
+
+            var fileStorageProvider = _fileStorageProviders.Get(_configuration["FileStorageProvider:Type"]);
+
+            foreach (var file in uploadedFiles)
             {
-                List<FileUploadModel> uploadedFiles = JsonConvert.DeserializeObject<List<FileUploadModel>>(value.Response.ToString());
+                var fileData = await fileStorageProvider.GetString(file.Key);
 
-                var fileStorageType = _configuration["FileStorageProvider:Type"];
-              
-                var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
+                if (fileData is null)
+                    throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {file.Key} from the distributed cache");
 
-                foreach (var file in uploadedFiles)
-                {
-                    var fileData = await fileStorageProvider.GetString(file.Key);
+                File model = new();
+                model.Content = fileData;
+                model.TrustedOriginalFileName = file.TrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100);
+                model.UntrustedOriginalFileName = file.UntrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100);
+                model.KeyName = key;
 
-                    if (fileData is null)
-                        throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {file.Key} from the distributed cache");
-
-                    File model = new();
-                    model.Content = fileData;
-                    model.TrustedOriginalFileName = file.TrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100);
-                    model.UntrustedOriginalFileName = file.UntrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100);
-                    model.KeyName = key;
-
-                    listOfFiles.Add(model);
-                }
-
-                return listOfFiles;
+                listOfFiles.Add(model);
             }
 
-            return null;
+            return listOfFiles;
+
         }
 
 
