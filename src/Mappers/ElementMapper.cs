@@ -177,10 +177,10 @@ namespace form_builder.Mappers
                 .SelectMany(_ => _.Answers)
                 .FirstOrDefault(_ => _.QuestionId.Equals(key));
 
-                List<FileUploadModel> uploadedFiles = value.Response.ToObject(typeof(List<FileUploadModel>));
             if (value is null || value.Response is null)
                 return null;
 
+            List<FileUploadModel> uploadedFiles = value.Response.ToObject(typeof(List<FileUploadModel>));
 
             var fileStorageProvider = _fileStorageProviders.Get(_configuration["FileStorageProvider:Type"]);
 
