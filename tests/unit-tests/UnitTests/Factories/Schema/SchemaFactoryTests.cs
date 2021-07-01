@@ -37,10 +37,6 @@ namespace form_builder_tests.UnitTests.Factories.Schema
 
         public SchemaFactoryTests()
         {
-            _mockUserPageFactory
-                .Setup(_ => _.Transform(It.IsAny<Page>(), It.IsAny<string>()))
-                .Returns(new Page());
-
             var mockUserPageFactoryItems = new List<IUserPageTransformFactory> { _mockUserPageFactory.Object };
             _mockUserPageFactories
                 .Setup(m => m.GetEnumerator())
@@ -111,7 +107,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .ReturnsAsync(true);
 
             // Act
-            await _schemaFactory.Build("form", string.Empty);
+            await _schemaFactory.Build("form");
 
             // Assert
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
@@ -271,6 +267,25 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             _mockFormSchemaIntegrityValidator.Verify(_ => _.Validate(It.IsAny<FormSchema>()), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task TransformPage_ShouldCallEachTransformFactory()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.P)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            // Act
+            await _schemaFactory.TransformPage(page, new FormAnswers());
+
+            // Assert
+            _mockUserPageFactory.Verify(_ => _.Transform(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Once);
         }
     }
 }

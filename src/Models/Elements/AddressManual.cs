@@ -14,6 +14,8 @@ namespace form_builder.Models.Elements
 {
     public class AddressManual : Element
     {
+        public AddressManual() => Type = EElementType.AddressManual;
+
         private string[] ErrorMessages
         {
             get
@@ -28,7 +30,7 @@ namespace form_builder.Models.Elements
 
         public bool IsLine1Valid => string.IsNullOrEmpty(Line1ValidationMessage);
 
-        public ErrorViewModel Line1ValidationModel => new ErrorViewModel
+        public ErrorViewModel Line1ValidationModel => new()
         {
             Id = GetCustomErrorId(AddressManualConstants.ADDRESS_LINE_1),
             IsValid = IsLine1Valid,
@@ -39,7 +41,7 @@ namespace form_builder.Models.Elements
 
         public bool IsTownValid => string.IsNullOrEmpty(TownValidationMessage);
 
-        public ErrorViewModel TownValidationModel => new ErrorViewModel
+        public ErrorViewModel TownValidationModel => new()
         {
             Id = GetCustomErrorId(AddressManualConstants.TOWN),
             IsValid = IsTownValid,
@@ -62,10 +64,6 @@ namespace form_builder.Models.Elements
         };
 
         public string ReturnURL { get; set; }
-        public AddressManual()
-        {
-            Type = EElementType.AddressManual;
-        }
 
         public AddressManual(ValidationResult validation)
         {
@@ -129,7 +127,7 @@ namespace form_builder.Models.Elements
         {
             SetAddressProperties(elementHelper, formAnswers, page.PageSlug, guid, viewModel);
 
-            if (results != null && results.Count == 0)
+            if (results is not null && results.Count.Equals(0))
                 Properties.DisplayNoResultsIAG = true;
 
             ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")

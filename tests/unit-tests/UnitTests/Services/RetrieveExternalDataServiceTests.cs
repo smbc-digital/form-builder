@@ -98,6 +98,57 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task Process_ShouldNot_AddDataToAdditionalFormData_ByDefault()
+        {
+            // Arrange
+            var action = new ActionBuilder()
+               .WithActionType(EActionType.RetrieveExternalData)
+               .WithPageActionSlug(new PageActionSlug
+               {
+                   URL = "www.test.com",
+                   AuthToken = string.Empty,
+                   Environment = "local"
+               })
+               .WithTargetQuestionId("targetId")
+               .Build();
+
+            var actions = new List<IAction> { action };
+
+            // Act
+            await _service.Process(actions, new FormSchema(), "test");
+
+            // Assert
+            Assert.Empty(_mappingEntity.FormAnswers.AdditionalFormData);
+            Assert.False(_mappingEntity.FormAnswers.AdditionalFormData.ContainsKey("targetId"));
+        }
+
+        [Fact]
+        public async Task Process_Should_AddDataToAdditionalFormData_If_IncludeInFormSubmission()
+        {
+            // Arrange
+            var action = new ActionBuilder()
+               .WithActionType(EActionType.RetrieveExternalData)
+               .WithPageActionSlug(new PageActionSlug
+               {
+                   URL = "www.test.com",
+                   AuthToken = string.Empty,
+                   Environment = "local"
+               })
+               .WithTargetQuestionId("targetId")
+               .Build();
+
+            action.Properties.IncludeInFormSubmission = true;
+            var actions = new List<IAction> { action };
+
+            // Act
+            await _service.Process(actions, new FormSchema(), "test");
+
+            // Assert
+            Assert.Single(_mappingEntity.FormAnswers.AdditionalFormData);
+            Assert.True(_mappingEntity.FormAnswers.AdditionalFormData.ContainsKey("targetId"));
+        }
+
+        [Fact]
         public async Task Process_Should_NotCallGatewayToUpdateHeader_IfNoAuthTokenProvided()
         {
             // Arrange

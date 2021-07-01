@@ -12,14 +12,9 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (element.Type != EElementType.Booking ||
-                (element.Type == EElementType.Booking && viewModel.IsCheckYourBooking()))
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+            if (!element.Type.Equals(EElementType.Booking) ||
+                (element.Type.Equals(EElementType.Booking) && viewModel.IsCheckYourBooking()))
+                return new ValidationResult { IsValid = true };
 
             var bookingElement = (Booking)element;
 
@@ -27,12 +22,7 @@ namespace form_builder.Validators
             var containsBookingStartTime = viewModel.ContainsKey(bookingElement.StartTimeQuestionId);
 
             if (!containsBookingDate && !containsBookingStartTime && element.Properties.Optional)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             if (!containsBookingDate)
             {
@@ -86,10 +76,7 @@ namespace form_builder.Validators
                 };
             }
 
-            return new ValidationResult
-            {
-                IsValid = true
-            };
+            return new ValidationResult { IsValid = true };
         }
 
         private string ValidationMessage(bool isDateValid, bool isTimeValid, string customValidationMessage)

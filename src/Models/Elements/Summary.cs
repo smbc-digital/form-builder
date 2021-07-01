@@ -12,10 +12,7 @@ namespace form_builder.Models.Elements
 {
     public class Summary : Element
     {
-        public Summary()
-        {
-            Type = EElementType.Summary;
-        }
+        public Summary() => Type = EElementType.Summary;
 
         public override async Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
@@ -27,10 +24,10 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
-            List<PageSummary> pages = elementHelper.GenerateQuestionAndAnswersList(guid, formSchema);
+            List<PageSummary> pages = await elementHelper.GenerateQuestionAndAnswersList(guid, formSchema);
             var summaryViewModel = new SummarySectionsViewModel();
 
-            if (formSchema.Pages.Any(_ => _.Elements.Any(_ => _.Type == EElementType.AddAnother)) && !Properties.HasSummarySectionsDefined)
+            if (formSchema.Pages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.AddAnother))) && !Properties.HasSummarySectionsDefined)
             {
                 summaryViewModel = AutoGenerateSummarySectionsViewModel(formSchema, formAnswers, pages, elementHelper);
 
@@ -66,12 +63,12 @@ namespace form_builder.Models.Elements
             var temporarySlugGroup = new List<string>();
             foreach (var schemaPage in formSchema.Pages)
             {
-                if (schemaPage.Elements.Any(_ => _.Type == EElementType.AddAnother))
+                if (schemaPage.Elements.Any(_ => _.Type.Equals(EElementType.AddAnother)))
                 {
                     temporarySlugGroup.Add(schemaPage.PageSlug);
                     groupedPageSlugs.Add(temporarySlugGroup);
                     temporarySlugGroup = new List<string>();
-                    groupedPageSlugs.Add(new List<string> { $"{schemaPage.PageSlug}-{schemaPage.Elements.FirstOrDefault(_ => _.Type == EElementType.AddAnother).Properties.QuestionId}" });
+                    groupedPageSlugs.Add(new List<string> { $"{schemaPage.PageSlug}-{schemaPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.QuestionId}" });
                 }
                 else
                 {
@@ -90,8 +87,8 @@ namespace form_builder.Models.Elements
             }
 
             List<IElement> addAnotherElements = formSchema.Pages
-                .Where(_ => _.Elements.Any(_ => _.Type == EElementType.AddAnother))
-                .SelectMany(_ => _.Elements.Where(_ => _.Type == EElementType.AddAnother)).ToList();
+                .Where(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.AddAnother)))
+                .SelectMany(_ => _.Elements.Where(_ => _.Type.Equals(EElementType.AddAnother))).ToList();
 
             foreach (var element in addAnotherElements)
             {
@@ -129,9 +126,9 @@ namespace form_builder.Models.Elements
 
         private SummarySectionsViewModel GenerateDefinedSummarySectionViewModel(FormSchema formSchema, FormAnswers formAnswers, IEnumerable<PageSummary> pages, IElementHelper elementHelper)
         {
-            if (formSchema.Pages.Any(_ => _.Elements.Any(_ => _.Type == EElementType.AddAnother)))
+            if (formSchema.Pages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.AddAnother))))
             {
-                var newSections = new List<Section>();
+                List<Section> newSections = new();
 
                 foreach (Section section in Properties.Sections)
                 {
@@ -140,9 +137,9 @@ namespace form_builder.Models.Elements
                         newSections.Add(section);
 
                         Page schemaPageForSection = formSchema.Pages.FirstOrDefault(_ => _.PageSlug.Equals(sectionPage));
-                        if (schemaPageForSection is not null && schemaPageForSection.Elements.Any(_ => _.Type == EElementType.AddAnother))
+                        if (schemaPageForSection is not null && schemaPageForSection.Elements.Any(_ => _.Type.Equals(EElementType.AddAnother)))
                         {
-                            IElement addAnotherElement = schemaPageForSection.Elements.FirstOrDefault(_ => _.Type == EElementType.AddAnother);
+                            IElement addAnotherElement = schemaPageForSection.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother));
                             int currentIncrement = elementHelper.GetAddAnotherNumberOfFieldsets(addAnotherElement, formAnswers);
 
                             for (var i = 1; i <= currentIncrement; i++)

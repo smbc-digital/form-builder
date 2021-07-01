@@ -14,10 +14,7 @@ namespace form_builder.Models.Elements
 
         public string VendorJSFIle => $"{Properties.Source}/vendor-latest.js";
 
-        public Map()
-        {
-            Type = EElementType.Map;
-        }
+        public Map() => Type = EElementType.Map;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,

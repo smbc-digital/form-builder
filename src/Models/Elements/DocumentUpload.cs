@@ -10,10 +10,7 @@ namespace form_builder.Models.Elements
 {
     public class DocumentUpload : Element
     {
-        public DocumentUpload()
-        {
-            Type = EElementType.DocumentUpload;
-        }
+        public DocumentUpload() => Type = EElementType.DocumentUpload;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,

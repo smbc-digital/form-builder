@@ -35,20 +35,20 @@ namespace form_builder.Workflows.ActionsWorkflow
 
         public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
         {
-            if (formSchema == null)
+            if (formSchema is null)
                 formSchema = await _schemaFactory.Build(formName);
 
             if (actions.Any(_ => _.Type.Equals(EActionType.RetrieveExternalData)))
-                await _retrieveExternalDataService.Process(actions.Where(_ => _.Type == EActionType.RetrieveExternalData).ToList(), formSchema, formName);
+                await _retrieveExternalDataService.Process(actions.Where(_ => _.Type.Equals(EActionType.RetrieveExternalData)).ToList(), formSchema, formName);
 
             if (actions.Any(_ => _.Type.Equals(EActionType.UserEmail) || _.Type.Equals(EActionType.BackOfficeEmail)))
-                await _emailService.Process(actions.Where(_ => _.Type == EActionType.UserEmail || _.Type == EActionType.BackOfficeEmail).ToList());
+                await _emailService.Process(actions.Where(_ => _.Type.Equals(EActionType.UserEmail) || _.Type.Equals(EActionType.BackOfficeEmail)).ToList());
 
             if (actions.Any(_ => _.Type.Equals(EActionType.Validate)))
-                await _validateService.Process(actions.Where(_ => _.Type == EActionType.Validate).ToList(), formSchema, formName);
+                await _validateService.Process(actions.Where(_ => _.Type.Equals(EActionType.Validate)).ToList(), formSchema, formName);
 
             if (actions.Any(_ => _.Type.Equals(EActionType.TemplatedEmail)))
-                _ = _templatedEmailService.ProcessTemplatedEmail(actions.Where(_ => _.Type == EActionType.TemplatedEmail).ToList());
+                _ = _templatedEmailService.ProcessTemplatedEmail(actions.Where(_ => _.Type.Equals(EActionType.TemplatedEmail)).ToList());
         }
     }
 }

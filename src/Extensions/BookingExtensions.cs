@@ -5,8 +5,8 @@ namespace form_builder.Extensions
 {
     public static class BookingExtensions
     {
-        public static bool IsEmpty(this Booking value) => value.Id == Guid.Empty
-            && value.Date == DateTime.MinValue
-            && value.StartTime == DateTime.MinValue;
+        public static bool IsEmpty(this Booking value) => value.Id.Equals(Guid.Empty)
+            && value.Date.Equals(DateTime.MinValue)
+            && value.StartTime.Equals(DateTime.MinValue);
     }
 }

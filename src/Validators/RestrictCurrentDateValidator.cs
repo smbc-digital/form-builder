@@ -10,13 +10,8 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (!element.Properties.RestrictCurrentDate || element.Type == EElementType.DatePicker)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+            if (!element.Properties.RestrictCurrentDate || element.Type.Equals(EElementType.DatePicker))
+                return new ValidationResult { IsValid = true };
 
             var valueDay = viewModel.ContainsKey($"{element.Properties.QuestionId}-day")
                 ? viewModel[$"{element.Properties.QuestionId}-day"]
@@ -31,12 +26,7 @@ namespace form_builder.Validators
                 : null;
 
             if (element.Properties.Optional && string.IsNullOrEmpty(valueDay) && string.IsNullOrEmpty(valueMonth) && string.IsNullOrEmpty(valueYear))
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out _);
             if (!isValidDate)
@@ -53,7 +43,7 @@ namespace form_builder.Validators
             var date = DateTime.Today;
             var dateOutput = DateTime.Parse($"{valueDay}/{valueMonth}/{valueYear}");
 
-            if (element.Properties.RestrictCurrentDate && dateOutput == date)
+            if (element.Properties.RestrictCurrentDate && dateOutput.Equals(date))
             {
                 return new ValidationResult
                 {

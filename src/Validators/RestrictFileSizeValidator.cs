@@ -11,7 +11,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (element.Type != EElementType.FileUpload && element.Type != EElementType.MultipleFileUpload)
+            if (!element.Type.Equals(EElementType.FileUpload) && !element.Type.Equals(EElementType.MultipleFileUpload))
                 return new ValidationResult { IsValid = true };
 
             var key = $"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
@@ -21,10 +21,10 @@ namespace form_builder.Validators
 
             List<DocumentModel> documentModel = viewModel[key];
 
-            if (documentModel == null)
+            if (documentModel is null)
                 return new ValidationResult { IsValid = true };
 
-            return element.Type == EElementType.FileUpload
+            return element.Type.Equals(EElementType.FileUpload)
                 ? SingleFileUpload(element, documentModel)
                 : MultiFileUpload(element, documentModel);
         }
@@ -38,7 +38,7 @@ namespace form_builder.Validators
             if (!invalidFileSizes.Any())
                 return new ValidationResult { IsValid = true };
 
-            var validationMessage = documentModel.Count == 1
+            var validationMessage = documentModel.Count.Equals(1)
                 ? $"The selected file must be smaller than {maxFileSize / SystemConstants.OneMBInBinaryBytes}MB"
                 : invalidFileSizes.Select(_ => $"{_.FileName} must be smaller than {maxFileSize / SystemConstants.OneMBInBinaryBytes}MB").Aggregate((curr, acc) => $"{acc} <br/> {curr}");
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using form_builder.Models;
 
@@ -14,6 +15,6 @@ namespace form_builder.Extensions
                   : value.First().ToUpper();
         }
 
-        public static AppointmentType GetAppointmentTypeForEnvironment(this List<AppointmentType> value, string environment) => value.First(_ => _.Environment.ToLower().Equals(environment.ToLower()));
+        public static AppointmentType GetAppointmentTypeForEnvironment(this List<AppointmentType> value, string environment) => value.First(_ => _.Environment.Equals(environment, StringComparison.OrdinalIgnoreCase));
     }
 }

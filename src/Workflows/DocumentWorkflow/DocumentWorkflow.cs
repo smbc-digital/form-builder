@@ -28,13 +28,13 @@ namespace form_builder.Workflows.DocumentWorkflow
         {
             var formData = _distributedCache.GetString($"document-{id.ToString()}");
 
-            if (formData == null)
+            if (formData is null)
                 throw new DocumentExpiredException($"DocumentWorkflow::GenerateSummaryDocument, Previous answers has expired, unable to generate {documentType.ToString()} document for summary");
 
             var previousAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-            var baseForm = await _schemaFactory.Build(previousAnswers.FormName, $"document-{id}");
+            var baseForm = await _schemaFactory.Build(previousAnswers.FormName);
 
-            return _documentSummaryService.GenerateDocument(new DocumentSummaryEntity
+            return await _documentSummaryService.GenerateDocument(new DocumentSummaryEntity
             {
                 DocumentType = documentType,
                 PreviousAnswers = previousAnswers,

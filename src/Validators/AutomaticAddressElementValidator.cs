@@ -9,31 +9,16 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (element.Type != Enum.EElementType.Address)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+            if (!element.Type.Equals(Enum.EElementType.Address))
+                return new ValidationResult { IsValid = true };
 
             var addressElement = (Address)element;
             if (!viewModel.ContainsKey(addressElement.AddressSelectQuestionId))
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             var value = viewModel[addressElement.AddressSelectQuestionId];
             if (addressElement.Properties.Optional && string.IsNullOrEmpty(value))
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             var isValid = AddressConstants.UPRN_REGEX.IsMatch(value);
 

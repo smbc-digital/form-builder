@@ -14,7 +14,7 @@ namespace form_builder.Builders.Document
             if (string.IsNullOrWhiteSpace(answer))
                 return;
 
-            if (type == EElementType.FileUpload || type == EElementType.MultipleFileUpload)
+            if (type.Equals(EElementType.FileUpload) || type.Equals(EElementType.MultipleFileUpload))
                 _filesData.Add($"{question}: {answer}");
             else
                 _data.Add($"{question}: {answer}");

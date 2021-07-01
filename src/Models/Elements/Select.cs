@@ -9,10 +9,8 @@ namespace form_builder.Models.Elements
 {
     public class Select : Element
     {
-        public Select()
-        {
-            Type = EElementType.Select;
-        }
+        public Select() => Type = EElementType.Select;
+
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,

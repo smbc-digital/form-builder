@@ -389,6 +389,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<ILookupSchemaTransformFactory, LookupSchemaTransformFactory>();
             services.AddTransient<IReusableElementSchemaTransformFactory, ReusableElementSchemaTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, AddAnotherPageTransformFactory>();
+            services.AddTransient<IUserPageTransformFactory, DynamicLookupPageTransformFactory>();
 
             return services;
         }
@@ -502,6 +503,7 @@ namespace form_builder.Utils.Startup
             services.AddDataProtection().SetApplicationName("formbuilder");
             services.AddTransient<IFileStorageProvider, RedisFileStorageProvider>();
             services.AddTransient<IFileStorageProvider, InMemoryStorageProvider>();
+            services.AddTransient<IFileStorageProvider, S3FileStorageProvider>();
 
             return services;
         }

@@ -39,7 +39,7 @@ namespace form_builder.Validators
             if (currentElementValue < comparisonElementValue) 
                 return new ValidationResult { IsValid = true };
 
-            if (currentElement.Properties.IsDateEqualityAllowed && currentElementValue == comparisonElementValue)
+            if (currentElement.Properties.IsDateEqualityAllowed && currentElementValue.Equals(comparisonElementValue))
                 return new ValidationResult { IsValid = true };
 
             return new ValidationResult {
@@ -52,13 +52,13 @@ namespace form_builder.Validators
 
         private bool IsValidatorRelevant(IElement element, IElement comparisonElement)
         {
-            if (element.Type != EElementType.DatePicker && element.Type != EElementType.DateInput)
+            if (!element.Type.Equals(EElementType.DatePicker) && !element.Type.Equals(EElementType.DateInput))
                 return false;
             
-            if (comparisonElement == null)
+            if (comparisonElement is null)
                 return false;
 
-            if (comparisonElement.Type != EElementType.DatePicker && comparisonElement.Type != EElementType.DateInput)
+            if (!comparisonElement.Type.Equals(EElementType.DatePicker) && !comparisonElement.Type.Equals(EElementType.DateInput))
                 return false;
 
             if ((string.IsNullOrEmpty(element.Properties.IsDateBefore)))
@@ -69,10 +69,10 @@ namespace form_builder.Validators
         
         private DateTime? GetElementValue(IElement element, Dictionary<string, dynamic> viewModel)
         {   
-            if (element.Type == EElementType.DatePicker)
+            if (element.Type.Equals(EElementType.DatePicker))
                 return DatePicker.GetDate(viewModel, element.Properties.QuestionId);
 
-            if (element.Type == EElementType.DateInput)
+            if (element.Type.Equals(EElementType.DateInput))
                 return DateInput.GetDate(viewModel, element.Properties.QuestionId);
 
             return new DateTime();
@@ -80,10 +80,10 @@ namespace form_builder.Validators
 
         private DateTime? GetElementValue(IElement element,  FormAnswers formAnswers)
         {            
-            if (element.Type == EElementType.DatePicker)
+            if (element.Type.Equals(EElementType.DatePicker))
                 return DatePicker.GetDate(formAnswers, element.Properties.QuestionId);
 
-            if (element.Type == EElementType.DateInput)
+            if (element.Type.Equals(EElementType.DateInput))
                 return DateInput.GetDate(formAnswers, element.Properties.QuestionId);
 
             return new DateTime();

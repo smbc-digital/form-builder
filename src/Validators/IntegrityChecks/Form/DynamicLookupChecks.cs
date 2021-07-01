@@ -32,7 +32,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                        element.Lookup.Equals(LookUpConstants.Dynamic))
                 .ToList();
 
-            if (elements.Count == 0)
+            if (elements.Count.Equals(0))
                 return result;
 
             foreach (var element in elements)

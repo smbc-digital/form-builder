@@ -10,10 +10,7 @@ namespace form_builder.Models.Elements
 {
     public class TimeInput : Element
     {
-        public TimeInput()
-        {
-            Type = EElementType.TimeInput;
-        }
+        public TimeInput() => Type = EElementType.TimeInput;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,

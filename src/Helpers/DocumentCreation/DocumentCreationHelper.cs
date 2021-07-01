@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using form_builder.Builders.Document;
 using form_builder.Extensions;
 using form_builder.Mappers;
@@ -12,7 +13,7 @@ namespace form_builder.Helpers.DocumentCreation
         private readonly IElementMapper _elementMapper;
         public DocumentCreationHelper(IElementMapper elementMapper) => _elementMapper = elementMapper;
 
-        public List<string> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema)
+        public async Task<List<string>> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema)
         {
             var summaryBuilder = new SummaryAnswerBuilder();
             var reducedAnswers = FormAnswersExtensions.GetReducedAnswers(formAnswers, formSchema);
@@ -20,15 +21,15 @@ namespace form_builder.Helpers.DocumentCreation
             foreach (var page in formSchema.Pages.ToList())
             {
                 var formSchemaQuestions = page.ValidatableElements
-                    .Where(_ => _ != null)
+                    .Where(_ => _ is not null)
                     .ToList();
 
-                if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug == page.PageSlug).Select(p => p).Any())
+                if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug.Equals(page.PageSlug)).Select(p => p).Any())
                     continue;
 
-                formSchemaQuestions.ForEach(question =>
+                formSchemaQuestions.ForEach(async question =>
                 {
-                    var answer = _elementMapper.GetAnswerStringValue(question, formAnswers);
+                    var answer = await _elementMapper.GetAnswerStringValue(question, formAnswers);
                     summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
 
                     summaryBuilder.AddBlankLine();

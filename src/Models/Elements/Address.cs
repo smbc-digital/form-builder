@@ -14,6 +14,8 @@ namespace form_builder.Models.Elements
 {
     public class Address : Element
     {
+        public Address() => Type = EElementType.Address;
+
         public List<SelectListItem> Items { get; set; }
 
         public string ReturnURL { get; set; }
@@ -47,12 +49,6 @@ namespace form_builder.Models.Elements
 
         public override string GetLabelText(string pageTitle) => $"{(string.IsNullOrEmpty(Properties.SummaryLabel) ? pageTitle : Properties.SummaryLabel)}{GetIsOptionalLabelText()}";
         
-
-        public Address()
-        {
-            Type = EElementType.Address;
-        }
-
         public override async Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,
@@ -86,14 +82,14 @@ namespace form_builder.Models.Elements
                         : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
                     var selectedAddress = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, AddressConstants.SELECT_SUFFIX);
-                    var searchSuffix = results?.Count == 1 ? "address found" : "addresses found";
+                    var searchSuffix = (bool)(results?.Count.Equals(1)) ? "address found" : "addresses found";
                     Items = new List<SelectListItem> { new SelectListItem($"{results.Count} {searchSuffix}", string.Empty) };
 
                     results.ForEach((objectResult) =>
                     {
                         AddressSearchResult searchResult;
 
-                        if ((objectResult as JObject) != null)
+                        if ((objectResult as JObject) is not null)
                             searchResult = (objectResult as JObject).ToObject<AddressSearchResult>();
                         else
                             searchResult = objectResult as AddressSearchResult;

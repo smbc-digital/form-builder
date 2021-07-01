@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Enum;
@@ -50,7 +49,7 @@ namespace form_builder.Factories.Schema
             _userPageTransformFactories = userPageTransformFactories;
         }
 
-        public async Task<FormSchema> Build(string formKey, string sessionGuid = "")
+        public async Task<FormSchema> Build(string formKey)
         {
             if (!_schemaProvider.ValidateSchemaName(formKey).Result)
                 return null;
@@ -61,15 +60,9 @@ namespace form_builder.Factories.Schema
             {
                 string data = _distributedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}");
 
-                if (data != null)
+                if (data is not null)
                 {
-                    formSchema = JsonConvert.DeserializeObject<FormSchema>(data);
-                    foreach (var page in formSchema.Pages)
-                    {
-                        _userPageTransformFactories.Aggregate(page, (current, userPageFactory) => userPageFactory.Transform(current, sessionGuid));
-                    }
-
-                    return formSchema;
+                    return JsonConvert.DeserializeObject<FormSchema>(data);
                 }
             }
             
@@ -83,12 +76,15 @@ namespace form_builder.Factories.Schema
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)
                 await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}", JsonConvert.SerializeObject(formSchema), _distributedCacheExpirationConfiguration.FormJson);
 
-            foreach (var page in formSchema.Pages)
-            {
-                _userPageTransformFactories.Aggregate(page, (current, userPageFactory) => userPageFactory.Transform(current, sessionGuid));
-            }
-
             return formSchema;
+        }
+
+        public async Task<Page> TransformPage(Page page, FormAnswers convertedAnswers)
+        {
+            foreach (var userPageFactory in _userPageTransformFactories)
+                await userPageFactory.Transform(page, convertedAnswers);
+
+            return page;
         }
     }
 }

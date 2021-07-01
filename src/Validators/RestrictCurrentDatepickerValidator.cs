@@ -10,13 +10,8 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (!element.Properties.RestrictCurrentDate || element.Type != EElementType.DatePicker || element.Properties.Optional)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+            if (!element.Properties.RestrictCurrentDate || !element.Type.Equals(EElementType.DatePicker) || element.Properties.Optional)
+                return new ValidationResult { IsValid = true };
 
             var value = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId] : null;
 
@@ -37,7 +32,7 @@ namespace form_builder.Validators
             var date = DateTime.Today;
             var dateOutput = DateTime.Parse(value);
 
-            if (dateOutput == date)
+            if (dateOutput.Equals(date))
             {
                 return new ValidationResult
                 {

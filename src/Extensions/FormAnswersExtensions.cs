@@ -26,24 +26,24 @@ namespace form_builder.Extensions
         {
             var page = new Page();
             var currentAnswer = answers.Find(_ => _.PageSlug.Equals(currentPageSlug));
-            if (currentAnswer == null)
+            if (currentAnswer is null)
                 return reducedAnswers;
 
             var currentSchema = schema.FindAll(_ => _.PageSlug.Equals(currentPageSlug));
-            if (currentSchema == null)
+            if (currentSchema is null)
                 return reducedAnswers;
 
             page = currentSchema.Count > 1
                 ? currentSchema.FirstOrDefault(page => page.CheckPageMeetsConditions(answersDictionary))
                 : currentSchema.FirstOrDefault();
 
-            if (page == null)
+            if (page is null)
                 return reducedAnswers;
 
             reducedAnswers.Add(currentAnswer);
 
             var behaviour = page.GetNextPage(answersDictionary);
-            if (behaviour.BehaviourType != EBehaviourType.GoToPage)
+            if (!behaviour.BehaviourType.Equals(EBehaviourType.GoToPage))
                 return reducedAnswers;
 
             return RecursivelyReduceAnswers(answers, answersDictionary, schema, behaviour.PageSlug, reducedAnswers);

@@ -10,13 +10,8 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (element.Type != EElementType.TimeInput)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+            if (!element.Type.Equals(EElementType.TimeInput))
+                return new ValidationResult { IsValid = true };
 
             var valueHours = viewModel.ContainsKey($"{element.Properties.QuestionId}{TimeConstants.HOURS_SUFFIX}")
                 ? viewModel[$"{element.Properties.QuestionId}{TimeConstants.HOURS_SUFFIX}"]
@@ -32,12 +27,7 @@ namespace form_builder.Validators
 
 
             if (string.IsNullOrEmpty(valueHours) && string.IsNullOrEmpty(valueMinutes) && string.IsNullOrEmpty(valueAmPm) && element.Properties.Optional)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             var isValid = !string.IsNullOrEmpty(valueHours) && !string.IsNullOrEmpty(valueMinutes);
 
