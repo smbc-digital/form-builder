@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Enum;
@@ -66,7 +65,8 @@ namespace form_builder.Factories.Schema
                     formSchema = JsonConvert.DeserializeObject<FormSchema>(data);
                     foreach (var page in formSchema.Pages)
                     {
-                        _userPageTransformFactories.Aggregate(page, (current, userPageFactory) => userPageFactory.Transform(current, sessionGuid));
+                        foreach (var userPageFactory in _userPageTransformFactories)
+                            await userPageFactory.Transform(page, sessionGuid);
                     }
 
                     return formSchema;
@@ -85,7 +85,8 @@ namespace form_builder.Factories.Schema
 
             foreach (var page in formSchema.Pages)
             {
-                _userPageTransformFactories.Aggregate(page, (current, userPageFactory) => userPageFactory.Transform(current, sessionGuid));
+                foreach (var userPageFactory in _userPageTransformFactories)
+                    await userPageFactory.Transform(page, sessionGuid);
             }
 
             return formSchema;
