@@ -55,7 +55,7 @@ namespace form_builder.Services.PageService
         private readonly IPageFactory _pageContentFactory;
         private readonly IIncomingDataHelper _incomingDataHelper;
         private readonly IActionsWorkflow _actionsWorkflow;
-        private readonly IFormAvailabilityService _formAvailabilityServics;
+        private readonly IFormAvailabilityService _formAvailabilityService;
         private readonly ILogger<IPageService> _logger;
         private readonly IConfiguration _configuration;
 
@@ -77,7 +77,7 @@ namespace form_builder.Services.PageService
             IIncomingDataHelper incomingDataHelper,
             IActionsWorkflow actionsWorkflow,
             IAddAnotherService addAnotherService,
-            IFormAvailabilityService formAvailabilityServics,
+            IFormAvailabilityService formAvailabilityService,
             ILogger<IPageService> logger,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
             IConfiguration configuration)
@@ -95,7 +95,7 @@ namespace form_builder.Services.PageService
             _successPageContentFactory = successPageFactory;
             _pageContentFactory = pageFactory;
             _environment = environment;
-            _formAvailabilityServics = formAvailabilityServics;
+            _formAvailabilityService = formAvailabilityService;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _incomingDataHelper = incomingDataHelper;
             _actionsWorkflow = actionsWorkflow;
@@ -123,7 +123,7 @@ namespace form_builder.Services.PageService
             if (baseForm is null)
                 return null;
 
-            if (!_formAvailabilityServics.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
+            if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
             {
                 _logger.LogWarning($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
                 return null;
@@ -148,22 +148,22 @@ namespace form_builder.Services.PageService
             if (page is null)
                 throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
-
-            if (page.Elements.Any(_ => _.Type.Equals(EElementType.Summary)))
-            {
-                foreach (var schemaPage in baseForm.Pages)
-                    await _schemaFactory.TransformPage(schemaPage, sessionGuid);
-            }
-            else
-            {
-                await _schemaFactory.TransformPage(page, sessionGuid);
-            }
-
             List<object> searchResults = null;
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+            if (page.Elements.Any(_ => _.Type.Equals(EElementType.Summary)))
+            {
+                var journeyPages = baseForm.GetReducedPages(convertedAnswers);
+                foreach (var schemaPage in journeyPages)
+                    await _schemaFactory.TransformPage(schemaPage, convertedAnswers);
+            }
+            else
+            {
+                await _schemaFactory.TransformPage(page, convertedAnswers);
+            }
 
             if (subPath.Equals(LookUpConstants.Automatic) || subPath.Equals(LookUpConstants.Manual))
             {
@@ -210,7 +210,7 @@ namespace form_builder.Services.PageService
         {
             FormSchema baseForm = await _schemaFactory.Build(form);
 
-            if (!_formAvailabilityServics.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
+            if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
@@ -221,7 +221,9 @@ namespace form_builder.Services.PageService
             if (currentPage is null)
                 throw new NullReferenceException($"Current page '{path}' object could not be found.");
 
-            await _schemaFactory.TransformPage(currentPage, sessionGuid);
+            var formData = _distributedCache.GetString(sessionGuid);
+            var convertedAnswers = !string.IsNullOrEmpty(formData) ? JsonConvert.DeserializeObject<FormAnswers>(formData) : new FormAnswers();
+            await _schemaFactory.TransformPage(currentPage, convertedAnswers);
 
             if (currentPage.HasIncomingPostValues)
                 viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);

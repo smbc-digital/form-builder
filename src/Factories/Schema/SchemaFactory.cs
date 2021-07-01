@@ -79,10 +79,10 @@ namespace form_builder.Factories.Schema
             return formSchema;
         }
 
-        public async Task<Page> TransformPage(Page page, string sessionGuid)
+        public async Task<Page> TransformPage(Page page, FormAnswers convertedAnswers)
         {
             foreach (var userPageFactory in _userPageTransformFactories)
-                await userPageFactory.Transform(page, sessionGuid);
+                await userPageFactory.Transform(page, convertedAnswers);
 
             return page;
         }
