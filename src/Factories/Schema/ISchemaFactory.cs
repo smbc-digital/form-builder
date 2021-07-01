@@ -7,6 +7,6 @@ namespace form_builder.Factories.Schema
     {
         Task<FormSchema> Build(string formKey);
 
-        Task<Page> TransformPage(Page page, string sessionGuid);
+        Task<Page> TransformPage(Page page, FormAnswers convertedAnswers);
     }
 }

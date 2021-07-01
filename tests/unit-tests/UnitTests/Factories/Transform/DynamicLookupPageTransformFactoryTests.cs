@@ -25,7 +25,6 @@ namespace form_builder_tests.UnitTests.Factories.Transform
     public class DynamicLookupPageTransformFactoryTests
     {
         private readonly Mock<IActionHelper> _mockActionHelper = new();
-        private readonly Mock<IPageHelper> _mockPageHelper = new();
         private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new();
         private readonly IEnumerable<ILookupProvider> _mockLookupProviders;
         private readonly Mock<ILookupProvider> _fakeLookupProvider = new();
@@ -43,9 +42,6 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 _fakeLookupProvider.Object
             };
 
-            _mockPageHelper
-                .Setup(_ => _.GetSavedAnswers(It.IsAny<string>()))
-                .Returns(new FormAnswers());
             _mockActionHelper
                 .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new RequestEntity
@@ -57,7 +53,6 @@ namespace form_builder_tests.UnitTests.Factories.Transform
 
             _dynamicLookupPageTransformFactory = new DynamicLookupPageTransformFactory(_mockActionHelper.Object,
                 _mockLookupProviders,
-                _mockPageHelper.Object,
                 _mockWebHostEnvironment.Object);
         }
 
@@ -80,12 +75,12 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Build();
 
             // Act & Assert
-            var result = await Assert.ThrowsAsync<Exception>(() => _dynamicLookupPageTransformFactory.Transform(page, "12345"));
+            var result = await Assert.ThrowsAsync<Exception>(() => _dynamicLookupPageTransformFactory.Transform(page, new FormAnswers()));
             Assert.Equal("DynamicLookupPageTransformFactory::AddDynamicOptions, No Environment specific details found", result.Message);
         }
 
         [Fact]
-        public async Task Transform_ShouldCall_PageHelper_And_ActionHelper()
+        public async Task Transform_ShouldCall_ActionHelper()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -106,10 +101,9 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Build();
 
             // Act
-            await _dynamicLookupPageTransformFactory.Transform(page, "12345");
+            await _dynamicLookupPageTransformFactory.Transform(page, new FormAnswers());
 
             // Assert
-            _mockPageHelper.Verify(_ => _.GetSavedAnswers(It.IsAny<string>()), Times.Once);
             _mockActionHelper.Verify(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()), Times.Once);
         }
 
@@ -134,7 +128,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Build();
 
             // Act & Assert
-            var result = await Assert.ThrowsAsync<Exception>(() => _dynamicLookupPageTransformFactory.Transform(page, "12345"));
+            var result = await Assert.ThrowsAsync<Exception>(() => _dynamicLookupPageTransformFactory.Transform(page, new FormAnswers()));
             Assert.Equal("DynamicLookupPageTransformFactory::AddDynamicOptions, No Provider name given in LookupSources", result.Message);
         }
 
@@ -160,50 +154,11 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Build();
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => _dynamicLookupPageTransformFactory.Transform(page, "12345"));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => _dynamicLookupPageTransformFactory.Transform(page, new FormAnswers()));
         }
 
         [Fact]
-        public async Task Transform_ShouldNotCallLookupProvider_IfOptionsFoundInCachedAnswers()
-        {
-            // Arrange
-            var formAnswers = new FormAnswers
-            {
-                FormData = new Dictionary<string, object>
-                {
-                    { "waste=waste", new List<Option> { new Option { Text = "option", Value = "option" } } }
-                }
-            };
-
-            _mockPageHelper
-                .Setup(_ => _.GetSavedAnswers(It.IsAny<string>()))
-                .Returns(formAnswers);
-
-            var element = new ElementBuilder()
-                .WithQuestionId("dynamicQuestion")
-                .WithLookup("dynamic")
-                .WithLookupSource(new LookupSource
-                {
-                    EnvironmentName = "local",
-                    Provider = "fake",
-                    URL = "waste={{wasteId}}"
-                })
-                .WithType(EElementType.Checkbox)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            // Act
-            await _dynamicLookupPageTransformFactory.Transform(page, "12345");
-
-            // Assert
-            _fakeLookupProvider.Verify(_ => _.GetAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task Transform_ShouldCallLookupProvider_IfOptionsNotFoundInCachedAnswers()
+        public async Task Transform_ShouldCallLookupProvider()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -224,7 +179,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Build();
 
             // Act
-            await _dynamicLookupPageTransformFactory.Transform(page, "12345");
+            await _dynamicLookupPageTransformFactory.Transform(page, new FormAnswers());
 
             // Assert
             _fakeLookupProvider.Verify(_ => _.GetAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
@@ -255,7 +210,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Build();
 
             // Act & Assert
-            var result = await Assert.ThrowsAsync<Exception>(() => _dynamicLookupPageTransformFactory.Transform(page, "12345"));
+            var result = await Assert.ThrowsAsync<Exception>(() => _dynamicLookupPageTransformFactory.Transform(page, new FormAnswers()));
             Assert.Equal("DynamicLookupPageTransformFactory::AddDynamicOptions, Provider returned no options", result.Message);
         }
     }

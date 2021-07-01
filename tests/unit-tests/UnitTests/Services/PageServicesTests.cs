@@ -461,13 +461,36 @@ namespace form_builder_tests.UnitTests.Services {
             await _service.ProcessPage("form", "page-one", "", new QueryCollection());
 
             // Assert
-            _mockSchemaFactory.Verify(_ => _.TransformPage(page, It.IsAny<string>()), Times.Once);
+            _mockSchemaFactory.Verify(_ => _.TransformPage(page, It.IsAny<FormAnswers>()), Times.Once);
         }
 
         [Fact]
         public async Task ProcessPage_ShouldCallPageFactory_TransformPage_OnEachSchemaPage_WhenPageHasSummaryElement()
         {
             // Arrange
+            var convertedAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers
+                    {
+                        PageSlug = "page-one",
+                        Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                QuestionId = "test-textbox",
+                                Response = "answer"
+                            }
+                        }
+                    }
+                }
+            };
+
+            _distributedCache
+                .Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(convertedAnswers));
+
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
                 .WithQuestionId("test-textbox")
@@ -477,19 +500,36 @@ namespace form_builder_tests.UnitTests.Services {
                 .WithType(EElementType.Summary)
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("summary")
+                .Build();
+
+            var behaviour2 = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageSlug("success")
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithPageSlug("page-one")
+                .WithBehaviour(behaviour)
                 .Build();
 
             var summaryPage = new PageBuilder()
                 .WithElement(summaryElement)
                 .WithPageSlug("summary")
+                .WithBehaviour(behaviour2)
+                .Build();
+
+            var successPage = new PageBuilder()
+                .WithPageSlug("success")
                 .Build();
 
             var schema = new FormSchemaBuilder()
                 .WithPage(page)
                 .WithPage(summaryPage)
+                .WithPage(successPage)
                 .WithBaseUrl("textbox")
                 .WithStartPageUrl("page-one")
                 .Build();
@@ -509,8 +549,7 @@ namespace form_builder_tests.UnitTests.Services {
             await _service.ProcessPage("form", "summary", "", new QueryCollection());
 
             // Assert
-            _mockSchemaFactory.Verify(_ => _.TransformPage(page, It.IsAny<string>()), Times.Once);
-            _mockSchemaFactory.Verify(_ => _.TransformPage(summaryPage, It.IsAny<string>()), Times.Once);
+            _mockSchemaFactory.Verify(_ => _.TransformPage(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Exactly(3));
         }
 
         [Fact]
@@ -567,7 +606,7 @@ namespace form_builder_tests.UnitTests.Services {
             await _service.ProcessRequest("form", "page-one", viewModel, null, true);
 
             // Assert
-            _mockSchemaFactory.Verify(_ => _.TransformPage(page, It.IsAny<string>()), Times.Once);
+            _mockSchemaFactory.Verify(_ => _.TransformPage(page, It.IsAny<FormAnswers>()), Times.Once);
         }
 
         [Fact]

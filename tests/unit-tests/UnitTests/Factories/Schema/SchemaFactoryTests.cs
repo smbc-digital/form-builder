@@ -268,5 +268,24 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             _mockFormSchemaIntegrityValidator.Verify(_ => _.Validate(It.IsAny<FormSchema>()), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         }
+
+        [Fact]
+        public async Task TransformPage_ShouldCallEachTransformFactory()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.P)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            // Act
+            await _schemaFactory.TransformPage(page, new FormAnswers());
+
+            // Assert
+            _mockUserPageFactory.Verify(_ => _.Transform(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Once);
+        }
     }
 }
