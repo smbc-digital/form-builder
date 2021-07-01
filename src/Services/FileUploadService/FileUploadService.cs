@@ -40,11 +40,11 @@ namespace form_builder.Services.FileUploadService
 
         public Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload)
         {
-            fileUpload.Where(_ => _ is not null)
-                .ToList()
+            fileUpload
+                .Where(_ => _ is not null)
                 .GroupBy(_ => _.QuestionId)
                 .ToList()
-                .ForEach((group) =>
+                .ForEach(group =>
                 {
                     viewModel.Add(group.Key, group.Select(_ => new DocumentModel
                     {

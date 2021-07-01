@@ -162,7 +162,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>
             {
                 {
-                    LookUpConstants.SubPathViewModelKey, 
+                    LookUpConstants.SubPathViewModelKey,
                     LookUpConstants.Automatic
                 }
             };
@@ -1162,23 +1162,20 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             // Arrange
             var questionId = "fileUpload";
-            var file = new List<CustomFormFile>();
-            file.Add(new CustomFormFile("content", questionId, 1, "newfile.txt"));
-            file.Add(new CustomFormFile("content", questionId, 1, "existingfile.txt"));
-            file.Add(new CustomFormFile("content", questionId, 1, "existingfiletwo.txt"));
+            List<CustomFormFile> files = new();
+            files.Add(new("content", questionId, 1, "newfile.txt"));
+            files.Add(new("content", questionId, 1, "existingfile.txt"));
+            files.Add(new("content", questionId, 1, "existingfiletwo.txt"));
 
-            var fileUpload = new List<FileUploadModel>();
-            fileUpload.Add(
-              new FileUploadModel
-              {
-                  Key = questionId,
-                  TrustedOriginalFileName = WebUtility.HtmlEncode("existingfile.txt"),
-                  UntrustedOriginalFileName = "existingfile.txt",
-                  FileSize = 0
-              }
-            );
-            fileUpload.Add(
-            new FileUploadModel
+            List<FileUploadModel> fileUpload = new();
+            fileUpload.Add(new()
+            {
+                Key = questionId,
+                TrustedOriginalFileName = WebUtility.HtmlEncode("existingfile.txt"),
+                UntrustedOriginalFileName = "existingfile.txt",
+                FileSize = 0
+            });
+            fileUpload.Add(new()
             {
                 Key = questionId,
                 TrustedOriginalFileName = WebUtility.HtmlEncode("existingfiletwo.txt"),
@@ -1186,17 +1183,17 @@ namespace form_builder_tests.UnitTests.Helpers
                 FileSize = 0
             });
 
-            var page = new PageAnswers
+            PageAnswers pageAnswers = new()
             {
                 PageSlug = "path",
-                Answers = new List<Answers>
+                Answers = new()
                 {
-                    new Answers { QuestionId = questionId, Response = JsonConvert.SerializeObject(fileUpload) }
+                    new() { QuestionId = questionId, Response = JsonConvert.SerializeObject(fileUpload) }
                 }
             };
 
             // Act
-            _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
+            _pageHelper.SaveFormFileAnswers(pageAnswers.Answers, files, true, pageAnswers);
 
             // Assert
             _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once());
@@ -1240,7 +1237,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void SavePaymentAmount_ShouldCallDistributedCache()
         {
             var sessionGuid = Guid.NewGuid().ToString();
-            _pageHelper.SavePaymentAmount(sessionGuid, "10.00" );
+            _pageHelper.SavePaymentAmount(sessionGuid, "10.00");
 
             _mockDistributedCache.Verify(_ => _.GetString(sessionGuid), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(sessionGuid, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
