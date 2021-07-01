@@ -31,6 +31,12 @@ namespace form_builder.Services.DocumentService
 
         public async Task<byte[]> GenerateDocument(DocumentSummaryEntity entity)
         {
+            var journeyPages = entity.FormSchema.GetReducedPages(entity.PreviousAnswers);
+            foreach (var page in journeyPages)
+            {
+                await _schemaFactory.TransformPage(page, entity.PreviousAnswers);
+            }
+
             switch (entity.DocumentType)
             {
                 case EDocumentType.Txt:
@@ -42,11 +48,7 @@ namespace form_builder.Services.DocumentService
 
         private async Task<byte[]> GenerateTextFile(FormAnswers formAnswers, FormSchema formSchema)
         {
-            var journeyPages = formSchema.GetReducedPages(formAnswers);
-            foreach (var page in journeyPages)
-            {
-                await _schemaFactory.TransformPage(page, formAnswers);
-            }
+            
 
             var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 

@@ -77,7 +77,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task GenerateDocument_ShouldCallSchemaFactory_WhenDocumentTypeIsTxt()
+        public async Task GenerateDocument_ShouldCallSchemaFactory()
         {
             // Act
             await _documentSummaryService.GenerateDocument(new DocumentSummaryEntity { FormSchema = _formSchema, DocumentType = EDocumentType.Txt, PreviousAnswers = _formAnswers });
