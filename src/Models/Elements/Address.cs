@@ -41,7 +41,7 @@ namespace form_builder.Models.Elements
             get
             {
                 if (IsSelect)
-                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Select the address below" : Properties.SelectLabel;
+                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Select the address from the list" : Properties.SelectLabel;
 
                 return string.IsNullOrEmpty(Properties.AddressLabel) ? "Postcode" : Properties.AddressLabel;
             }
