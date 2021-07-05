@@ -1,4 +1,6 @@
-﻿namespace form_builder.Models.Properties.ElementProperties
+﻿using form_builder.Constants;
+
+namespace form_builder.Models.Properties.ElementProperties
 {
     public partial class BaseProperty
     {
@@ -30,7 +32,7 @@
 
         public bool Disabled { get; set; } = false;
 
-        public string AddressManualLinkText { get; set; } = "I cannot find the address in the list";
+        public string AddressManualLinkText { get; set; } = AddressConstants.ADDRESS_MANUAL_DISABLED_TEXT;
 
         public bool DisableManualAddress { get; set; } = false;
 
