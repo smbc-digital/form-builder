@@ -14,7 +14,6 @@ namespace form_builder.Constants
         public const string SEARCH_SUFFIX = "-postcode";
         public const string SELECT_SUFFIX = "-address";
         public const string DESCRIPTION_SUFFIX = "-address-description";
-
         public const string ADDRESS_MANUAL_DISABLED_TEXT = "I cannot find the address in the list";
     }
 }
