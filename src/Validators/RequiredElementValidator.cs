@@ -54,7 +54,7 @@ namespace form_builder.Validators
                 else
                 {
                     key = $"{element.Properties.QuestionId}";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the street name";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the street name in the correct format";
                 }
             }
 

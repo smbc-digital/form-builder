@@ -39,7 +39,7 @@ namespace form_builder.Models.Elements
             get
             {
                 if (IsSelect)
-                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Select the street below" : Properties.SelectLabel;
+                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Select the street from the list" : Properties.SelectLabel;
 
                 return string.IsNullOrEmpty(Properties.Label) ? "Street name" : Properties.Label;
             }
