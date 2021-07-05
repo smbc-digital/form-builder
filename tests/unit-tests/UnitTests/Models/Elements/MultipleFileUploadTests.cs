@@ -136,5 +136,33 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.True(result.ContainsValue("smbc-multiple-file-upload"));
             Assert.True(result.ContainsValue(value * SystemConstants.OneMBInBinaryBytes));
         }
+
+        [Theory]
+        [InlineData(3)]
+        [InlineData(5)]
+        [InlineData(15)]
+        public void MaxFileSizeText_ShouldReturnCorrectText_ForFileSizeProvided(int maxFileSize)
+        {
+            //Arrange
+            var element = (MultipleFileUpload)new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .WithMaxFileSize(maxFileSize)
+                .Build();
+
+            //Act
+            Assert.Equal($"{maxFileSize}MB", element.MaxFileSizeText);
+        }
+
+        [Fact]
+        public void MaxFileSizeText_ShouldReturnCorrectText_WhenNo_MaxFileSize_Provided()
+        {
+            //Arrange
+            var element = (MultipleFileUpload)new ElementBuilder()
+                .WithType(EElementType.MultipleFileUpload)
+                .Build();
+
+            //Act
+            Assert.Equal("10MB", element.MaxFileSizeText);
+        }
     }
 }
