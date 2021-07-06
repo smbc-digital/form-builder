@@ -17,7 +17,7 @@ namespace form_builder.Models.Elements
         public MultipleFileUpload() => Type = EElementType.MultipleFileUpload;
 
         public string AllowFileTypeText { get { return Properties.AllowedFileTypes?.ToReadableFileType("and") ?? SystemConstants.AcceptedMimeTypes.ToReadableFileType("and"); } }
-        public string MaxFileSizeText { get { return $"{(Properties.MaxFileSize * (SystemConstants.OneMBInBinaryBytes.Equals(0) ? SystemConstants.DefaultMaxFileSize.ToReadableMaxFileSize() : Properties.MaxFileSize))}MB"; } }
+        public string MaxFileSizeText { get { return $"{((Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes).Equals(0) ? SystemConstants.DefaultMaxFileSize.ToReadableMaxFileSize() : Properties.MaxFileSize)}MB"; } }
         public string MaxCombinedFileSizeText { get { return $"{(Properties.MaxCombinedFileSize.Equals(0) ? SystemConstants.DefaultMaxCombinedFileSize.ToReadableMaxFileSize() : Properties.MaxCombinedFileSize)}MB"; } }
         public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
         public List<string> CurrentFilesUploaded { get; set; } = new List<string>();
