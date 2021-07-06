@@ -166,9 +166,13 @@ namespace form_builder.Services.MappingService
         {
             var data = new ExpandoObject() as IDictionary<string, dynamic>;
 
-            formSchema.Pages.SelectMany(_ => _.ValidatableElements)
-                .ToList()
-                .ForEach(async _ => data = await RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
+            var elements = formSchema.Pages.SelectMany(_ => _.ValidatableElements)
+                .ToList();
+
+            foreach (var element in elements)
+            {
+                data = await RecursiveCheckAndCreate(string.IsNullOrEmpty(element.Properties.TargetMapping) ? element.Properties.QuestionId : element.Properties.TargetMapping, element, formAnswers, data);
+            }
 
             if (formAnswers.AdditionalFormData.Any())
                 data = AddNonQuestionAnswers(data, formAnswers.AdditionalFormData);
