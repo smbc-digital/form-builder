@@ -431,7 +431,7 @@ namespace form_builder.Utils.Startup
             services.Configure<AwsSesKeysConfiguration>(configuration.GetSection(AwsSesKeysConfiguration.ConfigValue));
             services.Configure<CivicaPaymentConfiguration>(configuration.GetSection(CivicaPaymentConfiguration.ConfigValue));
             services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection(DistributedCacheExpirationConfiguration.ConfigValue));
-            services.Configure<FileStorageProviderConfiguration>(configuration.GetSection(NotifyConfiguration.ConfigValue));
+            services.Configure<FileStorageProviderConfiguration>(configuration.GetSection(FileStorageProviderConfiguration.ConfigValue));
             services.Configure<FormConfiguration>(configuration.GetSection(FormConfiguration.ConfigValue));
             services.Configure<HashConfiguration>(configuration.GetSection(HashConfiguration.ConfigValue));
             services.Configure<NotifyConfiguration>(configuration.GetSection(NotifyConfiguration.ConfigValue));
