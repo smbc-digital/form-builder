@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
@@ -13,6 +14,7 @@ using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace form_builder.Services.FileUploadService
@@ -20,22 +22,20 @@ namespace form_builder.Services.FileUploadService
     public class FileUploadService : IFileUploadService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
+        private readonly IFileStorageProvider _fileStorageProvider;
         private readonly IPageFactory _pageFactory;
         private readonly IPageHelper _pageHelper;
-        private readonly IConfiguration _configuration;
 
         public FileUploadService(IDistributedCacheWrapper distributedCache,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
             IPageFactory pageFactory,
             IPageHelper pageHelper,
-            IConfiguration configuration)
+            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
         {
             _distributedCache = distributedCache;
-            _fileStorageProviders = fileStorageProviders;
             _pageFactory = pageFactory;
             _pageHelper = pageHelper;
-            _configuration = configuration;
+            _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
         }
 
         public Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload)
@@ -91,12 +91,7 @@ namespace form_builder.Services.FileUploadService
             convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path)).Answers.FirstOrDefault().Response = response;
 
             _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
-
-            var fileStorageType = _configuration["FileStorageProvider:Type"];
-           
-            var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
-
-            fileStorageProvider.Remove(fileToRemove.Key);
+            _fileStorageProvider.Remove(fileToRemove.Key);
 
             return new ProcessRequestEntity
             {

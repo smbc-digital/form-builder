@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Builders;
@@ -10,7 +9,6 @@ using form_builder.ContentFactory.PageFactory;
 using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
-using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -67,11 +65,11 @@ namespace form_builder_tests.UnitTests.Services {
         private readonly Mock<IFormAvailabilityService> _mockFormAvailabilityService = new();
         private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new();
         private readonly Mock<ILogger<IPageService>> _mockLogger = new();
-        private readonly Mock<IConfiguration> _mockConfiguration = new();
+        private readonly Mock<IOptions<FileStorageProviderConfiguration>> _mockFileStorageConfiguration = new();
         private readonly Mock<IAddAnotherService> _mockAddAnotherService = new();
 
         public PageServicesTests() {
-            _mockConfiguration.Setup(_ => _["FileStorageProvider:Type"]).Returns("Redis");
+            _mockFileStorageConfiguration.Setup(_ => _.Value).Returns(new FileStorageProviderConfiguration { Type = "Redis" });
 
             _fileStorageProvider.Setup(_ => _.ProviderName).Returns("Redis");
             _fileStorageProviders = new List<IFileStorageProvider>
@@ -138,7 +136,7 @@ namespace form_builder_tests.UnitTests.Services {
                 _mockAddAnotherService.Object,
                 _mockFormAvailabilityService.Object,
                 _mockLogger.Object, _fileStorageProviders,
-                _mockConfiguration.Object
+                _mockFileStorageConfiguration.Object
                 );
         }
 

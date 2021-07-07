@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Builders;
+using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
@@ -17,6 +18,7 @@ using form_builder.Validators;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using Xunit;
@@ -33,7 +35,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IFileStorageProvider> _fileStorageProvider = new();
         private readonly Mock<IPageFactory> _mockPageFactory = new();
         private readonly Mock<IPageHelper> _mockPageHelper = new();
-        private readonly Mock<IConfiguration> _mockConfiguration = new();
+        private readonly Mock<IOptions<FileStorageProviderConfiguration>> _mockFileStorageConfiguration = new();
 
         private static readonly Element _element = new ElementBuilder()
             .WithType(EElementType.MultipleFileUpload)
@@ -53,7 +55,7 @@ namespace form_builder_tests.UnitTests.Services
 
         public FileUploadServiceTests()
         {
-            _mockConfiguration.Setup(_ => _["FileStorageProvider:Type"]).Returns("Redis");
+            _mockFileStorageConfiguration.Setup(_ => _.Value).Returns(new FileStorageProviderConfiguration { Type = "Redis" });
 
             _fileStorageProvider.Setup(_ => _.ProviderName).Returns("Redis");
             _fileStorageProviders = new List<IFileStorageProvider>
@@ -77,7 +79,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _validators.Setup(m => m.GetEnumerator()).Returns(() => elementValidatorItems.GetEnumerator());
 
-            _service = new FileUploadService(_mockDistributedCache.Object, _fileStorageProviders, _mockPageFactory.Object, _mockPageHelper.Object, _mockConfiguration.Object);
+            _service = new FileUploadService(_mockDistributedCache.Object, _fileStorageProviders, _mockPageFactory.Object, _mockPageHelper.Object, _mockFileStorageConfiguration.Object);
         }
 
         [Fact]

@@ -2,6 +2,7 @@
 {
     public class HashConfiguration
     {
+        public const string ConfigValue = "HashConfiguration";
         public string Salt { get; set; }
     }
 }

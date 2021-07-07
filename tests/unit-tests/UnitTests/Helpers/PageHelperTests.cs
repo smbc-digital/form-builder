@@ -39,11 +39,11 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings = new();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new();
-        private readonly Mock<IConfiguration> _mockConfiguration = new();
+        private readonly Mock<IOptions<FileStorageProviderConfiguration>> _mockFileStorageConfiguration = new();
 
         public PageHelperTests()
         {
-            _mockConfiguration.Setup(_ => _["FileStorageProvider:Type"]).Returns("Redis");
+            _mockFileStorageConfiguration.Setup(_ => _.Value).Returns(new FileStorageProviderConfiguration { Type = "Redis" });
 
             _fileStorageProvider.Setup(_ => _.ProviderName).Returns("Redis");
             _fileStorageProviders = new List<IFileStorageProvider>
@@ -73,7 +73,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 _mockElementHelper.Object, _mockDistributedCache.Object,
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockDistributedCacheExpirationSettings.Object,
-                _mockSessionHelper.Object, _fileStorageProviders, _mockConfiguration.Object);
+                _mockSessionHelper.Object, _fileStorageProviders, _mockFileStorageConfiguration.Object);
         }
 
         [Fact]
