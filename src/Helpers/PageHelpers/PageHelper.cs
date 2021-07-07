@@ -32,8 +32,6 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IFileStorageProvider _fileStorageProvider;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
-        private readonly FileStorageProviderConfiguration _fileStorageConfiguration;
-        
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper,
             IDistributedCacheWrapper distributedCache,
