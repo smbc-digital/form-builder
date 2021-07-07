@@ -3,7 +3,6 @@
     public class AwsSesKeysConfiguration
     {
         public const string ConfigValue = "Ses";
-        
         public string Accesskey { get; set; }
         public string Secretkey { get; set; }
 
