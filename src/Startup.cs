@@ -33,7 +33,6 @@ namespace form_builder
         {
             CultureInfo.CurrentCulture = new CultureInfo("en-GB");
             CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-GB");
-            services.AddDetection();
             services.AddControllersWithViews();
             services.AddRazorPages();
 
@@ -122,8 +121,7 @@ namespace form_builder
                     .UseHsts();
             }
 
-            app.UseDetection()
-                .UseMiddleware<HeaderConfiguration>()
+            app.UseMiddleware<HeaderConfiguration>()
                 .UseSession()
                 .UseHttpsRedirection()
                 .UseStaticFiles()
