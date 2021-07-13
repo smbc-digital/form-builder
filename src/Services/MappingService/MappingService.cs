@@ -19,7 +19,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
-using Wangkanai.Detection.Services;
 
 namespace form_builder.Services.MappingService
 {
@@ -31,21 +30,18 @@ namespace form_builder.Services.MappingService
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IWebHostEnvironment _environment;
         private ILogger<MappingService> _logger;
-        private readonly IDetectionService _detectionService;
 
         public MappingService(IDistributedCacheWrapper distributedCache,
             IElementMapper elementMapper,
             ISchemaFactory schemaFactory,
             IWebHostEnvironment environment,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            IDetectionService detectionService,
             ILogger<MappingService> logger)
         {
             _distributedCache = distributedCache;
             _elementMapper = elementMapper;
             _schemaFactory = schemaFactory;
             _environment = environment;
-            _detectionService = detectionService;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _logger = logger;
         }
@@ -109,10 +105,7 @@ namespace form_builder.Services.MappingService
             convertedAnswers.FormName = form;
 
             if (convertedAnswers.Pages is null || !convertedAnswers.Pages.Any())
-            {
-                var deviceInformation = $"Device Type: {_detectionService.Device.Type}, Browser Name/Version: {_detectionService.Browser.Name}/{_detectionService.Browser.Version}, Platform Name: {_detectionService.Platform.Name}, Engine Name: {_detectionService.Engine.Name}, Crawler: {_detectionService.Crawler.IsCrawler}/{_detectionService.Crawler.Name}";
-                _logger.LogWarning($"MappingService::GetFormAnswers, Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}, {deviceInformation}");
-            }
+                _logger.LogWarning($"MappingService::GetFormAnswers, Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}");
 
             return (convertedAnswers, baseForm);
         }

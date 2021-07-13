@@ -22,8 +22,6 @@ using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
-using Wangkanai.Detection.Models;
-using Wangkanai.Detection.Services;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
@@ -38,7 +36,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<ILogger<MappingService>> _mockLogger = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
-        private readonly Mock<IDetectionService>_mockDetectionService = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new();
 
         public MappingServiceTests()
@@ -61,27 +58,6 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaProvider.Setup(_ => _.Get<FormSchema>(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _mockDetectionService.Setup(_ => _.Browser.Name)
-                .Returns(new Browser());
-
-            _mockDetectionService.Setup(_ => _.Browser.Version)
-                .Returns(new Version());
-
-            _mockDetectionService.Setup(_ => _.Device.Type)
-                .Returns(new Device());
-
-            _mockDetectionService.Setup(_ => _.Platform.Name)
-                .Returns(new Platform());
-
-            _mockDetectionService.Setup(_ => _.Engine.Name)
-                .Returns(new Engine());
-
-            _mockDetectionService.Setup(_ => _.Crawler.Name)
-                .Returns(new Crawler());
-
-            _mockDetectionService.Setup(_ => _.Crawler.Version)
-                .Returns(new Version());
-
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {
@@ -98,7 +74,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
 
-            _service = new MappingService(_mockDistributedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockDetectionService.Object, _mockLogger.Object);
+            _service = new MappingService(_mockDistributedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockLogger.Object);
         }
 
         [Fact]
