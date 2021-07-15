@@ -9,13 +9,13 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (!element.Properties.Postcode.GetValueOrDefault())
+            if (!element.Properties.Postcode)
                 return new ValidationResult { IsValid = true };
 
             if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && element.Properties.Optional)
                 return new ValidationResult { IsValid = true };
 
-            if ((!element.Properties.Postcode.HasValue || !element.Properties.Postcode.Value) || !viewModel.ContainsKey(element.Properties.QuestionId))
+            if (!viewModel.ContainsKey(element.Properties.QuestionId))
                 return new ValidationResult { IsValid = true };
 
             var value = viewModel[element.Properties.QuestionId];

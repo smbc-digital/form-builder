@@ -18,9 +18,9 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public bool IsDynamicallyGeneratedElement { get; set; } = false;
 
-        public bool? Email { get; set; }
+        public bool Email { get; set; } = false;
 
-        public bool? Telephone { get; set; }
+        public bool Postcode { get; set; } = false;
 
         public bool Numeric { get; set; } = false;
 

@@ -14,10 +14,7 @@ namespace form_builder.Validators
             if (!element.Type.Equals(EElementType.Address) || (element.Type.Equals(EElementType.Address) && !viewModel.IsInitial()))
                 return new ValidationResult { IsValid = true };
 
-            if (!element.Properties.StockportPostcode.GetValueOrDefault())
-                return new ValidationResult { IsValid = true };
-
-            if ((!element.Properties.StockportPostcode.HasValue || !element.Properties.StockportPostcode.Value) || !viewModel.ContainsKey($"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"))
+            if (!element.Properties.StockportPostcode || !viewModel.ContainsKey($"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"))
                 return new ValidationResult { IsValid = true };
 
             if (string.IsNullOrEmpty(viewModel[$"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"]) && element.Properties.Optional)
