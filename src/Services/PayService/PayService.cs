@@ -7,12 +7,14 @@ using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Helpers.PaymentHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
+using form_builder.TagParsers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -30,6 +32,8 @@ namespace form_builder.Services.PayService
         private readonly IMappingService _mappingService;
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IPageHelper _pageHelper;
+        private readonly IPaymentHelper _paymentHelper;
+        private readonly IEnumerable<ITagParser> _tagParsers;
 
         public PayService(
             IEnumerable<IPaymentProvider> paymentProviders,
@@ -39,7 +43,9 @@ namespace form_builder.Services.PayService
             IMappingService mappingService,
             IWebHostEnvironment hostingEnvironment,
             IPageHelper pageHelper, 
-            IPaymentConfigurationTransformDataProvider paymentConfigProvider)
+            IPaymentConfigurationTransformDataProvider paymentConfigProvider, 
+            IPaymentHelper paymentHelper, 
+            IEnumerable<ITagParser> tagParsers)
         {
             _gateway = gateway;
             _logger = logger;
@@ -49,14 +55,18 @@ namespace form_builder.Services.PayService
             _hostingEnvironment = hostingEnvironment;
             _pageHelper = pageHelper;
             _paymentConfigProvider = paymentConfigProvider;
+            _paymentHelper = paymentHelper;
+            _tagParsers = tagParsers;
         }
 
         public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string sessionGuid)
         {
-            var paymentInformation = await GetFormPaymentInformation(form);
-            var paymentProvider = GetFormPaymentProvider(paymentInformation);
+            var paymentInformation = JsonConvert.SerializeObject(await _paymentHelper.GetFormPaymentInformation(form));
+            paymentInformation = _tagParsers.Aggregate(paymentInformation, (current, tagParser) => tagParser.ParseString(current, formData.FormAnswers));
+            var parsedPaymentInformation = JsonConvert.DeserializeObject<PaymentInformation>(paymentInformation);
+            var paymentProvider = GetFormPaymentProvider(parsedPaymentInformation);
 
-            return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, paymentInformation);
+            return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, parsedPaymentInformation, formData.FormAnswers);
         }
 
         public async Task<string> ProcessPaymentResponse(string form, string responseCode, string reference)
@@ -67,7 +77,7 @@ namespace form_builder.Services.PayService
                 throw new Exception($"PayService:: No mapping entity found for {form}");
 
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
-            var paymentInformation = await GetFormPaymentInformation(form);
+            var paymentInformation = await _paymentHelper.GetFormPaymentInformation(form);
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
@@ -99,56 +109,6 @@ namespace form_builder.Services.PayService
             catch (Exception ex)
             {
                 _logger.LogError(ex, "The payment callback failed");
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<PaymentInformation> GetFormPaymentInformation(string form)
-        {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-            var mappingEntity = await _mappingService.Map(sessionGuid, form);
-            if (mappingEntity is null)
-                throw new Exception($"PayService:: No mapping entity found for {form}");
-
-            var paymentConfig = await _paymentConfigProvider.Get<List<PaymentInformation>>();
-            var formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName.Equals(form));
-
-            if (formPaymentConfig is null)
-                throw new Exception($"PayService:: No payment information found for {form}");
-
-            if (string.IsNullOrEmpty(formPaymentConfig.Settings.Amount))
-                formPaymentConfig.Settings.Amount = await GetPaymentAmountAsync(mappingEntity, formPaymentConfig);
-
-            return formPaymentConfig;
-        }
-
-        private async Task<string> GetPaymentAmountAsync(MappingEntity formData, PaymentInformation formPaymentConfig)
-        {
-            try
-            {
-                var postUrl = formPaymentConfig.Settings.CalculationSlug;
-
-                if (postUrl.URL is null || postUrl.AuthToken is null)
-                    throw new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
-
-                _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
-                var response = await _gateway.PostAsync(postUrl.URL, formData.Data);
-
-                if (!response.IsSuccessStatusCode)
-                    throw new Exception($"PayService::CalculateAmountAsync, Gateway returned unsuccessful status code {response.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
-
-                if (response.Content is null)
-                    throw new ApplicationException($"PayService::CalculateAmountAsync, Gateway {postUrl.URL} responded with null content");
-
-                var content = await response.Content.ReadAsStringAsync();
-
-                if (string.IsNullOrWhiteSpace(content))
-                    throw new ApplicationException($"PayService::CalculateAmountAsync, Gateway {postUrl.URL} responded with empty payment amount within content");
-
-                return JsonConvert.DeserializeObject<string>(content);
-            }
-            catch (Exception ex)
-            {
                 throw new Exception(ex.Message);
             }
         }

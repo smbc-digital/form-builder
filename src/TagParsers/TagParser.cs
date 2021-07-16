@@ -26,12 +26,12 @@ namespace form_builder.TagParsers
                     format = splitMatch[2];
 
                 if (!answersDictionary.ContainsKey(questionId))
-                    throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is not stored within answers, Match value: {match.Value}");
+                    throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for questionId {questionId} is not stored within answers, Match value: {match.Value}");
 
                 var questionValue = (string)answersDictionary[questionId];
 
                 if (string.IsNullOrEmpty(questionValue))
-                    throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is null or empty, Match value: {match.Value}");
+                    throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for questionId {questionId} is null or empty, Match value: {match.Value}");
 
                 if (!string.IsNullOrEmpty(format))
                     questionValue = _formatters.Get(format).Parse(questionValue);
@@ -43,6 +43,39 @@ namespace form_builder.TagParsers
             }
 
             return value;
+
+            //var matches = regex.Matches(value);
+            //var replacementText = new StringBuilder(value);
+            //if (matches.Any())
+            //{
+            //    for (var i = matches.Count -1; i >= 0; i--)
+            //    {
+            //        var splitMatch = matches[i].Value.Split(":");
+            //        var questionId = splitMatch[1];
+
+            //        var format = string.Empty;
+            //        if (splitMatch.Length > 2)
+            //            format = splitMatch[2];
+
+            //        if (!answersDictionary.ContainsKey(questionId))
+            //            throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is not stored within answers, Match value: {matches[i].Value}");
+
+            //        var questionValue = (string)answersDictionary[questionId];
+
+            //        if (string.IsNullOrEmpty(questionValue))
+            //            throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is null or empty, Match value: {matches[i].Value}");
+
+            //        if (!string.IsNullOrEmpty(format))
+            //            questionValue = _formatters.Get(format).Parse(questionValue);
+
+            //        replacementText.Remove(matches[i].Index - 2, matches[i].Length + 4);
+            //        replacementText.Insert(matches[i].Index - 2, questionValue);
+            //    }
+
+            //    return Parse(replacementText.ToString(), answersDictionary, regex);
+            //}
+
+            //return value;
         }
 
 

@@ -19,6 +19,7 @@ using form_builder.Helpers.DocumentCreation;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Helpers.PaymentHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Helpers.ViewRender;
 using form_builder.Mappers;
@@ -139,6 +140,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<ITagParser, FormDataTagParser>();
             services.AddTransient<ITagParser, LinkTagParser>();
             services.AddTransient<ITagParser, PaymentAmountTagParser>();
+            services.AddTransient<ITagParser, CaseReferenceTagParser>();
 
             return services;
         }
@@ -182,6 +184,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IDocumentCreationHelper, DocumentCreationHelper>();
             services.AddSingleton<IActionHelper, ActionHelper>();
             services.AddSingleton<IIncomingDataHelper, IncomingDataHelper>();
+            services.AddSingleton<IPaymentHelper, PaymentHelper>();
 
             services.AddHttpContextAccessor();
             services.AddScoped<IViewRender, ViewRender>();

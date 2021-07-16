@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Exceptions;
 using form_builder.Extensions;
+using form_builder.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -32,7 +32,7 @@ namespace form_builder.Providers.PaymentProvider
             _environment = environment;
             _logger = logger;
         }
-        public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation)
+        public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation, FormAnswers formData)
         {
             if (string.IsNullOrEmpty(reference))
                 throw new PaymentFailureException("CivicaPayProvider::No valid reference");
@@ -63,6 +63,12 @@ namespace form_builder.Providers.PaymentProvider
                     }
                 }
             };
+
+            if (paymentInformation.Settings.IsServicePay())
+            {
+                basket.PaymentItems[0].PaymentDetails.ServicePayReference = paymentInformation.Settings.ServicePayReference;
+                basket.PaymentItems[0].PaymentDetails.ServicePayNarrative = paymentInformation.Settings.ServicePayNarrative;
+            }
 
             var civicaResponse = await _civicaPayGateway.CreateImmediateBasketAsync(basket);
 

@@ -119,6 +119,7 @@ namespace form_builder.Services.SubmitService
         {
             if (_submissionServiceConfiguration.FakePaymentSubmission)
             {
+                _pageHelper.SaveCaseReference(sessionGuid, "123456");
                 return "123456";
             }
 

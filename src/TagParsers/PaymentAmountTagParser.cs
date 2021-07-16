@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using form_builder.Helpers.PaymentHelpers;
 using form_builder.Models;
-using form_builder.Services.MappingService.Entities;
 using form_builder.Services.PayService;
 using form_builder.TagParsers.Formatters;
 
@@ -11,11 +10,11 @@ namespace form_builder.TagParsers
 {
     public class PaymentAmountTagParser : TagParser, ITagParser
     {
-        private readonly IPayService _payService;
+        private readonly IPaymentHelper _paymentHelper;
 
-        public PaymentAmountTagParser(IEnumerable<IFormatter> formatters, IPayService payService) : base(formatters) 
+        public PaymentAmountTagParser(IEnumerable<IFormatter> formatters, IPaymentHelper paymentHelper) : base(formatters)
         {
-            _payService = payService;
+            _paymentHelper = paymentHelper;
         }
 
         public Regex Regex => new Regex("(?<={{)PAYMENTAMOUNT.*?(?=}})", RegexOptions.Compiled);
@@ -29,7 +28,7 @@ namespace form_builder.TagParsers
             {
                 var paymentAmount = !string.IsNullOrEmpty(formAnswers.PaymentAmount) 
                         ? formAnswers.PaymentAmount 
-                        : _payService.GetFormPaymentInformation(formAnswers.FormName).Result.Settings.Amount;
+                        : _paymentHelper.GetFormPaymentInformation(formAnswers.FormName).Result.Settings.Amount;
 
                 if (leadingParagraphRegexIsMatch)
                 {
@@ -49,6 +48,20 @@ namespace form_builder.TagParsers
             }
 
             return page;
+        }
+
+        public string ParseString(string content, FormAnswers formAnswers)
+        {
+            if (Regex.IsMatch(content))
+            {
+                var paymentAmount = !string.IsNullOrEmpty(formAnswers.PaymentAmount)
+                    ? formAnswers.PaymentAmount
+                    : _paymentHelper.GetFormPaymentInformation(formAnswers.FormName).Result.Settings.Amount;
+
+                return Parse(content, paymentAmount, Regex);
+            }
+
+            return content;
         }
     }
 }

@@ -28,6 +28,8 @@ namespace form_builder.TagParsers
             return page;
         }
 
+        public string ParseString(string content, FormAnswers formAnswers) => Parse(content, Regex, _htmlContent, FormatContent);
+
         public string FormatContent(string[] values) => string.Format(_htmlContent, values[0], values[1]);
     }
 }

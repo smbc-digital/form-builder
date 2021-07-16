@@ -9,6 +9,5 @@ namespace form_builder.Services.PayService
     {
         Task<string> ProcessPayment(MappingEntity mappingEntity, string form, string path, string reference, string sessionGuid);
         Task<string> ProcessPaymentResponse(string form, string responseCode, string reference);
-        Task<PaymentInformation> GetFormPaymentInformation(string form);
     }
 }
