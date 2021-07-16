@@ -31,7 +31,6 @@ namespace form_builder.Workflows.PaymentWorkflow
 
             var data = await _mappingService.Map(sessionGuid, form);
             var paymentReference = await _submitService.PaymentSubmission(data, form, sessionGuid);
-            data.FormAnswers.CaseReference = paymentReference;
 
             return await _payService.ProcessPayment(data, form, path, paymentReference, sessionGuid);
         }

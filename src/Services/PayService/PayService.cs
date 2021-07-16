@@ -27,7 +27,6 @@ namespace form_builder.Services.PayService
         private readonly IGateway _gateway;
         private readonly ILogger<PayService> _logger;
         private readonly IEnumerable<IPaymentProvider> _paymentProviders;
-        private readonly IPaymentConfigurationTransformDataProvider _paymentConfigProvider;
         private readonly ISessionHelper _sessionHelper;
         private readonly IMappingService _mappingService;
         private readonly IWebHostEnvironment _hostingEnvironment;
@@ -42,8 +41,7 @@ namespace form_builder.Services.PayService
             ISessionHelper sessionHelper,
             IMappingService mappingService,
             IWebHostEnvironment hostingEnvironment,
-            IPageHelper pageHelper, 
-            IPaymentConfigurationTransformDataProvider paymentConfigProvider, 
+            IPageHelper pageHelper,
             IPaymentHelper paymentHelper, 
             IEnumerable<ITagParser> tagParsers)
         {
@@ -54,19 +52,19 @@ namespace form_builder.Services.PayService
             _mappingService = mappingService;
             _hostingEnvironment = hostingEnvironment;
             _pageHelper = pageHelper;
-            _paymentConfigProvider = paymentConfigProvider;
             _paymentHelper = paymentHelper;
             _tagParsers = tagParsers;
         }
 
         public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string sessionGuid)
         {
+            var formAnswers = _pageHelper.GetSavedAnswers(sessionGuid);
             var paymentInformation = JsonConvert.SerializeObject(await _paymentHelper.GetFormPaymentInformation(form));
-            paymentInformation = _tagParsers.Aggregate(paymentInformation, (current, tagParser) => tagParser.ParseString(current, formData.FormAnswers));
+            paymentInformation = _tagParsers.Aggregate(paymentInformation, (current, tagParser) => tagParser.ParseString(current, formAnswers));
             var parsedPaymentInformation = JsonConvert.DeserializeObject<PaymentInformation>(paymentInformation);
             var paymentProvider = GetFormPaymentProvider(parsedPaymentInformation);
 
-            return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, parsedPaymentInformation, formData.FormAnswers);
+            return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, parsedPaymentInformation);
         }
 
         public async Task<string> ProcessPaymentResponse(string form, string responseCode, string reference)

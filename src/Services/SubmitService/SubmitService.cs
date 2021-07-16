@@ -157,6 +157,7 @@ namespace form_builder.Services.SubmitService
                     throw new ApplicationException($"SubmitService::PaymentSubmission, Gateway {postUrl.URL} responded with empty reference");
                 }
 
+                _pageHelper.SaveCaseReference(sessionGuid, JsonConvert.DeserializeObject<string>(content));
                 return JsonConvert.DeserializeObject<string>(content);
             }
 

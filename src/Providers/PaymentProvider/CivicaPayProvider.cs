@@ -32,7 +32,7 @@ namespace form_builder.Providers.PaymentProvider
             _environment = environment;
             _logger = logger;
         }
-        public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation, FormAnswers formData)
+        public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation)
         {
             if (string.IsNullOrEmpty(reference))
                 throw new PaymentFailureException("CivicaPayProvider::No valid reference");
@@ -64,7 +64,7 @@ namespace form_builder.Providers.PaymentProvider
                 }
             };
 
-            if (paymentInformation.Settings.IsServicePay())
+            if (paymentInformation.IsServicePay())
             {
                 basket.PaymentItems[0].PaymentDetails.ServicePayReference = paymentInformation.Settings.ServicePayReference;
                 basket.PaymentItems[0].PaymentDetails.ServicePayNarrative = paymentInformation.Settings.ServicePayNarrative;

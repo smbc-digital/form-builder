@@ -170,8 +170,6 @@ namespace form_builder.Services.MappingService
             if (formAnswers.AdditionalFormData.Any())
                 data = AddNonQuestionAnswers(data, formAnswers.AdditionalFormData);
 
-            
-
             return data;
         }
 

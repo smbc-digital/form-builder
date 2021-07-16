@@ -8,6 +8,8 @@ namespace form_builder.Configuration
         public string FormName { get; set; }
         public string PaymentProvider { get; set; }
         public Settings Settings { get; set; }
+
+        public bool IsServicePay() => !string.IsNullOrEmpty(Settings.ServicePayReference);
     }
 
     public class Settings
@@ -19,7 +21,5 @@ namespace form_builder.Configuration
         public string CatalogueId { get; set; }
         public string Description { get; set; }
         public SubmitSlug CalculationSlug { get; set; }
-
-        public bool IsServicePay() => !string.IsNullOrEmpty(ServicePayReference);
     }
 }
