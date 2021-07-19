@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
-using form_builder.Models;
 using form_builder.Constants;
 using form_builder.Extensions;
+using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.Lookup;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace form_builder.Validators.IntegrityChecks.Form
 {
@@ -32,7 +32,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                        element.Lookup.Equals(LookUpConstants.Dynamic))
                 .ToList();
 
-            if (elements.Count == 0)
+            if (elements.Count.Equals(0))
                 return result;
 
             foreach (var element in elements)

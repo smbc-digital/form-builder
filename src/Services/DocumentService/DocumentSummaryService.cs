@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using form_builder.Enum;
+using form_builder.Extensions;
+using form_builder.Factories.Schema;
 using form_builder.Helpers.DocumentCreation;
 using form_builder.Models;
 using form_builder.Providers.DocumentCreation;
@@ -13,31 +16,41 @@ namespace form_builder.Services.DocumentService
     {
         private readonly IDocumentCreation _textfileProvider;
         private readonly IDocumentCreationHelper _documentCreationHelper;
+        private readonly ISchemaFactory _schemaFactory;
 
-        public DocumentSummaryService(IDocumentCreationHelper documentCreationHelper, IEnumerable<IDocumentCreation> providers)
+        public DocumentSummaryService(IDocumentCreationHelper documentCreationHelper, IEnumerable<IDocumentCreation> providers, ISchemaFactory schemaFactory)
         {
             _textfileProvider = providers
-                                    .Where(_ => _.DocumentType == EDocumentType.Txt)
+                                    .Where(_ => _.DocumentType.Equals(EDocumentType.Txt))
                                     .OrderByDescending(_ => _.Priority)
                                     .FirstOrDefault();
 
             _documentCreationHelper = documentCreationHelper;
+            _schemaFactory = schemaFactory;
         }
 
-        public byte[] GenerateDocument(DocumentSummaryEntity entity)
+        public async Task<byte[]> GenerateDocument(DocumentSummaryEntity entity)
         {
+            var journeyPages = entity.FormSchema.GetReducedPages(entity.PreviousAnswers);
+            foreach (var page in journeyPages)
+            {
+                await _schemaFactory.TransformPage(page, entity.PreviousAnswers);
+            }
+
             switch (entity.DocumentType)
             {
                 case EDocumentType.Txt:
-                    return GenerateTextFile(entity.PreviousAnswers, entity.FormSchema);
+                    return await GenerateTextFile(entity.PreviousAnswers, entity.FormSchema);
                 default:
                     throw new Exception("DocumentSummaryService::GenerateDocument, Unknown Document type request for Summary");
             }
         }
 
-        private byte[] GenerateTextFile(FormAnswers formAnswers, FormSchema formSchema)
+        private async Task<byte[]> GenerateTextFile(FormAnswers formAnswers, FormSchema formSchema)
         {
-            var data = _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+            
+
+            var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
             return _textfileProvider.CreateDocument(data);
         }

@@ -39,13 +39,13 @@ namespace form_builder.ContentFactory.SuccessPageFactory
             _distributedCache.Remove(sessionGuid);
             _sessionHelper.RemoveSessionGuid();
 
-            if (page == null && behaviourType == EBehaviourType.SubmitAndPay)
+            if (page is null && behaviourType.Equals(EBehaviourType.SubmitAndPay))
             {
                 page = GenerateGenericPaymentPage();
                 baseForm.Pages.Add(page);
             }
 
-            if (page == null)
+            if (page is null)
             {
                 return new SuccessPageEntity
                 {
@@ -189,7 +189,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                 LeadingParagraph = "We've received your cancellation request",
                 Title = "Success",
                 HideTitle = true,
-                DisplayBreadCrumbs = baseForm.BreadCrumbs != null && baseForm.BreadCrumbs.Any()
+                DisplayBreadCrumbs = baseForm.BreadCrumbs is not null && baseForm.BreadCrumbs.Any()
             };
         }
     }

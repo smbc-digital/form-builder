@@ -1,34 +1,16 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Reflection;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Notify.Client;
-using Notify.Interfaces;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.SimpleEmail;
-using StackExchange.Redis;
-using StockportGovUK.NetStandard.Gateways;
-using StockportGovUK.NetStandard.Gateways.AddressService;
-using StockportGovUK.NetStandard.Gateways.BookingService;
-using StockportGovUK.NetStandard.Gateways.CivicaPay;
-using StockportGovUK.NetStandard.Gateways.Extensions;
-using StockportGovUK.NetStandard.Gateways.OrganisationService;
-using StockportGovUK.NetStandard.Gateways.StreetService;
-using StockportGovUK.NetStandard.Gateways.VerintService;
 using form_builder.Attributes;
 using form_builder.Configuration;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Factories.Schema;
+using form_builder.Factories.Transform.UserSchema;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Gateways;
@@ -54,8 +36,12 @@ using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.EnabledFor;
 using form_builder.Providers.Street;
+using form_builder.Providers.Submit;
+using form_builder.Providers.TemplatedEmailProvider;
 using form_builder.Providers.Transforms.Lookups;
+using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.Transforms.ReusableElements;
+using form_builder.Services.AddAnotherService;
 using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
 using form_builder.Services.DocumentService;
@@ -68,9 +54,11 @@ using form_builder.Services.PayService;
 using form_builder.Services.RetrieveExternalDataService;
 using form_builder.Services.StreetService;
 using form_builder.Services.SubmitService;
+using form_builder.Services.TemplatedEmailService;
 using form_builder.Services.ValidateService;
 using form_builder.TagParsers;
 using form_builder.TagParsers.Formatters;
+using form_builder.Utils.Hash;
 using form_builder.Validators;
 using form_builder.Validators.IntegrityChecks;
 using form_builder.Validators.IntegrityChecks.Behaviours;
@@ -81,13 +69,28 @@ using form_builder.Workflows.DocumentWorkflow;
 using form_builder.Workflows.PaymentWorkflow;
 using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
-using form_builder.Utils.Hash;
-using form_builder.Providers.Submit;
-using form_builder.Providers.Transforms.PaymentConfiguration;
-using form_builder.Providers.TemplatedEmailProvider;
-using form_builder.Services.TemplatedEmailService;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Notify.Client;
+using Notify.Interfaces;
+using StackExchange.Redis;
+using StockportGovUK.NetStandard.Gateways;
+using StockportGovUK.NetStandard.Gateways.AddressService;
+using StockportGovUK.NetStandard.Gateways.BookingService;
+using StockportGovUK.NetStandard.Gateways.CivicaPay;
+using StockportGovUK.NetStandard.Gateways.Extensions;
+using StockportGovUK.NetStandard.Gateways.OrganisationService;
+using StockportGovUK.NetStandard.Gateways.StreetService;
+using StockportGovUK.NetStandard.Gateways.VerintService;
 using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.PreviewService;
+using form_builder.Providers.FileStorage;
 
 namespace form_builder.Utils.Startup
 {
@@ -140,7 +143,6 @@ namespace form_builder.Utils.Startup
 
             return services;
         }
-
 
         public static IServiceCollection AddGateways(this IServiceCollection services, IConfiguration configuration)
         {
@@ -206,6 +208,7 @@ namespace form_builder.Utils.Startup
 
             return services;
         }
+        
         public static IServiceCollection ConfigureAddressProviders(this IServiceCollection services)
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
@@ -331,6 +334,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, SubmitSlugsHaveAllPropertiesCheck>();
 
+            services.AddSingleton<IElementSchemaIntegrityCheck, AddAnotherElementCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, AbsoluteDateValidationsCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, AcceptedFileUploadFileTypesCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, AddressNoManualTextIsSetCheck>();
@@ -347,6 +351,7 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
+            services.AddSingleton<IAddAnotherService, AddAnotherService>();
             services.AddSingleton<IAddressService, AddressService>();
             services.AddSingleton<IBookingService, BookingService>();
             services.AddSingleton<IPageService, PageService>();
@@ -385,6 +390,8 @@ namespace form_builder.Utils.Startup
             services.AddTransient<ISchemaFactory, SchemaFactory>();
             services.AddTransient<ILookupSchemaTransformFactory, LookupSchemaTransformFactory>();
             services.AddTransient<IReusableElementSchemaTransformFactory, ReusableElementSchemaTransformFactory>();
+            services.AddTransient<IUserPageTransformFactory, AddAnotherPageTransformFactory>();
+            services.AddTransient<IUserPageTransformFactory, DynamicLookupPageTransformFactory>();
 
             return services;
         }
@@ -423,17 +430,19 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddIOptionsConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<FormConfiguration>(configuration.GetSection("FormConfig"));
-            services.Configure<CivicaPaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
-            services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection("DistributedCacheExpiration"));
-            services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>("UseDistributedCache"));
-            services.Configure<PreviewModeConfiguration>(cacheOptions => cacheOptions.IsEnabled = configuration.GetValue<bool>("AllowPreviewMode"));
-            services.Configure<AwsSesKeysConfiguration>(configuration.GetSection("Ses"));
-            services.Configure<ReCaptchaConfiguration>(configuration.GetSection("ReCaptchaConfiguration"));
-            services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
-            services.Configure<TagManagerConfiguration>(TagManagerId => TagManagerId.TagManagerId = configuration.GetValue<string>("TagManagerId"));
-            services.Configure<HashConfiguration>(configuration.GetSection("HashConfiguration"));
+            services.Configure<AwsSesKeysConfiguration>(configuration.GetSection(AwsSesKeysConfiguration.ConfigValue));
+            services.Configure<CivicaPaymentConfiguration>(configuration.GetSection(CivicaPaymentConfiguration.ConfigValue));
+            services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection(DistributedCacheExpirationConfiguration.ConfigValue));
+            services.Configure<FileStorageProviderConfiguration>(configuration.GetSection(FileStorageProviderConfiguration.ConfigValue));
+            services.Configure<FormConfiguration>(configuration.GetSection(FormConfiguration.ConfigValue));
+            services.Configure<HashConfiguration>(configuration.GetSection(HashConfiguration.ConfigValue));
             services.Configure<NotifyConfiguration>(configuration.GetSection(NotifyConfiguration.ConfigValue));
+            services.Configure<ReCaptchaConfiguration>(configuration.GetSection(ReCaptchaConfiguration.ConfigValue));
+            services.Configure<SubmissionServiceConfiguration>(configuration.GetSection(SubmissionServiceConfiguration.ConfigValue));
+
+            services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>("UseDistributedCache"));
+            services.Configure<PreviewModeConfiguration>(cacheOptions => cacheOptions.IsEnabled = configuration.GetValue<bool>("PreviewModeEnabled"));
+            services.Configure<TagManagerConfiguration>(TagManagerId => TagManagerId.TagManagerId = configuration.GetValue<string>("TagManagerId"));
 
             return services;
         }
@@ -450,16 +459,24 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddStorageProvider(this IServiceCollection services, IConfiguration configuration)
         {
-            var storageProviderConfiguration = configuration.GetSection("StorageProvider");
+            AddServiceCacheType(services, configuration.GetSection("StorageProvider"));
 
+            services.AddDataProtection().SetApplicationName("formbuilder");
+            services.AddTransient<IDistributedCacheWrapper, DistributedCacheWrapper>();
+
+            return services;
+        }
+
+        private static void AddServiceCacheType(IServiceCollection services, IConfigurationSection storageProviderConfiguration)
+        {
             switch (storageProviderConfiguration["Type"])
             {
                 case "Redis":
-                    services.AddStackExchangeRedisCache(options => 
+                    services.AddStackExchangeRedisCache(options =>
                     {
                         options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions
                         {
-                            EndPoints = 
+                            EndPoints =
                             {
                                 { storageProviderConfiguration["Address"] ?? "127.0.0.1",  6379}
                             },
@@ -482,9 +499,16 @@ namespace form_builder.Utils.Startup
                     services.AddDistributedMemoryCache();
                     break;
             }
+        }
+
+        public static IServiceCollection AddFileStorageProvider(this IServiceCollection services, IConfiguration configuration)
+        {
+            AddServiceCacheType(services, configuration.GetSection("FileStorageProvider"));
 
             services.AddDataProtection().SetApplicationName("formbuilder");
-            services.AddTransient<IDistributedCacheWrapper, DistributedCacheWrapper>();
+            services.AddTransient<IFileStorageProvider, RedisFileStorageProvider>();
+            services.AddTransient<IFileStorageProvider, InMemoryStorageProvider>();
+            services.AddTransient<IFileStorageProvider, S3FileStorageProvider>();
 
             return services;
         }
@@ -514,6 +538,7 @@ namespace form_builder.Utils.Startup
                 o.ViewLocationFormats.Add("/Views/Shared/FileUpload/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Button/{0}" + RazorViewEngine.ViewExtension);
+                o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Fieldset/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Footer/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Header/{0}" + RazorViewEngine.ViewExtension);
                 o.ViewLocationFormats.Add("/Views/Shared/HtmlElements/Headings/{0}" + RazorViewEngine.ViewExtension);

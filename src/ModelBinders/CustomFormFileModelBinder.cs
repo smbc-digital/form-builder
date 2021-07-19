@@ -12,11 +12,11 @@ namespace form_builder.ModelBinders
     {
         public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            if (bindingContext == null) throw new ArgumentNullException(nameof(bindingContext));
+            if (bindingContext is null) throw new ArgumentNullException(nameof(bindingContext));
 
             var formFiles = bindingContext.ActionContext?.HttpContext?.Request?.Form?.Files;
 
-            if (formFiles == null || !formFiles.Any())
+            if (formFiles is null || !formFiles.Any())
                 return;
 
             var list = new List<CustomFormFile>();

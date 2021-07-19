@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using form_builder.Conditions;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models.Actions;
@@ -46,17 +47,18 @@ namespace form_builder.Models
         [JsonIgnore] public bool IsValid => !InvalidElements.Any();
 
         public bool HasIncomingValues => IncomingValues.Any();
-        public bool HasIncomingGetValues => IncomingValues.Any(_ => _.HttpActionType == EHttpActionType.Get);
-        public bool HasIncomingPostValues => IncomingValues.Any(_ => _.HttpActionType == EHttpActionType.Post);
+        public bool HasIncomingGetValues => IncomingValues.Any(_ => _.HttpActionType.Equals(EHttpActionType.Get));
+        public bool HasIncomingPostValues => IncomingValues.Any(_ => _.HttpActionType.Equals(EHttpActionType.Post));
 
         public List<IAction> PageActions { get; set; } = new List<IAction>();
 
         public bool HasPageActions => PageActions.Any();
 
         public bool HasIncomingAction => PageActions.Any();
-        public bool HasPageActionsGetValues => PageActions.Any(_ => _.Properties.HttpActionType == EHttpActionType.Get);
-        public bool HasPageActionsPostValues => PageActions.Any(_ => _.Properties.HttpActionType == EHttpActionType.Post);
+        public bool HasPageActionsGetValues => PageActions.Any(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Get));
+        public bool HasPageActionsPostValues => PageActions.Any(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Post));
 
+        public bool HasDynamicLookupElements => Elements.Any(_ => !string.IsNullOrEmpty(_.Lookup) && _.Lookup.Equals(LookUpConstants.Dynamic));
 
         public List<Condition> RenderConditions { get; set; } = new List<Condition>();
 
@@ -78,39 +80,40 @@ namespace form_builder.Models
         }
 
         public IEnumerable<IElement> ValidatableElements => Elements.Where(element =>
-                element.Type == EElementType.Address ||
-                element.Type == EElementType.AddressManual ||
-                element.Type == EElementType.Booking ||
-                element.Type == EElementType.Checkbox ||
-                element.Type == EElementType.DatePicker ||
-                element.Type == EElementType.DateInput ||
-                element.Type == EElementType.Declaration ||
-                element.Type == EElementType.FileUpload ||
-                element.Type == EElementType.Radio ||
-                element.Type == EElementType.Select ||
-                element.Type == EElementType.Street ||
-                element.Type == EElementType.Textarea ||
-                element.Type == EElementType.Textbox ||
-                element.Type == EElementType.TimeInput ||
-                element.Type == EElementType.Map ||
-                element.Type == EElementType.MultipleFileUpload ||
-                element.Type == EElementType.Organisation
+                element.Type.Equals(EElementType.AddAnother) ||
+                element.Type.Equals(EElementType.Address) ||
+                element.Type.Equals(EElementType.AddressManual) ||
+                element.Type.Equals(EElementType.Booking) ||
+                element.Type.Equals(EElementType.Checkbox) ||
+                element.Type.Equals(EElementType.DatePicker) ||
+                element.Type.Equals(EElementType.DateInput) ||
+                element.Type.Equals(EElementType.Declaration) ||
+                element.Type.Equals(EElementType.FileUpload) ||
+                element.Type.Equals(EElementType.Radio) ||
+                element.Type.Equals(EElementType.Select) ||
+                element.Type.Equals(EElementType.Street) ||
+                element.Type.Equals(EElementType.Textarea) ||
+                element.Type.Equals(EElementType.Textbox) ||
+                element.Type.Equals(EElementType.TimeInput) ||
+                element.Type.Equals(EElementType.Map) ||
+                element.Type.Equals(EElementType.MultipleFileUpload) ||
+                element.Type.Equals(EElementType.Organisation)
         );
 
         public IEnumerable<IElement> ValidatableElementsConditional => Elements.Where(element =>
-            element.Type == EElementType.Textarea ||
-            element.Type == EElementType.Select ||
-            element.Type == EElementType.Textbox ||
-            element.Type == EElementType.DateInput ||
-            element.Type == EElementType.TimeInput
+            element.Type.Equals(EElementType.Textarea) ||
+            element.Type.Equals(EElementType.Select) ||
+            element.Type.Equals(EElementType.Textbox) ||
+            element.Type.Equals(EElementType.DateInput) ||
+            element.Type.Equals(EElementType.TimeInput)
         );
 
-		public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm)
+        public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm)
 		{
-			ValidatableElements.RemoveUnusedConditionalElements(viewModel)
-            .ForEach(element => {
-				element.Validate(viewModel, validators, baseForm);
-			});
+            ValidatableElements.RemoveUnusedConditionalElements(viewModel)
+                .ForEach(element => {
+                    element.Validate(viewModel, validators, baseForm);
+                });
 			IsValidated = true;
 		}
 
@@ -118,7 +121,7 @@ namespace form_builder.Models
         {
             var conditionValidator = new ConditionValidator();
 
-            if (Behaviours.Count == 1)
+            if (Behaviours.Count.Equals(1))
                 return Behaviours.FirstOrDefault();
 
             foreach (var behaviour in Behaviours.OrderByDescending(_ => _.Conditions.Count))
@@ -138,7 +141,7 @@ namespace form_builder.Models
             }
 
             var conditionValuesForDebug = Behaviours.OrderByDescending(_ => _.Conditions.Count)
-                .Where(_ => _.Conditions != null)
+                .Where(_ => _.Conditions is not null)
                 .SelectMany(_ => _.Conditions)
                 .Where(_ => !string.IsNullOrEmpty(_.QuestionId))
                 .Select(_ => _.QuestionId)
@@ -153,16 +156,16 @@ namespace form_builder.Models
         {
             var conditionValidator = new ConditionValidator();
 
-            return RenderConditions.Count == 0 ||
+            return RenderConditions.Count.Equals(0) ||
                    RenderConditions.All(condition => conditionValidator.IsValid(condition, answers));
         }
 
         public SubmitSlug GetSubmitFormEndpoint(FormAnswers formAnswers, string environment)
         {
-            var submitBehaviour = new SubmitSlug();
+            SubmitSlug submitBehaviour = new();
 
             var pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitForm);
-            if (pageSubmitBehaviours.Count == 0)
+            if (pageSubmitBehaviours.Count.Equals(0))
                 pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitAndPay);
 
             if (Behaviours.Count > 1)
@@ -177,7 +180,7 @@ namespace form_builder.Models
 
                 submitBehaviour = foundSubmitBehaviour.SubmitSlugs
                     .ToList()
-                    .FirstOrDefault(x => x.Environment.ToLower().Equals(environment.ToLower()));
+                    .FirstOrDefault(x => x.Environment.Equals(environment, StringComparison.OrdinalIgnoreCase));
             }
             else
             {
@@ -189,7 +192,7 @@ namespace form_builder.Models
                 {
                     var behaviour = pageSubmitBehaviours
                         .SelectMany(x => x.SubmitSlugs)
-                        .FirstOrDefault(x => x.Environment.ToLower().Equals(environment.ToLower()));
+                        .FirstOrDefault(x => x.Environment.Equals(environment, StringComparison.OrdinalIgnoreCase));
 
                     submitBehaviour = behaviour ?? throw new NullReferenceException("Page model::GetSubmitFormEndpoint, No Url supplied for submit form");
                 }
@@ -201,7 +204,7 @@ namespace form_builder.Models
                 : submitBehaviour;
         }
 
-        private List<Behaviour> GetBehavioursByType(EBehaviourType type) => Behaviours.Where(_ => _.BehaviourType == type).ToList();
+        private List<Behaviour> GetBehavioursByType(EBehaviourType type) => Behaviours.Where(_ => _.BehaviourType.Equals(type)).ToList();
 
         public string GetPageTitle() => Elements.Any() && HideTitle ? Elements.First().Properties.Label : Title;
     }

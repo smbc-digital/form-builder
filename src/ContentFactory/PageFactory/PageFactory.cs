@@ -1,5 +1,8 @@
 using form_builder.Configuration;
 using form_builder.Constants;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
@@ -8,10 +11,6 @@ using form_builder.TagParsers;
 using form_builder.ViewModels;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace form_builder.ContentFactory.PageFactory
 {
@@ -37,11 +36,11 @@ namespace form_builder.ContentFactory.PageFactory
 
         public async Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers = null, List<object> results = null)
         {
-            if (formAnswers == null)
+            if (formAnswers is null)
             {
                 var cachedAnswers = _distributedCache.GetString(sessionGuid);
 
-                formAnswers = cachedAnswers == null
+                formAnswers = cachedAnswers is null
                     ? new FormAnswers { Pages = new List<PageAnswers>(), FormName = baseForm.BaseURL }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
             }

@@ -11,13 +11,8 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (!(element.Type == EElementType.Address && viewModel.IsManual()))
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+            if (!(element.Type.Equals(EElementType.Address) && viewModel.IsManual()))
+                return new ValidationResult { IsValid = true };
 
             var valueAddressLine1 = viewModel.ContainsKey($"{element.Properties.QuestionId}-{AddressManualConstants.ADDRESS_LINE_1}")
                 ? viewModel[$"{element.Properties.QuestionId}-{AddressManualConstants.ADDRESS_LINE_1}"]
@@ -45,7 +40,7 @@ namespace form_builder.Validators
                 addressPostcodeMessage = ValidationConstants.POSTCODE_EMPTY;
                 addressPostcodeValid = false;
             }
-            else if (!AddressConstants.STOCKPORT_POSTCODE_REGEX.IsMatch(valueAddressPostcode) && element.Properties.StockportPostcode == true)
+            else if (!AddressConstants.STOCKPORT_POSTCODE_REGEX.IsMatch(valueAddressPostcode) && element.Properties.StockportPostcode)
             {
                 addressPostcodeMessage = ValidationConstants.POSTCODE_INCORRECT_FORMAT;
                 addressPostcodeValid = false;

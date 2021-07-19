@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
@@ -6,6 +7,7 @@ using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
+using form_builder.Factories.Transform.UserSchema;
 using form_builder.Models;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
@@ -27,6 +29,7 @@ namespace form_builder.Factories.Schema
         private readonly PreviewModeConfiguration _previewModeConfiguration;
         private readonly IConfiguration _configuration;
         private readonly IFormSchemaIntegrityValidator _formSchemaIntegrityValidator;
+        private readonly IEnumerable<IUserPageTransformFactory> _userPageTransformFactories;
 
         public SchemaFactory(IDistributedCacheWrapper distributedCache,
             ISchemaProvider schemaProvider,
@@ -36,7 +39,8 @@ namespace form_builder.Factories.Schema
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             IOptions<PreviewModeConfiguration> previewModeConfiguration,
             IConfiguration configuration,
-            IFormSchemaIntegrityValidator formSchemaIntegrityValidator)
+            IFormSchemaIntegrityValidator formSchemaIntegrityValidator, 
+            IEnumerable<IUserPageTransformFactory> userPageTransformFactories)
         {
             _distributedCache = distributedCache;
             _schemaProvider = schemaProvider;
@@ -47,6 +51,7 @@ namespace form_builder.Factories.Schema
             _configuration = configuration;
             _previewModeConfiguration = previewModeConfiguration.Value;
             _formSchemaIntegrityValidator = formSchemaIntegrityValidator;
+            _userPageTransformFactories = userPageTransformFactories;
         }
 
         public async Task<FormSchema> Build(string formKey)
@@ -57,15 +62,20 @@ namespace form_builder.Factories.Schema
             if (!_schemaProvider.ValidateSchemaName(formKey).Result)
                 return null;
 
+            FormSchema formSchema = new();
+
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)
             {
                 string data = _distributedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}");
 
-                if (data != null)
+                if (data is not null)
+                {
                     return JsonConvert.DeserializeObject<FormSchema>(data);
+                }
             }
             
-            FormSchema formSchema = await _schemaProvider.Get<FormSchema>(formKey);
+            formSchema = await _schemaProvider.Get<FormSchema>(formKey);
+
             formSchema = await _reusableElementSchemaFactory.Transform(formSchema);
             formSchema = _lookupSchemaFactory.Transform(formSchema);
 
@@ -91,6 +101,14 @@ namespace form_builder.Factories.Schema
             await _formSchemaIntegrityValidator.Validate(formSchema);
 
             return formSchema;
+        }
+
+        public async Task<Page> TransformPage(Page page, FormAnswers convertedAnswers)
+        {
+            foreach (var userPageFactory in _userPageTransformFactories)
+                await userPageFactory.Transform(page, convertedAnswers);
+
+            return page;
         }
     }
 }

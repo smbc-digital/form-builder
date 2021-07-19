@@ -3,13 +3,18 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace form_builder.Services.FileUploadService
@@ -17,25 +22,29 @@ namespace form_builder.Services.FileUploadService
     public class FileUploadService : IFileUploadService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IFileStorageProvider _fileStorageProvider;
         private readonly IPageFactory _pageFactory;
         private readonly IPageHelper _pageHelper;
 
         public FileUploadService(IDistributedCacheWrapper distributedCache,
+            IEnumerable<IFileStorageProvider> fileStorageProviders,
             IPageFactory pageFactory,
-            IPageHelper pageHelper)
+            IPageHelper pageHelper,
+            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
         {
             _distributedCache = distributedCache;
             _pageFactory = pageFactory;
             _pageHelper = pageHelper;
+            _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
         }
 
         public Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload)
         {
-            fileUpload.Where(_ => _ != null)
-                .ToList()
+            fileUpload
+                .Where(_ => _ is not null)
                 .GroupBy(_ => _.QuestionId)
                 .ToList()
-                .ForEach((group) =>
+                .ForEach(group =>
                 {
                     viewModel.Add(group.Key, group.Select(_ => new DocumentModel
                     {
@@ -70,7 +79,7 @@ namespace form_builder.Services.FileUploadService
         {
             var cachedAnswers = _distributedCache.GetString(sessionGuid);
 
-            var convertedAnswers = cachedAnswers == null
+            var convertedAnswers = cachedAnswers is null
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
@@ -82,7 +91,7 @@ namespace form_builder.Services.FileUploadService
             convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path)).Answers.FirstOrDefault().Response = response;
 
             _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
-            _distributedCache.Remove(fileToRemove.Key);
+            _fileStorageProvider.Remove(fileToRemove.Key);
 
             return new ProcessRequestEntity
             {
@@ -116,7 +125,7 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            if (currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files == null || !files.Any()) && modelStateIsValid)
+            if (currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files is null || !files.Any()) && modelStateIsValid)
             {
                 if (currentPage.Elements.Where(_ => _.Type.Equals(EElementType.MultipleFileUpload)).Any(_ => _.Properties.Optional))
                     _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
@@ -127,7 +136,7 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            if (!viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files == null || !files.Any()))
+            if (!viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files is null || !files.Any()))
             {
                 return new ProcessRequestEntity
                 {
@@ -141,7 +150,7 @@ namespace form_builder.Services.FileUploadService
                 };
             }
 
-            if (files != null && files.Any())
+            if (files is not null && files.Any())
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
 
             if (viewModel.ContainsKey(ButtonConstants.SUBMIT) && modelStateIsValid)
@@ -154,8 +163,10 @@ namespace form_builder.Services.FileUploadService
 
             if (!modelStateIsValid)
             {
-                var newViewModel = new Dictionary<string, dynamic>();
-                newViewModel.Add("modelStateInvalid", null);
+                var newViewModel = new Dictionary<string, dynamic>
+                {
+                    { "modelStateInvalid", null }
+                };
 
                 var formModel = await _pageFactory.Build(currentPage, newViewModel, baseForm, guid);
 

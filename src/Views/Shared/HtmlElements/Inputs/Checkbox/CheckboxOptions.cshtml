@@ -1,5 +1,9 @@
 @model Checkbox
 
+@{
+    var fieldsetIncrement = Model.Properties.QuestionId.Split(':').Length > 1 ? $"-{Model.Properties.QuestionId.Split(':')[1]}" : null;
+}
+
 <div class="govuk-checkboxes" data-module="govuk-checkboxes">
     @for (var i = 0; i < Model.Properties.Options.Count; i++)
     {
@@ -9,7 +13,7 @@
                    value="@Model.Properties.Options[i].Value"
                    name="@Model.Properties.QuestionId"
                    id="@Model.GetListItemId(i)"
-                   @(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? $"data-aria-controls=conditional-{i}" : string.Empty)
+                   @(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? $"data-aria-controls=conditional-{i}{fieldsetIncrement}" : string.Empty)
                    @(Model.Properties.Options[i].HasHint ? $"aria-describedby={Model.GetListItemHintId(i)}" : string.Empty)
                    @(Model.Properties.Checked || Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty) />
 
@@ -25,7 +29,7 @@
 
         @if (!string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElementId))
         {
-            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-@i">
+            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-@i@fieldsetIncrement">
                 @SystemConstants.CONDITIONAL_ELEMENT_REPLACEMENT@Model.Properties.Options[i].ConditionalElementId
             </div>
         }

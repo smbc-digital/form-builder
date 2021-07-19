@@ -50,9 +50,9 @@ namespace form_builder.Services.ValidateService
             {
                 var response = new HttpResponseMessage();
                 var submitSlug = action.Properties.PageActionSlugs.FirstOrDefault(_ =>
-                    _.Environment.ToLower().Equals(_environment.EnvironmentName.ToS3EnvPrefix().ToLower()));
+                    _.Environment.Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
 
-                if (submitSlug == null)
+                if (submitSlug is null)
                     throw new ApplicationException("ValidateService::Process, there is no PageActionSlug defined for this environment");
 
                 var entity = _actionHelper.GenerateUrl(submitSlug.URL, mappingData.FormAnswers);

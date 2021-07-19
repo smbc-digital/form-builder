@@ -12,6 +12,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
@@ -36,6 +37,8 @@ namespace form_builder.Services.SubmitService
 
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
 
+        private readonly ILogger<SubmitService> _logger;
+
         public SubmitService(
             IGateway gateway,
             IPageHelper pageHelper,
@@ -44,7 +47,8 @@ namespace form_builder.Services.SubmitService
             IDistributedCacheWrapper distributedCache,  
             ISchemaFactory schemaFactory,
             IReferenceNumberProvider referenceNumberProvider,
-            IEnumerable<ISubmitProvider> submitProviders)
+            IEnumerable<ISubmitProvider> submitProviders,
+            ILogger<SubmitService> logger)
         {
             _gateway = gateway;
             _pageHelper = pageHelper;
@@ -54,6 +58,7 @@ namespace form_builder.Services.SubmitService
             _schemaFactory = schemaFactory;
             _referenceNumberProvider = referenceNumberProvider;
             _submitProviders = submitProviders;
+            _logger = logger;
         }
 
         public async Task PreProcessSubmission(string form, string sessionGuid)
@@ -75,15 +80,18 @@ namespace form_builder.Services.SubmitService
             }
 
             return _submissionServiceConfiguration.FakeSubmission 
-                ? ProcessFakeSubmission(sessionGuid, reference) 
+                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference) 
                 : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, baseForm, reference);
         }
 
-        private string ProcessFakeSubmission(string sessionGuid, string reference)
+        private string ProcessFakeSubmission(MappingEntity mappingEntity, string form, string sessionGuid, string reference)
         {
                 if (!string.IsNullOrEmpty(reference))
                     return reference;
-                    
+                
+                var json = JsonConvert.SerializeObject(mappingEntity.Data);
+                _logger.LogInformation($"Fake Submission of: {json}");
+
                 _pageHelper.SaveCaseReference(sessionGuid, "123456");
                 return "123456";
         }
@@ -92,13 +100,12 @@ namespace form_builder.Services.SubmitService
         {
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
-
             HttpResponseMessage response = await _submitProviders.Get(submitSlug.Type).PostAsync(mappingEntity, submitSlug);
 
             if (!response.IsSuccessStatusCode)
                 throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occurred while attempting to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             
-            if (!baseForm.GenerateReferenceNumber && response.Content != null)
+            if (!baseForm.GenerateReferenceNumber && response.Content is not null)
             {
                 var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
                 reference = JsonConvert.DeserializeObject<string>(content);
@@ -140,7 +147,7 @@ namespace form_builder.Services.SubmitService
                 throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occurred while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
             }
 
-            if (response.Content != null)
+            if (response.Content is not null)
             {
                 var content = await response.Content.ReadAsStringAsync();
 

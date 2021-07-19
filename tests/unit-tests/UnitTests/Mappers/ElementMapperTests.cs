@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Mappers;
 using form_builder.Models;
-using form_builder.Providers.StorageProvider;
+using form_builder.Providers.FileStorage;
 using form_builder.Utils.Extensions;
 using form_builder.Utils.Hash;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Addresses;
@@ -20,20 +22,30 @@ namespace form_builder_tests.UnitTests.Mappers
     public class ElementMapperTests
     {
         private readonly ElementMapper _elementMapper;
-        private readonly Mock<IDistributedCacheWrapper> _wrapper = new ();
         private readonly Mock<IHashUtil> _mockHashUtil = new ();
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
+        private readonly Mock<IFileStorageProvider> _fileStorageProvider = new();
+        private readonly Mock<IConfiguration> _mockConfiguration = new();
 
         public ElementMapperTests()
         {
+            _mockConfiguration.Setup(_ => _["FileStorageProvider:Type"]).Returns("Redis");
+
+            _fileStorageProvider.Setup(_ => _.ProviderName).Returns("Redis");
+            _fileStorageProviders = new List<IFileStorageProvider>
+            {
+                _fileStorageProvider.Object
+            };
+
             _mockHashUtil
                 .Setup(_ => _.Hash(It.IsAny<string>()))
                 .Returns("hashedId");
 
-            _elementMapper = new ElementMapper(_wrapper.Object, _mockHashUtil.Object);
+            _elementMapper = new ElementMapper(_fileStorageProviders, _mockHashUtil.Object, _mockConfiguration.Object);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnIntWhenNumericIsTrue()
+        public async Task GetAnswerValue_ShouldReturnIntWhenNumericIsTrue()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -58,14 +70,14 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             Assert.IsType<int>(result);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnSingleDateWhenElementIsDatePicker()
+        public async Task GetAnswerValue_ShouldReturnSingleDateWhenElementIsDatePicker()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -90,14 +102,14 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             Assert.IsType<DateTime>(result);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnNullWhenResponseIsEmpty_WhenElementIsDatePicker()
+        public async Task GetAnswerValue_ShouldReturnNullWhenResponseIsEmpty_WhenElementIsDatePicker()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -121,14 +133,14 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             Assert.Null(result);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnNullWhenResponseIsEmpty_AndNumeric()
+        public async Task GetAnswerValue_ShouldReturnNullWhenResponseIsEmpty_AndNumeric()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -152,14 +164,14 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             Assert.Null(result);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnArrayOfStrings_WhenElementIsCheckbox()
+        public async Task GetAnswerValue_ShouldReturnArrayOfStrings_WhenElementIsCheckbox()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -184,7 +196,7 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             var type = Assert.IsType<List<string>>(result);
@@ -195,7 +207,7 @@ namespace form_builder_tests.UnitTests.Mappers
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnEmptyArray_WhenResponseIsEmpty_ForCheckbox()
+        public async Task GetAnswerValue_ShouldReturnEmptyArray_WhenResponseIsEmpty_ForCheckbox()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -219,7 +231,7 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             var type = Assert.IsType<List<string>>(result);
@@ -227,7 +239,7 @@ namespace form_builder_tests.UnitTests.Mappers
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnDateValue_WhenElementIsDateInput()
+        public async Task GetAnswerValue_ShouldReturnDateValue_WhenElementIsDateInput()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -266,13 +278,13 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             Assert.IsType<DateTime>(result);
         }
         [Fact]
-        public void GetAnswerValue_ShouldReturnNullIfDayIsEmpty_WhenElementIsDateInput()
+        public async Task GetAnswerValue_ShouldReturnNullIfDayIsEmpty_WhenElementIsDateInput()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -310,14 +322,14 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             Assert.Null(result);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnNullIfHourIsEmpty_WhenElementIsTimeInput()
+        public async Task GetAnswerValue_ShouldReturnNullIfHourIsEmpty_WhenElementIsTimeInput()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -356,14 +368,14 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             Assert.Null(result);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnTimeSpan_WhenElementIsTimeInput()
+        public async Task GetAnswerValue_ShouldReturnTimeSpan_WhenElementIsTimeInput()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -403,13 +415,13 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             Assert.IsType<TimeSpan>(result);
         }
         [Fact]
-        public void GetAnswerValue_ShouldReturnAddress_WhenElementIsAddress_Automatic()
+        public async Task GetAnswerValue_ShouldReturnAddress_WhenElementIsAddress_Automatic()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -443,7 +455,7 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             var type = Assert.IsType<Address>(result);
@@ -452,7 +464,7 @@ namespace form_builder_tests.UnitTests.Mappers
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnAddress_WhenElementIsAddress_Manual()
+        public async Task GetAnswerValue_ShouldReturnAddress_WhenElementIsAddress_Manual()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -497,7 +509,7 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             var type = Assert.IsType<Address>(result);
@@ -508,7 +520,7 @@ namespace form_builder_tests.UnitTests.Mappers
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnAddress_WhenElementIsStreet()
+        public async Task GetAnswerValue_ShouldReturnAddress_WhenElementIsStreet()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -541,7 +553,7 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             var type = Assert.IsType<Address>(result);
@@ -551,7 +563,7 @@ namespace form_builder_tests.UnitTests.Mappers
 
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnBookingModel_WhenElementIsBooking()
+        public async Task GetAnswerValue_ShouldReturnBookingModel_WhenElementIsBooking()
         {
             // Arrange
             var questionId = "testbookingId";
@@ -581,7 +593,7 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             var bookingResult = Assert.IsType<Booking>(result);
@@ -593,7 +605,7 @@ namespace form_builder_tests.UnitTests.Mappers
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldCallHashUtil_WhenElementIsBooking()
+        public async Task GetAnswerValue_ShouldCallHashUtil_WhenElementIsBooking()
         {
             // Arrange
             var questionId = "testbookingId";
@@ -620,14 +632,14 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            _elementMapper.GetAnswerValue(element, formAnswers);
+            await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             _mockHashUtil.Verify(_ => _.Hash(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnNull_WhenElementIsBooking_AndValueNotFound()
+        public async Task GetAnswerValue_ShouldReturnNull_WhenElementIsBooking_AndValueNotFound()
         {
             // Arrange
             var dateTime = DateTime.Now.ToString();
@@ -647,7 +659,7 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             Assert.Null(result);
@@ -655,7 +667,7 @@ namespace form_builder_tests.UnitTests.Mappers
 
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnOrganisation_WhenElementIsOrganisation()
+        public async Task GetAnswerValue_ShouldReturnOrganisation_WhenElementIsOrganisation()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -689,7 +701,7 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             var type = Assert.IsType<StockportGovUK.NetStandard.Models.Verint.Organisation>(result);
@@ -698,7 +710,7 @@ namespace form_builder_tests.UnitTests.Mappers
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnValue()
+        public async Task GetAnswerValue_ShouldReturnValue()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -722,7 +734,7 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
             Assert.IsType<string>(result);
@@ -731,12 +743,12 @@ namespace form_builder_tests.UnitTests.Mappers
         [Theory]
         [InlineData(EElementType.FileUpload)]
         [InlineData(EElementType.MultipleFileUpload)]
-        public void GetAnswerValue_ShouldCall_DistributedCache_ToGetFileUploadContent(EElementType type)
+        public async Task GetAnswerValue_ShouldCall_DistributedCache_ToGetFileUploadContent(EElementType type)
         {
             // Arrange
             var key = "fileUpload_fileUploadTestKey";
-            _wrapper.Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns("testfile");
+            _fileStorageProvider.Setup(_ => _.GetString(It.IsAny<string>()))
+                .ReturnsAsync("testfile");
 
             var formAnswers = new FormAnswers
             {
@@ -760,24 +772,24 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
-            _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+            _fileStorageProvider.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             var model = Assert.IsType<List<File>>(result);
             Assert.Equal("testfile", model[0].Content);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldCall_DistributedCache_MultipleTimes_ToGet_All_FileUploadContent()
+        public async Task GetAnswerValue_ShouldCall_DistributedCache_MultipleTimes_ToGet_All_FileUploadContent()
         {
             // Arrange
             var key = "fileUpload_fileUploadTestKey";
-            _wrapper.Setup(_ => _.GetString(It.Is<string>(_ => _ == "datakeyfile1")))
-                .Returns("file1content");
+            _fileStorageProvider.Setup(_ => _.GetString(It.Is<string>(_ => _ == "datakeyfile1")))
+                .ReturnsAsync("file1content");
 
-            _wrapper.Setup(_ => _.GetString(It.Is<string>(_ => _ == "datakeyfile2")))
-                .Returns("file2content");
+            _fileStorageProvider.Setup(_ => _.GetString(It.Is<string>(_ => _ == "datakeyfile2")))
+                .ReturnsAsync("file2content");
 
             var formAnswers = new FormAnswers
             {
@@ -805,10 +817,10 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
-            _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Exactly(2));
+            _fileStorageProvider.Verify(_ => _.GetString(It.IsAny<string>()), Times.Exactly(2));
             var model = Assert.IsType<List<File>>(result);
             Assert.Equal("file1content", model[0].Content);
             Assert.Equal("file2content", model[1].Content);
@@ -819,12 +831,12 @@ namespace form_builder_tests.UnitTests.Mappers
         [Theory]
         [InlineData(EElementType.FileUpload)]
         [InlineData(EElementType.MultipleFileUpload)]
-        public void GetAnswerValue_Should_ThrowException_WhenDistributedCacheThrows(EElementType type)
+        public async Task GetAnswerValue_Should_ThrowException_WhenDistributedCacheThrows(EElementType type)
         {
             // Arrange
             var key = "fileUploadTestKey";
-            _wrapper.Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns(() => null);
+            _fileStorageProvider.Setup(_ => _.GetString(It.IsAny<string>()))
+                .ReturnsAsync(() => null);
 
             var formAnswers = new FormAnswers
             {
@@ -856,14 +868,14 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = Assert.Throws<Exception>(() => _elementMapper.GetAnswerValue(element, formAnswers));
+            var result = await Assert.ThrowsAsync<Exception>(() => _elementMapper.GetAnswerValue(element, formAnswers));
 
             // Assert
             Assert.Equal($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {key} from the distributed cache", result.Message);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldNotCall_DistributedCache_WhenNoFileWithinAnswers()
+        public async Task GetAnswerValue_ShouldNotCall_DistributedCache_WhenNoFileWithinAnswers()
         {
             // Arrange
             var key = "fileUploadTestKey";
@@ -883,14 +895,14 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            _elementMapper.GetAnswerValue(element, formAnswers);
+            await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
-            _wrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
+            _fileStorageProvider.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public void GetAnswerValue_ShouldReturnDateTime_WithValidTime()
+        public async Task GetAnswerValue_ShouldReturnDateTime_WithValidTime()
         {
             // Arrange
             var elementHours = "03";
@@ -930,7 +942,7 @@ namespace form_builder_tests.UnitTests.Mappers
             };
 
 
-            var result = _elementMapper.GetAnswerValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             var resultData = Assert.IsType<TimeSpan>(result);
             Assert.Equal("3", resultData.Hours.ToString());
@@ -939,7 +951,7 @@ namespace form_builder_tests.UnitTests.Mappers
 
 
         [Fact]
-        public void Map_ShouldReturnExpandoObject_WhenFormContains_MultipleValidatableElementsWithTargetMapping_WithValues()
+        public async Task Map_ShouldReturnExpandoObject_WhenFormContains_MultipleValidatableElementsWithTargetMapping_WithValues()
         {
             // Arrange
             var elementOneAnswer = "01/01/2000";
@@ -965,7 +977,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 }
             };
 
-            var result = _elementMapper.GetAnswerValue(element3, formAnswers);
+            var result = await _elementMapper.GetAnswerValue(element3, formAnswers);
 
             var resultData = Assert.IsType<DateTime>(result);
             Assert.Equal($"{elementOneAnswer} 00:00:00", resultData.ToString());
@@ -974,7 +986,7 @@ namespace form_builder_tests.UnitTests.Mappers
         [Theory]
         [InlineData(EElementType.Textbox, "test")]
         [InlineData(EElementType.Textarea, "textAreaValue")]
-        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForElements(EElementType type, string value)
+        public async Task GetAnswerStringValue_ShouldReturnCorrectValue_ForElements(EElementType type, string value)
         {
             // Arrange
             var questionId = "test-questionID";
@@ -986,14 +998,14 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
             Assert.Equal(value, result);
         }
 
         [Fact]
-        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForDatePickerElement()
+        public async Task GetAnswerStringValue_ShouldReturnCorrectValue_ForDatePickerElement()
         {
             // Arrange
             var questionId = "test-questionID";
@@ -1008,14 +1020,14 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
             Assert.Equal(value.ToString("dd/MM/yyyy"), result);
         }
 
         [Fact]
-        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForCheckboxElement()
+        public async Task GetAnswerStringValue_ShouldReturnCorrectValue_ForCheckboxElement()
         {
             // Arrange
             var questionId = "test-questionID";
@@ -1031,14 +1043,14 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
             Assert.Equal(labelValue, result);
         }
 
         [Fact]
-        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForRadioElement()
+        public async Task GetAnswerStringValue_ShouldReturnCorrectValue_ForRadioElement()
         {
             // Arrange
             var labelText = "Radio radio";
@@ -1055,14 +1067,14 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
             Assert.Equal(labelValue, result);
         }
 
         [Fact]
-        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForStreetElement()
+        public async Task GetAnswerStringValue_ShouldReturnCorrectValue_ForStreetElement()
         {
             var questionId = "test-questionID";
             var labelText = "Enter the Street";
@@ -1096,14 +1108,14 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
             Assert.Equal("street, city, postcode, uk", result);
         }
 
         [Fact]
-        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForAddressElement()
+        public async Task GetAnswerStringValue_ShouldReturnCorrectValue_ForAddressElement()
         {
             // Arrange
             var value = new Address { SelectedAddress = "11 road, city, postcode, uk" };
@@ -1140,7 +1152,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
             Assert.Equal(value.SelectedAddress, result);
@@ -1149,7 +1161,7 @@ namespace form_builder_tests.UnitTests.Mappers
         [Theory]
         [InlineData(EElementType.FileUpload)]
         [InlineData(EElementType.MultipleFileUpload)]
-        public void GetAnswerStringValue_ShouldReturnCorrectValue_ForFileUpload(EElementType type)
+        public async Task GetAnswerStringValue_ShouldReturnCorrectValue_ForFileUpload(EElementType type)
         {
             // Arrange
             var questionId = "test-questionID";
@@ -1164,14 +1176,14 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
             Assert.Equal(value[0].TrustedOriginalFileName, result);
         }
 
         [Fact]
-        public void GetAnswerStringValue_ShouldReturn_MultipleStrings_WhenMultipleFiles_AreWithinAnswerValue()
+        public async Task GetAnswerStringValue_ShouldReturn_MultipleStrings_WhenMultipleFiles_AreWithinAnswerValue()
         {
             // Arrange
             var questionId = "test-questionID";
@@ -1186,14 +1198,14 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
             Assert.Equal($"{value[1].TrustedOriginalFileName} \\r\\n\\ {value[0].TrustedOriginalFileName}", result);
         }
 
         [Fact]
-        public void GetAnswerStringValue_ShouldGenerateCorrectValue_ForDateInput()
+        public async Task GetAnswerStringValue_ShouldGenerateCorrectValue_ForDateInput()
         {
             // Arrange
             var questionId = "test-questionID";
@@ -1210,7 +1222,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
             Assert.Equal($"{valueDay}/{valueMonth}/{valueYear}", result);
@@ -1221,7 +1233,7 @@ namespace form_builder_tests.UnitTests.Mappers
         [InlineData("12", "54", "PM")]
         [InlineData("12", "11", "AM")]
         [InlineData("05", "23", "AM")]
-        public void GetAnswerStringValue_ShouldGenerateCorrectValue_ForTimeInput(string hour, string min, string amPm)
+        public async Task GetAnswerStringValue_ShouldGenerateCorrectValue_ForTimeInput(string hour, string min, string amPm)
         {
             // Arrange
             var questionId = "test-questionID";
@@ -1235,14 +1247,14 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
             Assert.Equal($"{hour}:{min} {amPm}", result);
         }
 
         [Fact]
-        public void GetAnswerStringValue_ShouldGenerateCorrectValue_ForBooking()
+        public async Task GetAnswerStringValue_ShouldGenerateCorrectValue_ForBooking()
         {
             // Arrange
             var questionId = "test-bookingID";
@@ -1266,14 +1278,14 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
             Assert.Equal($"{date.ToFullDateFormat()} at 4:30am to 12am", result);
         }
 
         [Fact]
-        public void GetAnswerStringValue_ShouldGenerateCorrectValue_ForBooking_WhenDateTime_IsMinValue()
+        public async Task GetAnswerStringValue_ShouldGenerateCorrectValue_ForBooking_WhenDateTime_IsMinValue()
         {
             // Arrange
             var questionId = "test-bookingID";
@@ -1286,7 +1298,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 .Build();
 
             // Act
-            var result = _elementMapper.GetAnswerStringValue(element, formAnswers);
+            var result = await _elementMapper.GetAnswerStringValue(element, formAnswers);
 
             // Assert
             Assert.Equal(string.Empty, result);

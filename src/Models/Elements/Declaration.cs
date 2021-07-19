@@ -9,10 +9,7 @@ namespace form_builder.Models.Elements
 {
     public class Declaration : Element
     {
-        public Declaration()
-        {
-            Type = EElementType.Declaration;
-        }
+        public Declaration() => Type = EElementType.Declaration;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,

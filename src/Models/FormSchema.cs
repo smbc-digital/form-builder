@@ -23,9 +23,9 @@ namespace form_builder.Models
         public string FeedbackForm { get; set; }
 
         public string FeedbackPhase { get; set; }
-        
+
         public bool GenerateReferenceNumber { get; set; }
-        
+
         public string GeneratedReferenceNumberMapping { get; set; }
 
         public string ReferencePrefix { get; set; }
@@ -40,7 +40,7 @@ namespace form_builder.Models
 
         public bool DocumentDownload { get; set; }
 
-        public bool HasDocumentUpload => Pages.Any(_ => _.PageSlug == FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH);
+        public bool HasDocumentUpload => Pages.Any(_ => _.PageSlug.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH));
 
         public List<EDocumentType> DocumentType { get; set; }
 
@@ -53,9 +53,9 @@ namespace form_builder.Models
         {
             try
             {
-                var pages = Pages.Where(_ => _.PageSlug.ToLower().Trim() == path.ToLower().Trim()).OrderByDescending(_ => _.RenderConditions.Count).ToList();
+                var pages = Pages.Where(_ => _.PageSlug.Trim().Equals(path.Trim(), StringComparison.OrdinalIgnoreCase)).OrderByDescending(_ => _.RenderConditions.Count).ToList();
 
-                if (pages.Count == 1)
+                if (pages.Count.Equals(1))
                     return pages.First();
 
                 var page = pageHelper.GetPageWithMatchingRenderConditions(pages);
@@ -68,9 +68,9 @@ namespace form_builder.Models
             }
         }
 
-        public IElement GetElement(string questionId) => 
+        public IElement GetElement(string questionId) =>
             Pages.SelectMany(_ => _.Elements)
-                .SingleOrDefault(_ => _.Properties.QuestionId == questionId);
-
+            .Where(_ => _.Properties.QuestionId is not null)
+            .SingleOrDefault(_ => _.Properties.QuestionId.Equals(questionId));
     }
 }

@@ -33,7 +33,7 @@ namespace form_builder.Models.Elements
         public DateTime CurrentSelectedMonth { get; set; }
         public DateTime FirstAvailableMonth { get; set; }
         public string AppointmentTypeFullDayIAG => $"You can select a date but you cannot select a time. We’ll be with you between {AppointmentStartTime.ToTimeFormat()} and {AppointmentEndTime.ToTimeFormat()}.";
-        public bool DisplayNextAvailableAppointmentIAG => FirstAvailableMonth.Date > DateTime.Now.Date && CurrentSelectedMonth.Month == FirstAvailableMonth.Month && CurrentSelectedMonth.Year == FirstAvailableMonth.Year;
+        public bool DisplayNextAvailableAppointmentIAG => FirstAvailableMonth.Date > DateTime.Now.Date && CurrentSelectedMonth.Month.Equals(FirstAvailableMonth.Month) && CurrentSelectedMonth.Year.Equals(FirstAvailableMonth.Year);
         public string InsetText => SetInsetText();
         public bool DisplayInsetText => InsetText.Length > 0;
         public string CurrentSelectedMonthText => $"{CurrentSelectedMonth:MMMMM yyyy}";
@@ -138,7 +138,7 @@ namespace form_builder.Models.Elements
             {
                 var day = new DateTime(CurrentSelectedMonth.Year, CurrentSelectedMonth.Month, i + 1);
                 var containsDay = Appointments.FirstOrDefault(_ => _.Date.Equals(day));
-                dates.Add(new CalendarDay { Date = day, IsDisabled = containsDay == null, Checked = containsDay != null && Properties.Value.Equals(day.Date.ToString()) });
+                dates.Add(new CalendarDay { Date = day, IsDisabled = containsDay is null, Checked = containsDay is not null && Properties.Value.Equals(day.Date.ToString()) });
             }
 
             for (int i = dates.Count + 1; i < 43; i++)
@@ -194,7 +194,7 @@ namespace form_builder.Models.Elements
         {
             var selectedAppointment = Appointments.FirstOrDefault(_ => _.Date.ToString().Equals(Properties.Value));
 
-            if (selectedAppointment == null)
+            if (selectedAppointment is null)
                 throw new ApplicationException("Booking::GetSelectedAppointment, Unable to find selected appointment while attempting to generate check your booking view");
 
             AppointmentStartTime = DateTime.Parse(StartAppointmentTime);

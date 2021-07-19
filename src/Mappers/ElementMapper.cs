@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Providers.StorageProvider;
+using form_builder.Providers.FileStorage;
 using form_builder.Utils.Extensions;
 using form_builder.Utils.Hash;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
@@ -20,18 +22,26 @@ namespace form_builder.Mappers
 {
     public class ElementMapper : IElementMapper
     {
-        private readonly IDistributedCacheWrapper _distributedCacheWrapper;
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
         private readonly IHashUtil _hashUtil;
+        private readonly IConfiguration _configuration;
 
-        public ElementMapper(IDistributedCacheWrapper distributedCacheWrapper, IHashUtil hashUtil)
+        public ElementMapper(IEnumerable<IFileStorageProvider> fileStorageProviders,
+            IHashUtil hashUtil,
+            IConfiguration configuration)
         {
-            _distributedCacheWrapper = distributedCacheWrapper;
+            _fileStorageProviders = fileStorageProviders;
             _hashUtil = hashUtil;
-        } 
+            _configuration = configuration;
+        }
 
-        public T GetAnswerValue<T>(IElement element, FormAnswers formAnswers) => (T)GetAnswerValue(element, formAnswers);
+        public async Task<T> GetAnswerValue<T>(IElement element, FormAnswers formAnswers)
+        {
+            var value = await GetAnswerValue(element, formAnswers);
+            return (T)value;
+        }
 
-        public object GetAnswerValue(IElement element, FormAnswers formAnswers)
+        public async Task<object> GetAnswerValue(IElement element, FormAnswers formAnswers)
         {
             var key = element.Properties.QuestionId;
 
@@ -63,7 +73,7 @@ namespace form_builder.Mappers
 
                 case EElementType.FileUpload:
                 case EElementType.MultipleFileUpload:
-                    return GetFileUploadElementValue(key, formAnswers);
+                    return await GetFileUploadElementValue(key, formAnswers);
                 case EElementType.Booking:
                     return GetBookingElementValue(key, formAnswers);
                 default:
@@ -71,7 +81,7 @@ namespace form_builder.Mappers
                         return GetNumericElementValue(key, formAnswers);
 
                     var value = formAnswers.Pages.SelectMany(_ => _.Answers)
-                       .Where(_ => _.QuestionId == key)
+                       .Where(_ => _.QuestionId.Equals(key))
                        .ToList()
                        .FirstOrDefault();
 
@@ -83,39 +93,38 @@ namespace form_builder.Mappers
         {
             var value = formAnswers.Pages
                 .SelectMany(_ => _.Answers)
-                .FirstOrDefault(_ => _.QuestionId == key);
+                .FirstOrDefault(_ => _.QuestionId.Equals(key));
 
-            if (value == null || string.IsNullOrEmpty(value.Response))
-            {
+            if (value is null || string.IsNullOrEmpty(value.Response))
                 return "Unchecked";
-            }
+
             return "Checked";
         }
 
-        public string GetAnswerStringValue(IElement question, FormAnswers formAnswers)
+        public async Task<string> GetAnswerStringValue(IElement question, FormAnswers formAnswers)
         {
-            if (question.Type == EElementType.FileUpload || question.Type == EElementType.MultipleFileUpload)
+            if (question.Type.Equals(EElementType.FileUpload) || question.Type.Equals(EElementType.MultipleFileUpload))
             {
                 var fileInput = formAnswers.Pages
                     .ToList()
                     .SelectMany(_ => _.Answers)
                     .ToList()
-                    .FirstOrDefault(_ => _.QuestionId == $"{question.Properties.QuestionId}{FileUploadConstants.SUFFIX}")?.Response;
+                    .FirstOrDefault(_ => _.QuestionId.Equals($"{question.Properties.QuestionId}{FileUploadConstants.SUFFIX}"))?.Response;
 
-                if (fileInput == null)
+                if (fileInput is null)
                     return string.Empty;
 
                 List<FileUploadModel> fileUploadData = JsonConvert.DeserializeObject<List<FileUploadModel>>(fileInput.ToString());
 
-                if (question.Type == EElementType.FileUpload)
+                if (question.Type.Equals(EElementType.FileUpload))
                     return fileUploadData.FirstOrDefault()?.TrustedOriginalFileName;
 
                 return fileUploadData.Any() ? fileUploadData.Select(_ => _.TrustedOriginalFileName).Aggregate((cur, acc) => $"{acc} \\r\\n\\ {cur}") : string.Empty;
             }
 
-            object value = GetAnswerValue(question, formAnswers);
+            object value = await GetAnswerValue(question, formAnswers);
 
-            if (value == null)
+            if (value is null)
                 return string.Empty;
 
             switch (question.Type)
@@ -130,12 +139,12 @@ namespace form_builder.Mappers
                     return convertDateTime.Date.ToString("dd/MM/yyyy");
                 case EElementType.Select:
                 case EElementType.Radio:
-                    var selectValue = question.Properties.Options.FirstOrDefault(_ => _.Value == value.ToString());
+                    var selectValue = question.Properties.Options.FirstOrDefault(_ => _.Value.Equals(value.ToString()));
                     return selectValue?.Text ?? string.Empty;
                 case EElementType.Checkbox:
                     var answerCheckbox = string.Empty;
                     var list = (List<string>)value;
-                    list.ForEach((answersCheckbox) => answerCheckbox += $" {question.Properties.Options.FirstOrDefault(_ => _.Value == answersCheckbox)?.Text ?? string.Empty},");
+                    list.ForEach((answersCheckbox) => answerCheckbox += $" {question.Properties.Options.FirstOrDefault(_ => _.Value.Equals(answersCheckbox))?.Text ?? string.Empty},");
                     return answerCheckbox.EndsWith(",") ? answerCheckbox.Remove(answerCheckbox.Length - 1).Trim() : answerCheckbox.Trim();
                 case EElementType.Organisation:
                     var orgValue = (Organisation)value;
@@ -158,41 +167,41 @@ namespace form_builder.Mappers
             }
         }
 
-        private object GetFileUploadElementValue(string key, FormAnswers formAnswers)
+        private async Task<object> GetFileUploadElementValue(string key, FormAnswers formAnswers)
         {
             key = $"{key}{FileUploadConstants.SUFFIX}";
 
-            var listOfFiles = new List<File>();
+            List<File> listOfFiles = new();
 
-            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
-                .Where(_ => _.QuestionId == key)
-                .ToList()
-                .FirstOrDefault();
+            var value = formAnswers.Pages
+                .SelectMany(_ => _.Answers)
+                .FirstOrDefault(_ => _.QuestionId.Equals(key));
 
-            if (value != null && value.Response != null)
+            if (value is null || value.Response is null)
+                return null;
+
+            List<FileUploadModel> uploadedFiles = JsonConvert.DeserializeObject<List<FileUploadModel>>(value.Response.ToString());
+
+            var fileStorageProvider = _fileStorageProviders.Get(_configuration["FileStorageProvider:Type"]);
+
+            foreach (var file in uploadedFiles)
             {
-                List<FileUploadModel> uploadedFiles = JsonConvert.DeserializeObject<List<FileUploadModel>>(value.Response.ToString());
+                var fileData = await fileStorageProvider.GetString(file.Key);
 
-                foreach (var file in uploadedFiles)
-                {
-                    var fileData = _distributedCacheWrapper.GetString(file.Key);
+                if (fileData is null)
+                    throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {file.Key} from the distributed cache");
 
-                    if (fileData == null)
-                        throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {file.Key} from the distributed cache");
+                File model = new();
+                model.Content = fileData;
+                model.TrustedOriginalFileName = file.TrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100);
+                model.UntrustedOriginalFileName = file.UntrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100);
+                model.KeyName = key;
 
-                    var model = new File();
-                    model.Content = fileData;
-                    model.TrustedOriginalFileName = file.TrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100);
-                    model.UntrustedOriginalFileName = file.UntrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100);
-                    model.KeyName = key;
-
-                    listOfFiles.Add(model);
-                }
-
-                return listOfFiles;
+                listOfFiles.Add(model);
             }
 
-            return null;
+            return listOfFiles;
+
         }
 
 
@@ -220,11 +229,11 @@ namespace form_builder.Mappers
             var bookingStartTime = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentStartTime))?.Response;
             var bookingEndTime = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentEndTime))?.Response;
             var bookingLocation = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentLocation))?.Response;
-            bookingObject.Id = bookingId != null ? Guid.Parse(bookingId) : Guid.Empty;
-            bookingObject.HashedId = bookingId != null ? _hashUtil.Hash(bookingObject.Id.ToString()) : string.Empty;
-            bookingObject.Date = bookingDate != null ? DateTime.Parse(bookingDate) : DateTime.MinValue;
-            bookingObject.StartTime = bookingStartTime != null ? DateTime.Parse(bookingStartTime) : DateTime.MinValue;
-            bookingObject.EndTime = bookingEndTime != null ? DateTime.Parse(bookingEndTime) : DateTime.MinValue;
+            bookingObject.Id = bookingId is not null ? Guid.Parse(bookingId) : Guid.Empty;
+            bookingObject.HashedId = bookingId is not null ? _hashUtil.Hash(bookingObject.Id.ToString()) : string.Empty;
+            bookingObject.Date = bookingDate is not null ? DateTime.Parse(bookingDate) : DateTime.MinValue;
+            bookingObject.StartTime = bookingStartTime is not null ? DateTime.Parse(bookingStartTime) : DateTime.MinValue;
+            bookingObject.EndTime = bookingEndTime is not null ? DateTime.Parse(bookingEndTime) : DateTime.MinValue;
             bookingObject.Location = bookingLocation;
 
             return bookingObject.IsEmpty() ? null : bookingObject;
@@ -265,7 +274,7 @@ namespace form_builder.Mappers
             var streetDescription = $"{key}{StreetConstants.DESCRIPTION_SUFFIX}";
 
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
-                .Where(_ => _.QuestionId == usrnKey || _.QuestionId.Equals(streetDescription))
+                .Where(_ => _.QuestionId.Equals(usrnKey) || _.QuestionId.Equals(streetDescription))
                 .ToList();
 
             addressObject.PlaceRef = value.FirstOrDefault(_ => _.QuestionId.Equals(usrnKey))?.Response ?? string.Empty;
@@ -280,8 +289,9 @@ namespace form_builder.Mappers
             var dateYearKey = $"{key}-year";
 
             var value = formAnswers.Pages.SelectMany(_ => _.Answers)
-                .Where(_ => _.QuestionId == dateDayKey || _.QuestionId.Equals(dateMonthKey) ||
-                            _.QuestionId == dateYearKey)
+                .Where(_ => _.QuestionId.Equals(dateDayKey) ||
+                            _.QuestionId.Equals(dateMonthKey) ||
+                            _.QuestionId.Equals(dateYearKey))
                 .ToList();
 
             var day = value.FirstOrDefault(_ => _.QuestionId.Equals(dateDayKey))?.Response ?? string.Empty;
@@ -340,7 +350,7 @@ namespace form_builder.Mappers
                 .SelectMany(_ => _.Answers)
                 .FirstOrDefault(_ => _.QuestionId.Equals(key));
 
-            if (value == null || string.IsNullOrEmpty(value.Response))
+            if (value is null || string.IsNullOrEmpty(value.Response))
                 return null;
 
             return int.Parse(value.Response);
@@ -351,7 +361,7 @@ namespace form_builder.Mappers
                 .SelectMany(_ => _.Answers)
                 .FirstOrDefault(_ => _.QuestionId.Equals(key));
 
-            if (value == null || string.IsNullOrEmpty(value.Response))
+            if (value is null || string.IsNullOrEmpty(value.Response))
                 return null;
 
             return DateTime.Parse(value.Response);
@@ -362,7 +372,7 @@ namespace form_builder.Mappers
                 .SelectMany(_ => _.Answers)
                 .FirstOrDefault(_ => _.QuestionId.Equals(key));
 
-            if (value == null || string.IsNullOrEmpty(value.Response))
+            if (value is null || string.IsNullOrEmpty(value.Response))
                 return new List<string>();
 
             var val = value.Response.Split(",");

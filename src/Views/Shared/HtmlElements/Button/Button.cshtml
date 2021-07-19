@@ -5,6 +5,7 @@
         @(Model.Properties.DisableOnClick ? "data-disable-on-click=true" : string.Empty)
         class="govuk-button @Model.Properties.ClassName"
         id="@Model.Properties.ButtonId"
+        @(!string.IsNullOrEmpty(Model.Properties.ButtonName) ? $"name={ Model.Properties.ButtonName }" : string.Empty)
         @(Model.Properties.Disabled ? "disabled=disabled" : string.Empty)
         data-module="govuk-button">
     @Model.Properties.Text

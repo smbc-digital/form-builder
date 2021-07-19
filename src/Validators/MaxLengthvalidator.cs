@@ -10,20 +10,10 @@ namespace form_builder.Validators
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
             if (!viewModel.ContainsKey(element.Properties.QuestionId))
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
-            if (element.Type == EElementType.FileUpload || element.Type == EElementType.Map || element.Type == EElementType.Checkbox)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+            if (element.Type.Equals(EElementType.FileUpload) || element.Type.Equals(EElementType.Map) || element.Type.Equals(EElementType.Checkbox) || element.Type.Equals(EElementType.AddAnother))
+                return new ValidationResult { IsValid = true };
 
             var value = viewModel.ContainsKey(element.Properties.QuestionId) ? viewModel[element.Properties.QuestionId] : "";
 
@@ -36,10 +26,7 @@ namespace form_builder.Validators
                 };
             }
 
-            return new ValidationResult
-            {
-                IsValid = true
-            };
+            return new ValidationResult { IsValid = true };
         }
     }
 }

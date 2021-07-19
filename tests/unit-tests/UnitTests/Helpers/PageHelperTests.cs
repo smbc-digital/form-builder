@@ -8,7 +8,6 @@ using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -16,11 +15,11 @@ using form_builder.Helpers.ViewRender;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
-using form_builder.Providers.Lookup;
+using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
-using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -34,16 +33,24 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IViewRender> _mockIViewRender = new();
         private readonly Mock<IElementHelper> _mockElementHelper = new();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
+        private readonly Mock<IFileStorageProvider> _fileStorageProvider = new();
         private readonly Mock<IOptions<FormConfiguration>> _mockDisallowedKeysOptions = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings = new();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new();
-        private readonly List<ILookupProvider> _mockLookupProviders = new ();
-        private readonly FakeLookupProvider _lookupProvider = new();
-        private readonly Mock<IActionHelper> _mockActionHelper = new();
+        private readonly Mock<IOptions<FileStorageProviderConfiguration>> _mockFileStorageConfiguration = new();
 
         public PageHelperTests()
         {
+            _mockFileStorageConfiguration.Setup(_ => _.Value).Returns(new FileStorageProviderConfiguration { Type = "Redis" });
+
+            _fileStorageProvider.Setup(_ => _.ProviderName).Returns("Redis");
+            _fileStorageProviders = new List<IFileStorageProvider>
+            {
+                _fileStorageProvider.Object
+            };
+
             _mockDisallowedKeysOptions.Setup(_ => _.Value).Returns(new FormConfiguration
             {
                 DisallowedAnswerKeys = new[]
@@ -62,48 +69,11 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
 
-            _mockLookupProviders.Add(_lookupProvider);
-
             _pageHelper = new PageHelper(_mockIViewRender.Object,
                 _mockElementHelper.Object, _mockDistributedCache.Object,
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockDistributedCacheExpirationSettings.Object,
-                _mockSessionHelper.Object, _mockLookupProviders,
-                _mockActionHelper.Object);
-        }
-
-        [Fact]
-        public async Task GenerateHtml_ShouldAddOptions_WhenFormContainsDynamicLookup()
-        {
-            //Arrange
-            var element = new ElementBuilder().WithType(EElementType.Radio).WithLookup("dynamic").Build();
-            element.Properties.LookupSources = new List<LookupSource>
-            {
-                new LookupSource
-                {
-                    EnvironmentName = "local",
-                    Provider = "Fake",
-                    AuthToken = "fake",
-                    URL = "https://myapi.com"
-                }
-            };
-
-            var page = new PageBuilder().WithElement(element).Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add(LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic);
-
-            var schema = new FormSchemaBuilder().WithName("form-name").Build();
-            var formAnswers = new FormAnswers();
-
-            _mockActionHelper.Setup(_ => _.GenerateUrl("https://myapi.com", formAnswers)).Returns(new RequestEntity() { IsPost = false, Url = "waste" });
-
-            //Act
-            await _pageHelper.GenerateHtml(page, viewModel, schema, string.Empty, formAnswers, new List<object>());
-
-            //Assert
-            element = (Element)page.Elements.Single(x => !string.IsNullOrEmpty(x.Lookup) && x.Lookup.Equals("dynamic"));
-            Assert.True(element.Properties.Options.Any());
+                _mockSessionHelper.Object, _fileStorageProviders, _mockFileStorageConfiguration.Object);
         }
 
         [Fact]
@@ -192,7 +162,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>
             {
                 {
-                    LookUpConstants.SubPathViewModelKey, 
+                    LookUpConstants.SubPathViewModelKey,
                     LookUpConstants.Automatic
                 }
             };
@@ -472,6 +442,67 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
+        public void RemoveFieldset_ShouldRemoveAnswersFromCache()
+        {
+            // Arrange
+            var callbackCacheProvider = string.Empty;
+            var removeKey = "remove-0";
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {
+                    "answer:0:", "answer0"
+                },
+                {
+                    "answer:1:", "answer1"
+                },
+                {
+                    "Path", "page-one"
+                }
+            };
+
+            var existingAnswers = JsonConvert.SerializeObject(new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers
+                    {
+                        PageSlug = "page-one",
+                        Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                QuestionId = "answer:0:",
+                                Response = "answer0"
+                            },
+                            new Answers
+                            {
+                                QuestionId = "answer:1:",
+                                Response = "answer1"
+                            }
+                        }
+                    }
+                }
+            });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(existingAnswers);
+
+            _mockDistributedCache
+                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
+
+            // Act
+            _pageHelper.RemoveFieldset(viewModel, "form", Guid.NewGuid().ToString(), "page-one", removeKey);
+            var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
+
+            // Assert
+            Assert.Equal("answer:0:", callbackModel.Pages[0].Answers[0].QuestionId);
+            Assert.Equal("answer1", callbackModel.Pages[0].Answers[0].Response);
+            Assert.Single(callbackModel.Pages[0].Answers);
+        }
+
+        [Fact]
         public void SaveAnswers_ShouldCallCacheProvider()
         {
             // Arrange
@@ -644,7 +675,7 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection, true);
 
             // Assert
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
@@ -715,8 +746,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void
-        SaveAnswers_ShouldReplaceFilUploadReference_WithinFormAnswers_IfAnswerAlreadyExists_InDistributedCache()
+        public void SaveAnswers_ShouldReplaceFilUploadReference_WithinFormAnswers_IfAnswerAlreadyExists_InDistributedCache()
         {
             // Arrange
             var callbackCacheProvider = string.Empty;
@@ -1000,7 +1030,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveFormFileAnswer_ShouldInsertFilesToAnswers_IfAnswerDontExist()
+        public void SaveFormFileAnswers_ShouldInsertFilesToAnswers_IfAnswerDontExist()
         {
             // Arrange                                        
             var questionId = "fileUpload_FileQuestionId";
@@ -1023,36 +1053,36 @@ namespace form_builder_tests.UnitTests.Helpers
             // Assert
             Assert.NotNull(results);
             Assert.Equal(3, results.Count());
-            var itemData = Assert.IsType<List<FileUploadModel>>(results[2].Response);
+            Assert.IsType<List<FileUploadModel>>(results[2].Response);
             Assert.StartsWith("file-fileUpload_FileQuestionId-", results[2].Response[0].Key);
         }
 
         [Fact]
-        public void SaveFormFileAnswer_ShouldUpdateResponseFileForMultipleUpload_IfAnswerExist()
+        public void SaveFormFileAnswers_ShouldUpdateResponseFileForMultipleUpload_IfAnswerExist()
         {
             // Arrange                                        
             var questionId = "Item1";
             var currentAnswerKey = $"file-{questionId}-{Guid.NewGuid()}";
-            var file = new List<CustomFormFile>();
-            file.Add(new CustomFormFile(null, questionId, 1, null));
+            List<CustomFormFile> file = new();
+            file.Add(new(null, questionId, 1, "test"));
 
-            var fileUpload = new List<FileUploadModel>();
-            fileUpload.Add(
-                new FileUploadModel
+            List<FileUploadModel> fileUpload = new()
+            {
+                new()
                 {
                     Key = currentAnswerKey,
                     TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
                     UntrustedOriginalFileName = "replace-me.txt",
                     FileSize = 0
                 }
-            );
+            };
 
-            var page = new PageAnswers
+            PageAnswers page = new()
             {
                 PageSlug = "path",
-                Answers = new List<Answers>
+                Answers = new()
                 {
-                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(fileUpload) }
+                    new() { QuestionId = "Item1", Response = JsonConvert.SerializeObject(fileUpload) }
                 }
             };
 
@@ -1068,7 +1098,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveFormFileAnswer_ShouldUpdateResponseFileForSingleUpload_IfAnswerExist()
+        public void SaveFormFileAnswers_ShouldUpdateResponseFileForSingleUpload_IfAnswerExist()
         {
             // Arrange                                        
             var questionId = "Item1";
@@ -1107,7 +1137,65 @@ namespace form_builder_tests.UnitTests.Helpers
 
 
         [Fact]
-        public void SaveFormFileAnswer_ShouldSave_Files_InDistributedCache()
+        public void SaveFormFileAnswers_Should_SaveFilesInCache_Under_GeneratedKey_Which_Is_Then_Saved_In_Answers_As_Referene()
+        {
+            // Arrange                                        
+            var questionId = "Item1";
+            var file = new List<CustomFormFile>();
+            file.Add(new CustomFormFile(null, questionId, 1, null));
+            file.Add(new CustomFormFile(null, questionId, 1, null));
+
+            var page = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>()
+            };
+
+            // Act
+            var results = _pageHelper.SaveFormFileAnswers(new List<Answers>(), file, false, page);
+
+            // Assert
+            Assert.NotNull(results);
+            List<FileUploadModel> filesData = Assert.IsType<List<FileUploadModel>>(results[0].Response);
+            Assert.Equal(2, filesData.Count);
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(filesData[0].Key)), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(filesData[1].Key)), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public void SaveFormFileAnswers_Should_SaveFilesInCache_Under_GeneratedKey_Which_Is_Then_Saved_In_Answers_As_Referene_ForMultiple_Files()
+        {
+            // Arrange                                        
+            var questionId = "Item1";
+            var questionIdTwo = "Item2";
+            var file = new List<CustomFormFile>();
+            file.Add(new CustomFormFile(null, questionId, 1, null));
+            file.Add(new CustomFormFile(null, questionId, 1, null));
+            file.Add(new CustomFormFile(null, questionIdTwo, 1, null));
+
+            var page = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>()
+            };
+
+            // Act
+            var results = _pageHelper.SaveFormFileAnswers(new List<Answers>(), file, false, page);
+
+            // Assert
+            Assert.NotNull(results);
+            List<FileUploadModel> filesData = Assert.IsType<List<FileUploadModel>>(results[0].Response);
+            Assert.Equal(2, filesData.Count);
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(filesData[0].Key)), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(filesData[1].Key)), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
+
+            List<FileUploadModel> filesDataTwo = Assert.IsType<List<FileUploadModel>>(results[1].Response);
+            Assert.Single(filesDataTwo);
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(filesDataTwo[0].Key)), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public void SaveFormFileAnswers_ShouldSave_Files_InDistributedCache()
         {
             // Arrange                                        
             var questionId = "fileUpload";
@@ -1124,31 +1212,28 @@ namespace form_builder_tests.UnitTests.Helpers
             _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
 
             // Assert
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Exactly(2));
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Exactly(2));
         }
 
         [Fact]
-        public void SaveFormFileAnswer_ShouldNotSave_ExistingFiles_IfUploadedTwice_InDistributedCache()
+        public void SaveFormFileAnswers_ShouldNotSave_ExistingFiles_IfUploadedTwice_InDistributedCache()
         {
             // Arrange
             var questionId = "fileUpload";
-            var file = new List<CustomFormFile>();
-            file.Add(new CustomFormFile("content", questionId, 1, "newfile.txt"));
-            file.Add(new CustomFormFile("content", questionId, 1, "existingfile.txt"));
-            file.Add(new CustomFormFile("content", questionId, 1, "existingfiletwo.txt"));
+            List<CustomFormFile> files = new();
+            files.Add(new("content", questionId, 1, "newfile.txt"));
+            files.Add(new("content", questionId, 1, "existingfile.txt"));
+            files.Add(new("content", questionId, 1, "existingfiletwo.txt"));
 
-            var fileUpload = new List<FileUploadModel>();
-            fileUpload.Add(
-              new FileUploadModel
-              {
-                  Key = questionId,
-                  TrustedOriginalFileName = WebUtility.HtmlEncode("existingfile.txt"),
-                  UntrustedOriginalFileName = "existingfile.txt",
-                  FileSize = 0
-              }
-            );
-            fileUpload.Add(
-            new FileUploadModel
+            List<FileUploadModel> fileUpload = new();
+            fileUpload.Add(new()
+            {
+                Key = questionId,
+                TrustedOriginalFileName = WebUtility.HtmlEncode("existingfile.txt"),
+                UntrustedOriginalFileName = "existingfile.txt",
+                FileSize = 0
+            });
+            fileUpload.Add(new()
             {
                 Key = questionId,
                 TrustedOriginalFileName = WebUtility.HtmlEncode("existingfiletwo.txt"),
@@ -1156,20 +1241,20 @@ namespace form_builder_tests.UnitTests.Helpers
                 FileSize = 0
             });
 
-            var page = new PageAnswers
+            PageAnswers pageAnswers = new()
             {
                 PageSlug = "path",
-                Answers = new List<Answers>
+                Answers = new()
                 {
-                    new Answers { QuestionId = questionId, Response = JsonConvert.SerializeObject(fileUpload) }
+                    new() { QuestionId = questionId, Response = JsonConvert.SerializeObject(fileUpload) }
                 }
             };
 
             // Act
-            _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
+            _pageHelper.SaveFormFileAnswers(pageAnswers.Answers, files, true, pageAnswers);
 
             // Assert
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once());
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once());
         }
 
         [Fact]
@@ -1210,7 +1295,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void SavePaymentAmount_ShouldCallDistributedCache()
         {
             var sessionGuid = Guid.NewGuid().ToString();
-            _pageHelper.SavePaymentAmount(sessionGuid, "10.00" );
+            _pageHelper.SavePaymentAmount(sessionGuid, "10.00");
 
             _mockDistributedCache.Verify(_ => _.GetString(sessionGuid), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(sessionGuid, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);

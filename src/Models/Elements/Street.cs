@@ -14,6 +14,8 @@ namespace form_builder.Models.Elements
 {
     public class Street : Element
     {
+        public Street() => Type = EElementType.Street;
+
         public List<SelectListItem> Items { get; set; }
 
         public string ReturnURL { get; set; }
@@ -37,18 +39,13 @@ namespace form_builder.Models.Elements
             get
             {
                 if (IsSelect)
-                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Select the street below" : Properties.SelectLabel;
+                    return string.IsNullOrEmpty(Properties.SelectLabel) ? "Select the street from the list" : Properties.SelectLabel;
 
                 return string.IsNullOrEmpty(Properties.Label) ? "Street name" : Properties.Label;
             }
         }
 
         public override string GetLabelText(string pageTitle) => $"{(string.IsNullOrEmpty(Properties.SummaryLabel) ? pageTitle : Properties.SummaryLabel)}{GetIsOptionalLabelText()}";
-
-        public Street()
-        {
-            Type = EElementType.Street;
-        }
 
         public override async Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
@@ -82,7 +79,7 @@ namespace form_builder.Models.Elements
                     {
                         AddressSearchResult searchResult;
 
-                        if (objectResult as JObject != null)
+                        if (objectResult as JObject is not null)
                             searchResult = (objectResult as JObject).ToObject<AddressSearchResult>();
                         else
                             searchResult = objectResult as AddressSearchResult;

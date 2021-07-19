@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using form_builder.Exceptions;
-using form_builder.Models.Booking;
+using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
-using Newtonsoft.Json;
 
 namespace form_builder.Providers.Booking
 {

@@ -50,7 +50,7 @@ namespace form_builder.Controllers
         [Route("/")]
         public IActionResult Home()
         {
-            if (_hostingEnvironment.EnvironmentName.ToLower().Equals("prod"))
+            if (_hostingEnvironment.EnvironmentName.Equals("prod", StringComparison.OrdinalIgnoreCase))
                 return Redirect("https://www.stockport.gov.uk");
 
             return RedirectToAction("Index", "Error");
@@ -68,7 +68,7 @@ namespace form_builder.Controllers
             var queryParamters = Request.Query;
             var response = await _pageService.ProcessPage(form, path, subPath, queryParamters);
 
-            if (response == null)
+            if (response is null)
                 return RedirectToAction("NotFound", "Error");
 
             if (response.ShouldRedirect)
@@ -99,19 +99,21 @@ namespace form_builder.Controllers
         {
             var viewModel = formData.ToNormaliseDictionary(subPath);
 
-            if (fileUpload != null && fileUpload.Any())
+            if (fileUpload is not null && fileUpload.Any())
                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
 
             var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload, ModelState.IsValid);
 
             if (currentPageResult.RedirectToAction && !string.IsNullOrWhiteSpace(currentPageResult.RedirectAction))
+            {
                 return RedirectToAction(currentPageResult.RedirectAction, currentPageResult.RouteValues ?? new { form, path });
+            }
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
 
             if (currentPageResult.Page.HasPageActionsPostValues)
-                await _actionsWorkflow.Process(currentPageResult.Page.PageActions.Where(_ => _.Properties.HttpActionType == EHttpActionType.Post).ToList(), null, form);
+                await _actionsWorkflow.Process(currentPageResult.Page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Post)).ToList(), null, form);
 
             var behaviour = _pageService.GetBehaviour(currentPageResult);
 

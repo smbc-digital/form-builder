@@ -6,6 +6,8 @@ namespace form_builder.Models.Properties.ElementProperties
     {
         public string Text { get; set; }
 
+        public string AppendText { get; set; }
+
         public string QuestionId { get; set; }
 
         public virtual string Label { get; set; }
@@ -14,9 +16,11 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public bool Optional { get; set; } = false;
 
-        public bool? Email { get; set; }
+        public bool IsDynamicallyGeneratedElement { get; set; } = false;
 
-        public bool? Telephone { get; set; }
+        public bool Email { get; set; } = false;
+
+        public bool Postcode { get; set; } = false;
 
         public bool Numeric { get; set; } = false;
 

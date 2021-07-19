@@ -10,7 +10,7 @@ namespace form_builder.Conditions
         public static bool DateIsBefore(Condition condition, Dictionary<string, dynamic> viewModel)
         {
             var dateComparison = DateTime.Today;
-            if (condition.ComparisonDate.ToLower() != "today")
+            if (!condition.ComparisonDate.Equals("today", StringComparison.OrdinalIgnoreCase))
             {
                 dateComparison = DateTime.Parse(condition.ComparisonDate);
             }
@@ -25,10 +25,8 @@ namespace form_builder.Conditions
         public static bool DateIsAfter(Condition condition, Dictionary<string, dynamic> viewModel)
         {
             var dateComparison = DateTime.Today;
-            if (condition.ComparisonDate.ToLower() != "today")
-            {
+            if (!condition.ComparisonDate.Equals("today", StringComparison.OrdinalIgnoreCase))
                 dateComparison = DateTime.Parse(condition.ComparisonDate);
-            }
 
             var isAfter = !string.IsNullOrEmpty(condition.ComparisonValue) ? int.Parse(condition.ComparisonValue) : condition.IsAfter.Value;
             var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isAfter);
@@ -40,16 +38,14 @@ namespace form_builder.Conditions
         public static bool DateIsEqual(Condition condition, Dictionary<string, dynamic> viewModel)
         {
             var dateComparison = DateTime.Today;
-            if (condition.ComparisonDate.ToLower() != "today")
-            {
+            if (!condition.ComparisonDate.Equals("today", StringComparison.OrdinalIgnoreCase))
                 dateComparison = DateTime.Parse(condition.ComparisonDate);
-            }
 
             var isEqualTo = !string.IsNullOrEmpty(condition.ComparisonValue) ? int.Parse(condition.ComparisonValue) : condition.IsBefore.Value;
             var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isEqualTo);
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
 
-            return DateTime.Compare(dateValue, newComparisonDate) == 0;
+            return DateTime.Compare(dateValue, newComparisonDate).Equals(0);
         }
 
         private static DateTime GetComparisonDate(DateTime dateComparison, EDateUnit unit, int isAfter)
