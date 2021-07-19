@@ -181,7 +181,7 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
-        public void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedRefereceMappingId = "GeneratedReference")
+        public void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedReferenceMappingId = "GeneratedReference")
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -190,7 +190,7 @@ namespace form_builder.Helpers.PageHelpers
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             if (isGenerated)
-                convertedAnswers.AdditionalFormData.Add(generatedRefereceMappingId, caseReference);
+                convertedAnswers.AdditionalFormData.Add(generatedReferenceMappingId, caseReference);
 
             convertedAnswers.CaseReference = caseReference;
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));

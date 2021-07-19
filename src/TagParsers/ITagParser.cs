@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using form_builder.Models;
 
 namespace form_builder.TagParsers
@@ -8,6 +7,7 @@ namespace form_builder.TagParsers
     {
         Regex Regex { get; }
         Page Parse(Page formSchema, FormAnswers formAnswers);
+        string ParseString(string content, FormAnswers formAnswers);
     }
 
     public interface ISimpleTagParser

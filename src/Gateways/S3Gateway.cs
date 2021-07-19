@@ -1,8 +1,8 @@
-﻿using Amazon.S3;
+﻿using System.Text;
+using System.Threading.Tasks;
+using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace form_builder.Gateways
 {

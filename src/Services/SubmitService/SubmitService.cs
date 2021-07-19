@@ -119,6 +119,7 @@ namespace form_builder.Services.SubmitService
         {
             if (_submissionServiceConfiguration.FakePaymentSubmission)
             {
+                _pageHelper.SaveCaseReference(sessionGuid, "123456");
                 return "123456";
             }
 
@@ -156,6 +157,7 @@ namespace form_builder.Services.SubmitService
                     throw new ApplicationException($"SubmitService::PaymentSubmission, Gateway {postUrl.URL} responded with empty reference");
                 }
 
+                _pageHelper.SaveCaseReference(sessionGuid, JsonConvert.DeserializeObject<string>(content));
                 return JsonConvert.DeserializeObject<string>(content);
             }
 
