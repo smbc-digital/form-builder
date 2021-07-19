@@ -11,7 +11,6 @@ using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.Lookup;
 using form_builder.Services.RetrieveExternalDataService.Entities;
 using Microsoft.AspNetCore.Hosting;
-using Newtonsoft.Json;
 
 namespace form_builder.Factories.Transform.UserSchema
 {

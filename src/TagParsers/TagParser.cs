@@ -1,10 +1,10 @@
-using form_builder.Extensions;
-using form_builder.TagParsers.Formatters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using form_builder.Extensions;
+using form_builder.TagParsers.Formatters;
 
 namespace form_builder.TagParsers
 {

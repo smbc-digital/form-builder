@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using form_builder.Helpers.PaymentHelpers;
 using form_builder.Models;
-using form_builder.Services.PayService;
 using form_builder.TagParsers.Formatters;
 
 namespace form_builder.TagParsers

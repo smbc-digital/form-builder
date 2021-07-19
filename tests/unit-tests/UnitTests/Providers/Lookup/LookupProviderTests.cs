@@ -1,10 +1,10 @@
-﻿using form_builder.Providers.Lookup;
-using Moq;
-using StockportGovUK.NetStandard.Gateways;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using form_builder.Providers.Lookup;
+using Moq;
+using StockportGovUK.NetStandard.Gateways;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Providers.Lookup

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Enum;
@@ -9,10 +7,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.PaymentHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.PaymentProvider;
-using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.PayService;
