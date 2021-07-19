@@ -1,6 +1,7 @@
 ﻿using Amazon.S3;
+using form_builder.Configuration;
 using form_builder.Gateways;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Threading;
@@ -12,18 +13,18 @@ namespace form_builder.Providers.FileStorage
     {
         public string ProviderName { get => "S3"; }
         private readonly IS3Gateway _s3Gateway;
-        private readonly IConfiguration _configuration;
+        private readonly FileStorageProviderConfiguration _fileStorageConfiguration;
 
-        public S3FileStorageProvider(IS3Gateway s3Service, IConfiguration configuration)
+        public S3FileStorageProvider(IS3Gateway s3Service, IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
         {
             _s3Gateway = s3Service;
-            _configuration = configuration;
+            _fileStorageConfiguration = fileStorageConfiguration.Value;
         }
         public async Task<string> GetString(string key)
         {
             try
             {
-                var s3Response = await _s3Gateway.GetObject(_configuration["FileStorageProvider:S3BucketName"], key);
+                var s3Response = await _s3Gateway.GetObject(_fileStorageConfiguration.S3BucketName, key);
                 var s3StringResponse = new StreamReader(s3Response.ResponseStream).ReadToEnd();
                 return s3StringResponse;
             }
@@ -41,7 +42,7 @@ namespace form_builder.Providers.FileStorage
         {
             try
             {
-                await _s3Gateway.DeleteObject(_configuration["FileStorageProvider:S3BucketName"], filename);
+                await _s3Gateway.DeleteObject(_fileStorageConfiguration.S3BucketName, filename);
             }
             catch (AmazonS3Exception e)
             {
@@ -57,7 +58,7 @@ namespace form_builder.Providers.FileStorage
         {
             try
             {
-                await _s3Gateway.PutObject(_configuration["FileStorageProvider:S3BucketName"], filename, value);
+                await _s3Gateway.PutObject(_fileStorageConfiguration.S3BucketName, filename, value);
             }
             catch (AmazonS3Exception e)
             {

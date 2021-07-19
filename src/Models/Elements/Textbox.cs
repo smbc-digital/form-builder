@@ -30,7 +30,7 @@ namespace form_builder.Models.Elements
 
         public override Dictionary<string, dynamic> GenerateElementProperties(string type = "")
         {
-            var properties = new Dictionary<string, dynamic>()
+            var properties = new Dictionary<string, dynamic>
             {
                 { "name", Properties.QuestionId },
                 { "id", Properties.QuestionId },
@@ -45,9 +45,6 @@ namespace form_builder.Models.Elements
                 properties.Add("max", Properties.Max);
                 properties.Add("min", Properties.Min);
             }
-
-            if (Properties.Telephone.GetValueOrDefault())
-                properties["autocomplete"] = "tel";
 
             if (DisplayAriaDescribedby)
                 properties.Add("aria-describedby", GetDescribedByAttributeValue());

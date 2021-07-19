@@ -428,16 +428,18 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddIOptionsConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<FormConfiguration>(configuration.GetSection("FormConfig"));
-            services.Configure<CivicaPaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
-            services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection("DistributedCacheExpiration"));
-            services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>("UseDistributedCache"));
-            services.Configure<AwsSesKeysConfiguration>(configuration.GetSection("Ses"));
-            services.Configure<ReCaptchaConfiguration>(configuration.GetSection("ReCaptchaConfiguration"));
-            services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
-            services.Configure<TagManagerConfiguration>(TagManagerId => TagManagerId.TagManagerId = configuration.GetValue<string>("TagManagerId"));
-            services.Configure<HashConfiguration>(configuration.GetSection("HashConfiguration"));
+            services.Configure<AwsSesKeysConfiguration>(configuration.GetSection(AwsSesKeysConfiguration.ConfigValue));
+            services.Configure<CivicaPaymentConfiguration>(configuration.GetSection(CivicaPaymentConfiguration.ConfigValue));
+            services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection(DistributedCacheExpirationConfiguration.ConfigValue));
+            services.Configure<FileStorageProviderConfiguration>(configuration.GetSection(FileStorageProviderConfiguration.ConfigValue));
+            services.Configure<FormConfiguration>(configuration.GetSection(FormConfiguration.ConfigValue));
+            services.Configure<HashConfiguration>(configuration.GetSection(HashConfiguration.ConfigValue));
             services.Configure<NotifyConfiguration>(configuration.GetSection(NotifyConfiguration.ConfigValue));
+            services.Configure<ReCaptchaConfiguration>(configuration.GetSection(ReCaptchaConfiguration.ConfigValue));
+            services.Configure<SubmissionServiceConfiguration>(configuration.GetSection(SubmissionServiceConfiguration.ConfigValue));
+
+            services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>("UseDistributedCache"));
+            services.Configure<TagManagerConfiguration>(TagManagerId => TagManagerId.TagManagerId = configuration.GetValue<string>("TagManagerId"));
 
             return services;
         }

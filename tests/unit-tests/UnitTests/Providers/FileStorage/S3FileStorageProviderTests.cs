@@ -1,8 +1,10 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using form_builder.Configuration;
 using form_builder.Gateways;
 using form_builder.Providers.FileStorage;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -12,13 +14,13 @@ namespace form_builder_tests.UnitTests.Providers.FileStorage
     {
         private readonly S3FileStorageProvider _s3FileStorageProvider;
         private readonly Mock<IS3Gateway> _mockS3Gateway = new();
-        private readonly Mock<IConfiguration> _mockConfiguration = new();
+        private readonly Mock<IOptions<FileStorageProviderConfiguration>> _mockFileStorageConfiguration = new();
 
         public S3FileStorageProviderTests()
         {
-            _mockConfiguration.Setup(_ => _["FileStorageProvider:Type"]).Returns("S3");
-            _mockConfiguration.Setup(_ => _["FileStorageProvider:S3BucketName"]).Returns("formbuilder-s3-file-storage");
-            _s3FileStorageProvider = new S3FileStorageProvider(_mockS3Gateway.Object, _mockConfiguration.Object);
+            _mockFileStorageConfiguration.Setup(_ => _.Value).Returns(new FileStorageProviderConfiguration { Type = "S3", S3BucketName = "formbuilder-s3-file-storage" });
+
+            _s3FileStorageProvider = new S3FileStorageProvider(_mockS3Gateway.Object, _mockFileStorageConfiguration.Object);
         }
 
         [Fact]

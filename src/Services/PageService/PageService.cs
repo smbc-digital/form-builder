@@ -38,7 +38,7 @@ namespace form_builder.Services.PageService
     public class PageService : IPageService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
+        private readonly IFileStorageProvider _fileStorageProvider;
         private readonly IEnumerable<IElementValidator> _validators;
         private readonly IPageHelper _pageHelper;
         private readonly ISessionHelper _sessionHelper;
@@ -57,7 +57,6 @@ namespace form_builder.Services.PageService
         private readonly IActionsWorkflow _actionsWorkflow;
         private readonly IFormAvailabilityService _formAvailabilityService;
         private readonly ILogger<IPageService> _logger;
-        private readonly IConfiguration _configuration;
 
         public PageService(
             IEnumerable<IElementValidator> validators,
@@ -80,7 +79,7 @@ namespace form_builder.Services.PageService
             IFormAvailabilityService formAvailabilityService,
             ILogger<IPageService> logger,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
-            IConfiguration configuration)
+            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -101,8 +100,7 @@ namespace form_builder.Services.PageService
             _actionsWorkflow = actionsWorkflow;
             _logger = logger;
             _addAnotherService = addAnotherService;
-            _fileStorageProviders = fileStorageProviders;
-            _configuration = configuration;
+            _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
@@ -311,15 +309,11 @@ namespace form_builder.Services.PageService
                     var formFileAnswerData = formAnswers.Pages.SelectMany(_ => _.Answers).FirstOrDefault(_ => _.QuestionId.Equals($"{fileElement.Properties.QuestionId}{FileUploadConstants.SUFFIX}"))?.Response ?? string.Empty;
                     List<FileUploadModel> convertedFileUploadAnswer = JsonConvert.DeserializeObject<List<FileUploadModel>>(formFileAnswerData.ToString());
 
-                    var fileStorageType = _configuration["FileStorageProvider:Type"];
-
-                    var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
-
                     if (convertedFileUploadAnswer is not null && convertedFileUploadAnswer.Any())
                     {
                         convertedFileUploadAnswer.ForEach((_) =>
                         {
-                            fileStorageProvider.Remove(_.Key);
+                            _fileStorageProvider.Remove(_.Key);
                         });
                     }
                 });

@@ -30,9 +30,8 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IWebHostEnvironment _environment;
         private readonly FormConfiguration _disallowedKeys;
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
+        private readonly IFileStorageProvider _fileStorageProvider;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
-        private readonly IConfiguration _configuration;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper,
             IDistributedCacheWrapper distributedCache,
@@ -41,17 +40,16 @@ namespace form_builder.Helpers.PageHelpers
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ISessionHelper sessionHelper,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
-            IConfiguration configuration)
+            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
             _distributedCache = distributedCache;
-            _fileStorageProviders = fileStorageProviders;
             _disallowedKeys = disallowedKeys.Value;
             _environment = enviroment;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _sessionHelper = sessionHelper;
-            _configuration = configuration;
+            _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(
@@ -273,11 +271,10 @@ namespace form_builder.Helpers.PageHelpers
                     }
                 }
 
-                var fileStorageProvider = _fileStorageProviders.Get(_configuration["FileStorageProvider:Type"]);
                 foreach (var file in files)
                 {
                     string key = $"file-{questionId}-{Guid.NewGuid()}";
-                    fileStorageProvider.SetStringAsync(key, JsonConvert.SerializeObject(file.Base64EncodedContent), _distributedCacheExpirationConfiguration.FileUpload);
+                    _fileStorageProvider.SetStringAsync(key, JsonConvert.SerializeObject(file.Base64EncodedContent), _distributedCacheExpirationConfiguration.FileUpload);
                     fileUploadModel.Add(new()
                     {
                         Key = key,

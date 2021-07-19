@@ -10,13 +10,13 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (!element.Properties.Email.GetValueOrDefault())
+            if (!element.Properties.Email)
                 return new ValidationResult { IsValid = true };
 
             if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && element.Properties.Optional)
                 return new ValidationResult { IsValid = true };
 
-            if (!element.Properties.Email.HasValue || !element.Properties.Email.Value || !viewModel.ContainsKey(element.Properties.QuestionId))
+            if (!viewModel.ContainsKey(element.Properties.QuestionId))
                 return new ValidationResult { IsValid = true };
 
             var value = viewModel[element.Properties.QuestionId];

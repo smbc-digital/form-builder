@@ -16,7 +16,7 @@ namespace form_builder.Validators
             if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && element.Properties.Optional)
                 return new ValidationResult { IsValid = true };
 
-            if ((!element.Properties.StockportPostcode.HasValue || !element.Properties.StockportPostcode.Value) || !viewModel.ContainsKey(element.Properties.QuestionId))
+            if (!element.Properties.StockportPostcode || !viewModel.ContainsKey(element.Properties.QuestionId))
                 return new ValidationResult { IsValid = true };
 
             var value = viewModel[element.Properties.QuestionId];

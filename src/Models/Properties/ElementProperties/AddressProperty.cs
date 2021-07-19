@@ -22,11 +22,9 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public string AddressProvider { get; set; }
 
-        public bool? Postcode { get; set; }
-
         public string AddressIAG { get; set; } = "You must live in Stockport.";
 
-        public bool? StockportPostcode { get; set; }
+        public bool StockportPostcode { get; set; } = false;
 
         public bool DisplayNoResultsIAG { get; set; } = false;
 
