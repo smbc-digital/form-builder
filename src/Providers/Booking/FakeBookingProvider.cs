@@ -199,5 +199,10 @@ namespace form_builder.Providers.Booking
 
             _ = await Task.FromResult("");
         }
+
+        public async Task Confirm(ConfirmationRequest request)
+        {
+            _ = await Task.FromResult("");
+        }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Configuration;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
@@ -79,7 +81,22 @@ namespace form_builder.Services.SubmitService
                 reference = answers.CaseReference;
             }
 
-            return _submissionServiceConfiguration.FakeSubmission 
+            var isAutoConfirm = baseForm.Pages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.Booking) && _.Properties.AutoConfirm.Equals(true)));
+            if (isAutoConfirm)
+            {
+
+                var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
+                var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
+                _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
+                var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occurred while attempting to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+
+                return "Response reference goes here.";
+            }
+
+            return _submissionServiceConfiguration.FakeSubmission
                 ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference) 
                 : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, baseForm, reference);
         }

@@ -12,5 +12,6 @@ namespace form_builder.Models.Properties.ElementProperties
         public string NextAvailableIAG { get; set; } = "This is the next available appointment.";
         public string NoAvailableTimeForBookingType { get; set; } = "appointments";
         public string CustomerAddressId { get; set; }
+        public bool AutoConfirm { get; set; }
     }
 }

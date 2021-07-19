@@ -11,6 +11,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
+      "launchUrl": "booking-auto-confirm",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       }

@@ -109,5 +109,19 @@ namespace form_builder.Providers.Booking
             if (!response.IsSuccessStatusCode)
                 throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway returned with non success status code of {response.StatusCode}, Response: {JsonConvert.SerializeObject(response)}");
         }
+
+        public async Task Confirm(ConfirmationRequest request)
+        {
+            var result = await _gateway.Confirmation(request);
+
+            if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
+                throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
+
+            if (result.StatusCode.Equals(HttpStatusCode.NotFound))
+                throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway returned 404 status code, booking with id {request.BookingId} cannot be found");
+
+            if (!result.IsSuccessStatusCode)
+                throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {JsonConvert.SerializeObject(result)}");
+        }
     }
 }
