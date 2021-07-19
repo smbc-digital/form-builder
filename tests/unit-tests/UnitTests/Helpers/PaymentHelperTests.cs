@@ -125,14 +125,17 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task GetFormPaymentInformation_ShouldCallGatewayIfComplexCalculationRequired()
         {
+            // Arrange
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     Content = new StringContent("100.00")
                 });
 
+            // Act
             var result = await _paymentHelper.GetFormPaymentInformation("complexCalculationForm");
 
+            // Assert
             Assert.Equal("100.00", result.Settings.Amount);
         }
 
@@ -163,26 +166,34 @@ namespace form_builder_tests.UnitTests.Helpers
         [Fact]
         public async Task GetFormPaymentInformation_ShouldThrowException_If_GatewayResponseIsNull()
         {
+            // Arrange
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     Content = null
                 });
 
+            // Act
             var result = await Assert.ThrowsAsync<Exception>(() => _paymentHelper.GetFormPaymentInformation("complexCalculationForm"));
+            
+            // Assert
             Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty payment amount within content", result.Message);
         }
 
         [Fact]
         public async Task GetFormPaymentInformation_ShouldThrowException_If_GatewayResponseIsWhitespace()
         {
+            // Arrange
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     Content = new StringContent(string.Empty)
                 });
 
+            // Act
             var result = await Assert.ThrowsAsync<Exception>(() => _paymentHelper.GetFormPaymentInformation("complexCalculationForm"));
+            
+            // Assert
             Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty payment amount within content", result.Message);
         }
     }
