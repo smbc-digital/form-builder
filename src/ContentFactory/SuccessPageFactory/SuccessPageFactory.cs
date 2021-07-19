@@ -55,7 +55,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                     FeedbackFormUrl = baseForm.FeedbackForm,
                     FeedbackPhase = baseForm.FeedbackPhase,
                     FormName = baseForm.FormName,
-                    StartPageUrl = baseForm.StartPageUrl
+                    StartPageUrl = baseForm.StartPageUrl,
                 };
             }
 
