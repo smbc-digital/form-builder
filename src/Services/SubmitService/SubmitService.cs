@@ -89,9 +89,12 @@ namespace form_builder.Services.SubmitService
                 reference = answers.CaseReference;
             }
 
-            var isAutoConfirm = baseForm.Pages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.Booking) && _.Properties.AutoConfirm.Equals(true)));
-            if (isAutoConfirm)
-                return await ConfirmBooking(mappingEntity, form, sessionGuid, baseForm, reference);
+            if (baseForm.Pages != null)
+            {
+                var isAutoConfirm = baseForm.Pages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.Booking) && _.Properties.AutoConfirm.Equals(true)));
+                if (isAutoConfirm)
+                    return await ConfirmBooking(mappingEntity, form, sessionGuid, baseForm, reference);
+            }            
 
             return _submissionServiceConfiguration.FakeSubmission
                 ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference) 
@@ -107,7 +110,7 @@ namespace form_builder.Services.SubmitService
 
             var bookingId = Convert.ToString(mappingEntity.FormAnswers.AllAnswers
                 .ToDictionary(x => x.QuestionId, x => x.Response)
-                .Where(_ => _.Key.Contains(BookingConstants.RESERVED_APPOINTMENT_ID))
+                .Where(_ => _.Key.Contains(BookingConstants.RESERVED_BOOKING_ID))
                 .FirstOrDefault().Value);
 
             var appointmentType = bookingProperties.AppointmentTypes
@@ -118,6 +121,7 @@ namespace form_builder.Services.SubmitService
                 .Confirm(new()
                 {
                     BookingId = new Guid(bookingId),
+                    AdditionalInformation = string.Empty,
                     OptionalResources = appointmentType.OptionalResources
                 });
 
