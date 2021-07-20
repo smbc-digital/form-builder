@@ -4,11 +4,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Providers.Booking;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Submit;
@@ -18,6 +20,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
+using StockportGovUK.NetStandard.Models.Booking.Request;
 
 namespace form_builder.Services.SubmitService
 {
@@ -41,6 +44,9 @@ namespace form_builder.Services.SubmitService
 
         private readonly ILogger<SubmitService> _logger;
 
+        private readonly IEnumerable<IBookingProvider> _bookingProviders;
+
+
         public SubmitService(
             IGateway gateway,
             IPageHelper pageHelper,
@@ -50,7 +56,8 @@ namespace form_builder.Services.SubmitService
             ISchemaFactory schemaFactory,
             IReferenceNumberProvider referenceNumberProvider,
             IEnumerable<ISubmitProvider> submitProviders,
-            ILogger<SubmitService> logger)
+            ILogger<SubmitService> logger,
+            IEnumerable<IBookingProvider> bookingProviders)
         {
             _gateway = gateway;
             _pageHelper = pageHelper;
@@ -61,6 +68,7 @@ namespace form_builder.Services.SubmitService
             _referenceNumberProvider = referenceNumberProvider;
             _submitProviders = submitProviders;
             _logger = logger;
+            _bookingProviders = bookingProviders;
         }
 
         public async Task PreProcessSubmission(string form, string sessionGuid)
@@ -83,22 +91,39 @@ namespace form_builder.Services.SubmitService
 
             var isAutoConfirm = baseForm.Pages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.Booking) && _.Properties.AutoConfirm.Equals(true)));
             if (isAutoConfirm)
-            {
-
-                var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
-                var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
-                _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
-                var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
-
-                if (!response.IsSuccessStatusCode)
-                    throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occurred while attempting to call {postUrl}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
-
-                return "Response reference goes here.";
-            }
+                return await ConfirmBooking(mappingEntity, form, sessionGuid, baseForm, reference);
 
             return _submissionServiceConfiguration.FakeSubmission
                 ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference) 
                 : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, baseForm, reference);
+        }
+
+        private async Task<string> ConfirmBooking(MappingEntity mappingEntity, string form, string sessionGuid, FormSchema baseForm, string reference)
+        {
+            var bookingProperties = baseForm.Pages
+                               .Where(page => page.Elements is not null)
+                               .SelectMany(page => page.Elements)
+                               .First(element => element.Type.Equals(EElementType.Booking)).Properties;
+
+            var bookingId = Convert.ToString(mappingEntity.FormAnswers.AllAnswers
+                .ToDictionary(x => x.QuestionId, x => x.Response)
+                .Where(_ => _.Key.Contains(BookingConstants.RESERVED_APPOINTMENT_ID))
+                .FirstOrDefault().Value);
+
+            var appointmentType = bookingProperties.AppointmentTypes
+                .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+
+            await _bookingProviders
+                .Get(bookingProperties.BookingProvider)
+                .Confirm(new()
+                {
+                    BookingId = new Guid(bookingId),
+                    OptionalResources = appointmentType.OptionalResources
+                });
+
+            return bookingProperties.BookingProvider.Equals(BookingConstants.FAKE_PROVIDER)
+                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
+             : bookingId;
         }
 
         private string ProcessFakeSubmission(MappingEntity mappingEntity, string form, string sessionGuid, string reference)
