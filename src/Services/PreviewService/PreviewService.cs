@@ -80,8 +80,8 @@ namespace form_builder.Services.PreviewService
              if(!_previewModeConfiguration.IsEnabled)
                 throw new ApplicationException("PreviewService: Request to exit preview mode recieved but preview service is disabled in current enviroment");
 
-            var previewFormKey = _httpContextAccessor.HttpContext.Request.Cookies["PreviewMode"];
-            _httpContextAccessor.HttpContext.Response.Cookies.Delete("PreviewMode");
+            var previewFormKey = _httpContextAccessor.HttpContext.Request.Cookies[CookieConstants.PREVIEW_MODE];
+            _httpContextAccessor.HttpContext.Response.Cookies.Delete(CookieConstants.PREVIEW_MODE);
             _distributedCache.Remove($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewFormKey}");
         }
 
@@ -96,11 +96,12 @@ namespace form_builder.Services.PreviewService
                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
 
             var previewPage = PreviewPage();
-            previewPage.Validate(viewModel, _validators, PreviewModeFormSchema(PreviewPage()));
+            var previewFormSchema = PreviewModeFormSchema(previewPage);
+            previewPage.Validate(viewModel, _validators, previewFormSchema);
 
             if (!previewPage.IsValid)
             {
-                var formModel = await _pageContentFactory.Build(previewPage, viewModel, PreviewModeFormSchema(PreviewPage()), string.Empty, new FormAnswers());
+                var formModel = await _pageContentFactory.Build(previewPage, viewModel, previewFormSchema, string.Empty, new FormAnswers());
 
                 return new ProcessPreviewRequestEntity
                 {
@@ -135,9 +136,7 @@ namespace form_builder.Services.PreviewService
                 };
             }
 
-            var cookieOptions = new CookieOptions();
-            cookieOptions.Secure = true;
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("PreviewMode", previewKey, cookieOptions);
+            AddPreviewCookie(previewKey);
 
             return new ProcessPreviewRequestEntity
             {
@@ -148,7 +147,6 @@ namespace form_builder.Services.PreviewService
 
         private FormSchema PreviewModeFormSchema(Page page) =>
             new FormSchema { Pages = new List<Page>{ page }, FormName = "Preview", BaseURL = "preview" };
-
         private Page PreviewPage()
         {
 
@@ -176,17 +174,36 @@ namespace form_builder.Services.PreviewService
         }
         private Page PreviewErrorPage(string errorMessage)
         {
+            var warning = new ElementBuilder()
+                .WithType(Enum.EElementType.Warning)
+                .WithPropertyText("The provided file is not valid.")
+                .Build();
+
+            string[] errorMessages = errorMessage.Split("\n");
+
+            var page = new PageBuilder()
+                .WithElement(warning)
+                .WithValidatedModel(true)
+                .WithPageTitle("Preview mode");
+
+            errorMessages.ToList().ForEach((error) => {
             var pElement = new ElementBuilder()
                 .WithType(Enum.EElementType.P)
-                .WithPropertyText(errorMessage)
+                .WithPropertyText(error)
                 .Build();
 
-            return new PageBuilder()
-                .WithElement(pElement)
-                .WithValidatedModel(true)
-                .WithPageTitle("Preview form request")
-                .Build();
+                page.WithElement(pElement);
+            });
+
+            return page.Build();
         }
-
+        private void AddPreviewCookie(string key)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                Secure = true
+            };
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(CookieConstants.PREVIEW_MODE, key, cookieOptions);
+        }
     }
 }
