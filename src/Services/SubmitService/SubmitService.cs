@@ -85,7 +85,7 @@ namespace form_builder.Services.SubmitService
             {
                 var answers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
                 reference = answers.CaseReference;
-            }            
+            }
 
             var submissionReference = _submissionServiceConfiguration.FakeSubmission
                 ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
