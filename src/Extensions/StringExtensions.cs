@@ -59,7 +59,5 @@ namespace form_builder.Extensions
         }
 
         public static string ToBookingRequestedMonthUrl(this string form, string page, bool isLocal) => $"{(isLocal ? string.Empty : "/v2")}/booking/{form}/{page}/month";
-
-        public static string ToFormPreviewId() => $"preview-{Guid.NewGuid().ToString()}";
     }
 }

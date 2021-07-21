@@ -25,7 +25,7 @@ namespace form_builder.Controllers
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
                 return View("Index", currentPageResult.ViewModel);
 
-            return Redirect($"{currentPageResult.PreviewFormId}");
+            return Redirect($"{currentPageResult.PreviewFormKey}");
         }
 
         [Route("exit")]

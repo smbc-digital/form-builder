@@ -36,7 +36,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
             _sessionHelper = sessionHelper;
             _distributedCache = distributedCache;
             _environment = environment;
-             _previewModeConfiguration = previewModeConfiguration.Value;
+            _previewModeConfiguration = previewModeConfiguration.Value;
         }
 
         public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType)

@@ -141,7 +141,7 @@ namespace form_builder.Services.PreviewService
             return new ProcessPreviewRequestEntity
             {
                 Page = previewPage,
-                PreviewFormId = previewKey.ToString()
+                PreviewFormKey = previewKey.ToString()
             };
         }
 
