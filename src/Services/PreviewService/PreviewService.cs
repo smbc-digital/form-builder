@@ -19,6 +19,7 @@ using form_builder.Factories.Schema;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using form_builder.Constants;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace form_builder.Services.PreviewService
 {
@@ -63,18 +64,18 @@ namespace form_builder.Services.PreviewService
             _applicationVersionConfiguration = applicationVersionConfiguration.Value;
         }
 
-        public async Task<FormBuilderViewModel> GetPreviewPage() 
+        public async Task<FormBuilderViewModel> GetPreviewPage()
         {
-            if(!_previewModeConfiguration.Value.IsEnabled)
+            if (!_previewModeConfiguration.Value.IsEnabled)
                 throw new ApplicationException("PreviewService: Request to access preview service recieved but preview service is disabled in current enviroment");
-        
+
             var previewPage = PreviewPage();
             return await _pageContentFactory.Build(previewPage, new Dictionary<string, dynamic>(), PreviewModeFormSchema(previewPage), string.Empty, new FormAnswers());
         }
-        
+
         public void ExitPreviewMode()
         {
-             if(!_previewModeConfiguration.Value.IsEnabled)
+            if (!_previewModeConfiguration.Value.IsEnabled)
                 throw new ApplicationException("PreviewService: Request to exit preview mode recieved but preview service is disabled in current enviroment");
 
             var previewFormKey = _httpContextAccessor.HttpContext.Request.Cookies[CookieConstants.PREVIEW_MODE];
@@ -84,7 +85,7 @@ namespace form_builder.Services.PreviewService
 
         public async Task<ProcessPreviewRequestEntity> VerifyPreviewRequest(IEnumerable<CustomFormFile> fileUpload)
         {
-            if(!_previewModeConfiguration.Value.IsEnabled)
+            if (!_previewModeConfiguration.Value.IsEnabled)
                 throw new ApplicationException("PreviewService: Request to upload from in preview service recieved but preview service is disabled in current enviroment");
 
             var viewModel = new Dictionary<string, dynamic>();
@@ -111,7 +112,7 @@ namespace form_builder.Services.PreviewService
             List<DocumentModel> uploadedPreviewDocument = viewModel.Values.First();
 
             var fileContent = Convert.FromBase64String(uploadedPreviewDocument.First().Content);
-            await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}", JsonConvert.SerializeObject(fileContent), _distributedCacheExpirationConfiguration.FormJson);
+            await _distributedCache.SetAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}", fileContent, new DistributedCacheEntryOptions{ AbsoluteExpiration = DateTime.Now.AddMinutes(_distributedCacheExpirationConfiguration.FormJson) });
 
             try
             {
@@ -143,7 +144,7 @@ namespace form_builder.Services.PreviewService
         }
 
         private FormSchema PreviewModeFormSchema(Page page) =>
-            new FormSchema { Pages = new List<Page>{ page }, FormName = "Preview", BaseURL = "preview" };
+            new FormSchema { Pages = new List<Page> { page }, FormName = "Preview", BaseURL = "preview" };
         private Page PreviewPage()
         {
 
@@ -183,11 +184,12 @@ namespace form_builder.Services.PreviewService
                 .WithValidatedModel(true)
                 .WithPageTitle("Preview mode");
 
-            errorMessages.ToList().ForEach((error) => {
-            var pElement = new ElementBuilder()
-                .WithType(Enum.EElementType.P)
-                .WithPropertyText(error)
-                .Build();
+            errorMessages.ToList().ForEach((error) =>
+            {
+                var pElement = new ElementBuilder()
+                    .WithType(Enum.EElementType.P)
+                    .WithPropertyText(error)
+                    .Build();
 
                 page.WithElement(pElement);
             });

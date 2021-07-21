@@ -31,6 +31,7 @@ using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
@@ -209,7 +210,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.True(entity.UseGeneratedViewModel);
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             _testValidator.Verify(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()), Times.Once);
-            _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(10)), It.IsAny<CancellationToken>()), Times.Once);
+            _distributedCache.Verify(_ => _.SetAsync(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()), Times.Once);
             _distributedCache.Verify(_ => _.Remove(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}"))), Times.Once);
         }
 
@@ -253,6 +254,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX, entity.PreviewFormKey);
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             _testValidator.Verify(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()), Times.Once);
+            _distributedCache.Verify(_ => _.SetAsync(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
             _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(10)), It.IsAny<CancellationToken>()), Times.Exactly(3));
             _distributedCache.Verify(_ => _.Remove(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}"))), Times.Never);
         }
