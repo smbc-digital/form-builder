@@ -86,7 +86,11 @@ namespace form_builder.Services.SubmitService
             {
                 var answers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
                 reference = answers.CaseReference;
-            }
+            }            
+
+            var submissionReference = _submissionServiceConfiguration.FakeSubmission
+                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
+                : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, baseForm, reference);
 
             if (baseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)
             {
@@ -94,15 +98,13 @@ namespace form_builder.Services.SubmitService
 
                 var isAutoConfirm = journeyPages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.Booking) && _.Properties.AutoConfirm.Equals(true)));
                 if (isAutoConfirm)
-                    return await ConfirmBooking(mappingEntity, form, sessionGuid, baseForm, reference);
+                    await ConfirmBooking(mappingEntity, form, sessionGuid, baseForm, reference);
             }
 
-            return _submissionServiceConfiguration.FakeSubmission
-                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
-                : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, baseForm, reference);
+            return submissionReference;
         }
 
-        private async Task<string> ConfirmBooking(MappingEntity mappingEntity, string form, string sessionGuid, FormSchema baseForm, string reference)
+        private async Task ConfirmBooking(MappingEntity mappingEntity, string form, string sessionGuid, FormSchema baseForm, string reference)
         {
             var bookingProperties = baseForm.Pages
                                .Where(page => page.Elements is not null)
@@ -111,24 +113,20 @@ namespace form_builder.Services.SubmitService
 
             var bookingId = Convert.ToString(mappingEntity.FormAnswers.AllAnswers
                 .ToDictionary(x => x.QuestionId, x => x.Response)
-                .Where(_ => _.Key.Contains(BookingConstants.RESERVED_BOOKING_ID))
+                .Where(_ => _.Key.Equals($"{bookingProperties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}"))
                 .FirstOrDefault().Value);
 
             var appointmentType = bookingProperties.AppointmentTypes
                 .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
 
             await _bookingProviders
-                .Get(bookingProperties.BookingProvider)
-                .Confirm(new()
-                {
-                    BookingId = new Guid(bookingId),
-                    AdditionalInformation = string.Empty,
-                    OptionalResources = appointmentType.OptionalResources
-                });
-
-            return bookingProperties.BookingProvider.Equals(BookingConstants.FAKE_PROVIDER)
-                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
-             : bookingId;
+                            .Get(bookingProperties.BookingProvider)
+                            .Confirm(new()
+                            {
+                                BookingId = new Guid(bookingId),
+                                AdditionalInformation = string.Empty,
+                                OptionalResources = appointmentType.OptionalResources
+                            });
         }
 
         private string ProcessFakeSubmission(MappingEntity mappingEntity, string form, string sessionGuid, string reference)

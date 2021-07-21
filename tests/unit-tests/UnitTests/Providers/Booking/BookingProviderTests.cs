@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Exceptions;
 using form_builder.Providers.Booking;
+using Microsoft.Extensions.Logging;
 using Moq;
 using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Gateways.Response;
@@ -18,6 +19,8 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         private readonly BookingProvider _bookingProvider;
 
         private readonly Mock<IBookingServiceGateway> _mockBookingServiceGateway = new ();
+
+        private readonly Mock<ILogger<BookingProvider>> _mockLogger = new();
 
         public BookingProviderTests()
         {
@@ -39,7 +42,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
             _mockBookingServiceGateway.Setup(_ => _.Confirmation(It.IsAny<ConfirmationRequest>()))
                 .ReturnsAsync(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.NoContent });
 
-            _bookingProvider = new BookingProvider(_mockBookingServiceGateway.Object);
+            _bookingProvider = new BookingProvider(_mockBookingServiceGateway.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -274,53 +277,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
             await _bookingProvider.Cancel(Guid.NewGuid());
 
             _mockBookingServiceGateway.Verify(_ => _.Cancel(It.IsAny<string>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task Confirm_Should_Throw_Exception_When_Response_Is_BadRequest()
-        {
-            _mockBookingServiceGateway.Setup(_ => _.Confirmation(It.IsAny<ConfirmationRequest>()))
-                .ReturnsAsync(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.BadRequest });
-
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingProvider.Confirm(new ConfirmationRequest()));
-
-            _mockBookingServiceGateway.Verify(_ => _.Confirmation(It.IsAny<ConfirmationRequest>()), Times.Once);
-            Assert.StartsWith($"BookingProvider::Confirmation, BookingServiceGateway received a bad request, Request:", result.Message);
-        }
-
-        [Fact]
-        public async Task Confirm_Should_Throw_Exception_When_Booking_NotFound()
-        {
-            var request = new ConfirmationRequest
-            { 
-                BookingId = Guid.NewGuid()
-            }; 
-
-            _mockBookingServiceGateway.Setup(_ => _.Confirmation(It.IsAny<ConfirmationRequest>()))
-              .ReturnsAsync(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.NotFound });
-
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingProvider.Confirm(request));
-
-            _mockBookingServiceGateway.Verify(_ => _.Confirmation(It.IsAny<ConfirmationRequest>()), Times.Once);
-            Assert.Equal($"BookingProvider::Confirmation, BookingServiceGateway returned 404 status code, booking with id {request.BookingId} cannot be found", result.Message);
-        }
-
-        [Fact]
-        public async Task Confirm_Should_Throw_Exception_When_Response_Is_InternalServerError()
-        {
-            var request = new ConfirmationRequest
-            {
-                BookingId = Guid.NewGuid()
-            };
-
-            _mockBookingServiceGateway.Setup(_ => _.Confirmation(It.IsAny<ConfirmationRequest>()))
-              .ReturnsAsync(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.InternalServerError });
-
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingProvider.Confirm(request));
-
-            _mockBookingServiceGateway.Verify(_ => _.Confirmation(It.IsAny<ConfirmationRequest>()), Times.Once);
-            Assert.StartsWith($"BookingProvider::Confirmation, BookingServiceGateway returned with non success status code of", result.Message);
-        }
+        }       
 
         [Fact]
         public async Task Confirm_Should_Resolve_WhenResponse_Is_NoContent()

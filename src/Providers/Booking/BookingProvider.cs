@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using form_builder.Exceptions;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Models.Booking.Request;
@@ -14,7 +15,13 @@ namespace form_builder.Providers.Booking
     {
         public string ProviderName { get => "SMBC"; }
         private readonly IBookingServiceGateway _gateway;
-        public BookingProvider(IBookingServiceGateway gateway) => _gateway = gateway;
+        private readonly ILogger<BookingProvider> _logger;
+
+        public BookingProvider(IBookingServiceGateway gateway, ILogger<BookingProvider> logger)
+        {
+            _gateway = gateway;
+            _logger = logger;
+        }
 
         public async Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request)
         {
@@ -114,14 +121,22 @@ namespace form_builder.Providers.Booking
         {
             var result = await _gateway.Confirmation(request);
 
-            if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
-                throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
+            try
+            {
+                if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
+                    throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
 
-            if (result.StatusCode.Equals(HttpStatusCode.NotFound))
-                throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway returned 404 status code, booking with id {request.BookingId} cannot be found");
+                if (result.StatusCode.Equals(HttpStatusCode.NotFound))
+                    throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway returned 404 status code, booking with id {request.BookingId} cannot be found");
 
-            if (!result.IsSuccessStatusCode)
-                throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {JsonConvert.SerializeObject(result)}");
+                if (!result.IsSuccessStatusCode)
+                    throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {JsonConvert.SerializeObject(result)}");
+            }
+            catch (ApplicationException)
+            {
+                _logger.LogError($"BookingProvider: Failed to confirm booking id {request.BookingId}, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
+            }
+            
         }
     }
 }
