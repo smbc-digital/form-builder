@@ -1,0 +1,11 @@
+﻿@using Newtonsoft.Json
+@model JsonStructureViewModel
+@{
+    ViewData["Title"] = "Json Structure";
+    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadcrumbs;
+}
+
+<h1 class="govuk-heading-l">Form JSON structure preview</h1>
+<div class="smbc-body">
+    <pre>@JsonConvert.SerializeObject(Model.DataObject, Formatting.Indented)</pre>
+</div>

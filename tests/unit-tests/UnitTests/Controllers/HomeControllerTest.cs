@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
+using form_builder.Configuration;
 using form_builder.Controllers;
 using form_builder.Enum;
+using form_builder.Mappers.Structure;
 using form_builder.Models;
 using form_builder.Models.Properties.ActionProperties;
 using form_builder.Services.FileUploadService;
@@ -18,6 +20,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Xunit;
@@ -34,6 +37,8 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new ();
         private readonly Mock<ISuccessWorkflow> _mockSuccessWorkflow = new ();
+        private readonly Mock<IStructureMapper> _mockStructureMapper = new();
+        private readonly Mock<IOptions<DataStructureConfiguration>> _mockDataStructureConfiguration = new();
 
         public HomeControllerTest()
         {
@@ -51,7 +56,9 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockFileUploadService.Object,
                 _mockHostingEnv.Object,
                 _mockActionsWorkflow.Object,
-                _mockSuccessWorkflow.Object)
+                _mockSuccessWorkflow.Object,
+                _mockStructureMapper.Object,
+                _mockDataStructureConfiguration.Object)
             { TempData = tempData };
 
             _homeController.ControllerContext = new ControllerContext();

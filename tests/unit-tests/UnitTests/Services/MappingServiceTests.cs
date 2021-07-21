@@ -3,21 +3,18 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
 using form_builder.Builders;
-using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Providers.FileStorage;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
@@ -31,12 +28,10 @@ namespace form_builder_tests.UnitTests.Services
         private readonly MappingService _service;
         private readonly Mock<ISchemaProvider> _mockSchemaProvider = new();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
-        private readonly Mock<IFileStorageProvider> _mockFileStorage = new();
         private readonly Mock<IElementMapper> _mockElementMapper = new();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<ILogger<MappingService>> _mockLogger = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new();
 
         public MappingServiceTests()
         {
@@ -64,17 +59,12 @@ namespace form_builder_tests.UnitTests.Services
                     Pages = new List<PageAnswers>()
                 }));
 
-            _mockDistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
-            {
-                FormJson = 1
-            });
-
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
 
-            _service = new MappingService(_mockDistributedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockLogger.Object);
+            _service = new MappingService(_mockDistributedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockLogger.Object);
         }
 
         [Fact]
