@@ -45,7 +45,6 @@ namespace form_builder.Services.SubmitService
 
         private readonly IEnumerable<IBookingProvider> _bookingProviders;
 
-
         public SubmitService(
             IGateway gateway,
             IPageHelper pageHelper,
@@ -107,9 +106,9 @@ namespace form_builder.Services.SubmitService
         private async Task ConfirmBooking(MappingEntity mappingEntity, string form, string sessionGuid, FormSchema baseForm, string reference)
         {
             var bookingProperties = baseForm.Pages
-                               .Where(page => page.Elements is not null)
-                               .SelectMany(page => page.Elements)
-                               .First(element => element.Type.Equals(EElementType.Booking)).Properties;
+                .Where(page => page.Elements is not null)
+                .SelectMany(page => page.Elements)
+                .First(element => element.Type.Equals(EElementType.Booking)).Properties;
 
             var bookingId = Convert.ToString(mappingEntity.FormAnswers.AllAnswers
                 .ToDictionary(x => x.QuestionId, x => x.Response)
@@ -120,22 +119,19 @@ namespace form_builder.Services.SubmitService
                 .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
 
             await _bookingProviders
-                            .Get(bookingProperties.BookingProvider)
-                            .Confirm(new()
-                            {
-                                BookingId = new Guid(bookingId),
-                                AdditionalInformation = string.Empty,
-                                OptionalResources = appointmentType.OptionalResources
-                            });
+                 .Get(bookingProperties.BookingProvider)
+                 .Confirm(new()
+                 {
+                     BookingId = new Guid(bookingId),
+                     AdditionalInformation = string.Empty,
+                     OptionalResources = appointmentType.OptionalResources
+                 });
         }
 
         private string ProcessFakeSubmission(MappingEntity mappingEntity, string form, string sessionGuid, string reference)
         {
             if (!string.IsNullOrEmpty(reference))
                 return reference;
-
-            var json = JsonConvert.SerializeObject(mappingEntity.Data);
-            _logger.LogInformation($"Fake Submission of: {json}");
 
             _pageHelper.SaveCaseReference(sessionGuid, "123456");
             return "123456";

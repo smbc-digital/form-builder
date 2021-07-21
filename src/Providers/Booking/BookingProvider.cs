@@ -119,10 +119,10 @@ namespace form_builder.Providers.Booking
 
         public async Task Confirm(ConfirmationRequest request)
         {
-            var result = await _gateway.Confirmation(request);
-
             try
             {
+                var result = await _gateway.Confirmation(request);
+            
                 if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
                     throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
 
@@ -132,9 +132,9 @@ namespace form_builder.Providers.Booking
                 if (!result.IsSuccessStatusCode)
                     throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {JsonConvert.SerializeObject(result)}");
             }
-            catch (ApplicationException)
+            catch (ApplicationException ex)
             {
-                _logger.LogError($"BookingProvider: Failed to confirm booking id {request.BookingId}, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
+                _logger.LogError($"BookingProvider: Failed to confirm booking id {request.BookingId}, Request:{JsonConvert.SerializeObject(request)}, Exception: {ex}");
             }
             
         }
