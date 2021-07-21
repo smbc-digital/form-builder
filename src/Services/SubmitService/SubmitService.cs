@@ -10,6 +10,7 @@ using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Providers.Booking;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
@@ -97,29 +98,29 @@ namespace form_builder.Services.SubmitService
 
                 var isAutoConfirm = journeyPages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.Booking) && _.Properties.AutoConfirm.Equals(true)));
                 if (isAutoConfirm)
-                    await ConfirmBooking(mappingEntity, form, sessionGuid, baseForm, reference);
+                    await ConfirmBooking(mappingEntity, baseForm);
             }
 
             return submissionReference;
         }
 
-        private async Task ConfirmBooking(MappingEntity mappingEntity, string form, string sessionGuid, FormSchema baseForm, string reference)
+        private async Task ConfirmBooking(MappingEntity mappingEntity, FormSchema baseForm)
         {
-            var bookingProperties = baseForm.Pages
+            var booking = (Booking)baseForm.Pages
                 .Where(page => page.Elements is not null)
                 .SelectMany(page => page.Elements)
-                .First(element => element.Type.Equals(EElementType.Booking)).Properties;
+                .First(element => element.Type.Equals(EElementType.Booking));
 
             var bookingId = Convert.ToString(mappingEntity.FormAnswers.AllAnswers
                 .ToDictionary(x => x.QuestionId, x => x.Response)
-                .Where(_ => _.Key.Equals($"{bookingProperties.QuestionId}-{BookingConstants.RESERVED_BOOKING_ID}"))
+                .Where(_ => _.Key.Equals(booking.ReservedIdQuestionId))
                 .FirstOrDefault().Value);
 
-            var appointmentType = bookingProperties.AppointmentTypes
+            var appointmentType = booking.Properties.AppointmentTypes
                 .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
 
             await _bookingProviders
-                 .Get(bookingProperties.BookingProvider)
+                 .Get(booking.Properties.BookingProvider)
                  .Confirm(new()
                  {
                      BookingId = new Guid(bookingId),
