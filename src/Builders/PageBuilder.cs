@@ -11,6 +11,7 @@ namespace form_builder.Builders
         private bool _hideTitle = false;
         private bool _hideBackButton = false;
         private string _pageSlug = "test-url";
+        private string _leadingParagraph = "Leading paragraph";
         private bool _isValidated = false;
         private List<IElement> _elements = new List<IElement>();
         private List<Behaviour> _behaviours = new List<Behaviour>();
@@ -25,6 +26,7 @@ namespace form_builder.Builders
                 Title = _title,
                 HideTitle = _hideTitle,
                 HideBackButton = _hideBackButton,
+                LeadingParagraph = _leadingParagraph,
                 PageSlug = _pageSlug,
                 IsValidated = _isValidated,
                 Behaviours = _behaviours,
@@ -101,6 +103,13 @@ namespace form_builder.Builders
         public PageBuilder WithRenderConditions(Condition renderCondition)
         {
             _renderConditions.Add(renderCondition);
+
+            return this;
+        }
+
+        public PageBuilder WithLeadingParagraph(string leadingParagraph)
+        {
+            _leadingParagraph = leadingParagraph;
 
             return this;
         }

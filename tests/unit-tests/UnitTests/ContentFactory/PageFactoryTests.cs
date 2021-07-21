@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using form_builder.Builders;
+using form_builder.Configuration;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
@@ -7,6 +9,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.TagParsers;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -18,14 +21,19 @@ namespace form_builder_tests.UnitTests.ContentFactory
         private readonly Mock<IPageHelper> _mockPageHelper = new ();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new ();
         private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new ();
-        private readonly Mock<ITagParser> _tagParser = new ();      
+        private readonly Mock<ITagParser> _tagParser = new ();
+        private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new ();
 
         public PageFactoryTests()
         {
+            _mockPreviewModeConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new PreviewModeConfiguration());
+
             var mockTagParsersItems = new List<ITagParser>();
             _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => mockTagParsersItems.GetEnumerator());
 
-            _factory = new PageFactory(_mockPageHelper.Object, _mockTagParsers.Object, _mockDistributedCacheWrapper.Object);
+            _factory = new PageFactory(_mockPageHelper.Object, _mockTagParsers.Object, _mockPreviewModeConfiguration.Object, _mockDistributedCacheWrapper.Object);
         }
 
         [Fact]

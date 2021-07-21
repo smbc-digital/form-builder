@@ -30,6 +30,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
         private readonly Mock<IReusableElementSchemaTransformFactory> _mockReusableElementSchemaFactory = new ();
         private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new ();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new ();
+         private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new ();
         private readonly Mock<IConfiguration> _mockConfiguration = new ();
         private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new ();
         private readonly Mock<IEnumerable<IUserPageTransformFactory>> _mockUserPageFactories = new();
@@ -37,6 +38,10 @@ namespace form_builder_tests.UnitTests.Factories.Schema
 
         public SchemaFactoryTests()
         {
+            _mockPreviewModeConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new PreviewModeConfiguration());
+
             var mockUserPageFactoryItems = new List<IUserPageTransformFactory> { _mockUserPageFactory.Object };
             _mockUserPageFactories
                 .Setup(m => m.GetEnumerator())
@@ -90,9 +95,10 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 _mockDistributedCache.Object, 
                 _mockSchemaProvider.Object, 
                 _mockLookupSchemaFactory.Object, 
-                _mockReusableElementSchemaFactory.Object, 
-                _mockDistributedCacheConfiguration.Object, 
-                _mockDistributedCacheExpirationConfiguration.Object, 
+                _mockReusableElementSchemaFactory.Object,
+                _mockDistributedCacheConfiguration.Object,
+                _mockDistributedCacheExpirationConfiguration.Object,
+                _mockPreviewModeConfiguration.Object,
                 _mockConfiguration.Object, 
                 _mockFormSchemaIntegrityValidator.Object,
                 _mockUserPageFactories.Object);
