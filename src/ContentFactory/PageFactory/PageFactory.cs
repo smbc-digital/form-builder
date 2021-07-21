@@ -20,7 +20,7 @@ namespace form_builder.ContentFactory.PageFactory
         private readonly IPageHelper _pageHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IEnumerable<ITagParser> _tagParsers;
-        private readonly PreviewModeConfiguration _previewModeConfiguration;
+        private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
 
         public PageFactory(
             IPageHelper pageHelper,
@@ -31,7 +31,7 @@ namespace form_builder.ContentFactory.PageFactory
             _pageHelper = pageHelper;
             _tagParsers = tagParsers;
             _distributedCache = distributedCache;
-            _previewModeConfiguration = previewModeConfiguration.Value;
+            _previewModeConfiguration = previewModeConfiguration;
         }
 
         public async Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers = null, List<object> results = null)
@@ -57,7 +57,7 @@ namespace form_builder.ContentFactory.PageFactory
             result.BreadCrumbs = baseForm.BreadCrumbs;
             result.DisplayBreadCrumbs = page.DisplayBreadCrumbs;
             result.StartPageUrl = baseForm.StartPageUrl;
-            result.IsInPreviewMode = _previewModeConfiguration.IsEnabled && baseForm.BaseURL.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX);
+            result.IsInPreviewMode = _previewModeConfiguration.Value.IsEnabled && baseForm.BaseURL.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX);
             return result;
         }
     }

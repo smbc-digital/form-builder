@@ -32,19 +32,17 @@ namespace form_builder.Services.PreviewService
     public class PreviewService : IPreviewService
     {
         private readonly IEnumerable<IElementValidator> _validators;
-        private readonly ISuccessPageFactory _successPageContentFactory;
         private readonly IPageFactory _pageContentFactory;
         private readonly IFileUploadService _fileUploadService;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly ISchemaFactory _schemaFactory;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
-        private readonly PreviewModeConfiguration _previewModeConfiguration;
+        private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
         private readonly ApplicationVersionConfiguration _applicationVersionConfiguration;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public PreviewService(
             IEnumerable<IElementValidator> validators,
-            ISuccessPageFactory successPageFactory,
             IFileUploadService fileUploadService,
             IDistributedCacheWrapper distributedCache,
             ISchemaFactory schemaFactory,
@@ -55,20 +53,19 @@ namespace form_builder.Services.PreviewService
             IPageFactory pageFactory)
         {
             _validators = validators;
-            _successPageContentFactory = successPageFactory;
             _pageContentFactory = pageFactory;
             _fileUploadService = fileUploadService;
             _distributedCache = distributedCache;
             _schemaFactory = schemaFactory;
             _httpContextAccessor = httpContextAccessor;
-            _previewModeConfiguration = previewModeConfiguration.Value;
+            _previewModeConfiguration = previewModeConfiguration;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _applicationVersionConfiguration = applicationVersionConfiguration.Value;
         }
 
         public async Task<FormBuilderViewModel> GetPreviewPage() 
         {
-            if(!_previewModeConfiguration.IsEnabled)
+            if(!_previewModeConfiguration.Value.IsEnabled)
                 throw new ApplicationException("PreviewService: Request to access preview service recieved but preview service is disabled in current enviroment");
         
             var previewPage = PreviewPage();
@@ -77,7 +74,7 @@ namespace form_builder.Services.PreviewService
         
         public void ExitPreviewMode()
         {
-             if(!_previewModeConfiguration.IsEnabled)
+             if(!_previewModeConfiguration.Value.IsEnabled)
                 throw new ApplicationException("PreviewService: Request to exit preview mode recieved but preview service is disabled in current enviroment");
 
             var previewFormKey = _httpContextAccessor.HttpContext.Request.Cookies[CookieConstants.PREVIEW_MODE];
@@ -87,7 +84,7 @@ namespace form_builder.Services.PreviewService
 
         public async Task<ProcessPreviewRequestEntity> VerifyPreviewRequest(IEnumerable<CustomFormFile> fileUpload)
         {
-            if(!_previewModeConfiguration.IsEnabled)
+            if(!_previewModeConfiguration.Value.IsEnabled)
                 throw new ApplicationException("PreviewService: Request to upload from in preview service recieved but preview service is disabled in current enviroment");
 
             var viewModel = new Dictionary<string, dynamic>();
@@ -114,7 +111,7 @@ namespace form_builder.Services.PreviewService
             List<DocumentModel> uploadedPreviewDocument = viewModel.Values.First();
 
             var fileContent = Convert.FromBase64String(uploadedPreviewDocument.First().Content);
-            await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}", fileContent, _distributedCacheExpirationConfiguration.FormJson);
+            await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}", JsonConvert.SerializeObject(fileContent), _distributedCacheExpirationConfiguration.FormJson);
 
             try
             {

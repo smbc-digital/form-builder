@@ -24,7 +24,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
         private readonly ISessionHelper _sessionHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IWebHostEnvironment _environment;
-        private readonly PreviewModeConfiguration _previewModeConfiguration;
+        private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
         
         public SuccessPageFactory(IPageHelper pageHelper, IPageFactory pageFactory,
             ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache,
@@ -36,7 +36,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
             _sessionHelper = sessionHelper;
             _distributedCache = distributedCache;
             _environment = environment;
-            _previewModeConfiguration = previewModeConfiguration.Value;
+            _previewModeConfiguration = previewModeConfiguration;
         }
 
         public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType)
@@ -63,7 +63,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                     FeedbackPhase = baseForm.FeedbackPhase,
                     FormName = baseForm.FormName,
                     StartPageUrl = baseForm.StartPageUrl,
-                    IsInPreviewMode = _previewModeConfiguration.IsEnabled && baseForm.BaseURL.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX)
+                    IsInPreviewMode = _previewModeConfiguration.Value.IsEnabled && baseForm.BaseURL.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX)
                 };
             }
 

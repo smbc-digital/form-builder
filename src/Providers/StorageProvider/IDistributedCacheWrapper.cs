@@ -16,7 +16,6 @@ namespace form_builder.Providers.StorageProvider
         Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options, CancellationToken token = default);
         Task SetStringAsync(string key, string value, CancellationToken token = default);
         Task SetStringAsync(string key, string value, int expiration, CancellationToken token = default);
-        Task SetStringAsync(string key, byte[] value, int expiration, CancellationToken token = default);
         byte[] Get(string key);
     }
 }

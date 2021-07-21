@@ -26,7 +26,7 @@ namespace form_builder.Factories.Schema
         private readonly ISchemaProvider _schemaProvider;
         private readonly DistributedCacheConfiguration _distributedCacheConfiguration;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
-        private readonly PreviewModeConfiguration _previewModeConfiguration;
+        private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
         private readonly IConfiguration _configuration;
         private readonly IFormSchemaIntegrityValidator _formSchemaIntegrityValidator;
         private readonly IEnumerable<IUserPageTransformFactory> _userPageTransformFactories;
@@ -49,14 +49,14 @@ namespace form_builder.Factories.Schema
             _distributedCacheConfiguration = distributedCacheConfiguration.Value;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _configuration = configuration;
-            _previewModeConfiguration = previewModeConfiguration.Value;
+            _previewModeConfiguration = previewModeConfiguration;
             _formSchemaIntegrityValidator = formSchemaIntegrityValidator;
             _userPageTransformFactories = userPageTransformFactories;
         }
 
         public async Task<FormSchema> Build(string formKey)
         {
-            if(_previewModeConfiguration.IsEnabled && formKey.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX))
+            if(_previewModeConfiguration.Value.IsEnabled && formKey.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX))
                 return await InPreviewMode(formKey);
 
             if (!_schemaProvider.ValidateSchemaName(formKey).Result)
