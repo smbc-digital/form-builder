@@ -20,7 +20,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
-using StockportGovUK.NetStandard.Models.Booking.Request;
 
 namespace form_builder.Services.SubmitService
 {
@@ -52,7 +51,7 @@ namespace form_builder.Services.SubmitService
             IPageHelper pageHelper,
             IWebHostEnvironment environment,
             IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration,
-            IDistributedCacheWrapper distributedCache,  
+            IDistributedCacheWrapper distributedCache,
             ISchemaFactory schemaFactory,
             IReferenceNumberProvider referenceNumberProvider,
             IEnumerable<ISubmitProvider> submitProviders,
@@ -89,15 +88,17 @@ namespace form_builder.Services.SubmitService
                 reference = answers.CaseReference;
             }
 
-            if (baseForm.Pages != null)
+            if (baseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)
             {
-                var isAutoConfirm = baseForm.Pages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.Booking) && _.Properties.AutoConfirm.Equals(true)));
+                var journeyPages = baseForm.GetReducedPages(mappingEntity.FormAnswers);
+
+                var isAutoConfirm = journeyPages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.Booking) && _.Properties.AutoConfirm.Equals(true)));
                 if (isAutoConfirm)
                     return await ConfirmBooking(mappingEntity, form, sessionGuid, baseForm, reference);
-            }            
+            }
 
             return _submissionServiceConfiguration.FakeSubmission
-                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference) 
+                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
                 : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, baseForm, reference);
         }
 
@@ -132,14 +133,14 @@ namespace form_builder.Services.SubmitService
 
         private string ProcessFakeSubmission(MappingEntity mappingEntity, string form, string sessionGuid, string reference)
         {
-                if (!string.IsNullOrEmpty(reference))
-                    return reference;
-                
-                var json = JsonConvert.SerializeObject(mappingEntity.Data);
-                _logger.LogInformation($"Fake Submission of: {json}");
+            if (!string.IsNullOrEmpty(reference))
+                return reference;
 
-                _pageHelper.SaveCaseReference(sessionGuid, "123456");
-                return "123456";
+            var json = JsonConvert.SerializeObject(mappingEntity.Data);
+            _logger.LogInformation($"Fake Submission of: {json}");
+
+            _pageHelper.SaveCaseReference(sessionGuid, "123456");
+            return "123456";
         }
 
         private async Task<string> ProcessGenuineSubmission(MappingEntity mappingEntity, string form, string sessionGuid, FormSchema baseForm, string reference)
@@ -150,7 +151,7 @@ namespace form_builder.Services.SubmitService
 
             if (!response.IsSuccessStatusCode)
                 throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occurred while attempting to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
-            
+
             if (!baseForm.GenerateReferenceNumber && response.Content is not null)
             {
                 var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
