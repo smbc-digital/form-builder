@@ -80,10 +80,9 @@ namespace form_builder.Services.SubmitService
 
         public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
-            var baseForm = await _schemaFactory.Build(form);
             var reference = string.Empty;
 
-            if (baseForm.GenerateReferenceNumber)
+            if (mappingEntity.BaseForm.GenerateReferenceNumber)
             {
                 var answers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
                 reference = answers.CaseReference;
@@ -91,15 +90,15 @@ namespace form_builder.Services.SubmitService
 
             var submissionReference = _submissionServiceConfiguration.FakeSubmission
                 ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
-                : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, baseForm, reference);
+                : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, reference);
 
-            if (baseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)
+            if (mappingEntity.BaseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)
             {
-                var journeyPages = baseForm.GetReducedPages(mappingEntity.FormAnswers);
+                var journeyPages = mappingEntity.BaseForm.GetReducedPages(mappingEntity.FormAnswers);
 
                 var isAutoConfirm = journeyPages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.Booking) && _.Properties.AutoConfirm.Equals(true)));
                 if (isAutoConfirm)
-                    await _postSubmissionAction.ConfirmBooking(mappingEntity, baseForm, _environment.EnvironmentName);
+                    await _postSubmissionAction.ConfirmBooking(mappingEntity, _environment.EnvironmentName);
             }
 
             return submissionReference;
@@ -114,7 +113,7 @@ namespace form_builder.Services.SubmitService
             return "123456";
         }
 
-        private async Task<string> ProcessGenuineSubmission(MappingEntity mappingEntity, string form, string sessionGuid, FormSchema baseForm, string reference)
+        private async Task<string> ProcessGenuineSubmission(MappingEntity mappingEntity, string form, string sessionGuid, string reference)
         {
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
@@ -123,7 +122,7 @@ namespace form_builder.Services.SubmitService
             if (!response.IsSuccessStatusCode)
                 throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occurred while attempting to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
 
-            if (!baseForm.GenerateReferenceNumber && response.Content is not null)
+            if (!mappingEntity.BaseForm.GenerateReferenceNumber && response.Content is not null)
             {
                 var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
                 reference = JsonConvert.DeserializeObject<string>(content);

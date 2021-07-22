@@ -1,6 +1,5 @@
 ﻿using form_builder.Enum;
 using form_builder.Extensions;
-using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.Booking;
 using form_builder.Services.MappingService.Entities;
@@ -20,12 +19,12 @@ namespace form_builder.SubmissionActions
             _bookingProviders = bookingProviders;
         }
 
-        public async Task ConfirmBooking(MappingEntity mappingEntity, FormSchema baseForm, string environmentName)
+        public async Task ConfirmBooking(MappingEntity mappingEntity, string environmentName)
         {
-            var booking = (Booking)baseForm.Pages
+            var booking = (Booking)mappingEntity.BaseForm.Pages
                 .Where(page => page.Elements is not null)
                 .SelectMany(page => page.Elements)
-                .First(element => element.Type.Equals(EElementType.Booking));
+                .FirstOrDefault(element => element.Type.Equals(EElementType.Booking));
 
             var bookingId = Convert.ToString(mappingEntity.FormAnswers.AllAnswers
                 .ToDictionary(x => x.QuestionId, x => x.Response)
