@@ -94,6 +94,7 @@ using StockportGovUK.NetStandard.Gateways.VerintService;
 using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.PreviewService;
 using form_builder.Providers.FileStorage;
+using form_builder.Helpers.Cookie;
 
 namespace form_builder.Utils.Startup
 {
@@ -188,6 +189,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IActionHelper, ActionHelper>();
             services.AddSingleton<IIncomingDataHelper, IncomingDataHelper>();
             services.AddSingleton<IPaymentHelper, PaymentHelper>();
+            services.AddSingleton<ICookieHelper, CookieHelper>();
 
             services.AddHttpContextAccessor();
             services.AddScoped<IViewRender, ViewRender>();

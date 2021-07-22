@@ -44,6 +44,13 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithIAG(string value)
+        {
+            _property.IAG = value;
+
+            return this;
+        }
+
         public ElementBuilder WithLookupSource(LookupSource lookupSource)
         {
             _property.LookupSources ??= new List<LookupSource>();

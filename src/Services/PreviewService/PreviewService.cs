@@ -149,7 +149,8 @@ namespace form_builder.Services.PreviewService
 
             var fileUploadElement = new ElementBuilder()
                 .WithQuestionId("previewFile")
-                .WithType(Enum.EElementType.FileUpload)
+                .WithType(EElementType.FileUpload)
+                .WithIAG("Provide a txt/json file in the correct format to preview your form. Any errors will be detailed after upload if applicable.")
                 .WithLabelAsH1(true)
                 .WithLabel("Preview Mode")
                 .WithAcceptedMimeType(".json")
@@ -157,7 +158,7 @@ namespace form_builder.Services.PreviewService
                 .Build();
 
             var submitButton = new ElementBuilder()
-                .WithType(Enum.EElementType.Button)
+                .WithType(EElementType.Button)
                 .WithValue("Submit")
                 .Build();
 
@@ -172,7 +173,7 @@ namespace form_builder.Services.PreviewService
         private Page PreviewErrorPage(string errorMessage)
         {
             var warning = new ElementBuilder()
-                .WithType(Enum.EElementType.Warning)
+                .WithType(EElementType.Warning)
                 .WithPropertyText("The provided file is not valid.")
                 .Build();
 
@@ -186,7 +187,7 @@ namespace form_builder.Services.PreviewService
             errorMessages.ToList().ForEach((error) =>
             {
                 var pElement = new ElementBuilder()
-                    .WithType(Enum.EElementType.P)
+                    .WithType(EElementType.P)
                     .WithPropertyText(error)
                     .Build();
 
