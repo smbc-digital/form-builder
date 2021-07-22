@@ -110,7 +110,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
             Assert.False(result.IsInPreviewMode);
         }
 
-
         [Fact]
         public async Task Build_ShouldReturn_InPreviewMode_True_WhenForm_IsMatching_PreviewKey_AndPreviewModeEnabled()
         {

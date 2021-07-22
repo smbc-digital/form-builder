@@ -14,7 +14,6 @@ using Newtonsoft.Json;
 
 namespace form_builder.ContentFactory.PageFactory
 {
-
     public class PageFactory : IPageFactory
     {
         private readonly IPageHelper _pageHelper;

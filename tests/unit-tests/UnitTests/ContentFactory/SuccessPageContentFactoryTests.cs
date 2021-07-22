@@ -240,7 +240,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
             Assert.Equal(formSchema.StartPageUrl, result.StartPageUrl);
         }
 
-
         [Fact]
         public async Task Build_ShouldReturn_IsInPreviewMode_True_When_PreviewMode_Enabeld_And_Matching_BaseUrl_With_Generic_SuccessPage()
         {

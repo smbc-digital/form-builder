@@ -22,13 +22,6 @@ using form_builder.Helpers.Cookie;
 
 namespace form_builder.Services.PreviewService
 {
-    public interface IPreviewService
-    {
-        Task<FormBuilderViewModel> GetPreviewPage();
-        void ExitPreviewMode();
-        Task<ProcessPreviewRequestEntity> VerifyPreviewRequest(IEnumerable<CustomFormFile> fileUpload);
-    }
-
     public class PreviewService : IPreviewService
     {
         private readonly IEnumerable<IElementValidator> _validators;
@@ -111,7 +104,7 @@ namespace form_builder.Services.PreviewService
             List<DocumentModel> uploadedPreviewDocument = viewModel.Values.First();
 
             var fileContent = Convert.FromBase64String(uploadedPreviewDocument.First().Content);
-            await _distributedCache.SetAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}", fileContent, new DistributedCacheEntryOptions{ AbsoluteExpiration = DateTime.Now.AddMinutes(_distributedCacheExpirationConfiguration.FormJson) });
+            await _distributedCache.SetAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}", fileContent, new DistributedCacheEntryOptions { AbsoluteExpiration = DateTime.Now.AddMinutes(_distributedCacheExpirationConfiguration.FormJson) });
 
             try
             {
@@ -170,6 +163,7 @@ namespace form_builder.Services.PreviewService
                 .WithHideBackButton(true)
                 .Build();
         }
+        
         private Page PreviewErrorPage(string errorMessage)
         {
             var warning = new ElementBuilder()
