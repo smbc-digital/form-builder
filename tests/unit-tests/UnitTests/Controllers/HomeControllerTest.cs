@@ -51,7 +51,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _mockDataStructureConfiguration
                 .Setup(_ => _.Value)
-                .Returns(new DataStructureConfiguration { AllowDataStructureGeneration = true });
+                .Returns(new DataStructureConfiguration { IsEnabled = true });
 
             _mockStructureMapper
                 .Setup(_ => _.CreateBaseFormDataStructure(It.IsAny<string>()))
@@ -678,7 +678,7 @@ namespace form_builder_tests.UnitTests.Controllers
             // Arrange
             _mockDataStructureConfiguration
                 .Setup(_ => _.Value)
-                .Returns(new DataStructureConfiguration {AllowDataStructureGeneration = false});
+                .Returns(new DataStructureConfiguration { IsEnabled = false });
 
             var homeController = new HomeController(
                 _pageService.Object,
