@@ -62,6 +62,7 @@ namespace form_builder
                 .ConfigureEmailTemplateProviders()
                 .ConfigureDocumentCreationProviders()
                 .ConfigureFormAnswersProviders()
+                .ConfigurePostSubmissionActions()
                 .ConfigureFormatters()
                 .ConfigureEnabledFor()
                 .ConfigureEmailProviders(HostingEnvironment)

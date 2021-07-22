@@ -16,6 +16,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.SubmitService;
+using form_builder.SubmissionActions;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
@@ -40,7 +41,7 @@ namespace form_builder_tests.UnitTests.Services
 
         private readonly Mock<ILogger<SubmitService>> _mockLogger = new();
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
-        private readonly IEnumerable<IBookingProvider> _bookingProvider;
+        private readonly PostSubmissionAction _postSubmissionAction;
 
 
         public SubmitServiceTests()
@@ -74,7 +75,7 @@ namespace form_builder_tests.UnitTests.Services
                 _mockSubmitProvider.Object
             };
 
-            _service = new SubmitService(_mockGateway.Object, _mockPageHelper.Object, _mockEnvironment.Object, _mockIOptions.Object, _mockDistributedCache.Object, _mockSchemaFactory.Object, _mockReferenceNumberProvider.Object, _submitProviders, _mockLogger.Object, _bookingProvider);
+            _service = new SubmitService(_mockGateway.Object, _mockPageHelper.Object, _mockEnvironment.Object, _mockIOptions.Object, _mockDistributedCache.Object, _mockSchemaFactory.Object, _mockReferenceNumberProvider.Object, _submitProviders, _mockLogger.Object, _postSubmissionAction);
         }
 
         [Fact]

@@ -16,6 +16,7 @@ using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
+using form_builder.SubmissionActions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -44,7 +45,7 @@ namespace form_builder.Services.SubmitService
 
         private readonly ILogger<SubmitService> _logger;
 
-        private readonly IEnumerable<IBookingProvider> _bookingProviders;
+        private readonly IPostSubmissionAction _postSubmissionAction;
 
         public SubmitService(
             IGateway gateway,
@@ -56,7 +57,7 @@ namespace form_builder.Services.SubmitService
             IReferenceNumberProvider referenceNumberProvider,
             IEnumerable<ISubmitProvider> submitProviders,
             ILogger<SubmitService> logger,
-            IEnumerable<IBookingProvider> bookingProviders)
+            IPostSubmissionAction postSubmissionAction)
         {
             _gateway = gateway;
             _pageHelper = pageHelper;
@@ -67,7 +68,7 @@ namespace form_builder.Services.SubmitService
             _referenceNumberProvider = referenceNumberProvider;
             _submitProviders = submitProviders;
             _logger = logger;
-            _bookingProviders = bookingProviders;
+            _postSubmissionAction = postSubmissionAction;
         }
 
         public async Task PreProcessSubmission(string form, string sessionGuid)
@@ -98,35 +99,10 @@ namespace form_builder.Services.SubmitService
 
                 var isAutoConfirm = journeyPages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.Booking) && _.Properties.AutoConfirm.Equals(true)));
                 if (isAutoConfirm)
-                    await ConfirmBooking(mappingEntity, baseForm);
+                    await _postSubmissionAction.ConfirmBooking(mappingEntity, baseForm, _environment.EnvironmentName);
             }
 
             return submissionReference;
-        }
-
-        private async Task ConfirmBooking(MappingEntity mappingEntity, FormSchema baseForm)
-        {
-            var booking = (Booking)baseForm.Pages
-                .Where(page => page.Elements is not null)
-                .SelectMany(page => page.Elements)
-                .First(element => element.Type.Equals(EElementType.Booking));
-
-            var bookingId = Convert.ToString(mappingEntity.FormAnswers.AllAnswers
-                .ToDictionary(x => x.QuestionId, x => x.Response)
-                .Where(_ => _.Key.Equals(booking.ReservedIdQuestionId))
-                .FirstOrDefault().Value);
-
-            var appointmentType = booking.Properties.AppointmentTypes
-                .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
-
-            await _bookingProviders
-                 .Get(booking.Properties.BookingProvider)
-                 .Confirm(new()
-                 {
-                     BookingId = new Guid(bookingId),
-                     AdditionalInformation = string.Empty,
-                     OptionalResources = appointmentType.OptionalResources
-                 });
         }
 
         private string ProcessFakeSubmission(MappingEntity mappingEntity, string form, string sessionGuid, string reference)
