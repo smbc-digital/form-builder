@@ -168,5 +168,84 @@ namespace form_builder_tests.UnitTests.TagParsers
             _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
         }
 
+        [Fact]
+        public void ParseString_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
+        {
+            var text = "this has no values to be replaced";
+            var formAnswers = new FormAnswers();
+
+            var result = _tagParser.ParseString(text, formAnswers);
+
+            Assert.Equal(text, result);
+        }
+
+        [Fact]
+        public void ParseString_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
+        {
+            var text = "this value {{TAG:firstname}} should be replaced with name question";
+            var formAnswers = new FormAnswers();
+
+            var result = _tagParser.ParseString(text, formAnswers);
+
+            Assert.Equal(text, result);
+        }
+
+        [Fact]
+        public void ParseString_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
+        {
+            var expectedString = "this value testfirstname should be replaced with name question";
+            var text = "this value {{FORMDATA:firstname}} should be replaced with name question";
+
+            var formAnswers = new FormAnswers
+            {
+                AdditionalFormData = new Dictionary<string, object>
+                {
+                    { "firstname", "testfirstname"}
+                }
+            };
+
+            var result = _tagParser.ParseString(text, formAnswers);
+            Assert.Equal(expectedString, result);
+        }
+
+        [Fact]
+        public void ParseString_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
+        {
+            var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
+            var text = "this value {{FORMDATA:firstname}} should be replaced with firstname and this {{FORMDATA:lastname}} with lastname";
+
+            var formAnswers = new FormAnswers
+            {
+                AdditionalFormData = new Dictionary<string, object>
+                {
+                    { "firstname", "testfirstname"},
+                    { "lastname", "testlastname"}
+                }
+            };
+
+            var result = _tagParser.ParseString(text, formAnswers);
+            Assert.Equal(expectedString, result);
+        }
+
+
+        [Fact]
+        public void ParseString_ShouldCallFormatter_WhenProvided()
+        {
+            var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
+
+            var text = "this value should be formatted: {{FORMDATA:firstname:testformatter}}";
+
+            var formAnswers = new FormAnswers
+            {
+                AdditionalFormData = new Dictionary<string, object>
+                {
+                    { "firstname", "testfirstname"}
+                }
+            };
+
+            var result = _tagParser.ParseString(text, formAnswers);
+            Assert.Equal(expectedString, result);
+            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
+        }
     }
 }

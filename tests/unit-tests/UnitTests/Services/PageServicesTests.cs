@@ -38,9 +38,9 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using Xunit;
-using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
-namespace form_builder_tests.UnitTests.Services {
+namespace form_builder_tests.UnitTests.Services
+{
     public class PageServicesTests {
         private readonly PageService _service;
         private readonly Mock<IEnumerable<IElementValidator>> _validators = new();

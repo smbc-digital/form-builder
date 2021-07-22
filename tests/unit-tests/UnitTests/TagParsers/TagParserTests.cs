@@ -20,7 +20,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         public void Parse_ShouldThrowException_WhenQuestionValue_IsNotWithinAnswers()
         {
             var result = Assert.Throws<ApplicationException>(() => _tagParser.Parse("{{TEST:question}}", new Dictionary<string, object>(), _regex));
-            Assert.Equal("FormAnswerTagParser::Parse, replacement value for quetionId question is not stored within answers, Match value: TEST:question", result.Message);
+            Assert.Equal("FormAnswerTagParser::Parse, replacement value for questionId question is not stored within answers, Match value: TEST:question", result.Message);
         }
 
         [Fact]
@@ -32,7 +32,7 @@ namespace form_builder_tests.UnitTests.TagParsers
             };
 
             var result = Assert.Throws<ApplicationException>(() => _tagParser.Parse("{{TEST:question}}", answers, _regex));
-            Assert.Equal("FormAnswerTagParser::Parse, replacement value for quetionId question is null or empty, Match value: TEST:question", result.Message);
+            Assert.Equal("FormAnswerTagParser::Parse, replacement value for questionId question is null or empty, Match value: TEST:question", result.Message);
         }
 
 

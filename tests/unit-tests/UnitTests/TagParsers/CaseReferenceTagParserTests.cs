@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using form_builder.Builders;
 using form_builder.Enum;
@@ -11,43 +11,14 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.TagParsers
 {
-    public class LinkTagParserTests
+    public class CaseReferenceTagParserTests
     {
         private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
-        private readonly LinkTagParser _tagParser;
+        private readonly CaseReferenceTagParser _tagParser;
 
-        public LinkTagParserTests()
+        public CaseReferenceTagParserTests()
         {
-            _tagParser = new LinkTagParser(_mockFormatters.Object);
-        }
-
-        [Theory]
-        [InlineData("{{LINK:firstname}}")]
-        [InlineData("{{LINK:ref}}")]
-        public void Regex_ShouldReturnTrue_Result(string value)
-        {
-            Assert.True(_tagParser.Regex.Match(value).Success);
-        }
-
-        [Theory]
-        [InlineData("{{LIN:firstname}}")]
-        [InlineData("{{INK:ref}}")]
-        [InlineData("{LINK:firstname}")]
-        [InlineData("{{LINK:firstname}")]
-        [InlineData("{{TAG:firstname}")]
-        [InlineData("{{DIFFERENTTAG:firstname}}")]
-        public void Regex_ShouldReturnFalse_Result(string value)
-        {
-            Assert.False(_tagParser.Regex.Match(value).Success);
-        }
-
-        [Fact]
-        public void FormatContent_ShouldReturnValidFormattedText()
-        {
-            var url = "www.stockport.gov.uk";
-            var linkText = "link text";
-            var expectValue = string.Format(_tagParser._htmlContent, url, linkText);
-            Assert.Equal(expectValue, _tagParser.FormatContent(new string[2] { url, linkText }));
+            _tagParser = new CaseReferenceTagParser(_mockFormatters.Object);
         }
 
         [Fact]
@@ -60,6 +31,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithLeadingParagraph("this has no values to be replaced")
                 .Build();
 
             var formAnswers = new FormAnswers();
@@ -67,6 +39,7 @@ namespace form_builder_tests.UnitTests.TagParsers
             var result = _tagParser.Parse(page, formAnswers);
 
             Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(page.LeadingParagraph, result.LeadingParagraph);
         }
 
         [Fact]
@@ -74,11 +47,12 @@ namespace form_builder_tests.UnitTests.TagParsers
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
-                .WithPropertyText("this value {{TAG:firstname}} should be replaced with name question")
+                .WithPropertyText("this value {{TAG}} should be replaced with Case Reference")
                 .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithLeadingParagraph("this value {{TAG}} should be replaced with Case Reference")
                 .Build();
 
             var formAnswers = new FormAnswers();
@@ -86,24 +60,33 @@ namespace form_builder_tests.UnitTests.TagParsers
             var result = _tagParser.Parse(page, formAnswers);
 
             Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(page.LeadingParagraph, result.LeadingParagraph);
         }
 
         [Fact]
-        public void Parse_ShouldReturn_UpdatedText_WithReplacedValue()
+        public void Parse_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
         {
-            var expectedString = $"this link {_tagParser.FormatContent(new string[2] { "www.stockport.gov", "text" })} should be replaced";
+            var expectedString = "this value 123456 should be replaced with Case Reference";
 
             var element = new ElementBuilder()
                .WithType(EElementType.P)
-               .WithPropertyText("this link {{LINK:www.stockport.gov:text}} should be replaced")
+               .WithPropertyText("this value {{CASEREFERENCE}} should be replaced with Case Reference")
                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithLeadingParagraph("this value {{CASEREFERENCE}} should be replaced with Case Reference")
                 .Build();
 
-            var result = _tagParser.Parse(page, new FormAnswers());
+            var formAnswers = new FormAnswers
+            {
+                CaseReference = "123456"
+            };
+
+            var result = _tagParser.Parse(page, formAnswers);
+
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(expectedString, result.LeadingParagraph);
         }
 
         [Fact]
@@ -120,7 +103,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         [Fact]
         public void ParseString_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
         {
-            var text = "this value {{TAG:firstname}} should be replaced with name question";
+            var text = "this value {{TAG}} should be replaced with Case Reference";
             var formAnswers = new FormAnswers();
 
             var result = _tagParser.ParseString(text, formAnswers);
@@ -129,13 +112,19 @@ namespace form_builder_tests.UnitTests.TagParsers
         }
 
         [Fact]
-        public void ParseString_ShouldReturn_UpdatedText_WithReplacedValue()
+        public void ParseString_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
         {
-            var expectedString = $"this link {_tagParser.FormatContent(new string[2] { "www.stockport.gov", "text" })} should be replaced";
+            var expectedString = "this value 123456 should be replaced with Case Reference";
 
-            var text = "this link {{LINK:www.stockport.gov:text}} should be replaced";
+            var text = "this value {{CASEREFERENCE}} should be replaced with Case Reference";
 
-            var result = _tagParser.ParseString(text, new FormAnswers());
+            var formAnswers = new FormAnswers
+            {
+                CaseReference = "123456"
+            };
+
+            var result = _tagParser.ParseString(text, formAnswers);
+
             Assert.Equal(expectedString, result);
         }
     }

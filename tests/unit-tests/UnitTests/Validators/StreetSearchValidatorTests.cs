@@ -4,7 +4,8 @@ using form_builder.Enum;
 using form_builder.Validators;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Validators {
+namespace form_builder_tests.UnitTests.Validators
+{
     public class StreetSearchValidatorTests {
 
         private readonly StreetSearchValidator _streetSearchValidator = new StreetSearchValidator();
