@@ -2,7 +2,7 @@
 {
     public class DataStructureConfiguration
     {
-        public const string ConfigValue = "DataStructureConfiguration";
-        public bool AllowDataStructureGeneration { get; set; }
+        public const string ConfigValue = "DataStructureEnabled";
+        public bool IsEnabled { get; set; }
     }
 }

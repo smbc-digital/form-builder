@@ -193,7 +193,7 @@ namespace form_builder.Controllers
         [Route("{form}/data-structure")]
         public async Task<IActionResult> DataStructure(string form)
         {
-            if (!_dataStructureConfiguration.AllowDataStructureGeneration)
+            if (!_dataStructureConfiguration.IsEnabled)
                 return RedirectToAction("Index", new { form });
 
             object dataStructure = await _structureMapper.CreateBaseFormDataStructure(form);
