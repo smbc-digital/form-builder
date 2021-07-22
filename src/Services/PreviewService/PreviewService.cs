@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.ContentFactory.PageFactory;
-using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Models;
 using form_builder.ViewModels;
 using form_builder.Validators;
@@ -16,10 +15,10 @@ using form_builder.Enum;
 using form_builder.Extensions;
 using Microsoft.Extensions.Options;
 using form_builder.Factories.Schema;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using form_builder.Constants;
 using Microsoft.Extensions.Caching.Distributed;
+using form_builder.Helpers.Cookie;
 
 namespace form_builder.Services.PreviewService
 {
@@ -40,7 +39,7 @@ namespace form_builder.Services.PreviewService
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
         private readonly ApplicationVersionConfiguration _applicationVersionConfiguration;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICookieHelper _cookieHelper;
 
         public PreviewService(
             IEnumerable<IElementValidator> validators,
@@ -50,7 +49,7 @@ namespace form_builder.Services.PreviewService
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             IOptions<PreviewModeConfiguration> previewModeConfiguration,
             IOptions<ApplicationVersionConfiguration> applicationVersionConfiguration,
-            IHttpContextAccessor httpContextAccessor,
+            ICookieHelper cookieHelper,
             IPageFactory pageFactory)
         {
             _validators = validators;
@@ -58,7 +57,7 @@ namespace form_builder.Services.PreviewService
             _fileUploadService = fileUploadService;
             _distributedCache = distributedCache;
             _schemaFactory = schemaFactory;
-            _httpContextAccessor = httpContextAccessor;
+            _cookieHelper = cookieHelper;
             _previewModeConfiguration = previewModeConfiguration;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _applicationVersionConfiguration = applicationVersionConfiguration.Value;
@@ -78,9 +77,9 @@ namespace form_builder.Services.PreviewService
             if (!_previewModeConfiguration.Value.IsEnabled)
                 throw new ApplicationException("PreviewService: Request to exit preview mode recieved but preview service is disabled in current enviroment");
 
-            var previewFormKey = _httpContextAccessor.HttpContext.Request.Cookies[CookieConstants.PREVIEW_MODE];
-            _httpContextAccessor.HttpContext.Response.Cookies.Delete(CookieConstants.PREVIEW_MODE);
-            _distributedCache.Remove($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewFormKey}");
+            var cookiePreviewKeyValue = _cookieHelper.GetCookie(CookieConstants.PREVIEW_MODE);
+            _cookieHelper.DeleteCookie(cookiePreviewKeyValue);
+            _distributedCache.Remove($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{cookiePreviewKeyValue}");
         }
 
         public async Task<ProcessPreviewRequestEntity> VerifyPreviewRequest(IEnumerable<CustomFormFile> fileUpload)
@@ -134,7 +133,7 @@ namespace form_builder.Services.PreviewService
                 };
             }
 
-            AddPreviewCookie(previewKey);
+            _cookieHelper.AddCookie(CookieConstants.PREVIEW_MODE, previewKey);
 
             return new ProcessPreviewRequestEntity
             {
@@ -195,14 +194,6 @@ namespace form_builder.Services.PreviewService
             });
 
             return page.Build();
-        }
-        private void AddPreviewCookie(string key)
-        {
-            var cookieOptions = new CookieOptions
-            {
-                Secure = true
-            };
-            _httpContextAccessor.HttpContext.Response.Cookies.Append(CookieConstants.PREVIEW_MODE, key, cookieOptions);
         }
     }
 }
