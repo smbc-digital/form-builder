@@ -4,6 +4,7 @@ using form_builder.Models;
 using form_builder.Providers.Booking;
 using form_builder.SubmissionActions;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Logging;
 using Moq;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using System;
@@ -19,6 +20,7 @@ namespace form_builder_tests.UnitTests.SubmissionActions
         private readonly Mock<IBookingProvider> _bookingProvider = new();
         private readonly PostSubmissionAction _postSubmissionAction;
         private readonly IEnumerable<IBookingProvider> _bookingProviders;
+        private readonly Mock<ILogger<BookingProvider>> _mockLogger = new();
 
         const string bookingProvider = "testBookingProvider";       
 
@@ -31,7 +33,7 @@ namespace form_builder_tests.UnitTests.SubmissionActions
                 _bookingProvider.Object
             };
 
-            _postSubmissionAction = new PostSubmissionAction(_bookingProviders);
+            _postSubmissionAction = new PostSubmissionAction(_bookingProviders, _mockLogger.Object);
         }
 
         [Fact]

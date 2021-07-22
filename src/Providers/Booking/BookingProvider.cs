@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using form_builder.Exceptions;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Models.Booking.Request;
@@ -15,13 +14,8 @@ namespace form_builder.Providers.Booking
     {
         public string ProviderName { get => "SMBC"; }
         private readonly IBookingServiceGateway _gateway;
-        private readonly ILogger<BookingProvider> _logger;
 
-        public BookingProvider(IBookingServiceGateway gateway, ILogger<BookingProvider> logger)
-        {
-            _gateway = gateway;
-            _logger = logger;
-        }
+        public BookingProvider(IBookingServiceGateway gateway) => _gateway = gateway;                    
 
         public async Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request)
         {
@@ -119,8 +113,6 @@ namespace form_builder.Providers.Booking
 
         public async Task Confirm(ConfirmationRequest request)
         {
-            try
-            {
                 var result = await _gateway.Confirmation(request);
             
                 if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
@@ -130,12 +122,7 @@ namespace form_builder.Providers.Booking
                     throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway returned 404 status code, booking with id {request.BookingId} cannot be found");
 
                 if (!result.IsSuccessStatusCode)
-                    throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {JsonConvert.SerializeObject(result)}");
-            }
-            catch (ApplicationException ex)
-            {
-                _logger.LogError($"BookingProvider: Failed to confirm booking id {request.BookingId}, Request:{JsonConvert.SerializeObject(request)}, Exception: {ex}");
-            }            
+                    throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {JsonConvert.SerializeObject(result)}");           
         }
     }
 }

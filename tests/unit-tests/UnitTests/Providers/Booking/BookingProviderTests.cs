@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Exceptions;
 using form_builder.Providers.Booking;
-using Microsoft.Extensions.Logging;
 using Moq;
 using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Gateways.Response;
@@ -19,8 +18,6 @@ namespace form_builder_tests.UnitTests.Providers.Booking
         private readonly BookingProvider _bookingProvider;
 
         private readonly Mock<IBookingServiceGateway> _mockBookingServiceGateway = new ();
-
-        private readonly Mock<ILogger<BookingProvider>> _mockLogger = new();
 
         public BookingProviderTests()
         {
@@ -42,7 +39,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
             _mockBookingServiceGateway.Setup(_ => _.Confirmation(It.IsAny<ConfirmationRequest>()))
                 .ReturnsAsync(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.NoContent });
 
-            _bookingProvider = new BookingProvider(_mockBookingServiceGateway.Object, _mockLogger.Object);
+            _bookingProvider = new BookingProvider(_mockBookingServiceGateway.Object);
         }
 
         [Fact]
