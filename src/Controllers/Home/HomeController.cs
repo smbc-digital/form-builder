@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Attributes;
 using form_builder.Builders;
+using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Extensions;
+using form_builder.Mappers.Structure;
 using form_builder.Models;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
@@ -16,6 +18,7 @@ using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace form_builder.Controllers
 {
@@ -28,6 +31,8 @@ namespace form_builder.Controllers
         private readonly ISuccessWorkflow _successWorkflow;
         private readonly IFileUploadService _fileUploadService;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly IStructureMapper _structureMapper;
+        private readonly DataStructureConfiguration _dataStructureConfiguration;
 
         public HomeController(IPageService pageService,
             ISubmitWorkflow submitWorkflow,
@@ -35,7 +40,9 @@ namespace form_builder.Controllers
             IFileUploadService fileUploadService,
             IWebHostEnvironment hostingEnvironment,
             IActionsWorkflow actionsWorkflow,
-            ISuccessWorkflow successWorkflow)
+            ISuccessWorkflow successWorkflow,
+            IStructureMapper structureMapper,
+            IOptions<DataStructureConfiguration> dataStructureConfiguration)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
@@ -44,6 +51,8 @@ namespace form_builder.Controllers
             _hostingEnvironment = hostingEnvironment;
             _actionsWorkflow = actionsWorkflow;
             _successWorkflow = successWorkflow;
+            _structureMapper = structureMapper;
+            _dataStructureConfiguration = dataStructureConfiguration.Value;
         }
 
         [HttpGet]
@@ -178,6 +187,29 @@ namespace form_builder.Controllers
             };
 
             return View(result.ViewName, success);
+        }
+
+        [HttpGet]
+        [Route("{form}/data-structure")]
+        public async Task<IActionResult> DataStructure(string form)
+        {
+            if (!_dataStructureConfiguration.IsEnabled)
+                return RedirectToAction("Index", new { form });
+
+            object dataStructure = await _structureMapper.CreateBaseFormDataStructure(form);
+            var viewModel = new DataStructureViewModel
+            {
+                FormName = form,
+                StartPageUrl = form,
+                FeedbackPhase = string.Empty,
+                FeedbackForm = string.Empty,
+                PageTitle = form,
+                DisplayBreadcrumbs = false,
+                Breadcrumbs = null,
+                DataStructure = dataStructure
+            };
+
+            return View("DataStructure", viewModel);
         }
     }
 }
