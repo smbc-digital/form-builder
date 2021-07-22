@@ -61,15 +61,5 @@ namespace form_builder.Providers.StorageProvider
         }
 
         public byte[] Get(string key) => _distributedCache.Get(key);
-
-        public Task SetStringAsync(string key, byte[] value, int expiration, CancellationToken token = default)
-        {
-            var distributedCacheOptions = new DistributedCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTime.Now.AddMinutes(expiration)
-            };
-
-            return _distributedCache.SetAsync(key, value, distributedCacheOptions, token);
-        }
     }
 }
