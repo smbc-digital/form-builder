@@ -23,6 +23,7 @@ using form_builder.Helpers.PaymentHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Helpers.ViewRender;
 using form_builder.Mappers;
+using form_builder.Mappers.Structure;
 using form_builder.Providers;
 using form_builder.Providers.Address;
 using form_builder.Providers.Booking;
@@ -190,6 +191,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IIncomingDataHelper, IncomingDataHelper>();
             services.AddSingleton<IPaymentHelper, PaymentHelper>();
             services.AddSingleton<ICookieHelper, CookieHelper>();
+            services.AddSingleton<IStructureMapper, StructureMapper>();
 
             services.AddHttpContextAccessor();
             services.AddScoped<IViewRender, ViewRender>();
@@ -439,6 +441,7 @@ namespace form_builder.Utils.Startup
         {
             services.Configure<AwsSesKeysConfiguration>(configuration.GetSection(AwsSesKeysConfiguration.ConfigValue));
             services.Configure<CivicaPaymentConfiguration>(configuration.GetSection(CivicaPaymentConfiguration.ConfigValue));
+            services.Configure<DataStructureConfiguration>(configuration.GetSection(DataStructureConfiguration.ConfigValue));
             services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection(DistributedCacheExpirationConfiguration.ConfigValue));
             services.Configure<FileStorageProviderConfiguration>(configuration.GetSection(FileStorageProviderConfiguration.ConfigValue));
             services.Configure<FormConfiguration>(configuration.GetSection(FormConfiguration.ConfigValue));
