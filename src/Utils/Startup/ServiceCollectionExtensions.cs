@@ -95,6 +95,7 @@ using StockportGovUK.NetStandard.Gateways.VerintService;
 using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.PreviewService;
 using form_builder.Providers.FileStorage;
+using form_builder.SubmissionActions;
 using form_builder.Helpers.Cookie;
 
 namespace form_builder.Utils.Startup
@@ -276,6 +277,13 @@ namespace form_builder.Utils.Startup
         {
             services.AddSingleton<IStreetProvider, FakeStreetProvider>();
             services.AddSingleton<IStreetProvider, ServiceStreetProvider>();
+
+            return services;
+        }
+
+        public static IServiceCollection ConfigurePostSubmissionActions(this IServiceCollection services)
+        {
+            services.AddSingleton<IPostSubmissionAction, PostSubmissionAction>();
 
             return services;
         }

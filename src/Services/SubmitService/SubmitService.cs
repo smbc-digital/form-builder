@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Configuration;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
@@ -11,6 +13,7 @@ using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
+using form_builder.SubmissionActions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -39,16 +42,19 @@ namespace form_builder.Services.SubmitService
 
         private readonly ILogger<SubmitService> _logger;
 
+        private readonly IPostSubmissionAction _postSubmissionAction;
+
         public SubmitService(
             IGateway gateway,
             IPageHelper pageHelper,
             IWebHostEnvironment environment,
             IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration,
-            IDistributedCacheWrapper distributedCache,  
+            IDistributedCacheWrapper distributedCache,
             ISchemaFactory schemaFactory,
             IReferenceNumberProvider referenceNumberProvider,
             IEnumerable<ISubmitProvider> submitProviders,
-            ILogger<SubmitService> logger)
+            ILogger<SubmitService> logger,
+            IPostSubmissionAction postSubmissionAction)
         {
             _gateway = gateway;
             _pageHelper = pageHelper;
@@ -59,6 +65,7 @@ namespace form_builder.Services.SubmitService
             _referenceNumberProvider = referenceNumberProvider;
             _submitProviders = submitProviders;
             _logger = logger;
+            _postSubmissionAction = postSubmissionAction;
         }
 
         public async Task PreProcessSubmission(string form, string sessionGuid)
@@ -70,33 +77,34 @@ namespace form_builder.Services.SubmitService
 
         public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
-            var baseForm = await _schemaFactory.Build(form);
             var reference = string.Empty;
 
-            if (baseForm.GenerateReferenceNumber)
+            if (mappingEntity.BaseForm.GenerateReferenceNumber)
             {
                 var answers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
                 reference = answers.CaseReference;
             }
 
-            return _submissionServiceConfiguration.FakeSubmission 
-                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference) 
-                : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, baseForm, reference);
+            var submissionReference = _submissionServiceConfiguration.FakeSubmission
+                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
+                : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, reference);
+
+            if (mappingEntity.BaseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)            
+                await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
+
+            return submissionReference;
         }
 
         private string ProcessFakeSubmission(MappingEntity mappingEntity, string form, string sessionGuid, string reference)
         {
-                if (!string.IsNullOrEmpty(reference))
-                    return reference;
-                
-                var json = JsonConvert.SerializeObject(mappingEntity.Data);
-                _logger.LogInformation($"Fake Submission of: {json}");
+            if (!string.IsNullOrEmpty(reference))
+                return reference;
 
-                _pageHelper.SaveCaseReference(sessionGuid, "123456");
-                return "123456";
+            _pageHelper.SaveCaseReference(sessionGuid, "123456");
+            return "123456";
         }
 
-        private async Task<string> ProcessGenuineSubmission(MappingEntity mappingEntity, string form, string sessionGuid, FormSchema baseForm, string reference)
+        private async Task<string> ProcessGenuineSubmission(MappingEntity mappingEntity, string form, string sessionGuid, string reference)
         {
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
@@ -104,8 +112,8 @@ namespace form_builder.Services.SubmitService
 
             if (!response.IsSuccessStatusCode)
                 throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occurred while attempting to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
-            
-            if (!baseForm.GenerateReferenceNumber && response.Content is not null)
+
+            if (!mappingEntity.BaseForm.GenerateReferenceNumber && response.Content is not null)
             {
                 var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
                 reference = JsonConvert.DeserializeObject<string>(content);

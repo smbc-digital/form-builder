@@ -509,5 +509,12 @@ namespace form_builder.Builders
             _property.AppendText = value;
             return this;
         }
+
+        public ElementBuilder WithAutoConfirm(bool value)
+        {
+            _property.AutoConfirm = value;
+
+            return this;
+        }
     }
 }
