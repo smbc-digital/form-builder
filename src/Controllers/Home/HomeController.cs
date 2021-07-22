@@ -207,6 +207,7 @@ namespace form_builder.Controllers
                 PageTitle = form,
                 DisplayBreadcrumbs = false,
                 Breadcrumbs = null,
+                IsInPreviewMode = false,
                 DataStructure = dataStructure
             };
 
