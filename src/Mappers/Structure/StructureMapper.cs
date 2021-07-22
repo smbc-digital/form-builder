@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
@@ -154,7 +154,7 @@ namespace form_builder.Mappers.Structure
 
             foreach (var prop in props)
             {
-                if (prop.PropertyType.ToString().StartsWith("StockportGovUK.NetStandard") && !prop.PropertyType.ToString().EndsWith("[]"))
+                if (prop.PropertyType.ToString().StartsWith(StructureConstants.SMBC_MODELS_PREFIX) && !prop.PropertyType.ToString().EndsWith("[]"))
                 {
                     var typeInstance = Activator.CreateInstance(prop.PropertyType);
                     var nestedProperties = typeInstance.GetType().GetProperties();
@@ -166,7 +166,7 @@ namespace form_builder.Mappers.Structure
 
                     propertyDictionary.Add(prop.Name, nestedPropertyDictionary);
                 }
-                else if (prop.PropertyType.ToString().StartsWith("StockportGovUK.NetStandard") && prop.PropertyType.ToString().EndsWith("[]"))
+                else if (prop.PropertyType.ToString().StartsWith(StructureConstants.SMBC_MODELS_PREFIX) && prop.PropertyType.ToString().EndsWith("[]"))
                 {
                     var typeArray = new object[1];
                     typeArray[0] = Activator.CreateInstance(prop.PropertyType.GetElementType());
