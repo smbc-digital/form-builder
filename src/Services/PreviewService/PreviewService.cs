@@ -29,17 +29,16 @@ namespace form_builder.Services.PreviewService
         private readonly IFileUploadService _fileUploadService;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly ISchemaFactory _schemaFactory;
-        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
         private readonly ApplicationVersionConfiguration _applicationVersionConfiguration;
         private readonly ICookieHelper _cookieHelper;
+        private int _expiryMinutes => 30;
 
         public PreviewService(
             IEnumerable<IElementValidator> validators,
             IFileUploadService fileUploadService,
             IDistributedCacheWrapper distributedCache,
             ISchemaFactory schemaFactory,
-            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             IOptions<PreviewModeConfiguration> previewModeConfiguration,
             IOptions<ApplicationVersionConfiguration> applicationVersionConfiguration,
             ICookieHelper cookieHelper,
@@ -52,7 +51,6 @@ namespace form_builder.Services.PreviewService
             _schemaFactory = schemaFactory;
             _cookieHelper = cookieHelper;
             _previewModeConfiguration = previewModeConfiguration;
-            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _applicationVersionConfiguration = applicationVersionConfiguration.Value;
         }
 
@@ -104,13 +102,13 @@ namespace form_builder.Services.PreviewService
             List<DocumentModel> uploadedPreviewDocument = viewModel.Values.First();
 
             var fileContent = Convert.FromBase64String(uploadedPreviewDocument.First().Content);
-            await _distributedCache.SetAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}", fileContent, new DistributedCacheEntryOptions { AbsoluteExpiration = DateTime.Now.AddMinutes(_distributedCacheExpirationConfiguration.FormJson) });
+            await _distributedCache.SetAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}", fileContent, new DistributedCacheEntryOptions { AbsoluteExpiration = DateTime.Now.AddMinutes(_expiryMinutes) });
 
             try
             {
                 var formSchema = await _schemaFactory.Build(previewKey);
                 formSchema.BaseURL = previewKey;
-                await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}", JsonConvert.SerializeObject(formSchema), _distributedCacheExpirationConfiguration.FormJson);
+                await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}", JsonConvert.SerializeObject(formSchema), _expiryMinutes);
             }
             catch (Exception e)
             {
