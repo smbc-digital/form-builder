@@ -57,7 +57,6 @@ namespace form_builder.Mappers.Structure
 
         private IDictionary<string, dynamic> RecursiveObjectCreate(string targetMapping, IElement element, IDictionary<string, dynamic> dataStructure)
         {
-            TextInfo textInfo = new CultureInfo("en-GB", false).TextInfo;
             var splitTargets = targetMapping.Split(".");
 
             if (splitTargets.Length.Equals(1))
@@ -68,7 +67,7 @@ namespace form_builder.Mappers.Structure
                 if (dataStructure.ContainsKey(splitTargets[0]))
                     return dataStructure;
 
-                dataStructure.Add(textInfo.ToTitleCase(splitTargets[0]), GetDataType(element));
+                dataStructure.Add($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}", GetDataType(element));
                 return dataStructure;
             }
 
@@ -78,8 +77,8 @@ namespace form_builder.Mappers.Structure
 
             subObject = RecursiveObjectCreate(targetMapping.Replace($"{splitTargets[0]}.", ""), element, subObject as IDictionary<string, dynamic>);
 
-            dataStructure.Remove(textInfo.ToTitleCase(splitTargets[0]));
-            dataStructure.Add(textInfo.ToTitleCase(splitTargets[0]), subObject);
+            dataStructure.Remove($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}");
+            dataStructure.Add($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}", subObject);
 
             return dataStructure;
         }
@@ -96,7 +95,7 @@ namespace form_builder.Mappers.Structure
                         : nestedElement.Properties.TargetMapping, nestedElement, current));
 
             addAnotherStructure.Add(fieldsetStructure);
-            dataStructure.Add(target, addAnotherStructure);
+            dataStructure.Add($"{target.First().ToString().ToUpper()}{target[1..]}", addAnotherStructure);
 
             return dataStructure;
         }
@@ -115,6 +114,7 @@ namespace form_builder.Mappers.Structure
 
                 case EElementType.DateInput:
                 case EElementType.DatePicker:
+                case EElementType.TimeInput:
                     return new DateTime().GetType().ConvertTypeToFormattedString();
 
                 case EElementType.Street:
@@ -122,7 +122,6 @@ namespace form_builder.Mappers.Structure
                     var address = new StockportGovUK.NetStandard.Models.Addresses.Address();
                     properties = address.GetType().GetProperties();
                     return GeneratePropertyDictionary(properties);
-
 
                 case EElementType.Organisation:
                     var organisation = new StockportGovUK.NetStandard.Models.Verint.Organisation();
