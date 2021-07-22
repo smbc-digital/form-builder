@@ -1,4 +1,4 @@
-﻿@model form_builder.ViewModels.FormBuilderViewModel
+@model form_builder.ViewModels.FormBuilderViewModel
 @{
     ViewData["Title"] = Model.FormName;
     ViewData["PageTitle"] = Model.PageTitle;
@@ -9,9 +9,8 @@
     ViewData["PreviewMode"] = Model.IsInPreviewMode;
 }
 
-@using (Html.BeginForm("Index", "Home", new {}, FormMethod.Post, false, new { autocomplete = "on", novalidate = "novalidate", enctype = "multipart/form-data" }) )
+@using (Html.BeginForm("IndexPost", "Preview", new {}, FormMethod.Post, false, new { autocomplete = "on", novalidate = "novalidate", enctype = "multipart/form-data" }) )
 {
     @Html.AntiForgeryToken()
     @Html.Raw(Model.RawHTML)
-    @Html.HiddenFor(_ => _.Path)
 }

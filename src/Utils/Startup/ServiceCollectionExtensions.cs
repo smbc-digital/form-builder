@@ -92,6 +92,10 @@ using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
+using form_builder.Services.FormAvailabilityService;
+using form_builder.Services.PreviewService;
+using form_builder.Providers.FileStorage;
+using form_builder.Helpers.Cookie;
 
 namespace form_builder.Utils.Startup
 {
@@ -186,6 +190,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IActionHelper, ActionHelper>();
             services.AddSingleton<IIncomingDataHelper, IncomingDataHelper>();
             services.AddSingleton<IPaymentHelper, PaymentHelper>();
+            services.AddSingleton<ICookieHelper, CookieHelper>();
             services.AddSingleton<IStructureMapper, StructureMapper>();
 
             services.AddHttpContextAccessor();
@@ -371,6 +376,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IValidateService, ValidateService>();
             services.AddSingleton<ITemplatedEmailService, TemplatedEmailService>();
             services.AddSingleton<IFormAvailabilityService, FormAvailabilityService>();
+            services.AddSingleton<IPreviewService, PreviewService>();
 
             return services;
         }
@@ -444,8 +450,10 @@ namespace form_builder.Utils.Startup
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection(ReCaptchaConfiguration.ConfigValue));
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection(SubmissionServiceConfiguration.ConfigValue));
 
-            services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>("UseDistributedCache"));
-            services.Configure<TagManagerConfiguration>(TagManagerId => TagManagerId.TagManagerId = configuration.GetValue<string>("TagManagerId"));
+            services.Configure<ApplicationVersionConfiguration>(applicationVersion => applicationVersion.Version = configuration.GetValue<string>(ApplicationVersionConfiguration.ConfigValue));
+            services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>(DistributedCacheConfiguration.ConfigValue));
+            services.Configure<PreviewModeConfiguration>(cacheOptions => cacheOptions.IsEnabled = configuration.GetValue<bool>(PreviewModeConfiguration.ConfigValue));
+            services.Configure<TagManagerConfiguration>(tagManagerId => tagManagerId.TagManagerId = configuration.GetValue<string>(TagManagerConfiguration.ConfigValue));
 
             return services;
         }

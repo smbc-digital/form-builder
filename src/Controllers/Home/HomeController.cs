@@ -183,7 +183,8 @@ namespace form_builder.Controllers
                 BannerTitle = result.BannerTitle,
                 LeadingParagraph = result.LeadingParagraph,
                 DisplayBreadcrumbs = result.DisplayBreadcrumbs,
-                Breadcrumbs = result.Breadcrumbs
+                Breadcrumbs = result.Breadcrumbs,
+                IsInPreviewMode = result.IsInPreviewMode
             };
 
             return View(result.ViewName, success);
