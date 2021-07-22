@@ -1,44 +1,23 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
-using form_builder.ContentFactory.SuccessPageFactory;
-using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.Cookie;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Models.Properties.ElementProperties;
-using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.StorageProvider;
-using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Services.FileUploadService;
-using form_builder.Services.MappingService;
-using form_builder.Services.MappingService.Entities;
 using form_builder.Services.PageService.Entities;
-using form_builder.Services.PayService;
 using form_builder.Services.PreviewService;
 using form_builder.Validators;
 using form_builder.ViewModels;
-using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 using Moq;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
@@ -51,7 +30,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IFileUploadService> _fileUploadService = new();
         private readonly Mock<IDistributedCacheWrapper> _distributedCache = new();
         private readonly Mock<ISchemaFactory> _schemaFactory = new();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new();
         private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new();
         private readonly Mock<IOptions<ApplicationVersionConfiguration>> _mockApplicationVersionConfiguration = new();
         private readonly Mock<ICookieHelper> _mockCookieHelper = new();
@@ -59,10 +37,6 @@ namespace form_builder_tests.UnitTests.Services
 
         public PreviewServiceTests()
         {
-            _mockDistributedCacheExpirationConfiguration
-                .Setup(_ => _.Value)
-                .Returns(new DistributedCacheExpirationConfiguration{ FormJson = 10 });
-
             _mockApplicationVersionConfiguration
                 .Setup(_ => _.Value)
                 .Returns(new ApplicationVersionConfiguration{ Version = "v2" });
@@ -82,7 +56,6 @@ namespace form_builder_tests.UnitTests.Services
                 _fileUploadService.Object,
                 _distributedCache.Object,
                 _schemaFactory.Object,
-                _mockDistributedCacheExpirationConfiguration.Object,
                 _mockPreviewModeConfiguration.Object,
                 _mockApplicationVersionConfiguration.Object,
                 _mockCookieHelper.Object,
@@ -219,7 +192,7 @@ namespace form_builder_tests.UnitTests.Services
             _testValidator.Verify(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()), Times.Once);
             _mockCookieHelper.Verify(_ => _.AddCookie(It.Is<string>(x => x.Equals(CookieConstants.PREVIEW_MODE)), It.Is<string>(y => y.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX))), Times.Once);
             _distributedCache.Verify(_ => _.SetAsync(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()), Times.Once);
-            _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(10)), It.IsAny<CancellationToken>()), Times.Once);
+            _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(30)), It.IsAny<CancellationToken>()), Times.Once);
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
             _distributedCache.Verify(_ => _.Remove(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}"))), Times.Never);
         }
