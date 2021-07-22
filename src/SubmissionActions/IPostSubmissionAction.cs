@@ -5,6 +5,6 @@ namespace form_builder.SubmissionActions
 {
     public interface IPostSubmissionAction
     {
-        Task ConfirmBooking(MappingEntity mappingEntity, string environmentName);
+        Task ConfirmResult(MappingEntity mappingEntity, string environmentName);
     }
 }

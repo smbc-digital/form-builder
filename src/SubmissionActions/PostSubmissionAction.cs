@@ -19,29 +19,35 @@ namespace form_builder.SubmissionActions
             _bookingProviders = bookingProviders;
         }
 
-        public async Task ConfirmBooking(MappingEntity mappingEntity, string environmentName)
+        public async Task ConfirmResult(MappingEntity mappingEntity, string environmentName)
         {
-            var booking = (Booking)mappingEntity.BaseForm.Pages
+            var journeyPages = mappingEntity.BaseForm.GetReducedPages(mappingEntity.FormAnswers);
+
+            var isAutoConfirm = journeyPages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.Booking) && _.Properties.AutoConfirm.Equals(true)));
+            if (isAutoConfirm)
+            {
+                var booking = (Booking)mappingEntity.BaseForm.Pages
                 .Where(page => page.Elements is not null)
                 .SelectMany(page => page.Elements)
                 .FirstOrDefault(element => element.Type.Equals(EElementType.Booking));
 
-            var bookingId = Convert.ToString(mappingEntity.FormAnswers.AllAnswers
-                .ToDictionary(x => x.QuestionId, x => x.Response)
-                .Where(_ => _.Key.Equals(booking.ReservedIdQuestionId))
-                .FirstOrDefault().Value);
+                var bookingId = Convert.ToString(mappingEntity.FormAnswers.AllAnswers
+                    .ToDictionary(x => x.QuestionId, x => x.Response)
+                    .Where(_ => _.Key.Equals(booking.ReservedIdQuestionId))
+                    .FirstOrDefault().Value);
 
-            var appointmentType = booking.Properties.AppointmentTypes
-                .GetAppointmentTypeForEnvironment(environmentName);
+                var appointmentType = booking.Properties.AppointmentTypes
+                    .GetAppointmentTypeForEnvironment(environmentName);
 
-            await _bookingProviders
-                 .Get(booking.Properties.BookingProvider)
-                 .Confirm(new()
-                 {
-                     BookingId = new Guid(bookingId),
-                     AdditionalInformation = string.Empty,
-                     OptionalResources = appointmentType.OptionalResources
-                 });
+                await _bookingProviders
+                     .Get(booking.Properties.BookingProvider)
+                     .Confirm(new()
+                     {
+                         BookingId = new Guid(bookingId),
+                         AdditionalInformation = string.Empty,
+                         OptionalResources = appointmentType.OptionalResources
+                     });
+            }
         }
     }
 }

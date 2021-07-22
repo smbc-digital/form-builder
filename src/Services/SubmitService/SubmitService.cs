@@ -4,14 +4,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Configuration;
-using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.Booking;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Submit;
@@ -92,14 +89,8 @@ namespace form_builder.Services.SubmitService
                 ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
                 : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, reference);
 
-            if (mappingEntity.BaseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)
-            {
-                var journeyPages = mappingEntity.BaseForm.GetReducedPages(mappingEntity.FormAnswers);
-
-                var isAutoConfirm = journeyPages.Any(_ => _.Elements.Any(_ => _.Type.Equals(EElementType.Booking) && _.Properties.AutoConfirm.Equals(true)));
-                if (isAutoConfirm)
-                    await _postSubmissionAction.ConfirmBooking(mappingEntity, _environment.EnvironmentName);
-            }
+            if (mappingEntity.BaseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)            
+                await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
 
             return submissionReference;
         }
