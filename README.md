@@ -15,6 +15,7 @@
 - [Running High Availability](#running-high-availability)
 - [UI Tests](#ui-Tests)
 - [Preview](#preview)
+- [Data Structure Preview](#data-structure-preview)
 
 # Requirements & Prereqs
 - dotnet core 3.1
@@ -236,4 +237,8 @@ The bucket will be created using a Cloudformation template with the folder struc
 
 ## Preview
 
-Preview Allows you to view and validate a form without the need of uploading it to your configured Form schema provider. More info on this feature can be found [here](https://github.com/smbc-digital/form-builder/wiki/Preview-Mode).
+Preview allows you to view and validate a form without the need of uploading it to your configured Form schema provider. More info on this feature can be found [here](https://github.com/smbc-digital/form-builder/wiki/Preview-Mode).
+  
+## Data Structure Preview
+  
+Data Structure Preview allows you to view the data structure that will be submitted to the form Service. More info on this feature can be found [here](https://github.com/smbc-digital/form-builder/wiki/Preview-data-structure)
