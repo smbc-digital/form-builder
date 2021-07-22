@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Exceptions;
@@ -9,9 +8,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.CivicaPay;
 using StockportGovUK.NetStandard.Models.Civica.Pay.Request;
-using Newtonsoft.Json;
 
 namespace form_builder.Providers.PaymentProvider
 {
@@ -63,6 +62,12 @@ namespace form_builder.Providers.PaymentProvider
                     }
                 }
             };
+
+            if (paymentInformation.IsServicePay())
+            {
+                basket.PaymentItems[0].PaymentDetails.ServicePayReference = paymentInformation.Settings.ServicePayReference;
+                basket.PaymentItems[0].PaymentDetails.ServicePayNarrative = paymentInformation.Settings.ServicePayNarrative;
+            }
 
             var civicaResponse = await _civicaPayGateway.CreateImmediateBasketAsync(basket);
 

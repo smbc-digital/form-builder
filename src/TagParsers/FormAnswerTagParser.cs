@@ -26,5 +26,12 @@ namespace form_builder.TagParsers
 
             return page;
         }
+
+        public string ParseString(string content, FormAnswers formAnswers)
+        {
+            var answersDictionary = formAnswers.Pages?.SelectMany(x => x.Answers).ToDictionary(x => x.QuestionId, x => x.Response);
+            var updatedContent = Parse(content, answersDictionary, Regex);
+            return updatedContent;
+        }
     }
 }

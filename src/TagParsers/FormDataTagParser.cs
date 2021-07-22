@@ -26,5 +26,7 @@ namespace form_builder.TagParsers
 
             return page;
         }
+
+        public string ParseString(string content, FormAnswers formAnswers) => Parse(content, formAnswers.AdditionalFormData, Regex);
     }
 }

@@ -55,7 +55,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         }
 
         [Fact]
-        public void Parse_ShouldReturnInitalValue_WhenNoValuesAre_To_BeReplaced()
+        public void Parse_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
@@ -74,7 +74,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         }
 
         [Fact]
-        public void Parse_ShouldReturnInitalValue_When_NoTag_MatchesRegex()
+        public void Parse_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
@@ -282,6 +282,181 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var result = _tagParser.Parse(page, formAnswers);
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Exactly(2));
+        }
+
+        [Fact]
+        public void ParseString_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
+        {
+            var text = "this has no values to be replaced";
+            var formAnswers = new FormAnswers();
+
+            var result = _tagParser.ParseString(text, formAnswers);
+
+            Assert.Equal(text, result);
+        }
+
+        [Fact]
+        public void ParseString_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
+        {
+            var text = "this value {{TAG:firstname}} should be replaced with name question";
+            var formAnswers = new FormAnswers();
+
+            var result = _tagParser.ParseString(text, formAnswers);
+
+            Assert.Equal(text, result);
+        }
+
+        [Fact]
+        public void ParseString_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
+        {
+            var expectedString = "this value testfirstname should be replaced with name question";
+            var text = "this value {{QUESTION:firstname}} should be replaced with name question";
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new()
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new()
+                            {
+                                QuestionId = "firstname",
+                                Response = "testfirstname"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = _tagParser.ParseString(text, formAnswers);
+            Assert.Equal(expectedString, result);
+        }
+
+        [Fact]
+        public void ParseString_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
+        {
+            var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
+            var text = "this value {{QUESTION:firstname}} should be replaced with firstname and this {{QUESTION:lastname}} with lastname";
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new()
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new()
+                            {
+                                QuestionId = "firstname",
+                                Response = "testfirstname"
+                            },
+                            new()
+                            {
+                                QuestionId = "lastname",
+                                Response = "testlastname"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = _tagParser.ParseString(text, formAnswers);
+            Assert.Equal(expectedString, result);
+        }
+
+
+        [Fact]
+        public void ParseString_ShouldCallFormatter_WhenProvided()
+        {
+            var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
+            var text = "this value should be formatted: {{QUESTION:firstname:testformatter}}";
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new()
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new()
+                            {
+                                QuestionId = "firstname",
+                                Response = "value"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = _tagParser.ParseString(text, formAnswers);
+            Assert.Equal(expectedString, result);
+            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
+        }
+
+
+        [Fact]
+        public void ParseString_ShouldCall_Multiple_Formatters_WhenProvided()
+        {
+            var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE ANOTHER-FORMATTER";
+            var text = "this value should be formatted: {{QUESTION:firstname:testformatter}} {{QUESTION:firstname:anothertestformatter}}";
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new()
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new()
+                            {
+                                QuestionId = "firstname",
+                                Response = "value"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = _tagParser.ParseString(text, formAnswers);
+            Assert.Equal(expectedString, result);
+            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
+            _mockFormatterTwo.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
+        }
+
+
+
+        [Fact]
+        public void ParseString_ShouldCall_Same_Formatter_MultipleTimes()
+        {
+            var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE FAKE-FORMATTED-VALUE";
+            var text = "this value should be formatted: {{QUESTION:firstname:testformatter}} {{QUESTION:firstname:testformatter}}";
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new()
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new()
+                            {
+                                QuestionId = "firstname",
+                                Response = "value"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = _tagParser.ParseString(text, formAnswers);
+            Assert.Equal(expectedString, result);
             _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Exactly(2));
         }
     }

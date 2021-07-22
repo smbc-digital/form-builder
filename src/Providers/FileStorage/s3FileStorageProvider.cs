@@ -1,11 +1,11 @@
-﻿using Amazon.S3;
-using form_builder.Configuration;
-using form_builder.Gateways;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Amazon.S3;
+using form_builder.Configuration;
+using form_builder.Gateways;
+using Microsoft.Extensions.Options;
 
 namespace form_builder.Providers.FileStorage
 {

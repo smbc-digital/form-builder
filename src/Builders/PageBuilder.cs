@@ -3,11 +3,13 @@ using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Models.Elements;
 
-namespace form_builder_tests.Builders
+namespace form_builder.Builders
 {
     public class PageBuilder
     {
         private string _title = "TestTitle";
+        private bool _hideTitle = false;
+        private bool _hideBackButton = false;
         private string _pageSlug = "test-url";
         private string _leadingParagraph = "Leading paragraph";
         private bool _isValidated = false;
@@ -22,8 +24,10 @@ namespace form_builder_tests.Builders
             return new Page
             {
                 Title = _title,
-                PageSlug = _pageSlug,
+                HideTitle = _hideTitle,
+                HideBackButton = _hideBackButton,
                 LeadingParagraph = _leadingParagraph,
+                PageSlug = _pageSlug,
                 IsValidated = _isValidated,
                 Behaviours = _behaviours,
                 Elements = _elements,
@@ -54,16 +58,23 @@ namespace form_builder_tests.Builders
             return this;
         }
 
-        public PageBuilder WithLeadingParagraph(string leadingParagraph)
+        public PageBuilder WithElement(Element element)
         {
-            _leadingParagraph = leadingParagraph;
+            _elements.Add(element);
 
             return this;
         }
 
-        public PageBuilder WithElement(Element element)
+        public PageBuilder WithHideTitle(bool value)
         {
-            _elements.Add(element);
+            _hideTitle = value;
+
+            return this;
+        }
+
+        public PageBuilder WithHideBackButton(bool value)
+        {
+            _hideBackButton = value;
 
             return this;
         }
@@ -92,6 +103,13 @@ namespace form_builder_tests.Builders
         public PageBuilder WithRenderConditions(Condition renderCondition)
         {
             _renderConditions.Add(renderCondition);
+
+            return this;
+        }
+
+        public PageBuilder WithLeadingParagraph(string leadingParagraph)
+        {
+            _leadingParagraph = leadingParagraph;
 
             return this;
         }

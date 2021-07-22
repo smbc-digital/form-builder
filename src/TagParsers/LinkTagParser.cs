@@ -13,7 +13,7 @@ namespace form_builder.TagParsers
         }
 
         public Regex Regex => new Regex("(?<={{)LINK:.*?(?=}})", RegexOptions.Compiled);
-        public string _htmlContent => "<a rel='noreferrer noopener' target='_blank' href='https://{0}'>{1}</a>";
+        public string _htmlContent => "<a class='govuk-link' rel='noreferrer noopener' target='_blank' href='https://{0}'>{1}</a>";
 
         public Page Parse(Page page, FormAnswers formAnswers)
         {
@@ -27,6 +27,8 @@ namespace form_builder.TagParsers
 
             return page;
         }
+
+        public string ParseString(string content, FormAnswers formAnswers) => Parse(content, Regex, _htmlContent, FormatContent);
 
         public string FormatContent(string[] values) => string.Format(_htmlContent, values[0], values[1]);
     }

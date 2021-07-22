@@ -4,14 +4,14 @@ using System.Linq;
 using form_builder.Enum;
 using form_builder.Providers.Address;
 using form_builder.Providers.Booking;
+using form_builder.Providers.EnabledFor;
+using form_builder.Providers.FileStorage;
 using form_builder.Providers.Lookup;
 using form_builder.Providers.Organisation;
 using form_builder.Providers.Street;
 using form_builder.Providers.Submit;
-using form_builder.Providers.EnabledFor;
 using form_builder.Providers.TemplatedEmailProvider;
 using form_builder.TagParsers.Formatters;
-using form_builder.Providers.FileStorage;
 
 namespace form_builder.Extensions
 {

@@ -15,7 +15,6 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
@@ -27,7 +26,6 @@ namespace form_builder.Services.MappingService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IElementMapper _elementMapper;
         private readonly ISchemaFactory _schemaFactory;
-        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IWebHostEnvironment _environment;
         private ILogger<MappingService> _logger;
 
@@ -35,14 +33,12 @@ namespace form_builder.Services.MappingService
             IElementMapper elementMapper,
             ISchemaFactory schemaFactory,
             IWebHostEnvironment environment,
-            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ILogger<MappingService> logger)
         {
             _distributedCache = distributedCache;
             _elementMapper = elementMapper;
             _schemaFactory = schemaFactory;
             _environment = environment;
-            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _logger = logger;
         }
 
