@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -56,6 +57,7 @@ namespace form_builder.Mappers.Structure
 
         private IDictionary<string, dynamic> RecursiveObjectCreate(string targetMapping, IElement element, IDictionary<string, dynamic> dataStructure)
         {
+            TextInfo textInfo = new CultureInfo("en-GB", false).TextInfo;
             var splitTargets = targetMapping.Split(".");
 
             if (splitTargets.Length.Equals(1))
@@ -66,7 +68,7 @@ namespace form_builder.Mappers.Structure
                 if (dataStructure.ContainsKey(splitTargets[0]))
                     return dataStructure;
 
-                dataStructure.Add(splitTargets[0], GetDataType(element));
+                dataStructure.Add(textInfo.ToTitleCase(splitTargets[0]), GetDataType(element));
                 return dataStructure;
             }
 
@@ -76,8 +78,8 @@ namespace form_builder.Mappers.Structure
 
             subObject = RecursiveObjectCreate(targetMapping.Replace($"{splitTargets[0]}.", ""), element, subObject as IDictionary<string, dynamic>);
 
-            dataStructure.Remove(splitTargets[0]);
-            dataStructure.Add(splitTargets[0], subObject);
+            dataStructure.Remove(textInfo.ToTitleCase(splitTargets[0]));
+            dataStructure.Add(textInfo.ToTitleCase(splitTargets[0]), subObject);
 
             return dataStructure;
         }

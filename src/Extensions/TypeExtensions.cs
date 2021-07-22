@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace form_builder.Extensions
 {
     public static class TypeExtensions
     {
-        public static string ConvertTypeToFormattedString(this Type type) => type.ToString().Replace("System.", "");
+        public static string ConvertTypeToFormattedString(this Type type) 
+            => Regex.Replace(type.ToString().Replace("System", ""), @"[^A-Za-z\[\]]", "");
     }
 }

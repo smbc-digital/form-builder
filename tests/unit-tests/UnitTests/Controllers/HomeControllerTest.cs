@@ -49,6 +49,14 @@ namespace form_builder_tests.UnitTests.Controllers
             var httpContext = new DefaultHttpContext();
             var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
 
+            _mockDataStructureConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new DataStructureConfiguration { AllowDataStructureGeneration = true });
+
+            _mockStructureMapper
+                .Setup(_ => _.CreateBaseFormDataStructure(It.IsAny<string>()))
+                .ReturnsAsync(new Dictionary<string, dynamic>());
+
             _homeController = new HomeController(
                 _pageService.Object,
                 _submitWorkflow.Object,
@@ -662,6 +670,54 @@ namespace form_builder_tests.UnitTests.Controllers
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Success", viewResult.ViewName);
+        }
+
+        [Fact]
+        public async Task DataStructure_ShouldRedirectToIndex_If_DataStructureNotAllowed()
+        {
+            // Arrange
+            _mockDataStructureConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new DataStructureConfiguration {AllowDataStructureGeneration = false});
+
+            var homeController = new HomeController(
+                _pageService.Object,
+                _submitWorkflow.Object,
+                _paymentWorkflow.Object,
+                _mockFileUploadService.Object,
+                _mockHostingEnv.Object,
+                _mockActionsWorkflow.Object,
+                _mockSuccessWorkflow.Object,
+                _mockStructureMapper.Object,
+                _mockDataStructureConfiguration.Object);
+
+            // Act
+            var result = await homeController.DataStructure("test-form");
+
+            // Assert
+            var viewResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.True(viewResult.RouteValues.ContainsKey("form"));
+        }
+
+        [Fact]
+        public async Task DataStructure_ShouldCallStructureMapper_If_DataStructureAllowed()
+        {
+            // Act
+            await _homeController.DataStructure("test-form");
+
+            // Assert
+            _mockStructureMapper.Verify(_ => _.CreateBaseFormDataStructure(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task DataStructure_ShouldReturnDataStructureView_If_DataStructureAllowed()
+        {
+            // Act
+            var result = await _homeController.DataStructure("test-form") as ViewResult;
+
+            // Assert
+            Assert.IsType<ViewResult>(result);
+            Assert.Equal("DataStructure", result.ViewName);
         }
     }
 }
