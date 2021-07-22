@@ -10,7 +10,6 @@ using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
-using form_builder.Providers.Booking;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Submit;
@@ -38,10 +37,10 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<IReferenceNumberProvider> _mockReferenceNumberProvider = new();
         private readonly Mock<ISubmitProvider> _mockSubmitProvider = new();
+        private readonly Mock<IPostSubmissionAction> _mockPostSubmissionAction = new();
 
         private readonly Mock<ILogger<SubmitService>> _mockLogger = new();
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
-        private readonly PostSubmissionAction _postSubmissionAction;
 
 
         public SubmitServiceTests()
@@ -75,7 +74,7 @@ namespace form_builder_tests.UnitTests.Services
                 _mockSubmitProvider.Object
             };
 
-            _service = new SubmitService(_mockGateway.Object, _mockPageHelper.Object, _mockEnvironment.Object, _mockIOptions.Object, _mockDistributedCache.Object, _mockSchemaFactory.Object, _mockReferenceNumberProvider.Object, _submitProviders, _mockLogger.Object, _postSubmissionAction);
+            _service = new SubmitService(_mockGateway.Object, _mockPageHelper.Object, _mockEnvironment.Object, _mockIOptions.Object, _mockDistributedCache.Object, _mockSchemaFactory.Object, _mockReferenceNumberProvider.Object, _submitProviders, _mockLogger.Object, _mockPostSubmissionAction.Object);
         }
 
         [Fact]
@@ -495,5 +494,136 @@ namespace form_builder_tests.UnitTests.Services
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 
+        [Fact]
+        public async Task ProcessSubmission_ShouldCallBookingProvider_WhenBookingAutoConfirmIsTrue()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithAppointmentType(new AppointmentType { AppointmentId = Guid.Parse("37588e67-9852-4713-9df5-0eb94e320675"), Environment = "local" })
+                .WithBookingProvider("testBookingProvider")
+                .WithAutoConfirm(true)
+                .Build();
+
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlug)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageSlug("page-one")
+                .WithElement(element)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                QuestionId = "booking-reserved-booking-id",
+                                Response = "93dd24cd-cea5-40e7-b72a-a6b4757786ba"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var _mappingEntity =
+            new MappingEntityBuilder()
+                .WithBaseForm(schema)
+                .WithFormAnswers(formAnswers)
+                .WithData(new ExpandoObject())
+                .Build();
+
+            _mockSubmitProvider
+            .Setup(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()))
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+
+            // Act
+            await _service.ProcessSubmission(_mappingEntity, "form", "123454");
+
+            // Assert
+            _mockPostSubmissionAction.Verify(_ => _.ConfirmBooking(It.IsAny<MappingEntity>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessSubmission_ShouldnotCallBookingProvider_WhenBookingAutoConfirmIsFalse()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithAppointmentType(new AppointmentType { AppointmentId = Guid.Parse("37588e67-9852-4713-9df5-0eb94e320675"), Environment = "local" })
+                .WithBookingProvider("testBookingProvider")
+                .WithAutoConfirm(false)
+                .Build();
+
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlug)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageSlug("page-one")
+                .WithElement(element)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new Answers
+                            {
+                                QuestionId = "booking-reserved-booking-id",
+                                Response = "93dd24cd-cea5-40e7-b72a-a6b4757786ba"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var _mappingEntity =
+            new MappingEntityBuilder()
+                .WithBaseForm(schema)
+                .WithFormAnswers(formAnswers)
+                .WithData(new ExpandoObject())
+                .Build();
+
+            _mockSubmitProvider
+            .Setup(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()))
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+
+            // Act
+            await _service.ProcessSubmission(_mappingEntity, "form", "123454");
+
+            // Assert
+            _mockPostSubmissionAction.Verify(_ => _.ConfirmBooking(It.IsAny<MappingEntity>(), It.IsAny<string>()), Times.Never);
+        }
     }
 }

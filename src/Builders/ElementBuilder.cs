@@ -496,5 +496,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithAutoConfirm(bool value)
+        {
+            _property.AutoConfirm = value;
+
+            return this;
+        }
     }
 }

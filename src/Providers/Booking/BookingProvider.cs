@@ -135,8 +135,7 @@ namespace form_builder.Providers.Booking
             catch (ApplicationException ex)
             {
                 _logger.LogError($"BookingProvider: Failed to confirm booking id {request.BookingId}, Request:{JsonConvert.SerializeObject(request)}, Exception: {ex}");
-            }
-            
+            }            
         }
     }
 }
