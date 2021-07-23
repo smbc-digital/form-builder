@@ -99,14 +99,21 @@ namespace form_builder_tests.UnitTests.Mappers
         public async Task CreateBaseFormDataStructure_ShouldCreateObjectForTargetMapping()
         {
             // Arrange
-            var element = new ElementBuilder()
+            var firstName = new ElementBuilder()
                 .WithType(EElementType.Textbox)
-                .WithQuestionId("questionId")
-                .WithTargetMapping("textbox.targetQuestionId")
+                .WithQuestionId("firstName")
+                .WithTargetMapping("customer.firstName")
+                .Build();
+
+            var lastName = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("lastName")
+                .WithTargetMapping("customer.lastName")
                 .Build();
 
             var page = new PageBuilder()
-                .WithElement(element)
+                .WithElement(firstName)
+                .WithElement(lastName)
                 .Build();
 
             var formSchema = new FormSchemaBuilder()
@@ -121,10 +128,11 @@ namespace form_builder_tests.UnitTests.Mappers
             var result = (IDictionary<string, dynamic>)await _structureMapper.CreateBaseFormDataStructure("test-form");
 
             // Assert
-            Assert.NotNull(result["Textbox"]);
-            result.TryGetValue("Textbox", out var textboxObj);
-            IDictionary<string, dynamic> textboxDict = textboxObj;
-            Assert.NotNull(textboxDict["TargetQuestionId"]);
+            Assert.NotNull(result["Customer"]);
+            result.TryGetValue("Customer", out var customerObj);
+            IDictionary<string, dynamic> customerDict = customerObj;
+            Assert.NotNull(customerDict["FirstName"]);
+            Assert.NotNull(customerDict["LastName"]);
         }
 
         [Fact]

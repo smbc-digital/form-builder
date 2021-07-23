@@ -72,7 +72,7 @@ namespace form_builder.Mappers.Structure
             }
 
             object subObject;
-            if (!dataStructure.TryGetValue(splitTargets[0], out subObject))
+            if (!dataStructure.TryGetValue($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}", out subObject))
                 subObject = new ExpandoObject();
 
             subObject = RecursiveObjectCreate(targetMapping.Replace($"{splitTargets[0]}.", ""), element, subObject as IDictionary<string, dynamic>);
