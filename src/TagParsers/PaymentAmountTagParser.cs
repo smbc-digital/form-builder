@@ -21,9 +21,8 @@ namespace form_builder.TagParsers
         public Page Parse(Page page, FormAnswers formAnswers)
         {
             var leadingParagraphRegexIsMatch = !string.IsNullOrEmpty(page.LeadingParagraph) && Regex.IsMatch(page.LeadingParagraph);
-            var pageHasConditionMatchingRegex = page.Behaviours is not null && page.Behaviours.Any(_ => _.Conditions.Any(_ => _.QuestionId is not null && Regex.IsMatch(_.QuestionId)));
             var pageHasElementsMatchingRegex = page.Elements.Any(_ => _.Properties.Text is not null && Regex.IsMatch(_.Properties.Text));
-
+            var pageHasConditionMatchingRegex = page.Behaviours is not null && page.Behaviours.Any(_ => _.Conditions.Any(_ => _.QuestionId is not null && Regex.IsMatch(_.QuestionId)));
 
             if (leadingParagraphRegexIsMatch || pageHasElementsMatchingRegex || pageHasConditionMatchingRegex)
             {
@@ -38,7 +37,7 @@ namespace form_builder.TagParsers
 
                 if (pageHasElementsMatchingRegex)
                 {
-                    page.Elements.Select((element) =>
+                    page.Elements.Select(element =>
                     {
                         if (!string.IsNullOrEmpty(element.Properties?.Text))
                             element.Properties.Text = Parse(element.Properties.Text, paymentAmount, Regex);
@@ -51,10 +50,9 @@ namespace form_builder.TagParsers
                 {
                     foreach (var behaviour in page.Behaviours)
                     {
-                        foreach (var condition in behaviour.Conditions)
+                        foreach (var condition in behaviour.Conditions.Where(condition => !string.IsNullOrEmpty(condition.QuestionId)))
                         {
-                            if (!string.IsNullOrEmpty(condition.QuestionId))
-                                condition.QuestionId = Parse(condition.QuestionId, paymentAmount, Regex);
+                            condition.QuestionId = Parse(condition.QuestionId, paymentAmount, Regex);
                         }
                     }
                 }
