@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using form_builder.Extensions;
@@ -17,12 +18,12 @@ namespace form_builder.Services.FormAvailabilityService
 
         public bool IsAvailable(List<EnvironmentAvailability> availability, string environment)
         {
-            var environmentAvailability = availability.SingleOrDefault(_ => _.Environment.ToLower().Equals(environment.ToLower()));
+            var environmentAvailability = availability.SingleOrDefault(_ => _.Environment.Equals(environment, StringComparison.OrdinalIgnoreCase));
 
             if(environmentAvailability is not null && environmentAvailability.EnabledFor is not null && environmentAvailability.EnabledFor.Any())
                 return environmentAvailability.EnabledFor.All(_ => _enabledFor.Get(_.Type).IsAvailable(_));
 
-            return environmentAvailability == null || environmentAvailability.IsAvailable;
+            return environmentAvailability is null || environmentAvailability.IsAvailable;
         }
     }
 }

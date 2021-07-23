@@ -10,31 +10,34 @@ using form_builder.Configuration;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Factories.Schema;
-using form_builder.Factories.Transform.UserSchema;
 using form_builder.Factories.Transform.Lookups;
 using form_builder.Factories.Transform.ReusableElements;
+using form_builder.Factories.Transform.UserSchema;
 using form_builder.Gateways;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.DocumentCreation;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Helpers.PaymentHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Helpers.ViewRender;
 using form_builder.Mappers;
+using form_builder.Mappers.Structure;
 using form_builder.Providers;
 using form_builder.Providers.Address;
 using form_builder.Providers.Booking;
 using form_builder.Providers.DocumentCreation;
 using form_builder.Providers.DocumentCreation.Generic;
 using form_builder.Providers.EmailProvider;
+using form_builder.Providers.EnabledFor;
+using form_builder.Providers.FileStorage;
 using form_builder.Providers.Lookup;
 using form_builder.Providers.Organisation;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
-using form_builder.Providers.EnabledFor;
 using form_builder.Providers.Street;
 using form_builder.Providers.Submit;
 using form_builder.Providers.TemplatedEmailProvider;
@@ -47,6 +50,7 @@ using form_builder.Services.BookingService;
 using form_builder.Services.DocumentService;
 using form_builder.Services.EmailService;
 using form_builder.Services.FileUploadService;
+using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService;
@@ -89,7 +93,10 @@ using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
 using form_builder.Services.FormAvailabilityService;
+using form_builder.Services.PreviewService;
 using form_builder.Providers.FileStorage;
+using form_builder.SubmissionActions;
+using form_builder.Helpers.Cookie;
 
 namespace form_builder.Utils.Startup
 {
@@ -139,6 +146,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<ITagParser, FormDataTagParser>();
             services.AddTransient<ITagParser, LinkTagParser>();
             services.AddTransient<ITagParser, PaymentAmountTagParser>();
+            services.AddTransient<ITagParser, CaseReferenceTagParser>();
 
             return services;
         }
@@ -182,6 +190,9 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IDocumentCreationHelper, DocumentCreationHelper>();
             services.AddSingleton<IActionHelper, ActionHelper>();
             services.AddSingleton<IIncomingDataHelper, IncomingDataHelper>();
+            services.AddSingleton<IPaymentHelper, PaymentHelper>();
+            services.AddSingleton<ICookieHelper, CookieHelper>();
+            services.AddSingleton<IStructureMapper, StructureMapper>();
 
             services.AddHttpContextAccessor();
             services.AddScoped<IViewRender, ViewRender>();
@@ -266,6 +277,13 @@ namespace form_builder.Utils.Startup
         {
             services.AddSingleton<IStreetProvider, FakeStreetProvider>();
             services.AddSingleton<IStreetProvider, ServiceStreetProvider>();
+
+            return services;
+        }
+
+        public static IServiceCollection ConfigurePostSubmissionActions(this IServiceCollection services)
+        {
+            services.AddSingleton<IPostSubmissionAction, PostSubmissionAction>();
 
             return services;
         }
@@ -366,6 +384,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IValidateService, ValidateService>();
             services.AddSingleton<ITemplatedEmailService, TemplatedEmailService>();
             services.AddSingleton<IFormAvailabilityService, FormAvailabilityService>();
+            services.AddSingleton<IPreviewService, PreviewService>();
 
             return services;
         }
@@ -428,16 +447,21 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddIOptionsConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<FormConfiguration>(configuration.GetSection("FormConfig"));
-            services.Configure<CivicaPaymentConfiguration>(configuration.GetSection("PaymentConfiguration"));
-            services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection("DistributedCacheExpiration"));
-            services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>("UseDistributedCache"));
-            services.Configure<AwsSesKeysConfiguration>(configuration.GetSection("Ses"));
-            services.Configure<ReCaptchaConfiguration>(configuration.GetSection("ReCaptchaConfiguration"));
-            services.Configure<SubmissionServiceConfiguration>(configuration.GetSection("SubmissionServiceConfiguration"));
-            services.Configure<TagManagerConfiguration>(TagManagerId => TagManagerId.TagManagerId = configuration.GetValue<string>("TagManagerId"));
-            services.Configure<HashConfiguration>(configuration.GetSection("HashConfiguration"));
+            services.Configure<AwsSesKeysConfiguration>(configuration.GetSection(AwsSesKeysConfiguration.ConfigValue));
+            services.Configure<CivicaPaymentConfiguration>(configuration.GetSection(CivicaPaymentConfiguration.ConfigValue));
+            services.Configure<DataStructureConfiguration>(configuration.GetSection(DataStructureConfiguration.ConfigValue));
+            services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection(DistributedCacheExpirationConfiguration.ConfigValue));
+            services.Configure<FileStorageProviderConfiguration>(configuration.GetSection(FileStorageProviderConfiguration.ConfigValue));
+            services.Configure<FormConfiguration>(configuration.GetSection(FormConfiguration.ConfigValue));
+            services.Configure<HashConfiguration>(configuration.GetSection(HashConfiguration.ConfigValue));
             services.Configure<NotifyConfiguration>(configuration.GetSection(NotifyConfiguration.ConfigValue));
+            services.Configure<ReCaptchaConfiguration>(configuration.GetSection(ReCaptchaConfiguration.ConfigValue));
+            services.Configure<SubmissionServiceConfiguration>(configuration.GetSection(SubmissionServiceConfiguration.ConfigValue));
+
+            services.Configure<ApplicationVersionConfiguration>(applicationVersion => applicationVersion.Version = configuration.GetValue<string>(ApplicationVersionConfiguration.ConfigValue));
+            services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>(DistributedCacheConfiguration.ConfigValue));
+            services.Configure<PreviewModeConfiguration>(cacheOptions => cacheOptions.IsEnabled = configuration.GetValue<bool>(PreviewModeConfiguration.ConfigValue));
+            services.Configure<TagManagerConfiguration>(tagManagerId => tagManagerId.TagManagerId = configuration.GetValue<string>(TagManagerConfiguration.ConfigValue));
 
             return services;
         }
@@ -503,6 +527,7 @@ namespace form_builder.Utils.Startup
             services.AddDataProtection().SetApplicationName("formbuilder");
             services.AddTransient<IFileStorageProvider, RedisFileStorageProvider>();
             services.AddTransient<IFileStorageProvider, InMemoryStorageProvider>();
+            services.AddTransient<IFileStorageProvider, S3FileStorageProvider>();
 
             return services;
         }

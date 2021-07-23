@@ -19,7 +19,6 @@ using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -39,11 +38,11 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings = new();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new();
-        private readonly Mock<IConfiguration> _mockConfiguration = new();
+        private readonly Mock<IOptions<FileStorageProviderConfiguration>> _mockFileStorageConfiguration = new();
 
         public PageHelperTests()
         {
-            _mockConfiguration.Setup(_ => _["FileStorageProvider:Type"]).Returns("Redis");
+            _mockFileStorageConfiguration.Setup(_ => _.Value).Returns(new FileStorageProviderConfiguration { Type = "Redis" });
 
             _fileStorageProvider.Setup(_ => _.ProviderName).Returns("Redis");
             _fileStorageProviders = new List<IFileStorageProvider>
@@ -73,7 +72,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 _mockElementHelper.Object, _mockDistributedCache.Object,
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockDistributedCacheExpirationSettings.Object,
-                _mockSessionHelper.Object, _fileStorageProviders, _mockConfiguration.Object);
+                _mockSessionHelper.Object, _fileStorageProviders, _mockFileStorageConfiguration.Object);
         }
 
         [Fact]
@@ -162,7 +161,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>
             {
                 {
-                    LookUpConstants.SubPathViewModelKey, 
+                    LookUpConstants.SubPathViewModelKey,
                     LookUpConstants.Automatic
                 }
             };
@@ -1030,7 +1029,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveFormFileAnswer_ShouldInsertFilesToAnswers_IfAnswerDontExist()
+        public void SaveFormFileAnswers_ShouldInsertFilesToAnswers_IfAnswerDontExist()
         {
             // Arrange                                        
             var questionId = "fileUpload_FileQuestionId";
@@ -1058,31 +1057,31 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveFormFileAnswer_ShouldUpdateResponseFileForMultipleUpload_IfAnswerExist()
+        public void SaveFormFileAnswers_ShouldUpdateResponseFileForMultipleUpload_IfAnswerExist()
         {
             // Arrange                                        
             var questionId = "Item1";
             var currentAnswerKey = $"file-{questionId}-{Guid.NewGuid()}";
-            var file = new List<CustomFormFile>();
-            file.Add(new CustomFormFile(null, questionId, 1, null));
+            List<CustomFormFile> file = new();
+            file.Add(new(null, questionId, 1, "test"));
 
-            var fileUpload = new List<FileUploadModel>();
-            fileUpload.Add(
-                new FileUploadModel
+            List<FileUploadModel> fileUpload = new()
+            {
+                new()
                 {
                     Key = currentAnswerKey,
                     TrustedOriginalFileName = WebUtility.HtmlEncode("replace-me.txt"),
                     UntrustedOriginalFileName = "replace-me.txt",
                     FileSize = 0
                 }
-            );
+            };
 
-            var page = new PageAnswers
+            PageAnswers page = new()
             {
                 PageSlug = "path",
-                Answers = new List<Answers>
+                Answers = new()
                 {
-                    new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(fileUpload) }
+                    new() { QuestionId = "Item1", Response = JsonConvert.SerializeObject(fileUpload) }
                 }
             };
 
@@ -1098,7 +1097,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveFormFileAnswer_ShouldUpdateResponseFileForSingleUpload_IfAnswerExist()
+        public void SaveFormFileAnswers_ShouldUpdateResponseFileForSingleUpload_IfAnswerExist()
         {
             // Arrange                                        
             var questionId = "Item1";
@@ -1137,7 +1136,65 @@ namespace form_builder_tests.UnitTests.Helpers
 
 
         [Fact]
-        public void SaveFormFileAnswer_ShouldSave_Files_InDistributedCache()
+        public void SaveFormFileAnswers_Should_SaveFilesInCache_Under_GeneratedKey_Which_Is_Then_Saved_In_Answers_As_Referene()
+        {
+            // Arrange                                        
+            var questionId = "Item1";
+            var file = new List<CustomFormFile>();
+            file.Add(new CustomFormFile(null, questionId, 1, null));
+            file.Add(new CustomFormFile(null, questionId, 1, null));
+
+            var page = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>()
+            };
+
+            // Act
+            var results = _pageHelper.SaveFormFileAnswers(new List<Answers>(), file, false, page);
+
+            // Assert
+            Assert.NotNull(results);
+            List<FileUploadModel> filesData = Assert.IsType<List<FileUploadModel>>(results[0].Response);
+            Assert.Equal(2, filesData.Count);
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(filesData[0].Key)), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(filesData[1].Key)), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public void SaveFormFileAnswers_Should_SaveFilesInCache_Under_GeneratedKey_Which_Is_Then_Saved_In_Answers_As_Referene_ForMultiple_Files()
+        {
+            // Arrange                                        
+            var questionId = "Item1";
+            var questionIdTwo = "Item2";
+            var file = new List<CustomFormFile>();
+            file.Add(new CustomFormFile(null, questionId, 1, null));
+            file.Add(new CustomFormFile(null, questionId, 1, null));
+            file.Add(new CustomFormFile(null, questionIdTwo, 1, null));
+
+            var page = new PageAnswers
+            {
+                PageSlug = "path",
+                Answers = new List<Answers>()
+            };
+
+            // Act
+            var results = _pageHelper.SaveFormFileAnswers(new List<Answers>(), file, false, page);
+
+            // Assert
+            Assert.NotNull(results);
+            List<FileUploadModel> filesData = Assert.IsType<List<FileUploadModel>>(results[0].Response);
+            Assert.Equal(2, filesData.Count);
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(filesData[0].Key)), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(filesData[1].Key)), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
+
+            List<FileUploadModel> filesDataTwo = Assert.IsType<List<FileUploadModel>>(results[1].Response);
+            Assert.Single(filesDataTwo);
+            _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(filesDataTwo[0].Key)), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public void SaveFormFileAnswers_ShouldSave_Files_InDistributedCache()
         {
             // Arrange                                        
             var questionId = "fileUpload";
@@ -1158,27 +1215,24 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveFormFileAnswer_ShouldNotSave_ExistingFiles_IfUploadedTwice_InDistributedCache()
+        public void SaveFormFileAnswers_ShouldNotSave_ExistingFiles_IfUploadedTwice_InDistributedCache()
         {
             // Arrange
             var questionId = "fileUpload";
-            var file = new List<CustomFormFile>();
-            file.Add(new CustomFormFile("content", questionId, 1, "newfile.txt"));
-            file.Add(new CustomFormFile("content", questionId, 1, "existingfile.txt"));
-            file.Add(new CustomFormFile("content", questionId, 1, "existingfiletwo.txt"));
+            List<CustomFormFile> files = new();
+            files.Add(new("content", questionId, 1, "newfile.txt"));
+            files.Add(new("content", questionId, 1, "existingfile.txt"));
+            files.Add(new("content", questionId, 1, "existingfiletwo.txt"));
 
-            var fileUpload = new List<FileUploadModel>();
-            fileUpload.Add(
-              new FileUploadModel
-              {
-                  Key = questionId,
-                  TrustedOriginalFileName = WebUtility.HtmlEncode("existingfile.txt"),
-                  UntrustedOriginalFileName = "existingfile.txt",
-                  FileSize = 0
-              }
-            );
-            fileUpload.Add(
-            new FileUploadModel
+            List<FileUploadModel> fileUpload = new();
+            fileUpload.Add(new()
+            {
+                Key = questionId,
+                TrustedOriginalFileName = WebUtility.HtmlEncode("existingfile.txt"),
+                UntrustedOriginalFileName = "existingfile.txt",
+                FileSize = 0
+            });
+            fileUpload.Add(new()
             {
                 Key = questionId,
                 TrustedOriginalFileName = WebUtility.HtmlEncode("existingfiletwo.txt"),
@@ -1186,17 +1240,17 @@ namespace form_builder_tests.UnitTests.Helpers
                 FileSize = 0
             });
 
-            var page = new PageAnswers
+            PageAnswers pageAnswers = new()
             {
                 PageSlug = "path",
-                Answers = new List<Answers>
+                Answers = new()
                 {
-                    new Answers { QuestionId = questionId, Response = JsonConvert.SerializeObject(fileUpload) }
+                    new() { QuestionId = questionId, Response = JsonConvert.SerializeObject(fileUpload) }
                 }
             };
 
             // Act
-            _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
+            _pageHelper.SaveFormFileAnswers(pageAnswers.Answers, files, true, pageAnswers);
 
             // Assert
             _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once());
@@ -1240,7 +1294,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void SavePaymentAmount_ShouldCallDistributedCache()
         {
             var sessionGuid = Guid.NewGuid().ToString();
-            _pageHelper.SavePaymentAmount(sessionGuid, "10.00" );
+            _pageHelper.SavePaymentAmount(sessionGuid, "10.00");
 
             _mockDistributedCache.Verify(_ => _.GetString(sessionGuid), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(sessionGuid, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);

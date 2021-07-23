@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using Newtonsoft.Json;
@@ -15,23 +12,14 @@ namespace form_builder.Factories.Transform.UserSchema
 {
     public class AddAnotherPageTransformFactory : IUserPageTransformFactory
     {
-        private readonly IPageHelper _pageHelper;
-        private readonly ISessionHelper _sessionHelper;
-
-        public AddAnotherPageTransformFactory(IPageHelper pageHelper, ISessionHelper sessionHelper)
-        {
-            _pageHelper = pageHelper;
-            _sessionHelper = sessionHelper;
-        }
-
-        public async Task<Page> Transform(Page page, string sessionGuid)
+        public async Task<Page> Transform(Page page, FormAnswers convertedAnswers)
         {
             var newListOfElements = new List<IElement>();
             foreach (var element in page.Elements)
             {
                 if (element.Type.Equals(EElementType.AddAnother))
                 {
-                    newListOfElements.AddRange(GenerateListOfIncrementedElements(page.Elements, sessionGuid));
+                    newListOfElements.AddRange(GenerateListOfIncrementedElements(page.Elements, convertedAnswers));
                 }
 
                 newListOfElements.Add(element);
@@ -42,23 +30,13 @@ namespace form_builder.Factories.Transform.UserSchema
             return page;
         }
 
-        private IEnumerable<IElement> GenerateListOfIncrementedElements(IReadOnlyCollection<IElement> currentPageElements, string sessionGuid)
+        private IEnumerable<IElement> GenerateListOfIncrementedElements(IReadOnlyCollection<IElement> currentPageElements, FormAnswers convertedAnswers)
         {
             var addAnotherElement = currentPageElements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother));
             var addAnotherReplacementElements = new List<IElement>();
-            if (string.IsNullOrEmpty(sessionGuid))
-            {
-                sessionGuid = _sessionHelper.GetSessionGuid();
-                if (string.IsNullOrEmpty(sessionGuid))
-                {
-                    sessionGuid = Guid.NewGuid().ToString();
-                    _sessionHelper.SetSessionGuid(sessionGuid);
-                }
-            }
 
-            var convertedAnswers = _pageHelper.GetSavedAnswers(sessionGuid);
             var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
-            var fieldsetIncrements = convertedAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
+            var fieldsetIncrements = convertedAnswers.FormData is not null && convertedAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
 
             foreach (var pageElement in currentPageElements)
             {

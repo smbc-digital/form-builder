@@ -10,10 +10,7 @@ namespace form_builder.Models.Elements
     public class Textarea : Element
     {
         public bool DisplayCharacterCount => Properties.DisplayCharacterCount;
-        public Textarea()
-        {
-            Type = EElementType.Textarea;
-        }
+        public Textarea() => Type = EElementType.Textarea;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,

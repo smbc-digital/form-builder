@@ -27,7 +27,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 .Where(element => element.Properties.isConditionalElement)
                 .ToList();
 
-            if (elementsWithConditionals.Count == 0)
+            if (elementsWithConditionals.Count.Equals(0))
                 return result;
 
             foreach (var element in elementsWithConditionals)

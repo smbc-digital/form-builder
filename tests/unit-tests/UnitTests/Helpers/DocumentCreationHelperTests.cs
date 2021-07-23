@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Helpers.DocumentCreation;
@@ -22,10 +23,10 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void GenerateQuestionAndAnswersList_ShouldReturn_Summary_With_SingleAnswer_And_NewLine()
+        public async Task GenerateQuestionAndAnswersList_ShouldReturn_Summary_With_SingleAnswer_And_NewLine()
         {
             // Arrange
-            _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns("test value");
+            _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).ReturnsAsync("test value");
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers>() } } };
 
             var element = new ElementBuilder()
@@ -49,16 +50,16 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             // Act
-            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+            var result = await _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
             Assert.Equal(2, result.Count);
         }
 
         [Fact]
-        public void GenerateQuestionAndAnswersList_ShouldRemove_OtherPages_NotRelated_ToJourney_WhenBuilding_Answers()
+        public async Task GenerateQuestionAndAnswersList_ShouldRemove_OtherPages_NotRelated_ToJourney_WhenBuilding_Answers()
         {
             // Arrange
-            _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns("test value");
+            _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).ReturnsAsync("test value");
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers>() }, new PageAnswers { PageSlug = "page-two", Answers = new List<Answers>() }, new PageAnswers { PageSlug = "page-three", Answers = new List<Answers>() } } };
 
             var element = new ElementBuilder()
@@ -131,21 +132,21 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             // Act
-            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+            var result = await _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
             Assert.Equal(4, result.Count);
         }
 
         [Fact]
-        public void GenerateQuestionAndAnswersList_ShouldReturn_FilesData()
+        public async Task GenerateQuestionAndAnswersList_ShouldReturn_FilesData()
         {
             // Arrange
-            _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns("test value");
+            _mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).ReturnsAsync("test value");
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers>() } } };
             var value = "file.txt";
             _mockElementMapper
                 .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(value);
+                .ReturnsAsync(value);
 
             var labelText = "I am a label";
             var labelText2 = "second label";
@@ -178,7 +179,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             // Act
-            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+            var result = await _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
             Assert.Equal($"{labelText}: {value}", result[4]);
             Assert.Equal($"{labelText2}: {value}", result[5]);
@@ -193,14 +194,14 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData(EElementType.DatePicker)]
         [InlineData(EElementType.Select)]
         [InlineData(EElementType.TimeInput)]
-        public void GenerateQuestionAndAnswersList_ShouldReturn_ListWithSingleItem_For_ElementType(EElementType type)
+        public async Task GenerateQuestionAndAnswersList_ShouldReturn_ListWithSingleItem_For_ElementType(EElementType type)
         {
             // Arrange
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers>() } } };
             var value = "value";
             _mockElementMapper
                 .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(value);
+                .ReturnsAsync(value);
 
             var labelText = "I am a label";
 
@@ -225,7 +226,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             // Act
-            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+            var result = await _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
             Assert.Equal(2, result.Count);
             Assert.Equal($"{labelText}: {value}", result[0]);
@@ -235,14 +236,14 @@ namespace form_builder_tests.UnitTests.Helpers
         [InlineData(EElementType.Address)]
         [InlineData(EElementType.Street)]
         [InlineData(EElementType.Organisation)]
-        public void GenerateQuestionAndAnswersList_ShouldReturn_TitleAsLabel_For_ElementType(EElementType type)
+        public async Task GenerateQuestionAndAnswersList_ShouldReturn_TitleAsLabel_For_ElementType(EElementType type)
         {
             // Arrange
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers>() } } };
             var value = "value";
             _mockElementMapper
                 .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(value);
+                .ReturnsAsync(value);
 
             var titleText = "I am a title";
 
@@ -267,21 +268,21 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             // Act
-            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+            var result = await _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
             Assert.Equal(2, result.Count);
             Assert.Equal($"{titleText}: {value}", result[0]);
         }
 
         [Fact]
-        public void GenerateQuestionAndAnswersList_ShouldReturn_ListOfMultipleItems()
+        public async Task GenerateQuestionAndAnswersList_ShouldReturn_ListOfMultipleItems()
         {
             // Arrange
             var value = "value";
             var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers>() } } };
             _mockElementMapper
                 .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns(value);
+                .ReturnsAsync(value);
 
             var labelText = "I am a label";
             var labelText2 = "second label";
@@ -322,7 +323,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             // Act
-            var result = _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+            var result = await _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
             Assert.Equal(6, result.Count);
             Assert.Equal($"{labelText}: {value}", result[0]);

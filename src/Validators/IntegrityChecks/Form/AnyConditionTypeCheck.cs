@@ -30,7 +30,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
             anyConditionType.AddRange(anyConditionTypeRenderConditions);
             anyConditionType.AddRange(anyConditionTypeBehaviours);
 
-            if (anyConditionType.Count == 0)
+            if (anyConditionType.Count.Equals(0))
                 return result;
 
             anyConditionType.ForEach(condition =>

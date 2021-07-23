@@ -16,5 +16,6 @@ namespace form_builder.Providers.Booking
         Task<string> GetLocation(LocationRequest request);
         Task<BookingInformationResponse> GetBooking(Guid bookingId);
         Task Cancel(Guid bookingId);
+        Task Confirm(ConfirmationRequest request);
     }
 }

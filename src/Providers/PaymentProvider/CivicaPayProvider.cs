@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Exceptions;
@@ -9,9 +8,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.CivicaPay;
 using StockportGovUK.NetStandard.Models.Civica.Pay.Request;
-using Newtonsoft.Json;
 
 namespace form_builder.Providers.PaymentProvider
 {
@@ -37,7 +36,7 @@ namespace form_builder.Providers.PaymentProvider
             if (string.IsNullOrEmpty(reference))
                 throw new PaymentFailureException("CivicaPayProvider::No valid reference");
 
-            var basket = new CreateImmediateBasketRequest
+            CreateImmediateBasketRequest basket = new()
             {
                 CallingAppIdentifier = "Basket",
                 CustomerID = _paymentConfig.CustomerId,
@@ -64,9 +63,15 @@ namespace form_builder.Providers.PaymentProvider
                 }
             };
 
+            if (paymentInformation.IsServicePay())
+            {
+                basket.PaymentItems[0].PaymentDetails.ServicePayReference = paymentInformation.Settings.ServicePayReference;
+                basket.PaymentItems[0].PaymentDetails.ServicePayNarrative = paymentInformation.Settings.ServicePayNarrative;
+            }
+
             var civicaResponse = await _civicaPayGateway.CreateImmediateBasketAsync(basket);
 
-            if (civicaResponse.StatusCode != HttpStatusCode.OK)
+            if (!civicaResponse.IsSuccessStatusCode)
                 throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code {civicaResponse.StatusCode}, HttpResponse: {JsonConvert.SerializeObject(civicaResponse)}");
 
             return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, reference);
@@ -74,10 +79,10 @@ namespace form_builder.Providers.PaymentProvider
 
         public void VerifyPaymentResponse(string responseCode)
         {
-            if (responseCode == "00022" || responseCode == "00023" || responseCode == "00001")
+            if (responseCode.Equals("00022") || responseCode.Equals("00023") || responseCode.Equals("00001"))
                 throw new PaymentDeclinedException($"CivicaPayProvider::Declined payment with response code: {responseCode}");
 
-            if (responseCode != "00000")
+            if (!responseCode.Equals("00000"))
                 throw new PaymentFailureException($"CivicaPayProvider::Payment failed with response code: {responseCode}");
         }
     }

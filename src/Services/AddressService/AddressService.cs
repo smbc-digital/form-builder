@@ -67,7 +67,7 @@ namespace form_builder.Services.AddressService
             {
                 var cachedAnswers = _distributedCache.GetString(guid);
 
-                var convertedAnswers = cachedAnswers == null
+                var convertedAnswers = cachedAnswers is null
                     ? new FormAnswers { Pages = new List<PageAnswers>() }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
@@ -97,17 +97,17 @@ namespace form_builder.Services.AddressService
         {
             var cachedAnswers = _distributedCache.GetString(guid);
 
-            var convertedAnswers = cachedAnswers == null
+            var convertedAnswers = cachedAnswers is null
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-            var addressElement = currentPage.Elements.FirstOrDefault(_ => _.Type == EElementType.Address);
+            var addressElement = currentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Address));
 
             var postcode = (string)convertedAnswers
                         .Pages
-                        .FirstOrDefault(_ => _.PageSlug == path)
+                        .FirstOrDefault(_ => _.PageSlug.Equals(path))
                         .Answers
-                        .FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}")
+                        .FirstOrDefault(_ => _.QuestionId.Equals($"{addressElement.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"))
                         .Response;
 
             var address = (string)viewModel[$"{addressElement.Properties.QuestionId}{AddressConstants.SELECT_SUFFIX}"];
@@ -160,11 +160,11 @@ namespace form_builder.Services.AddressService
         {
             var cachedAnswers = _distributedCache.GetString(guid);
 
-            var convertedAnswers = cachedAnswers == null
+            var convertedAnswers = cachedAnswers is null
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-            var addressElement = currentPage.Elements.Where(_ => _.Type == EElementType.Address).FirstOrDefault();
+            var addressElement = currentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Address));
 
             if (!currentPage.IsValid)
             {
@@ -190,10 +190,10 @@ namespace form_builder.Services.AddressService
 
             var foundPostCode = convertedAnswers
                 .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
-                .Answers?.FirstOrDefault(_ => _.QuestionId == $"{addressElement.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}")?
+                .Answers?.FirstOrDefault(_ => _.QuestionId.Equals($"{addressElement.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"))?
                 .Response;
 
-            var addressResults = new List<object>();
+            List<object> addressResults = new();
             if (postcode.Equals(foundPostCode))
             {
                 addressResults = (convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>).ToList();

@@ -45,7 +45,7 @@ namespace form_builder_tests.UnitTests.Workflows
                 .Build();
 
             _mockSchemaFactory
-                .Setup(_ => _.Build(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(formSchema);
 
             _mockPageService
@@ -57,13 +57,13 @@ namespace form_builder_tests.UnitTests.Workflows
         }
 
         [Fact]
-        public async Task Process_ShouldCallSchemaFactory()
+        public async Task Process_ShouldCallSchemaFactory_Build()
         {
             // Act
             await _workflow.Process(EBehaviourType.SubmitForm, "form");
 
             // Assert
-            _mockSchemaFactory.Verify(_ => _.Build("form", It.IsAny<string>()), Times.Once);
+            _mockSchemaFactory.Verify(_ => _.Build("form"), Times.Once);
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace form_builder_tests.UnitTests.Workflows
         }
 
         [Fact]
-        public async Task Process_ShouldCallActionService()
+        public async Task Process_ShouldCallActionWorkflow()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -102,7 +102,7 @@ namespace form_builder_tests.UnitTests.Workflows
                 })
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(formSchema);
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>())).ReturnsAsync(formSchema);
 
             // Act
             await _workflow.Process(EBehaviourType.SubmitForm, "form");

@@ -683,7 +683,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _mockElementMapper
                 .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns("address");
+                .ReturnsAsync("address");
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
@@ -734,7 +734,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             _mockElementMapper
                 .Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
-                .Returns("address");
+                .ReturnsAsync("address");
 
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)

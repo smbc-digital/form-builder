@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Factories.Transform.Lookups;
@@ -30,6 +32,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
         private readonly Mock<IReusableElementSchemaTransformFactory> _mockReusableElementSchemaFactory = new ();
         private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new ();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new ();
+         private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new ();
         private readonly Mock<IConfiguration> _mockConfiguration = new ();
         private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new ();
         private readonly Mock<IEnumerable<IUserPageTransformFactory>> _mockUserPageFactories = new();
@@ -37,9 +40,9 @@ namespace form_builder_tests.UnitTests.Factories.Schema
 
         public SchemaFactoryTests()
         {
-            _mockUserPageFactory
-                .Setup(_ => _.Transform(It.IsAny<Page>(), It.IsAny<string>()))
-                .ReturnsAsync(new Page());
+            _mockPreviewModeConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new PreviewModeConfiguration());
 
             var mockUserPageFactoryItems = new List<IUserPageTransformFactory> { _mockUserPageFactory.Object };
             _mockUserPageFactories
@@ -94,9 +97,10 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 _mockDistributedCache.Object, 
                 _mockSchemaProvider.Object, 
                 _mockLookupSchemaFactory.Object, 
-                _mockReusableElementSchemaFactory.Object, 
-                _mockDistributedCacheConfiguration.Object, 
-                _mockDistributedCacheExpirationConfiguration.Object, 
+                _mockReusableElementSchemaFactory.Object,
+                _mockDistributedCacheConfiguration.Object,
+                _mockDistributedCacheExpirationConfiguration.Object,
+                _mockPreviewModeConfiguration.Object,
                 _mockConfiguration.Object, 
                 _mockFormSchemaIntegrityValidator.Object,
                 _mockUserPageFactories.Object);
@@ -111,7 +115,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .ReturnsAsync(true);
 
             // Act
-            await _schemaFactory.Build("form", string.Empty);
+            await _schemaFactory.Build("form");
 
             // Assert
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
@@ -271,6 +275,60 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             _mockFormSchemaIntegrityValidator.Verify(_ => _.Validate(It.IsAny<FormSchema>()), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task TransformPage_ShouldCallEachTransformFactory()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.P)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            // Act
+            await _schemaFactory.TransformPage(page, new FormAnswers());
+
+            // Assert
+            _mockUserPageFactory.Verify(_ => _.Transform(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Build_Should_Throw_Exception_WhenPreview_FormSchema_HasExpired()
+        {
+            _mockPreviewModeConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new PreviewModeConfiguration{ IsEnabled = true });
+
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _schemaFactory.Build(PreviewConstants.PREVIEW_MODE_PREFIX));
+
+            _mockDistributedCache.Verify(_ => _.GetString($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}"));
+            _mockFormSchemaIntegrityValidator.Verify(_ => _.Validate(It.IsAny<FormSchema>()), Times.Never);
+            _mockSchemaProvider.Verify(_ => _.ValidateSchemaName(It.IsAny<string>()), Times.Never);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Build_Should_CallDistrbutedCache_AndReturn_Preview_FormSchema_WhenPreviewMode_Enabled_AndFormName_Matches()
+        {
+            _mockDistributedCache
+            .Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(new FormSchema{ Pages = new List<Page>(), BaseURL = PreviewConstants.PREVIEW_MODE_PREFIX }));
+
+            _mockPreviewModeConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new PreviewModeConfiguration{ IsEnabled = true });
+
+            var result = await _schemaFactory.Build(PreviewConstants.PREVIEW_MODE_PREFIX);
+
+            _mockDistributedCache.Verify(_ => _.GetString($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}"));
+            _mockFormSchemaIntegrityValidator.Verify(_ => _.Validate(It.IsAny<FormSchema>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
+            _mockSchemaProvider.Verify(_ => _.ValidateSchemaName(It.IsAny<string>()), Times.Never);
+            var formSchemaResult = Assert.IsType<FormSchema>(result);
         }
     }
 }

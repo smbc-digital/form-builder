@@ -10,7 +10,7 @@ namespace form_builder.Conditions
         {
             var questionId = $"{condition.QuestionId}{FileUploadConstants.SUFFIX}";
 
-            return viewModel.ContainsKey(questionId) && (viewModel[questionId] == null) == bool.Parse(condition.ComparisonValue);
+            return viewModel.ContainsKey(questionId) && (viewModel[questionId] is null).Equals(bool.Parse(condition.ComparisonValue));
         }
     }
 }

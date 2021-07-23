@@ -1,4 +1,6 @@
-﻿namespace form_builder.Models.Properties.ElementProperties
+﻿using form_builder.Constants;
+
+namespace form_builder.Models.Properties.ElementProperties
 {
     public partial class BaseProperty
     {
@@ -20,17 +22,15 @@
 
         public string AddressProvider { get; set; }
 
-        public bool? Postcode { get; set; }
-
         public string AddressIAG { get; set; } = "You must live in Stockport.";
 
-        public bool? StockportPostcode { get; set; }
+        public bool StockportPostcode { get; set; } = false;
 
         public bool DisplayNoResultsIAG { get; set; } = false;
 
         public bool Disabled { get; set; } = false;
 
-        public string AddressManualLinkText { get; set; } = "I can't find my address in the list";
+        public string AddressManualLinkText { get; set; } = AddressConstants.ADDRESS_MANUAL_DISABLED_TEXT;
 
         public bool DisableManualAddress { get; set; } = false;
 

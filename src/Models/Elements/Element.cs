@@ -13,10 +13,7 @@ namespace form_builder.Models.Elements
     {
         protected ValidationResult validationResult;
 
-        public Element()
-        {
-            validationResult = new ValidationResult();
-        }
+        public Element() => validationResult = new ValidationResult();
 
         public EElementType Type { get; set; }
 

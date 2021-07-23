@@ -31,5 +31,6 @@ namespace form_builder.ViewModels
         public bool DisplayBreadcrumbs { get; set; }
 
         public List<Breadcrumb> Breadcrumbs { get; set; }
+        public bool IsInPreviewMode { get; set; }
     }
 }

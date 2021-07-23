@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Providers.TemplatedEmailProvider;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Notify.Interfaces;
-using Notify.Models.Responses;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Providers.TemplatedEmailProvider

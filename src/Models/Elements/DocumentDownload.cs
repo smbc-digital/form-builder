@@ -5,9 +5,6 @@ namespace form_builder.Models.Elements
     public class DocumentDownload : Element
     {
 
-        public DocumentDownload()
-        {
-            Type = EElementType.DocumentDownload;
-        }
+        public DocumentDownload() => Type = EElementType.DocumentDownload;
     }
 }

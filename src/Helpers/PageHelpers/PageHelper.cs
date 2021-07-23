@@ -30,9 +30,8 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IWebHostEnvironment _environment;
         private readonly FormConfiguration _disallowedKeys;
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
+        private readonly IFileStorageProvider _fileStorageProvider;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
-        private readonly IConfiguration _configuration;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper,
             IDistributedCacheWrapper distributedCache,
@@ -41,17 +40,16 @@ namespace form_builder.Helpers.PageHelpers
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ISessionHelper sessionHelper,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
-            IConfiguration configuration)
+            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
             _distributedCache = distributedCache;
-            _fileStorageProviders = fileStorageProviders;
             _disallowedKeys = disallowedKeys.Value;
             _environment = enviroment;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _sessionHelper = sessionHelper;
-            _configuration = configuration;
+            _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(
@@ -64,11 +62,11 @@ namespace form_builder.Helpers.PageHelpers
         {
             var formModel = new FormBuilderViewModel();
 
-            if (page.PageSlug.ToLower() != "success" && !page.HideTitle)
+            if (!page.PageSlug.Equals("success", StringComparison.OrdinalIgnoreCase) && !page.HideTitle)
             {
                 formModel.RawHTML += await _viewRender
                     .RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle(), Optional = page.DisplayOptionalInTitle } });
-            }   
+            }
 
             foreach (var element in page.Elements)
             {
@@ -103,7 +101,7 @@ namespace form_builder.Helpers.PageHelpers
                 {
                     var splitQuestionId = item.Key.Split(':');
                     var currentQuestionIncrement = int.Parse(splitQuestionId[1]);
-                    if (currentQuestionIncrement == incrementToRemove)
+                    if (currentQuestionIncrement.Equals(incrementToRemove))
                     {
                         answersToRemove.Add(item.Key, item.Value);
                     }
@@ -127,7 +125,7 @@ namespace form_builder.Helpers.PageHelpers
                     updatedViewModel.Add(item.Key, item.Value);
                 }
             }
-            
+
             SaveAnswers(updatedViewModel, guid, form, null, true);
         }
 
@@ -151,13 +149,13 @@ namespace form_builder.Helpers.PageHelpers
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-            if (convertedAnswers.Pages != null && convertedAnswers.Pages.Any(_ => _.PageSlug == viewModel["Path"].ToLower()))
+            if (convertedAnswers.Pages is not null && convertedAnswers.Pages.Any(_ => _.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)))
             {
-                currentPageAnswers = convertedAnswers.Pages.Where(_ => _.PageSlug == viewModel["Path"].ToLower()).ToList().FirstOrDefault();
-                convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => _.PageSlug != viewModel["Path"].ToLower()).ToList();
+                currentPageAnswers = convertedAnswers.Pages.Where(_ => _.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)).ToList().FirstOrDefault();
+                convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => !_.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            var answers = new List<Answers>();
+            List<Answers> answers = new();
 
             foreach (var item in viewModel)
             {
@@ -165,10 +163,10 @@ namespace form_builder.Helpers.PageHelpers
                     answers.Add(new Answers { QuestionId = item.Key, Response = item.Value });
             }
 
-            if ((files == null || !files.Any()) && currentPageAnswers.Answers != null && currentPageAnswers.Answers.Any() && isPageValid && appendMultipleFileUploadParts)
+            if ((files is null || !files.Any()) && currentPageAnswers.Answers is not null && currentPageAnswers.Answers.Any() && isPageValid && appendMultipleFileUploadParts)
                 answers = currentPageAnswers.Answers;
 
-            if (files != null && files.Any() && isPageValid)
+            if (files is not null && files.Any() && isPageValid)
                 answers = SaveFormFileAnswers(answers, files, appendMultipleFileUploadParts, currentPageAnswers);
 
             convertedAnswers.Pages?.Add(new PageAnswers
@@ -183,7 +181,7 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
-        public void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedRefereceMappingId = "GeneratedReference")
+        public void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedReferenceMappingId = "GeneratedReference")
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -192,7 +190,7 @@ namespace form_builder.Helpers.PageHelpers
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             if (isGenerated)
-                convertedAnswers.AdditionalFormData.Add(generatedRefereceMappingId, caseReference);
+                convertedAnswers.AdditionalFormData.Add(generatedReferenceMappingId, caseReference);
 
             convertedAnswers.CaseReference = caseReference;
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
@@ -201,7 +199,7 @@ namespace form_builder.Helpers.PageHelpers
         public void SavePaymentAmount(string guid, string paymentAmount, string targetMapping)
         {
             var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers {Pages = new List<PageAnswers>() };
+            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
@@ -234,10 +232,10 @@ namespace form_builder.Helpers.PageHelpers
                 return;
 
             var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers 
-            { 
-                Pages = new List<PageAnswers>(), 
-                FormName = form, 
+            var convertedAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>(),
+                FormName = form,
                 Path = path
             };
 
@@ -257,52 +255,45 @@ namespace form_builder.Helpers.PageHelpers
 
         public List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload)
         {
-            files.GroupBy(_ => _.QuestionId).ToList().ForEach(file =>
+            files.GroupBy(_ => _.QuestionId).ToList().ForEach(group =>
             {
-                var fileUploadModel = new List<FileUploadModel>();
-                var filsToAdd = file.ToList();
+                string questionId = group.Key;
+                IEnumerable<CustomFormFile> files = group;
+                List<FileUploadModel> fileUploadModel = new();
+
                 if (isMultipleFileUploadElementType)
                 {
-                    var data = currentAnswersForFileUpload.Answers?.FirstOrDefault(_ => _.QuestionId.Equals(file.Key))?.Response;
-                    if (data != null)
+                    var data = currentAnswersForFileUpload.Answers?.FirstOrDefault(_ => _.QuestionId.Equals(questionId))?.Response;
+                    if (data is not null)
                     {
                         List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(data.ToString());
                         fileUploadModel.AddRange(response);
-                        filsToAdd = filsToAdd.Where(_ => !response.Any(x => WebUtility.HtmlEncode(_.UntrustedOriginalFileName) == x.TrustedOriginalFileName)).ToList();
+                        files = files.Where(_ => !response.Any(x => WebUtility.HtmlEncode(_.UntrustedOriginalFileName).Equals(x.TrustedOriginalFileName)));
                     }
                 }
 
-                var keys = filsToAdd.Select(_ => $"file-{file.Key}-{Guid.NewGuid()}").ToArray();
-
-                var fileContent = filsToAdd.Select(_ => _.Base64EncodedContent).ToList();
-
-
-                var fileStorageType = _configuration["FileStorageProvider:Type"];
-                
-                var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
-
-                for (int i = 0; i < fileContent.Count; i++)
+                foreach (var file in files)
                 {
-                    fileStorageProvider.SetStringAsync(keys[i], JsonConvert.SerializeObject(fileContent[i]), _distributedCacheExpirationConfiguration.FileUpload);
+                    string key = $"file-{questionId}-{Guid.NewGuid()}";
+                    _fileStorageProvider.SetStringAsync(key, JsonConvert.SerializeObject(file.Base64EncodedContent), _distributedCacheExpirationConfiguration.FileUpload);
+                    fileUploadModel.Add(new()
+                    {
+                        Key = key,
+                        TrustedOriginalFileName = WebUtility.HtmlEncode(file.UntrustedOriginalFileName),
+                        UntrustedOriginalFileName = file.UntrustedOriginalFileName,
+                        FileSize = file.Length
+                    });
                 }
 
-                fileUploadModel.AddRange(filsToAdd.Select((_, index) => new FileUploadModel
+                if (answers.Exists(_ => _.QuestionId.Equals(questionId)))
                 {
-                    Key = keys[index],
-                    TrustedOriginalFileName = WebUtility.HtmlEncode(_.UntrustedOriginalFileName),
-                    UntrustedOriginalFileName = _.UntrustedOriginalFileName,
-                    FileSize = _.Length
-                }).ToList());
-
-                if (answers.Exists(_ => _.QuestionId == file.Key))
-                {
-                    var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId == file.Key);
-                    if (fileUploadAnswer != null)
+                    var fileUploadAnswer = answers.FirstOrDefault(_ => _.QuestionId.Equals(questionId));
+                    if (fileUploadAnswer is not null)
                         fileUploadAnswer.Response = fileUploadModel;
                 }
                 else
                 {
-                    answers.Add(new Answers { QuestionId = file.Key, Response = fileUploadModel });
+                    answers.Add(new() { QuestionId = questionId, Response = fileUploadModel });
                 }
             });
 

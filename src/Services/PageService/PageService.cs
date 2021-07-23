@@ -9,7 +9,6 @@ using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
-using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -40,7 +39,7 @@ namespace form_builder.Services.PageService
     public class PageService : IPageService
     {
         private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
+        private readonly IFileStorageProvider _fileStorageProvider;
         private readonly IEnumerable<IElementValidator> _validators;
         private readonly IPageHelper _pageHelper;
         private readonly ISessionHelper _sessionHelper;
@@ -57,7 +56,7 @@ namespace form_builder.Services.PageService
         private readonly IPageFactory _pageContentFactory;
         private readonly IIncomingDataHelper _incomingDataHelper;
         private readonly IActionsWorkflow _actionsWorkflow;
-        private readonly IFormAvailabilityService _formAvailabilityServics;
+        private readonly IFormAvailabilityService _formAvailabilityService;
         private readonly ILogger<IPageService> _logger;
         private readonly IConfiguration _configuration;
         private readonly IEnumerable<ITagParser> _tagParsers;
@@ -80,10 +79,12 @@ namespace form_builder.Services.PageService
             IIncomingDataHelper incomingDataHelper,
             IActionsWorkflow actionsWorkflow,
             IAddAnotherService addAnotherService,
-            IFormAvailabilityService formAvailabilityServics,
+            IFormAvailabilityService formAvailabilityService,
             ILogger<IPageService> logger,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
-            IConfiguration configuration, IEnumerable<ITagParser> tagParsers)
+            IConfiguration configuration, 
+            IEnumerable<ITagParser> tagParsers,
+            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -98,15 +99,15 @@ namespace form_builder.Services.PageService
             _successPageContentFactory = successPageFactory;
             _pageContentFactory = pageFactory;
             _environment = environment;
-            _formAvailabilityServics = formAvailabilityServics;
+            _formAvailabilityService = formAvailabilityService;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _incomingDataHelper = incomingDataHelper;
             _actionsWorkflow = actionsWorkflow;
             _logger = logger;
             _addAnotherService = addAnotherService;
-            _fileStorageProviders = fileStorageProviders;
             _configuration = configuration;
             _tagParsers = tagParsers;
+            _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
@@ -124,40 +125,32 @@ namespace form_builder.Services.PageService
 
             var baseForm = await _schemaFactory.Build(form);
 
-            if (baseForm == null)
+            if (baseForm is null)
                 return null;
 
-            if (!_formAvailabilityServics.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
+            if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
             {
                 _logger.LogWarning($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
                 return null;
             }
 
+            if (string.IsNullOrEmpty(path))
+                return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug };
+
             var formData = _distributedCache.GetString(sessionGuid);
 
-            if (formData == null && path != baseForm.FirstPageSlug && (!baseForm.HasDocumentUpload || path != FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH))
-                return new ProcessPageEntity
-                {
-                    ShouldRedirect = true,
-                    TargetPage = baseForm.FirstPageSlug
-                };
+            if (string.IsNullOrEmpty(formData) && !path.Equals(baseForm.FirstPageSlug) && (!baseForm.HasDocumentUpload || !path.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH)))
+                return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug };
 
-            if (string.IsNullOrEmpty(path))
-                return new ProcessPageEntity
-                {
-                    ShouldRedirect = true,
-                    TargetPage = baseForm.FirstPageSlug
-                };
-
-            if (formData != null && path == baseForm.FirstPageSlug)
+            if (!string.IsNullOrEmpty(formData) && path.Equals(baseForm.FirstPageSlug))
             {
                 var convertedFormData = JsonConvert.DeserializeObject<FormAnswers>(formData);
-                if (form.ToLower() != convertedFormData.FormName.ToLower())
+                if (!form.Equals(convertedFormData.FormName, StringComparison.OrdinalIgnoreCase))
                     _distributedCache.Remove(sessionGuid);
             }
 
             var page = baseForm.GetPage(_pageHelper, path);
-            if (page == null)
+            if (page is null)
                 throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
             List<object> searchResults = null;
@@ -165,6 +158,18 @@ namespace form_builder.Services.PageService
 
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+            if (page.Elements.Any(_ => _.Type.Equals(EElementType.Summary)))
+            {
+                var journeyPages = baseForm.GetReducedPages(convertedAnswers);
+                foreach (var schemaPage in journeyPages)
+                    await _schemaFactory.TransformPage(schemaPage, convertedAnswers);
+            }
+            else
+            {
+                await _schemaFactory.TransformPage(page, convertedAnswers);
+            }
+
             if (subPath.Equals(LookUpConstants.Automatic) || subPath.Equals(LookUpConstants.Manual))
             {
                 if (convertedAnswers.FormData.ContainsKey($"{path}{LookUpConstants.SearchResultsKeyPostFix}"))
@@ -198,10 +203,7 @@ namespace form_builder.Services.PageService
 
             var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
 
-            return new ProcessPageEntity
-            {
-                ViewModel = viewModel
-            };
+            return new ProcessPageEntity { ViewModel = viewModel };
         }
 
         public async Task<ProcessRequestEntity> ProcessRequest(
@@ -213,40 +215,42 @@ namespace form_builder.Services.PageService
         {
             FormSchema baseForm = await _schemaFactory.Build(form);
 
-            if (!_formAvailabilityServics.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
+            if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
 
-            var currentPage = baseForm.GetPage(_pageHelper, path);
-
             var sessionGuid = _sessionHelper.GetSessionGuid();
-
-            if (sessionGuid == null)
+            if (sessionGuid is null)
                 throw new NullReferenceException($"Session guid null.");
 
-            if (currentPage == null)
+            var currentPage = baseForm.GetPage(_pageHelper, path);
+            if (currentPage is null)
                 throw new NullReferenceException($"Current page '{path}' object could not be found.");
+
+            var formData = _distributedCache.GetString(sessionGuid);
+            var convertedAnswers = !string.IsNullOrEmpty(formData) ? JsonConvert.DeserializeObject<FormAnswers>(formData) : new FormAnswers();
+            await _schemaFactory.TransformPage(currentPage, convertedAnswers);
 
             if (currentPage.HasIncomingPostValues)
                 viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
             currentPage.Validate(viewModel, _validators, baseForm);
 
-            if (currentPage.Elements.Any(_ => _.Type == EElementType.AddAnother))
+            if (currentPage.Elements.Any(_ => _.Type.Equals(EElementType.AddAnother)))
                 return await _addAnotherService.ProcessAddAnother(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            if (currentPage.Elements.Any(_ => _.Type == EElementType.Address))
+            if (currentPage.Elements.Any(_ => _.Type.Equals(EElementType.Address)))
                 return await _addressService.ProcessAddress(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            if (currentPage.Elements.Any(_ => _.Type == EElementType.Street))
+            if (currentPage.Elements.Any(_ => _.Type.Equals(EElementType.Street)))
                 return await _streetService.ProcessStreet(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            if (currentPage.Elements.Any(_ => _.Type == EElementType.Organisation))
+            if (currentPage.Elements.Any(_ => _.Type.Equals(EElementType.Organisation)))
                 return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
 
-            if (currentPage.Elements.Any(_ => _.Type == EElementType.MultipleFileUpload))
+            if (currentPage.Elements.Any(_ => _.Type.Equals(EElementType.MultipleFileUpload)))
                 return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files, modelStateIsValid);
 
-            if (currentPage.Elements.Any(_ => _.Type == EElementType.Booking))
+            if (currentPage.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
                 return await _bookingService.ProcessBooking(viewModel, currentPage, baseForm, sessionGuid, path);
 
             _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
@@ -255,17 +259,10 @@ namespace form_builder.Services.PageService
             {
                 var formModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, sessionGuid);
 
-                return new ProcessRequestEntity
-                {
-                    Page = currentPage,
-                    ViewModel = formModel
-                };
+                return new ProcessRequestEntity { Page = currentPage, ViewModel = formModel };
             }
 
-            return new ProcessRequestEntity
-            {
-                Page = currentPage
-            };
+            return new ProcessRequestEntity { Page = currentPage };
         }
 
         public async Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid, string subPath, List<object> results)
@@ -306,30 +303,26 @@ namespace form_builder.Services.PageService
 
             var formData = _distributedCache.GetString(sessionGuid);
 
-            if (formData == null)
+            if (formData is null)
                 throw new ApplicationException("PageService::FinalisePageJourney: Session data is null");
 
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             var formFileUploadElements = baseForm.Pages.SelectMany(_ => _.Elements)
-                .Where(_ => _.Type == EElementType.FileUpload || _.Type == EElementType.MultipleFileUpload)
+                .Where(_ => _.Type.Equals(EElementType.FileUpload) || _.Type.Equals(EElementType.MultipleFileUpload))
                 .ToList();
 
             if (formFileUploadElements.Any())
                 formFileUploadElements.ForEach(fileElement =>
                 {
-                    var formFileAnswerData = formAnswers.Pages.SelectMany(_ => _.Answers).FirstOrDefault(_ => _.QuestionId == $"{fileElement.Properties.QuestionId}{FileUploadConstants.SUFFIX}")?.Response ?? string.Empty;
+                    var formFileAnswerData = formAnswers.Pages.SelectMany(_ => _.Answers).FirstOrDefault(_ => _.QuestionId.Equals($"{fileElement.Properties.QuestionId}{FileUploadConstants.SUFFIX}"))?.Response ?? string.Empty;
                     List<FileUploadModel> convertedFileUploadAnswer = JsonConvert.DeserializeObject<List<FileUploadModel>>(formFileAnswerData.ToString());
 
-                    var fileStorageType = _configuration["FileStorageProvider:Type"];
-                    
-                    var fileStorageProvider = _fileStorageProviders.Get(fileStorageType);
-
-                    if (convertedFileUploadAnswer != null && convertedFileUploadAnswer.Any())
+                    if (convertedFileUploadAnswer is not null && convertedFileUploadAnswer.Any())
                     {
                         convertedFileUploadAnswer.ForEach((_) =>
                         {
-                            fileStorageProvider.Remove(_.Key);
+                            _fileStorageProvider.Remove(_.Key);
                         });
                     }
                 });

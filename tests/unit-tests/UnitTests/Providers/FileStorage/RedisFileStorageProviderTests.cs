@@ -1,10 +1,11 @@
-﻿using form_builder.Models;
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using form_builder.Models;
 using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using Moq;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Threading;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Providers.FileStorage
@@ -24,25 +25,25 @@ namespace form_builder_tests.UnitTests.Providers.FileStorage
         }
 
         [Fact]
-        public void GetString_ShouldCallDistributedCacheGetString()
+        public async Task GetString_ShouldCallDistributedCacheGetString()
         {
-            _redisFileStorageProvider.GetString(It.IsAny<string>());
+            await _redisFileStorageProvider.GetString(It.IsAny<string>());
 
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
-        public void Remove_ShouldCallDistributedCacheRemove()
+        public async Task Remove_ShouldCallDistributedCacheRemove()
         {
-            _redisFileStorageProvider.Remove(It.IsAny<string>());
+            await _redisFileStorageProvider.Remove(It.IsAny<string>());
 
-            _mockDistributedCache.Verify(_ => _.Remove(It.IsAny<string>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.RemoveAsync(It.IsAny<string>(), new CancellationToken()), Times.Once);
         }
 
         [Fact]
-        public void SetStringAsync_ShouldCallDistributedCacheSetStringAsync()
+        public async Task SetStringAsync_ShouldCallDistributedCacheSetStringAsync()
         {
-            _redisFileStorageProvider.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>());
+            await _redisFileStorageProvider.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>());
 
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         }

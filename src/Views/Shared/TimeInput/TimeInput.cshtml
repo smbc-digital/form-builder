@@ -49,11 +49,11 @@
         <div class="govuk-form-group govuk-!-margin-top-2">
             <div class="govuk-radios govuk-radios--inline govuk-radios--small">
                 <div class="govuk-radios__item govuk-!-margin-right-2">
-                    <input type="radio" class="govuk-radios__input" name=@Model.GetCustomItemId("ampm") id=@Model.GetCustomItemId("am") value="am" @(Model.Properties.AmPm.ToLower() == "am" ? "checked" : string.Empty) />
+                    <input type="radio" class="govuk-radios__input" name=@Model.GetCustomItemId("ampm") id=@Model.GetCustomItemId("am") value="am" @(Model.Properties.AmPm.Equals("am", StringComparison.OrdinalIgnoreCase) ? "checked" : string.Empty) />
                     <label class="govuk-label govuk-radios__label" for=@Model.GetCustomItemId("am")>am</label>
                 </div>
                 <div class="govuk-radios__item">
-                    <input type="radio" class="govuk-radios__input" name=@Model.GetCustomItemId("ampm") id=@Model.GetCustomItemId("pm") value="pm" @(Model.Properties.AmPm.ToLower() == "pm" ? "checked" : string.Empty) />
+                    <input type="radio" class="govuk-radios__input" name=@Model.GetCustomItemId("ampm") id=@Model.GetCustomItemId("pm") value="pm" @(Model.Properties.AmPm.Equals("pm", StringComparison.OrdinalIgnoreCase) ? "checked" : string.Empty) />
                     <label class="govuk-label govuk-radios__label" for=@Model.GetCustomItemId("pm")>pm</label>
                 </div>
             </div>

@@ -18,22 +18,6 @@ namespace form_builder.Helpers.ActionsHelpers
         public RequestEntity GenerateUrl(string baseUrl, FormAnswers formAnswers)
         {
             var matches = TagRegex.Matches(baseUrl);
-
-            if (matches.Any())
-            {
-                foreach (Match match in matches.ToList())
-                {
-                    if (!formAnswers.AllAnswers.ToList().Any(_ => _.QuestionId.Equals(match.Value)))
-                    {
-                        return new RequestEntity
-                        {
-                            Url = baseUrl,
-                            IsPost = !matches.Any()
-                        };
-                    }
-                }
-            }
-
             var newUrl = matches.Aggregate(baseUrl, (current, match) => Replace(match, current, formAnswers));
 
             return new RequestEntity
@@ -60,7 +44,7 @@ namespace form_builder.Helpers.ActionsHelpers
                             .SelectMany(_ => _.Answers)
                             .FirstOrDefault(_ => _.QuestionId.Equals(questionKey));
 
-                    if (question != null)
+                    if (question is not null)
                     {
                         var answer = question.Response as string;
 
@@ -94,7 +78,7 @@ namespace form_builder.Helpers.ActionsHelpers
 
             emailList.AddRange(action.Properties.To.Split(",").Where(_ => !TagRegex.IsMatch(_)));
 
-            return emailList.Where(_ => _ != null).Aggregate((current, email) => current + "," + email);
+            return emailList.Where(_ => _ is not null).Aggregate((current, email) => current + "," + email);
         }
 
         private string Replace(Match match, string current, FormAnswers formAnswers)
@@ -114,7 +98,7 @@ namespace form_builder.Helpers.ActionsHelpers
         {
             var splitTargets = targetMapping.Split(".");
 
-            if (splitTargets.Length == 1)
+            if (splitTargets.Length.Equals(1))
                 return (dynamic)answer.Response;
 
             var subObject = new Answers { Response = (dynamic)answer.Response[splitTargets[1]] };
