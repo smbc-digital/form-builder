@@ -36,9 +36,20 @@ namespace form_builder_tests.UnitTests.TagParsers
                 .WithPropertyText("{{PAYMENTAMOUNT}}")
                 .Build();
 
+            var condition = new ConditionBuilder()
+                .WithQuestionId("{{PAYMENTAMOUNT}}")
+                .WithComparisonValue("10.00")
+                .WithConditionType(ECondition.PaymentAmountEqualTo)
+                .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithCondition(condition)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithLeadingParagraph("{{PAYMENTAMOUNT}}")
+                .WithBehaviour(behaviour)
                 .Build();
 
             var formAnswer = new FormAnswers();
@@ -47,6 +58,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             Assert.Equal("10.00",result.Elements.First().Properties.Text);
             Assert.Equal("10.00", result.LeadingParagraph);
+            Assert.Equal("10.00", result.Behaviours.FirstOrDefault().Conditions.FirstOrDefault().QuestionId);
         }
 
         [Fact]

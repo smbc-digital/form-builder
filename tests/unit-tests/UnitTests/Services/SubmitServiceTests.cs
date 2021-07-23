@@ -9,6 +9,7 @@ using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Helpers.PaymentHelpers;
 using form_builder.Models;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
@@ -38,10 +39,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IReferenceNumberProvider> _mockReferenceNumberProvider = new();
         private readonly Mock<ISubmitProvider> _mockSubmitProvider = new();
         private readonly Mock<IPostSubmissionAction> _mockPostSubmissionAction = new();
-
-        private readonly Mock<ILogger<SubmitService>> _mockLogger = new();
+        private readonly Mock<IPaymentHelper> _mockPaymentHelper = new();
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
-
 
         public SubmitServiceTests()
         {
@@ -66,6 +65,10 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetReference(It.IsAny<string>(), It.IsAny<int>()))
                 .Returns("TEST123456");
 
+            _mockPaymentHelper
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .ReturnsAsync(new PaymentInformation { Settings = new Settings { Amount = "10.00" } });
+
             _mockSubmitProvider
                 .Setup(_ => _.ProviderName).Returns("AuthHeader");
 
@@ -74,7 +77,17 @@ namespace form_builder_tests.UnitTests.Services
                 _mockSubmitProvider.Object
             };
 
-            _service = new SubmitService(_mockGateway.Object, _mockPageHelper.Object, _mockEnvironment.Object, _mockIOptions.Object, _mockDistributedCache.Object, _mockSchemaFactory.Object, _mockReferenceNumberProvider.Object, _submitProviders, _mockLogger.Object, _mockPostSubmissionAction.Object);
+            _service = new SubmitService(
+                _mockGateway.Object, 
+                _mockPageHelper.Object, 
+                _mockEnvironment.Object, 
+                _mockIOptions.Object, 
+                _mockDistributedCache.Object, 
+                _mockSchemaFactory.Object, 
+                _mockReferenceNumberProvider.Object, 
+                _submitProviders,
+                _mockPaymentHelper.Object,
+                _mockPostSubmissionAction.Object);
         }
 
         [Fact]
@@ -216,6 +229,31 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             _mockReferenceNumberProvider.Verify(_ => _.GetReference(It.IsAny<string>(), It.IsAny<int>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveCaseReference(It.IsAny<string>(), It.IsAny<string>(), true, "CaseReference"), Times.Once);
+            _mockPageHelper.Verify(_ => _.SavePaymentAmount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task PreProcessSubmission_SavePaymentAmount()
+        {
+            // Arrange
+            var schema = new FormSchemaBuilder()
+                .WithSavePaymentAmount("paymentAmount")
+                .WithBaseUrl("form")
+                .Build();
+
+            _mockSchemaFactory
+                .Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockPageHelper
+                .Setup(_ => _.SaveCaseReference(It.IsAny<string>(), It.IsAny<string>(), true, It.IsAny<string>()))
+                .Verifiable();
+
+            // Act
+            await _service.PreProcessSubmission("form", "123454");
+
+            // Assert
+            _mockPageHelper.Verify(_ => _.SavePaymentAmount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]

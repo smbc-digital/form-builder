@@ -81,7 +81,6 @@ namespace form_builder.Services.PageService
             IFormAvailabilityService formAvailabilityService,
             ILogger<IPageService> logger,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
-            IConfiguration configuration, 
             IEnumerable<ITagParser> tagParsers,
             IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
         {

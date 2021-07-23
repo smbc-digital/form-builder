@@ -588,6 +588,82 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task Map_ShouldReturnExpandoObject_WithPaymentAmount()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("textbox")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithSavePaymentAmount("paymentAmount")
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers
+                {
+                    Pages = new List<PageAnswers>(),
+                    PaymentAmount = "10.00"
+                }));
+
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "textbox"), It.IsAny<FormAnswers>()))
+                .ReturnsAsync("textbox answer");
+
+            // Act
+            var result = await _service.Map("form", "guid");
+
+            // Assert
+            var resultData = Assert.IsType<ExpandoObject>(result.Data);
+            dynamic castResultsData = resultData;
+
+            Assert.NotNull(castResultsData);
+            Assert.NotNull(castResultsData.textbox);
+            Assert.NotNull(castResultsData.paymentAmount);
+            Assert.Equal("10.00", castResultsData.paymentAmount);
+        }
+
+        [Fact]
+        public async Task Map_ShouldReturnExpandoObject_WithPaymentAmount_UsingTargetMapping()
+        {
+            // Arrange
+            var schema = new FormSchemaBuilder()
+                .WithSavePaymentAmount("mappedPaymentAmount")
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers
+                {
+                    Pages = new List<PageAnswers>(),
+                    PaymentAmount = "10.00"
+                }));
+
+            // Act
+            var result = await _service.Map("form", "guid");
+
+            // Assert
+            var resultData = Assert.IsType<ExpandoObject>(result.Data);
+            dynamic castResultsData = resultData;
+
+            Assert.NotNull(castResultsData);
+            Assert.NotNull(castResultsData.mappedPaymentAmount);
+            Assert.Equal("10.00", castResultsData.mappedPaymentAmount);
+        }
+
+        [Fact]
         public async Task MapBookingRequest_ShouldReturn_ValidBookingRequest()
         {
             // Arrange

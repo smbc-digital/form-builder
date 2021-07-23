@@ -279,7 +279,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessPaymentResponse("testForm", "12345", "reference");
 
             // Assert
-            _mockPageHelper.Verify(_ => _.SavePaymentAmount(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.SavePaymentAmount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
     }
 }

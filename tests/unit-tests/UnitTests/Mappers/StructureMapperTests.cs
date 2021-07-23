@@ -65,6 +65,25 @@ namespace form_builder_tests.UnitTests.Mappers
         }
 
         [Fact]
+        public async Task CreateBaseFormDataStructure_ShouldInclude_PaymentAmount()
+        {
+            // Arrange
+            var formSchema = new FormSchemaBuilder()
+                .WithSavePaymentAmount("paymentAmount")
+                .Build();
+
+            _mockSchemaFactory
+                .Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(formSchema);
+
+            // Act
+            var result = (IDictionary<string, dynamic>)await _structureMapper.CreateBaseFormDataStructure("test-form");
+
+            // Assert
+            Assert.NotNull(result["PaymentAmount"]);
+        }
+
+        [Fact]
         public async Task CreateBaseFormDataStructure_ShouldUseTargetMappingIfProvided()
         {
             // Arrange
