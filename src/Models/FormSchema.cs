@@ -31,8 +31,6 @@ namespace form_builder.Models
 
         public string PaymentAmountMapping { get; set; } = "paymentAmount";
 
-        public string PaymentConfig { get; set; }
-
         public string ReferencePrefix { get; set; }
 
         public List<Breadcrumb> BreadCrumbs { get; set; }

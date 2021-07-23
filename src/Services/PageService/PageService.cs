@@ -58,7 +58,6 @@ namespace form_builder.Services.PageService
         private readonly IActionsWorkflow _actionsWorkflow;
         private readonly IFormAvailabilityService _formAvailabilityService;
         private readonly ILogger<IPageService> _logger;
-        private readonly IConfiguration _configuration;
         private readonly IEnumerable<ITagParser> _tagParsers;
 
         public PageService(
@@ -105,7 +104,6 @@ namespace form_builder.Services.PageService
             _actionsWorkflow = actionsWorkflow;
             _logger = logger;
             _addAnotherService = addAnotherService;
-            _configuration = configuration;
             _tagParsers = tagParsers;
             _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
         }

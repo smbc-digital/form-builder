@@ -49,7 +49,7 @@ namespace form_builder.Mappers.Structure
 
             dataStructure.Add(formSchema.GenerateReferenceNumber ? formSchema.GeneratedReferenceNumberMapping : "CaseReference", string.Empty.GetType().ConvertTypeToFormattedString());
 
-            if (formSchema.Pages.Any(_ => _.Behaviours is not null && _.Behaviours.Any(_ => _.BehaviourType.Equals(EBehaviourType.SubmitAndPay))))
+            if (formSchema.Pages.Any(_ => _.Behaviours is not null && _.Behaviours.Any(_ => _.BehaviourType.Equals(EBehaviourType.SubmitAndPay))) || formSchema.SavePaymentAmount)
                 dataStructure.Add("PaymentAmount", string.Empty.GetType().ConvertTypeToFormattedString());
 
             return dataStructure;
