@@ -85,14 +85,12 @@ namespace form_builder.Services.SubmitService
                 reference = answers.CaseReference;
             }
 
-            var submissionReference = _submissionServiceConfiguration.FakeSubmission
-                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
-                : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, reference);
-
-            if (mappingEntity.BaseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)            
+            if (mappingEntity.BaseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)
                 await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
 
-            return submissionReference;
+            return _submissionServiceConfiguration.FakeSubmission
+                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
+                : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, reference);
         }
 
         private string ProcessFakeSubmission(MappingEntity mappingEntity, string form, string sessionGuid, string reference)
