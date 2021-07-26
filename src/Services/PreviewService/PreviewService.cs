@@ -113,7 +113,7 @@ namespace form_builder.Services.PreviewService
             catch (Exception e)
             {
                 _distributedCache.Remove($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}");
-                var errorPage = PreviewErrorPage(e.Message);
+                var errorPage = PreviewErrorPage(e.Message, e.Source);
                 var errorSchema = PreviewModeFormSchema(errorPage);
                 var formModel = await _pageContentFactory.Build(errorPage, viewModel, errorSchema, string.Empty, new FormAnswers());
                 return new ProcessPreviewRequestEntity
@@ -162,14 +162,17 @@ namespace form_builder.Services.PreviewService
                 .Build();
         }
         
-        private Page PreviewErrorPage(string errorMessage)
+        private Page PreviewErrorPage(string errorMessage, string errorSource)
         {
             var warning = new ElementBuilder()
                 .WithType(EElementType.Warning)
                 .WithPropertyText("The provided file is not valid.")
                 .Build();
 
-            string[] errorMessages = errorMessage.Split("\n");
+            if(errorSource.Equals(LibConstants.NEWTONSOFT_LIBRARY_NAME))
+                errorMessage = $"The provided file is not valid JSON data format. Check the provided file JSON data strcuture. {SystemConstants.NEW_LINE_CHARACTER} {errorMessage}";
+
+            string[] errorMessages = errorMessage.Split(SystemConstants.NEW_LINE_CHARACTER);
 
             var page = new PageBuilder()
                 .WithElement(warning)
