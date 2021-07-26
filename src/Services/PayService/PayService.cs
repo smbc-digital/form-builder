@@ -74,6 +74,7 @@ namespace form_builder.Services.PayService
 
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var paymentInformation = await _paymentHelper.GetFormPaymentInformation(form);
+            _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers));
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
