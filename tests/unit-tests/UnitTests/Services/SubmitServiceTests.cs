@@ -17,6 +17,7 @@ using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.SubmitService;
 using form_builder.SubmissionActions;
+using form_builder.TagParsers;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
@@ -41,9 +42,16 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IPostSubmissionAction> _mockPostSubmissionAction = new();
         private readonly Mock<IPaymentHelper> _mockPaymentHelper = new();
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
+        private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
+        private readonly Mock<ITagParser> _tagParser = new();
 
         public SubmitServiceTests()
         {
+            _tagParser.Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()))
+                .Returns(new Page());
+            var tagParserItems = new List<ITagParser> { _tagParser.Object };
+            _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => tagParserItems.GetEnumerator());
+
             _mockEnvironment
                 .Setup(_ => _.EnvironmentName)
                 .Returns("local");
@@ -87,7 +95,8 @@ namespace form_builder_tests.UnitTests.Services
                 _mockReferenceNumberProvider.Object, 
                 _submitProviders,
                 _mockPaymentHelper.Object,
-                _mockPostSubmissionAction.Object);
+                _mockPostSubmissionAction.Object,
+                _mockTagParsers.Object);
         }
 
         [Fact]
@@ -205,6 +214,49 @@ namespace form_builder_tests.UnitTests.Services
             _mockSubmitProvider.Verify(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()), Times.Once);
 
             Assert.NotNull(callbackValue);
+        }
+
+        [Fact]
+        public async Task ProcessSubmission_ShouldCallTagParsers()
+        {
+            // Arrange
+            var questionId = "testQuestion";
+
+            var element = new ElementBuilder()
+                .WithQuestionId(questionId)
+                .WithType(EElementType.Textarea)
+                .Build();
+
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlug)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            _mockSubmitProvider
+                .Setup(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+
+            // Act
+            await _service.ProcessSubmission(new MappingEntity { Data = new ExpandoObject(), BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "123454");
+
+            // Assert
+            _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Once);
         }
 
         [Fact]
