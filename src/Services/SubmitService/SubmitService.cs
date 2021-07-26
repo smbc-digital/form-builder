@@ -86,11 +86,13 @@ namespace form_builder.Services.SubmitService
             }
 
             if (mappingEntity.BaseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)
-                await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
+                 await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
 
-            return _submissionServiceConfiguration.FakeSubmission
-                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
-                : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, reference);
+            var submissionReference = _submissionServiceConfiguration.FakeSubmission
+               ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
+               : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, reference);
+
+            return submissionReference;
         }
 
         private string ProcessFakeSubmission(MappingEntity mappingEntity, string form, string sessionGuid, string reference)
@@ -118,7 +120,7 @@ namespace form_builder.Services.SubmitService
                 _pageHelper.SaveCaseReference(sessionGuid, reference);
             }
 
-            return reference;
+            return reference;   
         }
 
         public async Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
