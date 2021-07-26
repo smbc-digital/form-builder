@@ -113,7 +113,7 @@ namespace form_builder.Services.SubmitService
                 _pageHelper.SaveCaseReference(sessionGuid, reference);
             }
 
-            return reference;   
+            return reference;
         }
 
         public async Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
