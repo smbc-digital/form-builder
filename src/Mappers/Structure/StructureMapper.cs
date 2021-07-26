@@ -64,7 +64,7 @@ namespace form_builder.Mappers.Structure
                 if (element is { Type: EElementType.AddAnother })
                     return CreateStructureForAddAnother(splitTargets[0], element, dataStructure);
 
-                if (dataStructure.ContainsKey(splitTargets[0]))
+                if (dataStructure.ContainsKey($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}"))
                     return dataStructure;
 
                 dataStructure.Add($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}", GetDataType(element));

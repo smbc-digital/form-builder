@@ -95,6 +95,11 @@ namespace form_builder.Services.MappingService
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
+            foreach (var page in baseForm.Pages)
+            {
+                await _schemaFactory.TransformPage(page, convertedAnswers);
+            }
+
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
 
             convertedAnswers.FormName = form;

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using form_builder.Helpers.PaymentHelpers;
 using form_builder.Models;
 using form_builder.TagParsers.Formatters;
@@ -18,7 +19,7 @@ namespace form_builder.TagParsers
 
         public Regex Regex => new Regex("(?<={{)PAYMENTAMOUNT.*?(?=}})", RegexOptions.Compiled);
 
-        public Page Parse(Page page, FormAnswers formAnswers)
+        public async Task<Page> Parse(Page page, FormAnswers formAnswers)
         {
             var leadingParagraphRegexIsMatch = !string.IsNullOrEmpty(page.LeadingParagraph) && Regex.IsMatch(page.LeadingParagraph);
             var pageHasElementsMatchingRegex = page.Elements.Any(_ => _.Properties.Text is not null && Regex.IsMatch(_.Properties.Text));
@@ -26,9 +27,17 @@ namespace form_builder.TagParsers
 
             if (leadingParagraphRegexIsMatch || pageHasElementsMatchingRegex || pageHasConditionMatchingRegex)
             {
-                var paymentAmount = !string.IsNullOrEmpty(formAnswers.PaymentAmount) 
-                        ? formAnswers.PaymentAmount 
-                        : _paymentHelper.GetFormPaymentInformation(formAnswers.FormName).Result.Settings.Amount;
+                var paymentAmount = string.Empty;
+
+                if (!string.IsNullOrEmpty(formAnswers.PaymentAmount))
+                {
+                    paymentAmount = formAnswers.PaymentAmount;
+                }
+                else
+                {
+                    var paymentInformation = await _paymentHelper.GetFormPaymentInformation(formAnswers.FormName);
+                    paymentAmount = paymentInformation.Settings.Amount;
+                }
 
                 if (leadingParagraphRegexIsMatch)
                 {

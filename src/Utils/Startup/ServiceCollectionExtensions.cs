@@ -92,9 +92,7 @@ using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
-using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.PreviewService;
-using form_builder.Providers.FileStorage;
 using form_builder.SubmissionActions;
 using form_builder.Helpers.Cookie;
 
@@ -409,6 +407,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IReusableElementSchemaTransformFactory, ReusableElementSchemaTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, AddAnotherPageTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, DynamicLookupPageTransformFactory>();
+            services.AddTransient<IUserPageTransformFactory, BehaviourConditionsPageTransformFactory>();
 
             return services;
         }

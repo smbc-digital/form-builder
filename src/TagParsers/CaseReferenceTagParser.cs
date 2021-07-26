@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using form_builder.Models;
 using form_builder.TagParsers.Formatters;
 
@@ -12,7 +13,7 @@ namespace form_builder.TagParsers
 
         public Regex Regex => new Regex("(?<={{)CASEREFERENCE.*?(?=}})", RegexOptions.Compiled);
 
-        public Page Parse(Page page, FormAnswers formAnswers)
+        public async Task<Page> Parse(Page page, FormAnswers formAnswers)
         {
             var leadingParagraphRegexIsMatch = !string.IsNullOrEmpty(page.LeadingParagraph) && Regex.IsMatch(page.LeadingParagraph);
             var pageHasElementsMatchingRegex = page.Elements.Any(_ => _.Properties.Text is not null && Regex.IsMatch(_.Properties.Text));
