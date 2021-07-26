@@ -93,36 +93,36 @@ namespace form_builder.Providers.Booking
             var response = new List<AvailabilityDayResponse>();
             switch (request.StartDate.Month)
             {
-                case 3:
-                    response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 13), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 15), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 22), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 23), 1, true)
-                        .Build();
-                    break;
-                case 4:
-                    response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 15), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 12), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 13), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 20), 1, true)
-                        .Build();
-                    break;
-                case 5:
-                    response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 1), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 4), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 9), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 22), 1, true)
-                        .Build();
-                    break;
                 case 8:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 4), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 5), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 6), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 7), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 13), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 15), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 22), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 23), 1, true)
+                        .Build();
+                    break;
+                case 9:
+                    response = new AvailabilityDayResponseBuilder()
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 15), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 12), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 13), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 20), 1, true)
+                        .Build();
+                    break;
+                case 10:
+                    response = new AvailabilityDayResponseBuilder()
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 1), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 4), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 9), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 22), 1, true)
+                        .Build();
+                    break;
+                case 11:
+                    response = new AvailabilityDayResponseBuilder()
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 4), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 5), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 6), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 7), 1, true)
                         .Build();
                     break;
                 default:

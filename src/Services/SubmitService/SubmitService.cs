@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Configuration;
-using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
+using form_builder.Helpers.PaymentHelpers;
 using form_builder.Models;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
@@ -15,7 +14,6 @@ using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
 using form_builder.SubmissionActions;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
@@ -25,23 +23,14 @@ namespace form_builder.Services.SubmitService
     public class SubmitService : ISubmitService
     {
         private readonly IGateway _gateway;
-
         private readonly IPageHelper _pageHelper;
-
         private readonly IWebHostEnvironment _environment;
-
         private readonly SubmissionServiceConfiguration _submissionServiceConfiguration;
-
         private readonly IDistributedCacheWrapper _distributedCache;
-
         private readonly ISchemaFactory _schemaFactory;
-
         private readonly IReferenceNumberProvider _referenceNumberProvider;
-
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
-
-        private readonly ILogger<SubmitService> _logger;
-
+        private readonly IPaymentHelper _paymentHelper;
         private readonly IPostSubmissionAction _postSubmissionAction;
 
         public SubmitService(
@@ -53,7 +42,7 @@ namespace form_builder.Services.SubmitService
             ISchemaFactory schemaFactory,
             IReferenceNumberProvider referenceNumberProvider,
             IEnumerable<ISubmitProvider> submitProviders,
-            ILogger<SubmitService> logger,
+            IPaymentHelper paymentHelper,
             IPostSubmissionAction postSubmissionAction)
         {
             _gateway = gateway;
@@ -64,7 +53,7 @@ namespace form_builder.Services.SubmitService
             _schemaFactory = schemaFactory;
             _referenceNumberProvider = referenceNumberProvider;
             _submitProviders = submitProviders;
-            _logger = logger;
+            _paymentHelper = paymentHelper;
             _postSubmissionAction = postSubmissionAction;
         }
 
@@ -73,6 +62,10 @@ namespace form_builder.Services.SubmitService
             var baseForm = await _schemaFactory.Build(form);
             if (baseForm.GenerateReferenceNumber)
                 _pageHelper.SaveCaseReference(sessionGuid, _referenceNumberProvider.GetReference(baseForm.ReferencePrefix), true, baseForm.GeneratedReferenceNumberMapping);
+
+            if (baseForm.SavePaymentAmount)
+                _pageHelper.SavePaymentAmount(sessionGuid, _paymentHelper.GetFormPaymentInformation(baseForm.BaseURL).Result.Settings.Amount, baseForm.PaymentAmountMapping);
+                
         }
 
         public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)

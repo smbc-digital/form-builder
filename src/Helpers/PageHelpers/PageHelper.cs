@@ -16,7 +16,6 @@ using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -196,7 +195,7 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
-        public void SavePaymentAmount(string guid, string paymentAmount)
+        public void SavePaymentAmount(string guid, string paymentAmount, string targetMapping)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -205,6 +204,7 @@ namespace form_builder.Helpers.PageHelpers
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             convertedAnswers.PaymentAmount = paymentAmount;
+
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 

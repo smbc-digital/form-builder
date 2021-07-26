@@ -27,6 +27,10 @@ namespace form_builder.Models
 
         public string GeneratedReferenceNumberMapping { get; set; }
 
+        public bool SavePaymentAmount { get; set; }
+
+        public string PaymentAmountMapping { get; set; } = "paymentAmount";
+
         public string ReferencePrefix { get; set; }
 
         public List<Breadcrumb> BreadCrumbs { get; set; }

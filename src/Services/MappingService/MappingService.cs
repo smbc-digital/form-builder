@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -165,6 +164,9 @@ namespace form_builder.Services.MappingService
 
             if (formAnswers.AdditionalFormData.Any())
                 data = AddNonQuestionAnswers(data, formAnswers.AdditionalFormData);
+
+            if (!string.IsNullOrEmpty(formAnswers.PaymentAmount))
+                data = AddNonQuestionAnswers(data, new Dictionary<string, object> { { formSchema.PaymentAmountMapping, formAnswers.PaymentAmount } });
 
             return data;
         }

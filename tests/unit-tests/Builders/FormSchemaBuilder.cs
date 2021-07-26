@@ -17,6 +17,8 @@ namespace form_builder_tests.Builders
         private bool _documentDownload;
         private bool _generateReferenceNumber = false;
         public string _generatedReferenceNumberMapping { get; set; }
+        private bool _savePaymentAmount { get; set; }
+        private string _paymentAmountMapping { get; set; }
         public string _referencePrefix { get; set; }
         private List<EDocumentType> _documentType = new();
         private List<IAction> _formActions = new();
@@ -39,7 +41,9 @@ namespace form_builder_tests.Builders
             GenerateReferenceNumber = _generateReferenceNumber,
             ReferencePrefix = _referencePrefix,
             GeneratedReferenceNumberMapping = _generatedReferenceNumberMapping,
-            BreadCrumbs = _breadcrumbs
+            BreadCrumbs = _breadcrumbs,
+            SavePaymentAmount = _savePaymentAmount,
+            PaymentAmountMapping = _paymentAmountMapping
         };
 
         public FormSchemaBuilder WithBaseUrl(string baseUrl)
@@ -141,6 +145,14 @@ namespace form_builder_tests.Builders
         public FormSchemaBuilder WithBreadcrumbs(List<Breadcrumb> breadcrumbs)
         {
             _breadcrumbs = breadcrumbs;
+
+            return this;
+        }
+
+        public FormSchemaBuilder WithSavePaymentAmount(string mapping)
+        {
+            _savePaymentAmount = true;
+            _paymentAmountMapping = mapping;
 
             return this;
         }
