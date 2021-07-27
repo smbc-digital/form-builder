@@ -239,7 +239,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPaymentResponse_ShouldCallPaymentHelper()
+        public async Task ProcessPaymentResponse_ShouldCallPaymentHelper_AndTagParser()
         {
             // Arrange
             _mockPaymentHelper
@@ -258,6 +258,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Once);
+            _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Once);
         }
 
         [Fact]
