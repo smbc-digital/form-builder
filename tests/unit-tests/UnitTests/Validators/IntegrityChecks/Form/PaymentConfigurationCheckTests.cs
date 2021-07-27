@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -72,7 +73,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Setup(_ => _.Get<List<PaymentInformation>>())
                 .ReturnsAsync(new List<PaymentInformation>
                 {
-                    new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings() }
+                    new PaymentInformation { FormName = new[] {"test-name"}, PaymentProvider = "testProvider", Settings = new Settings() }
                 });
 
             var behaviour = new BehaviourBuilder()
@@ -107,7 +108,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .ReturnsAsync(new List<PaymentInformation>
                 {
                     new PaymentInformation { 
-                        FormName = "test-name", 
+                        FormName = new[] {"test-name"}, 
                         PaymentProvider = "testProvider", 
                         Settings = new Settings
                         {
@@ -150,7 +151,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .ReturnsAsync(new List<PaymentInformation>
                 {
                     new PaymentInformation {
-                        FormName = "test-name",
+                        FormName = new[] {"test-name"},
                         PaymentProvider = "testProvider",
                         Settings = new Settings
                         {
@@ -192,7 +193,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Setup(_ => _.Get<List<PaymentInformation>>())
                 .ReturnsAsync(new List<PaymentInformation>
                 {
-                    new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings { Amount = "10.00"} }
+                    new PaymentInformation { FormName = new[] {"test-name"}, PaymentProvider = "testProvider", Settings = new Settings { Amount = "10.00"} }
                 });
 
             var behaviour = new BehaviourBuilder()
@@ -228,7 +229,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 {
                     new PaymentInformation
                     {
-                        FormName = "test-name", 
+                        FormName = new[] {"test-name"}, 
                         PaymentProvider = "testProvider", 
                         Settings = new Settings
                         {
@@ -277,7 +278,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 {
                     new PaymentInformation 
                     { 
-                        FormName = "test-name", 
+                        FormName = new[] {"test-name"}, 
                         PaymentProvider = "testProvider", 
                         Settings = new Settings
                         {
@@ -326,7 +327,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 {
                     new PaymentInformation
                     {
-                        FormName = "test-name", 
+                        FormName = new[] {"test-name"}, 
                         PaymentProvider = "testProvider",
                         Settings = new Settings
                         {
@@ -375,7 +376,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Setup(_ => _.Get<List<PaymentInformation>>())
                 .ReturnsAsync(new List<PaymentInformation>
                 {
-                    new PaymentInformation { FormName = "test-name", PaymentProvider = "testProvider", Settings = new Settings {  } }
+                    new PaymentInformation { FormName = new[] {"test-name"}, PaymentProvider = "testProvider", Settings = new Settings {  } }
                 });
 
             var behaviour = new BehaviourBuilder()

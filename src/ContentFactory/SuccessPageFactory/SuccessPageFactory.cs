@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Builders;
+using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
@@ -11,6 +13,7 @@ using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.PageService.Entities;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace form_builder.ContentFactory.SuccessPageFactory
 {
@@ -21,8 +24,11 @@ namespace form_builder.ContentFactory.SuccessPageFactory
         private readonly ISessionHelper _sessionHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IWebHostEnvironment _environment;
+        private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
+        
         public SuccessPageFactory(IPageHelper pageHelper, IPageFactory pageFactory,
             ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache,
+            IOptions<PreviewModeConfiguration> previewModeConfiguration, 
             IWebHostEnvironment environment)
         {
             _pageHelper = pageHelper;
@@ -30,6 +36,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
             _sessionHelper = sessionHelper;
             _distributedCache = distributedCache;
             _environment = environment;
+            _previewModeConfiguration = previewModeConfiguration;
         }
 
         public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType)
@@ -55,7 +62,8 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                     FeedbackFormUrl = baseForm.FeedbackForm,
                     FeedbackPhase = baseForm.FeedbackPhase,
                     FormName = baseForm.FormName,
-                    StartPageUrl = baseForm.StartPageUrl
+                    StartPageUrl = baseForm.StartPageUrl,
+                    IsInPreviewMode = _previewModeConfiguration.Value.IsEnabled && baseForm.BaseURL.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX)
                 };
             }
 
@@ -91,7 +99,8 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                 BannerTitle = page.BannerTitle,
                 LeadingParagraph = page.LeadingParagraph,
                 DisplayBreadcrumbs = page.DisplayBreadCrumbs,
-                Breadcrumbs = baseForm.BreadCrumbs
+                Breadcrumbs = baseForm.BreadCrumbs,
+                IsInPreviewMode = result.IsInPreviewMode
             };
         }
 
@@ -115,7 +124,8 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                 BannerTitle = page.BannerTitle,
                 LeadingParagraph = page.LeadingParagraph,
                 DisplayBreadcrumbs = page.DisplayBreadCrumbs,
-                Breadcrumbs = baseForm.BreadCrumbs
+                Breadcrumbs = baseForm.BreadCrumbs,
+                IsInPreviewMode = result.IsInPreviewMode
             };
         }
 

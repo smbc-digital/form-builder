@@ -7,6 +7,9 @@
 <div class="govuk-checkboxes" data-module="govuk-checkboxes">
     @for (var i = 0; i < Model.Properties.Options.Count; i++)
     {
+        @if (Model.Properties.Options[i].HasDivider) {
+            <div class="govuk-checkboxes__divider">@Model.Properties.Options[i].Divider</div>
+        }
         <div class="govuk-checkboxes__item">
             <input class="govuk-checkboxes__input"
                    type="checkbox"

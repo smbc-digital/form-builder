@@ -44,6 +44,13 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithIAG(string value)
+        {
+            _property.IAG = value;
+
+            return this;
+        }
+
         public ElementBuilder WithLookupSource(LookupSource lookupSource)
         {
             _property.LookupSources ??= new List<LookupSource>();
@@ -466,6 +473,13 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithLabelAsH1(bool value)
+        {
+            _property.LabelAsH1 = value;
+
+            return this;
+        }
+        
         public ElementBuilder WithNestedElement(Element element)
         {
             if (_property.Elements is null)
@@ -493,6 +507,12 @@ namespace form_builder.Builders
         public ElementBuilder WithAppendText(string value)
         {
             _property.AppendText = value;
+            return this;
+        }
+
+        public ElementBuilder WithAutoConfirm(bool value)
+        {
+            _property.AutoConfirm = value;
 
             return this;
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -15,7 +14,6 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
@@ -27,7 +25,6 @@ namespace form_builder.Services.MappingService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IElementMapper _elementMapper;
         private readonly ISchemaFactory _schemaFactory;
-        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IWebHostEnvironment _environment;
         private ILogger<MappingService> _logger;
 
@@ -35,14 +32,12 @@ namespace form_builder.Services.MappingService
             IElementMapper elementMapper,
             ISchemaFactory schemaFactory,
             IWebHostEnvironment environment,
-            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ILogger<MappingService> logger)
         {
             _distributedCache = distributedCache;
             _elementMapper = elementMapper;
             _schemaFactory = schemaFactory;
             _environment = environment;
-            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _logger = logger;
         }
 
@@ -169,6 +164,9 @@ namespace form_builder.Services.MappingService
 
             if (formAnswers.AdditionalFormData.Any())
                 data = AddNonQuestionAnswers(data, formAnswers.AdditionalFormData);
+
+            if (!string.IsNullOrEmpty(formAnswers.PaymentAmount))
+                data = AddNonQuestionAnswers(data, new Dictionary<string, object> { { formSchema.PaymentAmountMapping, formAnswers.PaymentAmount } });
 
             return data;
         }

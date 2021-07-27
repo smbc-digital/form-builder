@@ -16,6 +16,7 @@ namespace form_builder.Conditions
             { ECondition.IsNullOrEmpty, StringComparator.IsNullOrEmpty },
             { ECondition.IsFileUploadNullOrEmpty, FileUploadComparator.IsFileUploadNullOrEmpty },
             { ECondition.EqualTo, StringComparator.IsEqualTo },
+            { ECondition.PaymentAmountEqualTo, StringComparator.PaymentAmountIsEqualTo },
             { ECondition.Contains, StringComparator.Contains },
             { ECondition.GreaterThan, IntegerComparator.IsGreaterThan },
             { ECondition.LessThan, IntegerComparator.IsLessThan },

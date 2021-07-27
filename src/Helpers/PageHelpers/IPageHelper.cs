@@ -17,7 +17,7 @@ namespace form_builder.Helpers.PageHelpers
 
         void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedRefereceMappingId = "");
 
-        void SavePaymentAmount(string guid, string paymentAmount);
+        void SavePaymentAmount(string guid, string paymentAmount, string targetMapping);
 
         void SaveFormData(string key, object value, string guid, string formName);
 

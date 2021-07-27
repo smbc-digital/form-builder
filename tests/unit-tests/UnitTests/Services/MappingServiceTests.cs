@@ -3,21 +3,18 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
 using form_builder.Builders;
-using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using form_builder.Providers.FileStorage;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
@@ -31,12 +28,10 @@ namespace form_builder_tests.UnitTests.Services
         private readonly MappingService _service;
         private readonly Mock<ISchemaProvider> _mockSchemaProvider = new();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
-        private readonly Mock<IFileStorageProvider> _mockFileStorage = new();
         private readonly Mock<IElementMapper> _mockElementMapper = new();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<ILogger<MappingService>> _mockLogger = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new();
 
         public MappingServiceTests()
         {
@@ -64,17 +59,12 @@ namespace form_builder_tests.UnitTests.Services
                     Pages = new List<PageAnswers>()
                 }));
 
-            _mockDistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
-            {
-                FormJson = 1
-            });
-
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
 
-            _service = new MappingService(_mockDistributedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockLogger.Object);
+            _service = new MappingService(_mockDistributedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -595,6 +585,82 @@ namespace form_builder_tests.UnitTests.Services
             Assert.NotNull(castResultsData.textbox);
             Assert.NotNull(castResultsData.additional);
             Assert.Equal("answerData", castResultsData.additional);
+        }
+
+        [Fact]
+        public async Task Map_ShouldReturnExpandoObject_WithPaymentAmount()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("textbox")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithSavePaymentAmount("paymentAmount")
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers
+                {
+                    Pages = new List<PageAnswers>(),
+                    PaymentAmount = "10.00"
+                }));
+
+            _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "textbox"), It.IsAny<FormAnswers>()))
+                .ReturnsAsync("textbox answer");
+
+            // Act
+            var result = await _service.Map("form", "guid");
+
+            // Assert
+            var resultData = Assert.IsType<ExpandoObject>(result.Data);
+            dynamic castResultsData = resultData;
+
+            Assert.NotNull(castResultsData);
+            Assert.NotNull(castResultsData.textbox);
+            Assert.NotNull(castResultsData.paymentAmount);
+            Assert.Equal("10.00", castResultsData.paymentAmount);
+        }
+
+        [Fact]
+        public async Task Map_ShouldReturnExpandoObject_WithPaymentAmount_UsingTargetMapping()
+        {
+            // Arrange
+            var schema = new FormSchemaBuilder()
+                .WithSavePaymentAmount("mappedPaymentAmount")
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers
+                {
+                    Pages = new List<PageAnswers>(),
+                    PaymentAmount = "10.00"
+                }));
+
+            // Act
+            var result = await _service.Map("form", "guid");
+
+            // Assert
+            var resultData = Assert.IsType<ExpandoObject>(result.Data);
+            dynamic castResultsData = resultData;
+
+            Assert.NotNull(castResultsData);
+            Assert.NotNull(castResultsData.mappedPaymentAmount);
+            Assert.Equal("10.00", castResultsData.mappedPaymentAmount);
         }
 
         [Fact]

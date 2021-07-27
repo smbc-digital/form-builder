@@ -36,13 +36,13 @@ namespace form_builder.Validators.IntegrityChecks.Form
             bool containsPayment = schema.Pages
                 .Where(page => page.Behaviours is not null)
                 .SelectMany(page => page.Behaviours)
-                .Any(page => page.BehaviourType.Equals(EBehaviourType.SubmitAndPay));
+                .Any(page => page.BehaviourType.Equals(EBehaviourType.SubmitAndPay)) || schema.SavePaymentAmount;
 
             if (!containsPayment)
                 return result;
 
             List<PaymentInformation> paymentInformation = await _paymentConfigProvider.Get<List<PaymentInformation>>();
-            PaymentInformation formPaymentInformation = paymentInformation.FirstOrDefault(payment => payment.FormName.Equals(schema.BaseURL));
+            PaymentInformation formPaymentInformation = paymentInformation.FirstOrDefault(payment => payment.FormName.Any(_ => _.Equals(schema.BaseURL)));
 
             if (formPaymentInformation is null)
             {

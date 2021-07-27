@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
@@ -238,7 +239,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPaymentResponse_ShouldCallPaymentHelper()
+        public async Task ProcessPaymentResponse_ShouldCallPaymentHelper_AndTagParser()
         {
             // Arrange
             _mockPaymentHelper
@@ -257,6 +258,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Once);
+            _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Once);
         }
 
         [Fact]
@@ -278,7 +280,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessPaymentResponse("testForm", "12345", "reference");
 
             // Assert
-            _mockPageHelper.Verify(_ => _.SavePaymentAmount(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.SavePaymentAmount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
     }
 }

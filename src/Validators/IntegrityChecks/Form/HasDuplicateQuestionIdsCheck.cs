@@ -30,7 +30,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             HashSet<string> hashSet = new();
             if (questionIds.Any(id => !hashSet.Add(id)))
-                result.AddFailureMessage($"The provided json has duplicate QuestionIDs");
+                result.AddFailureMessage($"The provided json contains questions with the same QuestionID, All Questions must have unique QuestionIds, QuestionId: {hashSet.First()}");
             
             return result;
         }

@@ -14,6 +14,8 @@
 - [Storage Providers](#storage-providers)
 - [Running High Availability](#running-high-availability)
 - [UI Tests](#ui-Tests)
+- [Preview](#preview)
+- [Data Structure Preview](#data-structure-preview)
 
 # Requirements & Prereqs
 - dotnet core 3.1
@@ -232,3 +234,11 @@ The example below shows the policy we manually created and applied to a test use
 The S3 bucket used during testing was cofigured to 'Block all public access' to 'On'.
 
 The bucket will be created using a Cloudformation template with the folder structure created by the template.
+
+## Preview
+
+Preview allows you to view and validate a form without the need of uploading it to your configured Form schema provider. More info on this feature can be found [here](https://github.com/smbc-digital/form-builder/wiki/Preview-Mode).
+  
+## Data Structure Preview
+  
+Data Structure Preview allows you to view the data structure that will be submitted to the form Service. More info on this feature can be found [here](https://github.com/smbc-digital/form-builder/wiki/Preview-data-structure)

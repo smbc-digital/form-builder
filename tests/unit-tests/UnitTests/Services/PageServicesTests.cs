@@ -26,6 +26,7 @@ using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Services.StreetService;
+using form_builder.TagParsers;
 using form_builder.Validators;
 using form_builder.Validators.IntegrityChecks;
 using form_builder.ViewModels;
@@ -67,6 +68,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ILogger<IPageService>> _mockLogger = new();
         private readonly Mock<IOptions<FileStorageProviderConfiguration>> _mockFileStorageConfiguration = new();
         private readonly Mock<IAddAnotherService> _mockAddAnotherService = new();
+        private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
+        private readonly Mock<ITagParser> _tagParser = new();
 
         public PageServicesTests() {
             _mockFileStorageConfiguration.Setup(_ => _.Value).Returns(new FileStorageProviderConfiguration { Type = "Redis" });
@@ -76,6 +79,11 @@ namespace form_builder_tests.UnitTests.Services
             {
                 _fileStorageProvider.Object
             };
+
+            _tagParser.Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()))
+                .Returns(new Page());
+            var tagParserItems = new List<ITagParser> { _tagParser.Object };
+            _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => tagParserItems.GetEnumerator());
 
             _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
                 .Returns(true);
@@ -135,7 +143,9 @@ namespace form_builder_tests.UnitTests.Services
                 _mockActionsWorkflow.Object,
                 _mockAddAnotherService.Object,
                 _mockFormAvailabilityService.Object,
-                _mockLogger.Object, _fileStorageProviders,
+                _mockLogger.Object, 
+                _fileStorageProviders,
+                _mockTagParsers.Object,
                 _mockFileStorageConfiguration.Object
                 );
         }
@@ -1193,7 +1203,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public void GetBehaviour_ShouldCallSession_And_DistributedCache() {
+        public void GetBehaviour_ShouldCallSession_And_DistributedCache_And_TagParsers() {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("12345");
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
 
@@ -1210,6 +1220,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
             _distributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
+            _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Once);
         }
 
         [Fact]

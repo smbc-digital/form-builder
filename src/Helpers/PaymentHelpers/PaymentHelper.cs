@@ -7,7 +7,6 @@ using form_builder.Helpers.Session;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
-using form_builder.TagParsers;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
@@ -45,7 +44,7 @@ namespace form_builder.Helpers.PaymentHelpers
                 throw new Exception($"PayService:: No mapping entity found for {form}");
 
             var paymentConfig = await _paymentConfigProvider.Get<List<PaymentInformation>>();
-            var formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName.Equals(form));
+            var formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName.Any(_ => _.Equals(form)));
 
             if (formPaymentConfig is null)
                 throw new Exception($"PayService:: No payment information found for {form}");

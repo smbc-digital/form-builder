@@ -1294,7 +1294,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public void SavePaymentAmount_ShouldCallDistributedCache()
         {
             var sessionGuid = Guid.NewGuid().ToString();
-            _pageHelper.SavePaymentAmount(sessionGuid, "10.00");
+            _pageHelper.SavePaymentAmount(sessionGuid, "10.00", "paymentAmount");
 
             _mockDistributedCache.Verify(_ => _.GetString(sessionGuid), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(sessionGuid, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);

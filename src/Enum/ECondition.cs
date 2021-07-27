@@ -4,6 +4,7 @@
     {
         Undefined = 0,
         EqualTo,
+        PaymentAmountEqualTo,
         Contains,
         IsNullOrEmpty,
         IsFileUploadNullOrEmpty,

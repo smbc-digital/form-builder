@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Helpers.PaymentHelpers;
@@ -34,7 +35,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 {
                     new()
                     {
-                        FormName = "testForm",
+                        FormName = new[] {"testForm"},
                         PaymentProvider = "testPaymentProvider",
                         Settings = new Settings
                         {
@@ -43,7 +44,7 @@ namespace form_builder_tests.UnitTests.Helpers
                     },
                     new()
                     {
-                        FormName = "testFormWithNoValidPayment",
+                        FormName = new[] {"testFormWithNoValidPayment"},
                         PaymentProvider = "invalidPaymentProvider",
                         Settings = new Settings
                         {
@@ -52,7 +53,7 @@ namespace form_builder_tests.UnitTests.Helpers
                     },
                     new()
                     {
-                        FormName = "complexCalculationForm",
+                        FormName = new[] {"complexCalculationForm"},
                         PaymentProvider = "testPaymentProvider",
                         Settings = new Settings
                         {
