@@ -46,17 +46,14 @@ namespace form_builder.Models.Elements
             }
 
             if (Properties.Options[i].HasHint) 
-                properties.Add("aria-describedby", GetListItemHintId(i));
-            
+                properties.Add("aria-describedby", GetListItemHintId(i));      
 
             if (Properties.Options[i].Exclusive) 
                 properties.Add("data-behaviour", "exclusive");
-            
 
             if (Properties.Checked || Properties.Value.Contains(Properties.Options[i].Value)) 
                 properties.Add("checked", "true");
             
-
             return properties;
         }
     }
