@@ -361,6 +361,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidQuestionCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidTargetMappingValueCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, CheckboxElementCheck>();
 
             services.AddSingleton<IFormSchemaIntegrityValidator, FormSchemaIntegrityValidator>();
 
