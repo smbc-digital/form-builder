@@ -21,5 +21,7 @@ namespace form_builder.Models
         public string Divider { get; set; }
 
         public bool HasDivider => !string.IsNullOrEmpty(Divider);
+
+        public bool Exclusive { get; set; } = false;
     }
 }

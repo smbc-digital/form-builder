@@ -136,6 +136,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IElementValidator, IsDateBeforeValidator>();
             services.AddTransient<IElementValidator, IsDateAfterAbsoluteValidator>();
             services.AddTransient<IElementValidator, IsDateAfterValidator>();
+            services.AddTransient<IElementValidator, ExclusiveCheckboxValidator>();
 
             return services;
         }
