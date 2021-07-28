@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
@@ -28,6 +29,41 @@ namespace form_builder.Models.Elements
             elementHelper.OrderOptionsAlphabetically(this);
 
             return viewRender.RenderAsync(Type.ToString(), this);
+        }
+
+        public Dictionary<string, dynamic> GenerateCheckboxProperties(int i) {
+            var properties = new Dictionary<string, dynamic>
+            {
+                { "class", "govuk-checkboxes__input" },
+                { "type", "checkbox" },
+                { "id", GetListItemId(i) },
+                { "value", Properties.Options[i].Value},
+            };
+
+            if (Properties.Options.Any(_ => _.HasConditionalElement)) {
+                var fieldsetIncrement = Properties.QuestionId.Split(':').Length > 1 ? $"-{Properties.QuestionId.Split(':')[1]}" : null;
+                properties.Add("data-aria-controls", $"conditional-{i}{fieldsetIncrement}");
+            }
+
+            if (Properties.Options[i].HasHint) {
+                properties.Add("aria-describedby", GetListItemHintId(i));
+            }
+
+            if (Properties.Options[i].Exclusive) {
+                properties.Add("data-behaviour", "exclusive");
+            }
+
+            if (Properties.Checked || Properties.Value.Contains(Properties.Options[i].Value)) {
+                properties.Add("checked", "true");
+            }
+
+            if (DisplayAriaDescribedby)
+                properties.Add("aria-describedby", GetDescribedByAttributeValue());
+
+            if (!string.IsNullOrEmpty(Properties.Purpose))
+                properties.Add("autocomplete", Properties.Purpose);
+
+            return properties;
         }
     }
 }
