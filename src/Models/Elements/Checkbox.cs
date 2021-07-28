@@ -45,23 +45,17 @@ namespace form_builder.Models.Elements
                 properties.Add("data-aria-controls", $"conditional-{i}{fieldsetIncrement}");
             }
 
-            if (Properties.Options[i].HasHint) {
+            if (Properties.Options[i].HasHint) 
                 properties.Add("aria-describedby", GetListItemHintId(i));
-            }
+            
 
-            if (Properties.Options[i].Exclusive) {
+            if (Properties.Options[i].Exclusive) 
                 properties.Add("data-behaviour", "exclusive");
-            }
+            
 
-            if (Properties.Checked || Properties.Value.Contains(Properties.Options[i].Value)) {
+            if (Properties.Checked || Properties.Value.Contains(Properties.Options[i].Value)) 
                 properties.Add("checked", "true");
-            }
-
-            if (DisplayAriaDescribedby)
-                properties.Add("aria-describedby", GetDescribedByAttributeValue());
-
-            if (!string.IsNullOrEmpty(Properties.Purpose))
-                properties.Add("autocomplete", Properties.Purpose);
+            
 
             return properties;
         }
