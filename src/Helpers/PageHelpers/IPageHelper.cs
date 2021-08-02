@@ -13,6 +13,8 @@ namespace form_builder.Helpers.PageHelpers
 
         FormAnswers GetSavedAnswers(string guid);
 
+        Dictionary<string, dynamic> SanitizeViewModel(Dictionary<string, dynamic> viewModel);
+
         void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false);
 
         void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedRefereceMappingId = "");
