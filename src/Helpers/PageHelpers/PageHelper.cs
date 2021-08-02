@@ -139,6 +139,26 @@ namespace form_builder.Helpers.PageHelpers
             return convertedAnswers;
         }
 
+        public Dictionary<string, dynamic> SanitizeViewModel(Dictionary<string, dynamic> viewModel)
+        {
+            var sanitizedViewModel = new Dictionary<string, dynamic>();
+            foreach (var item in viewModel)
+            {
+                if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
+                {
+                    var valueType = item.Value?.GetType();
+                    if (valueType is not null && valueType.FullName.Equals("System.String"))
+                        sanitizedViewModel.Add(item.Key, item.Value.ToString().Trim());
+                    else
+                        sanitizedViewModel.Add(item.Key, item.Value);
+                }
+                else
+                    sanitizedViewModel.Add(item.Key, item.Value);
+            }
+
+            return sanitizedViewModel;
+        }
+
         public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
         {
             var formData = _distributedCache.GetString(guid);

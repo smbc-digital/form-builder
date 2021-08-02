@@ -104,6 +104,10 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), null))
                 .ReturnsAsync(new FormBuilderViewModel());
 
+            _mockPageHelper
+                .Setup(_ => _.SanitizeViewModel(It.IsAny<Dictionary<string, dynamic>>()))
+                .Returns(new Dictionary<string, dynamic>());
+
             _mockEnvironment
                 .Setup(_ => _.EnvironmentName)
                 .Returns("local");
@@ -610,6 +614,10 @@ namespace form_builder_tests.UnitTests.Services
                 { element.Properties.QuestionId, "text" }
             };
 
+            _mockPageHelper
+                .Setup(_ => _.SanitizeViewModel(It.IsAny<Dictionary<string, dynamic>>()))
+                .Returns(viewModel);
+
             // Act
             await _service.ProcessRequest("form", "page-one", viewModel, null, true);
 
@@ -651,6 +659,10 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
+            _mockPageHelper
+                .Setup(_ => _.SanitizeViewModel(It.IsAny<Dictionary<string, dynamic>>()))
+                .Returns(viewModel);
+
             var result = await _service.ProcessRequest("form", "page-one", viewModel, null, true);
 
             _addressService.Verify(_ => _.ProcessAddress(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
@@ -690,6 +702,10 @@ namespace form_builder_tests.UnitTests.Services
                 { "Guid", Guid.NewGuid().ToString() },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
+
+            _mockPageHelper
+                .Setup(_ => _.SanitizeViewModel(It.IsAny<Dictionary<string, dynamic>>()))
+                .Returns(viewModel);
 
             var result = await _service.ProcessRequest("form", "page-one", viewModel, null, true);
 
@@ -732,6 +748,10 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
+            _mockPageHelper
+                .Setup(_ => _.SanitizeViewModel(It.IsAny<Dictionary<string, dynamic>>()))
+                .Returns(viewModel);
+
             await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessRequest("form", "page-one", viewModel, null, true));
 
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
@@ -766,6 +786,10 @@ namespace form_builder_tests.UnitTests.Services
                 { "Guid", Guid.NewGuid().ToString() },
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
+
+            _mockPageHelper
+                .Setup(_ => _.SanitizeViewModel(It.IsAny<Dictionary<string, dynamic>>()))
+                .Returns(viewModel);
 
             var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessRequest("form", "page-one", viewModel, null, true));
             Assert.Equal("Session guid null.", result.Message);
@@ -804,6 +828,10 @@ namespace form_builder_tests.UnitTests.Services
                 { "Guid", Guid.NewGuid().ToString() },
                 { $"{element.Properties.QuestionId}-organisation-searchterm", "orgName" },
             };
+
+            _mockPageHelper
+                .Setup(_ => _.SanitizeViewModel(It.IsAny<Dictionary<string, dynamic>>()))
+                .Returns(viewModel);
 
             var result = await _service.ProcessRequest("form", "page-one", viewModel, null, true);
 
@@ -855,7 +883,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessRequest_ShouldNot_CallPageHelper_WhenPageContains_NoInboundValues() {
+        public async Task ProcessRequest_ShouldNot_CallIncomingDataHelper_WhenPageContains_NoInboundValues() {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
             _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
@@ -882,7 +910,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessRequest_Should_CallPageHelper_WhenPageContains_InboundValues() {
+        public async Task ProcessRequest_Should_CallIncomingDataHelper_WhenPageContains_InboundValues() {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
             _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
@@ -911,6 +939,34 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), It.IsAny<IEnumerable<CustomFormFile>>(), true);
 
             _mockIncomingDataHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessRequest_Should_CallPageHelper_ToSanitizeViewModel()
+        {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel());
+
+            var page = new PageBuilder()
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null, true);
+
+            _mockPageHelper.Verify(_ => _.SanitizeViewModel(It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
         }
 
         [Fact]
@@ -954,6 +1010,10 @@ namespace form_builder_tests.UnitTests.Services
                 { "Guid", Guid.NewGuid().ToString() },
                 { $"{element.Properties.QuestionId}-fileupload", "file" }
             };
+
+            _mockPageHelper
+                .Setup(_ => _.SanitizeViewModel(It.IsAny<Dictionary<string, dynamic>>()))
+                .Returns(viewModel);
 
             var result = await _service.ProcessRequest("form", "page-one", viewModel, null, true);
 
@@ -1002,7 +1062,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessRequest_ShouldCall_IncomingDataHelper_WhenFormHasIncomingGetValues() {
+        public async Task ProcessPage_ShouldCall_IncomingDataHelper_WhenFormHasIncomingGetValues() {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
 
             var element = new ElementBuilder()
@@ -1041,7 +1101,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessRequest_ShouldCall_IncomingDataHelper_AndSaveData_WhenFormHasIncomingGetValues() {
+        public async Task ProcessPage_ShouldCall_IncomingDataHelper_AndSaveData_WhenFormHasIncomingGetValues() {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
             _mockIncomingDataHelper.Setup(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>(), It.IsAny<FormAnswers>()))
                 .Returns(new Dictionary<string, dynamic> { { "test", "testdata" } });
@@ -1083,7 +1143,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessRequest_ShouldRedirect_WhenBookingService_ReturnsEntity_WithNoAppointments() {
+        public async Task ProcessPage_ShouldRedirect_WhenBookingService_ReturnsEntity_WithNoAppointments() {
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
             _bookingService.Setup(_ => _.Get(It.IsAny<string>(), It.IsAny<Page>(), It.IsAny<string>()))
                 .ReturnsAsync(new BookingProcessEntity { BookingHasNoAvailableAppointments = true });
@@ -1146,6 +1206,10 @@ namespace form_builder_tests.UnitTests.Services
             {
                 { "Guid", Guid.NewGuid().ToString() }
             };
+
+            _mockPageHelper
+                .Setup(_ => _.SanitizeViewModel(It.IsAny<Dictionary<string, dynamic>>()))
+                .Returns(viewModel);
 
             _mockPageHelper
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
