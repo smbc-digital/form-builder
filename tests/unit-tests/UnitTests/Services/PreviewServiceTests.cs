@@ -169,6 +169,39 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task VerifyPreviewRequest_ShouldReturnErrorPage_When_Uploaded_Schama_Is_Not_Valid_AndAdd_MesseageWhen_ExceptionType_Is_From_Newtonsoft()
+        {
+            Page callbackPage = new ();
+            _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel())
+                .Callback<Page, Dictionary<string, dynamic>, FormSchema, string, FormAnswers, object>((a,b,c,d,e,f) => callbackPage = a);
+
+            _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
+                .Returns(new ValidationResult { IsValid = true });
+
+            var model = new List<CustomFormFile>
+            {
+                new CustomFormFile("", "", 0, "")
+            };
+
+            _schemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ThrowsAsync(new ApplicationException{ Source = LibConstants.NEWTONSOFT_LIBRARY_NAME });
+
+            _fileUploadService.Setup(_ => _.AddFiles(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
+                .Returns(new Dictionary<string, dynamic>{ { "file", new List<DocumentModel> { new DocumentModel{ Content = "" }} } });
+
+            var result = await _service.VerifyPreviewRequest(model);
+            
+            var entity = Assert.IsType<ProcessPreviewRequestEntity>(result);
+            Assert.True(entity.UseGeneratedViewModel);
+            Assert.Equal(3, callbackPage.Elements.Count);
+            _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
+            _testValidator.Verify(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()), Times.Once);
+            _distributedCache.Verify(_ => _.SetAsync(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()), Times.Once);
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}"))), Times.Once);
+        }
+
+        [Fact]
         public async Task VerifyPreviewRequest_Should_Return_ProcessPreviewRequestEntity_OnSuccessfuly_PreviewRequest()
         {
             _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))

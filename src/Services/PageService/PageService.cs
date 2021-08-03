@@ -230,6 +230,7 @@ namespace form_builder.Services.PageService
             if (currentPage.HasIncomingPostValues)
                 viewModel = _incomingDataHelper.AddIncomingFormDataValues(currentPage, viewModel);
 
+            viewModel = _pageHelper.SanitizeViewModel(viewModel);
             currentPage.Validate(viewModel, _validators, baseForm);
 
             if (currentPage.Elements.Any(_ => _.Type.Equals(EElementType.AddAnother)))

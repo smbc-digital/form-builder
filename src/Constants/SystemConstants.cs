@@ -15,5 +15,6 @@ namespace form_builder.Constants
         public static readonly string CaseReferenceQueryString = "?caseReference=";
 
         public static readonly string CONDITIONAL_ELEMENT_REPLACEMENT = "CONDITIONAL_ELEMENT_TO_BE_REPLACED=";
+        public static readonly string NEW_LINE_CHARACTER = "\n";
     }
 }

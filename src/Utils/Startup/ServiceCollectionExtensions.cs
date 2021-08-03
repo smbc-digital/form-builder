@@ -134,6 +134,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IElementValidator, IsDateBeforeValidator>();
             services.AddTransient<IElementValidator, IsDateAfterAbsoluteValidator>();
             services.AddTransient<IElementValidator, IsDateAfterValidator>();
+            services.AddTransient<IElementValidator, ExclusiveCheckboxValidator>();
 
             return services;
         }
@@ -358,6 +359,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidQuestionCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidTargetMappingValueCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, CheckboxElementCheck>();
 
             services.AddSingleton<IFormSchemaIntegrityValidator, FormSchemaIntegrityValidator>();
 

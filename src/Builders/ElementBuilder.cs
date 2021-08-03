@@ -516,5 +516,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithExclusiveCheckboxValidationMessage(string value)
+        {
+            _property.ExclusiveCheckboxValidationMessage = value;
+
+            return this;
+        }
     }
 }

@@ -7,25 +7,20 @@
 <div class="govuk-checkboxes" data-module="govuk-checkboxes">
     @for (var i = 0; i < Model.Properties.Options.Count; i++)
     {
-        <div class="govuk-checkboxes__item">
-            <input class="govuk-checkboxes__input"
-                   type="checkbox"
-                   value="@Model.Properties.Options[i].Value"
-                   name="@Model.Properties.QuestionId"
-                   id="@Model.GetListItemId(i)"
-                   @(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? $"data-aria-controls=conditional-{i}{fieldsetIncrement}" : string.Empty)
-                   @(Model.Properties.Options[i].HasHint ? $"aria-describedby={Model.GetListItemHintId(i)}" : string.Empty)
-                   @(Model.Properties.Checked || Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty) />
+        @if (Model.Properties.Options[i].HasDivider) {
+            <div class="govuk-checkboxes__divider">@Model.Properties.Options[i].Divider</div>
+        }
+<div class="govuk-checkboxes__item">
+    @Html.TextBox(Model.QuestionId, Model.Properties.Options[i].Value, Model.GenerateCheckboxProperties(i))
 
-            <label class="govuk-label govuk-checkboxes__label" for="@Model.GetListItemId(i)">
-                @Model.Properties.Options[i].Text
-            </label>
+    <label class="govuk-label govuk-checkboxes__label" for="@Model.GetListItemId(i)">
+        @Model.Properties.Options[i].Text
+    </label>
 
-            @if (Model.Properties.Options[i].HasHint)
-            {
-                <div class="govuk-hint govuk-checkboxes__hint" id="@Model.GetListItemHintId(i)">@Model.Properties.Options[i].Hint</div>
-            }
-        </div>
+    @if (Model.Properties.Options[i].HasHint) {
+        <div class="govuk-hint govuk-checkboxes__hint" id="@Model.GetListItemHintId(i)">@Model.Properties.Options[i].Hint</div>
+    }
+</div>
 
         @if (!string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElementId))
         {

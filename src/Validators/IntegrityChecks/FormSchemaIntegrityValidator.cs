@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.Models;
 using form_builder.Validators.IntegrityChecks.Behaviours;
 using form_builder.Validators.IntegrityChecks.Elements;
@@ -73,7 +74,7 @@ namespace form_builder.Validators.IntegrityChecks
             if (invalidCheckResults.Any())
             {
                 var failingCheckResultMessages = invalidCheckResults.SelectMany(result => result.Messages);
-                throw new ApplicationException($"The requested for schema '{schema.FormName}' was invalid, The following integrity check results are failing: \n { String.Join('\n', failingCheckResultMessages) }");
+                throw new ApplicationException($"The requested for schema '{schema.FormName}' was invalid, The following integrity check results are failing: {SystemConstants.NEW_LINE_CHARACTER} { String.Join(SystemConstants.NEW_LINE_CHARACTER, failingCheckResultMessages) }");
             }
         }
     }

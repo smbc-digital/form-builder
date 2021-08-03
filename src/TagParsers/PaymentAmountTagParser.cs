@@ -23,7 +23,7 @@ namespace form_builder.TagParsers
         {
             var leadingParagraphRegexIsMatch = !string.IsNullOrEmpty(page.LeadingParagraph) && Regex.IsMatch(page.LeadingParagraph);
             var pageHasElementsMatchingRegex = page.Elements.Any(_ => _.Properties.Text is not null && Regex.IsMatch(_.Properties.Text));
-            var pageHasConditionMatchingRegex = page.Behaviours is not null && page.Behaviours.Any(_ => _.Conditions.Any(_ => _.QuestionId is not null && Regex.IsMatch(_.QuestionId)));
+            var pageHasConditionMatchingRegex = page.Behaviours is not null && page.Behaviours.Where(_ => _.Conditions is not null).Any(_ => _.Conditions.Any(_ => _.QuestionId is not null && Regex.IsMatch(_.QuestionId)));
 
             if (leadingParagraphRegexIsMatch || pageHasElementsMatchingRegex || pageHasConditionMatchingRegex)
             {
