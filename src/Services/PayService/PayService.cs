@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Enum;
@@ -85,22 +86,27 @@ namespace form_builder.Services.PayService
             try
             {
                 paymentProvider.VerifyPaymentResponse(responseCode);
-                await _gateway.PostAsync(postUrl.CallbackUrl,
+                var result = await _gateway.PostAsync(postUrl.CallbackUrl,
                     new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString() });
 
+                LogCallBackFailure(result, reference, EPaymentCallbackType.Success);
                 _pageHelper.SavePaymentAmount(sessionGuid, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
                 return reference;
             }
             catch (PaymentDeclinedException)
             {
-                await _gateway.PostAsync(postUrl.CallbackUrl,
+                var result = await _gateway.PostAsync(postUrl.CallbackUrl,
                     new { CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString() });
+
+                LogCallBackFailure(result, reference, EPaymentCallbackType.Declined);
                 throw new PaymentDeclinedException("PayService::ProcessPaymentResponse, PaymentProvider declined payment");
             }
             catch (PaymentFailureException)
             {
-                await _gateway.PostAsync(postUrl.CallbackUrl,
+                var result = await _gateway.PostAsync(postUrl.CallbackUrl,
                     new { CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString() });
+
+                LogCallBackFailure(result, reference, EPaymentCallbackType.Failure);
                 throw new PaymentFailureException("PayService::ProcessPaymentResponse, PaymentProvider failed payment");
             }
             catch (Exception ex)
@@ -118,6 +124,12 @@ namespace form_builder.Services.PayService
                 throw new Exception($"PayService::GetFormPaymentProvider, No payment provider configured for {paymentInfo.PaymentProvider}");
 
             return paymentProvider;
+        }
+
+        private void LogCallBackFailure(HttpResponseMessage callbackResponse, string reference, EPaymentCallbackType callbackType) 
+        {
+            if(!callbackResponse.IsSuccessStatusCode)
+                _logger.LogError($"PayService::ProcessPaymentResponse, Payment callback for {callbackType} failed with statuscode: {callbackResponse.StatusCode}, Payment reference {reference}, Response: {JsonConvert.SerializeObject(callbackResponse)}");
         }
     }
 }
