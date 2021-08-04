@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using form_builder.Models;
 
 namespace form_builder.ViewModels
@@ -14,6 +14,6 @@ namespace form_builder.ViewModels
         public bool HideBackButton { get; set; } = false;
         public bool DisplayBreadCrumbs { get; set; }
         public List<Breadcrumb> BreadCrumbs { get; set; }
-        public bool IsInPreviewMode {get;set;}
+        public bool IsInPreviewMode { get; set; }
     }
 }

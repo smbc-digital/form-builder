@@ -92,9 +92,7 @@ using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
-using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.PreviewService;
-using form_builder.Providers.FileStorage;
 using form_builder.SubmissionActions;
 using form_builder.Helpers.Cookie;
 
@@ -136,6 +134,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IElementValidator, IsDateBeforeValidator>();
             services.AddTransient<IElementValidator, IsDateAfterAbsoluteValidator>();
             services.AddTransient<IElementValidator, IsDateAfterValidator>();
+            services.AddTransient<IElementValidator, ExclusiveCheckboxValidator>();
 
             return services;
         }
@@ -360,6 +359,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidQuestionCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidTargetMappingValueCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, CheckboxElementCheck>();
 
             services.AddSingleton<IFormSchemaIntegrityValidator, FormSchemaIntegrityValidator>();
 

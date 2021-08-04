@@ -502,6 +502,57 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
+        public void SanitizeViewModel_ShouldTrimWhitespace_OnAllowedKeysWhereValueTypeIsString()
+        {
+            // Arrange
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { "question", "   answer   " }
+            };
+
+            // Act
+            var result = _pageHelper.SanitizeViewModel(viewModel);
+
+            // Assert
+            Assert.Equal("answer", result["question"]);
+        }
+
+        [Fact]
+        public void SanitizeViewModel_ShouldNotTrimWhitespace_OnDisallowedKeys()
+        {
+            // Arrange
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { "Path", "   path   " }
+            };
+
+            // Act
+            var result = _pageHelper.SanitizeViewModel(viewModel);
+
+            // Assert
+            Assert.Equal("   path   ", result["Path"]);
+        }
+
+        [Fact]
+        public void SanitizeViewModel_ShouldNotChangeCountOfViewModel()
+        {
+            // Arrange
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                { "questionOne", "   answer   " },
+                { "questionTwo", true },
+                { "Guid", Guid.NewGuid() },
+                { "Path", "path" }
+            };
+
+            // Act
+            var result = _pageHelper.SanitizeViewModel(viewModel);
+
+            // Assert
+            Assert.Equal(viewModel.Count, result.Count);
+        }
+
+        [Fact]
         public void SaveAnswers_ShouldCallCacheProvider()
         {
             // Arrange
