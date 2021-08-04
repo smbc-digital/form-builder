@@ -1,6 +1,6 @@
 namespace form_builder.Enum
 {
-    public enum EPaymentCallbackType
+    public enum EPaymentCallbackStatus
     {
         Unknown,
         Success,

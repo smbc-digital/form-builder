@@ -89,7 +89,7 @@ namespace form_builder.Services.PayService
                 var result = await _gateway.PostAsync(postUrl.CallbackUrl,
                     new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString() });
 
-                LogCallBackFailure(result, reference, EPaymentCallbackType.Success);
+                LogCallBackFailure(result, reference, EPaymentCallbackStatus.Success);
                 _pageHelper.SavePaymentAmount(sessionGuid, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
                 return reference;
             }
@@ -98,7 +98,7 @@ namespace form_builder.Services.PayService
                 var result = await _gateway.PostAsync(postUrl.CallbackUrl,
                     new { CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString() });
 
-                LogCallBackFailure(result, reference, EPaymentCallbackType.Declined);
+                LogCallBackFailure(result, reference, EPaymentCallbackStatus.Declined);
                 throw new PaymentDeclinedException("PayService::ProcessPaymentResponse, PaymentProvider declined payment");
             }
             catch (PaymentFailureException)
@@ -106,7 +106,7 @@ namespace form_builder.Services.PayService
                 var result = await _gateway.PostAsync(postUrl.CallbackUrl,
                     new { CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString() });
 
-                LogCallBackFailure(result, reference, EPaymentCallbackType.Failure);
+                LogCallBackFailure(result, reference, EPaymentCallbackStatus.Failure);
                 throw new PaymentFailureException("PayService::ProcessPaymentResponse, PaymentProvider failed payment");
             }
             catch (Exception ex)
@@ -126,7 +126,7 @@ namespace form_builder.Services.PayService
             return paymentProvider;
         }
 
-        private void LogCallBackFailure(HttpResponseMessage callbackResponse, string reference, EPaymentCallbackType callbackType) 
+        private void LogCallBackFailure(HttpResponseMessage callbackResponse, string reference, EPaymentCallbackStatus callbackType) 
         {
             if(!callbackResponse.IsSuccessStatusCode)
                 _logger.LogError($"PayService::ProcessPaymentResponse, Payment callback for {callbackType} failed with statuscode: {callbackResponse.StatusCode}, Payment reference {reference}, Response: {JsonConvert.SerializeObject(callbackResponse)}");
