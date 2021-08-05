@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Enum;
+using form_builder.Exceptions;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.PaymentHelpers;
 using form_builder.Helpers.Session;
@@ -39,7 +42,11 @@ namespace form_builder_tests.UnitTests.Services
 
         public PayServiceTests()
         {
-            _mockPageHelper.Setup(_ => _.GetSavedAnswers(It.IsAny<string>())).Returns(new FormAnswers());
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+
+            _mockPageHelper.Setup(_ => _.GetSavedAnswers(It.IsAny<string>()))
+                .Returns(new FormAnswers());
 
             _tagParser.Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns("{\"PaymentProvider\":\"testPaymentProvider\",\"Settings\":{\"CalculationSlug\":{\"Environment\":null,\"URL\":\"url\",\"Type\":\"AuthHeader\",\"AuthToken\":\"TestToken\",\"CallbackUrl\":null}}}");
@@ -281,6 +288,141 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             _mockPageHelper.Verify(_ => _.SavePaymentAmount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessPaymentResponse_ShouldLog_Error_OnCallbackFailure_ForDeclinedJourney()
+        {
+            // Arrange
+            _mockPaymentHelper
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .ReturnsAsync(new PaymentInformation
+                {
+                    PaymentProvider = "testPaymentProvider", 
+                    Settings = new Settings
+                    {
+                        Amount = "10"
+                    }
+                });
+
+            _paymentProvider
+                .Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
+                .Throws(new PaymentDeclinedException("error"));
+
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.InternalServerError });
+
+            // Act
+            await Assert.ThrowsAsync<PaymentDeclinedException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", "reference"));
+
+            // Assert
+            _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessPaymentResponse_ShouldLog_Error_OnCallbackFailure_ForFailureJourney()
+        {
+            // Arrange
+            _mockPaymentHelper
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .ReturnsAsync(new PaymentInformation
+                {
+                    PaymentProvider = "testPaymentProvider", 
+                    Settings = new Settings
+                    {
+                        Amount = "10"
+                    }
+                });
+
+            _paymentProvider
+                .Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
+                .Throws(new PaymentFailureException("error"));
+
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.InternalServerError });
+
+            // Act
+            await Assert.ThrowsAsync<PaymentFailureException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", "reference"));
+
+            // Assert
+            _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessPaymentResponse_ShouldLog_Error_OnCallbackFailure_ForSuccessJourney()
+        {
+            // Arrange
+            _mockPaymentHelper
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .ReturnsAsync(new PaymentInformation
+                {
+                    PaymentProvider = "testPaymentProvider", 
+                    Settings = new Settings
+                    {
+                        Amount = "10"
+                    }
+                });
+
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.InternalServerError });
+
+            // Act
+            await _service.ProcessPaymentResponse("testForm", "12345", "reference");
+
+            // Assert
+            _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+        }
+        
+        [Fact]
+        public async Task ProcessPaymentResponse_ShouldNotLog_Error_If_CallbackIsSuccessfull_OnFailure()
+        {
+            // Arrange
+            _mockPaymentHelper
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .ReturnsAsync(new PaymentInformation
+                {
+                    PaymentProvider = "testPaymentProvider", 
+                    Settings = new Settings
+                    {
+                        Amount = "10"
+                    }
+                });
+
+            _paymentProvider
+                .Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
+                .Throws(new PaymentFailureException("error"));
+
+            // Act
+            await Assert.ThrowsAsync<PaymentFailureException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", "reference"));
+
+            // Assert
+            _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task ProcessPaymentResponse_ShouldNotLog_Error_If_CallbackIsSuccessfull_OnDeclined()
+        {
+            // Arrange
+            _mockPaymentHelper
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .ReturnsAsync(new PaymentInformation
+                {
+                    PaymentProvider = "testPaymentProvider", 
+                    Settings = new Settings
+                    {
+                        Amount = "10"
+                    }
+                });
+
+            _paymentProvider
+                .Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
+                .Throws(new PaymentDeclinedException("error"));
+
+            // Act
+            await Assert.ThrowsAsync<PaymentDeclinedException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", "reference"));
+
+            // Assert
+            _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Never);
         }
     }
 }
