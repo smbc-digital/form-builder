@@ -97,6 +97,7 @@ using form_builder.Services.PreviewService;
 using form_builder.Providers.FileStorage;
 using form_builder.SubmissionActions;
 using form_builder.Helpers.Cookie;
+using form_builder.Services.RetrieveFormDataService;
 
 namespace form_builder.Utils.Startup
 {
@@ -382,6 +383,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFileUploadService, FileUploadService>();
             services.AddSingleton<IDocumentSummaryService, DocumentSummaryService>();
             services.AddSingleton<IRetrieveExternalDataService, RetrieveExternalDataService>();
+            services.AddSingleton<IRetrieveFormDataService, RetrieveFormDataService>();
             services.AddSingleton<IEmailService, EmailService>();
             services.AddSingleton<IValidateService, ValidateService>();
             services.AddSingleton<ITemplatedEmailService, TemplatedEmailService>();
