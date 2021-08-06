@@ -51,17 +51,15 @@ namespace form_builder.Services.RetrieveFormDataService
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var formData = _distributedCache.GetString(sessionGuid);
 
-            if (!string.IsNullOrEmpty(formData))
-                return;
-
-            var formAnswers = new FormAnswers
+            var formAnswers = !string.IsNullOrEmpty(formData) ? JsonConvert.DeserializeObject<FormAnswers>(formData) : new FormAnswers
             {
                 FormName = formName,
                 Pages = new List<PageAnswers>(),
-                StartPageUrl = formSchema.StartPageUrl
+                StartPageUrl = formSchema.StartPageUrl,
+                FormData = new Dictionary<string, object>()
             };
 
-            if (!string.IsNullOrEmpty(formData))
+            if (formAnswers.FormData.ContainsKey("RetrieveFormDataActionComplete"))
                 return;
 
             if (action.Properties.IncomingValues.Any())
@@ -126,6 +124,8 @@ namespace form_builder.Services.RetrieveFormDataService
 
                 formAnswers.Pages.Add(pageAnswers);
             }
+
+            formAnswers.FormData.Add("RetrieveFormDataActionComplete", true);
 
             await _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(formAnswers));
         }
