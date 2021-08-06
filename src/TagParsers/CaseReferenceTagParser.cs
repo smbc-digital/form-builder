@@ -37,7 +37,7 @@ namespace form_builder.TagParsers
                 }
             }
 
-            return page;
+            return await Task.FromResult(page);
         }
 
         public string ParseString(string content, FormAnswers formAnswers) => Regex.IsMatch(content) ? Parse(content, formAnswers.CaseReference, Regex) : content;

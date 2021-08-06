@@ -186,14 +186,13 @@ namespace form_builder.Services.MappingService
             if (splitTargets.Length.Equals(1))
             {
 
-                if (element.Type == EElementType.FileUpload || element.Type == EElementType.MultipleFileUpload)
+                if (element.Type.Equals(EElementType.FileUpload) || element.Type.Equals(EElementType.MultipleFileUpload))
                     return await CheckAndCreateForFileUpload(splitTargets[0], element, formAnswers, obj);
 
-                if (element.Type == EElementType.AddAnother)
+                if (element.Type.Equals(EElementType.AddAnother))
                     return await CheckAndCreateForAddAnother(splitTargets[0], element, formAnswers, obj);
 
                 object answerValue = await _elementMapper.GetAnswerValue(element, formAnswers);
-
 
                 if (answerValue is not null && obj.TryGetValue(splitTargets[0], out var objectValue))
                 {

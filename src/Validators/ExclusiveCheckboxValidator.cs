@@ -27,7 +27,7 @@ namespace form_builder.Validators
             bool isValid = true;
             answer.ToList().ForEach(value =>
             {
-                if (element.Properties.Options.FirstOrDefault(_ => _.Exclusive && _.Value == value) != null)
+                if (element.Properties.Options.FirstOrDefault(_ => _.Exclusive && _.Value.Equals(value)) is not null)
                     isValid = false;
             });
 

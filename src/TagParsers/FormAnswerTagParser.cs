@@ -25,7 +25,7 @@ namespace form_builder.TagParsers
                 return element;
             }).ToList();
 
-            return page;
+            return await Task.FromResult(page);
         }
 
         public string ParseString(string content, FormAnswers formAnswers)

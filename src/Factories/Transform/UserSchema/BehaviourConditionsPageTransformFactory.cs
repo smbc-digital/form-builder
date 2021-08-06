@@ -25,7 +25,7 @@ namespace form_builder.Factories.Transform.UserSchema
                 }
             }
 
-            return page;
+            return await Task.FromResult(page);
         }
     }
 }
