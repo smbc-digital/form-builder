@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using form_builder.Enum;
 using form_builder.Models;
+using form_builder.Models.Actions;
 using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Helpers.IncomingDataHelper
@@ -34,6 +35,32 @@ namespace form_builder.Helpers.IncomingDataHelper
             var formData = new Dictionary<string, dynamic>();
             var queryData = queryCollection.ToDictionary(x => x.Key, x => (dynamic)x.Value);
             page.IncomingValues.Where(_ => _.HttpActionType.Equals(EHttpActionType.Get)).ToList().ForEach(_ =>
+            {
+                var containsValue = queryData.ContainsKey(_.Name);
+
+                if (!containsValue && formAnswers.AdditionalFormData.ContainsKey(_.QuestionId))
+                    return;
+
+                if (!_.Optional && !containsValue)
+                    throw new Exception($"IncomingDataHelper::AddIncomingFormDataValues, FormData does not contain {_.Name} required value");
+
+                if (!containsValue) return;
+
+                dynamic value = queryCollection[_.Name];
+                if (_.Base64Encoded)
+                    value = Encoding.UTF8.GetString(Convert.FromBase64String(value));
+
+                formData = RecursiveCheckAndCreate(_.QuestionId, value, formData);
+            });
+
+            return formData;
+        }
+
+        public Dictionary<string, dynamic> AddIncomingFormDataValues(IAction action, IQueryCollection queryCollection, FormAnswers formAnswers)
+        {
+            var formData = new Dictionary<string, dynamic>();
+            var queryData = queryCollection.ToDictionary(x => x.Key, x => (dynamic)x.Value);
+            action.Properties.IncomingValues.ForEach(_ =>
             {
                 var containsValue = queryData.ContainsKey(_.Name);
 

@@ -139,6 +139,11 @@ namespace form_builder.Services.PageService
             if (string.IsNullOrEmpty(formData) && !path.Equals(baseForm.FirstPageSlug) && (!baseForm.HasDocumentUpload || !path.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH)))
                 return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug };
 
+            if (string.IsNullOrEmpty(formData) && baseForm.HasFormActionsGetValues)
+                await _actionsWorkflow.Process(
+                    baseForm.FormActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Get)).ToList(),
+                    baseForm, baseForm.BaseURL, queryParameters);
+
             if (!string.IsNullOrEmpty(formData) && path.Equals(baseForm.FirstPageSlug))
             {
                 var convertedFormData = JsonConvert.DeserializeObject<FormAnswers>(formData);
@@ -180,7 +185,7 @@ namespace form_builder.Services.PageService
             }
 
             if (page.HasPageActionsGetValues)
-                await _actionsWorkflow.Process(page.PageActions, null, form);
+                await _actionsWorkflow.Process(page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Get)).ToList(), null, form, queryParameters);
 
             if (page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
             {

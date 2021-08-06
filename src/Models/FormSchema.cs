@@ -37,7 +37,11 @@ namespace form_builder.Models
 
         public List<Page> Pages { get; set; }
 
-        public List<IAction> FormActions { get; set; } = new List<IAction>();
+        public List<IAction> FormActions { get; set; } = new ();
+
+        public bool HasFormActionsGetValues => FormActions.Any(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Get));
+
+        public bool HasFormActionsPostValues => FormActions.Any(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Post));
 
         public List<EnvironmentAvailability> EnvironmentAvailabilities { get; set; }
 

@@ -10,6 +10,7 @@ using form_builder.Services.RetrieveExternalDataService;
 using form_builder.Services.RetrieveFormDataService;
 using form_builder.Services.TemplatedEmailService;
 using form_builder.Services.ValidateService;
+using Microsoft.AspNetCore.Http;
 
 namespace form_builder.Workflows.ActionsWorkflow
 {
@@ -37,7 +38,7 @@ namespace form_builder.Workflows.ActionsWorkflow
             _retrieveFormDataService = retrieveFormDataService;
         }
 
-        public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
+        public async Task Process(List<IAction> actions, FormSchema formSchema, string formName, IQueryCollection queryParameters)
         {
             if (formSchema is null)
                 formSchema = await _schemaFactory.Build(formName);
@@ -52,7 +53,7 @@ namespace form_builder.Workflows.ActionsWorkflow
                 await _validateService.Process(actions.Where(_ => _.Type.Equals(EActionType.Validate)).ToList(), formSchema, formName);
 
             if (actions.Any(_ => _.Type.Equals(EActionType.RetrieveFormData)))
-                await _retrieveFormDataService.Process(actions.Where(_ => _.Type.Equals(EActionType.RetrieveFormData)).ToList(), formSchema, formName);
+                await _retrieveFormDataService.Process(actions.First(_ => _.Type.Equals(EActionType.RetrieveFormData)), formSchema, formName, queryParameters);
 
             if (actions.Any(_ => _.Type.Equals(EActionType.TemplatedEmail)))
                 _ = _templatedEmailService.ProcessTemplatedEmail(actions.Where(_ => _.Type.Equals(EActionType.TemplatedEmail)).ToList());

@@ -122,7 +122,7 @@ namespace form_builder.Controllers
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
 
             if (currentPageResult.Page.HasPageActionsPostValues)
-                await _actionsWorkflow.Process(currentPageResult.Page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Post)).ToList(), null, form);
+                await _actionsWorkflow.Process(currentPageResult.Page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Post)).ToList(), null, form, null);
 
             var behaviour = _pageService.GetBehaviour(currentPageResult);
 

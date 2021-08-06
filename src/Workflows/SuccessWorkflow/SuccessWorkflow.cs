@@ -25,8 +25,8 @@ namespace form_builder.Workflows.SuccessWorkflow
         {
             var baseForm = await _schemaFactory.Build(form);
 
-            if (baseForm.FormActions.Any())
-                await _actionsWorkflow.Process(baseForm.FormActions, baseForm, form);
+            if (baseForm.HasFormActionsPostValues)
+                await _actionsWorkflow.Process(baseForm.FormActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Post)).ToList(), baseForm, form, null);
 
             return await _pageService.FinalisePageJourney(form, behaviourType, baseForm);
         }
