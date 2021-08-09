@@ -80,7 +80,7 @@ namespace form_builder.Services.PreviewService
 
             var viewModel = new Dictionary<string, dynamic>();
 
-            if (fileUpload != null && fileUpload.Any())
+            if (fileUpload is not null && fileUpload.Any())
                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
 
             var previewPage = PreviewPage();

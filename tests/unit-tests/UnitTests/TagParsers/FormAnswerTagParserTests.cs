@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Models;
@@ -55,7 +56,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         }
 
         [Fact]
-        public void Parse_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
+        public async Task Parse_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
@@ -68,13 +69,13 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var formAnswers = new FormAnswers();
 
-            var result = _tagParser.Parse(page, formAnswers);
+            var result = await _tagParser.Parse(page, formAnswers);
 
             Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
         }
 
         [Fact]
-        public void Parse_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
+        public async Task Parse_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
@@ -87,13 +88,13 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var formAnswers = new FormAnswers();
 
-            var result = _tagParser.Parse(page, formAnswers);
+            var result = await _tagParser.Parse(page, formAnswers);
 
             Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
         }
 
         [Fact]
-        public void Parse_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
+        public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
         {
             var expectedString = "this value testfirstname should be replaced with name question";
 
@@ -124,12 +125,12 @@ namespace form_builder_tests.UnitTests.TagParsers
                 }
             };
 
-            var result = _tagParser.Parse(page, formAnswers);
+            var result = await _tagParser.Parse(page, formAnswers);
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
         }
 
         [Fact]
-        public void Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
+        public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
         {
             var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
 
@@ -165,13 +166,13 @@ namespace form_builder_tests.UnitTests.TagParsers
                 }
             };
 
-            var result = _tagParser.Parse(page, formAnswers);
+            var result = await _tagParser.Parse(page, formAnswers);
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
         }
 
 
         [Fact]
-        public void Parse_ShouldCallFormatter_WhenProvided()
+        public async Task Parse_ShouldCallFormatter_WhenProvided()
         {
             var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
 
@@ -202,14 +203,14 @@ namespace form_builder_tests.UnitTests.TagParsers
                 }
             };
 
-            var result = _tagParser.Parse(page, formAnswers);
+            var result = await _tagParser.Parse(page, formAnswers);
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
             _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
         }
 
 
         [Fact]
-        public void Parse_ShouldCall_Multiple_Formatters_WhenProvided()
+        public async Task Parse_ShouldCall_Multiple_Formatters_WhenProvided()
         {
             var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE ANOTHER-FORMATTER";
 
@@ -240,7 +241,7 @@ namespace form_builder_tests.UnitTests.TagParsers
                 }
             };
 
-            var result = _tagParser.Parse(page, formAnswers);
+            var result = await _tagParser.Parse(page, formAnswers);
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
             _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
             _mockFormatterTwo.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
@@ -249,7 +250,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
 
         [Fact]
-        public void Parse_ShouldCall_Same_Formatter_MultipleTimes()
+        public async Task Parse_ShouldCall_Same_Formatter_MultipleTimes()
         {
             var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE FAKE-FORMATTED-VALUE";
 
@@ -280,7 +281,7 @@ namespace form_builder_tests.UnitTests.TagParsers
                 }
             };
 
-            var result = _tagParser.Parse(page, formAnswers);
+            var result = await _tagParser.Parse(page, formAnswers);
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
             _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Exactly(2));
         }

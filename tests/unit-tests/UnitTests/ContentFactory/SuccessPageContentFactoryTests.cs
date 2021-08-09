@@ -304,7 +304,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
 
             // Assert
             _mockSessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
-            _mockDistributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == guid.ToString())), Times.Once);
+            _mockDistributedCache.Verify(_ => _.Remove(It.Is<string>(x => x.Equals(guid.ToString()))), Times.Once);
         }
 
         [Fact]

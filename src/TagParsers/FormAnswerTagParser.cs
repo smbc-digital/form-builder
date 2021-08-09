@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using form_builder.Models;
 using form_builder.TagParsers.Formatters;
 
@@ -12,7 +13,7 @@ namespace form_builder.TagParsers
 
         public Regex Regex => new Regex("(?<={{)QUESTION:.*?(?=}})", RegexOptions.Compiled);
 
-        public Page Parse(Page page, FormAnswers formAnswers)
+        public async Task<Page> Parse(Page page, FormAnswers formAnswers)
         {
             var answersDictionary = formAnswers.Pages?.SelectMany(x => x.Answers).ToDictionary(x => x.QuestionId, x => x.Response);
 
@@ -24,7 +25,7 @@ namespace form_builder.TagParsers
                 return element;
             }).ToList();
 
-            return page;
+            return await Task.FromResult(page);
         }
 
         public string ParseString(string content, FormAnswers formAnswers)

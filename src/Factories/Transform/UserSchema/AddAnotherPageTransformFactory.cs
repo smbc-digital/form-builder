@@ -27,7 +27,7 @@ namespace form_builder.Factories.Transform.UserSchema
 
             page.Elements = newListOfElements;
 
-            return page;
+            return await Task.FromResult(page);
         }
 
         private IEnumerable<IElement> GenerateListOfIncrementedElements(IReadOnlyCollection<IElement> currentPageElements, FormAnswers convertedAnswers)

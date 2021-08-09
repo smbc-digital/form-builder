@@ -44,7 +44,10 @@ namespace form_builder.ContentFactory.PageFactory
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
             }
 
-            _tagParsers.ToList().ForEach(_ => _.Parse(page, formAnswers));
+            foreach (var tagParser in _tagParsers)
+            {
+                await tagParser.Parse(page, formAnswers);
+            }
 
             var result = await _pageHelper.GenerateHtml(page, viewModel, baseForm, sessionGuid, formAnswers, results);
             result.Path = page.PageSlug;

@@ -409,6 +409,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IReusableElementSchemaTransformFactory, ReusableElementSchemaTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, AddAnotherPageTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, DynamicLookupPageTransformFactory>();
+            services.AddTransient<IUserPageTransformFactory, BehaviourConditionsPageTransformFactory>();
 
             return services;
         }

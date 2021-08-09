@@ -81,7 +81,7 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             _tagParser.Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()))
-                .Returns(new Page());
+                .ReturnsAsync(new Page());
             var tagParserItems = new List<ITagParser> { _tagParser.Object };
             _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => tagParserItems.GetEnumerator());
 

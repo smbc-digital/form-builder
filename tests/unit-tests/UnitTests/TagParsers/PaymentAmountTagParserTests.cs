@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Enum;
@@ -29,7 +30,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         }
 
         [Fact]
-        public void Parse_ShouldReturnPaymentAmount()
+        public async Task Parse_ShouldReturnPaymentAmount()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
@@ -54,7 +55,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var formAnswer = new FormAnswers();
 
-            var result = _tagParser.Parse(page, formAnswer);
+            var result = await _tagParser.Parse(page, formAnswer);
 
             Assert.Equal("10.00",result.Elements.First().Properties.Text);
             Assert.Equal("10.00", result.LeadingParagraph);

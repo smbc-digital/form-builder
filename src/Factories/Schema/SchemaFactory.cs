@@ -91,7 +91,7 @@ namespace form_builder.Factories.Schema
         {
             var data = _distributedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}");
 
-            if(data == null)
+            if (data is null)
                 throw new ApplicationException("ScheamFactory::InPreviewMode, Requested form has expired");
 
             FormSchema formSchema = JsonConvert.DeserializeObject<FormSchema>(data);

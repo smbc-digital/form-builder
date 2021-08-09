@@ -18,7 +18,7 @@ namespace form_builder_tests.Builders
         {
             var elementType = typeof(IAction).GetTypeInfo().Assembly
                 .GetTypes()
-                .FirstOrDefault(type => type.Name == _type.ToString());
+                .FirstOrDefault(type => type.Name.Equals(_type.ToString()));
 
             var element = (Action)Activator.CreateInstance(elementType);
             element.Properties = _actionProperties;
