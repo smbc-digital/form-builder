@@ -139,7 +139,7 @@ namespace form_builder.Services.PageService
             if (string.IsNullOrEmpty(formData) && !path.Equals(baseForm.FirstPageSlug) && (!baseForm.HasDocumentUpload || !path.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH)))
                 return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug };
 
-            if (string.IsNullOrEmpty(formData) && baseForm.HasFormActionsGetValues)
+            if (path.Equals(baseForm.FirstPageSlug) && baseForm.HasFormActionsGetValues)
                 await _actionsWorkflow.Process(
                     baseForm.FormActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Get)).ToList(),
                     baseForm, baseForm.BaseURL, queryParameters);
