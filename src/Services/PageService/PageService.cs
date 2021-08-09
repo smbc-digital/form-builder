@@ -180,7 +180,7 @@ namespace form_builder.Services.PageService
             }
 
             if (page.HasPageActionsGetValues)
-                await _actionsWorkflow.Process(page.PageActions, null, form);
+                await _actionsWorkflow.Process(page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Get)).ToList(), null, form);
 
             if (page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
             {
