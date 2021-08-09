@@ -13,6 +13,7 @@ using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
+using form_builder.Models.Actions;
 using form_builder.Models.Elements;
 using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
@@ -1140,6 +1141,52 @@ namespace form_builder_tests.UnitTests.Services
             Assert.IsType<ProcessPageEntity>(result);
             _mockIncomingDataHelper.Verify(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>(), It.IsAny<FormAnswers>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveNonQuestionAnswers(It.IsAny<Dictionary<string, object>>(), It.Is<string>(_ => _ == "form"), It.Is<string>(_ => _ == "page-one"), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessPage_ShouldCall_ActionsWorkflow_WithGetActions_WhenFormHasGetPageActions()
+        {
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _mockIncomingDataHelper.Setup(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>(), It.IsAny<FormAnswers>()))
+                .Returns(new Dictionary<string, dynamic> { { "test", "testdata" } });
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.H1)
+                .WithQuestionId("test-id")
+                .WithPropertyText("test-text")
+                .Build();
+
+            var getPageAction = new ActionBuilder()
+                .WithHttpActionType(EHttpActionType.Get)
+                .Build();
+
+            var postPageAction = new ActionBuilder()
+                .WithHttpActionType(EHttpActionType.Post)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithPageActions(getPageAction)
+                .WithPageActions(postPageAction)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            // Act
+            var result = await _service.ProcessPage("form", "page-one", "", new QueryCollection());
+
+            // Assert
+            _mockActionsWorkflow.Verify(_ => _.Process(new List<IAction>{getPageAction}, It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
