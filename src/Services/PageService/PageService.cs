@@ -180,7 +180,7 @@ namespace form_builder.Services.PageService
             }
 
             if (page.HasPageActionsGetValues)
-                await _actionsWorkflow.Process(page.PageActions, null, form);
+                await _actionsWorkflow.Process(page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Get)).ToList(), null, form);
 
             if (page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
             {
@@ -275,7 +275,7 @@ namespace form_builder.Services.PageService
             return viewModel;
         }
 
-        public Behaviour GetBehaviour(ProcessRequestEntity currentPageResult)
+        public async Task<Behaviour> GetBehaviour(ProcessRequestEntity currentPageResult)
         {
             var answers = new Dictionary<string, dynamic>();
             var sessionGuid = _sessionHelper.GetSessionGuid();
@@ -287,7 +287,10 @@ namespace form_builder.Services.PageService
                 .ToList()
                 .ForEach(x => answers.Add(x.QuestionId, x.Response));
 
-            _tagParsers.ToList().ForEach(_ => _.Parse(currentPageResult.Page, convertedAnswers));
+            foreach (var tagParser in _tagParsers)
+            {
+                await tagParser.Parse(currentPageResult.Page, convertedAnswers);
+            }
 
             return currentPageResult.Page.GetNextPage(answers);
         }

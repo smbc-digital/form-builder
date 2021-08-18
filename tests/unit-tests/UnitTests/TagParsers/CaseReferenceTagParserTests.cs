@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Models;
@@ -22,7 +23,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         }
 
         [Fact]
-        public void Parse_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
+        public async Task Parse_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
@@ -36,14 +37,14 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var formAnswers = new FormAnswers();
 
-            var result = _tagParser.Parse(page, formAnswers);
+            var result = await _tagParser.Parse(page, formAnswers);
 
             Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
             Assert.Equal(page.LeadingParagraph, result.LeadingParagraph);
         }
 
         [Fact]
-        public void Parse_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
+        public async Task Parse_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
@@ -57,14 +58,14 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var formAnswers = new FormAnswers();
 
-            var result = _tagParser.Parse(page, formAnswers);
+            var result = await _tagParser.Parse(page, formAnswers);
 
             Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
             Assert.Equal(page.LeadingParagraph, result.LeadingParagraph);
         }
 
         [Fact]
-        public void Parse_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
+        public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
         {
             var expectedString = "this value 123456 should be replaced with Case Reference";
 
@@ -83,7 +84,7 @@ namespace form_builder_tests.UnitTests.TagParsers
                 CaseReference = "123456"
             };
 
-            var result = _tagParser.Parse(page, formAnswers);
+            var result = await _tagParser.Parse(page, formAnswers);
 
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
             Assert.Equal(expectedString, result.LeadingParagraph);

@@ -64,7 +64,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
 
             // Assert
             Assert.IsType<FormSchema>(result);
-            Assert.True(result.Pages.FirstOrDefault().Elements.FirstOrDefault().Type == EElementType.Textbox);
+            Assert.True(result.Pages.FirstOrDefault().Elements.FirstOrDefault().Type.Equals(EElementType.Textbox));
             _transformDataProvider.Verify(_ => _.Get(It.Is<string>(x => x.Equals("test"))), Times.Once);
         }
 

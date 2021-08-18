@@ -16,7 +16,7 @@ namespace form_builder.Services.PageService
 
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid, string subPath, List<object> results);
 
-        Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
+        Task<Behaviour> GetBehaviour(ProcessRequestEntity currentPageResult);
 
         Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType, FormSchema formSchema);
 
