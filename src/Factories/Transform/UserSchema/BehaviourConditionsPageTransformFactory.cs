@@ -9,7 +9,7 @@ namespace form_builder.Factories.Transform.UserSchema
     {
         public async Task<Page> Transform(Page page, FormAnswers convertedAnswers)
         {
-            if (page.Behaviours is not null && page.Behaviours.Any() && page.Behaviours.Any(_ => _.Conditions.Any()))
+            if (page.Behaviours is not null && page.Behaviours.Any() && page.Behaviours.Where(_ => _.Conditions is not null).Any(_ => _.Conditions.Any()))
             {
                 foreach (var behaviour in page.Behaviours.Where(_ => _.Conditions.Any()))
                 {
