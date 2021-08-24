@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using form_builder.Constants;
 
 namespace form_builder.Extensions
@@ -9,13 +10,18 @@ namespace form_builder.Extensions
     {
         public static Dictionary<string, object> ToNormaliseDictionary(this Dictionary<string, string[]> formData, string subPath)
         {
-            var normalisedFormData = new Dictionary<string, dynamic>();
+            Dictionary<string, dynamic> normalisedFormData = new();
             normalisedFormData.Add(LookUpConstants.SubPathViewModelKey, subPath);
 
             foreach (var item in formData)
             {
                 if (item.Key.EndsWith(FileUploadConstants.SUFFIX))
                     continue;
+
+                for (int x = 0; x < item.Value.Length; x++)
+                {
+                    item.Value[x] = HttpUtility.HtmlEncode(item.Value[x]);
+                }
 
                 if (item.Value.Length.Equals(1))
                 {
