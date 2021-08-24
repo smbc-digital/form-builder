@@ -8,6 +8,24 @@ namespace form_builder_tests.UnitTests.Extensions
 {
     public class DictionaryExtensionsTests
     {
+        [Fact]
+        public void ToNormaliseDictionary_ShouldEncodeAllUserInput()
+        {
+            // Arrange
+            string questionId = "questionId";
+            var disallowedChars = new char[] { '<', '>', '&', '\"' };
+            Dictionary<string, string[]> viewModel = new() { { questionId, new string[] { disallowedChars.ToString() } } };
+
+            // Act
+            var result = viewModel.ToNormaliseDictionary(string.Empty);
+            result.TryGetValue(questionId, out var encodedUserInput);
+
+            // Assert
+            foreach (char character in disallowedChars)
+            {
+                Assert.False(encodedUserInput.ToString().Contains(character));
+            }
+        }
 
         [Fact]
         public void ToNormaliseDictionary_ShouldRemoveAny_Keys_AssociatedWith_Time_And_Add_AppointmentStart_EndTime()
