@@ -8,6 +8,9 @@
 
         public bool RestrictCurrentDate { get; set; } = false;
 
+        public string OutsideRange { get; set; }
+        public string WithinRange { get; set; }
+
         public string Day { get; set; } = string.Empty;
 
         public string Month { get; set; } = string.Empty;

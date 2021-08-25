@@ -109,6 +109,8 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IElementValidator, AutomaticAddressElementValidator>();
             services.AddTransient<IElementValidator, ManualAddressValidator>();
             services.AddTransient<IElementValidator, DateInputElementValidator>();
+            services.AddTransient<IElementValidator, DateInputOutsideRangeValidator>();
+            services.AddTransient<IElementValidator, DateInputWithInRangeValidator>();
             services.AddTransient<IElementValidator, DatePickerElementValidator>();
             services.AddTransient<IElementValidator, RestrictPastDateValidator>();
             services.AddTransient<IElementValidator, RestrictFutureDateValidator>();
