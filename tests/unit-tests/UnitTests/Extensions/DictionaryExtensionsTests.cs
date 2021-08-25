@@ -8,23 +8,22 @@ namespace form_builder_tests.UnitTests.Extensions
 {
     public class DictionaryExtensionsTests
     {
-        [Fact]
-        public void ToNormaliseDictionary_ShouldEncodeAllUserInput()
+        [Theory]
+        [InlineData("<script>window.alert('HACKED!')</script>")]
+        [InlineData("first-name></><p onload=hack()></p>")]
+        [InlineData("harmless this & that text")]
+        public void ToNormaliseDictionary_Should_EncodeUserInput(string userInput)
         {
             // Arrange
             string questionId = "questionId";
-            var disallowedChars = new char[] { '<', '>', '&', '\"' };
-            Dictionary<string, string[]> viewModel = new() { { questionId, new string[] { disallowedChars.ToString() } } };
+            Dictionary<string, string[]> viewModel = new() { { questionId, new string[] { userInput } } };
 
             // Act
             var result = viewModel.ToNormaliseDictionary(string.Empty);
             result.TryGetValue(questionId, out var encodedUserInput);
 
             // Assert
-            foreach (char character in disallowedChars)
-            {
-                Assert.False(encodedUserInput.ToString().Contains(character));
-            }
+            Assert.False(encodedUserInput.ToString().Equals(userInput));
         }
 
         [Fact]
