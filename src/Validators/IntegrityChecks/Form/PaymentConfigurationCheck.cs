@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,13 +36,13 @@ namespace form_builder.Validators.IntegrityChecks.Form
             bool containsPayment = schema.Pages
                 .Where(page => page.Behaviours is not null)
                 .SelectMany(page => page.Behaviours)
-                .Any(page => page.BehaviourType.Equals(EBehaviourType.SubmitAndPay));
+                .Any(page => page.BehaviourType.Equals(EBehaviourType.SubmitAndPay)) || schema.SavePaymentAmount;
 
             if (!containsPayment)
                 return result;
 
             List<PaymentInformation> paymentInformation = await _paymentConfigProvider.Get<List<PaymentInformation>>();
-            PaymentInformation formPaymentInformation = paymentInformation.FirstOrDefault(payment => payment.FormName.Equals(schema.BaseURL));
+            PaymentInformation formPaymentInformation = paymentInformation.FirstOrDefault(payment => payment.FormName.Any(_ => _.Equals(schema.BaseURL)));
 
             if (formPaymentInformation is null)
             {
@@ -53,7 +52,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             IPaymentProvider paymentProvider = _paymentProviders
                 .FirstOrDefault(provider => provider.ProviderName
-                .Equals(formPaymentInformation.PaymentProvider));
+                    .Equals(formPaymentInformation.PaymentProvider));
 
             if (paymentProvider is null)
             {
@@ -79,6 +78,20 @@ namespace form_builder.Validators.IntegrityChecks.Form
             {
                 if (!_environment.IsEnvironment("local") && !formPaymentInformation.Settings.CalculationSlug.URL.StartsWith("https://"))
                     result.AddFailureMessage("PaymentConfiguration::CalculateCostUrl must start with https");
+            }
+
+            if (!string.IsNullOrEmpty(formPaymentInformation.Settings.ServicePayReference) &&
+                string.IsNullOrEmpty(formPaymentInformation.Settings.ServicePayNarrative))
+            {
+                result.AddFailureMessage("PaymentConfiguration::If ServicePayReference is used, ServicePayNarrative cannot be empty");
+                return result;
+            }
+
+            if (!string.IsNullOrEmpty(formPaymentInformation.Settings.ServicePayNarrative) &&
+                string.IsNullOrEmpty(formPaymentInformation.Settings.ServicePayReference))
+            {
+                result.AddFailureMessage("PaymentConfiguration::If ServicePayNarrative is used, ServicePayReference cannot be empty");
+                return result;
             }
 
             return result;

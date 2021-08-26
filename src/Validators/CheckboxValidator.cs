@@ -9,36 +9,18 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (element.Type != EElementType.Checkbox && element.Type != EElementType.Declaration)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+            if (!element.Type.Equals(EElementType.Checkbox) && !element.Type.Equals(EElementType.Declaration))
+                return new ValidationResult { IsValid = true };
 
             var containsValue = viewModel.ContainsKey(element.Properties.QuestionId);
             if (!containsValue && element.Properties.Optional)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            }
+                return new ValidationResult { IsValid = true };
 
             dynamic value = viewModel[element.Properties.QuestionId] as List<string> ?? viewModel[element.Properties.QuestionId];
-            if (value == null)
-            {
-                return new ValidationResult
-                {
-                    IsValid = false
-                };
-            }
+            if (value is null)
+                return new ValidationResult { IsValid = false };
 
-            return new ValidationResult
-            {
-                IsValid = true
-            };
+            return new ValidationResult { IsValid = true };
         }
     }
 }

@@ -13,10 +13,7 @@ namespace form_builder.Models.Elements
     {
         public const string PLACEHOLDER_DATE_FORMAT = "dd/mm/yyyy";
 
-        public DatePicker()
-        {
-            Type = EElementType.DatePicker;
-        }
+        public DatePicker() => Type = EElementType.DatePicker;
 
         public override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
@@ -80,9 +77,9 @@ namespace form_builder.Models.Elements
         public static DateTime? GetDate(FormAnswers answers, string key)
         {
             IEnumerable<Answers> response = answers.AllAnswers;
-            Answers answer = response.SingleOrDefault(_ => _.QuestionId == key);
+            Answers answer = response.SingleOrDefault(_ => _.QuestionId.Equals(key));
 
-            if (answer == null || string.IsNullOrEmpty(answer.Response))
+            if (answer is null || string.IsNullOrEmpty(answer.Response))
                 return null;
 
             if (!DateTime.TryParse(answer.Response, out DateTime dateValue))

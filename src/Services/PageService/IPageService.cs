@@ -10,13 +10,13 @@ namespace form_builder.Services.PageService
 {
     public interface IPageService
     {
-        Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParamters);
+        Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters);
 
         Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> file, bool modelStateIsValid);
 
         Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid, string subPath, List<object> results);
 
-        Behaviour GetBehaviour(ProcessRequestEntity currentPageResult);
+        Task<Behaviour> GetBehaviour(ProcessRequestEntity currentPageResult);
 
         Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType, FormSchema formSchema);
 

@@ -1,4 +1,8 @@
-﻿using form_builder.Extensions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
@@ -6,10 +10,6 @@ using form_builder.Models.Actions;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.TemplatedEmailProvider;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace form_builder.Services.TemplatedEmailService
 {

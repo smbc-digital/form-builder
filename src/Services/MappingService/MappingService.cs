@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -15,7 +14,6 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
@@ -27,7 +25,6 @@ namespace form_builder.Services.MappingService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IElementMapper _elementMapper;
         private readonly ISchemaFactory _schemaFactory;
-        private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IWebHostEnvironment _environment;
         private ILogger<MappingService> _logger;
 
@@ -35,14 +32,12 @@ namespace form_builder.Services.MappingService
             IElementMapper elementMapper,
             ISchemaFactory schemaFactory,
             IWebHostEnvironment environment,
-            IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ILogger<MappingService> logger)
         {
             _distributedCache = distributedCache;
             _elementMapper = elementMapper;
             _schemaFactory = schemaFactory;
             _environment = environment;
-            _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _logger = logger;
         }
 
@@ -52,7 +47,7 @@ namespace form_builder.Services.MappingService
 
             return new MappingEntity
             {
-                Data = CreatePostData(convertedAnswers, baseForm),
+                Data = await CreatePostData(convertedAnswers, baseForm),
                 BaseForm = baseForm,
                 FormAnswers = convertedAnswers
             };
@@ -71,7 +66,7 @@ namespace form_builder.Services.MappingService
             return new BookingRequest
             {
                 AppointmentId = appointmentType.AppointmentId,
-                Customer = GetCustomerBookingDetails(convertedAnswers, baseForm, bookingElement),
+                Customer = await GetCustomerBookingDetails (convertedAnswers, baseForm, bookingElement),
                 StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form),
                 OptionalResources = appointmentType.OptionalResources
             };
@@ -100,11 +95,16 @@ namespace form_builder.Services.MappingService
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
+            foreach (var page in baseForm.Pages)
+            {
+                await _schemaFactory.TransformPage(page, convertedAnswers);
+            }
+
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
 
             convertedAnswers.FormName = form;
 
-            if (convertedAnswers.Pages == null || !convertedAnswers.Pages.Any())
+            if (convertedAnswers.Pages is null || !convertedAnswers.Pages.Any())
                 _logger.LogWarning($"MappingService::GetFormAnswers, Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}");
 
             return (convertedAnswers, baseForm);
@@ -127,15 +127,15 @@ namespace form_builder.Services.MappingService
             return new DateTime(startDateTime.Year, startDateTime.Month, startDateTime.Day, time.Hour, time.Minute, time.Second);
         }
 
-        private Customer GetCustomerBookingDetails(FormAnswers formAnswers, FormSchema formSchema, IElement bookingElement)
+        private async Task<Customer> GetCustomerBookingDetails(FormAnswers formAnswers, FormSchema formSchema, IElement bookingElement)
         {
             var data = new ExpandoObject() as IDictionary<string, dynamic>;
             formSchema.Pages.SelectMany(_ => _.ValidatableElements)
                 .Where(x => !string.IsNullOrEmpty(x.Properties.TargetMapping)
-                            && x.Properties.TargetMapping.ToLower().StartsWith("customer.")
-                            && !x.Properties.TargetMapping.ToLower().Equals("customer.address"))
+                            && x.Properties.TargetMapping.StartsWith("customer.", StringComparison.OrdinalIgnoreCase)
+                            && !x.Properties.TargetMapping.Equals("customer.address", StringComparison.OrdinalIgnoreCase))
                 .ToList()
-                .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
+                .ForEach(async _ => data = await RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
 
             if (!data.ContainsKey("customer"))
                 throw new ApplicationException($"MappingService::GetCustomerDetails, Booking request form data for form {formSchema.BaseURL} does not contain required customer object");
@@ -148,38 +148,53 @@ namespace form_builder.Services.MappingService
 
             var addressElement = formSchema.Pages.SelectMany(_ => _.Elements)
                 .FirstOrDefault(_ =>
-                    _.Properties.QuestionId != null &&
+                    _.Properties.QuestionId is not null &&
                     _.Properties.QuestionId.Contains(bookingElement.Properties.CustomerAddressId));
-            customer.Address = _elementMapper.GetAnswerStringValue(addressElement, formAnswers);
+            customer.Address = await _elementMapper.GetAnswerStringValue(addressElement, formAnswers);
 
             return customer;
         }
 
-        private object CreatePostData(FormAnswers formAnswers, FormSchema formSchema)
+        private async Task<object> CreatePostData(FormAnswers formAnswers, FormSchema formSchema)
         {
             var data = new ExpandoObject() as IDictionary<string, dynamic>;
 
-            formSchema.Pages.SelectMany(_ => _.ValidatableElements)
-                .ToList()
-                .ForEach(_ => data = RecursiveCheckAndCreate(string.IsNullOrEmpty(_.Properties.TargetMapping) ? _.Properties.QuestionId : _.Properties.TargetMapping, _, formAnswers, data));
+            var elements = formSchema.Pages.SelectMany(_ => _.ValidatableElements)
+                .ToList();
+
+            foreach (var element in elements)
+            {
+                data = await RecursiveCheckAndCreate(string.IsNullOrEmpty(element.Properties.TargetMapping) ? element.Properties.QuestionId : element.Properties.TargetMapping, element, formAnswers, data);
+            }
 
             if (formAnswers.AdditionalFormData.Any())
                 data = AddNonQuestionAnswers(data, formAnswers.AdditionalFormData);
 
+            if (!string.IsNullOrEmpty(formAnswers.PaymentAmount))
+                data = AddNonQuestionAnswers(data, new Dictionary<string, object> { { formSchema.PaymentAmountMapping, formAnswers.PaymentAmount } });
+
             return data;
         }
 
-        private IDictionary<string, dynamic> RecursiveCheckAndCreate(string targetMapping, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
+        private async Task<IDictionary<string, dynamic>> RecursiveCheckAndCreate(string targetMapping, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
         {
             var splitTargets = targetMapping.Split(".");
 
-            if (splitTargets.Length == 1)
-            {
-                if (element.Type == EElementType.FileUpload || element.Type == EElementType.MultipleFileUpload)
-                    return CheckAndCreateForFileUpload(splitTargets[0], element, formAnswers, obj);
+            if (element.Properties.IsDynamicallyGeneratedElement)
+                return obj;
 
-                object answerValue = _elementMapper.GetAnswerValue(element, formAnswers);
-                if (answerValue != null && obj.TryGetValue(splitTargets[0], out var objectValue))
+            if (splitTargets.Length.Equals(1))
+            {
+
+                if (element.Type.Equals(EElementType.FileUpload) || element.Type.Equals(EElementType.MultipleFileUpload))
+                    return await CheckAndCreateForFileUpload(splitTargets[0], element, formAnswers, obj);
+
+                if (element.Type.Equals(EElementType.AddAnother))
+                    return await CheckAndCreateForAddAnother(splitTargets[0], element, formAnswers, obj);
+
+                object answerValue = await _elementMapper.GetAnswerValue(element, formAnswers);
+
+                if (answerValue is not null && obj.TryGetValue(splitTargets[0], out var objectValue))
                 {
                     var combinedValue = $"{objectValue} {answerValue}";
                     obj.Remove(splitTargets[0]);
@@ -187,7 +202,7 @@ namespace form_builder.Services.MappingService
                     return obj;
                 }
 
-                if (answerValue != null)
+                if (answerValue is not null)
                     obj.Add(splitTargets[0], answerValue);
 
                 return obj;
@@ -197,7 +212,7 @@ namespace form_builder.Services.MappingService
             if (!obj.TryGetValue(splitTargets[0], out subObject))
                 subObject = new ExpandoObject();
 
-            subObject = RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", ""), element, formAnswers, subObject as IDictionary<string, dynamic>);
+            subObject = await RecursiveCheckAndCreate(targetMapping.Replace($"{splitTargets[0]}.", ""), element, formAnswers, subObject as IDictionary<string, dynamic>);
 
             obj.Remove(splitTargets[0]);
             obj.Add(splitTargets[0], subObject);
@@ -205,15 +220,42 @@ namespace form_builder.Services.MappingService
             return obj;
         }
 
-        private IDictionary<string, dynamic> CheckAndCreateForFileUpload(string target, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
+        private async Task<IDictionary<string, dynamic>> CheckAndCreateForAddAnother(string target, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
+        {
+            var savedIncrementValue = formAnswers.FormData[$"{AddAnotherConstants.IncrementKeyPrefix}{element.Properties.QuestionId}"].ToString();
+            if (string.IsNullOrEmpty(savedIncrementValue))
+                throw new ApplicationException($"MappingService::CheckAndCreateForAddAnother, Fieldset increment value not found in FormData in saved answers for questionId {element.Properties.QuestionId}");
+
+            var numberOfIncrements = int.Parse(savedIncrementValue);
+            var answers = new List<IDictionary<string, dynamic>>();
+
+            for (var i = 1; i <= numberOfIncrements; i++)
+            {
+                var fieldsetAnswers = new Dictionary<string, dynamic>();
+                foreach (var nestedElement in element.Properties.Elements)
+                {
+                    var incrementedElement = JsonConvert.DeserializeObject<IElement>(JsonConvert.SerializeObject(nestedElement));
+                    incrementedElement.Properties.QuestionId = $"{nestedElement.Properties.QuestionId}:{i}:";
+                    fieldsetAnswers =  (Dictionary<string, dynamic>) await RecursiveCheckAndCreate(string.IsNullOrEmpty(nestedElement.Properties.TargetMapping) ? nestedElement.Properties.QuestionId : nestedElement.Properties.TargetMapping, incrementedElement, formAnswers, fieldsetAnswers);
+                }
+
+                answers.Add(fieldsetAnswers);
+            }
+
+            obj.Add(target, answers);
+
+            return obj;
+        }
+
+        private async Task<IDictionary<string, dynamic>> CheckAndCreateForFileUpload(string target, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
         {
             object objectValue;
-            var value = _elementMapper.GetAnswerValue(element, formAnswers);
+            var value = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             if (obj.TryGetValue(target, out objectValue))
             {
                 var files = (List<File>)objectValue;
-                if (value != null)
+                if (value is not null)
                 {
                     obj.Remove(target);
                     files.AddRange((List<File>)value);
@@ -224,7 +266,7 @@ namespace form_builder.Services.MappingService
             }
             else
             {
-                if (value != null)
+                if (value is not null)
                 {
                     obj.Add(target, (List<File>)value);
                 }

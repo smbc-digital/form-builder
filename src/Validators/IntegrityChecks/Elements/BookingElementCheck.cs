@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using form_builder.Enum;
-using form_builder.Models.Elements;
 using form_builder.Models;
+using form_builder.Models.Elements;
+using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Validators.IntegrityChecks.Elements
 {
@@ -33,19 +33,19 @@ namespace form_builder.Validators.IntegrityChecks.Elements
                 return result;
             }
 
-            if (appointmentTypeForEnv.AppointmentId == Guid.Empty &&
+            if (appointmentTypeForEnv.AppointmentId.Equals(Guid.Empty) &&
                 string.IsNullOrEmpty(appointmentTypeForEnv.AppointmentIdKey))
             {
                 result.AddFailureMessage("Booking Element Check, You must supply either an AppointmentId or an AppointmentIdKey in the AppointmentType.");
             }
 
-            if (appointmentTypeForEnv.AppointmentId != Guid.Empty &&
+            if (!appointmentTypeForEnv.AppointmentId.Equals(Guid.Empty) &&
                 !string.IsNullOrEmpty(appointmentTypeForEnv.AppointmentIdKey))
             {
                 result.AddFailureMessage("Booking Element Check, You cannot use both AppointmentId and AppointmentIdKey in the AppointmentType.");
             }
 
-            if (appointmentTypeForEnv.OptionalResources.Count == 0)
+            if (appointmentTypeForEnv.OptionalResources.Count.Equals(0))
                 return result;
 
             foreach (var resource in appointmentTypeForEnv.OptionalResources)

@@ -14,14 +14,11 @@ namespace form_builder.Models.Elements
 {
     public class MultipleFileUpload : Element
     {
-        public MultipleFileUpload()
-        {
-            Type = EElementType.MultipleFileUpload;
-        }
+        public MultipleFileUpload() => Type = EElementType.MultipleFileUpload;
 
         public string AllowFileTypeText { get { return Properties.AllowedFileTypes?.ToReadableFileType("and") ?? SystemConstants.AcceptedMimeTypes.ToReadableFileType("and"); } }
-        public string MaxFileSizeText { get { return $"{(Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes == 0 ? SystemConstants.DefaultMaxFileSize.ToReadableMaxFileSize() : Properties.MaxFileSize)}MB"; } }
-        public string MaxCombinedFileSizeText { get { return $"{(Properties.MaxCombinedFileSize == 0 ? SystemConstants.DefaultMaxCombinedFileSize.ToReadableMaxFileSize() : Properties.MaxCombinedFileSize)}MB"; } }
+        public string MaxFileSizeText { get { return $"{((Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes).Equals(0) ? SystemConstants.DefaultMaxFileSize.ToReadableMaxFileSize() : Properties.MaxFileSize)}MB"; } }
+        public string MaxCombinedFileSizeText { get { return $"{(Properties.MaxCombinedFileSize.Equals(0) ? SystemConstants.DefaultMaxCombinedFileSize.ToReadableMaxFileSize() : Properties.MaxCombinedFileSize)}MB"; } }
         public override string QuestionId => $"{base.QuestionId}{FileUploadConstants.SUFFIX}";
         public List<string> CurrentFilesUploaded { get; set; } = new List<string>();
         public int MaxFileSize => Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes > 0 && Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes < SystemConstants.DefaultMaxFileSize ? Properties.MaxFileSize * SystemConstants.OneMBInBinaryBytes : SystemConstants.DefaultMaxFileSize;
@@ -65,7 +62,7 @@ namespace form_builder.Models.Elements
             SubmitButtonText = SetSubmitButtonText(page);
             IsModelStateValid = !viewModel.ContainsKey("modelStateInvalid");
 
-            if (currentAnswer != null)
+            if (currentAnswer is not null)
             {
                 List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(currentAnswer.ToString());
                 CurrentFilesUploaded = response.Select(_ => _.TrustedOriginalFileName).ToList();
@@ -81,7 +78,7 @@ namespace form_builder.Models.Elements
 
         private string SetSubmitButtonText(Page page)
         {
-            if (page.Behaviours.Any(_ => _.BehaviourType == EBehaviourType.SubmitForm || _.BehaviourType == EBehaviourType.SubmitAndPay))
+            if (page.Behaviours.Any(_ => _.BehaviourType.Equals(EBehaviourType.SubmitForm) || _.BehaviourType.Equals(EBehaviourType.SubmitAndPay)))
                 return string.IsNullOrEmpty(Properties.PageSubmitButtonLabel) ? ButtonConstants.SUBMIT_TEXT : Properties.PageSubmitButtonLabel;
 
             return string.IsNullOrEmpty(Properties.PageSubmitButtonLabel) ? ButtonConstants.NEXTSTEP_TEXT : Properties.PageSubmitButtonLabel;

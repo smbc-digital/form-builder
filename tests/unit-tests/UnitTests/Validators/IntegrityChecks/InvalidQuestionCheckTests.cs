@@ -36,8 +36,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
         [InlineData("quest%ion")]
         [InlineData("question.")]
         [InlineData(".question")]
-        public void InvalidQuestion_IsNotValid_WhenQuestionIdInvalid(
-                string questionId)
+        public void InvalidQuestion_IsNotValid_WhenQuestionIdInvalid(string questionId)
         {
             // Arrange
             var element = new ElementBuilder()

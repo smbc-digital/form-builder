@@ -57,7 +57,7 @@ namespace form_builder_tests.UnitTests.Workflows
         }
 
         [Fact]
-        public async Task Process_ShouldCallSchemaFactory()
+        public async Task Process_ShouldCallSchemaFactory_Build()
         {
             // Act
             await _workflow.Process(EBehaviourType.SubmitForm, "form");
@@ -77,7 +77,7 @@ namespace form_builder_tests.UnitTests.Workflows
         }
 
         [Fact]
-        public async Task Process_ShouldCallActionService()
+        public async Task Process_ShouldCallActionWorkflow()
         {
             // Arrange
             var element = new ElementBuilder()

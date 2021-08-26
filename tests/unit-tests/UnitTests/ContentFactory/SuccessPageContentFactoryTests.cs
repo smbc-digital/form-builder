@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Builders;
+using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.ContentFactory.SuccessPageFactory;
 using form_builder.Enum;
@@ -15,6 +17,7 @@ using form_builder.Services.PageService.Entities;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -28,14 +31,20 @@ namespace form_builder_tests.UnitTests.ContentFactory
         private readonly Mock<ISessionHelper> _mockSessionHelper = new ();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new ();
         private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new ();
+        private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new ();
 
         public SuccessPageContentFactoryTests()
         {
+            _mockPreviewModeConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new PreviewModeConfiguration());
+
             _factory = new SuccessPageFactory(
                 _mockPageHelper.Object,
                 _mockPageContentFactory.Object,
                 _mockSessionHelper.Object,
                 _mockDistributedCache.Object,
+                _mockPreviewModeConfiguration.Object,
                 _mockWebHostEnvironment.Object);
 
             _mockWebHostEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
@@ -163,6 +172,39 @@ namespace form_builder_tests.UnitTests.ContentFactory
             Assert.Equal($"Download {EDocumentType.Txt} document", callBack.Elements[1].Properties.Label);
         }
 
+        [Fact]
+        public async Task Build_Should_Set_IsInPreviewMode_ToTrue()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.H2)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("success")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithFirstPageSlug("page-one")
+                .WithBaseUrl("base-test")
+                .WithPage(page)
+                .Build();
+
+            _mockPageContentFactory
+                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel{ IsInPreviewMode = true });
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(formSchema.Pages.FirstOrDefault());
+
+            // Act 
+            var result = await _factory.Build(string.Empty, formSchema, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm);
+
+            // Assert
+            Assert.True(result.IsInPreviewMode);
+        }
 
         [Fact]
         public async Task Build_ShouldReturn_Correct_StartPageUrl()
@@ -199,6 +241,44 @@ namespace form_builder_tests.UnitTests.ContentFactory
         }
 
         [Fact]
+        public async Task Build_ShouldReturn_IsInPreviewMode_True_When_PreviewMode_Enabeld_And_Matching_BaseUrl_With_Generic_SuccessPage()
+        {
+            _mockPreviewModeConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new PreviewModeConfiguration{ IsEnabled = true });
+
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.H2)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithStartPageUrl("page-one")
+                .WithBaseUrl(PreviewConstants.PREVIEW_MODE_PREFIX)
+                .WithPage(page)
+                .Build();
+
+            _mockPageContentFactory
+                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel{ IsInPreviewMode = true });
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns((Page)null);
+
+            // Act 
+            var result = await _factory.Build(string.Empty, formSchema, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm);
+
+            // Assert
+            Assert.True(result.IsInPreviewMode);
+        }
+
+        [Fact]
         public async Task Build_ShouldDeleteCacheEntry()
         {
             // Arrange
@@ -224,7 +304,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
 
             // Assert
             _mockSessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
-            _mockDistributedCache.Verify(_ => _.Remove(It.Is<string>(x => x == guid.ToString())), Times.Once);
+            _mockDistributedCache.Verify(_ => _.Remove(It.Is<string>(x => x.Equals(guid.ToString()))), Times.Once);
         }
 
         [Fact]
@@ -257,6 +337,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             Assert.Equal("We've received your cancellation request", pageCallback.LeadingParagraph);
             Assert.Equal("Success", pageCallback.Title);
             Assert.True(pageCallback.HideTitle);
+            Assert.False(result.IsInPreviewMode);
         }
     }
 }

@@ -37,19 +37,31 @@ namespace form_builder.Factories.Transform.ReusableElements
             {
                 var page = formSchema.Pages[i];
                 page.Elements
-                    .Where(_ => _.Type == EElementType.Reusable)
+                    .Where(_ => _.Type.Equals(EElementType.Reusable))
                     .ToList()
-                    .ForEach(_ => substitutions.Add(CreateSubstitutionRecord(i, page.Elements.IndexOf(_), _)));
+                    .ForEach(_ => substitutions.Add(CreateSubstitutionRecord(i, page.Elements.IndexOf(_), null, _)));
+
+                for (int j = 0; j < page.Elements.Count; j++)
+                {
+                    if (page.Elements[j].Properties.Elements is not null && page.Elements[j].Properties.Elements.Count > 0)
+                    {
+                        page.Elements[j].Properties.Elements
+                            .Where(_ => _.Type.Equals(EElementType.Reusable))
+                            .ToList()
+                            .ForEach(_ => substitutions.Add(CreateSubstitutionRecord(i, page.Elements.IndexOf(page.Elements[j]), page.Elements[j].Properties.Elements.IndexOf(_), _)));
+                    }
+                }
             }
 
             return await Task.WhenAll(substitutions);
         }
 
-        private async Task<ElementSubstitutionRecord> CreateSubstitutionRecord(int pageIndex, int elementIndex, IElement element) =>
+        private async Task<ElementSubstitutionRecord> CreateSubstitutionRecord(int pageIndex, int elementIndex, int? nestedElementIndex, IElement element) =>
             new ElementSubstitutionRecord
             {
                 PageIndex = pageIndex,
                 OriginalElementIndex = elementIndex,
+                NestedElementIndex = nestedElementIndex,
                 SubstituteElement = await CreateSubstituteRecord(element)
             };
 
@@ -64,7 +76,7 @@ namespace form_builder.Factories.Transform.ReusableElements
 
             var substituteElement = await _reusableElementTransformDataProvider.Get(reusableElement.ElementRef);
 
-            if (substituteElement == null)
+            if (substituteElement is null)
                 throw new Exception($"ReusableElementSchemaTransformFactory::CreateSubstituteRecord, No substitute element could be created for question {reusableElement.Properties.QuestionId}");
 
             substituteElement.Properties.QuestionId = reusableElement.Properties.QuestionId;
@@ -75,7 +87,7 @@ namespace form_builder.Factories.Transform.ReusableElements
             if (reusableElement.Properties.Optional)
                 substituteElement.Properties.Optional = true;
 
-            if (reusableElement.Properties.MaxLength != 200)
+            if (!reusableElement.Properties.MaxLength.Equals(200))
                 substituteElement.Properties.MaxLength = reusableElement.Properties.MaxLength;
 
             if (!string.IsNullOrEmpty(reusableElement.Properties.Hint))
@@ -99,7 +111,10 @@ namespace form_builder.Factories.Transform.ReusableElements
                 .ToList()
                 .ForEach(_ =>
                 {
-                    formSchema.Pages[_.PageIndex].Elements[_.OriginalElementIndex] = _.SubstituteElement;
+                    if (_.NestedElementIndex is null)
+                        formSchema.Pages[_.PageIndex].Elements[_.OriginalElementIndex] = _.SubstituteElement;
+                    else
+                        formSchema.Pages[_.PageIndex].Elements[_.OriginalElementIndex].Properties.Elements[_.NestedElementIndex.Value] = _.SubstituteElement;
                 });
 
             return formSchema;
@@ -110,6 +125,7 @@ namespace form_builder.Factories.Transform.ReusableElements
     {
         public int PageIndex { get; set; }
         public int OriginalElementIndex { get; set; }
+        public int? NestedElementIndex { get; set; }
         public IElement SubstituteElement { get; set; }
     }
 }

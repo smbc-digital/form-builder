@@ -28,11 +28,11 @@
         <details class="govuk-details govuk-!-margin-top-5" data-module="govuk-details">
             <summary class="govuk-details__summary">
                 <span class="govuk-details__summary-text">
-                    I can't find my address in the list
+                    @AddressConstants.ADDRESS_MANUAL_DISABLED_TEXT
                 </span>
             </summary>
             <div class="govuk-details__text">
-                @Model.Properties.NoManualAddressDetailText
+                @Html.Raw(Model.Properties.NoManualAddressDetailText)
             </div>
         </details>
     }

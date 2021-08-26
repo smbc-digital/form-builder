@@ -16,18 +16,14 @@ namespace form_builder.Providers.FileStorage
 
         public string ProviderName { get => "Application"; }
 
-        public InMemoryStorageProvider(IDistributedCacheWrapper distributedCache)
-        {
+        public InMemoryStorageProvider(IDistributedCacheWrapper distributedCache) =>
             _distributedCache = distributedCache;
-        }
 
-        public string GetString(string key) => _distributedCache.GetString(key);
+        public async Task<string> GetString(string key) => await Task.Run(() => _distributedCache.GetString(key));
 
-        public void Remove(string key) => _distributedCache.Remove(key);
+        public async Task Remove(string key) => await _distributedCache.RemoveAsync(key);
 
-        public Task SetStringAsync(string key, string value, int expiration, CancellationToken token = default)
-        {
-            return _distributedCache.SetStringAsync(key, value, expiration, token);
-        }
+        public Task SetStringAsync(string key, string value, int expiration, CancellationToken token = default) =>
+            _distributedCache.SetStringAsync(key, value, expiration, token);
     }
 }

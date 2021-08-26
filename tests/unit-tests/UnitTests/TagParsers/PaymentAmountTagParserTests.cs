@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Enum;
+using form_builder.Helpers.PaymentHelpers;
 using form_builder.Models;
-using form_builder.Services.MappingService.Entities;
-using form_builder.Services.PayService;
 using form_builder.TagParsers;
 using form_builder.TagParsers.Formatters;
 using form_builder_tests.Builders;
@@ -18,39 +18,52 @@ namespace form_builder_tests.UnitTests.TagParsers
     {
         private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
         private readonly PaymentAmountTagParser _tagParser;
-        private readonly Mock<IPayService> _mockPaymentService = new();
+        private readonly Mock<IPaymentHelper> _mockPaymentHelper = new();
 
         public PaymentAmountTagParserTests()
         {
-            _mockPaymentService.Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
-                           .ReturnsAsync(new PaymentInformation() { Settings = new Settings { Amount = "10.00"} });
+            _mockPaymentHelper
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .ReturnsAsync(new PaymentInformation { Settings = new Settings { Amount = "10.00"} });
 
-            _tagParser = new PaymentAmountTagParser(_mockFormatters.Object, _mockPaymentService.Object);
+            _tagParser = new PaymentAmountTagParser(_mockFormatters.Object, _mockPaymentHelper.Object);
         }
 
         [Fact]
-        public void Parse_ShouldReturnPaymentAmount()
+        public async Task Parse_ShouldReturnPaymentAmount()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
                 .WithPropertyText("{{PAYMENTAMOUNT}}")
                 .Build();
 
+            var condition = new ConditionBuilder()
+                .WithQuestionId("{{PAYMENTAMOUNT}}")
+                .WithComparisonValue("10.00")
+                .WithConditionType(ECondition.PaymentAmountEqualTo)
+                .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithCondition(condition)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithLeadingParagraph("{{PAYMENTAMOUNT}}")
+                .WithBehaviour(behaviour)
                 .Build();
 
             var formAnswer = new FormAnswers();
 
-            var result = _tagParser.Parse(page, formAnswer);
+            var result = await _tagParser.Parse(page, formAnswer);
 
             Assert.Equal("10.00",result.Elements.First().Properties.Text);
             Assert.Equal("10.00", result.LeadingParagraph);
+            Assert.Equal("10.00", result.Behaviours.FirstOrDefault().Conditions.FirstOrDefault().QuestionId);
         }
 
         [Fact]
-        public void Parse_ShouldCallPayService_IfAmountNotInFormAnswers()
+        public void Parse_ShouldCallPaymentHelper_IfAmountNotInFormAnswers()
         {
             var page = new PageBuilder()
                 .WithLeadingParagraph("{{PAYMENTAMOUNT}}")
@@ -58,13 +71,13 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var formAnswer = new FormAnswers();
 
-            var result = _tagParser.Parse(page, formAnswer);
+            _tagParser.Parse(page, formAnswer);
 
-            _mockPaymentService.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Once);
+            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
-        public void Parse_ShouldNotCallPayService_IfAmountInFormAnswers()
+        public void Parse_ShouldNotCallPaymentHelper_IfAmountInFormAnswers()
         {
             var page = new PageBuilder()
                 .WithLeadingParagraph("{{PAYMENTAMOUNT}}")
@@ -75,9 +88,46 @@ namespace form_builder_tests.UnitTests.TagParsers
                 PaymentAmount = "15.00"
             };
 
-            var result = _tagParser.Parse(page, formAnswer);
+            _tagParser.Parse(page, formAnswer);
 
-            _mockPaymentService.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Never);
+            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public void ParseString_ShouldReturnPaymentAmount()
+        {
+            var text = "{{PAYMENTAMOUNT}}";
+            var formAnswer = new FormAnswers();
+
+            var result = _tagParser.ParseString(text, formAnswer);
+
+            Assert.Equal("10.00", result);
+        }
+
+        [Fact]
+        public void ParseString_ShouldCallPaymentHelper_IfAmountNotInFormAnswers()
+        {
+            var text = "{{PAYMENTAMOUNT}}";
+            var formAnswer = new FormAnswers();
+
+            _tagParser.ParseString(text, formAnswer);
+
+            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public void ParseString_ShouldNotCallPaymentHelper_IfAmountInFormAnswers()
+        {
+            var text = "{{PAYMENTAMOUNT}}";
+
+            var formAnswer = new FormAnswers
+            {
+                PaymentAmount = "15.00"
+            };
+
+            _tagParser.ParseString(text, formAnswer);
+
+            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Never);
         }
     }
 }

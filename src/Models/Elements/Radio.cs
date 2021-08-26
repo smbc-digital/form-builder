@@ -9,10 +9,8 @@ namespace form_builder.Models.Elements
 {
     public class Radio : Element
     {
-        public Radio()
-        {
-            Type = EElementType.Radio;
-        }
+        public Radio() => Type = EElementType.Radio;
+
         public async override Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
             string guid,

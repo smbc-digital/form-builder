@@ -1,10 +1,10 @@
-using form_builder.Extensions;
-using form_builder.TagParsers.Formatters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using form_builder.Extensions;
+using form_builder.TagParsers.Formatters;
 
 namespace form_builder.TagParsers
 {
@@ -26,12 +26,12 @@ namespace form_builder.TagParsers
                     format = splitMatch[2];
 
                 if (!answersDictionary.ContainsKey(questionId))
-                    throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is not stored within answers, Match value: {match.Value}");
+                    throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for questionId {questionId} is not stored within answers, Match value: {match.Value}");
 
                 var questionValue = (string)answersDictionary[questionId];
 
                 if (string.IsNullOrEmpty(questionValue))
-                    throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for quetionId {questionId} is null or empty, Match value: {match.Value}");
+                    throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for questionId {questionId} is null or empty, Match value: {match.Value}");
 
                 if (!string.IsNullOrEmpty(format))
                     questionValue = _formatters.Get(format).Parse(questionValue);

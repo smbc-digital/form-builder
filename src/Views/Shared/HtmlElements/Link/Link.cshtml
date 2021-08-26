@@ -1,11 +1,14 @@
 ﻿@model Link
-@{
-    var OpenInTab = Model.Properties.OpenInTab ? "target='_blank'" : "";
-}
 
-<a href='@Model.Properties.Url' rel='noreferrer noopener' @OpenInTab class='@Model.Properties.ClassName'>
-    @Model.Properties.Text
-    @if(Model.Properties.DisplayRightChevron){
-        <partial name="ChevronSVG" />
-    }
-</a>
+<div class="govuk-width-container">
+    <a href=@Model.Properties.Url rel="noreferrer noopener"
+    target=@(Model.Properties.OpenInTab ? "_blank" : "_self")
+    class="@Model.Properties.ClassName">
+        @Model.Properties.Text
+        @if (Model.Properties.DisplayRightChevron)
+        {
+            <partial name=ChevronSVG />
+        }
+    </a>
+</div>
+

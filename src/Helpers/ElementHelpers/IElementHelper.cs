@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using form_builder.Models;
 using form_builder.Models.Elements;
 
@@ -36,9 +37,12 @@ namespace form_builder.Helpers.ElementHelpers
 
         FormAnswers GetFormData(string guid);
 
-        List<PageSummary> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema);
+        Task<List<PageSummary>> GenerateQuestionAndAnswersList(string guid, FormSchema formSchema);
+
+        int GetAddAnotherNumberOfFieldsets(IElement addAnotherElement, FormAnswers formAnswers);
 
         string GenerateDocumentUploadUrl(Element element, FormSchema formSchema, FormAnswers formAnswers);
+
         void OrderOptionsAlphabetically(Element element);
     }
 }

@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using form_builder.Builders;
+using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Models;
@@ -7,6 +10,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.TagParsers;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -18,14 +22,19 @@ namespace form_builder_tests.UnitTests.ContentFactory
         private readonly Mock<IPageHelper> _mockPageHelper = new ();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new ();
         private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new ();
-        private readonly Mock<ITagParser> _tagParser = new ();      
+        private readonly Mock<ITagParser> _tagParser = new ();
+        private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new ();
 
         public PageFactoryTests()
         {
+            _mockPreviewModeConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new PreviewModeConfiguration{ IsEnabled = false });
+
             var mockTagParsersItems = new List<ITagParser>();
             _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => mockTagParsersItems.GetEnumerator());
 
-            _factory = new PageFactory(_mockPageHelper.Object, _mockTagParsers.Object, _mockDistributedCacheWrapper.Object);
+            _factory = new PageFactory(_mockPageHelper.Object, _mockTagParsers.Object, _mockPreviewModeConfiguration.Object, _mockDistributedCacheWrapper.Object);
         }
 
         [Fact]
@@ -98,6 +107,49 @@ namespace form_builder_tests.UnitTests.ContentFactory
             Assert.Equal("feedbackurl", result.FeedbackForm);
             Assert.Equal("BETA", result.FeedbackPhase);
             Assert.Equal(startPageUrl, result.StartPageUrl);
+            Assert.False(result.IsInPreviewMode);
+        }
+
+        [Fact]
+        public async Task Build_ShouldReturn_InPreviewMode_True_WhenForm_IsMatching_PreviewKey_AndPreviewModeEnabled()
+        {
+            // Arrange
+            _mockPreviewModeConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new PreviewModeConfiguration{ IsEnabled = true });
+
+            var html = "testHtml";
+            var pageUrl = "page-one";
+            var startPageUrl = "start-page-url";
+
+            _mockPageHelper.Setup(_ => _.GenerateHtml(
+                It.IsAny<Page>(),
+                It.IsAny<Dictionary<string, dynamic>>(),
+                It.IsAny<FormSchema>(),
+                It.IsAny<string>(),
+                It.IsAny<FormAnswers>(),
+                It.IsAny<List<object>>()))
+                .ReturnsAsync(new FormBuilderViewModel { RawHTML = html });
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl($"{PreviewConstants.PREVIEW_MODE_PREFIX}-test")
+                .WithName("form name")
+                .WithFeedback("BETA", "feedbackurl")
+                .WithStartPageUrl(startPageUrl)
+                .Build();
+
+            var formAnswers = new FormAnswers();
+
+            var page = new PageBuilder()
+                .WithPageSlug(pageUrl)
+                .WithPageTitle("page title")
+                .Build();
+
+            // Act
+            var result = await _factory.Build(page, new Dictionary<string, dynamic>(), formSchema, string.Empty, formAnswers);
+
+            // Assert
+            Assert.True(result.IsInPreviewMode);
         }
 
         [Fact]
@@ -134,7 +186,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
         {
             // Arrange
             _tagParser.Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()))
-                .Returns(new Page());
+                .ReturnsAsync(new Page());
             var tagParserItems = new List<ITagParser> { _tagParser.Object, _tagParser.Object };
             _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => tagParserItems.GetEnumerator());
 

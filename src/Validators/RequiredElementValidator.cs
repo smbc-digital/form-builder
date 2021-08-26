@@ -11,32 +11,25 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (element.Type == EElementType.DateInput || element.Type == EElementType.Map ||
-                element.Type == EElementType.TimeInput || element.Type == EElementType.DatePicker ||
-                element.Type == EElementType.MultipleFileUpload || element.Properties.Optional ||
-                element.Type == EElementType.Booking ||
-                (element.Type == EElementType.Address && viewModel.IsManual()))
+            if (element.Type.Equals(EElementType.DateInput) || element.Type.Equals(EElementType.Map) ||
+                element.Type.Equals(EElementType.TimeInput) || element.Type.Equals(EElementType.DatePicker) ||
+                element.Type.Equals(EElementType.MultipleFileUpload) || element.Properties.Optional ||
+                element.Type.Equals(EElementType.Booking) || element.Type.Equals(EElementType.AddAnother) ||
+                (element.Type.Equals(EElementType.Address) && viewModel.IsManual()))
             {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
+                return new ValidationResult { IsValid = true };
             }
 
             var key = element.Properties.QuestionId;
             var validationMessage = string.Empty;
 
-            if (element.Type != EElementType.Address && element.Type != EElementType.Street && element.Type != EElementType.Organisation)
-            {
+            if (!element.Type.Equals(EElementType.Address) && !element.Type.Equals(EElementType.Street) && !element.Type.Equals(EElementType.Organisation))
                 validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the " + element.Properties.Label.ToLower();
-            }
 
-            if (element.Type == EElementType.FileUpload)
-            {
+            if (element.Type.Equals(EElementType.FileUpload))
                 key = $"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
-            }
 
-            if (element.Type == EElementType.Address)
+            if (element.Type.Equals(EElementType.Address))
             {
                 if (viewModel.IsAutomatic())
                 {
@@ -51,7 +44,7 @@ namespace form_builder.Validators
                 }
             }
 
-            if (element.Type == EElementType.Street)
+            if (element.Type.Equals(EElementType.Street))
             {
                 if (viewModel.IsAutomatic())
                 {
@@ -61,11 +54,11 @@ namespace form_builder.Validators
                 else
                 {
                     key = $"{element.Properties.QuestionId}";
-                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the street name";
+                    validationMessage = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Enter the street name in the correct format";
                 }
             }
 
-            if (element.Type == EElementType.Organisation)
+            if (element.Type.Equals(EElementType.Organisation))
             {
                 if (viewModel.IsAutomatic())
                 {
@@ -80,7 +73,7 @@ namespace form_builder.Validators
             }
 
             bool isValid;
-            if (element.Type == EElementType.FileUpload)
+            if (element.Type.Equals(EElementType.FileUpload))
             {
                 List<DocumentModel> value = viewModel.ContainsKey(key)
                     ? viewModel[key]

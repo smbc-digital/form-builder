@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Hosting;
+using System.Linq;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Models;
@@ -7,9 +7,9 @@ using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.Lookup;
 using form_builder.Validators.IntegrityChecks.Form;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
 using Moq;
 using Xunit;
-using System.Linq;
 
 namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 {

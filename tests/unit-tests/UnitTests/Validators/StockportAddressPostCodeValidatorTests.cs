@@ -8,7 +8,7 @@ namespace form_builder_tests.UnitTests.Validators
 {
     public class StockportAddressPostCodeValidatorTests
     {
-        private readonly StockportAddressPostcodeElementValidator _stockportPostcodeValidator = new StockportAddressPostcodeElementValidator();
+        private readonly StockportAddressPostcodeElementValidator _stockportPostcodeValidator = new();
 
         [Fact]
         public void Validate_ShouldReturnTrue_WhenDoesNotPostcode()
@@ -37,7 +37,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithType(EElementType.Address)
                 .Build();
 
-            var viewModel = new Dictionary<string, dynamic>();
+            Dictionary<string, dynamic> viewModel = new();
             viewModel.Add("testaddress-postcode", "SK4 1AA");
 
             // Act

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Models;
@@ -41,7 +42,6 @@ namespace form_builder_tests.UnitTests.TagParsers
             Assert.False(_tagParser.Regex.Match(value).Success);
         }
 
-
         [Fact]
         public void FormatContent_ShouldReturnValidFormattedText()
         {
@@ -51,9 +51,8 @@ namespace form_builder_tests.UnitTests.TagParsers
             Assert.Equal(expectValue, _tagParser.FormatContent(new string[2] { url, linkText }));
         }
 
-
         [Fact]
-        public void Parse_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
+        public async Task Parse_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
@@ -66,13 +65,13 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var formAnswers = new FormAnswers();
 
-            var result = _tagParser.Parse(page, formAnswers);
+            var result = await _tagParser.Parse(page, formAnswers);
 
             Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
         }
 
         [Fact]
-        public void Parse_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
+        public async Task Parse_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
         {
             var element = new ElementBuilder()
                 .WithType(EElementType.P)
@@ -85,13 +84,13 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var formAnswers = new FormAnswers();
 
-            var result = _tagParser.Parse(page, formAnswers);
+            var result = await _tagParser.Parse(page, formAnswers);
 
             Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
         }
 
         [Fact]
-        public void Parse_ShouldReturn_UpdatedText_WithReplacedValue()
+        public async Task Parse_ShouldReturn_UpdatedText_WithReplacedValue()
         {
             var expectedString = $"this link {_tagParser.FormatContent(new string[2] { "www.stockport.gov", "text" })} should be replaced";
 
@@ -104,9 +103,41 @@ namespace form_builder_tests.UnitTests.TagParsers
                 .WithElement(element)
                 .Build();
 
-            var result = _tagParser.Parse(page, new FormAnswers());
+            var result = await _tagParser.Parse(page, new FormAnswers());
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
         }
 
+        [Fact]
+        public void ParseString_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
+        {
+            var text = "this has no values to be replaced";
+            var formAnswers = new FormAnswers();
+
+            var result = _tagParser.ParseString(text, formAnswers);
+
+            Assert.Equal(text, result);
+        }
+
+        [Fact]
+        public void ParseString_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
+        {
+            var text = "this value {{TAG:firstname}} should be replaced with name question";
+            var formAnswers = new FormAnswers();
+
+            var result = _tagParser.ParseString(text, formAnswers);
+
+            Assert.Equal(text, result);
+        }
+
+        [Fact]
+        public void ParseString_ShouldReturn_UpdatedText_WithReplacedValue()
+        {
+            var expectedString = $"this link {_tagParser.FormatContent(new string[2] { "www.stockport.gov", "text" })} should be replaced";
+
+            var text = "this link {{LINK:www.stockport.gov:text}} should be replaced";
+
+            var result = _tagParser.ParseString(text, new FormAnswers());
+            Assert.Equal(expectedString, result);
+        }
     }
 }

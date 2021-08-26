@@ -24,7 +24,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private const string contentWithInvalidVariableQuestionIdInBraces = "Some text with a {{invalidVariableQuestionId}}";
 
         private readonly IActionHelper _actionHelper;
-        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new ();
+        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
 
         private readonly MappingEntity _mappingEntity = new MappingEntityBuilder()
             .WithFormAnswers(new FormAnswers
@@ -117,6 +117,26 @@ namespace form_builder_tests.UnitTests.Helpers
             // Assert
             Assert.Equal("www.testurl.com", result.Url);
             Assert.True(result.IsPost);
+        }
+
+        [Fact]
+        public void GenerateUrl_ShouldGenerateCorrectUrl_WhichContains_Empty_OptionalQuery_Values()
+        {
+            // Act
+            var result = _actionHelper.GenerateUrl("www.testurl.com?id={{testQuestionId}}&extra={{doesnotexists}}", _mappingEntity.FormAnswers);
+
+            // Assert
+            Assert.Equal("www.testurl.com?id=testResponse&extra=", result.Url);
+        }
+
+        [Fact]
+        public void GenerateUrl_ShouldGenerateCorrectUrl_WhichContains_Multiple_Empty_OptionalQuery_Values()
+        {
+            // Act
+            var result = _actionHelper.GenerateUrl("www.testurl.com?id={{testQuestionId}}&extra={{doesnotexists}}&more={{testQuestionId}}&empty={{doesnotexists}}", _mappingEntity.FormAnswers);
+
+            // Assert
+            Assert.Equal("www.testurl.com?id=testResponse&extra=&more=testResponse&empty=", result.Url);
         }
 
         [Fact]

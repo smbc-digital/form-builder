@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
@@ -46,6 +45,31 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             //Assert
             _mockElementHelper.Verify(_ => _.OrderOptionsAlphabetically(It.IsAny<Element>()), Times.Once);
+        }
+
+        [Fact]
+        public void GenerateCheckboxProperties_ShouldAddDataAttribute_ForExclusiveOption() {
+            //Arrange
+            var options = new List<Option> {
+                new Option {
+                    Text = "test",
+                    Value = "test",
+                    Exclusive = true
+                }
+            };
+
+            //Arrange
+            var element = (Checkbox) new ElementBuilder()
+                .WithType(EElementType.Checkbox)
+                .WithOptions(options)
+                .WithQuestionId("test")
+                .Build();
+
+            //Act
+            var result = element.GenerateCheckboxProperties(0);
+
+            //Assert
+            Assert.True(result.ContainsKey("data-behaviour"));
         }
     }
 }

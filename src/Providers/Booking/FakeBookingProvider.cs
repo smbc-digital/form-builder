@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Exceptions;
-using form_builder.Models.Booking;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 
@@ -94,36 +93,36 @@ namespace form_builder.Providers.Booking
             var response = new List<AvailabilityDayResponse>();
             switch (request.StartDate.Month)
             {
-                case 3:
+                case 8:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 13), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 15), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 22), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 23), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 13), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 15), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 22), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 23), 1, true)
                         .Build();
                     break;
-                case 4:
+                case 9:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 15), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 12), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 13), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 20), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 15), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 12), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 13), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 20), 1, true)
                         .Build();
                     break;
-                case 5:
+                case 10:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 1), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 4), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 9), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 22), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 1), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 4), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 9), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 22), 1, true)
                         .Build();
                     break;
-                case 6:
+                case 11:
                     response = new AvailabilityDayResponseBuilder()
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 4), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 5), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 6), 1, true)
-                        .WithDay(new DateTime(2021, request.StartDate.Month, 7), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 4), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 5), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 6), 1, true)
+                        .WithDay(new DateTime(DateTime.Now.Year, request.StartDate.Month, 7), 1, true)
                         .Build();
                     break;
                 default:
@@ -198,6 +197,11 @@ namespace form_builder.Providers.Booking
             if(bookingId.Equals(Guid.Parse(BOOKING_WITH_ERROR_ON_CANCEL)))
                 throw new Exception("FakeBookingProvider::Cancel, Booking faked with fake exception");
 
+            _ = await Task.FromResult("");
+        }
+
+        public async Task Confirm(ConfirmationRequest request)
+        {
             _ = await Task.FromResult("");
         }
     }

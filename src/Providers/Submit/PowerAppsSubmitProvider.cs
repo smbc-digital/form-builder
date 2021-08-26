@@ -1,13 +1,11 @@
-﻿using form_builder.Models;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
+using form_builder.Models;
 using form_builder.Services.MappingService.Entities;
 using StockportGovUK.NetStandard.Gateways;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 
-namespace form_builder.Providers.Submit {
+namespace form_builder.Providers.Submit
+{
     public class PowerAppsSubmitProvider : ISubmitProvider {
         public string ProviderName => "flowtoken";
         private IGateway _gateway;

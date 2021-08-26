@@ -29,6 +29,21 @@ namespace form_builder_tests.UnitTests.Conditions
         }
 
         [Fact]
+        public void PaymentAmountEqualTo_Should_Return_True_False()
+        {
+            // Arrange
+            var viewModel = new Dictionary<string, dynamic>();
+
+            var condition1 = new Condition { ComparisonValue = "pear", QuestionId = "pear", ConditionType = ECondition.PaymentAmountEqualTo };
+            var condition2 = new Condition { ComparisonValue = "plum", QuestionId = "test2", ConditionType = ECondition.PaymentAmountEqualTo };
+            var conditionValidator = new ConditionValidator();
+
+            // Act & Assert
+            Assert.True(conditionValidator.IsValid(condition1, viewModel));
+            Assert.False(conditionValidator.IsValid(condition2, viewModel));
+        }
+
+        [Fact]
         public void CheckBox_Contains_Should_Return_True_False()
         {
             // Arrange

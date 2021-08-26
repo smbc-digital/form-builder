@@ -14,7 +14,7 @@
             <div class="smbc-time__time">
                 <input class="smbc-time__time__input"
                        type='radio'
-                       @(Model.CurrentValue == Model.Value(startTime).ToString() ? "checked" : string.Empty)
+                       @(Model.CurrentValue.Equals(Model.Value(startTime).ToString()) ? "checked" : string.Empty)
                        value="@Model.Value(startTime)|@Model.Value(endTime)"
                        name='@Model.Id'
                        aria-describedby="@Model.GetTimeInputHint(i)"

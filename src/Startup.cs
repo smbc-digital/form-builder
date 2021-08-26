@@ -62,6 +62,7 @@ namespace form_builder
                 .ConfigureEmailTemplateProviders()
                 .ConfigureDocumentCreationProviders()
                 .ConfigureFormAnswersProviders()
+                .ConfigurePostSubmissionActions()
                 .ConfigureFormatters()
                 .ConfigureEnabledFor()
                 .ConfigureEmailProviders(HostingEnvironment)
@@ -71,7 +72,7 @@ namespace form_builder
                 .AddServices()
                 .AddWorkflows()
                 .AddFactories()
-                .AddAntiforgery(_ => 
+                .AddAntiforgery(_ =>
                     {
                         _.Cookie.Name = ".formbuilder.antiforgery.v2";
                         _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
@@ -135,12 +136,12 @@ namespace form_builder
             app.UseResponseCaching();
             app.Use(async (context, next) =>
             {
-                context.Response.GetTypedHeaders().CacheControl = 
+                context.Response.GetTypedHeaders().CacheControl =
                     new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
                     {
                         NoCache = true,
                         NoStore = true
-                    };                
+                    };
 
                 await next();
             });

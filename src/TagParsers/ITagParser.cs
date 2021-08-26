@@ -7,7 +7,8 @@ namespace form_builder.TagParsers
     public interface ITagParser
     {
         Regex Regex { get; }
-        Page Parse(Page formSchema, FormAnswers formAnswers);
+        Task<Page> Parse(Page formSchema, FormAnswers formAnswers);
+        string ParseString(string content, FormAnswers formAnswers);
     }
 
     public interface ISimpleTagParser

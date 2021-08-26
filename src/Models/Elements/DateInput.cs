@@ -11,10 +11,7 @@ namespace form_builder.Models.Elements
 {
     public class DateInput : Element
     {
-        public DateInput()
-        {
-            Type = EElementType.DateInput;
-        }
+        public DateInput() => Type = EElementType.DateInput;
 
         public static string DAY_EXTENSION => "-day";
         public static string MONTH_EXTENSION => "-month";
@@ -83,9 +80,9 @@ namespace form_builder.Models.Elements
         public static DateTime? GetDate(FormAnswers answers, string key)
         {
             IEnumerable<Answers> flattenedAnswers = answers.AllAnswers;
-            string year = flattenedAnswers.Single(answer => answer.QuestionId == $"{key}{DateInput.YEAR_EXTENSION}").Response; 
-            string month = flattenedAnswers.Single(answer => answer.QuestionId == $"{key}{DateInput.MONTH_EXTENSION}").Response;
-            string day = flattenedAnswers.Single(answer => answer.QuestionId == $"{key}{DateInput.DAY_EXTENSION}").Response;
+            string year = flattenedAnswers.Single(answer => answer.QuestionId.Equals($"{key}{DateInput.YEAR_EXTENSION}")).Response; 
+            string month = flattenedAnswers.Single(answer => answer.QuestionId.Equals($"{key}{DateInput.MONTH_EXTENSION}")).Response;
+            string day = flattenedAnswers.Single(answer => answer.QuestionId.Equals($"{key}{DateInput.DAY_EXTENSION}")).Response;
             
             return new DateTime(Convert.ToInt32(year), Convert.ToInt32(month), Convert.ToInt32(day));
         }

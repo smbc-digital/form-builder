@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using form_builder.Factories.Schema;
 using form_builder.Helpers.Session;
-using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService;
 using form_builder.Services.SubmitService;
 
