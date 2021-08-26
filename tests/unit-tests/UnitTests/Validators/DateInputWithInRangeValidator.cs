@@ -26,27 +26,6 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
-        public void Validate_ShouldCheckDateIsOptional()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
-                .WithQuestionId("test-date")
-                .Build();
-
-            element.Properties.WithinRange = "1";
-            element.Properties.Optional = true;
-
-            var viewModel = new Dictionary<string, dynamic>();
-
-            // Act
-            var result = _dateInputWithInRangeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
-
-            // Assert
-            Assert.True(result.IsValid);
-        }
-
-        [Fact]
         public void Validate_ShouldCheckDateIsNotValid()
         {
             // Arrange
@@ -78,7 +57,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test")
                 .Build();
-            element.Properties.WithinRange = "18";
+            element.Properties.WithinRange = "18-Y";
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-day", "01");
@@ -102,7 +81,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test")
                 .Build();
-            element.Properties.WithinRange = "18";
+            element.Properties.WithinRange = "18-Y";
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-day", "01");
