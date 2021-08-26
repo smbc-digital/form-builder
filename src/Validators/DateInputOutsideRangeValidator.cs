@@ -28,7 +28,7 @@ namespace form_builder.Validators
             var inputDate = DateTime.Now;
             var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out inputDate);
 
-            var dateType = element.Properties.OutsideRange.Substring(element.Properties.OutsideRange.LastIndexOf('-') + 1).Trim();
+            var dateType = element.Properties.OutsideRange.Substring(element.Properties.OutsideRange.LastIndexOf('-') + 1).Trim().ToUpper();
             string value = element.Properties.OutsideRange.Split('-')[0].Trim();
             var valueToSubtract = Convert.ToInt32(value);
 
