@@ -25,26 +25,24 @@ namespace form_builder.Validators
                 ? viewModel[$"{element.Properties.QuestionId}-year"]
                 : null;
 
-            var isOptional = string.IsNullOrEmpty(valueDay) && string.IsNullOrEmpty(valueMonth) && string.IsNullOrEmpty(valueYear) && element.Properties.Optional;
-            if (isOptional)
-                return new ValidationResult { IsValid = true };
-
             var inputDate = DateTime.Now;
             var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out inputDate);
 
-            if (!isValidDate)
-            {
-                return new ValidationResult
-                {
-                    IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the date and try again"
-                };
-            }
+            var dateType = element.Properties.WithinRange.Substring(element.Properties.WithinRange.LastIndexOf('-') + 1).Trim();
+            string value = element.Properties.WithinRange.Split('-')[0].Trim();
+            var valueToSubtract = Convert.ToInt32(value);
 
-            var yearsToSubtract = Convert.ToInt32(element.Properties.WithinRange);
-            var date = DateTime.Today.AddYears(-yearsToSubtract);
+            var date = DateTime.Today; //make sure it fix in one condition
+            if (dateType.Equals("Y"))
+                date = DateTime.Today.AddYears(-valueToSubtract);
 
-            if (!(inputDate > date && inputDate < DateTime.Now))
+            if (dateType.Equals("M"))
+                date = DateTime.Today.AddMonths(-valueToSubtract);
+
+            if (dateType.Equals("D"))
+                date = DateTime.Today.AddDays(-valueToSubtract);
+
+            if (!(inputDate >= date && inputDate < DateTime.Now))
             {
                 return new ValidationResult
                 {
