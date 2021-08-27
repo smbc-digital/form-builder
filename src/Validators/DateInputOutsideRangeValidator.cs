@@ -1,4 +1,5 @@
-﻿using form_builder.Enum;
+﻿using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using System;
@@ -36,13 +37,13 @@ namespace form_builder.Validators
                     var valueToSubtract = Convert.ToInt32(value);
 
                     var date = DateTime.Today;
-                    if (element.Properties.OutsideRangeType.Equals("Y"))
+                    if (element.Properties.OutsideRangeType.Equals(DateInputConstants.YEAR))
                         date = DateTime.Today.AddYears(-valueToSubtract);
 
-                    if (element.Properties.OutsideRangeType.Equals("M"))
+                    if (element.Properties.OutsideRangeType.Equals(DateInputConstants.MONTH))
                         date = DateTime.Today.AddMonths(-valueToSubtract);
 
-                    if (element.Properties.OutsideRangeType.Equals("D"))
+                    if (element.Properties.OutsideRangeType.Equals(DateInputConstants.DAY))
                         date = DateTime.Today.AddDays(-valueToSubtract);
 
                     if (date < inputDate)
