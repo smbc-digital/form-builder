@@ -68,7 +68,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             var dateinput = new ElementBuilder()
            .WithType(EElementType.DateInput)
            .WithQuestionId("testDate")
-           .WithinRange("18-D")
+           .WithWithinRange("18-D")
            .Build();
 
             var page1 = new PageBuilder()
@@ -93,7 +93,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             var dateinput = new ElementBuilder()
            .WithType(EElementType.DateInput)
            .WithQuestionId("testDate")
-           .WithinRange("18-W")
+           .WithWithinRange("18-W")
            .Build();
 
             var page1 = new PageBuilder()

@@ -531,7 +531,7 @@ namespace form_builder.Builders
             return this;
         }
 
-        public ElementBuilder WithinRange(string value)
+        public ElementBuilder WithWithinRange(string value)
         {
             _property.WithinRange = value;
 
