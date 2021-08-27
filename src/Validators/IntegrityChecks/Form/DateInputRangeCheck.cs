@@ -18,23 +18,24 @@ namespace form_builder.Validators.IntegrityChecks.Form
             var pagesWithElements = schema.Pages
                 .Where(page => page.Elements is not null);
 
-            var dateInputElements = pagesWithElements
+            var dateInputOutsideRangeElements = pagesWithElements
                 .SelectMany(page => page.Elements
-                    .Where(element => element.Type.Equals(EElementType.DateInput)));
+                    .Where(element => element.Type.Equals(EElementType.DateInput) && !string.IsNullOrEmpty(element.Properties.OutsideRangeType)));
 
-            foreach (var element in dateInputElements)
+            var dateInputWithinRangeElements = pagesWithElements
+                .SelectMany(page => page.Elements
+                    .Where(element => element.Type.Equals(EElementType.DateInput) && !string.IsNullOrEmpty(element.Properties.WithinRangeType)));
+
+            foreach (var element in dateInputOutsideRangeElements)
             {
-                foreach (var outsideRange in element.Properties.OutsideRangeType)
-                {
-                    if (!outsideRange.Equals('Y') && !outsideRange.Equals('M') && !outsideRange.Equals('D'))
-                        result.AddFailureMessage($"The provided json has Dateinput elements with a incorrect range format for '{ String.Join(", ", element.Properties.QuestionId) }'");
-                }
+                if (!element.Properties.OutsideRangeType.Equals("Y") && !element.Properties.OutsideRangeType.Equals("M") && !element.Properties.OutsideRangeType.Equals("D"))
+                    result.AddFailureMessage($"The provided json has Dateinput elements with a incorrect range format for '{ String.Join(", ", element.Properties.QuestionId) }'");
+            }
 
-                foreach (var withinRange in element.Properties.WithinRangeType)
-                {
-                    if (!withinRange.Equals('Y') && !withinRange.Equals('M') && !withinRange.Equals('D'))
-                        result.AddFailureMessage($"The provided json has Dateinput elements with a incorrect range format for '{ String.Join(", ", element.Properties.QuestionId) }'");
-                }
+            foreach (var element in dateInputWithinRangeElements)
+            {
+                if (!element.Properties.WithinRangeType.Equals("Y") && !element.Properties.WithinRangeType.Equals("M") && !element.Properties.WithinRangeType.Equals("D"))
+                    result.AddFailureMessage($"The provided json has Dateinput elements with a incorrect range format for '{ String.Join(", ", element.Properties.QuestionId) }'");
             }
 
             return result;
