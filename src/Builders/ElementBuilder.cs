@@ -523,5 +523,19 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithOutsideRange(string value)
+        {
+            _property.OutsideRange = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithinRange(string value)
+        {
+            _property.WithinRange = value;
+
+            return this;
+        }
     }
 }
