@@ -26,30 +26,6 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
-        public void Validate_ShouldCheckDateIsNotValid()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
-                .WithQuestionId("test-date")
-                .Build();
-
-            element.Properties.WithinRange = "1";
-
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("test-date-day", "aa");
-            viewModel.Add("test-date-month", "aa");
-            viewModel.Add("test-date-year", "aaaa");
-
-            // Act
-            var result = _dateInputWithInRangeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Equal("Check the date and try again", result.Message);
-        }
-
-        [Fact]
         public void Validate_ShouldReturnFalse_WhenYearNotWithinRange()
         {
             // Arrange
