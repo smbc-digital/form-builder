@@ -23,32 +23,37 @@ namespace form_builder.Validators
 
             var valueYear = viewModel.ContainsKey($"{element.Properties.QuestionId}-year")
                 ? viewModel[$"{element.Properties.QuestionId}-year"]
-                : null;      
+                : null;
 
-            var inputDate = DateTime.Now;
-            var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out inputDate);
-
-            var dateType = element.Properties.OutsideRange.Substring(element.Properties.OutsideRange.LastIndexOf('-') + 1).Trim().ToUpper();
-            string value = element.Properties.OutsideRange.Split('-')[0].Trim();
-            var valueToSubtract = Convert.ToInt32(value);
-
-            var date = DateTime.Today; //make sure it fix in one condition
-            if (dateType.Equals("Y"))
-                date = DateTime.Today.AddYears(-valueToSubtract);
-
-            if (dateType.Equals("M"))
-                date = DateTime.Today.AddMonths(-valueToSubtract);
-
-            if (dateType.Equals("D"))
-                date = DateTime.Today.AddDays(-valueToSubtract);
-
-            if (date < inputDate)
+            if (!string.IsNullOrEmpty(valueDay) && !string.IsNullOrEmpty(valueMonth) && !string.IsNullOrEmpty(valueYear))
             {
-                return new ValidationResult
+                var inputDate = DateTime.Now;
+                var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out inputDate);
+
+                if (isValidDate)
                 {
-                    IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the date and try again"
-                };
+                    string value = element.Properties.OutsideRange.Split('-')[0].Trim();
+                    var valueToSubtract = Convert.ToInt32(value);
+
+                    var date = DateTime.Today;
+                    if (element.Properties.OutsideRangeType.Equals("Y"))
+                        date = DateTime.Today.AddYears(-valueToSubtract);
+
+                    if (element.Properties.OutsideRangeType.Equals("M"))
+                        date = DateTime.Today.AddMonths(-valueToSubtract);
+
+                    if (element.Properties.OutsideRangeType.Equals("D"))
+                        date = DateTime.Today.AddDays(-valueToSubtract);
+
+                    if (date < inputDate)
+                    {
+                        return new ValidationResult
+                        {
+                            IsValid = false,
+                            Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessage) ? element.Properties.CustomValidationMessage : "Check the date and try again"
+                        };
+                    }
+                }
             }
 
             return new ValidationResult
