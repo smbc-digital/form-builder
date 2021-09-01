@@ -46,7 +46,7 @@ namespace form_builder.Validators
                     if (element.Properties.WithinRangeType.Equals(DateInputConstants.DAY))
                         date = DateTime.Today.AddDays(-valueToSubtract);
 
-                    if (!(inputDate >= date && inputDate < DateTime.Now))
+                    if (!(inputDate >= date && inputDate < DateTime.Now) || (inputDate == date))
                     {
                         return new ValidationResult
                         {
