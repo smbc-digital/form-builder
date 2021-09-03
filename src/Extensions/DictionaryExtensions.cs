@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using form_builder.Constants;
 
@@ -20,7 +21,15 @@ namespace form_builder.Extensions
 
                 for (int x = 0; x < item.Value.Length; x++)
                 {
-                    item.Value[x] = HttpUtility.HtmlEncode(item.Value[x]);
+                    if (item.Value[x] is null) continue;
+
+                    string lessThan = "<";
+                    if (item.Value[x].Contains(lessThan))
+                        item.Value[x] = item.Value[x].Replace(lessThan, "%3C");
+
+                    string moreThan = ">";
+                    if (item.Value[x].Contains(moreThan))
+                        item.Value[x] = item.Value[x].Replace(moreThan, "%3E");
                 }
 
                 if (item.Value.Length.Equals(1))

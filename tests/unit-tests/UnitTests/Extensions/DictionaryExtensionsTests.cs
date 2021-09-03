@@ -10,9 +10,8 @@ namespace form_builder_tests.UnitTests.Extensions
     {
         [Theory]
         [InlineData("<script>window.alert('HACKED!')</script>")]
-        [InlineData("first-name></><p onload=hack()></p>")]
-        [InlineData("harmless this & that text")]
-        public void ToNormaliseDictionary_Should_EncodeUserInput(string userInput)
+        [InlineData("first-name</><p onload=hack()></p>")]
+        public void ToNormaliseDictionary_Should_EncodeAngleBrackets(string userInput)
         {
             // Arrange
             string questionId = "questionId";
@@ -23,7 +22,8 @@ namespace form_builder_tests.UnitTests.Extensions
             result.TryGetValue(questionId, out var encodedUserInput);
 
             // Assert
-            Assert.False(encodedUserInput.ToString().Equals(userInput));
+            Assert.True(userInput.Contains("<") || userInput.Contains(">"));
+            Assert.True(!encodedUserInput.ToString().Contains("<") || !encodedUserInput.ToString().Contains(">"));
         }
 
         [Fact]
