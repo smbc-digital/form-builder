@@ -95,6 +95,8 @@ using StockportGovUK.NetStandard.Gateways.VerintService;
 using form_builder.Services.PreviewService;
 using form_builder.SubmissionActions;
 using form_builder.Helpers.Cookie;
+using form_builder.Providers.Analytics;
+using form_builder.Services.AnalyticsService;
 
 namespace form_builder.Utils.Startup
 {
@@ -388,6 +390,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<ITemplatedEmailService, TemplatedEmailService>();
             services.AddSingleton<IFormAvailabilityService, FormAvailabilityService>();
             services.AddSingleton<IPreviewService, PreviewService>();
+            services.AddSingleton<IAnalyticsService, AnalyticsService>();
 
             return services;
         }
@@ -461,6 +464,8 @@ namespace form_builder.Utils.Startup
             services.Configure<NotifyConfiguration>(configuration.GetSection(NotifyConfiguration.ConfigValue));
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection(ReCaptchaConfiguration.ConfigValue));
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection(SubmissionServiceConfiguration.ConfigValue));
+            services.Configure<AnalyticsConfiguration>(configuration.GetSection(AnalyticsConfiguration.ConfigValue));
+            services.Configure<GoogleAnalyticsConfiguration>(configuration.GetSection(GoogleAnalyticsConfiguration.ConfigValue));
 
             services.Configure<ApplicationVersionConfiguration>(applicationVersion => applicationVersion.Version = configuration.GetValue<string>(ApplicationVersionConfiguration.ConfigValue));
             services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>(DistributedCacheConfiguration.ConfigValue));
@@ -534,6 +539,15 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IFileStorageProvider, RedisFileStorageProvider>();
             services.AddTransient<IFileStorageProvider, InMemoryStorageProvider>();
             services.AddTransient<IFileStorageProvider, S3FileStorageProvider>();
+
+            return services;
+        }
+
+        
+        public static IServiceCollection AddAnalyticsProvider(this IServiceCollection services)
+        {
+            services.AddTransient<IAnalyticsProvider, FakeAnalyticsProvider>();
+            services.AddTransient<IAnalyticsProvider, GoogleAnalyticsProvider>();
 
             return services;
         }
