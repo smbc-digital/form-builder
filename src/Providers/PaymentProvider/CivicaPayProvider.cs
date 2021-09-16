@@ -74,6 +74,9 @@ namespace form_builder.Providers.PaymentProvider
             if (!civicaResponse.IsSuccessStatusCode)
                 throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code {civicaResponse.StatusCode}, HttpResponse: {JsonConvert.SerializeObject(civicaResponse)}");
 
+            if (civicaResponse.ResponseContent.Success.Equals("false"))
+                throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway responded with a non successful response from the provider, { civicaResponse.ResponseContent.ResponseCode }, Summary: { civicaResponse.ResponseContent.ErrorMessage } - { civicaResponse.ResponseContent.ErrorSummary }");
+
             return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, reference);
         }
 

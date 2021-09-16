@@ -8,6 +8,12 @@
 
         public bool RestrictCurrentDate { get; set; } = false;
 
+        public string OutsideRange { get; set; }
+        public string OutsideRangeType => string.IsNullOrEmpty(OutsideRange) ? string.Empty : OutsideRange.Substring(OutsideRange.LastIndexOf('-') + 1).Trim().ToUpper();
+        public string WithinRange { get; set; }
+        public string WithinRangeType => string.IsNullOrEmpty(WithinRange)? string.Empty: WithinRange.Substring(WithinRange.LastIndexOf('-') + 1).Trim().ToUpper();
+
+
         public string Day { get; set; } = string.Empty;
 
         public string Month { get; set; } = string.Empty;

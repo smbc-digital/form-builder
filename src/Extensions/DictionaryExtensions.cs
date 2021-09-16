@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web;
 using form_builder.Constants;
 
 namespace form_builder.Extensions
@@ -9,13 +11,26 @@ namespace form_builder.Extensions
     {
         public static Dictionary<string, object> ToNormaliseDictionary(this Dictionary<string, string[]> formData, string subPath)
         {
-            var normalisedFormData = new Dictionary<string, dynamic>();
+            Dictionary<string, dynamic> normalisedFormData = new();
             normalisedFormData.Add(LookUpConstants.SubPathViewModelKey, subPath);
 
             foreach (var item in formData)
             {
                 if (item.Key.EndsWith(FileUploadConstants.SUFFIX))
                     continue;
+
+                for (int x = 0; x < item.Value.Length; x++)
+                {
+                    if (item.Value[x] is null) continue;
+
+                    string lessThan = "<";
+                    if (item.Value[x].Contains(lessThan))
+                        item.Value[x] = item.Value[x].Replace(lessThan, "%3C");
+
+                    string moreThan = ">";
+                    if (item.Value[x].Contains(moreThan))
+                        item.Value[x] = item.Value[x].Replace(moreThan, "%3E");
+                }
 
                 if (item.Value.Length.Equals(1))
                 {

@@ -109,6 +109,8 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IElementValidator, AutomaticAddressElementValidator>();
             services.AddTransient<IElementValidator, ManualAddressValidator>();
             services.AddTransient<IElementValidator, DateInputElementValidator>();
+            services.AddTransient<IElementValidator, DateInputOutsideRangeValidator>();
+            services.AddTransient<IElementValidator, DateInputWithInRangeValidator>();
             services.AddTransient<IElementValidator, DatePickerElementValidator>();
             services.AddTransient<IElementValidator, RestrictPastDateValidator>();
             services.AddTransient<IElementValidator, RestrictFutureDateValidator>();
@@ -345,7 +347,8 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, SummaryElementFormCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, EnabledForTimeWindowCheck>();
-            
+            services.AddSingleton<IFormSchemaIntegrityCheck, DateInputRangeCheck>();            
+
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, SubmitSlugsHaveAllPropertiesCheck>();
@@ -463,6 +466,8 @@ namespace form_builder.Utils.Startup
             services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>(DistributedCacheConfiguration.ConfigValue));
             services.Configure<PreviewModeConfiguration>(cacheOptions => cacheOptions.IsEnabled = configuration.GetValue<bool>(PreviewModeConfiguration.ConfigValue));
             services.Configure<TagManagerConfiguration>(tagManagerId => tagManagerId.TagManagerId = configuration.GetValue<string>(TagManagerConfiguration.ConfigValue));
+            services.Configure<StylesheetConfiguration>(stylesheetConfig => stylesheetConfig.Stylesheet = configuration.GetValue<string>(StylesheetConfiguration.ConfigValue));
+            services.Configure<JavascriptConfiguration>(javascriptConfig => javascriptConfig.Javascript = configuration.GetValue<string>(JavascriptConfiguration.ConfigValue));
 
             return services;
         }

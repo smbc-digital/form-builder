@@ -8,6 +8,23 @@ namespace form_builder_tests.UnitTests.Extensions
 {
     public class DictionaryExtensionsTests
     {
+        [Theory]
+        [InlineData("<script>window.alert('HACKED!')</script>")]
+        [InlineData("first-name</><p onload=hack()></p>")]
+        public void ToNormaliseDictionary_Should_EncodeAngleBrackets(string userInput)
+        {
+            // Arrange
+            string questionId = "questionId";
+            Dictionary<string, string[]> viewModel = new() { { questionId, new string[] { userInput } } };
+
+            // Act
+            var result = viewModel.ToNormaliseDictionary(string.Empty);
+            result.TryGetValue(questionId, out var encodedUserInput);
+
+            // Assert
+            Assert.True(userInput.Contains("<") || userInput.Contains(">"));
+            Assert.True(!encodedUserInput.ToString().Contains("<") || !encodedUserInput.ToString().Contains(">"));
+        }
 
         [Fact]
         public void ToNormaliseDictionary_ShouldRemoveAny_Keys_AssociatedWith_Time_And_Add_AppointmentStart_EndTime()
