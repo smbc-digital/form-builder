@@ -1,6 +1,6 @@
 describe('Success', () => {
     it('Success', () => {
-      cy.visit('ui-success-page');
+      cy.visit('UI-Success-Page');
       cy.get('.govuk-button').click()
         .toMatchingDOM()
     });
