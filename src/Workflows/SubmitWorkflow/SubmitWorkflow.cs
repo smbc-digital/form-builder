@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using form_builder.Helpers.Session;
-using form_builder.Providers.Analytics.Request;
 using form_builder.Services.AnalyticsService;
 using form_builder.Services.MappingService;
 using form_builder.Services.SubmitService;
@@ -12,17 +11,14 @@ namespace form_builder.Workflows.SubmitWorkflow
     {
         private readonly ISubmitService _submitService;
         private readonly IMappingService _mappingService;
-        private readonly IAnalyticsService _analyticsService;
         private readonly ISessionHelper _sessionHelper;
 
         public SubmitWorkflow(ISubmitService submitService, 
             IMappingService mappingService, 
-            IAnalyticsService analyticsService, 
             ISessionHelper sessionHelper)
         {
             _submitService = submitService;
             _mappingService = mappingService;
-            _analyticsService = analyticsService;
             _sessionHelper = sessionHelper;
         }
 
@@ -37,11 +33,7 @@ namespace form_builder.Workflows.SubmitWorkflow
 
             var data = await _mappingService.Map(sessionGuid, form);
 
-            var result = await _submitService.ProcessSubmission(data, form, sessionGuid);
-
-            _analyticsService.RaiseEvent(form, EAnalyticsEventType.Finish);
-
-            return result;
+            return await _submitService.ProcessSubmission(data, form, sessionGuid);
         }
     }
 }
