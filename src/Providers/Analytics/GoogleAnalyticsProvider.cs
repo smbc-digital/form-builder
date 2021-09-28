@@ -35,11 +35,14 @@ namespace form_builder.Providers.Analytics
                     ClientId = _configuration.Value.ClientId
                 };
 
-                await _gateway.GetAsync(payload.ToString(_configuration.Value.ApiUrl));
+                var result = await _gateway.GetAsync(payload.ToString(_configuration.Value.ApiUrl));
+
+                if(!result.IsSuccessStatusCode)
+                    throw new ApplicationException("GoogleAnalyticsProvider::RaiseEventAsync gateway retuened unsuccessful status code");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"GoogleAnalyticsProvider::RaiseEventAsync, failed to send event to GA for {request.EventType} on form {request.Form}. Exception: {ex.Message}");
+                _logger.LogError($"GoogleAnalyticsProvider::RaiseEventAsync, failed to send event to {ProviderName} for {request.EventType} on form {request.Form}. Exception: {ex.Message}");
             }
         }
     }
