@@ -38,7 +38,7 @@ namespace form_builder.Providers.Analytics
                 var result = await _gateway.GetAsync(payload.ToString(_configuration.Value.ApiUrl));
 
                 if(!result.IsSuccessStatusCode)
-                    throw new ApplicationException("GoogleAnalyticsProvider::RaiseEventAsync gateway retuened unsuccessful status code");
+                    throw new ApplicationException($"GoogleAnalyticsProvider::RaiseEventAsync gateway returned a unsuccessful status code, {result.StatusCode}");
             }
             catch (Exception ex)
             {
