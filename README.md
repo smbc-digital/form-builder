@@ -13,6 +13,7 @@
 - [Payment Providers](#payment-providers)
 - [Storage Providers](#storage-providers)
 - [Running High Availability](#running-high-availability)
+- [Structure Tests](#structure-tests)
 - [UI Tests](#ui-Tests)
 - [Preview](#preview)
 - [Data Structure Preview](#data-structure-preview)
@@ -163,6 +164,10 @@ Distributed cache and DataProtecton key storage specification is wrapped up in t
   var redis = ConnectionMultiplexer.Connect(storageProviderConfiguration["Address"]);
   services.AddDataProtection().PersistKeysToStackExchangeRedis(redis, $"{storageProviderConfiguration["InstanceName"]}DataProtection-Keys");
 ```
+
+# Structure Tests
+  
+Structure tests use Cypress to compare the DOM structure of components against snapshots. New structure tests should be added when a new component type is created. Existing tests may need to be modified, or snapshots replaced if the DOM structure of an existing component changes. More info on this feature can be found [here](https://github.com/smbc-digital/form-builder/wiki/Structure-tests)
 
 # UI Tests
 
