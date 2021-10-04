@@ -1,7 +1,8 @@
 describe('Summary', () => {
     it('Summary', () => {
       cy.visit('ui-summary');
-      cy.get('#firstName').type('firstname');
+      cy.get('#firstName').type('firstname')
+      cy.get('#lastName').type('lastname')
       cy.get('input[name=dob-day]').type('12')
       cy.get('input[name=dob-month]').type('04')
       cy.get('input[name=dob-year]').type('1991')
