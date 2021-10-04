@@ -1,11 +1,12 @@
 using System;
 using System.Threading.Tasks;
 using Amazon.S3;
+using form_builder.Configuration;
 using form_builder.Gateways;
 using form_builder.Providers.Transforms.ReusableElements;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -17,13 +18,12 @@ namespace form_builder_tests.UnitTests.Providers.TransformDataProvider
         private readonly Mock<IS3Gateway> _mockS3Gateway = new();
         private readonly Mock<ILogger<S3ReusableElementTransformDataProvider>> _mockLogger = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
-
-        private readonly Mock<IConfiguration> _mockConfiguration = new();
+        private readonly Mock<IOptions<S3SchemaProviderConfiguration>> _mockConfiguration = new();
 
         public S3ReusableElementTransformDataProviderTests()
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("uitest");
-            _mockConfiguration.Setup(_ => _["S3BucketKey"]).Returns("forms-storage");
+            _mockConfiguration.Setup(_ => _.Value).Returns(new S3SchemaProviderConfiguration{ S3BucketKey = "forms-storage" } );
             _s3TransformProvider = new S3ReusableElementTransformDataProvider(_mockS3Gateway.Object, _mockLogger.Object, _mockHostingEnv.Object, _mockConfiguration.Object);
         }
 
