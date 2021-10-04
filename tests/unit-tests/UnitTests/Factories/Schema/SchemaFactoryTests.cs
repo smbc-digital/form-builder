@@ -32,8 +32,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
         private readonly Mock<IReusableElementSchemaTransformFactory> _mockReusableElementSchemaFactory = new ();
         private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new ();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new ();
-         private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new ();
-        private readonly Mock<IConfiguration> _mockConfiguration = new ();
+        private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new ();
         private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new ();
         private readonly Mock<IEnumerable<IUserPageTransformFactory>> _mockUserPageFactories = new();
         private readonly Mock<IUserPageTransformFactory> _mockUserPageFactory = new();
@@ -48,10 +47,6 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             _mockUserPageFactories
                 .Setup(m => m.GetEnumerator())
                 .Returns(() => mockUserPageFactoryItems.GetEnumerator());
-
-            _mockConfiguration
-                .Setup(_ => _["ApplicationVersion"])
-                .Returns("v2");
 
             _mockDistributedCacheExpirationConfiguration
                 .Setup(_ => _.Value)
@@ -101,7 +96,6 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 _mockDistributedCacheConfiguration.Object,
                 _mockDistributedCacheExpirationConfiguration.Object,
                 _mockPreviewModeConfiguration.Object,
-                _mockConfiguration.Object, 
                 _mockFormSchemaIntegrityValidator.Object,
                 _mockUserPageFactories.Object);
         }
@@ -305,7 +299,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _schemaFactory.Build(PreviewConstants.PREVIEW_MODE_PREFIX));
 
-            _mockDistributedCache.Verify(_ => _.GetString($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}"));
+            _mockDistributedCache.Verify(_ => _.GetString($"form-json-{PreviewConstants.PREVIEW_MODE_PREFIX}"));
             _mockFormSchemaIntegrityValidator.Verify(_ => _.Validate(It.IsAny<FormSchema>()), Times.Never);
             _mockSchemaProvider.Verify(_ => _.ValidateSchemaName(It.IsAny<string>()), Times.Never);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -324,7 +318,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
 
             var result = await _schemaFactory.Build(PreviewConstants.PREVIEW_MODE_PREFIX);
 
-            _mockDistributedCache.Verify(_ => _.GetString($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}"));
+            _mockDistributedCache.Verify(_ => _.GetString($"form-json-{PreviewConstants.PREVIEW_MODE_PREFIX}"));
             _mockFormSchemaIntegrityValidator.Verify(_ => _.Validate(It.IsAny<FormSchema>()), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
             _mockSchemaProvider.Verify(_ => _.ValidateSchemaName(It.IsAny<string>()), Times.Never);

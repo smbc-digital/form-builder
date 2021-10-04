@@ -67,9 +67,7 @@ namespace form_builder.Models.Elements
                     IsSelect = true;
                     Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
 
-                    ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
-                        ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
-                        : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
+                    ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
                     var selectedStreet = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, StreetConstants.SELECT_SUFFIX);
                     var searchSuffix = results?.Count is 1 ? "street found" : "streets found";

@@ -130,9 +130,7 @@ namespace form_builder.Models.Elements
             if (results is not null && results.Count.Equals(0))
                 Properties.DisplayNoResultsIAG = true;
 
-            ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
-                ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
-                : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
+            ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
             return await viewRender.RenderAsync("AddressManual", this);
         }

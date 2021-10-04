@@ -69,7 +69,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
 
             if (baseForm.DocumentDownload)
             {
-                var sourceBase = _environment.EnvironmentName.Equals("local") ? "/document/Summary" : "/v2/document/Summary";
+                var sourceBase = "/document/Summary";
                 baseForm.DocumentType.ForEach(docType =>
                 {
                     var element = new ElementBuilder()
