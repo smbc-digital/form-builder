@@ -281,9 +281,7 @@ namespace form_builder.Helpers.ElementHelpers
             var urlOrigin = $"https://{_httpContextAccessor.HttpContext.Request.Host}/";
             var urlPath = $"{formSchema.BaseURL}/{FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH}{SystemConstants.CaseReferenceQueryString}{Convert.ToBase64String(Encoding.ASCII.GetBytes(formAnswers.CaseReference))}";
 
-            return _environment.EnvironmentName.Equals("local")
-                ? $"{urlOrigin}{urlPath}"
-                : $"{urlOrigin}v2/{urlPath}";
+            return $"{urlOrigin}{urlPath}";
         }
 
         public void OrderOptionsAlphabetically(Element element)

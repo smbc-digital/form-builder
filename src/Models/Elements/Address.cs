@@ -73,13 +73,9 @@ namespace form_builder.Models.Elements
                     IsSelect = true;
                     Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, AddressConstants.SEARCH_SUFFIX);
 
-                    ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
-                        ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
-                        : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
+                    ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
-                    ManualAddressURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
-                        ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual"
-                        : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}/manual";
+                    ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
                     var selectedAddress = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, AddressConstants.SELECT_SUFFIX);
                     var searchSuffix = (bool)(results?.Count.Equals(1)) ? "address found" : "addresses found";

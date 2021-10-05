@@ -23,7 +23,7 @@ namespace form_builder.Providers.SchemaProvider
     {
         private readonly IS3Gateway _s3Gateway;
         private readonly IWebHostEnvironment _environment;
-        private readonly IConfiguration _configuration;
+        private readonly S3SchemaProviderConfiguration _s3SchemaConfiguration;
         private readonly ILogger<ISchemaProvider> _logger;
         private readonly IDistributedCacheWrapper _distributedCacheWrapper;
         private readonly DistributedCacheConfiguration _distributedCacheConfiguration;
@@ -32,14 +32,14 @@ namespace form_builder.Providers.SchemaProvider
         public S3FileSchemaProvider(IS3Gateway s3Service,
             IWebHostEnvironment environment,
             IDistributedCacheWrapper distributedCacheWrapper,
-            IConfiguration configuration,
+            IOptions<S3SchemaProviderConfiguration> s3SchemaConfiguration,
             IOptions<DistributedCacheConfiguration> distributedCacheConfiguration,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ILogger<ISchemaProvider> logger)
         {
             _s3Gateway = s3Service;
             _environment = environment;
-            _configuration = configuration;
+            _s3SchemaConfiguration = s3SchemaConfiguration.Value;
             _logger = logger;
             _distributedCacheWrapper = distributedCacheWrapper;
             _distributedCacheConfiguration = distributedCacheConfiguration.Value;
@@ -50,7 +50,7 @@ namespace form_builder.Providers.SchemaProvider
         {
             try
             {
-                var s3Result = await _s3Gateway.GetObject(_configuration["S3BucketKey"], $"{_environment.EnvironmentName.ToS3EnvPrefix()}/{_configuration["ApplicationVersion"]}/{schemaName}.json");
+                var s3Result = await _s3Gateway.GetObject(_s3SchemaConfiguration.S3BucketKey, $"{_environment.EnvironmentName.ToS3EnvPrefix()}/{_s3SchemaConfiguration.S3BucketFolderName}/{schemaName}.json");
 
                 using Stream responseStream = s3Result.ResponseStream;
                 using StreamReader sr = new(responseStream);
@@ -60,7 +60,7 @@ namespace form_builder.Providers.SchemaProvider
             }
             catch (AmazonS3Exception e)
             {
-                throw new Exception($"S3FileSchemaProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_environment.EnvironmentName.ToS3EnvPrefix()}/{_configuration["ApplicationVersion"]}/{schemaName}", e);
+                throw new Exception($"S3FileSchemaProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {_environment.EnvironmentName.ToS3EnvPrefix()}/{_s3SchemaConfiguration.S3BucketKey}/{_s3SchemaConfiguration.S3BucketFolderName}/{schemaName}", e);
             }
             catch (Exception e)
             {
@@ -82,10 +82,10 @@ namespace form_builder.Providers.SchemaProvider
             }
 
             ListObjectsV2Response result = new ();
-            string bucketSearchPrefix = $"{_environment.EnvironmentName.ToS3EnvPrefix()}/{_configuration["ApplicationVersion"]}/";
+            string bucketSearchPrefix = $"{_environment.EnvironmentName.ToS3EnvPrefix()}/{_s3SchemaConfiguration.S3BucketFolderName}/";
             try
             {
-                result = await _s3Gateway.ListObjectsV2(_configuration["S3BucketKey"], bucketSearchPrefix);
+                result = await _s3Gateway.ListObjectsV2(_s3SchemaConfiguration.S3BucketKey, bucketSearchPrefix);
             }
             catch (Exception e)
             {

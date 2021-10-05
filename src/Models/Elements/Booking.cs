@@ -102,7 +102,7 @@ namespace form_builder.Models.Elements
                 default:
                     CreateCalendar();
                     CreateTimeAvailability();
-                    MonthSelectionPostUrl = formSchema.BaseURL.ToBookingRequestedMonthUrl(page.PageSlug, environment.EnvironmentName.Equals("local"));
+                    MonthSelectionPostUrl = formSchema.BaseURL.ToBookingRequestedMonthUrl(page.PageSlug);
                     return viewRender.RenderAsync(Type.ToString(), this);
             }
         }

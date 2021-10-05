@@ -30,7 +30,6 @@ namespace form_builder.Services.PreviewService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly ISchemaFactory _schemaFactory;
         private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
-        private readonly ApplicationVersionConfiguration _applicationVersionConfiguration;
         private readonly ICookieHelper _cookieHelper;
         private int _expiryMinutes => 30;
 
@@ -40,7 +39,6 @@ namespace form_builder.Services.PreviewService
             IDistributedCacheWrapper distributedCache,
             ISchemaFactory schemaFactory,
             IOptions<PreviewModeConfiguration> previewModeConfiguration,
-            IOptions<ApplicationVersionConfiguration> applicationVersionConfiguration,
             ICookieHelper cookieHelper,
             IPageFactory pageFactory)
         {
@@ -51,7 +49,6 @@ namespace form_builder.Services.PreviewService
             _schemaFactory = schemaFactory;
             _cookieHelper = cookieHelper;
             _previewModeConfiguration = previewModeConfiguration;
-            _applicationVersionConfiguration = applicationVersionConfiguration.Value;
         }
 
         public async Task<FormBuilderViewModel> GetPreviewPage()
@@ -70,7 +67,7 @@ namespace form_builder.Services.PreviewService
 
             var cookiePreviewKeyValue = _cookieHelper.GetCookie(CookieConstants.PREVIEW_MODE);
             _cookieHelper.DeleteCookie(cookiePreviewKeyValue);
-            _distributedCache.Remove($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{cookiePreviewKeyValue}");
+            _distributedCache.Remove($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{cookiePreviewKeyValue}");
         }
 
         public async Task<ProcessPreviewRequestEntity> VerifyPreviewRequest(IEnumerable<CustomFormFile> fileUpload)
@@ -102,17 +99,17 @@ namespace form_builder.Services.PreviewService
             List<DocumentModel> uploadedPreviewDocument = viewModel.Values.First();
 
             var fileContent = Convert.FromBase64String(uploadedPreviewDocument.First().Content);
-            await _distributedCache.SetAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}", fileContent, new DistributedCacheEntryOptions { AbsoluteExpiration = DateTime.Now.AddMinutes(_expiryMinutes) });
+            await _distributedCache.SetAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{previewKey}", fileContent, new DistributedCacheEntryOptions { AbsoluteExpiration = DateTime.Now.AddMinutes(_expiryMinutes) });
 
             try
             {
                 var formSchema = await _schemaFactory.Build(previewKey);
                 formSchema.BaseURL = previewKey;
-                await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}", JsonConvert.SerializeObject(formSchema), _expiryMinutes);
+                await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{previewKey}", JsonConvert.SerializeObject(formSchema), _expiryMinutes);
             }
             catch (Exception e)
             {
-                _distributedCache.Remove($"{ESchemaType.FormJson.ToESchemaTypePrefix(_applicationVersionConfiguration.Version)}{previewKey}");
+                _distributedCache.Remove($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{previewKey}");
                 var errorPage = PreviewErrorPage(e.Message, e.Source);
                 var errorSchema = PreviewModeFormSchema(errorPage);
                 var formModel = await _pageContentFactory.Build(errorPage, viewModel, errorSchema, string.Empty, new FormAnswers());

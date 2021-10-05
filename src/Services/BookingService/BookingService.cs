@@ -244,9 +244,7 @@ namespace form_builder.Services.BookingService
             if (!bookingInformation.CanCustomerCancel)
                 throw new BookingCannotBeCancelledException($"BookingSerivice::ValidateCancellationRequest, booking: {bookingGuid} specified it can not longer be cancelled");
 
-            var envStartPageUrl = _environment.EnvironmentName.Equals("local") ?
-                 $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{formName}/{formSchema.StartPageUrl}" :
-                 $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formName}/{formSchema.StartPageUrl}";
+            var envStartPageUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{formName}/{formSchema.StartPageUrl}";
 
             return new CancelledAppointmentInformation
             {

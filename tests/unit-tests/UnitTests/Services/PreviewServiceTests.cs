@@ -31,16 +31,11 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDistributedCacheWrapper> _distributedCache = new();
         private readonly Mock<ISchemaFactory> _schemaFactory = new();
         private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new();
-        private readonly Mock<IOptions<ApplicationVersionConfiguration>> _mockApplicationVersionConfiguration = new();
         private readonly Mock<ICookieHelper> _mockCookieHelper = new();
         private readonly Mock<IPageFactory> _mockPageFactory = new();
 
         public PreviewServiceTests()
         {
-            _mockApplicationVersionConfiguration
-                .Setup(_ => _.Value)
-                .Returns(new ApplicationVersionConfiguration{ Version = "v2" });
-
             _mockPreviewModeConfiguration
                 .Setup(_ => _.Value)
                 .Returns(new PreviewModeConfiguration{ IsEnabled = true });
@@ -57,7 +52,6 @@ namespace form_builder_tests.UnitTests.Services
                 _distributedCache.Object,
                 _schemaFactory.Object,
                 _mockPreviewModeConfiguration.Object,
-                _mockApplicationVersionConfiguration.Object,
                 _mockCookieHelper.Object,
                 _mockPageFactory.Object
             );
@@ -164,8 +158,8 @@ namespace form_builder_tests.UnitTests.Services
             Assert.True(entity.UseGeneratedViewModel);
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             _testValidator.Verify(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()), Times.Once);
-            _distributedCache.Verify(_ => _.SetAsync(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}"))), Times.Once);
+            _distributedCache.Verify(_ => _.SetAsync(It.Is<string>(_ => _.StartsWith($"form-json-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()), Times.Once);
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(_ => _.StartsWith($"form-json-{PreviewConstants.PREVIEW_MODE_PREFIX}"))), Times.Once);
         }
 
         [Fact]
@@ -197,8 +191,8 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal(3, callbackPage.Elements.Count);
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             _testValidator.Verify(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()), Times.Once);
-            _distributedCache.Verify(_ => _.SetAsync(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}"))), Times.Once);
+            _distributedCache.Verify(_ => _.SetAsync(It.Is<string>(_ => _.StartsWith($"form-json-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()), Times.Once);
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(_ => _.StartsWith($"form-json-{PreviewConstants.PREVIEW_MODE_PREFIX}"))), Times.Once);
         }
 
         [Fact]
@@ -224,10 +218,10 @@ namespace form_builder_tests.UnitTests.Services
             Assert.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX, entity.PreviewFormKey);
             _testValidator.Verify(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()), Times.Once);
             _mockCookieHelper.Verify(_ => _.AddCookie(It.Is<string>(x => x.Equals(CookieConstants.PREVIEW_MODE)), It.Is<string>(y => y.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX))), Times.Once);
-            _distributedCache.Verify(_ => _.SetAsync(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()), Times.Once);
-            _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(30)), It.IsAny<CancellationToken>()), Times.Once);
+            _distributedCache.Verify(_ => _.SetAsync(It.Is<string>(_ => _.StartsWith($"form-json-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()), Times.Once);
+            _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.StartsWith($"form-json-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(30)), It.IsAny<CancellationToken>()), Times.Once);
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(_ => _.StartsWith($"form-json-v2-{PreviewConstants.PREVIEW_MODE_PREFIX}"))), Times.Never);
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(_ => _.StartsWith($"form-json-{PreviewConstants.PREVIEW_MODE_PREFIX}"))), Times.Never);
         }
     }
 }
