@@ -95,7 +95,7 @@ namespace form_builder
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsEnvironment("local") || env.IsEnvironment("uitest"))
+            if (env.IsEnvironment("local") || env.IsEnvironment("uitest") || env.IsEnvironment("int"))
             {
                 app.UseDeveloperExceptionPage();
             }
