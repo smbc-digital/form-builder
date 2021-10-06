@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using System.Web;
 using form_builder.Middleware;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -21,9 +17,11 @@ namespace form_builder_tests.UnitTests.Middleware
         }
 
         [Theory]
-        [InlineData("/v2/form-name", "/form-name", 302)]
-        [InlineData("/V2/form-name", "/form-name", 302)]
-        public async Task Invoke_ShouldReturnRedirectStatusCode_ForLegacyPathPrefix(string actualPath, string expectedPath, int statusCode)
+        [InlineData("/v2/form-name", "/form-name")]
+        [InlineData("/V2/form-name", "/form-name")]
+        [InlineData("/V2/form-name?querystring=test", "/form-name?querystring=test")]
+        [InlineData("/v2/form-name?querystring=test&another=one", "/form-name?querystring=test&another=one")]
+        public async Task Invoke_ShouldReturnRedirectStatusCode_ForLegacyPathPrefix(string actualPath, string expectedPath)
         {
             // Arrange
             var httpContext = new DefaultHttpContext();
@@ -33,14 +31,16 @@ namespace form_builder_tests.UnitTests.Middleware
             await _legacyRedirect.Invoke(httpContext);
 
             // Assert
-            Assert.Equal(statusCode, httpContext.Response.StatusCode);
-            Assert.Equal(expectedPath, httpContext.Response.Headers["Location"][0]);
+            Assert.Equal(302, httpContext.Response.StatusCode);
+            Assert.Equal(expectedPath, HttpUtility.UrlDecode(httpContext.Response.Headers["Location"][0]));
         }
 
         [Theory]
-        [InlineData("/form-name", 200)]
-        [InlineData("/v2-form-name", 200)]
-        public async Task Invoke_ShouldReturnOkStatusCode_ForNonLegacyPathPrefix(string actualPath, int statusCode)
+        [InlineData("/form-name")]
+        [InlineData("/v2-form-name")]
+        [InlineData("/form-name?querystring=test")]
+        [InlineData("/form-name?querystring=test&another=one")]
+        public async Task Invoke_ShouldReturnOkStatusCode_ForNonLegacyPathPrefix(string actualPath)
         {
             // Arrange
             var httpContext = new DefaultHttpContext();
@@ -50,9 +50,8 @@ namespace form_builder_tests.UnitTests.Middleware
             await _legacyRedirect.Invoke(httpContext);
 
             // Assert
-            Assert.Equal(statusCode, httpContext.Response.StatusCode);
+            Assert.Equal(200, httpContext.Response.StatusCode);
             Assert.Empty(httpContext.Response.Headers);
         }
-
     }
 }
