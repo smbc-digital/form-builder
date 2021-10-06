@@ -74,14 +74,14 @@ namespace form_builder
                 .AddAntiforgery(_ =>
                     {
                         _.Cookie.Name = ".formbuilder.antiforgery.v2";
-                        _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                        _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                     })
                 .AddSession(_ =>
                 {
                     _.IdleTimeout = TimeSpan.FromMinutes(30);
                     _.Cookie.Path = "/";
                     _.Cookie.Name = ".formbuilder.v2";
-                    _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 });
 
             services
