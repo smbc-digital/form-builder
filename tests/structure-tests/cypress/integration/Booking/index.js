@@ -10,7 +10,7 @@ describe('Booking', () => {
       cy.visit('ui-booking')
       FillOutRequiredUserDetailsPages()
 
-        cy.get('[type="radio"]').first().check()
+        cy.get('[type="radio"]').first().check({force: true})
         .get('.govuk-button').click()
         .toMatchingDOM()
     });

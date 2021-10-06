@@ -7,7 +7,6 @@ using form_builder.Utils.Startup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -75,14 +74,14 @@ namespace form_builder
                 .AddAntiforgery(_ =>
                     {
                         _.Cookie.Name = ".formbuilder.antiforgery.v2";
-                        _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                        _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                     })
                 .AddSession(_ =>
                 {
                     _.IdleTimeout = TimeSpan.FromMinutes(30);
                     _.Cookie.Path = "/";
                     _.Cookie.Name = ".formbuilder.v2";
-                    _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 });
 
             services
@@ -92,27 +91,11 @@ namespace form_builder
                     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                     options.ModelBinderProviders.Insert(0, new CustomFormFileModelBinderProvider());
                 });
-
-            services.Configure<ForwardedHeadersOptions>(options =>
-                {
-                    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-
-                    options.KnownNetworks.Clear();
-                    options.KnownProxies.Clear();
-                });
-
-            services.AddHttpsRedirection(options =>
-                {
-                    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                    options.HttpsPort = 443;
-                });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseForwardedHeaders();
-
-            if (env.IsEnvironment("local") || env.IsEnvironment("uitest"))
+            if (env.IsEnvironment("local") || env.IsEnvironment("uitest") || env.IsEnvironment("int"))
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -123,6 +106,7 @@ namespace form_builder
             }
 
             app.UseMiddleware<HeaderConfiguration>()
+                .UseMiddleware<LegacyRedirect>()
                 .UseSession()
                 .UseHttpsRedirection()
                 .UseStaticFiles()

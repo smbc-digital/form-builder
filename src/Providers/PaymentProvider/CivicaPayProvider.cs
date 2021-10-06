@@ -41,7 +41,7 @@ namespace form_builder.Providers.PaymentProvider
                 CallingAppIdentifier = "Basket",
                 CustomerID = _paymentConfig.CustomerId,
                 ApiPassword = _paymentConfig.ApiPassword,
-                ReturnURL = _environment.EnvironmentName.Equals("local") ? $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response" : $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{form}/{path}/payment-response",
+                ReturnURL = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response",
                 NotifyURL = string.Empty,
                 CallingAppTranReference = reference,
                 PaymentItems = new List<PaymentItem>

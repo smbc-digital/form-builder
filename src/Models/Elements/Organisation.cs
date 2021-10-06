@@ -65,9 +65,7 @@ namespace form_builder.Models.Elements
                 case LookUpConstants.Automatic:
                     Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
                     IsSelect = true;
-                    ReturnURL = environment.EnvironmentName.Equals("local") || environment.EnvironmentName.Equals("uitest")
-                                ? $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}"
-                                : $"{environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{formSchema.BaseURL}/{page.PageSlug}";
+                    ReturnURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}";
 
                     var selectedOrganisation = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, OrganisationConstants.SELECT_SUFFIX);
                     Items = new List<SelectListItem> { new SelectListItem($"{results?.Count} organisations found", string.Empty) };
