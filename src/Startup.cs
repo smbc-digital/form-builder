@@ -108,7 +108,6 @@ namespace form_builder
             app.UseMiddleware<HeaderConfiguration>()
                 .UseMiddleware<LegacyRedirect>()
                 .UseSession()
-                .UseHttpsRedirection()
                 .UseStaticFiles()
                 .UseRouting()
                 .UseEndpoints(endpoints =>
