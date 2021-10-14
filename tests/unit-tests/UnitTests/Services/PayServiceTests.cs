@@ -424,5 +424,86 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Never);
         }
+
+        [Fact]
+        public async Task ProcessPaymentResponse_ShouldLogError_AndNotFail_IfCallback_ThrowsException_OnSuccess()
+        {
+            // Arrange
+            var reference = "12345abc";
+            _mockPaymentHelper
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .ReturnsAsync(new PaymentInformation
+                {
+                    PaymentProvider = "testPaymentProvider", 
+                    Settings = new Settings
+                    {
+                        Amount = "10"
+                    }
+                });
+
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ThrowsAsync(new Exception("An error has occured"));
+
+            // Act
+            var result = await _service.ProcessPaymentResponse("testForm", "12345", reference);
+
+            // Assert
+            Assert.Equal(reference, result);
+            _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessPaymentResponse_ShouldLogError_AndThrowNormalFailedException_IfCallback_ThrowsException_OnFailure()
+        {
+            // Arrange
+            _mockPaymentHelper
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .ReturnsAsync(new PaymentInformation
+                {
+                    PaymentProvider = "testPaymentProvider", 
+                    Settings = new Settings
+                    {
+                        Amount = "10"
+                    }
+                });
+
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ThrowsAsync(new Exception("An error has occured"));
+
+            _paymentProvider
+                .Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
+                .Throws(new PaymentFailureException("error"));
+
+            // Act & Assert
+            await Assert.ThrowsAsync<PaymentFailureException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", "reference"));
+            _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessPaymentResponse_ShouldLogError_AndThrowNormalDeclinedException_IfCallback_ThrowsException_OnDeclined()
+        {
+            // Arrange
+            _mockPaymentHelper
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .ReturnsAsync(new PaymentInformation
+                {
+                    PaymentProvider = "testPaymentProvider", 
+                    Settings = new Settings
+                    {
+                        Amount = "10"
+                    }
+                });
+
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ThrowsAsync(new Exception("An error has occured"));
+
+            _paymentProvider
+                .Setup(_ => _.VerifyPaymentResponse(It.IsAny<string>()))
+                .Throws(new PaymentDeclinedException("error"));
+
+            // Act & Assert
+            await Assert.ThrowsAsync<PaymentDeclinedException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", "reference"));
+            _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+        }
     }
 }
