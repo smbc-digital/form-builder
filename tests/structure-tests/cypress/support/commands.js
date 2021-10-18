@@ -1,6 +1,6 @@
 require('@cypress/snapshot').register()
 
-const REGEX = /<input name="__RequestVerificationToken" type="hidden" value=".*">/g
+const REGEX = /<input name="__RequestVerificationToken" type="hidden" value=".*?">/g
 
 Cypress.Commands.add('toMatchingDOM', (className = 'govuk-grid-column-two-thirds') => {
     cy.document().then((win) => {
