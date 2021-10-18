@@ -17,14 +17,14 @@ namespace form_builder_tests.UnitTests.Extensions
             {
                 new AppointmentType 
                 {
-                    Environment = "test",
+                    Environment = "local",
                     AppointmentId = id,
                     OptionalResources = new List<BookingResource>{
                         new BookingResource()
                     }
                 }
             };
-            var result = testList.GetAppointmentTypeForEnvironment("test");
+            var result = testList.GetAppointmentTypeForEnvironment("uitest");
 
             
             Assert.NotNull(result);
