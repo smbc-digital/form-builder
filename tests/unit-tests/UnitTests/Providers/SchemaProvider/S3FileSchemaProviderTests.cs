@@ -116,7 +116,7 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
         [Fact]
         public async Task ValidateSchemaName_Should_Remove_BucketPrefix_WhenIndexing_List()
         {
-            var testIndexKey = $"Int/{_s3SchemaFolderName}/test-form-name.json";
+            var testIndexKey = $"local/{_s3SchemaFolderName}/test-form-name.json";
             var expected = "test-form-name.json";
             _mockS3Gateway.Setup(_ => _.ListObjectsV2(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ListObjectsV2Response{ S3Objects = new List<S3Object>{ new S3Object { Key = testIndexKey } } });

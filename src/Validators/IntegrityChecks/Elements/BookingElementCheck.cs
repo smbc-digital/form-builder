@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using Microsoft.AspNetCore.Hosting;
@@ -25,7 +26,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
                 result.AddFailureMessage($"Booking Element Check, Booking element '{element.Properties.QuestionId}' requires a valid booking provider property.");
 
             AppointmentType appointmentTypeForEnv = element.Properties.AppointmentTypes
-                .FirstOrDefault(appointmentType => appointmentType.Environment.Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(appointmentType => appointmentType.Environment.Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
 
             if (appointmentTypeForEnv is null)
             {
