@@ -7,7 +7,7 @@ namespace form_builder_tests.UnitTests.Extensions
     public class StringExtensionsTests
     {
         [Theory]
-        [InlineData("uitest", "Int")]
+        [InlineData("uitest", "local")]
         [InlineData("local", "local")]
         [InlineData("int", "Int")]
         [InlineData("qa", "QA")]
