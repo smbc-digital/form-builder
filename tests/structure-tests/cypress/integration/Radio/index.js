@@ -1,10 +1,24 @@
 describe('Radio', () => {
-  it('snapshot test', () => {
+  it('Radio', () => {
     cy.visit('ui-radio')
-      .toMatchingDOM('govuk-form-group')
+      .toMatchingDOM('govuk-form-group', 0)
   });
-  it('snapshot conditional test', () => {
+
+  it('Radio optional', () => {
+    cy.visit('ui-radio')
+      .toMatchingDOM('govuk-form-group', 1)
+  });
+
+  it('Radio validation', () => {
+    cy.visit('ui-radio')
+    cy.get('.govuk-button').click()
+      .toMatchingDOM()
+  });
+});
+
+describe('Radio with conditional element', () => {
+  it('Radio with conditional element', () => {
     cy.visit('ui-radio-conditional')
-      .toMatchingDOM('govuk-form-group')
+      .toMatchingDOM()
   });
 });
